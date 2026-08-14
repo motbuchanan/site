@@ -76,7 +76,7 @@ var GN={
  friendly:false,
  whoBadge:function(el,name){if(el)el.textContent=name||'';},
  soloStart:function(cb){if(typeof cb==='function')cb('You');},
- matchStart:function(cb,opts){var you={name:'You'},cpu={name:'Computer'};if(typeof cb==='function')cb({a:you,b:cpu,first:you,friendly:false,vsComputer:true,bot:(opts&&opts.bot)?'medium':null});}, sync:function(){}, statsButton:function(){},
+ matchStart:function(cb,opts){var you={name:'You',color:'#d8312b',light:'#f06a60',dark:'#8d1d19'},cpu={name:'Computer',color:'#2f6fd0',light:'#6fa0ec',dark:'#194182'};if(typeof cb==='function')cb({a:you,b:cpu,first:you,friendly:false,vsComputer:true,bot:(opts&&opts.bot)?'medium':null});}, sync:function(){}, statsButton:function(){},
  players:function(){return [];},
  recordGame:function(key,rec){try{var k='gnl_'+key,a=JSON.parse(localStorage.getItem(k)||'[]');a.push(rec);if(a.length>200)a=a.slice(-200);localStorage.setItem(k,JSON.stringify(a));}catch(e){}},
  readGames:function(key){try{return JSON.parse(localStorage.getItem('gnl_'+key)||'[]');}catch(e){return [];}},
