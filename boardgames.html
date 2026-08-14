@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Board Games</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#ebedef;--soft:#b9c1ca;--teal:#4cf0e0;--orange:#f59847;--line:#2b323b}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:#0f1318;color:var(--ink);font-family:'Archivo',system-ui,sans-serif;min-height:100svh;display:flex;flex-direction:column}
+#glow{position:fixed;inset:0;z-index:-1;pointer-events:none;background:
+  conic-gradient(from 118deg at 1.3% -6.9%, transparent 0deg, rgba(254,228,196,.11) 9deg, rgba(254,228,196,.32) 26deg, rgba(254,228,196,.12) 44deg, transparent 52deg),
+  radial-gradient(46vmax 82vmax at 110% 55%, rgba(76,240,224,.1), transparent 60%),#0f1318}
+#bar{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line);
+  font:600 14px 'Archivo',sans-serif}
+#bar a{color:var(--soft);text-decoration:none}
+#bar .t{color:var(--ink)}
+.wrap{flex:1;display:flex;flex-direction:column;justify-content:center;max-width:560px;width:100%;margin:0 auto;padding:22px 18px 34px}
+.kick{font:600 11px 'JetBrains Mono',monospace;letter-spacing:.2em;text-transform:uppercase;color:var(--orange);text-align:center}
+h1{text-align:center;font-size:clamp(24px,7vw,32px);font-weight:800;margin-top:6px}
+.sub{text-align:center;color:var(--soft);font-size:13.5px;margin-top:6px}
+.games{margin-top:26px;display:flex;flex-direction:column;gap:14px}
+.g{position:relative;display:flex;align-items:center;gap:16px;border:1px solid var(--line);border-radius:16px;
+  background:linear-gradient(175deg,#161c24,#10151c);padding:18px 18px;cursor:pointer;color:inherit;font:inherit;text-align:left;
+  box-shadow:0 12px 26px rgba(0,0,0,.4)}
+.g:active{transform:scale(.985)}
+.g .pc{flex:none;width:64px;height:64px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+  font-size:38px;box-shadow:inset 0 1px 0 rgba(255,255,255,.1)}
+.g h2{font-size:19px;font-weight:800}
+.g p{color:var(--soft);font-size:12.5px;margin-top:3px;line-height:1.45}
+.g .go{margin-left:auto;color:var(--teal);font:600 12px 'JetBrains Mono',monospace;white-space:nowrap}
+.g.hero{border-color:rgba(76,240,224,.45)}
+.g.hero .pc{background:linear-gradient(170deg,#33281a,#171006);color:#f0d9a8}
+.g.alt .pc{background:linear-gradient(170deg,#3a1d14,#1c0d08);color:#f0b48a}
+.note{margin-top:18px;text-align:center;color:var(--soft);opacity:.7;font:400 11px 'JetBrains Mono',monospace}
+</style>
+</head>
+<body>
+<div id="glow"></div>
+<div id="bar"><a href="index.html">&#8962; Home</a><span class="t">Board Games</span></div>
+
+<div class="wrap">
+  <div class="kick">One board. Two games.</div>
+  <h1>Pick your battle</h1>
+  <div class="sub">Play the computer or pass the phone. Nothing leaves your device.</div>
+
+  <div class="games">
+    <button class="g hero" data-go="chess.html">
+      <span class="pc">&#9822;</span>
+      <span><h2>Chess</h2><p>Full engine with ten levels and a coach that warns you before a blunder. Level 10 has humbled good players.</p></span>
+      <span class="go">PLAY &#9654;</span>
+    </button>
+    <button class="g alt" data-go="checkers.html">
+      <span class="pc">&#9920;</span>
+      <span><h2>Checkers</h2><p>Same board, faster fight. Kings, jumps, and a bot that does not hand you pieces.</p></span>
+      <span class="go">PLAY &#9654;</span>
+    </button>
+  </div>
+
+  <div class="note">solo vs the computer &middot; or pass and play</div>
+</div>
+
+<script>
+(function(){
+document.querySelectorAll('.g[data-go]').forEach(function(b){
+  b.addEventListener('click',function(){window.location.href=b.dataset.go;});
+});
+document.addEventListener('click',function(e){
+  var a=e.target&&e.target.closest?e.target.closest('a[href="index.html"]'):null;
+  if(a){e.preventDefault();try{if(window.parent!==window){parent.history.back();return;}}catch(err){}window.location.href='index.html';}
+},true);
+})();
+</script>
+</body>
+</html>

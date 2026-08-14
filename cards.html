@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Card Games</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#ebedef;--soft:#b9c1ca;--teal:#4cf0e0;--orange:#f59847;--line:#2b323b;--felt:#12181f}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:var(--felt);color:var(--ink);font-family:'Archivo',system-ui,sans-serif;min-height:100svh;display:flex;flex-direction:column}
+#glow{position:fixed;inset:0;z-index:-1;pointer-events:none;background:
+  conic-gradient(from 118deg at 1.3% -6.9%, transparent 0deg, rgba(254,228,196,.11) 9deg, rgba(254,228,196,.3) 26deg, rgba(254,228,196,.12) 44deg, transparent 52deg),
+  radial-gradient(46vmax 82vmax at 110% 55%, rgba(76,240,224,.09), transparent 60%),var(--felt)}
+#bar{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line);font:600 14px 'Archivo',sans-serif}
+#bar a{color:var(--soft);text-decoration:none}
+#bar .t{color:var(--ink)}
+.wrap{flex:1;max-width:560px;width:100%;margin:0 auto;padding:22px 18px 34px}
+.kick{font:600 11px 'JetBrains Mono',monospace;letter-spacing:.2em;text-transform:uppercase;color:var(--orange);text-align:center}
+h1{text-align:center;font-size:clamp(24px,7vw,32px);font-weight:800;margin-top:6px}
+.sub{text-align:center;color:var(--soft);font-size:13.5px;margin-top:6px}
+.deal{margin-top:24px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.c{position:relative;border:1px solid var(--line);border-radius:14px;background:linear-gradient(175deg,#171d26,#10161d);
+  padding:15px 14px 13px;cursor:pointer;color:inherit;font:inherit;text-align:left;box-shadow:0 10px 22px rgba(0,0,0,.38)}
+.c:active{transform:scale(.98)}
+.c .suit{font-size:22px;line-height:1}
+.c h2{font-size:15.5px;font-weight:800;margin-top:8px}
+.c p{color:var(--soft);font-size:11.5px;margin-top:3px;line-height:1.4}
+.c .go{position:absolute;top:12px;right:12px;color:var(--teal);font:600 10px 'JetBrains Mono',monospace}
+.sec{margin-top:26px;font:600 11px 'JetBrains Mono',monospace;letter-spacing:.18em;text-transform:uppercase;color:var(--soft);opacity:.8;
+  display:flex;align-items:center;gap:10px}
+.sec::after{content:"";flex:1;height:1px;background:var(--line)}
+.soonwrap{margin-top:12px;display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px dashed #3a434e;border-radius:9px;padding:8px 12px;color:#8b95a1;font-size:12px;font-weight:600}
+.note{margin-top:20px;text-align:center;color:var(--soft);opacity:.7;font:400 11px 'JetBrains Mono',monospace}
+.r{color:#e0655a}.b{color:#cfd6de}
+</style>
+</head>
+<body>
+<div id="glow"></div>
+<div id="bar"><a href="index.html">&#8962; Home</a><span class="t">Card Games</span></div>
+
+<div class="wrap">
+  <div class="kick">One deck. A whole night.</div>
+  <h1>Pull up a chair</h1>
+  <div class="sub">Play the computer or pass the phone around the table.</div>
+
+  <div class="deal">
+    <button class="c" data-go="blackjack.html"><span class="suit b">&spades;</span><span class="go">PLAY &#9654;</span>
+      <h2>Blackjack</h2><p>Beat the dealer to 21. House rules, real odds.</p></button>
+    <button class="c" data-go="gin.html"><span class="suit r">&hearts;</span><span class="go">PLAY &#9654;</span>
+      <h2>Gin Rummy</h2><p>Melds, knocks, and deadwood. The thinking player's game.</p></button>
+    <button class="c" data-go="gofish.html"><span class="suit r">&diams;</span><span class="go">PLAY &#9654;</span>
+      <h2>Go Fish</h2><p>Got any threes? The bot remembers what you ask for.</p></button>
+    <button class="c" data-go="oldmaid.html"><span class="suit b">&clubs;</span><span class="go">PLAY &#9654;</span>
+      <h2>Old Maid</h2><p>Pair up and pass it on. Just don't get stuck with her.</p></button>
+    <button class="c" data-go="solitaire.html"><span class="suit b">&spades;</span><span class="go">PLAY &#9654;</span>
+      <h2>Solitaire</h2><p>Klondike. Just you against the deck.</p></button>
+    <button class="c" data-go="war.html"><span class="suit r">&hearts;</span><span class="go">PLAY &#9654;</span>
+      <h2>War</h2><p>High card takes all. Pure luck, maximum drama.</p></button>
+  </div>
+
+  <div class="sec">Dealing soon</div>
+  <div class="soonwrap">
+    <span class="chip">Poker</span><span class="chip">Texas Hold'em</span><span class="chip">Rummy</span>
+    <span class="chip">Tonk</span><span class="chip">Hearts</span><span class="chip">Spades</span><span class="chip">Euchre</span>
+  </div>
+
+  <div class="note">solo vs the computer &middot; or pass and play &middot; nothing leaves your device</div>
+</div>
+
+<script>
+(function(){
+document.querySelectorAll('.c[data-go]').forEach(function(b){
+  b.addEventListener('click',function(){window.location.href=b.dataset.go;});
+});
+document.addEventListener('click',function(e){
+  var a=e.target&&e.target.closest?e.target.closest('a[href="index.html"]'):null;
+  if(a){e.preventDefault();try{if(window.parent!==window){parent.history.back();return;}}catch(err){}window.location.href='index.html';}
+},true);
+})();
+</script>
+</body>
+</html>
