@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Build Log</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#ebedef;--soft:#b6bec8;--teal:#4cf0e0;--orange:#f59847;--line:#252c35;--card:#161c24;--sys:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,system-ui,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:#0d1117;color:var(--ink);font-family:var(--sys);min-height:100svh;display:flex;flex-direction:column}
+#glow{position:fixed;inset:0;z-index:-1;pointer-events:none;background:
+  conic-gradient(from 118deg at 1.3% -6.9%, transparent 0deg, rgba(254,228,196,.1) 9deg, rgba(254,228,196,.28) 26deg, rgba(254,228,196,.1) 44deg, transparent 52deg),
+  radial-gradient(46vmax 82vmax at 110% 55%, rgba(76,240,224,.08), transparent 60%),#0d1117}
+#bar{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line);font:600 14px 'Archivo',sans-serif}
+#bar a{color:var(--soft);text-decoration:none}
+#bar .t{color:var(--ink)}
+.wrap{flex:1;max-width:520px;width:100%;margin:0 auto;padding:26px 18px 40px}
+h1{font-family:'Archivo',sans-serif;font-weight:800;font-size:22px}
+.sub{color:var(--soft);font-size:13px;margin:6px 0 20px}
+.log{position:relative;padding-left:20px}
+.log::before{content:"";position:absolute;left:5px;top:8px;bottom:8px;width:2px;background:linear-gradient(var(--teal),rgba(76,240,224,.08))}
+.entry{position:relative;margin-bottom:16px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 15px}
+.entry::before{content:"";position:absolute;left:-19px;top:18px;width:10px;height:10px;border-radius:50%;background:var(--teal);box-shadow:0 0 8px rgba(76,240,224,.6)}
+.entry.new::before{background:var(--orange);box-shadow:0 0 8px rgba(245,152,71,.6)}
+.entry .d{font:600 10.5px 'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--orange)}
+.entry h2{font-family:'Archivo',sans-serif;font-weight:800;font-size:15.5px;margin-top:4px}
+.entry p{color:var(--soft);font-size:13px;margin-top:4px;line-height:1.5}
+.foot{margin-top:26px;text-align:center;font:400 11px 'JetBrains Mono',monospace;color:var(--soft);opacity:.65}
+</style>
+</head>
+<body>
+<div id="glow"></div>
+<div id="bar"><a href="index.html">&#8962; Home</a><span class="t">Build Log</span></div>
+
+<div class="wrap">
+  <h1>What shipped, when</h1>
+  <div class="sub">Newest first. This list only grows.</div>
+  <div class="log" id="log"></div>
+  <div class="foot">updated every time something ships</div>
+</div>
+
+<script>
+var LOG=[
+["Aug 15","Two more games","Jigsaw, cut up your own photos with custom piece shapes. And Five Letters, a daily word puzzle with streaks. Same word for everyone, new one at midnight."],
+["Aug 15","Build log","This page. Yes, shipping the build log is an entry in the build log. Very meta."],
+["Aug 15","Brighter decks","The aperture card backs got a glow pass so the logo actually reads at card size."],
+["Aug 15","33 rotating taglines","The widget greets you differently every visit and every 12 seconds. Refresh the home screen. Go ahead."],
+["Aug 15","About page","The photo, the story, a live counter that tracks how old all of this is, and a LinkedIn link."],
+["Aug 14","Brand on the cards","Every card back in every game now carries the aperture mark. The deck matches the icon."],
+["Aug 14","Chess and checkers fixed","A framework shim forgot to deal out player colors, so checker pieces rendered invisible. Found it, fixed it, tested every game after."],
+["Aug 14","Cover art","All five tiles got real art, squircle icon masks, and the liquid-glass treatment. Search pill added, it actually filters."],
+["Aug 14","Solitaire dealt in","Klondike joins the card room."],
+["Aug 14","The card room opens","Blackjack, Gin Rummy, Go Fish, Old Maid, and War. Play the computer or pass the phone."],
+["Aug 14","Board games live","Chess with a ten-level engine and a blunder coach, plus checkers on the same board."],
+["Aug 14","motbuchanan.com is live","The site becomes a phone. Brick Breaker and Star Stuff playable on day one."]
+];
+var wrap=document.getElementById('log');
+LOG.forEach(function(e,i){
+  var d=document.createElement('div');
+  d.className='entry'+(i===0?' new':'');
+  d.innerHTML='<div class="d">'+e[0]+'</div><h2>'+e[1]+'</h2><p>'+e[2]+'</p>';
+  wrap.appendChild(d);
+});
+document.addEventListener('click',function(e){
+  var a=e.target&&e.target.closest?e.target.closest('a[href="index.html"]'):null;
+  if(a){e.preventDefault();try{if(window.parent!==window){parent.history.back();return;}}catch(err){}window.location.href='index.html';}
+},true);
+</script>
+</body>
+</html>
