@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<meta name="theme-color" content="#12141a">
+<meta name="theme-color" content="#0f1420">
 <title>Five Letters</title>
 <style>
   :root{
-    --bg:#12141a; --tile:#2b2f3a; --line:#3b4150; --txt:#f2f4f8; --dim:#98a0b4;
-    --hit:#63a84f; --near:#c9a227; --miss:#3a4050; --accent:#7ecfff;
+    --bg:#0e1420; --tile:#252a38; --line:#333a4c; --txt:#f2f4f8; --dim:#98a0b4;
+    --hit:#5aa838; --near:#8a8a3a; --miss:#2a303e; --accent:#4cf0e0;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{margin:0;padding:0;height:100%;background:var(--bg);color:var(--txt);
@@ -39,7 +39,7 @@
   .cell.filled{border-color:#5a6274}
   .cell.pop{transform:scale(1.08)}
   .cell.hit{background:var(--hit);border-color:var(--hit)}
-  .cell.near{background:var(--near);border-color:var(--near);color:#221c00}
+  .cell.near{background:var(--near);border-color:var(--near);color:#fff}
   .cell.miss{background:var(--miss);border-color:var(--miss);color:#aeb6c6}
   .row.shake{animation:sh .38s}
   @keyframes sh{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}
@@ -53,7 +53,7 @@
        cursor:pointer;display:flex;align-items:center;justify-content:center}
   .key.wide{max-width:64px;font-size:11px}
   .key.hit{background:var(--hit)}
-  .key.near{background:var(--near);color:#221c00}
+  .key.near{background:var(--near);color:#fff}
   .key.miss{background:#2a2f3b;color:#6d7688}
   .key:active{transform:translateY(1px)}
 
@@ -84,10 +84,29 @@
   .btn.ghost{background:transparent;color:var(--txt);border:1px solid var(--line)}
   .legend{display:flex;align-items:center;gap:9px;margin-bottom:9px;font-size:13px;color:#cfd5e2}
   .swatch{width:26px;height:26px;border-radius:5px;flex:0 0 auto}
+
+
+/* tile flip reveal (the satisfying part) */
+.cell{transition:transform .0s}
+.cell.flip{animation:flipReveal .55s ease forwards}
+@keyframes flipReveal{
+  0%{transform:rotateX(0)}
+  45%{transform:rotateX(-90deg)}
+  55%{transform:rotateX(-90deg)}
+  100%{transform:rotateX(0)}
+}
+/* win: synchronized jump for joy */
+.cell.win{animation:winJump .5s ease}
+@keyframes winJump{
+  0%{transform:translateY(0)}
+  30%{transform:translateY(-16px)}
+  50%{transform:translateY(0)}
+  65%{transform:translateY(-6px)}
+  100%{transform:translateY(0)}
+}
 </style>
 </head>
 <body>
-
 <div id="top">
   <a href="index.html" id="gsShelfBtn" aria-label="Back home" style="pointer-events:auto;flex:0 0 auto;display:inline-flex;align-items:center;gap:5px;background:rgba(127,127,127,.18);border:1px solid rgba(127,127,127,.42);color:inherit;font:600 12px/1 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;text-decoration:none;padding:10px 12px;border-radius:999px;white-space:nowrap">&#8962; Home</a>
   <span id="wordmark">Five<span>Letters</span></span>
@@ -275,7 +294,7 @@ function scoreRow(guess,instant){
   }
   var rowEls=state.grid[state.row];
   res.forEach(function(kind,idx){
-    var apply=function(){
+    var applyColor=function(){
       rowEls[idx].classList.remove("filled");
       rowEls[idx].classList.add(kind);
       var ch=guess[idx], ke=keyEl(ch);
@@ -284,7 +303,14 @@ function scoreRow(guess,instant){
         ke.classList.remove("hit","near","miss"); ke.classList.add(kind); state.keys[ch]=kind;
       }
     };
-    if(instant)apply(); else setTimeout(apply,idx*190);
+    if(instant){applyColor();}
+    else setTimeout(function(){
+      var el=rowEls[idx];
+      el.classList.add("flip");
+      // color swaps at the flip midpoint so it "reveals" as the tile turns
+      setTimeout(applyColor,250);
+      setTimeout(function(){el.classList.remove("flip");},560);
+    }, idx*260);
   });
   return res;
 }
@@ -305,7 +331,13 @@ function submit(){
   }
   if(won||state.row>=ROWS){
     state.done=true;
-    var delay=COLS*190+260;
+    var delay=COLS*260+560;
+    if(won){
+      var winRow=state.grid[rowUsed];
+      setTimeout(function(){
+        winRow.forEach(function(el,i){ setTimeout(function(){ el.classList.add("win"); },i*90); });
+      }, COLS*260+300);
+    }
     setTimeout(function(){
       recordResult(won,rowUsed+1);
       if(won)toast(["Genius","Great","Nice","Good","Phew","Made it"][Math.min(rowUsed,5)]);
@@ -405,5 +437,7 @@ document.addEventListener('click',function(e){
   if(a){e.preventDefault();try{if(window.parent!==window){parent.history.back();return;}}catch(err){}window.location.href='index.html';}
 },true);
 </script>
+
+
 </body>
 </html>
