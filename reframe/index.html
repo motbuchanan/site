@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a0d11">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="reframe-icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Reframe">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="description" content="Rewrites expert jargon and hard framing into plain, humane words. Runs entirely on your device.">
+<title>Reframe · plain words for expert talk</title>
+<style>
+  :root{
+    --bg:#0a0d11;--panel:#12161d;--panel2:#1a212c;--line:#29313f;--ink:#ebedef;
+    --muted:#8b94a3;--accent:#4cf0e0;--accent2:#4cf0e0;--warn:#f59847;--good:#4cf0e0;
+    --danger:#e57373;--radius:14px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
+    font-family:Arial,Helvetica,sans-serif;
+    font-size:16px;line-height:1.5}
+  .wrap{max-width:660px;margin:0 auto;padding:0 14px calc(30px + env(safe-area-inset-bottom)) 14px}
+  header{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,var(--bg) 72%,transparent);
+    padding:14px 0 8px;display:flex;align-items:center;justify-content:space-between}
+  .brand{display:flex;align-items:center;gap:10px;flex:1 1 auto;min-width:0;margin-right:10px}
+  .wm{font-family:"Arial Black","Arial Bold",Arial,sans-serif;font-size:1.45rem;letter-spacing:-.4px;line-height:1}
+  .wm::after{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);margin-left:4px}
+  .sub{font-size:.72rem;color:var(--muted);margin-top:3px}
+  .packcard{background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:11px 12px;margin-bottom:8px;cursor:pointer}
+  .packcard.on{border-color:var(--accent);background:rgba(76,240,224,.08)}
+  .packcard .pn{font-family:"Arial Black","Arial Bold",Arial,sans-serif;font-size:.95rem}
+  .packcard .pw{font-size:.8rem;color:var(--muted);margin-top:2px}
+  .packcard .pc{font-size:.72rem;color:var(--accent);margin-top:3px}
+  .packcard .prow{display:flex;gap:6px;margin-top:8px}
+  .detect{display:flex;align-items:center;gap:8px;background:rgba(76,240,224,.08);border:1px solid var(--accent);border-radius:11px;padding:9px 11px;margin-bottom:10px;font-size:.84rem}
+  .detect span{flex:1;min-width:0}
+  .pe-in{width:100%;background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:9px;padding:9px 10px;font-size:.9rem;font-family:inherit}
+  .pe-in:focus{outline:none;border-color:var(--accent)}
+  .pe-row{display:flex;gap:8px;align-items:center;font-size:.83rem;padding:6px 0;border-bottom:1px solid var(--line)}
+  .pe-row .t{font-weight:700}.pe-row .a{color:var(--muted)}.pe-row .p{flex:1;min-width:0;overflow-wrap:anywhere}
+  .badge{font-size:.68rem;color:var(--muted);background:var(--panel);border:1px solid var(--line);
+    padding:5px 9px;border-radius:20px;cursor:pointer}
+  .note{background:rgba(76,240,224,.08);border:1px solid rgba(76,240,224,.32);color:#4cf0e0;font-size:.76rem;
+    padding:9px 11px;border-radius:10px;margin:6px 0 12px;display:flex;gap:8px;align-items:flex-start}
+  .note svg{flex:0 0 auto;width:15px;height:15px;margin-top:2px}
+  .tabs{display:flex;gap:6px;background:var(--panel);border:1px solid var(--line);
+    border-radius:12px;padding:5px;margin-bottom:14px}
+  .tab{flex:1;text-align:center;padding:9px 0;border-radius:8px;font-size:.9rem;font-weight:600;
+    color:var(--muted);cursor:pointer;user-select:none}
+  .tab.on{background:var(--panel2);color:var(--ink)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:14px;margin-bottom:12px}
+  label.lbl{display:block;font-size:.78rem;color:var(--muted);margin-bottom:6px;font-weight:600}
+  textarea{width:100%;min-height:130px;resize:vertical;background:var(--panel2);color:var(--ink);
+    border:1px solid var(--line);border-radius:11px;padding:12px;font-size:1rem;line-height:1.55;
+    font-family:inherit}
+  textarea:focus{outline:none;border-color:var(--accent)}
+  .meterbar{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
+  .chip{font-size:.74rem;font-weight:700;padding:6px 10px;border-radius:20px;border:1px solid var(--line);
+    background:var(--panel2);color:var(--muted);display:inline-flex;gap:6px;align-items:center}
+  .chip .lv{font-weight:800}
+  .chip.g{color:var(--good);border-color:rgba(76,240,224,.32);background:rgba(76,240,224,.08)}
+  .chip.a{color:var(--warn);border-color:rgba(245,152,71,.35);background:rgba(245,152,71,.08)}
+  .chip.r{color:var(--danger);border-color:rgba(229,115,115,.35);background:rgba(229,115,115,.08)}
+  .chip.tap{cursor:pointer}
+  .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  button{font-family:inherit;font-size:.9rem;font-weight:600;border:none;border-radius:11px;
+    padding:11px 13px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;justify-content:center}
+  button svg{width:15px;height:15px}
+  .btn-primary{background:var(--accent);color:#04251f;flex:1;min-width:140px}
+  .btn-ghost{background:var(--panel2);color:var(--ink);border:1px solid var(--line)}
+  .btn-mini{background:var(--accent);color:#04251f;padding:6px 10px;font-size:.76rem;border-radius:8px}
+  .btn-mini.sec{background:var(--panel2);color:var(--ink);border:1px solid var(--line)}
+  button:disabled{opacity:.45;cursor:default}
+  .seg-title{font-size:.78rem;color:var(--muted);font-weight:700;letter-spacing:.4px;
+    text-transform:uppercase;margin:2px 0 8px}
+  .issue{display:flex;gap:9px;align-items:flex-start;padding:9px 10px;border-radius:10px;margin-bottom:7px;
+    font-size:.85rem;border:1px solid var(--line);background:var(--panel2)}
+  .issue .dot{width:9px;height:9px;border-radius:50%;margin-top:5px;flex:0 0 auto}
+  .issue.jargon{background:rgba(76,240,224,.08);border-color:rgba(76,240,224,.32)}.issue.jargon .dot{background:var(--good)}
+  .issue.frame{background:rgba(229,115,115,.08);border-color:rgba(229,115,115,.35)}.issue.frame .dot{background:var(--danger)}
+  .issue.struct{background:rgba(245,152,71,.08);border-color:rgba(245,152,71,.35)}.issue.struct .dot{background:var(--warn)}
+  .issue .body{flex:1;min-width:0}
+  .issue .term{font-weight:700;overflow-wrap:anywhere}
+  .issue .arrow{color:var(--muted)}
+  .issue .swap{color:var(--accent);font-weight:700}
+  .issue .why{color:var(--muted);font-size:.8rem;margin-top:2px}
+  .issue .fix{font-size:.8rem;margin-top:5px;padding:6px 8px;border-radius:7px;
+    background:rgba(0,0,0,.25);border:1px dashed var(--line)}
+  .issue .fix b{color:var(--accent);font-weight:800;letter-spacing:.3px}
+  .issue .act{margin-left:8px;flex:0 0 auto}
+  .empty{font-size:.85rem;color:var(--muted);padding:6px 2px}
+  .log{font-size:.8rem;color:var(--muted);margin-top:8px}
+  .log b{color:var(--good)}
+  .rule{border-bottom:1px solid var(--line);padding:11px 0}
+  .rule:last-child{border-bottom:none}
+  .rule .h{font-weight:700;font-size:.95rem;margin-bottom:3px}
+  .rule .d{font-size:.85rem;color:var(--muted)}
+  .ba{margin-top:8px;display:grid;gap:6px}
+  .ba .b4{font-size:.83rem;background:rgba(229,115,115,.08);border:1px solid rgba(229,115,115,.35);border-radius:8px;padding:7px 9px}
+  .ba .af{font-size:.83rem;background:rgba(76,240,224,.08);border:1px solid rgba(76,240,224,.32);border-radius:8px;padding:7px 9px}
+  .ba .tag{font-size:.66rem;font-weight:800;letter-spacing:.5px;display:block;margin-bottom:2px}
+  .ba .b4 .tag{color:var(--danger)}.ba .af .tag{color:var(--good)}
+  .pb-cat{font-weight:700;font-size:.95rem;margin:14px 0 6px}
+  .pb{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 72px 10px 11px;
+    margin-bottom:7px;font-size:.86rem;line-height:1.5;position:relative}
+  .pb .cp{position:absolute;top:8px;right:8px}
+  .spot{position:fixed;border-radius:12px;box-shadow:0 0 0 9999px rgba(0,0,0,.74);
+    pointer-events:none;transition:all .28s ease;z-index:60}
+  .tourcard{position:fixed;left:12px;right:12px;bottom:calc(14px + env(safe-area-inset-bottom));
+    z-index:61;background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    padding:14px;max-width:636px;margin:0 auto}
+  .tourcard .tt{font-family:"Arial Black","Arial Bold",Arial,sans-serif;font-size:.95rem;margin-bottom:4px}
+  .tourcard .td{font-size:.88rem;color:var(--muted);line-height:1.5}
+  .tourcard .tr{display:flex;gap:8px;align-items:center;margin-top:12px}
+  .tourcard .dots{flex:1;font-size:.75rem;color:var(--muted);letter-spacing:2px}
+  .tourcard .dots b{color:var(--accent)}
+  .welcome{position:fixed;inset:0;background:rgba(0,0,0,.74);z-index:62;display:flex;
+    align-items:center;justify-content:center;padding:20px}
+  .welcome .wc{background:var(--panel);border:1px solid var(--line);border-radius:16px;
+    padding:20px;max-width:420px;width:100%}
+  .welcome .wt{font-family:"Arial Black","Arial Bold",Arial,sans-serif;font-size:1.05rem;margin-bottom:6px}
+  .welcome .wd{font-size:.9rem;color:var(--muted);line-height:1.55;margin-bottom:14px}
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);
+    background:#000;border:1px solid var(--line);color:var(--ink);padding:10px 16px;border-radius:24px;
+    font-size:.85rem;opacity:0;pointer-events:none;transition:.25s;z-index:50;max-width:88vw;text-align:center}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .seg-title,.rule .h,.pb-cat,.tab{font-family:"Arial Black","Arial Bold",Arial,sans-serif}
+  .hide{display:none!important}
+  .foot{font-size:.72rem;color:var(--muted);text-align:center;margin-top:14px;line-height:1.6}
+  /* a11y */
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+  [role="button"]{cursor:pointer}
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;scroll-behavior:auto !important}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand"><div>
+<div class="wm">Reframe</div>
+<div class="sub" id="wholine">plain words for expert talk</div>
+</div></div>
+    <div style="display:flex;gap:6px;align-items:center;flex:0 0 auto"><div class="badge" id="help" title="How to use this">?</div><div class="badge" id="packbtn">Medical</div><div class="badge" id="badge">v1.6</div></div>
+  </header>
+
+  <div class="note">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#4cf0e0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+    <span>Runs entirely on this device. No internet, no accounts, nothing sent anywhere. Safe to work with real wording.</span>
+  </div>
+
+  <div class="tabs" id="tabsbar">
+    <div class="tab on" id="t-edit">Editor</div>
+    <div class="tab" id="t-pb">Phrasebank</div>
+    <div class="tab" id="t-guide">Guide</div>
+  </div>
+
+  <!-- EDITOR -->
+  <section id="pane-edit">
+    <div id="detect" class="detect hide"><span id="detect-t"></span><button class="btn-mini" id="detect-go">switch</button><button class="btn-mini sec" id="detect-x">&times;</button></div>
+    <div class="card">
+      <label class="lbl" for="inp">Type or paste what you plan to say</label>
+      <textarea id="inp"></textarea>
+      <div class="meterbar" id="meterbar">
+        <span class="chip" id="grade"><span>Reading level</span><span class="lv" id="grade-v">&ndash;</span></span>
+        <span class="chip tap" id="count" title="Jump to review"><span class="lv" id="count-v">0</span><span id="count-w">issues</span></span>
+      </div>
+      <div class="row">
+        <button class="btn-primary" id="clean">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#04251f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+          Swap the plain terms
+        </button>
+        <button class="btn-ghost" id="undo" disabled>Undo</button>
+        <button class="btn-ghost" id="copy">Copy</button>
+      </div>
+      <div class="row">
+        <button class="btn-ghost" id="ex" style="flex:1">Try an example</button>
+        <button class="btn-ghost" id="clr" style="flex:1">Clear</button>
+      </div>
+      <div class="log hide" id="log"></div>
+    </div>
+
+    <div class="card" id="reviewcard">
+      <div class="seg-title">Review</div>
+      <div id="issues"><div class="empty">Start typing and suggestions appear here as you go. New here? Tap the <b>?</b> up top for a 30-second tour.</div></div>
+    </div>
+  </section>
+
+  <!-- PHRASEBANK -->
+  <section id="pane-pb" class="hide">
+    <div class="card" style="padding-top:12px">
+      <div style="font-size:.85rem;color:var(--muted);margin-bottom:2px">
+        Ready-to-copy plain lines for the conversations this field has every week. Tap to copy, then make it fit the person in front of you.
+      </div>
+      <div id="pbwrap"></div>
+    </div>
+  </section>
+
+  <!-- GUIDE -->
+  <section id="pane-guide" class="hide">
+    <div class="card">
+      <div style="font-weight:700;margin-bottom:2px">Talk to a smart, anxious listener</div>
+      <div style="font-size:.85rem;color:var(--muted);margin-bottom:6px">The seven habits behind every suggestion.</div>
+      <div class="rule"><div class="h">1. Short and plain</div><div class="d">Short sentences. Plain English even for complex ideas. If it needs a second read, cut it.</div></div>
+      <div class="rule"><div class="h">2. "You" for their action, plain names for the rest</div><div class="d">"You" for what they will do. Name who does everything else. Never "the patient", "the user", "the client".</div></div>
+      <div class="rule"><div class="h">3. No blame framing</div><div class="d">Attach the problem to the situation and the goal, not the person. Not "your son's deformity." Not "user error."</div></div>
+      <div class="rule"><div class="h">4. De-jargon by default</div><div class="d">Lead with the plain meaning. The technical term is optional and never the opener.</div></div>
+      <div class="rule"><div class="h">5. Honest, pointed at the next step</div><div class="d">Every outcome truthful and forward-facing. Never sugarcoat, never fatalistic.</div></div>
+      <div class="rule"><div class="h">6. End on an action</div><div class="d">Answer "what do I do now": next visit, what to watch for, who to call.</div></div>
+      <div class="rule"><div class="h">7. Center the person, not the problem</div><div class="d">Lead with the person and what becomes possible, not what is wrong.</div></div>
+    </div>
+    <div class="card">
+      <div style="font-weight:700;margin-bottom:8px">Before &rarr; after</div>
+      <div id="bawrap"></div>
+    </div>
+  </section>
+
+  <div class="foot">Reframe v1.6 &middot; runs entirely on this device &middot; suggestions only. You stay the author.<br>
+  Spotted a bad suggestion? <a id="reportlink" href="mailto:motbuchanan@gmail.com?subject=Reframe%20suggestion%20report" style="color:var(--accent)">Report it</a> and make the tool better.</div>
+</div>
+
+<div class="welcome hide" id="welcome">
+  <div class="wc">
+    <div class="wt">First time here?</div>
+    <div id="wpacks" style="margin-bottom:12px"></div>
+    <div class="wd">Reframe checks what you plan to say to someone outside your field and suggests plainer, kinder wording. Pick your field, then a 30-second tour shows exactly how it works.</div>
+    <div class="row" style="margin-top:0">
+      <button class="btn-primary" id="w-go">Show me</button>
+      <button class="btn-ghost" id="w-skip">Skip for now</button>
+    </div>
+  </div>
+</div>
+<div class="welcome hide" id="packsheet">
+  <div class="wc">
+    <div class="wt">Pick your field</div>
+    <div class="wd">Each pack loads its own jargon dictionary, phrase lines, and examples. Your text stays put when you switch.</div>
+    <div id="packlist"></div>
+    <div class="row" style="margin-top:10px">
+      <button class="btn-ghost" id="pk-import" style="flex:1">Import pack</button>
+      <button class="btn-ghost" id="pk-new" style="flex:1">New pack</button>
+    </div>
+    <input type="file" id="pk-file" accept=".json,application/json" class="hide">
+    <div class="row" style="margin-top:8px"><button class="btn-ghost" id="pk-close" style="flex:1">Close</button></div>
+  </div>
+</div>
+<div class="welcome hide" id="packedit">
+  <div class="wc" style="max-height:86vh;overflow:auto">
+    <div class="wt" id="pe-title">New pack</div>
+    <label class="lbl" for="pe-name">Pack name</label>
+    <input type="text" id="pe-name" class="pe-in" placeholder="e.g. Auto Repair">
+    <label class="lbl" for="pe-who" style="margin-top:8px">Who is it for?</label>
+    <input type="text" id="pe-who" class="pe-in" placeholder="e.g. For mechanics talking with drivers">
+    <div class="seg-title" style="margin-top:12px">Terms</div>
+    <div id="pe-list"></div>
+    <div class="row" style="margin-top:6px">
+      <input type="text" id="pe-term" class="pe-in" placeholder="jargon term" style="flex:1;min-width:100px">
+      <input type="text" id="pe-plain" class="pe-in" placeholder="plain version" style="flex:1;min-width:100px">
+    </div>
+    <div class="row" style="margin-top:6px;align-items:center">
+      <label style="font-size:.8rem;color:var(--muted);display:flex;align-items:center;gap:6px;flex:1"><input type="checkbox" id="pe-auto"> safe for one-tap swap</label>
+      <button class="btn-mini" id="pe-add">Add term</button>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <button class="btn-primary" id="pe-save">Save pack</button>
+      <button class="btn-ghost" id="pe-close">Cancel</button>
+    </div>
+  </div>
+</div>
+<div class="spot hide" id="spot"></div>
+<div class="tourcard hide" id="tourcard">
+  <div class="tt" id="tour-t"></div>
+  <div class="td" id="tour-d"></div>
+  <div class="tr">
+    <button class="btn-ghost" id="tour-back" style="padding:8px 12px">Back</button>
+    <span class="dots" id="tour-dots"></span>
+    <button class="btn-ghost" id="tour-skip" style="padding:8px 12px">Skip</button>
+    <button class="btn-primary" id="tour-next" style="flex:0 1 auto;min-width:90px;padding:8px 16px">Next</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ data ============ */
+/* [term, plain, auto] - auto:true swapped by the button; auto:false suggest-only
+   because the right plain word depends on context. */
+var MED_GLOSSARY=[
+  /* direction & anatomy */
+  ["bilateral","both sides",true],["unilateral","one side",true],
+  ["contralateral","the other side",true],["ipsilateral","the same side",true],
+  ["proximal","closer to the body",true],["distal","toward the end",true],
+  ["anterior","front",false],["posterior","back",false],["dorsal","the top side",false],
+  ["medial","inner",true],["lateral","outer",true],["plantar","bottom of the foot",true],
+  ["tibial","shin",true],["femoral","thigh",true],["calcaneus","heel bone",true],
+  ["talus","ankle bone",true],["navicular","a bone in the arch",true],
+  ["metatarsal","the bones behind the toes",true],["musculoskeletal","muscles and bones",true],
+  /* motion */
+  ["dorsiflexion","lifting the foot up",true],["dorsiflex","lift the foot up",true],
+  ["plantarflexion","pointing the foot down",true],["flexion","bending",true],
+  ["extension","straightening",false],["hyperextension","bending too far back",true],
+  ["pronation","rolling inward",true],["supination","rolling outward",true],
+  ["inversion","turning inward",false],["eversion","turning outward",true],
+  ["abduction","moving away from the middle",true],["adduction","moving toward the middle",true],
+  ["range of motion","how far the joint moves",true],["ROM","how far the joint moves",true],
+  ["proprioception","the sense of where the limb is",true],
+  /* foot & leg presentations */
+  ["equinus","a tight heel cord",true],["equinovarus","the foot turning down and inward",true],
+  ["pes planus","flat foot",true],["planovalgus","a flat foot that rolls inward",true],
+  ["pes cavus","a high-arched foot",true],["valgus","angled outward",true],
+  ["varus","angled inward",true],["genu valgum","knock knees",true],
+  ["genu varum","bowed legs",true],["metatarsus adductus","the front of the foot curving inward",true],
+  ["hallux valgus","a bunion",true],["femoral anteversion","the thigh bone turning inward",true],
+  ["tibial torsion","a twist in the shin bone",true],
+  ["leg length discrepancy","one leg longer than the other",true],
+  ["crouch gait","walking with bent knees",true],
+  ["gait deviation","a change in how they walk",true],["gait analysis","watching and measuring how they walk",true],
+  ["gait training","practicing walking",true],["gait","the way they walk",true],
+  /* spine & head shape */
+  ["scoliosis","a sideways curve in the spine",false],["kyphosis","rounding of the upper back",true],
+  ["lordosis","inward curve of the lower back",true],
+  ["plagiocephaly","a flat spot on the head",true],["brachycephaly","flattening across the back of the head",true],
+  ["scaphocephaly","a long, narrow head shape",true],
+  ["cranial remolding orthosis","helmet",true],
+  ["torticollis","tight neck muscles that tilt the head",true],
+  /* devices & acronyms */
+  ["orthosis","brace",true],["orthoses","braces",true],["orthotic","brace",false],
+  ["orthotics","braces or inserts",false],
+  ["AFO","ankle-foot brace",true],["KAFO","leg brace",true],["HKAFO","hip-and-leg brace",true],
+  ["RGO","hip-and-leg walking brace",true],["SMO","short ankle brace",true],
+  ["UCBL","deep foot insert",true],["FO","shoe insert",false],
+  ["TLSO","back brace",true],["LSO","lower-back brace",true],["CTO","neck-and-upper-back brace",true],
+  ["posterior leaf spring","a flexible brace that helps lift the foot",true],
+  ["articulated","hinged",true],
+  ["prosthesis","artificial limb",true],["prosthetic","artificial limb",false],
+  ["myoelectric","powered by muscle signals",true],
+  ["terminal device","the hand or hook at the end",true],
+  ["pylon","the support tube",true],["componentry","the parts",true],
+  ["check socket","test socket",true],["diagnostic socket","test socket",true],
+  ["suspension sleeve","the sleeve that holds the limb on",true],
+  ["suspension","how the limb stays on",false],
+  ["cosmesis","how natural it looks",true],
+  ["osseointegration","an implant anchored in the bone",true],
+  /* limb & amputation */
+  ["transtibial","below the knee",true],["transfemoral","above the knee",true],
+  ["transradial","below the elbow",true],["transhumeral","above the elbow",true],
+  ["disarticulation","through the joint",true],
+  ["residual limb","the remaining part of the limb",true],["residuum","the remaining limb",true],
+  ["shrinker","a snug sock that shapes the limb",true],
+  ["pistoning","the limb sliding up and down in the socket",true],
+  ["volume fluctuation","changes in limb size during the day",true],
+  ["neuroma","a sensitive nerve spot",true],
+  ["desensitization","getting the skin used to touch",true],
+  /* skin & wound */
+  ["pressure ulcer","pressure sore",true],["decubitus","pressure sore",true],
+  ["erythema","redness",true],["edema","swelling",true],["callus","thickened skin",true],
+  ["maceration","skin soft and pale from moisture",true],
+  ["lesion","a spot on the skin",false],["debridement","cleaning away damaged tissue",true],
+  ["granulation","healing tissue",true],["necrosis","tissue that is not getting blood",false],
+  /* tone & neuro */
+  ["contracture","tightness that keeps a joint from straightening",true],
+  ["hypertonia","tight, stiff muscles",true],["hypotonia","low muscle tone",true],
+  ["spasticity","muscle tightness",true],["clonus","rhythmic muscle jerks",true],
+  ["hemiplegia","weakness on one side",true],["diplegia","mainly affecting both legs",true],
+  ["neuromuscular","affecting nerves and muscles",true],
+  ["subluxation","the joint slipping partly out of place",true],
+  /* clinical process */
+  ["serial casting","a series of casts over a few weeks",true],
+  ["osteotomy","cutting and repositioning bone",true],["arthrodesis","fusing the joint",true],
+  ["tenotomy","releasing a tight tendon",true],
+  ["ambulate","walk",true],["ambulation","walking",true],["ambulatory","able to walk",true],
+  ["non-ambulatory","not walking yet",true],
+  ["NWB","no weight on it",true],["PWB","some weight on it",true],
+  ["WBAT","as much weight as feels okay",true],
+  ["ADLs","everyday activities",true],["PT","physical therapy",false],["OT","occupational therapy",false],
+  ["physiatrist","rehab doctor",true],["orthotist","brace specialist",true],
+  ["prosthetist","artificial-limb specialist",true],["CPO","brace and limb specialist",false],
+  ["accommodate","make room for",false],["offload","take pressure off",true],
+  ["doff","take off",true],["fabricate","make",true],["fabrication","making the device",true],
+  ["impression","mold",false],["modification","adjustment",true],["alignment","how it lines up",true],
+  ["trimline","the edge of the brace",true],
+  ["prophylactic","preventive",true],["indicated","a good fit",false],
+  ["contraindicated","not recommended here",true],["follow-up","next visit",false],
+  ["etiology","the cause",true],["congenital","from birth",true],["acquired","happened after birth",false],
+  ["idiopathic","without a known cause",true],["atrophy","muscle shrinking",true],
+  /* insurance & paperwork */
+  ["DME","medical equipment",true],["K-level","activity level rating",true],
+  ["L-code","insurance billing code",true],["prior authorization","insurance approval",true],
+  ["assistive device","walking aid",false]
+];
+
+/* framing / tone patterns shared by every field */
+var GLOBAL_FRAMES=[
+  {re:/\byou\s+(need to|have to|must|gotta|got to)\b/i,
+   why:"Command framing. Orders raise defenses; a shared plan does not.",
+   fix:function(m,text){
+     var mm=text.match(/\byou\s+(?:need to|have to|must|gotta|got to)\s+([a-z][^,.;!?]{2,70})/i);
+     if(mm){return "Try: \u201cThe next step is to "+mm[1].trim()+", and here is what it does.\u201d";}
+     return "Try: \u201cThe next step is\u2026, and here is what it does.\u201d";}},
+  {re:/\b(right away|immediately|as soon as possible|asap)\b/i,
+   why:"Urgency without a reason reads as panic. Give the reason and a real timeframe.",
+   fix:function(){return "Try: \u201cwithin a day or two, so we can catch it before it causes damage.\u201d";}},
+  {re:/\byou should('| ha)ve\b/i,
+   why:"Hindsight blame. It changes nothing and costs trust.",
+   fix:function(){return "Move to now: \u201chere is where we are, and here is what we can still do.\u201d";}},
+  {re:/\b(failed to|refuses? to|refused to|unable to tolerate)\b/i,
+   why:"Sounds like fault.",
+   fix:function(){return "State what happened plainly and what you will try next.";}},
+  {re:/\b(obviously|clearly|as you (already )?know)\b/i,
+   why:"Lands as condescension on someone still learning this.",
+   fix:function(){return "Cut the word. If it were obvious to them, you would not need to say it.";}},
+  {re:/\b(it'?s|it is|this is) complicated\b/i,
+   why:"A dead end for the listener.",
+   fix:function(){return "Give the one-sentence version first, then offer the detail: \u201cshort version: X. Want the long one?\u201d";}},
+  {re:/\bonly works?\b/i,
+   why:"Fatalistic. Point at what starting now makes possible instead of what closes.",
+   fix:function(){return "Try: \u201cthere is a window right now, which is why starting today works so well.\u201d";}},
+  {re:/\b(no (other )?(choice|option)|will never|can'?t be)\b/i,
+   why:"Absolute framing.",
+   fix:function(){return "Offer the realistic path and the next step, not a closed door.";}},
+  {re:/\bif you don'?t\b/i,
+   why:"Threat framing. Lead with the benefit of doing it, not the penalty for not.",
+   fix:function(){return "Try: \u201cdoing this each night is what keeps the progress we worked for.\u201d";}}
+];
+var MED_FRAMES=[
+  {re:/\b(your\s+(son'?s|daughter'?s|child'?s|kid'?s)|the\s+patient'?s)\s+(deformity|defect|disability|abnormality|condition|problem|disease)/i,
+   why:"Blame framing. Attach the issue to the device and the goal, not the child.",
+   fix:function(){return "Name the device and the goal: \u201cThe brace guides how the foot grows, so we stay ahead of changes.\u201d";}},
+  {re:/\bnon-?complian(t|ce)\b/i,
+   why:"\u201cNoncompliant\u201d blames the family.",
+   fix:function(){return "Describe what is happening: \u201cthe brace is being worn about half the time - what would make nights easier?\u201d";}},
+  {re:/\bpoor(ly)?\s+complian/i,
+   why:"Reframe without blame.",
+   fix:function(){return "Say how often it is worn and what would help, not a compliance grade.";}},
+  {re:/\bsuffer(s|ed|ing)?\s+from\b/i,
+   why:"\u201cSuffers from\u201d defines the person by the condition.",
+   fix:function(){return "Use \u201chas\u201d or \u201clives with\u201d - same fact, no pity framing.";}},
+  {re:/\b(wheelchair[-\s]?bound|confined to a wheelchair)\b/i,
+   why:"A wheelchair is mobility, not confinement.",
+   fix:function(){return "Say \u201cuses a wheelchair.\u201d";}},
+  {re:/\b(handicapped|crippled?)\b/i,
+   why:"Outdated and hurtful to many families.",
+   fix:function(){return "Name the specific thing: \u201cwalks with a brace,\u201d \u201chas limited motion in the ankle.\u201d";}},
+  {re:/\bnormal\s+(kids?|children|foot|feet|leg|legs|gait|development)\b/i,
+   why:"Comparing to \u201cnormal\u201d tells a parent their child is abnormal.",
+   fix:function(){return "Use \u201ctypical\u201d for the comparison, and lead with what their child WILL do.";}},
+  {re:/\bthe patient\b/i,
+   why:"If you are talking TO them, \u201cthe patient\u201d puts distance in the room.",
+   fix:function(){return "Use \u201cyou\u201d for the parent's actions and the child's name for everything else.";}},
+  {re:/\b(deformity|deformities|defect|abnormal(ity|ities)?)\b/i,
+   why:"Loaded word for a parent.",
+   fix:function(){return "Describe the shape or position instead: \u201cthe foot turns inward more than we want.\u201d";}}
+];
+
+/* buried-verb nominalizations */
+var NOMINAL={"administration":"give","utilization":"use","immobilization":"hold still",
+  "stabilization":"steady","evaluation":"check","examination":"look at","presentation":"shows",
+  "indication":"reason","progression":"getting worse","intervention":"treatment",
+  "recommendation":"suggest","application":"put on","initiation":"start"};
+var IRREG=["written","made","given","taken","seen","done","fitted","cast","worn","built",
+  "shown","found","kept","held","set","put","left","sent","brought","cut","fit"];
+
+/* phrasebank */
+var MED_PB=[
+  ["First brace (AFO)",[
+    "This brace helps the foot sit flat and line up better, so walking feels steadier.",
+    "We will take a mold today so the brace fits only your child. Nothing about it hurts.",
+    "Wear it over a thin sock. We start a few hours a day and build up. I will show you the schedule.",
+    "Check the skin when it comes off. A little pink that fades in a few minutes is fine. Redness that stays is my cue to adjust it, so call us."]],
+  ["Cranial helmet",[
+    "The helmet gently guides the head back toward a rounder shape while it is still growing quickly.",
+    "It does not squeeze. It leaves room where the head should fill in and rests where it should not.",
+    "It works best worn most of the day and night. We check the fit every couple of weeks and adjust as the head grows.",
+    "Most families see the change over a few months. We will track it together at each visit."]],
+  ["First prosthesis",[
+    "This first limb is about getting comfortable and confident, not perfect right away.",
+    "The socket is molded to fit only your child. We expect small tweaks as they grow and get stronger.",
+    "We start with short sessions and build up. Soreness that settles is normal. Skin that stays red is worth a call.",
+    "The next visit is to check the fit and see how they are moving. Bring anything that felt off."]],
+  ["Serial casting",[
+    "Each cast gently holds the correction, and every week or two we swap it for the next small step.",
+    "The casts do the work slowly on purpose. Slow and gentle is what makes it stick.",
+    "Between casts we check the skin and the progress. If a cast gets wet or slips, call us the same day.",
+    "By the end, most kids move into a brace that holds what the casts achieved."]],
+  ["Cast / device care at home",[
+    "Keep it dry. If it gets wet or a strap frays, call us before it rubs a sore.",
+    "Watch for skin that stays red, or complaints of a hot spot. That means it needs a small adjustment.",
+    "Do not pad or re-strap it yourself. A quick visit is safer than a fix at home.",
+    "Call us with anything that seems off. Catching it early is easy. Waiting is what causes problems."]],
+  ["Explaining next steps",[
+    "Here is what happens next, and here is what to watch for at home.",
+    "Your job is the wearing schedule and the skin checks. Mine is the fit. We do this as a team.",
+    "Write down anything that felt strange this week and bring it. There are no small questions.",
+    "If anything worries you before the next visit, call. That is exactly what we are here for."]]
+];
+
+
+/* ============ IT pack ============ */
+var IT_GLOSSARY=[
+  ["latency","delay",true],["bandwidth","how much data can move at once",true],
+  ["throughput","how much actually gets through",true],
+  ["DNS propagation","the address update spreading across the internet",true],
+  ["DNS","the internet's address book",true],
+  ["IP address","the device's network address",true],
+  ["router","the box that shares your internet",true],["modem","the box that brings the internet in",false],
+  ["cache","saved copies kept for speed",false],["cached","saved for speed",true],
+  ["cookies","small files sites use to remember you",false],
+  ["reboot","restart",true],["power cycle","unplug it, wait, plug it back in",true],
+  ["reimage","wipe it and reinstall everything fresh",true],["reformat","erase the drive completely",true],
+  ["sync","keep the same copy everywhere",false],["synchronization","keeping copies matched",true],
+  ["provision","set up",true],["deprecated","being phased out",true],["end of life","no longer supported",true],
+  ["patch","a small fix",false],["hotfix","an urgent small fix",true],["rollback","undoing the update",true],
+  ["migration","moving everything to the new system",true],["migrate","move over",false],
+  ["authentication","proving it is really you",true],["authenticate","prove it is really you",true],
+  ["credentials","username and password",true],
+  ["two-factor authentication","a second check besides your password",true],
+  ["2FA","a second check besides your password",true],["MFA","extra sign-in checks",true],
+  ["phishing","a fake message built to steal your login",true],
+  ["malware","harmful software",true],["ransomware","software that locks your files for money",true],
+  ["firewall","the filter that blocks unwanted traffic",true],
+  ["VPN","a private tunnel for your connection",true],
+  ["encryption","scrambling data so only the right person can read it",true],
+  ["encrypted","scrambled so only the right person can read it",true],
+  ["SSL certificate","the site's proof of identity",true],
+  ["server","the computer that runs the service",false],
+  ["the cloud","computers you rent over the internet",false],
+  ["backend","the behind-the-scenes part",true],["frontend","the part you see and click",true],
+  ["UI","the screens and buttons",true],["UX","how it feels to use",true],
+  ["API","the connection that lets programs talk to each other",true],
+  ["integration","the connection between the systems",false],
+  ["configuration","settings",true],["configure","set up",false],
+  ["corrupted","damaged and unreadable",true],
+  ["driver","the software that runs a device",false],
+  ["peripheral","anything you plug in",true],
+  ["ethernet","a wired connection",true],["SSID","the network's name",true],
+  ["operating system","the software that runs the whole device",false],["OS","the operating system",false],
+  ["URL","the web address",true],["domain","the site's name",false],
+  ["repository","where the code lives",true],["repo","where the code lives",true],
+  ["deployment","putting the new version live",true],["deploy","put the new version live",true],
+  ["downtime","time the system is unavailable",true],["uptime","time the system stays running",true],
+  ["redundancy","a backup ready to take over",true],["failover","switching to the backup automatically",true],
+  ["compatibility","whether they work together",true],
+  ["legacy system","the old system still in use",true],["legacy","old but still in use",false]
+];
+var IT_FRAMES=[
+  {re:/\buser error\b/i,
+   why:"\u201cUser error\u201d grades the person instead of fixing the path.",
+   fix:function(){return "Describe what happened and the guardrail: \u201cthat button made this easy to hit - I will move it.\u201d";}},
+  {re:/\byou (must have|probably|obviously) (clicked|deleted|changed|moved|broke|broken|installed)\b/i,
+   why:"Guessing fault puts them on defense.",
+   fix:function(){return "Describe the state, not the suspect: \u201cthe file got moved - here is how we get it back.\u201d";}},
+  {re:/\bjust (click|tap|reboot|restart|reinstall|update|reset|clear|open|go to)\b/i,
+   why:"\u201cJust\u201d makes a hard step sound trivial and the listener feel slow.",
+   fix:function(){return "Drop \u201cjust\u201d and walk the step: \u201cnext we restart it - I will stay on while it comes back.\u201d";}},
+  {re:/\bthe user\b/i,
+   why:"If you are talking TO them, \u201cthe user\u201d puts distance in the room.",
+   fix:function(){return "Use \u201cyou.\u201d";}},
+  {re:/\b(rtfm|read the (manual|docs|documentation))\b/i,
+   why:"Reads as a brush-off.",
+   fix:function(){return "Give the one step they need now, then point to where the rest lives.";}}
+];
+var IT_PB=[
+  ["When something is down",[
+    "Part of the system is down and we are on it. Email still works; the shared drive does not.",
+    "Here is what happened in one line: an update to the login system failed, and we are rolling it back.",
+    "You do not need to do anything. I will message you the moment it is back.",
+    "It should be back within the hour. If it runs longer, I will update you at three rather than leave you guessing."]],
+  ["Fixing someone's device",[
+    "Nothing you did caused this. This one breaks on its own, and it picked today.",
+    "I am going to restart it twice and change one setting. Your files are not touched by any of it.",
+    "It is fixed. Here is the one-line version of what was wrong, in case it ever happens again.",
+    "If it acts up again, note what you were doing and the time. That is the clue that cracks it."]],
+  ["Passwords and security",[
+    "That message was built to fool people, and it fools plenty. Deleting it was exactly right.",
+    "We are adding a second sign-in check. Thirty extra seconds that blocks the most common break-in.",
+    "Pick a password made of a few random words. Long beats clever.",
+    "If anything ever asks for your password by email, it is fake. We will never ask that way."]],
+  ["After an update",[
+    "The update moved some things around. Everything is still there; two features changed doors.",
+    "Here are the two changes you will actually notice, and where each thing went.",
+    "The first week feels slower. That is the layout being new, not the computer being worse.",
+    "If something you use daily got harder, tell me. Sometimes one setting puts it back."]]
+];
+var IT_BA=[
+  ["JARGON","The DNS propagation has not completed since the migration, so your records still resolve to the legacy server.",
+   "The address change is still spreading across the internet. Until it finishes, some traffic goes to the old system. It usually settles within a day."],
+  ["BLAME","This happened because you clicked a phishing link.",
+   "That message was built to fool people, and it fooled a lot of them. Here is how we lock things back down."],
+  ["MINIMIZING","Just clear your cache and reboot.",
+   "Two steps, and I will walk you through both. First we clear the saved copies your browser keeps, then we restart it."]
+];
+
+/* ============ Legal pack ============ */
+var LEGAL_GLOSSARY=[
+  ["pursuant to","under",true],["notwithstanding","even so",false],
+  ["aforementioned","mentioned above",true],["herein","in this document",true],
+  ["hereinafter","from here on",true],["thereof","of it",true],["therein","in it",true],
+  ["whereas","since",false],["forthwith","right away",true],
+  ["in the event that","if",true],["prior to","before",true],["subsequent to","after",true],
+  ["remit","send",false],["indemnification","covering the other side's losses",true],
+  ["indemnify","cover the other side's losses",true],
+  ["liability","legal responsibility",true],["liable","legally responsible",true],
+  ["damages","money to make up for the harm",false],
+  ["plaintiff","the person suing",true],["defendant","the person being sued",true],
+  ["litigation","a lawsuit",true],["litigate","take it to court",true],
+  ["deposition","a recorded interview under oath",true],
+  ["discovery","the phase where both sides share evidence",false],
+  ["subpoena","a court order to show up or hand over records",true],
+  ["affidavit","a sworn written statement",true],
+  ["statute of limitations","the deadline to file",true],
+  ["tort","a harm you can sue over",true],
+  ["negligence","failing to take reasonable care",true],
+  ["due diligence","doing the homework first",true],
+  ["escrow","money held by a neutral third party",true],
+  ["lien","a legal claim against the property",true],
+  ["encumbrance","a claim or restriction on the property",true],
+  ["probate","the court process for a will",true],
+  ["intestate","without a will",true],
+  ["executor","the person who carries out the will",true],
+  ["power of attorney","written authority to act for someone",true],
+  ["arbitration","a private decision instead of court",true],
+  ["mediation","a guided negotiation",true],
+  ["settlement","an agreement to end the dispute",false],
+  ["retainer","money paid up front for legal work",true],
+  ["contingency fee","payment only if you win",false],
+  ["pro bono","free of charge",true],
+  ["counsel","lawyer",false],
+  ["jurisdiction","which court has the power to decide",true],
+  ["venue","where the case is heard",false],
+  ["motion","a formal request to the judge",false],
+  ["injunction","a court order to stop or start something",true],
+  ["breach","breaking the agreement",true],
+  ["consideration","what each side gives up in the deal",false],
+  ["force majeure","events outside anyone's control",true],
+  ["severability","if one part fails, the rest still stands",true],
+  ["waiver","giving up a right",true],
+  ["stipulate","agree on the record",true],
+  ["adjudicate","decide officially",true],
+  ["remand","sent back to the lower court",true],
+  ["provision","a section of the agreement",false],
+  ["null and void","cancelled, with no effect",true],
+  ["boilerplate","the standard fine print",true]
+];
+var LEGAL_FRAMES=[
+  {re:/\bplease be advised\b/i,
+   why:"Formal filler. It adds distance, not meaning.",
+   fix:function(){return "Delete it and start with the point.";}},
+  {re:/\bas (previously|already) (stated|advised|discussed|indicated)\b/i,
+   why:"Points backward instead of helping now.",
+   fix:function(){return "Restate it in one plain sentence. Repeating it costs nothing.";}},
+  {re:/\bthe client\b/i,
+   why:"If you are talking TO them, \u201cthe client\u201d puts distance in the room.",
+   fix:function(){return "Use \u201cyou.\u201d";}}
+];
+var LEGAL_PB=[
+  ["Starting an engagement",[
+    "Here is what I will do, what it costs, and how long each stage usually takes.",
+    "You get a copy of everything with my name on it. Nothing gets filed without you seeing it first.",
+    "Ask me anything twice. This is my language, not yours, and that is my problem to fix.",
+    "My job is the strategy and the paperwork. Your job is the facts and the decisions. The decisions stay yours."]],
+  ["Fees and billing",[
+    "The retainer is a deposit, not the total. I bill against it and you see every line.",
+    "The bill lists who did what and how long it took. Question any line; that is what the list is for.",
+    "If a cheaper path gets the same result, I will tell you before we spend the difference.",
+    "Fees and costs are different things: fees pay for my time, costs pay for filings and experts."]],
+  ["Timelines",[
+    "Courts move in months, not weeks. Here is what happens during each stretch of waiting.",
+    "Silence from me means nothing is wrong. When something needs you, you hear the same day.",
+    "The other side controls some of the clock. Here is the part we control, and we are ahead on it.",
+    "I will check in on the first of each month even if the update is \u201cno change.\u201d"]],
+  ["Hard news",[
+    "The ruling went against us. Here is what it means in plain terms, and the two moves we still have.",
+    "Short version: we likely win one claim and lose the other. The details change the amounts, not the direction.",
+    "This offer is worse than we hoped and better than the risk of trial. Here is the math I would weigh.",
+    "You can say no to this deal. Here is exactly what saying no costs, and what it protects."]]
+];
+var LEGAL_BA=[
+  ["JARGON","Pursuant to clause 7, the indemnification provisions survive termination.",
+   "Even after the contract ends, clause 7 still makes you responsible for covering their losses in those situations."],
+  ["BLAME","You should have read the agreement before signing.",
+   "Here is what the agreement says, and here is what we can still do about it."],
+  ["DEAD END","It is complicated and depends on many factors.",
+   "Short version: we likely win on the contract claim and lose the penalty claim. The details change the amounts, not the direction."]
+];
+
+var MED_BA=[
+  ["JARGON","A custom AFO will accommodate the pes planovalgus and support the medial arch.",
+   "The brace supports the arch and helps the ankle line up better."],
+  ["BLAME","The brace will correct your son's deformity.",
+   "The brace guides how the foot grows, so we stay ahead of changes."],
+  ["COMMAND","You need to keep the brace on him and call us right away.",
+   "The next step is wearing the brace through the night. If the skin stays red, call us the same day so we can adjust it before it rubs a sore."],
+  ["FATALISTIC","Helmets only work in a narrow window before the skull hardens.",
+   "There is a window while the skull is still shaping quickly, which is why starting now works so well."]
+];
+
+/* ============ pack registry ============ */
+var PACKS={
+  medical:{name:"Medical",who:"For clinicians talking with patients and families",
+    glossary:MED_GLOSSARY,frames:MED_FRAMES,pb:MED_PB,ba:MED_BA,
+    example:"Your son presents with a bilateral equinovarus deformity. We will cast for a custom AFO to accommodate the alignment, and if he remains noncompliant with the wearing schedule the contracture will progress and surgical intervention may be indicated.",
+    ph:"e.g. Your son presents with a bilateral equinovarus deformity that we will accommodate with a custom AFO after serial casting..."},
+  it:{name:"IT",who:"For IT folks talking with everyone else",
+    glossary:IT_GLOSSARY,frames:IT_FRAMES,pb:IT_PB,ba:IT_BA,
+    example:"The outage stemmed from DNS propagation latency after the migration to the new server. You probably clicked a phishing link, which corrupted your credentials, so you need to reset your password right away. Just clear the cache and reboot the router.",
+    ph:"e.g. The migration caused DNS propagation delays, so your credentials failed to authenticate against the legacy server..."},
+  legal:{name:"Legal",who:"For lawyers talking with clients",
+    glossary:LEGAL_GLOSSARY,frames:LEGAL_FRAMES,pb:LEGAL_PB,ba:LEGAL_BA,
+    example:"Pursuant to the aforementioned agreement, you should have remitted the retainer prior to execution. Notwithstanding the breach, we can pursue mediation, but you need to sign the affidavit immediately or litigation will commence forthwith.",
+    ph:"e.g. Pursuant to clause 7, the indemnification provisions survive termination of the agreement..."}
+};
+var BUNDLED=[
+{"reframePack": 1, "name": "Insurance & Billing", "who": "For billing staff and providers talking with patients", "sources": ["healthcare.gov/sbc-glossary (federal consumer glossary)", "medicareinteractive.org/glossary", "stanfordhealthcare.org billing glossary", "uwmedicine.org billing glossary", "tdi.texas.gov consumer health insurance glossary"], "glossary": [["premium", "the monthly bill for having the plan", true], ["deductible", "what you pay each year before the plan starts paying its share", true], ["copayment", "the flat fee you pay at the visit", true], ["copay", "the flat fee you pay at the visit", true], ["coinsurance", "the percentage of the bill that is yours after the deductible", true], ["out-of-pocket maximum", "the most you can pay in a year before the plan covers the rest", true], ["out-of-pocket max", "the most you can pay in a year before the plan covers the rest", true], ["explanation of benefits", "the statement showing what insurance paid and what is left. It is not a bill", true], ["EOB", "the statement showing what insurance paid and what is left. It is not a bill", true], ["prior authorization", "the plan's advance approval", true], ["preauthorization", "the plan's advance approval", true], ["prior auth", "the plan's advance approval", true], ["in-network", "contracted with your plan, so it costs you less", false], ["out-of-network", "not contracted with your plan, so it costs you more", false], ["network", "the group of providers your plan has price deals with", false], ["claim", "the payment request sent to your insurance", false], ["denial", "the plan's refusal to pay", false], ["denied", "refused payment", false], ["appeal", "a formal ask for the plan to reconsider", false], ["formulary", "the plan's list of covered drugs", true], ["HMO", "a plan where you pick a main doctor and need referrals", false], ["PPO", "a plan that costs more but lets you go almost anywhere", false], ["HDHP", "a high-deductible plan", true], ["HSA", "a savings account for medical costs with tax breaks", false], ["FSA", "a use-it-or-lose-it account for medical costs", false], ["allowed amount", "the price your plan agreed to for that service", true], ["balance billing", "billing you the gap between the charge and what the plan allows", true], ["coordination of benefits", "working out which plan pays first when you have two", true], ["COB", "working out which plan pays first when you have two", true], ["CPT code", "the procedure code", true], ["ICD-10", "the diagnosis code", true], ["ICD code", "the diagnosis code", true], ["durable medical equipment", "medical gear you use at home, like a brace or a walker", true], ["DME", "medical gear you use at home, like a brace or a walker", true], ["medically necessary", "needed for your care by the plan's rules", false], ["medical necessity", "the plan's test of whether the care is needed", false], ["referral", "your main doctor's written go-ahead", false], ["superbill", "the itemized receipt you send to your insurance yourself", true], ["adjustment", "the discount the provider agreed to with your plan", false], ["write-off", "the part the provider agreed not to charge", false], ["patient responsibility", "your share", true], ["non-covered service", "something the plan will not pay toward", true], ["exclusion", "something the policy never covers", false], ["open enrollment", "the yearly window to pick or change plans", true], ["qualifying life event", "a big life change that lets you switch plans mid-year", true], ["premium tax credit", "government help paying the monthly bill", true], ["subsidy", "government help with the cost", false], ["primary insurance", "the plan that pays first", true], ["secondary insurance", "the plan that pays second", true], ["itemized bill", "the line-by-line version of the bill", true], ["facility fee", "the separate charge for the building and its staff", true], ["surprise billing", "an unexpected out-of-network bill", true], ["No Surprises Act", "the federal law that protects you from many surprise out-of-network bills", false], ["grievance", "a formal complaint to the plan", true], ["utilization review", "the plan's check on whether the care was needed", true], ["step therapy", "trying the plan's preferred drug before the prescribed one", true], ["beneficiary", "the person covered", true], ["policyholder", "the person who holds the plan", false], ["subscriber", "the person who holds the plan", false], ["timely filing", "the deadline for submitting the claim", true], ["pre-existing condition", "a health issue you had before the plan started", true], ["guarantor", "the person responsible for the bill", true], ["self-pay", "paying without insurance", true], ["sliding scale", "a price based on your income", true]], "frames": [{"re": "\\byou (did not|didn't|failed to) (obtain|get|request) (prior )?(authorization|approval)", "flags": "i", "why": "Blames the patient for a step that usually lives between the provider and the plan.", "fix": "Name the miss and the path: “the approval step got missed before the visit - here is how we resubmit.”"}, {"re": "\\b(delinquent|past due)\\b", "flags": "i", "why": "Loaded words that read as a threat.", "fix": "Say the amount, the date, and the easiest way to handle it, including the payment plan."}, {"re": "\\bper your (policy|plan|contract)\\b", "flags": "i", "why": "Points at paperwork instead of explaining.", "fix": "Say the rule in one plain sentence first, then where it lives in the policy."}, {"re": "\\bnothing (we|I) can do\\b", "flags": "i", "why": "A dead end. There is almost always an appeal, an itemized review, or a plan.", "fix": "Offer the next step you would start with: appeal, itemized review, or a payment plan."}, {"re": "\\bsent? (it |this )?to collections?\\b", "flags": "i", "why": "Fear framing. Before it happens, it reads as a threat.", "fix": "State the timeline and every off-ramp before that point."}], "pb": [["Explaining a bill", ["The statement from your insurance is not a bill. The bill comes from us, and its math will match that statement.", "Three numbers matter here: what was charged, what your plan allows, and your share. Let me walk the lines.", "The visit and the building bill separately. That is why one appointment shows two charges.", "If any line looks wrong to you, question it. Bills carry errors more often than people think."]], ["When a claim is denied", ["Denied does not mean final. It usually means the plan wants more information or a second look.", "Here is why they said no, in plain terms, and here is the appeal path with its deadline.", "Ask us before paying a denied line. Many get fixed on resubmission.", "Write down who you talk to and when, every call. Names and dates win appeals."]], ["Getting approval first", ["Some services need the plan's okay before we do them. We request it; you do not have to.", "Approval usually takes a few days to two weeks. Here is what we do if the clock runs long.", "If the plan says no, that is the start of the process, not the end. Doctors appeal these and often win.", "You can call the number on your card and ask whether a service needs approval. Fair question, five minutes."]], ["When money is tight", ["Tell us early if the bill is a problem. Early is when we have the most options.", "Ask about a payment plan. Small and steady works.", "Ask about financial assistance. Hospitals have programs most people never hear about.", "An itemized bill is free for the asking, and it is the first step in questioning any charge."]]], "ba": [["JARGON", "Per the EOB, the claim was adjudicated and coinsurance applies after your deductible.", "Your insurance finished reviewing the visit. You have paid enough this year to hit your deductible, so you owe your percentage of this one and the plan pays the rest."], ["BLAME", "The claim was denied because you failed to obtain prior authorization.", "The approval step got missed before the visit. We are resubmitting with the paperwork, and if they still say no, the appeal path is open."], ["DEAD END", "There's nothing we can do; per your policy this is patient responsibility.", "The plan puts this one on your side. Here is what we can still do: an itemized review, an appeal if anything looks off, and a payment plan either way."]], "example": "Per your policy, the claim was denied because you failed to obtain prior authorization, so the balance is now patient responsibility. The EOB reflects the allowed amount after coinsurance. You need to remit payment right away or the account will be past due and sent to collections.", "ph": "e.g. The EOB shows the allowed amount; coinsurance applies after your deductible is met..."},
+{"reframePack": 1, "name": "Veterinary", "who": "For vet teams talking with pet owners", "sources": ["avma.org pet-owner resources + Language That Works client-communication study", "petco.com A-Z veterinary terminology dictionary", "petmd.com veterinary terms glossary", "zoetispetcare.com common veterinary terminology", "embracepetinsurance.com veterinary vocabulary"], "glossary": [["ovariohysterectomy", "spay", true], ["orchiectomy", "neuter", true], ["castration", "neuter", false], ["intact", "not spayed or neutered", true], ["estrus", "heat", true], ["gestation", "pregnancy", true], ["whelping", "giving birth", true], ["prophylaxis", "a dental cleaning under anesthesia", false], ["dental prophy", "a dental cleaning under anesthesia", true], ["NPO", "no food after midnight, water is fine unless we say otherwise", false], ["palpation", "feeling with the hands", true], ["auscultation", "listening with the stethoscope", true], ["CBC", "a blood count", true], ["chemistry panel", "blood work that checks the organs", true], ["fecal", "a stool-sample check", true], ["urinalysis", "a urine test", true], ["cytology", "looking at cells under the microscope", true], ["biopsy", "taking a small tissue sample to test", false], ["radiographs", "X-rays", true], ["radiograph", "X-ray", true], ["titer", "a blood test that measures immunity", true], ["serology", "blood testing for infection or immunity", true], ["prognosis", "the likely outcome", true], ["idiopathic", "with no known cause", true], ["chronic", "long-term", true], ["acute", "sudden", true], ["benign", "not cancer", true], ["malignant", "cancerous and able to spread", true], ["neoplasia", "abnormal growth, possibly cancer", false], ["mass", "a lump", false], ["zoonotic", "able to spread to people", true], ["brachycephalic", "flat-faced", true], ["body condition score", "a body-fat rating", true], ["BCS", "a body-fat rating", true], ["dermatitis", "skin inflammation", true], ["otitis", "an ear infection", true], ["pyometra", "a serious infection of the uterus", true], ["parvovirus", "a dangerous and very contagious stomach virus in young dogs", false], ["bordetella", "the kennel-cough vaccine", false], ["FeLV", "feline leukemia virus", true], ["FIV", "the feline version of an immune-weakening virus", false], ["analgesia", "pain relief", true], ["analgesic", "pain medicine", true], ["NSAID", "an anti-inflammatory pain medicine", true], ["sedation", "medicine to keep them calm and still, lighter than anesthesia", false], ["anesthesia", "fully asleep and feeling nothing", false], ["Elizabethan collar", "the cone", true], ["e-collar", "the cone", true], ["sutures", "stitches", true], ["incision", "the surgical cut", true], ["abscess", "a pocket of infection", true], ["subcutaneous fluids", "fluids given under the skin", true], ["IV fluids", "fluids through a vein", false], ["cruciate ligament", "the knee's main stabilizing ligament", true], ["luxating patella", "a kneecap that slips out of place", true], ["hip dysplasia", "a hip joint that formed loose", true], ["calculus", "hardened plaque", false], ["tartar", "hardened plaque", false], ["gingivitis", "inflamed gums", true], ["periodontal disease", "gum disease", true], ["extraction", "pulling the tooth", true], ["GDV", "a twisted stomach, a true emergency", true], ["foreign body", "something swallowed that is stuck", true], ["palliative", "focused on comfort, not cure", true], ["quality of life", "how good their days actually are", false], ["euthanasia", "a peaceful, painless passing that we guide", false], ["recheck", "a follow-up visit", true], ["microchip", "a rice-sized permanent ID under the skin", false]], "frames": [{"re": "\\bif you had (brought|come|called|noticed)", "flags": "i", "why": "Hindsight blame. The owner already feels it; saying it closes their ears.", "fix": "Move to now: “here is where we are today and what we can do from here.”"}, {"re": "\\bthe owner\\b", "flags": "i", "why": "If you are talking TO them, “the owner” puts distance in the room.", "fix": "Use “you,” and use the pet's name."}, {"re": "\\b(morbidly )?obese\\b", "flags": "i", "why": "Reads as a grade on the owner. Shame closes ears; numbers open them.", "fix": "Give the number and the plan: “about 20 percent over ideal - here is the new portion and a recheck date.”"}, {"re": "\\byou('re| are) (overfeeding|feeding (him|her|them) too much)", "flags": "i", "why": "Blames the person instead of fixing the routine.", "fix": "Blame the portions, not the person: “the current scoop is set for a more active dog - here is the new one.”"}, {"re": "\\bput (him|her|them) (down|to sleep)\\b", "flags": "i", "why": "Euphemisms blur the most important conversation you will have with this family.", "fix": "Use clear, kind words: what it is, that it is painless, that they can be present, and that it is a decision made from love."}, {"re": "\\b(destroy|dispose of)\\b", "flags": "i", "why": "Shelter-form language. Devastating said aloud to a family.", "fix": "Never these words with an owner. Say what actually happens, gently and plainly."}], "pb": [["Costs and estimates", ["Here is the estimate line by line, and what each piece does for him.", "There is a solid plan at more than one price. Let me show you the options before you decide.", "The estimate is a range because we will know more after the first test. I will call before anything beyond it.", "If cost is a worry, say so early. Early is when we have the most choices."]], ["Before surgery or a dental", ["No food after midnight; water is fine. This keeps the anesthesia safe.", "She will be asleep and feeling nothing the whole time, with someone monitoring her the entire way.", "We will call you the moment she is awake. Most go home the same day, a little groggy and very glad to see you.", "The cone stays on until the stitches are out. It is annoying for days and protects weeks of healing."]], ["Weight and food", ["The goal is feeling ribs easily and seeing a waist from above. Let me show you on him right now.", "Measure the food with an actual cup once, and you will know exactly where the day stands.", "Treats count. Pick one kind, decide the daily number, and everyone in the house sticks to it.", "We will weigh in monthly. A half pound a month in the right direction is a win at this size."]], ["The hardest conversations", ["There is no perfect moment. There is a window, and inside it, this is a decision made from love.", "Good days and bad days both count. Keep a simple calendar; it answers the question more honestly than memory does.", "You can be with her the whole time. Most families are glad they stayed, and she will only know you are there.", "Whatever you decide, you are not doing it alone, and there is no wrong amount of grief afterward."]]], "ba": [["JARGON", "The radiographs show a luxating patella; if it progresses, cruciate involvement is a concern.", "The X-rays show her kneecap slips out of place. If it keeps slipping, it can strain the main ligament in the knee, so here is what we watch for."], ["BLAME", "If you had brought him in sooner, the otitis wouldn't have gotten this bad.", "His ear infection is a stubborn one. Here is where we are today, the plan to knock it out, and the early signs to call about next time."], ["EUPHEMISM", "It might be time to think about putting her to sleep.", "I think we are close to the point where the kindest thing we can offer her is a peaceful, painless passing, with you right there. Let me tell you exactly what that looks like, and you decide nothing today."]], "example": "The radiographs reveal a foreign body, and if you had brought him in sooner the prognosis would be better. He is also obese, which complicates anesthesia. You need to approve the estimate right away, and post-op he will be NPO with an e-collar until the recheck.", "ph": "e.g. The chemistry panel and CBC are unremarkable; we recommend a dental prophy with extractions..."},
+{"reframePack": 1, "name": "Auto Repair", "who": "For mechanics and service writers talking with drivers", "sources": ["AAA auto repair glossary (exchange.aaa.com PDF)", "diamondcertified.org auto repair glossary", "carhq.org driver glossaries", "artmorse.com plain-English repair glossary", "tediousrepairs.com ASE master tech glossary"], "glossary": [["OEM", "made by your car's manufacturer", true], ["aftermarket", "made by another company, often cheaper", false], ["serpentine belt", "the one belt that drives several systems at once", true], ["timing belt", "the belt that keeps the engine's halves in sync; if it snaps, major damage", false], ["alternator", "the part that charges the battery while you drive", true], ["rotors", "the discs the brake pads squeeze", true], ["calipers", "the clamps that press the brake pads", true], ["master cylinder", "the pump that pushes brake fluid when you press the pedal", true], ["ABS", "the anti-lock braking system", true], ["resurface the rotors", "machine the brake discs smooth again", true], ["struts", "the supports that absorb bumps and hold the wheel steady", false], ["suspension", "everything connecting the wheels to the car that smooths the ride", false], ["alignment", "adjusting the wheels so they all point exactly where they should", false], ["tire rotation", "moving the tires between positions so they wear evenly", true], ["CV joint", "the flexible joint that lets a spinning axle steer with the wheel", false], ["CV boot", "the rubber cover that protects that joint", true], ["tie rod", "the link that turns the wheels when you steer", true], ["ball joint", "the pivot that lets the wheel steer and ride over bumps", true], ["wheel bearing", "the part that lets the wheel spin smoothly", true], ["differential", "the gearbox that lets the wheels turn at different speeds in corners", true], ["transmission flush", "replacing all of the transmission fluid", true], ["head gasket", "the seal between the engine's two main halves", true], ["gasket", "a seal between two parts", false], ["coolant", "the liquid that keeps the engine from overheating or freezing", true], ["antifreeze", "the liquid that keeps the engine from overheating or freezing", true], ["thermostat", "the valve that controls coolant flow to hold engine temperature", false], ["water pump", "the pump that moves coolant through the engine", true], ["catalytic converter", "the exhaust part that scrubs pollutants", true], ["oxygen sensor", "the sensor that reads the exhaust so the computer can tune the fuel mix", true], ["O2 sensor", "the sensor that reads the exhaust so the computer can tune the fuel mix", true], ["OBD-II", "the diagnostic port under the dash", true], ["diagnostic trouble code", "the stored code that says which system complained", true], ["DTC", "the stored code that says which system complained", true], ["misfire", "a cylinder not firing right", true], ["TSB", "a factory bulletin describing a known problem and its fix", true], ["PCV valve", "a small valve that recycles engine vapors", true], ["fuel injector", "the nozzle that sprays fuel into the engine", true], ["throttle body", "the valve that controls how much air the engine breathes", true], ["intake manifold", "the passage that carries air into the engine", true], ["EGR valve", "a valve that recirculates a little exhaust to cut emissions", true], ["ECU", "the car's main computer", true], ["ECM", "the car's main computer", true], ["drivetrain", "everything that carries power from the engine to the wheels", true], ["powertrain", "the engine, transmission, and everything that moves the power", true], ["torque to spec", "tightened to the exact factory setting", true], ["torque", "twisting force", false], ["out-of-round", "worn unevenly out of a true circle", true], ["play", "looseness where there should be none", false], ["seized", "stuck solid", true], ["vacuum leak", "unmetered air sneaking into the engine", false], ["blown", "failed completely", false], ["LOF", "lube, oil, and filter - a standard oil change", true], ["flush", "draining and replacing a fluid completely", false], ["glazing", "worn smooth and shiny so it slips", false], ["dry rot", "rubber cracked from age, not wear", true], ["brake fade", "brakes weakening from heat", true], ["brake drag", "brakes not fully releasing", true], ["limp mode", "the computer protecting the engine by limiting power", true], ["idler pulley", "a wheel that guides the belt", true], ["tensioner", "the part that keeps the belt tight", true], ["hub", "the center piece the wheel bolts to", false], ["spindle", "the shaft the wheel spins on", true], ["bushing", "a rubber cushion between metal parts", true], ["deferred maintenance", "upkeep that got skipped and stacked up", false]], "frames": [{"re": "\\byou (rode|been riding) the (brakes?|clutch)", "flags": "i", "why": "Blames the driver's habits. Even when true, it closes ears.", "fix": "Describe the wear and the fix: “the pads wore fast on the rear - here is what is left and what new ones run.”"}, {"re": "\\bwhat did you do to (it|the car|this thing)", "flags": "i", "why": "Sounds like an accusation.", "fix": "Ask what it does and when it started: “when did the noise show up, and what does it sound like?”"}, {"re": "\\b(it'?s|it is) (shot|toast|junk|done for)\\b", "flags": "i", "why": "A slang verdict with no path forward.", "fix": "Name the part, the failure, and the choice: repair, replace, or keep driving with a named risk."}, {"re": "\\bthe vehicle\\b", "flags": "i", "why": "If you are talking TO the owner, “the vehicle” puts distance in the room.", "fix": "Say “your car” or “your truck.”"}, {"re": "\\byou (never|didn'?t) (changed?|rotated?|maintained|serviced)", "flags": "i", "why": "Hindsight blame changes nothing and costs trust.", "fix": "Move to now: “here is where it stands and the order I would fix things in.”"}], "pb": [["Walking the estimate", ["Here is every line, what the part does, and what happens if we skip it.", "Parts and labor are separate on purpose. Ask me about any number on this sheet.", "Two of these are safety items. The rest can wait, and I will tell you how long.", "Get a second opinion any time. A good estimate survives one."]], ["Found more once it was open", ["We found something we could not see until it was apart. Nothing happens until you say so.", "Here is a photo of the part in your car, next to what it should look like.", "The extra work adds this much and this many days. Your call, and either answer is fine.", "If we button it up without fixing it, here is exactly what to watch for."]], ["Safety now vs can wait", ["If it affects stopping or steering, I will always say so first. This one does.", "This one is a keep-an-eye-on-it, not a today thing. Check it again at the next oil change.", "Here is the order I would spend money on this car, most important first.", "You will not hurt anything driving it this month. Past that, the risk is this part letting go."]], ["Handing the keys back", ["Here is what we did, in one sentence each, and here is the old part if you want to see it.", "The first few days, it may smell faintly as coatings burn in. That is normal; smoke is not.", "The repair carries a warranty on parts and labor. If it acts up, bring it straight back.", "Nothing else on this car worries me today. See you at the next oil change."]]], "ba": [["JARGON", "The serpentine belt shows glazing and the tensioner is out of spec.", "The belt that drives several systems is worn smooth, and the part that keeps it tight is at the end of its range. Together that is why it squeals."], ["BLAME", "The pads are metal-on-metal because you rode the brakes.", "The pads are completely gone, so metal is grinding on metal. Here is what new pads and discs run, and the front set is the urgent one."], ["DEAD END", "The transmission is shot. It's junk.", "The transmission is failing internally. Three paths: rebuild it, swap in a used one with a warranty, or put that money toward the next car. Here is what each costs."]], "example": "The vehicle threw a DTC for a misfire, and the serpentine belt is glazed because you never changed the tensioner. Honestly it's shot. You need to approve the estimate right away, and what did you do to the alignment?", "ph": "e.g. The OBD-II scan shows a misfire code; the rotors are out-of-round and the CV boot is torn..."},
+{"reframePack": 1, "name": "Dental", "who": "For dental teams talking with patients", "sources": ["mouthhealthy.org ADA patient glossary", "ADA Consumer-Friendly CDT plain-language guide", "wvudentalcare.org patient terminology", "petmd-style cross-check: selfgood.com dental terms (secondary)"], "glossary": [["caries", "tooth decay", true], ["carious lesion", "a cavity", true], ["prophylaxis", "a routine cleaning", true], ["prophy", "a routine cleaning", true], ["scaling and root planing", "a deep cleaning below the gumline", true], ["SRP", "a deep cleaning below the gumline", true], ["periodontal disease", "gum disease", true], ["periodontitis", "advanced gum disease", true], ["gingivitis", "early gum disease - inflamed gums", true], ["calculus", "hardened plaque", true], ["tartar", "hardened plaque", false], ["restoration", "a filling, crown, or other repair", false], ["composite", "a tooth-colored filling", true], ["amalgam", "a silver filling", true], ["crown", "a cap that covers the whole tooth", false], ["bridge", "a fixed replacement anchored to the neighboring teeth", false], ["pontic", "the replacement tooth in a bridge", true], ["abutment", "the anchor tooth or implant post", false], ["endodontic therapy", "a root canal", true], ["endodontic treatment", "a root canal", true], ["pulp", "the nerve and blood supply inside the tooth", true], ["pulpitis", "an inflamed tooth nerve", true], ["extraction", "pulling the tooth", true], ["impacted", "stuck under the gum or bone", true], ["eruption", "a tooth coming in", true], ["deciduous teeth", "baby teeth", true], ["primary teeth", "baby teeth", true], ["permanent dentition", "the adult teeth", true], ["dentition", "the teeth", false], ["occlusion", "how the teeth meet when you bite", true], ["malocclusion", "a bite that does not line up", true], ["bruxism", "grinding or clenching", true], ["TMJ", "the jaw joint", false], ["abscess", "a pocket of infection", true], ["bone graft", "rebuilding bone with transplanted material", false], ["periapical", "around the tip of the root", true], ["bitewings", "the routine cavity-check X-rays", true], ["panoramic radiograph", "the full-mouth X-ray", true], ["radiograph", "X-ray", true], ["sealant", "a protective coating on the chewing surface", false], ["fluoride varnish", "a protective fluoride coating painted on", false], ["local anesthesia", "numbing just the area", true], ["anesthetic", "numbing medicine", true], ["nitrous oxide", "laughing gas", true], ["partial denture", "a removable replacement for some of the teeth", true], ["veneer", "a thin shell bonded to the front of the tooth", true], ["enamel", "the tooth's hard outer coating", true], ["dentin", "the softer layer under the enamel", true], ["dental erosion", "enamel worn away by acid", true], ["attrition", "wear from grinding tooth on tooth", true], ["recession", "gums pulling back from the tooth", true], ["probing depths", "the gum measurements we call out during the exam", false], ["pocket", "the gap between tooth and gum that deepens with gum disease", false], ["interproximal", "between the teeth", true], ["distal", "the back side of the tooth", false], ["mesial", "the front side of the tooth", false], ["prosthesis", "a replacement tooth or set of teeth", false], ["curettage", "cleaning out infected tissue", false], ["exfoliation", "a baby tooth falling out on schedule", false], ["edentulous", "without teeth", true], ["xerostomia", "dry mouth", true], ["halitosis", "bad breath", true]], "frames": [{"re": "\\bpoor (oral )?hygiene\\b", "flags": "i", "why": "A grade on the person. Shame does not build brushing habits.", "fix": "Describe what you see and the routine that changes it: “the buildup is heaviest along the gumline - here is the two-minute fix.”"}, {"re": "\\byou('re| are) (not|never) (flossing|brushing)", "flags": "i", "why": "An accusation, and half the time a guess.", "fix": "Point at the evidence and the payoff: “these spots are the between-teeth kind. Floss reaches exactly there.”"}, {"re": "\\bneglect(ed|ing)?\\b", "flags": "i", "why": "Harsh, and it makes people avoid the next visit.", "fix": "Say where things stand and the first step back: “it has been a while, and today is a good restart. Here is the plan.”"}, {"re": "\\bthe patient\\b", "flags": "i", "why": "If you are talking TO them, “the patient” puts distance in the room.", "fix": "Use “you.”"}, {"re": "\\bblown out\\b", "flags": "i", "why": "Chairside slang that sounds catastrophic to the person in the chair.", "fix": "Say what actually happened to the tooth and what fixes it."}], "pb": [["Cavity conversations", ["There is a soft spot starting on one tooth. Caught now, the fix is small.", "A filling today prevents a root canal later. That is the whole math.", "Nothing about this will hurt. You will feel pressure and hear noise, and that is all.", "This one is small enough to watch. We will check it again in six months and only drill if it grows."]], ["Explaining a deep cleaning", ["This is a cleaning below the gumline, where a regular cleaning cannot reach.", "We numb the area first. The most you feel is pressure.", "The gums may be tender for a day or two. Warm salt water helps more than anything in a bottle.", "This stops gum disease where it is. What we save today does not have to be replaced later."]], ["Cost and phasing", ["Here is the full plan and here is the order that protects you most if we spread it out.", "The urgent piece is this one tooth. Everything else can be scheduled around your budget.", "Ask us to check your benefits first. It changes the math and takes a day.", "A written estimate before anything starts, every time. No surprises on the way out."]], ["Nervous patients", ["Tell me you are nervous and everything slows down. That is the deal.", "Raise your left hand any time and we stop. You are in charge of the pace.", "Numb first, always, and we test it before we start.", "The sounds are worse than the sensations. Headphones are welcome here."]]], "ba": [["JARGON", "The radiographs show interproximal caries on the distal of number 30 with possible pulpal involvement.", "The X-rays show a cavity between two back teeth on the lower right, and it may have reached the nerve. Here is what that means for the fix."], ["BLAME", "There's significant calculus buildup from poor oral hygiene.", "There is a lot of hardened buildup, especially along the gumline, and that is what today's cleaning removes. Here is the spot your brush is missing."], ["EUPHEMISM", "We'll just watch that tooth.", "That tooth has a small weak spot. We are choosing not to drill yet, and here is exactly what we are watching for at the next visit."]], "example": "The radiographs reveal interproximal caries with periapical involvement, likely from poor oral hygiene since you're not flossing. The patient needs scaling and root planing right away, and if you don't schedule the endodontic therapy the prognosis is extraction.", "ph": "e.g. Probing depths of 5-6mm with generalized recession; recommend SRP and composite restorations..."},
+{"reframePack": 1, "name": "Skilled Trades", "who": "For HVAC, plumbing, and electrical pros talking with homeowners", "sources": ["ars.com homeowner HVAC/plumbing glossary", "ajperri.com HVAC and plumbing glossary", "dormarhvac.com HVAC glossary", "servicelegends.com home services glossary", "newcombandcompany.com HVAC terms"], "glossary": [["condenser", "the outdoor unit", true], ["condensing unit", "the outdoor unit", true], ["evaporator coil", "the indoor coil that actually cools the air", true], ["air handler", "the indoor unit that moves the air", true], ["heat exchanger", "the part that transfers heat into your air; a crack in it is a safety issue", false], ["refrigerant", "the chemical that carries heat out of your air", true], ["refrigerant charge", "the amount of refrigerant in the system", true], ["line set", "the copper lines connecting the indoor and outdoor units", true], ["plenum", "the main air box the ducts connect to", true], ["register", "the vent cover", true], ["return", "the vent that pulls air back into the system", false], ["SEER", "the efficiency rating; higher costs less to run", true], ["SEER2", "the current efficiency rating; higher costs less to run", true], ["AFUE", "how much of the fuel actually becomes heat", true], ["BTU", "the unit of heating and cooling power", true], ["load calculation", "the math that sizes the system to your house", true], ["tonnage", "cooling capacity, not weight", false], ["heat pump", "a system that heats and cools by moving heat instead of making it", false], ["condensate line", "the drain for the moisture the AC pulls out of the air", true], ["short cycling", "turning on and off too fast", true], ["capacitor", "the small part that gives the motors their starting kick", true], ["contactor", "the switch that turns the outdoor unit on", true], ["blower motor", "the fan that pushes air through the house", false], ["thermocouple", "the safety sensor that proves the flame is lit", true], ["flue", "the exhaust pipe for burned gas", true], ["MERV rating", "the filter's catch rating; higher catches finer dust", true], ["IAQ", "indoor air quality", true], ["ACH", "how many times an hour the room's air gets replaced", true], ["latent heat", "the heat tied up in moisture the system must remove", false], ["supply line", "the pipe bringing water in", true], ["P-trap", "the curved pipe that holds water to block sewer gas", true], ["trap", "the curved pipe that holds water to block sewer gas", false], ["vent stack", "the pipe that lets the drains breathe out the roof", true], ["angle stop", "the little shutoff valve under the fixture", true], ["anode rod", "the sacrificial rod that protects the water heater tank from rust", true], ["T&P valve", "the water heater's emergency pressure-relief valve", true], ["relief valve", "the emergency pressure-release valve", false], ["water hammer", "the bang when rushing water stops suddenly", true], ["aerator", "the faucet's screen tip", true], ["auger", "the drain-clearing cable", false], ["hydro jetting", "clearing the line with high-pressure water", true], ["scale", "mineral buildup from hard water", true], ["hard water", "water heavy in minerals", false], ["backflow preventer", "the valve that keeps dirty water from flowing backward into clean", true], ["main line", "the big pipe out to the street or septic", false], ["cleanout", "the capped access point for clearing the line", true], ["fixture", "anything water comes out of or drains into", false], ["sediment", "the grit that settles in the tank", true], ["GFCI", "the shock-protection outlet that trips fast", true], ["AFCI", "the breaker that catches dangerous arcing", true], ["grounding", "the safe path for stray electricity", false], ["panel", "the breaker box", true], ["junction box", "the enclosed box where wires connect", true], ["up to code", "meeting the current safety rules", false], ["grandfathered", "allowed under the rules in place when it was built", true], ["rough-in", "the pipes and wires installed before the walls close up", true], ["load", "how much power something draws", false], ["dedicated circuit", "a breaker serving one appliance only", true], ["pigtail", "a short connecting wire", true], ["knob and tube", "the very old wiring style, a rewiring conversation", false], ["low voltage", "the small safe wiring for thermostats and doorbells", true], ["variable speed", "a motor that adjusts instead of only on/off", true], ["zoning", "splitting the house into separately controlled areas", true], ["mini-split", "a ductless system with a wall unit per room", true], ["ductless", "without ductwork; wall units instead", false]], "frames": [{"re": "\\bwho(ever)? (did|installed|wired|plumbed|put in) this", "flags": "i", "why": "Trash-talking the last person's work makes the homeowner feel judged for hiring them.", "fix": "Describe the condition and the fix, and skip the verdict on whoever came before."}, {"re": "\\b(burn (your|the) house down|kill you|death trap)", "flags": "i", "why": "Fear framing. If the hazard is real, calm specifics land better than a horror line.", "fix": "Name the specific risk and the fix: “this connection is overheating - here is what makes it safe and what it costs.”"}, {"re": "\\bthe homeowner\\b", "flags": "i", "why": "If you are talking TO them, “the homeowner” puts distance in the room.", "fix": "Use “you” and “your house.”"}, {"re": "\\bcan'?t guarantee anything\\b", "flags": "i", "why": "Reads as pre-blame for a failure that has not happened.", "fix": "Say what IS covered and for how long, then the one thing that is genuinely unpredictable."}, {"re": "\\bband-?aid( fix)?\\b", "flags": "i", "why": "Dismisses the affordable option people may genuinely need.", "fix": "Frame it as a real choice: “the repair buys you roughly a season; the replacement resets the clock. Both are legitimate.”"}], "pb": [["Walking the estimate", ["Here is each line, what it does for the house, and which ones are optional.", "Equipment and labor are separate numbers on purpose. Ask about either.", "The permit line is real and it protects you: it means an inspector checks my work.", "Take a day to decide. A fair estimate is still fair tomorrow."]], ["Found a safety issue", ["I found one thing today that is a safety item, not a comfort item. Let me show you where it is.", "It is safe to sleep here tonight; it is not safe to leave for another season. Here is the difference.", "Here is a photo of it in your house next to what it should look like.", "Fixing just the safety piece is a fine answer today. The rest can wait for a plan."]], ["Repair or replace", ["The repair buys time; the replacement resets the clock. Here is what each costs and how long each lasts.", "Past a certain age, every repair is a bet. This unit's age makes it about a coin flip.", "A properly sized new system usually runs cheaper monthly. I will do the sizing math, not guess.", "Nobody should buy a furnace in a panic. If we get heat back on today, you can decide the big question slowly."]], ["Wrapping the job", ["Here is what I did, where the shutoffs are, and the one thing to watch this week.", "The old parts are in this bag if you want to see them.", "Change the filter on the first of the month; that one habit is half of system life.", "If anything acts up, call me before you call anyone. It is warrantied, and I want to know."]]], "ba": [["JARGON", "The condensate line is clogged and the evaporator coil is icing due to low refrigerant charge.", "The AC's drain line is clogged and the indoor coil is freezing over because the system is low on the chemical that moves the heat. Two fixes, same visit."], ["FEAR", "Whoever wired this created a death trap. It could burn your house down.", "Two of these connections are overheating, and that is the thing I fix before I leave today. Here is the burn mark I am talking about, and here is what making it safe costs."], ["DISMISSAL", "I can patch it, but that's just a band-aid.", "The repair is real and buys you roughly this season. The replacement resets the clock for fifteen years. Different budgets pick differently, and both are legitimate."]], "example": "Whoever installed this created a death trap; the heat exchanger is cracked and the panel isn't up to code. I can't guarantee anything with a band-aid fix. The homeowner needs to approve the load calculation and replacement right away.", "ph": "e.g. The capacitor is weak and the contactor is pitted; recommend replacing the condensate line and adding a float switch..."}
+];
+BUNDLED.forEach(function(raw){
+  var c=compilePack(raw);
+  if(c){var key=raw.name.toLowerCase().replace(/[^a-z0-9]+/g,"");c.custom=false;PACKS[key]=c;}
+});
+var PACK=null;
+
+/* ============ user packs (JSON) ============ */
+/* raw JSON form kept in storage for export fidelity; compiled at load */
+var USER_RAW={};   /* key -> raw pack object */
+var USER={};       /* key -> compiled runtime pack */
+function loadUserPacks(){
+  USER_RAW={};USER={};
+  var raw=store.get("reframe.userpacks");
+  if(!raw)return;
+  try{USER_RAW=JSON.parse(raw)||{};}catch(e){USER_RAW={};return;}
+  Object.keys(USER_RAW).forEach(function(k){
+    var c=compilePack(USER_RAW[k]);
+    if(c)USER[k]=c;
+  });
+}
+function saveUserPacks(){store.set("reframe.userpacks",JSON.stringify(USER_RAW));}
+function compilePack(raw){
+  if(!raw||typeof raw!=="object"||!raw.name)return null;
+  var gl=Array.isArray(raw.glossary)?raw.glossary.filter(function(g){
+    return Array.isArray(g)&&typeof g[0]==="string"&&typeof g[1]==="string"&&g[0].trim()&&g[1].trim();
+  }).map(function(g){return [g[0].trim(),g[1].trim(),g[2]===true];}):[];
+  var fr=[];
+  if(Array.isArray(raw.frames))raw.frames.forEach(function(f){
+    if(!f||typeof f.re!=="string"||typeof f.why!=="string")return;
+    try{
+      var rx=new RegExp(f.re,typeof f.flags==="string"?f.flags.replace(/[^gimsuy]/g,""):"i");
+      var fx=typeof f.fix==="string"?f.fix:null;
+      fr.push({re:rx,why:f.why,fix:fx?function(){return fx;}:null});
+    }catch(e){}
+  });
+  var pb=Array.isArray(raw.pb)?raw.pb.filter(function(c){
+    return Array.isArray(c)&&typeof c[0]==="string"&&Array.isArray(c[1]);
+  }).map(function(c){return [c[0],c[1].filter(function(l){return typeof l==="string";})];}):[];
+  var ba=Array.isArray(raw.ba)?raw.ba.filter(function(x){
+    return Array.isArray(x)&&x.length>=3&&x.every(function(v){return typeof v==="string";});
+  }):[];
+  return {name:String(raw.name).slice(0,40),
+    who:typeof raw.who==="string"?raw.who.slice(0,90):"Custom pack",
+    glossary:gl,frames:fr,pb:pb,ba:ba,
+    example:typeof raw.example==="string"?raw.example:null,
+    ph:typeof raw.ph==="string"?raw.ph:"Type or paste what you plan to say...",
+    custom:true};
+}
+function packKeyFor(name){
+  var base="u_"+name.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,24);
+  var k=base,n=2;
+  while(PACKS[k]||USER_RAW[k]){k=base+"-"+n;n++;}
+  return k;
+}
+function importPackText(txt){
+  var raw;
+  try{raw=JSON.parse(txt);}catch(e){toast("That file is not valid JSON");return null;}
+  if(!raw||raw.reframePack!==1||!raw.name){toast("Not a Reframe pack file");return null;}
+  var c=compilePack(raw);
+  if(!c||!c.glossary.length){toast("Pack has no usable terms");return null;}
+  var k=packKeyFor(raw.name);
+  USER_RAW[k]=raw;USER[k]=c;saveUserPacks();
+  toast('"'+c.name+'" imported: '+c.glossary.length+" terms");
+  return k;
+}
+function exportPack(k){
+  var raw;
+  if(USER_RAW[k]){raw=USER_RAW[k];}
+  else if(PACKS[k]){
+    var pk=PACKS[k];
+    raw={reframePack:1,name:pk.name,who:pk.who,glossary:pk.glossary,
+      frames:pk.frames.map(function(f){
+        var fx=null;try{fx=f.fix?f.fix():null;}catch(e){}
+        return {re:f.re.source,flags:f.re.flags,why:f.why,fix:fx};
+      }),
+      pb:pk.pb,ba:pk.ba,example:pk.example,ph:pk.ph};
+  } else return;
+  var txt=JSON.stringify(raw,null,1);
+  var name=(raw.name||"pack").toLowerCase().replace(/[^a-z0-9]+/g,"-")+".reframe.json";
+  try{
+    var blob=new Blob([txt],{type:"application/json"});
+    var a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);a.download=name;
+    document.body.appendChild(a);a.click();
+    setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},600);
+    toast("Pack exported");
+  }catch(e){
+    if(navigator.clipboard&&navigator.clipboard.writeText)
+      navigator.clipboard.writeText(txt).then(function(){toast("Pack JSON copied");},function(){toast("Export failed");});
+    else toast("Export failed");
+  }
+}
+function deletePack(k){
+  if(!USER_RAW[k])return;
+  var nm=USER[k]?USER[k].name:"pack";
+  delete USER_RAW[k];delete USER[k];saveUserPacks();
+  if(PACK===k)setPack("medical",true);
+  toast('"'+nm+'" deleted');
+}
+function getPack(k){return PACKS[k]||USER[k]||null;}
+function cur(){return getPack(PACK)||PACKS.medical;}
+
+/* ============ helpers ============ */
+function $(id){return document.getElementById(id);}
+function esc(s){return s.replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];});}
+function toast(m){var t=$("toast");t.textContent=m;t.classList.add("show");
+  clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove("show");},1900);}
+function reEscape(s){return s.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");}
+var store={get:function(k){try{return localStorage.getItem(k);}catch(e){return null;}},
+  set:function(k,v){try{localStorage.setItem(k,v);}catch(e){}}};
+
+/* ============ readability ============ */
+function syllables(w){
+  w=w.toLowerCase().replace(/[^a-z]/g,"");
+  if(w.length<=3)return 1;
+  w=w.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/,"").replace(/^y/,"");
+  var m=w.match(/[aeiouy]{1,2}/g);
+  return m?m.length:1;
+}
+function readingLevel(text){
+  var sents=text.split(/[.!?]+/).map(function(s){return s.trim();}).filter(Boolean);
+  var words=text.split(/\s+/).filter(function(w){return /[a-z]/i.test(w);});
+  if(!sents.length||!words.length)return null;
+  var syl=words.reduce(function(a,w){return a+syllables(w);},0);
+  var grade=0.39*(words.length/sents.length)+11.8*(syl/words.length)-15.59;
+  return Math.max(1,Math.round(grade));
+}
+
+/* ============ jargon matching ============ */
+function buildJargonRegex(list){
+  var terms=list.map(function(g){return g[0];}).sort(function(a,b){return b.length-a.length;});
+  var alt=terms.map(function(t){return reEscape(t);}).join("|");
+  /* trailing lookahead blocks matches that run into an apostrophe or letter
+     (prevents "don" inside "don't", "pt" inside "pt's", etc.) */
+  return new RegExp("\\b("+alt+")(s|es|ing|ed)?\\b(?!['\u2019\\w])","gi");
+}
+var JARGON_RE=null;
+function lookupPlain(base){
+  var G=cur().glossary;
+  base=base.toLowerCase();
+  for(var i=0;i<G.length;i++){if(G[i][0].toLowerCase()===base)return G[i];}
+  var stripped=base.replace(/(ing|es|ed|s)$/,"");
+  for(var j=0;j<G.length;j++){if(G[j][0].toLowerCase()===stripped)return G[j];}
+  return null;
+}
+
+/* ============ long-sentence split helper ============ */
+function suggestSplit(sentence){
+  var joins=[" and "," but "," so ",", which"," because "," while "];
+  var mid=sentence.length/2,best=-1,bestDist=1e9,bestJoin="";
+  joins.forEach(function(j){
+    var idx=sentence.toLowerCase().indexOf(j);
+    while(idx>-1){
+      var d=Math.abs(idx-mid);
+      if(d<bestDist){bestDist=d;best=idx;bestJoin=j;}
+      idx=sentence.toLowerCase().indexOf(j,idx+1);
+    }
+  });
+  if(best<0)return null;
+  var before=sentence.slice(0,best).trim().split(/\s+/).slice(-4).join(" ");
+  var after=sentence.slice(best+bestJoin.length).trim().split(/\s+/).slice(0,4).join(" ");
+  if(!before||!after)return null;
+  return "Try ending one sentence at \u201c\u2026"+before+".\u201d and starting fresh: \u201c"+
+    after.charAt(0).toUpperCase()+after.slice(1)+"\u2026\u201d";
+}
+
+/* ============ analysis ============ */
+function analyze(text){
+  var issues=[];
+  /* jargon */
+  var seen={};var m;JARGON_RE.lastIndex=0;
+  while((m=JARGON_RE.exec(text))){
+    var g=lookupPlain(m[1]);if(!g)continue;
+    var key=m[0].toLowerCase();if(seen[key])continue;seen[key]=1;
+    issues.push({type:"jargon",term:m[0],swap:g[1],auto:g[2],
+      why:"Plain wording anyone can follow."});
+  }
+  /* nominalizations */
+  Object.keys(NOMINAL).forEach(function(n){
+    if(new RegExp("\\b"+n+"\\b","i").test(text))
+      issues.push({type:"struct",term:n,swap:NOMINAL[n],
+        why:"Buried verb. The action version is easier to hear.",
+        fix:"Say who does it: \u201cwe "+NOMINAL[n]+"\u2026\u201d"});
+  });
+  /* framing */
+  cur().frames.concat(GLOBAL_FRAMES).forEach(function(f){
+    var mm=text.match(f.re);
+    if(mm)issues.push({type:"frame",term:mm[0].trim(),why:f.why,
+      fix:f.fix?f.fix(mm,text):null});
+  });
+  /* passive voice */
+  var pv=text.match(new RegExp("\\b(is|are|was|were|be|been|being)\\s+(\\w+ed|"+IRREG.join("|")+")\\b","i"));
+  if(pv)issues.push({type:"struct",term:pv[0],
+    why:"Passive voice hides who does what.",
+    fix:"Name the actor: \u201cwe fit the brace,\u201d not \u201cthe brace is fitted.\u201d"});
+  /* long sentences */
+  text.split(/(?<=[.!?])\s+/).forEach(function(s){
+    var w=s.trim().split(/\s+/).filter(Boolean).length;
+    if(w>25){
+      var sp=suggestSplit(s.trim());
+      issues.push({type:"struct",term:s.trim().slice(0,44)+"\u2026",
+        why:"Long sentence ("+w+" words). The listener loses the thread past ~20.",
+        fix:sp||"Split it into two sentences, one idea each."});
+    }
+  });
+  /* reading level as an explained issue when out of band */
+  var g=readingLevel(text);
+  if(g!==null&&g>8){
+    issues.push({type:"struct",term:"Reading level: grade "+g,
+      why:"Aim for grade 8 or below so it lands the first time it is heard.",
+      fix:"Shorter sentences and shorter words bring it down. The swaps above help too."});
+  }
+  return issues;
+}
+
+function renderIssues(issues){
+  var el=$("issues");
+  if(!issues.length){el.innerHTML='<div class="empty">Nothing flagged. Still read it against the seven habits in the Guide.</div>';return;}
+  el.innerHTML="";
+  var order={jargon:0,frame:1,struct:2};
+  issues.sort(function(a,b){return order[a.type]-order[b.type];});
+  issues.forEach(function(is,i){
+    var d=document.createElement("div");d.className="issue "+is.type;
+    var main="";
+    if(is.swap)main='<span class="term">'+esc(is.term)+'</span> <span class="arrow">&rarr;</span> <span class="swap">'+esc(is.swap)+'</span>';
+    else main='<span class="term">'+esc(is.term)+'</span>';
+    var fix=is.fix?'<div class="fix"><b>FIX</b> '+esc(is.fix)+'</div>':"";
+    var act=(is.type==="jargon"&&is.swap)?'<div class="act"><button class="btn-mini" data-swap="'+i+'">apply</button></div>':"";
+    d.innerHTML='<span class="dot"></span><div class="body">'+main+'<div class="why">'+esc(is.why)+'</div>'+fix+'</div>'+act;
+    el.appendChild(d);
+  });
+  el.querySelectorAll("[data-swap]").forEach(function(btn){
+    btn.onclick=function(){var is=issues[+btn.getAttribute("data-swap")];applyOne(is.term,is.swap);};
+  });
+}
+
+function updateMeter(text,issues){
+  var g=readingLevel(text);var gc=$("grade"),gv=$("grade-v");
+  gc.className="chip";
+  if(g===null){gv.textContent="-";}
+  else{gv.textContent="grade "+g;gc.classList.add(g<=8?"g":g<=11?"a":"r");}
+  $("count-v").textContent=issues.length;
+  $("count-w").textContent=issues.length===1?"issue":"issues";
+  $("count").className="chip tap"+(issues.length?"":" g");
+}
+
+/* ============ edit actions ============ */
+var undoStack=[];
+function pushUndo(t){undoStack.push(t);if(undoStack.length>20)undoStack.shift();$("undo").disabled=false;}
+function clearUndo(){undoStack=[];$("undo").disabled=true;}
+function run(){
+  var text=$("inp").value;
+  var issues=analyze(text);
+  renderIssues(issues);
+  updateMeter(text,issues);
+  store.set("reframe.draft",text);
+  updateReport(issues);
+}
+function applyOne(term,swap){
+  var re=new RegExp("\\b"+reEscape(term)+"(s|es|ing|ed)?\\b(?!['\u2019\\w])","gi");
+  var t=$("inp").value;var n=0;
+  var out=t.replace(re,function(mt){n++;
+    return /^[A-Z]/.test(mt)&&!/^[A-Z]{2,}/.test(mt)?swap.charAt(0).toUpperCase()+swap.slice(1):swap;});
+  if(out!==t){pushUndo(t);$("inp").value=out;run();toast(n>1?"Swapped "+n+" spots":"Swapped");}
+}
+$("clean").onclick=function(){
+  var t=$("inp").value;if(!t.trim()){toast("Type or paste something first");return;}
+  var g1=readingLevel(t),n1=analyze(t).length;
+  var changed=[];var out=t;
+  cur().glossary.forEach(function(g){
+    if(!g[2])return;
+    var re=new RegExp("\\b"+reEscape(g[0])+"(s|es|ing|ed)?\\b(?!['\u2019\\w])","gi");
+    out=out.replace(re,function(mt){changed.push(g[0]);
+      return /^[A-Z]/.test(mt)&&!/^[A-Z]{2,}/.test(mt)?g[1].charAt(0).toUpperCase()+g[1].slice(1):g[1];});
+  });
+  if(!changed.length){toast("No safe auto-swaps found - check Review for judgment calls");return;}
+  pushUndo(t);$("inp").value=out;
+  var g2=readingLevel(out),n2=analyze(out).length;
+  var uniq=changed.filter(function(v,i,a){return a.indexOf(v)===i;});
+  var win="";
+  if(g1!==null&&g2!==null){win+=(g2<g1)?("Reading level grade "+g1+" &rarr; grade "+g2):("Reading level held at grade "+g2);}
+  if(n1>n2){var d=n1-n2;win+=(win?" &middot; ":"")+d+(d===1?" issue":" issues")+" cleared, "+n2+" left for you";}
+  $("log").classList.remove("hide");
+  $("log").innerHTML="<b>Swapped "+changed.length+":</b> "+esc(uniq.join(", "))+"."+(win?(" <b>"+win+".</b>"):"")+" Framing and structure notes stay in Review for you to decide.";
+  run();
+};
+$("undo").onclick=function(){if(undoStack.length){$("inp").value=undoStack.pop();
+  if(!undoStack.length)$("undo").disabled=true;
+  $("log").classList.add("hide");run();toast("Reverted");}};
+$("copy").onclick=function(){var t=$("inp").value;
+  if(navigator.clipboard&&navigator.clipboard.writeText)
+    navigator.clipboard.writeText(t).then(function(){toast("Copied");},function(){toast("Copy failed");});
+  else toast("Copy not available here");};
+$("ex").onclick=function(){
+  if(!cur().example){toast("This pack has no example yet");return;}
+  $("inp").value=cur().example;
+  $("log").classList.add("hide");clearUndo();run();};
+$("clr").onclick=function(){$("inp").value="";$("log").classList.add("hide");clearUndo();run();};
+$("count").onclick=function(){if($("reviewcard").scrollIntoView)$("reviewcard").scrollIntoView({behavior:"smooth",block:"start"});};
+
+var deb;$("inp").addEventListener("input",function(){clearTimeout(deb);deb=setTimeout(run,300);});
+
+/* ============ pack auto-detect ============ */
+var detectDismissed={};
+function scorePack(text,pk){
+  var t=" "+text.toLowerCase()+" ";var n=0;
+  pk.glossary.forEach(function(g){
+    var term=g[0].toLowerCase();var idx=t.indexOf(term);
+    if(idx<0)return;
+    var b=t.charAt(idx-1),a=t.charAt(idx+term.length);
+    if(!/[a-z0-9]/.test(b)&&!/[a-z0-9]/.test(a))n++;
+  });
+  return n;
+}
+function hideDetect(){$("detect").classList.add("hide");}
+function checkDetect(){
+  var text=$("inp").value;
+  if(text.split(/\s+/).length<8)return;
+  var curN=scorePack(text,cur());
+  var bestK=null,bestN=0;
+  Object.keys(PACKS).concat(Object.keys(USER)).forEach(function(k){
+    if(k===PACK||detectDismissed[k])return;
+    var pk=getPack(k);if(!pk)return;
+    var n=scorePack(text,pk);
+    if(n>bestN){bestN=n;bestK=k;}
+  });
+  if(bestK&&bestN>=3&&bestN>curN*2){
+    $("detect-t").textContent="This sounds like "+getPack(bestK).name+".";
+    $("detect").classList.remove("hide");
+    $("detect-go").onclick=function(){hideDetect();setPack(bestK);};
+    $("detect-x").onclick=function(){detectDismissed[bestK]=1;hideDetect();};
+  } else hideDetect();
+}
+$("inp").addEventListener("paste",function(){setTimeout(checkDetect,60);});
+
+/* ============ phrasebank ============ */
+function renderPB(){
+  var w=$("pbwrap");w.innerHTML="";
+  if(!cur().pb.length){w.innerHTML='<div class="empty">This pack has no phrase lines yet. Import a fuller version or add lines in its JSON.</div>';return;}
+  cur().pb.forEach(function(cat){
+    var h=document.createElement("div");h.className="pb-cat";h.textContent=cat[0];w.appendChild(h);
+    cat[1].forEach(function(line){
+      var d=document.createElement("div");d.className="pb";
+      d.innerHTML='<button class="btn-mini sec cp" data-t="'+esc(line).replace(/"/g,"&quot;")+'">copy</button>'+esc(line);
+      w.appendChild(d);
+    });
+  });
+  w.querySelectorAll("[data-t]").forEach(function(b){
+    b.onclick=function(){var t=b.getAttribute("data-t");
+      if(navigator.clipboard&&navigator.clipboard.writeText)
+        navigator.clipboard.writeText(t).then(function(){toast("Copied");},function(){toast("Copy failed");});
+      else toast("Copy not available here");};
+  });
+}
+
+/* ============ before/after ============ */
+function renderBA(){
+  var w=$("bawrap");w.innerHTML="";
+  if(!cur().ba.length){w.innerHTML='<div class="empty">No before/after pairs in this pack yet.</div>';return;}
+  cur().ba.forEach(function(pair,i){
+    var d=document.createElement("div");d.className="ba";
+    if(i)d.style.marginTop="12px";
+    d.innerHTML='<div class="b4"><span class="tag">'+esc(pair[0])+'</span>'+esc(pair[1])+'</div>'+
+                '<div class="af"><span class="tag">PLAIN</span>'+esc(pair[2])+'</div>';
+    w.appendChild(d);
+  });
+}
+
+/* ============ packs ============ */
+function setPack(k,quiet){
+  if(!getPack(k))k="medical";
+  PACK=k;store.set("reframe.pack",k);
+  var db=document.getElementById("detect");if(db)db.classList.add("hide");
+  JARGON_RE=buildJargonRegex(cur().glossary);
+  $("packbtn").textContent=cur().name;
+  $("wholine").textContent=cur().who;
+  $("inp").setAttribute("placeholder",cur().ph);
+  renderPB();renderBA();run();
+  if(!quiet)toast(cur().name+" pack loaded");
+}
+function packCardEl(k,opts){
+  var pk=getPack(k);if(!pk)return null;
+  var d=document.createElement("div");d.className="packcard"+(k===opts.sel?" on":"");
+  var html='<div class="pn">'+esc(pk.name)+'</div><div class="pw">'+esc(pk.who)+'</div>';
+  if(opts.meta){
+    var meta=pk.glossary.length+' terms'+(pk.pb.length?' \u00b7 '+pk.pb.length+' phrase sets':'')+(pk.custom?' \u00b7 custom':'');
+    html+='<div class="pc">'+meta+'</div>';
+  }
+  d.innerHTML=html;
+  if(opts.actions){
+    var row=document.createElement("div");row.className="prow";
+    function mini(label,fn){var b=document.createElement("button");b.className="btn-mini sec";b.textContent=label;
+      b.onclick=function(ev){ev.stopPropagation();fn();};row.appendChild(b);}
+    mini("export",function(){exportPack(k);});
+    if(pk.custom){
+      mini("edit",function(){openEditor(k);});
+      mini("delete",function(){
+        if(row._arm){deletePack(k);renderPackList();}
+        else{row._arm=1;toast("Tap delete again to confirm");setTimeout(function(){row._arm=0;},2600);}
+      });
+    }
+    d.appendChild(row);
+  }
+  d.onclick=opts.tap;
+  return d;
+}
+function renderPackList(){
+  var w=$("packlist");w.innerHTML="";
+  Object.keys(PACKS).concat(Object.keys(USER)).forEach(function(k){
+    var d=packCardEl(k,{sel:PACK,meta:true,actions:true,
+      tap:function(){setPack(k);$("packsheet").classList.add("hide");}});
+    if(d)w.appendChild(d);
+  });
+}
+$("pk-import").onclick=function(){$("pk-file").click();};
+$("pk-file").addEventListener("change",function(){
+  var f=this.files&&this.files[0];this.value="";
+  if(!f)return;
+  var r=new FileReader();
+  r.onload=function(){var k=importPackText(r.result);if(k){setPack(k);renderPackList();}};
+  r.onerror=function(){toast("Could not read that file");};
+  r.readAsText(f);
+});
+
+/* ============ pack editor ============ */
+var peKey=null,peTerms=[];
+function openEditor(k){
+  peKey=k||null;
+  var raw=k?USER_RAW[k]:null;
+  $("pe-title").textContent=k?"Edit pack":"New pack";
+  $("pe-name").value=raw?raw.name:"";
+  $("pe-who").value=raw&&raw.who?raw.who:"";
+  peTerms=raw&&Array.isArray(raw.glossary)?raw.glossary.map(function(g){return g.slice();}):[];
+  $("pe-term").value="";$("pe-plain").value="";$("pe-auto").checked=false;
+  renderPeList();
+  $("packsheet").classList.add("hide");
+  $("packedit").classList.remove("hide");
+}
+function renderPeList(){
+  var w=$("pe-list");w.innerHTML="";
+  if(!peTerms.length){w.innerHTML='<div class="empty">No terms yet. Add the jargon your field uses.</div>';return;}
+  peTerms.forEach(function(g,i){
+    var d=document.createElement("div");d.className="pe-row";
+    d.innerHTML='<span class="t">'+esc(g[0])+'</span><span class="a">&rarr;</span><span class="p">'+esc(g[1])+(g[2]?' <span class="a">(auto)</span>':'')+'</span>';
+    var b=document.createElement("button");b.className="btn-mini sec";b.textContent="remove";
+    b.onclick=function(){peTerms.splice(i,1);renderPeList();};
+    d.appendChild(b);w.appendChild(d);
+  });
+}
+$("pe-add").onclick=function(){
+  var t=$("pe-term").value.trim(),pl=$("pe-plain").value.trim();
+  if(!t||!pl){toast("Need both the term and the plain version");return;}
+  if(peTerms.some(function(g){return g[0].toLowerCase()===t.toLowerCase();})){toast("That term is already in the pack");return;}
+  peTerms.push([t,pl,$("pe-auto").checked]);
+  $("pe-term").value="";$("pe-plain").value="";$("pe-auto").checked=false;
+  renderPeList();$("pe-term").focus();
+};
+$("pe-save").onclick=function(){
+  var nm=$("pe-name").value.trim();
+  if(!nm){toast("Give the pack a name");return;}
+  if(!peTerms.length){toast("Add at least one term");return;}
+  var raw=peKey&&USER_RAW[peKey]?USER_RAW[peKey]:{reframePack:1};
+  raw.name=nm;raw.who=$("pe-who").value.trim()||"Custom pack";raw.glossary=peTerms;
+  var k=peKey||packKeyFor(nm);
+  USER_RAW[k]=raw;USER[k]=compilePack(raw);saveUserPacks();
+  $("packedit").classList.add("hide");
+  setPack(k,true);toast('"'+nm+'" saved: '+peTerms.length+" terms");
+};
+$("pe-close").onclick=function(){$("packedit").classList.add("hide");};
+$("pk-new").onclick=function(){openEditor(null);};
+$("packbtn").onclick=function(){renderPackList();$("packsheet").classList.remove("hide");};
+$("pk-close").onclick=function(){$("packsheet").classList.add("hide");};
+
+/* ============ tabs ============ */
+function setTab(n){
+  ["edit","pb","guide"].forEach(function(x){
+    $("t-"+x).classList.toggle("on",x===n);
+    $("pane-"+x).classList.toggle("hide",x!==n);
+  });
+}
+$("t-edit").onclick=function(){setTab("edit");};
+$("t-pb").onclick=function(){setTab("pb");};
+$("t-guide").onclick=function(){setTab("guide");};
+
+
+/* ============ walkthrough ============ */
+var TOUR=[
+  {id:"inp",t:"1. Say it here",
+   d:"Type or paste what you plan to say to someone outside your field. We loaded an example so you can watch it work."},
+  {id:"meterbar",t:"2. The instant read",
+   d:"Reading level plus how many things are worth a look. Green at grade 8 or below means it lands the first time it is heard. Tap the issues chip anytime to jump to the list."},
+  {id:"clean",t:"3. One tap to plain English",
+   d:"Swaps clinical terms for plain ones and lists what changed. Undo puts everything back. Nothing changes meaning without you."},
+  {id:"reviewcard",t:"4. Why, and what to try instead",
+   d:"Every flag explains why it matters and offers wording to try. Green flags are word swaps, red are tone, amber are structure. You decide what to keep."},
+  {id:"tabsbar",t:"5. Two more tools",
+   d:"Phrasebank has ready-to-copy lines for common visits. Guide has the seven habits behind every suggestion."}
+];
+var tourAt=-1;
+function placeSpot(){
+  if(tourAt<0)return;
+  var el=$(TOUR[tourAt].id);var r=el.getBoundingClientRect();
+  var s=$("spot");var pad=6;
+  s.style.left=(r.left-pad)+"px";s.style.top=(r.top-pad)+"px";
+  s.style.width=(r.width+pad*2)+"px";s.style.height=(r.height+pad*2)+"px";
+}
+function showStep(i){
+  tourAt=i;var st=TOUR[i];
+  setTab("edit");
+  $("tour-t").textContent=st.t;$("tour-d").textContent=st.d;
+  var dots="";for(var k=0;k<TOUR.length;k++){dots+=k===i?"\u25cf":"\u25cb";}
+  $("tour-dots").innerHTML=dots.split("").map(function(c,k){return k===i?"<b>"+c+"</b>":c;}).join("");
+  $("tour-back").disabled=i===0;
+  $("tour-next").textContent=i===TOUR.length-1?"Done":"Next";
+  if($(TOUR[i].id).scrollIntoView)$(TOUR[i].id).scrollIntoView({behavior:"smooth",block:"center"});
+  $("spot").classList.remove("hide");$("tourcard").classList.remove("hide");
+  setTimeout(placeSpot,320);
+}
+function endTour(){
+  tourAt=-1;$("spot").classList.add("hide");$("tourcard").classList.add("hide");
+  store.set("reframe.tour.done","1");
+  toast("The ? up top replays this anytime");
+}
+function startTour(){
+  if(!$("inp").value.trim()){$("ex").onclick();}
+  showStep(0);
+}
+$("tour-next").onclick=function(){tourAt>=TOUR.length-1?endTour():showStep(tourAt+1);};
+$("tour-back").onclick=function(){if(tourAt>0)showStep(tourAt-1);};
+$("tour-skip").onclick=endTour;
+window.addEventListener("resize",placeSpot);
+window.addEventListener("scroll",placeSpot,true);
+$("help").onclick=function(){$("welcome").classList.add("hide");startTour();};
+$("w-go").onclick=function(){if(wSel!==PACK)setPack(wSel,true);$("welcome").classList.add("hide");startTour();};
+$("w-skip").onclick=function(){if(wSel!==PACK)setPack(wSel,true);$("welcome").classList.add("hide");
+  store.set("reframe.tour.done","1");toast("Tap ? up top whenever you want the tour");};
+
+/* ============ init ============ */
+$("badge").onclick=function(){toast("Reframe v1.6 \u00b7 on-device \u00b7 built Aug 18");};
+function renderWPacks(sel){
+  var w=$("wpacks");w.innerHTML="";
+  Object.keys(PACKS).forEach(function(k){
+    var d=packCardEl(k,{sel:sel,tap:function(){wSel=k;renderWPacks(k);}});
+    if(d)w.appendChild(d);
+  });
+}
+loadUserPacks();
+var wSel=store.get("reframe.pack")||"medical";
+setPack(wSel,true);
+var saved=store.get("reframe.draft");if(saved){$("inp").value=saved;run();}
+if(!store.get("reframe.tour.done")){renderWPacks(wSel);$("welcome").classList.remove("hide");}
+
+/* ============ v1.5: report context, a11y, PWA ============ */
+function updateReport(issues){
+  var a=document.getElementById("reportlink");if(!a)return;
+  var pk=cur();
+  var flagged=(issues&&issues.length)?issues.filter(function(i){return i.type==="jargon"||i.type==="frame";}).slice(0,3).map(function(i){return i.term;}):[];
+  var body="Pack: "+(pk?pk.name:"?")+"\n";
+  body+=flagged.length?("Flagged terms: "+flagged.join(", ")+"\n"):"";
+  body+="\nWhat was wrong with the suggestion:\n\n(Your text stays on your device. Only what you type below is sent.)";
+  a.href="mailto:motbuchanan@gmail.com?subject="+encodeURIComponent("Reframe report - "+(pk?pk.name:"pack"))+"&body="+encodeURIComponent(body);
+}
+function a11yButton(el,label){
+  if(!el)return;
+  el.setAttribute("role","button");
+  el.setAttribute("tabindex","0");
+  if(label)el.setAttribute("aria-label",label);
+  el.addEventListener("keydown",function(e){
+    if(e.key==="Enter"||e.key===" "||e.key==="Spacebar"){e.preventDefault();el.click();}
+  });
+}
+(function initA11y(){
+  a11yButton($("help"),"How to use this tool");
+  a11yButton($("packbtn"),"Change field pack");
+  a11yButton($("count"),"Jump to the review list");
+  ["t-edit","t-pb","t-guide"].forEach(function(id){var t=document.getElementById(id);if(t)a11yButton(t,null);});
+  document.querySelectorAll(".tab").forEach(function(t){if(!t.getAttribute("role"))a11yButton(t,null);});
+})();
+if("serviceWorker" in navigator){
+  window.addEventListener("load",function(){
+    navigator.serviceWorker.register("sw.js",{scope:"./"})["catch"](function(){});
+  });
+}
+</script>
+</body>
+</html>
