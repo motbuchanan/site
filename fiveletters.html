@@ -113,6 +113,26 @@ main{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;
 .dist{display:flex;flex-direction:column;gap:5px;margin-bottom:18px}
 .btn{width:100%;background:var(--accent);color:#08121a;border:none;border-radius:12px;padding:14px;font:800 14px var(--sys);cursor:pointer;margin-top:8px}
 .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--txt)}
+/* ---------- settings ---------- */
+.setrow{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--line)}
+.setrow:last-of-type{border-bottom:none;margin-bottom:6px}
+.setinfo{flex:1}
+.setinfo b{display:block;font-family:'Archivo',sans-serif;font-weight:800;font-size:15px}
+.setinfo span{display:block;color:var(--dim);font-size:12.5px;line-height:1.4;margin-top:2px}
+.tog{flex:0 0 auto;width:52px;height:30px;border-radius:999px;border:1px solid var(--line);background:#20293b;cursor:pointer;position:relative;transition:background .2s,border-color .2s}
+.tog .knob{position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#8892a4;transition:transform .2s,background .2s}
+.tog.on{background:rgba(76,240,224,.22);border-color:var(--accent)}
+.tog.on .knob{transform:translateX(22px);background:var(--accent)}
+/* ---------- high contrast (colorblind) ---------- */
+body.cb{--hit:#e8703a;--near:#4d9be6}
+body.cb .cell.hit{background:linear-gradient(160deg,#f0813f,#cf5f1e);color:#160a02;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35), inset 0 -2px 4px rgba(0,0,0,.2), 0 0 18px rgba(232,112,58,.5), 0 3px 8px rgba(0,0,0,.35)}
+body.cb .cell.near{background:linear-gradient(160deg,#5aa4ea,#3577c2);color:#04101e;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.3), inset 0 -2px 4px rgba(0,0,0,.22), 0 3px 8px rgba(0,0,0,.35)}
+body.cb .key.hit{background:linear-gradient(160deg,#f0813f,#cf5f1e);color:#160a02}
+body.cb .key.near{background:linear-gradient(160deg,#5aa4ea,#3577c2);color:#04101e}
+body.cb .ttile.hit{background:linear-gradient(160deg,#f0813f,#cf5f1e);color:#160a02;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 0 14px rgba(232,112,58,.5)}
+body.cb .ttile.near{background:linear-gradient(160deg,#5aa4ea,#3577c2);color:#04101e;box-shadow:inset 0 1px 0 rgba(255,255,255,.3)}
 </style>
 </head>
 <body>
@@ -120,6 +140,7 @@ main{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;
   <a href="index.html" id="home" aria-label="Back home">&#8962; Home</a>
   <span id="wordmark">Five<span>Letters</span></span>
   <button class="tbtn" id="bHelp" aria-label="How to play">?</button>
+  <button class="tbtn" id="bSet" aria-label="Settings">&#9881;</button>
   <button class="tbtn" id="bStats" aria-label="Your record">&#9776;</button>
 </div>
 
@@ -140,11 +161,11 @@ main{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;
   <div class="tutrow">
     <span class="ttile hit">M</span><span class="ttile">A</span><span class="ttile">P</span><span class="ttile">L</span><span class="ttile">E</span>
   </div>
-  <p><b>Green</b> means that letter is correct and in the right spot.</p>
+  <p><b class="cn1">Green</b> means that letter is correct and in the right spot.</p>
   <div class="tutrow">
     <span class="ttile">C</span><span class="ttile near">R</span><span class="ttile">A</span><span class="ttile">N</span><span class="ttile">E</span>
   </div>
-  <p><b>Gold</b> means the letter is in the word, but in a different spot.</p>
+  <p><b class="cn2">Gold</b> means the letter is in the word, but in a different spot.</p>
   <div class="tutrow">
     <span class="ttile">S</span><span class="ttile">T</span><span class="ttile miss">O</span><span class="ttile">R</span><span class="ttile">M</span>
   </div>
@@ -161,6 +182,19 @@ main{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;
   <div class="legend"><span class="swatch" style="background:var(--miss)"></span> Not in the word</div>
   <p><b>Today</b> is the same word for everyone in the house, so you can compare. <b>Practice</b> gives you a new word whenever you like.</p>
   <button class="btn" id="bHelpClose">Got it</button>
+</div></div>
+
+<div class="sheet" id="shSet"><div class="sbox">
+  <h3>Settings</h3>
+  <div class="setrow">
+    <div class="setinfo"><b>Hard Mode</b><span>Revealed hints must be used in your next guess.</span></div>
+    <button class="tog" id="tgHard" role="switch" aria-checked="false" aria-label="Hard Mode"><span class="knob"></span></button>
+  </div>
+  <div class="setrow">
+    <div class="setinfo"><b>High Contrast</b><span>Orange and blue tiles instead of green and gold, for colorblind play.</span></div>
+    <button class="tog" id="tgCB" role="switch" aria-checked="false" aria-label="High Contrast"><span class="knob"></span></button>
+  </div>
+  <button class="btn ghost" id="bSetClose">Close</button>
 </div></div>
 
 <div class="sheet" id="shStats"><div class="sbox">
@@ -180,7 +214,18 @@ main{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;
 <script>
 "use strict";
 var $=function(i){return document.getElementById(i);};
-var VERSION="v1.0";
+var VERSION="v1.1";
+
+/* ---------- settings state ---------- */
+function pref(k){try{return localStorage.getItem(k)==="1";}catch(e){return false;}}
+function setPref(k,v){try{localStorage.setItem(k,v?"1":"0");}catch(e){}}
+var CB=pref("fl_cb"), HARD=pref("fl_hard");
+function applyCB(){
+  document.body.classList.toggle("cb",CB);
+  var n1=document.querySelectorAll(".cn1"), n2=document.querySelectorAll(".cn2");
+  n1.forEach(function(el){el.textContent=CB?"Orange":"Green";});
+  n2.forEach(function(el){el.textContent=CB?"Blue":"Gold";});
+}
 
 /* Answer pool: hand-picked common words, every one verified against the shelf
    dictionary at build time so an answer is always a legal guess too. Guesses are
@@ -276,7 +321,7 @@ function toast(msg){
 
 /* ---------- play ---------- */
 function newGame(mode){
-  state.mode=mode; state.row=0; state.col=0; state.done=false; state.keys={};
+  state.mode=mode; state.row=0; state.col=0; state.done=false; state.keys={}; state.res=[];
   if(mode==="daily"){
     state.answer=ANSWERS[daySeed()%ANSWERS.length];
   } else {
@@ -330,6 +375,7 @@ function scoreRow(guess,instant){
     var ch=guess[i];
     if(pool[ch]>0){res[i]="near";pool[ch]--;}
   }
+  state.res=state.res||[]; state.res[state.row]={g:guess,r:res.slice()};
   var rowEls=state.grid[state.row];
   res.forEach(function(kind,idx){
     var applyColor=function(){
@@ -353,10 +399,25 @@ function scoreRow(guess,instant){
   return res;
 }
 
+function hardViolation(guess){
+  var ORD=["1st","2nd","3rd","4th","5th"];
+  for(var r=0;r<state.row;r++){
+    var pr=state.res&&state.res[r]; if(!pr)continue;
+    for(var i=0;i<COLS;i++)
+      if(pr.r[i]==="hit"&&guess[i]!==pr.g[i]) return ORD[i]+" letter must be "+pr.g[i];
+    for(i=0;i<COLS;i++)
+      if(pr.r[i]==="near"&&guess.indexOf(pr.g[i])<0) return "Guess must contain "+pr.g[i];
+  }
+  return "";
+}
 function submit(){
   if(state.col<COLS){shake();toast("Not enough letters");return;}
   var guess=""; for(var i=0;i<COLS;i++)guess+=state.grid[state.row][i].textContent;
   if(!validWord(guess)){shake();toast("Not in the word list");return;}
+  if(HARD){
+    var hv=hardViolation(guess.toUpperCase());
+    if(hv){shake();toast(hv);return;}
+  }
   var res=scoreRow(guess,false);
   var won=res.every(function(r){return r==="hit";});
   var rowUsed=state.row;
@@ -422,18 +483,20 @@ function openStats(){
 }
 function shareText(){
   var d=loadDaily();
-  if(!d.rows||!d.rows.length)return "";
-  var ans=state.answer.toUpperCase();
+  if(d.date!==todayKey()||!d.rows||!d.rows.length)return "";
+  var ans=ANSWERS[daySeed()%ANSWERS.length].toUpperCase();
+  var solved=d.rows[d.rows.length-1]===ans;
+  if(!solved&&d.rows.length<ROWS)return "unfinished";
+  var HIT=CB?"\uD83D\uDFE7":"\uD83D\uDFE9", NEAR=CB?"\uD83D\uDFE6":"\uD83D\uDFE8";
   var lines=d.rows.map(function(g){
     var res=new Array(COLS).fill("\u2b1b"), pool={};
     for(var i=0;i<COLS;i++) if(g[i]!==ans[i]) pool[ans[i]]=(pool[ans[i]]||0)+1;
-    for(i=0;i<COLS;i++) if(g[i]===ans[i]) res[i]="\uD83D\uDFE9";
+    for(i=0;i<COLS;i++) if(g[i]===ans[i]) res[i]=HIT;
     for(i=0;i<COLS;i++){ if(res[i]!=="\u2b1b")continue;
-      if(pool[g[i]]>0){res[i]="\uD83D\uDFE8";pool[g[i]]--;} }
+      if(pool[g[i]]>0){res[i]=NEAR;pool[g[i]]--;} }
     return res.join("");
   });
-  var solved=d.rows[d.rows.length-1]===ans;
-  return "Five Letters "+todayKey()+"  "+(solved?d.rows.length:"X")+"/6\n"+lines.join("\n");
+  return "Five Letters Daily #"+dailyNumber()+" "+(solved?d.rows.length:"X")+"/6\n"+lines.join("\n");
 }
 
 /* ---------- wiring ---------- */
@@ -444,18 +507,38 @@ $("bHelpClose").onclick=function(){$("shHelp").classList.remove("on");};
 $("bStats").onclick=openStats;
 $("bStatsClose").onclick=function(){$("shStats").classList.remove("on");};
 $("bTutClose").onclick=function(){$("shTut").classList.remove("on");try{localStorage.setItem("fl_tut_seen","1");}catch(e){}};
+$("bSet").onclick=function(){$("shSet").classList.add("on");};
+$("bSetClose").onclick=function(){$("shSet").classList.remove("on");};
+function drawTogs(){
+  $("tgHard").classList.toggle("on",HARD); $("tgHard").setAttribute("aria-checked",HARD?"true":"false");
+  $("tgCB").classList.toggle("on",CB); $("tgCB").setAttribute("aria-checked",CB?"true":"false");
+}
+$("tgHard").onclick=function(){HARD=!HARD;setPref("fl_hard",HARD);drawTogs();toast(HARD?"Hard Mode on":"Hard Mode off");};
+$("tgCB").onclick=function(){CB=!CB;setPref("fl_cb",CB);drawTogs();applyCB();};
+drawTogs(); applyCB();
 $("bShare").onclick=function(){
   var t=shareText();
   if(!t){toast("Play today's word first");return;}
+  if(t==="unfinished"){toast("Finish today's word first");return;}
+  function fallbackCopy(){
+    try{
+      var ta=document.createElement("textarea");
+      ta.value=t; ta.style.position="fixed"; ta.style.opacity="0";
+      document.body.appendChild(ta); ta.focus(); ta.select();
+      var ok=document.execCommand("copy");
+      document.body.removeChild(ta);
+      toast(ok?"Copied":"Could not copy");
+    }catch(e){toast("Could not copy");}
+  }
   if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(t).then(function(){toast("Copied");},function(){toast("Could not copy");});
-  } else toast("Copying is not available here");
+    navigator.clipboard.writeText(t).then(function(){toast("Copied");},fallbackCopy);
+  } else fallbackCopy();
 };
-[$("shHelp"),$("shStats"),$("shTut")].forEach(function(sh){
+[$("shHelp"),$("shStats"),$("shTut"),$("shSet")].forEach(function(sh){
   sh.addEventListener("click",function(e){if(e.target===sh)sh.classList.remove("on");});
 });
 window.addEventListener("keydown",function(e){
-  if($("shHelp").classList.contains("on")||$("shStats").classList.contains("on"))return;
+  if($("shHelp").classList.contains("on")||$("shStats").classList.contains("on")||$("shSet").classList.contains("on"))return;
   if(e.key==="Enter")press("enter");
   else if(e.key==="Backspace")press("del");
   else if(/^[a-zA-Z]$/.test(e.key))press(e.key.toUpperCase());

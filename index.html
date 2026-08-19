@@ -223,7 +223,7 @@ tick();setInterval(tick,15000);
 
 var pl=document.getElementById('player'),pw=document.getElementById('pw');
 function openG(f,selfback){document.getElementById('back').style.display=selfback?'none':'block';var fr=document.createElement('iframe');fr.id='gf';fr.src=f;
-  fr.setAttribute('allow','autoplay; fullscreen; gamepad');
+  fr.setAttribute('allow','autoplay; fullscreen; gamepad; clipboard-write');
   pw.appendChild(fr);pl.classList.add('on');
   try{history.pushState({g:f},'',location.pathname);}catch(e){}}
 function closeG(){var fr=document.getElementById('gf');if(fr){fr.src='about:blank';fr.remove();}pl.classList.remove('on');}
