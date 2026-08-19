@@ -1,0 +1,16 @@
+{
+  "name": "Reframe - plain words for expert talk",
+  "short_name": "Reframe",
+  "description": "Rewrites expert jargon and hard framing into plain, humane words. Runs entirely on your device.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a0d11",
+  "theme_color": "#0a0d11",
+  "icons": [
+    { "src": "reframe-icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "reframe-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "reframe-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
