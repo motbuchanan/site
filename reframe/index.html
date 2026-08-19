@@ -29,7 +29,7 @@
   .wm{font-family:"Arial Black","Arial Bold",Arial,sans-serif;font-size:1.45rem;letter-spacing:-.4px;line-height:1}
   .wm::after{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);margin-left:4px}
   .sub{font-size:.72rem;color:var(--muted);margin-top:3px}
-  .packcard{background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:11px 12px;margin-bottom:8px;cursor:pointer}
+  .packcard{background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:9px 11px;margin-bottom:7px;cursor:pointer}
   .packcard.on{border-color:var(--accent);background:rgba(76,240,224,.08)}
   .packcard .pn{font-family:"Arial Black","Arial Bold",Arial,sans-serif;font-size:.95rem}
   .packcard .pw{font-size:.8rem;color:var(--muted);margin-top:2px}
@@ -121,7 +121,9 @@
   .welcome{position:fixed;inset:0;background:rgba(0,0,0,.74);z-index:62;display:flex;
     align-items:center;justify-content:center;padding:20px}
   .welcome .wc{background:var(--panel);border:1px solid var(--line);border-radius:16px;
-    padding:20px;max-width:420px;width:100%}
+    padding:20px;max-width:420px;width:100%;
+    max-height:calc(100vh - 40px);max-height:calc(100dvh - 40px);
+    overflow-y:auto;-webkit-overflow-scrolling:touch}
   .welcome .wt{font-family:"Arial Black","Arial Bold",Arial,sans-serif;font-size:1.05rem;margin-bottom:6px}
   .welcome .wd{font-size:.9rem;color:var(--muted);line-height:1.55;margin-bottom:14px}
   .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);
@@ -146,7 +148,7 @@
 <div class="wm">Reframe</div>
 <div class="sub" id="wholine">plain words for expert talk</div>
 </div></div>
-    <div style="display:flex;gap:6px;align-items:center;flex:0 0 auto"><div class="badge" id="help" title="How to use this">?</div><div class="badge" id="packbtn">Medical</div><div class="badge" id="badge">v1.6</div></div>
+    <div style="display:flex;gap:6px;align-items:center;flex:0 0 auto"><div class="badge" id="help" title="How to use this">?</div><div class="badge" id="packbtn">Medical</div><div class="badge" id="badge">v1.7</div></div>
   </header>
 
   <div class="note">
@@ -220,15 +222,15 @@
     </div>
   </section>
 
-  <div class="foot">Reframe v1.6 &middot; runs entirely on this device &middot; suggestions only. You stay the author.<br>
+  <div class="foot">Reframe v1.7 &middot; runs entirely on this device &middot; suggestions only. You stay the author.<br>
   Spotted a bad suggestion? <a id="reportlink" href="mailto:motbuchanan@gmail.com?subject=Reframe%20suggestion%20report" style="color:var(--accent)">Report it</a> and make the tool better.</div>
 </div>
 
 <div class="welcome hide" id="welcome">
   <div class="wc">
     <div class="wt">First time here?</div>
-    <div id="wpacks" style="margin-bottom:12px"></div>
     <div class="wd">Reframe checks what you plan to say to someone outside your field and suggests plainer, kinder wording. Pick your field, then a 30-second tour shows exactly how it works.</div>
+    <div id="wpacks" style="margin-bottom:12px"></div>
     <div class="row" style="margin-top:0">
       <button class="btn-primary" id="w-go">Show me</button>
       <button class="btn-ghost" id="w-skip">Skip for now</button>
@@ -1257,7 +1259,7 @@ $("w-skip").onclick=function(){if(wSel!==PACK)setPack(wSel,true);$("welcome").cl
   store.set("reframe.tour.done","1");toast("Tap ? up top whenever you want the tour");};
 
 /* ============ init ============ */
-$("badge").onclick=function(){toast("Reframe v1.6 \u00b7 on-device \u00b7 built Aug 18");};
+$("badge").onclick=function(){toast("Reframe v1.7 \u00b7 on-device \u00b7 built Aug 18");};
 function renderWPacks(sel){
   var w=$("wpacks");w.innerHTML="";
   Object.keys(PACKS).forEach(function(k){
