@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<script>document.documentElement.classList.add('js');try{if(window.self!==window.top)document.documentElement.classList.add('embed');}catch(e){document.documentElement.classList.add('embed');}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0C0F14">
+<title>The Production Triangle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink-0:#0C0F14; --ink-1:#11151C; --ink-2:#171D26; --ink-3:#1E2530;
+    --line:#232C38; --line-2:#34414F;
+    --text:#EAF1F8; --muted:#93A0B0; --faint:#5C6875; --dim:#3c4653;
+    --good:#35C08A; --fast:#F5B94A; --cheap:#5B9BE0;
+    --disp:'Space Grotesk',ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    --mono:'Space Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --body:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --e-out:cubic-bezier(.2,.7,.2,1);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--ink-0);color:var(--text);font-family:var(--body);line-height:1.6;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;overflow-x:hidden}
+  body::before{content:"";position:fixed;inset:0;z-index:-2;background:radial-gradient(1200px 800px at 50% -10%, #1a2230 0%, transparent 60%),radial-gradient(900px 900px at 85% 110%, #14202b 0%, transparent 55%),linear-gradient(180deg,#0C0F14,#0A0D12);}
+  .bg-grid{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.42;
+    background-image:linear-gradient(#ffffff1c 1px,transparent 1px),linear-gradient(90deg,#ffffff1c 1px,transparent 1px);
+    background-size:44px 44px;background-position:0 0;will-change:background-position,opacity;
+    -webkit-mask-image:radial-gradient(125% 96% at 50% 42%,#000 0%,transparent 88%);
+            mask-image:radial-gradient(125% 96% at 50% 42%,#000 0%,transparent 88%)}
+
+  .wrap{max-width:840px;margin:0 auto;padding:0 20px}
+  section{padding:64px 0}
+
+  .eyebrow{font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#AEBAC8}
+  h1{font-family:var(--disp);font-weight:700;letter-spacing:-.03em;line-height:.98;font-size:clamp(46px,13vw,92px);margin:.24em 0 0}
+  h2{font-family:var(--disp);font-weight:600;letter-spacing:-.02em;line-height:1.05;font-size:clamp(28px,6vw,42px);margin:0 0 .5em}
+  h3{font-family:var(--disp);font-weight:600;font-size:19px;letter-spacing:-.01em;margin:0}
+  p{margin:0 0 18px;color:#d3dbe5;font-size:clamp(16px,2.4vw,18px)}
+  p.lead{font-size:clamp(18px,3vw,22px);color:var(--text)}
+  .muted{color:var(--muted)}
+  strong{color:#fff;font-weight:600}
+  em{font-style:italic}
+  .kg{color:var(--good);font-weight:600}.kf{color:var(--fast);font-weight:600}.kc{color:var(--cheap);font-weight:600}
+  .block{max-width:680px}
+
+  /* section eyebrow with oversized index as an eye-anchor */
+  .lbl{font-family:var(--mono);font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--faint);display:flex;align-items:center;gap:12px;margin-bottom:20px}
+  .lbl::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--line-2),transparent)}
+  .lbl.io{clip-path:inset(0 100% 0 0)}
+  .lbl.io.in{animation:wipe .6s var(--e-out) forwards}
+  @keyframes wipe{to{clip-path:inset(0 0 0 0)}}
+
+  /* headline 3-beat */
+  .headline .w{display:inline-block;overflow:hidden;vertical-align:top}
+  .headline .w > b{display:inline-block;font-weight:700;transform:translateY(110%);animation:beat .8s var(--e-out) forwards}
+  .headline .w.g > b{animation-delay:.20s;color:var(--good)}
+  .headline .w.c > b{animation-delay:.44s;color:var(--cheap)}
+  .headline .w.f > b{animation-delay:.62s;color:var(--fast)}
+  .headline .two{display:block;overflow:hidden}
+  .headline .two > b{display:inline-block;font-weight:700;transform:translateY(110%);animation:beat .85s var(--e-out) .9s forwards}
+  @keyframes beat{to{transform:translateY(0)}}
+  .fade-load{opacity:0;animation:fadein .8s ease .7s forwards}
+  @keyframes fadein{to{opacity:1}}
+
+  /* word-highlight reading reveal (scroll-driven via JS) */
+  .rw{color:var(--dim);transition:color .05s linear}
+
+  /* HERO */
+  .hero{padding-top:clamp(36px,8vh,84px);padding-bottom:36px;text-align:center}
+  .hero .sub{max-width:44ch;margin:24px auto 0;color:#d3dbe5}
+  .stage-wrap{margin:32px auto 0;max-width:760px;display:grid;grid-template-columns:1fr;gap:18px}
+  @media(min-width:720px){.stage-wrap{grid-template-columns:1.08fr .92fr;align-items:center}}
+  .stage{position:relative;background:linear-gradient(180deg,#12171F,#0F141B);border:1px solid var(--line);border-radius:22px;padding:16px 14px 12px;box-shadow:0 30px 60px -30px #000,0 2px 0 #ffffff08 inset;overflow:hidden}
+  .svgbox{position:relative;width:100%;max-width:440px;margin:0 auto;aspect-ratio:1.05/1;touch-action:none}
+  svg.tri{width:100%;height:100%;display:block;overflow:visible}
+  .puck{cursor:grab}.puck:active{cursor:grabbing}
+  .puck.pulse{animation:pop .4s ease}
+  @keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.14)}100%{transform:scale(1)}}
+  .cap{font-family:var(--mono);font-size:11.5px;color:var(--faint);text-align:center;margin:8px 6px 2px;line-height:1.5}
+  .cap b{color:var(--muted)}
+  .reads{display:flex;flex-direction:column;gap:12px}
+  .deal-card{background:var(--ink-1);border:1px solid var(--line);border-radius:16px;padding:15px 16px;min-height:78px;display:flex;flex-direction:column;justify-content:center;gap:4px}
+  .deal-card .d{font-family:var(--disp);font-weight:600;font-size:18px}
+  .deal-card .n{font-size:13.5px;color:var(--muted)}
+  .bars{background:var(--ink-1);border:1px solid var(--line);border-radius:16px;padding:4px 16px}
+  .bar{padding:12px 0;border-bottom:1px solid var(--line)}
+  .bar:last-child{border-bottom:none}
+  .bar .row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px}
+  .bar .nm{font-family:var(--disp);font-weight:600;font-size:13px;letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+  .sw{width:9px;height:9px;border-radius:2px}
+  .bar .ds{font-family:var(--body);font-size:12px;letter-spacing:0;text-transform:none;color:var(--muted);font-weight:400}
+  .bar .vl{font-family:var(--mono);font-weight:700;font-size:15px;font-variant-numeric:tabular-nums}
+  .track{height:8px;background:#0c1118;border-radius:99px;overflow:hidden;box-shadow:inset 0 1px 2px #0008}
+  .fill{height:100%;width:33%;border-radius:99px;transition:width .1s linear}
+  .presets{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:2px}
+  .presets .full{grid-column:1/-1}
+  button.p{font-family:var(--disp);font-size:13px;font-weight:600;color:var(--text);background:var(--ink-1);border:1px solid var(--line);border-radius:12px;padding:11px 10px;cursor:pointer;transition:border-color .14s,background .14s,transform .1s}
+  button.p:hover{border-color:var(--line-2);background:var(--ink-2)}
+  button.p:active{transform:translateY(1px)}
+  button.p:focus-visible{outline:2px solid var(--text);outline-offset:2px}
+  button.p small{display:block;font-family:var(--body);font-weight:400;color:var(--faint);font-size:11px;margin-top:2px}
+  .scrollcue{margin:40px auto 0;width:26px;height:42px;border:1.5px solid var(--line-2);border-radius:14px;position:relative;opacity:.7}
+  .scrollcue::after{content:"";position:absolute;left:50%;top:8px;width:4px;height:8px;border-radius:2px;background:var(--muted);transform:translateX(-50%);animation:cue 1.6s ease-in-out infinite}
+  @keyframes cue{0%,100%{opacity:.3;transform:translate(-50%,0)}50%{opacity:1;transform:translate(-50%,10px)}}
+
+  /* pool */
+  .pool{margin:22px 0 6px;background:var(--ink-1);border:1px solid var(--line);border-radius:16px;padding:20px}
+  .pool .cap2{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--faint);text-transform:uppercase;margin-bottom:12px}
+  .poolbar{display:flex;height:46px;border-radius:10px;overflow:hidden;border:1px solid var(--line-2)}
+  .poolbar span{display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-weight:600;font-size:13px;color:#0c1118}
+
+  /* corner cards */
+  .corners{display:grid;grid-template-columns:1fr;gap:14px;margin-top:8px}
+  @media(min-width:680px){.corners{grid-template-columns:repeat(3,1fr)}}
+  .ccard{position:relative;background:var(--ink-1);border:1px solid var(--line);border-radius:16px;padding:20px 18px;overflow:hidden}
+  .ccard::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(120px 90px at 20% -10%,var(--c) 0%,transparent 70%);opacity:.14}
+  .ccard .ic{width:40px;height:40px;border-radius:11px;display:grid;place-items:center;margin-bottom:14px;background:#0d1219;border:1px solid var(--line-2)}
+  .ccard h3{color:var(--c)}
+  .ccard .tag{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin:2px 0 12px}
+  .ccard p{font-size:14.5px;margin:0;color:#c3ccd7}
+  .ccard .floor{margin-top:12px;padding-top:12px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+  .ccard .floor b{color:var(--c);font-weight:600}
+  .js .ccard{opacity:0;will-change:opacity,clip-path}
+
+  /* ===== DEALS: sticky scroll walk ===== */
+  .deals-scroll{position:relative;height:300vh;height:300svh}
+  .deals-sticky{position:sticky;top:0;height:100vh;height:100svh;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:16px;padding:20px;overflow:hidden}
+  @media(min-width:760px){.deals-sticky{flex-direction:row;gap:44px;max-width:900px;margin:0 auto}}
+  .deals-tri,.deals-panel{z-index:1}
+  .deals-tri{position:relative;width:100%;max-width:min(360px,44svh);aspect-ratio:1.05/1;flex:0 0 auto}
+  @media(min-width:760px){.deals-tri{max-width:360px}}
+  .deals-tri svg{width:100%;height:100%;display:block;overflow:visible}
+  .deals-panel{width:100%;max-width:420px;flex:0 0 auto}
+  .deals-panel .lbl{margin-bottom:14px}
+  .dstack{position:relative;min-height:186px}
+  @media(min-width:760px){.dstack{min-height:210px}}
+  .dt{position:absolute;inset:0;opacity:0;transition:opacity .4s var(--e-out);pointer-events:none}
+  .dt.on{opacity:1;pointer-events:auto}
+  .dt .deal-t{font-family:var(--disp);font-weight:700;font-size:clamp(24px,5vw,32px);margin-bottom:4px;letter-spacing:-.01em}
+  .dt .lose{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#d16a7e;margin-bottom:12px}
+  .dt p{font-size:16px;color:#c8d1db;margin:0;max-width:42ch}
+  .dprog{position:relative;height:4px;background:#1b222c;border-radius:2px;margin-top:26px}
+  .dprog .pf{position:absolute;left:0;top:0;height:100%;width:0;background:linear-gradient(90deg,var(--good),var(--fast),var(--cheap));border-radius:2px}
+  .dprog .tk{position:absolute;top:50%;width:8px;height:8px;border-radius:50%;background:var(--ink-0);border:2px solid #2c3540;transform:translate(-50%,-50%);transition:border-color .3s}
+  .dprog .tk.done{border-color:var(--muted)}
+  .dprog .ph{position:absolute;top:50%;left:0;width:12px;height:12px;border-radius:50%;background:#fff;transform:translate(-50%,-50%);box-shadow:0 0 12px #ffffffaa}
+  .keepscroll{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-top:16px;transition:opacity .5s;height:16px}
+  .keepscroll .cv{color:var(--muted);animation:bob 1.5s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(-1px);opacity:.45}50%{transform:translateY(3px);opacity:1}}
+  @media (prefers-reduced-motion:reduce){
+    .deals-scroll{height:auto}
+    .deals-sticky{position:static;height:auto;display:block;padding:20px 0}
+    .dprog,.keepscroll{display:none}
+    .dstack{position:static;min-height:0}
+    .dt{position:relative;opacity:1;margin-bottom:24px;padding-left:16px;border-left:2px solid var(--line-2)}
+  }
+
+  /* balance */
+  .pullquote{font-family:var(--disp);font-weight:600;font-size:clamp(24px,5vw,38px);line-height:1.15;letter-spacing:-.02em;color:var(--text);margin:8px 0 22px;max-width:16ch}
+  .pullquote .mid{color:var(--good)}
+  .leans{display:flex;flex-direction:column;gap:10px;margin:22px 0 4px}
+  @media(min-width:560px){.leans{flex-direction:row}}
+  .lean{flex:1;background:var(--ink-1);border:1px solid var(--line);border-left:3px solid var(--c);border-radius:12px;padding:14px 15px}
+  .lean .job{font-family:var(--disp);font-weight:600;font-size:14.5px;color:var(--text)}
+  .lean .to{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--c);margin-top:5px}
+  .callout{border-left:2px solid var(--fast);padding:2px 0 2px 20px;margin:24px 0 0}
+  .callout p:last-child{margin-bottom:0}
+
+  /* waste demo */
+  .demo{background:var(--ink-1);border:1px solid var(--line);border-radius:18px;padding:22px;margin:24px 0}
+  .partnum{font-family:var(--disp);font-weight:700;font-size:34px;line-height:1;color:var(--fast);opacity:.6;float:left;margin:2px 14px 0 0}
+  .partnum.two{color:var(--cheap)}
+  .demo .steps{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 20px}
+  .chip{font-family:var(--mono);font-size:12px;padding:8px 12px;border-radius:9px;background:#0e131a;border:1px solid var(--line-2);color:var(--muted);transition:opacity .5s,transform .5s,filter .5s}
+  .chip.waste{color:#e88;border-color:#5a2b34;background:#1b1013}
+  .demo.clean .chip.waste{opacity:0;transform:scale(.8);filter:blur(3px);pointer-events:none}
+  .demo .two-bars{display:grid;gap:14px;margin-bottom:20px}
+  .mb{display:grid;grid-template-columns:64px 1fr 46px;align-items:center;gap:12px}
+  .mb .k{font-family:var(--disp);font-weight:600;font-size:13px}
+  .mb .t{height:10px;background:#0c1118;border-radius:99px;overflow:hidden}
+  .mb .f{height:100%;border-radius:99px;transition:width .9s var(--e-out)}
+  .mb .v{font-family:var(--mono);font-weight:700;font-size:13px;text-align:right;font-variant-numeric:tabular-nums}
+  .togg{font-family:var(--disp);font-weight:600;font-size:14px;color:#0c1118;background:var(--fast);border:none;border-radius:11px;padding:12px 18px;cursor:pointer;transition:transform .1s,filter .14s}
+  .togg:hover{filter:brightness(1.08)}.togg:active{transform:translateY(1px)}
+
+  /* sand cone - scroll-tied fill */
+  .cone-wrap{display:grid;grid-template-columns:1fr;gap:22px;margin-top:24px;align-items:center}
+  @media(min-width:680px){.cone-wrap{grid-template-columns:250px 1fr}}
+  .conebox{position:relative;width:100%;max-width:250px;margin:0 auto;aspect-ratio:1/1}
+  .conebox svg{width:100%;height:100%;overflow:visible}
+  .band{opacity:0}
+  .conelegend{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+  .conelegend li{display:flex;gap:13px;align-items:flex-start;opacity:.3;transition:opacity .25s}
+  .conelegend li.lit{opacity:1}
+  .conelegend li .n{font-family:var(--mono);font-weight:700;font-size:13px;width:20px;color:var(--faint);flex:0 0 auto;padding-top:1px}
+  .conelegend li .txt b{font-family:var(--disp);font-size:15px}
+  .conelegend li .txt span{display:block;font-size:13px;color:var(--muted)}
+
+  /* origins timeline */
+  .origins{border-top:1px solid var(--line);padding-top:38px}
+  .timeline{position:relative;margin:22px 0 0;padding-left:34px}
+  .timeline::before{content:"";position:absolute;left:9px;top:6px;bottom:6px;width:2px;background:#232c38}
+  .tlfill{position:absolute;left:9px;top:6px;width:2px;height:0;border-radius:2px;background:linear-gradient(180deg,var(--good),var(--fast) 55%,var(--cheap));z-index:0}
+  .tl{position:relative;padding:0 0 26px 0;z-index:1}
+  .tl:last-child{padding-bottom:0}
+  .tl::before{content:"";position:absolute;left:-30px;top:5px;width:12px;height:12px;border-radius:50%;background:var(--ink-0);border:2px solid #2c3540;transition:border-color .3s,box-shadow .3s}
+  .tl.lit::before{border-color:var(--c);box-shadow:0 0 8px var(--c)}
+  .js .tl{opacity:0;will-change:opacity}
+  .tl .y{font-family:var(--mono);font-weight:700;font-size:13px;color:var(--c);letter-spacing:.05em}
+  .tl p{font-size:14.5px;margin:5px 0 0;color:#c3ccd7;max-width:56ch}
+
+  footer{padding:38px 0 68px;text-align:center;color:var(--faint);font-size:13px}
+  .badge{display:inline-block;font-family:var(--mono);font-size:11px;color:var(--muted);background:var(--ink-1);border:1px solid var(--line);padding:8px 12px;border-radius:999px;cursor:pointer;letter-spacing:.04em}
+  .badge:active{background:var(--ink-2)}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(18px);background:var(--ink-3);border:1px solid var(--line-2);color:var(--text);padding:10px 15px;border-radius:11px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:30}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    .headline .w > b,.headline .two > b{transform:none;animation:none}
+    .fade-load{opacity:1;animation:none}
+    .lbl.io{clip-path:none}
+    .corners.io .ccard{opacity:1;clip-path:none}
+    .rw{color:#d3dbe5}
+    .band{opacity:1}
+    .conelegend li{opacity:1}
+    .js .ccard{opacity:1}
+    .js .tl{opacity:1}
+    .tl::before{border-color:var(--c)}
+    .tlfill{display:none}
+    .timeline::before{background:linear-gradient(180deg,var(--good),var(--fast) 55%,var(--cheap))}
+    *{animation-duration:.001s!important}
+  }
+/* when embedded in the site home-screen iframe, drop the hero below the floating back button */
+html.embed .hero{padding-top:clamp(52px,8vh,84px)}
+</style>
+</head>
+<body>
+<div class="bg-grid" id="bgGrid" aria-hidden="true"></div>
+
+<!-- HERO -->
+<section class="hero wrap">
+  <div class="eyebrow fade-load">The Production Triangle</div>
+  <h1 class="headline">
+    <span class="w g"><b>Good.</b></span> <span class="w c"><b>Cheap.</b></span> <span class="w f"><b>Fast.</b></span>
+    <span class="two"><b>Pick two.</b></span>
+  </h1>
+  <p class="lead sub fade-load">Every made thing lives inside this triangle. Drag the point and watch what each choice costs you.</p>
+  <div class="stage-wrap fade-load">
+    <div class="stage">
+      <div class="svgbox">
+        <svg class="tri" viewBox="0 0 420 400" id="svg" role="group" aria-label="Production triangle. Drag the point toward a corner.">
+          <defs>
+            <filter id="soft" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="14"/></filter>
+            <filter id="soft2" x="-120%" y="-120%" width="340%" height="340%"><feGaussianBlur stdDeviation="26"/></filter>
+          </defs>
+          <circle id="lamp" cx="210" cy="245" r="120" fill="#f5b94a" opacity="0.10" filter="url(#soft2)"/>
+          <polygon points="210,54 58,340 362,340" fill="#10151d" stroke="#37424f" stroke-width="1.5"/>
+          <circle id="hG" cx="210" cy="54"  r="30" fill="#35C08A" opacity="0" filter="url(#soft)"/>
+          <circle id="hF" cx="58"  cy="340" r="30" fill="#F5B94A" opacity="0" filter="url(#soft)"/>
+          <circle id="hC" cx="362" cy="340" r="30" fill="#5B9BE0" opacity="0" filter="url(#soft)"/>
+          <line id="tG" stroke="#35C08A" stroke-linecap="round"/>
+          <line id="tF" stroke="#F5B94A" stroke-linecap="round"/>
+          <line id="tC" stroke="#5B9BE0" stroke-linecap="round"/>
+          <circle cx="210" cy="54"  r="4.5" fill="#35C08A"/>
+          <circle cx="58"  cy="340" r="4.5" fill="#F5B94A"/>
+          <circle cx="362" cy="340" r="4.5" fill="#5B9BE0"/>
+          <text x="210" y="34"  text-anchor="middle" fill="#35C08A" font-size="16" font-weight="600" font-family="'Space Grotesk',sans-serif">GOOD</text>
+          <text x="50"  y="366" text-anchor="start"  fill="#F5B94A" font-size="16" font-weight="600" font-family="'Space Grotesk',sans-serif">FAST</text>
+          <text x="370" y="366" text-anchor="end"    fill="#5B9BE0" font-size="16" font-weight="600" font-family="'Space Grotesk',sans-serif">CHEAP</text>
+          <text x="210" y="18"  text-anchor="middle" id="vG" fill="#8ba0ae" font-size="12" font-family="'Space Mono',monospace">33</text>
+          <text x="50"  y="384" text-anchor="start"  id="vF" fill="#8ba0ae" font-size="12" font-family="'Space Mono',monospace">33</text>
+          <text x="370" y="384" text-anchor="end"    id="vC" fill="#8ba0ae" font-size="12" font-family="'Space Mono',monospace">33</text>
+          <circle id="glow" cx="210" cy="245" r="30" fill="#7d8794" opacity="0.7" filter="url(#soft)"/>
+          <circle id="puckring" cx="210" cy="245" r="26" fill="none" stroke="#EAF1F8" stroke-width="1" opacity="0"/>
+          <circle id="puck" class="puck" cx="210" cy="245" r="17" fill="#7d8794" stroke="#0a0d12" stroke-width="2.5" tabindex="0" role="slider" aria-label="Priority balance" aria-valuetext="Good 33, Fast 33, Cheap 33"/>
+        </svg>
+      </div>
+      <p class="cap">One fixed budget of <b>100</b>, split three ways. Pull toward a corner and the other two give ground.</p>
+    </div>
+    <div class="reads">
+      <div class="deal-card"><div class="d" id="deal">Balanced</div><div class="n" id="note">Nothing's bad. Nothing's great.</div></div>
+      <div class="bars">
+        <div class="bar"><div class="row"><span class="nm"><span class="sw" style="background:var(--good)"></span>Good <span class="ds" id="dG">Decent</span></span><span class="vl" style="color:var(--good)" id="bG">33</span></div><div class="track"><div class="fill" id="fG" style="background:var(--good)"></div></div></div>
+        <div class="bar"><div class="row"><span class="nm"><span class="sw" style="background:var(--fast)"></span>Fast <span class="ds" id="dF">Steady</span></span><span class="vl" style="color:var(--fast)" id="bF">33</span></div><div class="track"><div class="fill" id="fF" style="background:var(--fast)"></div></div></div>
+        <div class="bar"><div class="row"><span class="nm"><span class="sw" style="background:var(--cheap)"></span>Cheap <span class="ds" id="dC">Fair</span></span><span class="vl" style="color:var(--cheap)" id="bC">33</span></div><div class="track"><div class="fill" id="fC" style="background:var(--cheap)"></div></div></div>
+      </div>
+      <div class="presets">
+        <button class="p" data-preset="gf">Good + Fast<small>drops Cheap</small></button>
+        <button class="p" data-preset="gc">Good + Cheap<small>drops Fast</small></button>
+        <button class="p" data-preset="fc">Fast + Cheap<small>drops Good</small></button>
+        <button class="p full" data-preset="bal">Balance all three<small>everyone gets a third</small></button>
+      </div>
+    </div>
+  </div>
+  <div class="scrollcue" aria-hidden="true"></div>
+</section>
+
+<!-- 01 THE RULE (word-highlight reading reveal) -->
+<section class="wrap">
+  <div class="block">
+    <div class="lbl io">01 / The rule</div>
+    <h2>Why can't you have all three?</h2>
+    <p class="lead reveal-words">The three corners aren't separate dials you can each crank to the top. They pull from one shared pool: the hours in a day, the machines you own, the material on the shelf, the people on shift. Spend more on speed and there's less left for quality and cost. Push it all at one corner and you feel the other two thin out.</p>
+  </div>
+  <div class="pool">
+    <div class="cap2">The same 100 units of capacity, spent three ways</div>
+    <div class="poolbar"><span style="background:var(--good);flex-basis:33%">Good</span><span style="background:var(--fast);flex-basis:34%">Fast</span><span style="background:var(--cheap);flex-basis:33%">Cheap</span></div>
+  </div>
+</section>
+
+<!-- 02 CORNERS -->
+<section class="wrap">
+  <div class="block"><div class="lbl io">02 / The corners</div><h2>What each corner means on the floor</h2></div>
+  <div class="corners io">
+    <div class="ccard" style="--c:var(--good)">
+      <div class="ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#35C08A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+      <h3>Good</h3><div class="tag">Quality</div><p>Does it meet spec, fit right, and hold up? Measured in defects, rework, and returns.</p>
+      <div class="floor"><b>On the floor:</b> tight tolerances, the right material, careful finishing, real inspection.</div>
+    </div>
+    <div class="ccard" style="--c:var(--fast)">
+      <div class="ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F5B94A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h7l-1 8 10-12h-7z"/></svg></div>
+      <h3>Fast</h3><div class="tag">Speed</div><p>How quickly it's done and out the door. Lead time, turnaround, on-time delivery.</p>
+      <div class="floor"><b>On the floor:</b> rush jobs, overtime, expedited stock, jumping the queue.</div>
+    </div>
+    <div class="ccard" style="--c:var(--cheap)">
+      <div class="ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5B9BE0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5h4a1.8 1.8 0 010 3.5h-3a1.8 1.8 0 000 3.5h4"/></svg></div>
+      <h3>Cheap</h3><div class="tag">Cost</div><p>What it takes to make. Material, labor hours, machine time, tooling.</p>
+      <div class="floor"><b>On the floor:</b> standard materials, batched work, no overtime, no waste.</div>
+    </div>
+  </div>
+</section>
+
+<!-- 03 DEALS: sticky scroll walk -->
+<section class="deals-scroll" id="dealsScroll">
+  <div class="deals-sticky">
+    <div class="deals-tri">
+      <svg viewBox="0 0 420 400" id="dsvg" aria-label="The point walks to each two-corner deal as you scroll">
+        <defs><filter id="dsoft" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="13"/></filter></defs>
+        <polygon points="210,54 58,340 362,340" fill="#10151d" stroke="#37424f" stroke-width="1.5"/>
+        <circle id="dhG" cx="210" cy="54"  r="28" fill="#35C08A" opacity="0" filter="url(#dsoft)"/>
+        <circle id="dhF" cx="58"  cy="340" r="28" fill="#F5B94A" opacity="0" filter="url(#dsoft)"/>
+        <circle id="dhC" cx="362" cy="340" r="28" fill="#5B9BE0" opacity="0" filter="url(#dsoft)"/>
+        <line id="dtG" stroke="#35C08A" stroke-linecap="round"/>
+        <line id="dtF" stroke="#F5B94A" stroke-linecap="round"/>
+        <line id="dtC" stroke="#5B9BE0" stroke-linecap="round"/>
+        <circle cx="210" cy="54"  r="4.5" fill="#35C08A"/>
+        <circle cx="58"  cy="340" r="4.5" fill="#F5B94A"/>
+        <circle cx="362" cy="340" r="4.5" fill="#5B9BE0"/>
+        <text x="210" y="34"  text-anchor="middle" fill="#35C08A" font-size="16" font-weight="600" font-family="'Space Grotesk',sans-serif">GOOD</text>
+        <text x="50"  y="366" text-anchor="start"  fill="#F5B94A" font-size="16" font-weight="600" font-family="'Space Grotesk',sans-serif">FAST</text>
+        <text x="370" y="366" text-anchor="end"    fill="#5B9BE0" font-size="16" font-weight="600" font-family="'Space Grotesk',sans-serif">CHEAP</text>
+        <circle id="dglow" cx="210" cy="245" r="28" fill="#7d8794" opacity="0.7" filter="url(#dsoft)"/>
+        <circle id="dpuck" cx="210" cy="245" r="16" fill="#7d8794" stroke="#0a0d12" stroke-width="2.5"/>
+      </svg>
+    </div>
+    <div class="deals-panel">
+      <div class="lbl">03 / The trade</div>
+      <div class="dstack">
+        <div class="dt" data-i="0">
+          <div class="deal-t"><span class="kg">Good</span> + <span class="kf">Fast</span></div>
+          <div class="lose">You give up cheap</div>
+          <p>Rush a quality job and you pay for it: overtime, premium material, expedited freight. Same-day and done right means someone stayed late and the good stock got burned.</p>
+        </div>
+        <div class="dt" data-i="1">
+          <div class="deal-t"><span class="kg">Good</span> + <span class="kc">Cheap</span></div>
+          <div class="lose">You give up fast</div>
+          <p>Do it right and do it lean, and it takes time. You wait for the efficient path, batch the run, use standard stock. The well-made, fair-priced part is the one with a lead time.</p>
+        </div>
+        <div class="dt" data-i="2">
+          <div class="deal-t"><span class="kf">Fast</span> + <span class="kc">Cheap</span></div>
+          <div class="lose">You give up good</div>
+          <p>Quick and cheap means corners cut: looser tolerances, skipped steps, whatever material is on hand. It ships tomorrow and it's affordable, but plan on rework.</p>
+        </div>
+      </div>
+      <div class="dprog" id="dprog" aria-hidden="true">
+        <div class="pf" id="pfill"></div>
+        <i class="tk" style="left:12%"></i><i class="tk" style="left:50%"></i><i class="tk" style="left:88%"></i>
+        <div class="ph" id="phead"></div>
+      </div>
+      <div class="keepscroll" id="keepscroll">
+        <svg class="cv" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>Keep scrolling
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 04 BALANCE -->
+<section class="wrap">
+  <div class="block">
+    <div class="lbl io">04 / The balance</div>
+    <div class="pullquote">Quality sits in the <span class="mid">middle</span>, not on a corner.</div>
+    <p class="reveal-words">It's what you get when time, cost, and scope stay balanced. Good shops don't grab a corner and forget it. They decide what each job actually needs, then place the point on purpose.</p>
+  </div>
+  <div class="leans">
+    <div class="lean" style="--c:var(--fast)"><div class="job">A rough prototype</div><div class="to">Lean toward Fast</div></div>
+    <div class="lean" style="--c:var(--good)"><div class="job">A load-bearing part</div><div class="to">Lean toward Good</div></div>
+    <div class="lean" style="--c:var(--cheap)"><div class="job">A big simple batch</div><div class="to">Lean toward Cheap</div></div>
+  </div>
+  <div class="block"><div class="callout">
+    <p class="muted" style="font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)">The demand connection</p>
+    <p>The customer's pull decides where you sit. When everyone wants it <span class="kf">now</span>, speed gets expensive: the price climbs or the quality gives. When there's slack, you can do it <span class="kg">right</span> and <span class="kc">cheap</span>. The triangle is how a shop prices against whatever the market is pulling for.</p>
+  </div></div>
+</section>
+
+<!-- 05 BENDING -->
+<section class="wrap">
+  <div class="block"><div class="lbl io">05 / The catch</div><h2>So is it a hard law? Not quite.</h2>
+    <p class="lead">Pick-two is true in the moment, with the setup you have today. But two things quietly bend the triangle over time.</p>
+  </div>
+  <div class="demo" id="demo">
+    <h3 style="margin-bottom:6px"><span class="partnum">1</span>Waste is the loophole</h3>
+    <p class="muted" style="font-size:14.5px;overflow:hidden">A part sitting in a queue, a wasted walk, a tool nobody can find: that burns time <em>and</em> money at once. Cut it and two corners rise together. Hunting that waste is the whole idea behind lean manufacturing.</p>
+    <div class="steps" aria-hidden="true">
+      <span class="chip">Cut</span><span class="chip waste">Wait for machine</span><span class="chip">Shape</span>
+      <span class="chip waste">Walk to find tool</span><span class="chip">Finish</span><span class="chip waste">Part sits in queue</span><span class="chip">Inspect</span>
+    </div>
+    <div class="two-bars">
+      <div class="mb"><span class="k kc">Cheap</span><div class="t"><div class="f" id="wCheap" style="background:var(--cheap);width:48%"></div></div><span class="v" id="vwCheap">48</span></div>
+      <div class="mb"><span class="k kf">Fast</span><div class="t"><div class="f" id="wFast" style="background:var(--fast);width:44%"></div></div><span class="v" id="vwFast">44</span></div>
+    </div>
+    <button class="togg" id="wasteBtn">Remove the wasted steps</button>
+  </div>
+  <div class="block" style="margin-top:40px">
+    <h3 style="margin-bottom:6px"><span class="partnum two">2</span>Build it in the right order</h3>
+    <p class="muted" style="font-size:14.5px;overflow:hidden">You can grow the whole triangle, but not by wishing all three bigger at once. Factory research (Ferdows &amp; De Meyer, 1990) found capability stacks in a sequence, like a cone of sand. As you scroll, watch it fill from the base up.</p>
+  </div>
+  <div class="cone-wrap" id="coneWrap">
+    <div class="conebox">
+      <svg viewBox="0 0 220 220" aria-label="Sand cone: quality at the base, cost at the top">
+        <polygon points="110,20 190,190 30,190" fill="none" stroke="#2b3542" stroke-width="1.5"/>
+        <polygon class="band b1" points="30,190 190,190 170,148 50,148" fill="#35C08A" opacity="0.92"/>
+        <polygon class="band b2" points="50,148 170,148 150,106 70,106" fill="#5BC0C0" opacity="0.9"/>
+        <polygon class="band b3" points="70,106 150,106 130,64 90,64"   fill="#F5B94A" opacity="0.9"/>
+        <polygon class="band b4" points="90,64 130,64 110,20 110,20"     fill="#5B9BE0" opacity="0.95"/>
+      </svg>
+    </div>
+    <ul class="conelegend" id="coneLegend">
+      <li><span class="n">1</span><span class="txt"><b style="color:#35C08A">Quality</b><span>Make it right first. Everything else stacks on this.</span></span></li>
+      <li><span class="n">2</span><span class="txt"><b style="color:#5BC0C0">Dependability</b><span>Then hit the date every time. Predictable delivery.</span></span></li>
+      <li><span class="n">3</span><span class="txt"><b style="color:#F5B94A">Speed</b><span>Now you can safely go faster and stay flexible.</span></span></li>
+      <li><span class="n">4</span><span class="txt"><b style="color:#5B9BE0">Cost</b><span>Lasting low cost comes last, earned on top of the rest.</span></span></li>
+    </ul>
+  </div>
+  <div class="block" style="margin-top:24px">
+    <p class="reveal-words"><strong>Cheap is the payoff, not the opening move.</strong> Chase cheap first and you get defects and delays that cost more than they saved. Build quality, then reliability, then speed, and low cost tends to follow. On today's setup it's still pick-two, so choose on purpose. Over time, by improving the system itself, you push the whole triangle outward.</p>
+  </div>
+</section>
+
+<!-- ORIGINS timeline -->
+<section class="wrap">
+  <div class="origins">
+    <div class="lbl io">Where it comes from</div>
+    <div class="timeline">
+      <div class="tlfill" id="tlfill"></div>
+      <div class="tl" style="--c:var(--good)"><div class="y">~1800s</div><p>A version of "you can't pay little and get a lot" is often pinned on the Victorian critic John Ruskin, likely more legend than record.</p></div>
+      <div class="tl" style="--c:var(--fast)"><div class="y">~1969</div><p>The triangle we draw today traces to Martin Barnes, who mapped cost, time, and quality as three competing points while modeling project cost.</p></div>
+      <div class="tl" style="--c:#5BC0C0"><div class="y">Auto line</div><p>Manufacturing runs its own version, QCD: Quality, Cost, Delivery. Sometimes called the "devil's triangle."</p></div>
+      <div class="tl" style="--c:var(--cheap)"><div class="y">1990</div><p>Ferdows &amp; De Meyer's sand cone reframed it: capabilities aren't just traded, they're layered, quality at the base, cost as the earned apex.</p></div>
+    </div>
+  </div>
+</section>
+
+<footer class="wrap">
+  <p>Move the point, make the trade, on purpose.</p>
+  <span class="badge" id="badge">v10.0 · Aug 7</span>
+</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+  var VERSION="v10.0 · Aug 7";
+  var reduce=matchMedia("(prefers-reduced-motion:reduce)").matches;
+  function id(x){return document.getElementById(x);}
+
+  var A={x:210,y:54},B={x:58,y:340},C={x:362,y:340};
+  var CEN={x:(A.x+B.x+C.x)/3,y:(A.y+B.y+C.y)/3};
+  var COL={good:[53,192,138],fast:[245,185,74],cheap:[91,155,224]};
+  function baryToPoint(bc){return{x:bc.a*A.x+bc.b*B.x+bc.c*C.x,y:bc.a*A.y+bc.b*B.y+bc.c*C.y};}
+  function mix(bc){function ch(i){return Math.round(bc.a*COL.good[i]+bc.b*COL.fast[i]+bc.c*COL.cheap[i]);}return"rgb("+ch(0)+","+ch(1)+","+ch(2)+")";}
+  function clampBary(a,b,c){a=Math.max(0,a);b=Math.max(0,b);c=Math.max(0,c);var s=a+b+c;if(s<=0)return{a:1/3,b:1/3,c:1/3};return{a:a/s,b:b/s,c:c/s};}
+  function pointToBary(px,py){var d=(B.y-C.y)*(A.x-C.x)+(C.x-B.x)*(A.y-C.y);var a=((B.y-C.y)*(px-C.x)+(C.x-B.x)*(py-C.y))/d;var b=((C.y-A.y)*(px-C.x)+(A.x-C.x)*(py-C.y))/d;return clampBary(a,b,1-a-b);}
+  function lerpB(x,y,t){return{a:x.a+(y.a-x.a)*t,b:x.b+(y.b-x.b)*t,c:x.c+(y.c-x.c)*t};}
+  function smooth(t){t=Math.max(0,Math.min(1,t));return t*t*(3-2*t);}
+  function thread(el,p,v,w){el.setAttribute("x1",p.x);el.setAttribute("y1",p.y);el.setAttribute("x2",v.x);el.setAttribute("y2",v.y);el.setAttribute("stroke-width",(1+w*9).toFixed(2));el.setAttribute("stroke-opacity",(0.12+w*0.55).toFixed(3));}
+  function halo(el,w){el.setAttribute("opacity",(w*0.85).toFixed(3));el.setAttribute("r",(15+w*33).toFixed(1));}
+
+  /* HERO */
+  var svg=id("svg"),puck=id("puck"),ring=id("puckring"),glow=id("glow"),lamp=id("lamp");
+  var tG=id("tG"),tF=id("tF"),tC=id("tC"),hG=id("hG"),hF=id("hF"),hC=id("hC");
+  var bary={a:1/3,b:1/3,c:1/3};
+  var LV={good:["Broken","Rough","Decent","Solid","Excellent"],fast:["Glacial","Slow","Steady","Quick","Instant"],cheap:["Premium $$$","Costly","Fair","Affordable","Bargain"]};
+  function tier(v){return v<20?0:v<40?1:v<60?2:v<80?3:4;}
+  function verdict(g,f,c){var mx=Math.max(g,f,c),mn=Math.min(g,f,c);if(mx-mn<=12)return{d:"Balanced",n:"Nothing's bad. Nothing's great."};if(mx>=82){var wn=g===mx?"Good":f===mx?"Fast":"Cheap";var wt=g===mx?"quality":f===mx?"speed":"low cost";return{d:"All-in on "+wn,n:"You bought "+wt+". The other two are gone."};}if(c===mn)return{d:"Good & Fast",n:"Sharp and quick, but you're paying for it."};if(f===mn)return{d:"Good & Cheap",n:"Sharp and affordable, but it'll take a while."};return{d:"Fast & Cheap",n:"Quick and affordable, but it'll come out rough."};}
+  function txt(x,v){id(x).textContent=v;}
+  function renderHero(){
+    var g=Math.round(bary.a*100),f=Math.round(bary.b*100),c=Math.round(bary.c*100),p=baryToPoint(bary),col=mix(bary);
+    puck.setAttribute("cx",p.x);puck.setAttribute("cy",p.y);puck.setAttribute("fill",col);
+    ring.setAttribute("cx",p.x);ring.setAttribute("cy",p.y);glow.setAttribute("cx",p.x);glow.setAttribute("cy",p.y);glow.setAttribute("fill",col);
+    puck.setAttribute("aria-valuetext","Good "+g+", Fast "+f+", Cheap "+c);
+    lamp.setAttribute("cx",(CEN.x+(p.x-CEN.x)*0.6).toFixed(1));lamp.setAttribute("cy",(CEN.y+(p.y-CEN.y)*0.6).toFixed(1));
+    thread(tG,p,A,bary.a);thread(tF,p,B,bary.b);thread(tC,p,C,bary.c);halo(hG,bary.a);halo(hF,bary.b);halo(hC,bary.c);
+    txt("vG",g);txt("vF",f);txt("vC",c);txt("bG",g);txt("bF",f);txt("bC",c);
+    id("fG").style.width=g+"%";id("fF").style.width=f+"%";id("fC").style.width=c+"%";
+    txt("dG",LV.good[tier(g)]);txt("dF",LV.fast[tier(f)]);txt("dC",LV.cheap[tier(c)]);
+    var v=verdict(g,f,c);txt("deal",v.d);txt("note",v.n);
+  }
+  function clientToView(cx,cy){var r=svg.getBoundingClientRect();return{x:(cx-r.left)/r.width*420,y:(cy-r.top)/r.height*400};}
+  var dragging=false;
+  function moveTo(cx,cy){var pt=clientToView(cx,cy);bary=pointToBary(pt.x,pt.y);renderHero();}
+  puck.addEventListener("pointerdown",function(e){dragging=true;puck.setPointerCapture(e.pointerId);ring.setAttribute("opacity","0.55");e.preventDefault();});
+  svg.addEventListener("pointermove",function(e){if(dragging)moveTo(e.clientX,e.clientY);});
+  function endDrag(){if(!dragging)return;dragging=false;ring.setAttribute("opacity","0");puck.classList.remove("pulse");void puck.offsetWidth;puck.classList.add("pulse");}
+  puck.addEventListener("pointerup",endDrag);puck.addEventListener("pointercancel",endDrag);
+  svg.addEventListener("pointerdown",function(e){if(e.target===puck)return;moveTo(e.clientX,e.clientY);});
+  puck.addEventListener("keydown",function(e){var s=10,p=baryToPoint(bary),m=true;if(e.key==="ArrowUp")p.y-=s;else if(e.key==="ArrowDown")p.y+=s;else if(e.key==="ArrowLeft")p.x-=s;else if(e.key==="ArrowRight")p.x+=s;else m=false;if(m){e.preventDefault();bary=pointToBary(p.x,p.y);renderHero();}});
+  var PRE={gf:{a:.5,b:.5,c:0},gc:{a:.5,b:0,c:.5},fc:{a:0,b:.5,c:.5},bal:{a:1/3,b:1/3,c:1/3}};
+  var pbtns=document.querySelectorAll("button.p");
+  for(var i=0;i<pbtns.length;i++){pbtns[i].addEventListener("click",function(){
+    var t=PRE[this.getAttribute("data-preset")];
+    if(reduce){bary={a:t.a,b:t.b,c:t.c};renderHero();}
+    else{var f={a:bary.a,b:bary.b,c:bary.c},t0=null;function ease(k){var s=1.2;return 1+(--k)*k*((s+1)*k+s);}function step(ts){if(t0===null)t0=ts;var k=Math.min(1,(ts-t0)/560),e=ease(k);bary=clampBary(f.a+(t.a-f.a)*e,f.b+(t.b-f.b)*e,f.c+(t.c-f.c)*e);renderHero();if(k<1)requestAnimationFrame(step);else{puck.classList.remove("pulse");void puck.offsetWidth;puck.classList.add("pulse");}}requestAnimationFrame(step);}
+  });}
+  renderHero();
+
+  /* ===== DEALS: paint by scroll ===== */
+  var dsvg=id("dsvg"),dpuck=id("dpuck"),dglow=id("dglow"),dtG=id("dtG"),dtF=id("dtF"),dtC=id("dtC"),dhG=id("dhG"),dhF=id("dhF"),dhC=id("dhC");
+  var GF={a:.5,b:.5,c:0},GC={a:.5,b:0,c:.5},FC={a:0,b:.5,c:.5},CENB={a:1/3,b:1/3,c:1/3};
+  var dts=document.querySelectorAll(".dt"),dealsScroll=id("dealsScroll");
+  var pfill=id("pfill"),phead=id("phead"),keepscroll=id("keepscroll"),ticks=document.querySelectorAll("#dprog .tk");
+  function paintDeals(bc){var p=baryToPoint(bc),col=mix(bc);dpuck.setAttribute("cx",p.x);dpuck.setAttribute("cy",p.y);dpuck.setAttribute("fill",col);dglow.setAttribute("cx",p.x);dglow.setAttribute("cy",p.y);dglow.setAttribute("fill",col);thread(dtG,p,A,bc.a);thread(dtF,p,B,bc.b);thread(dtC,p,C,bc.c);halo(dhG,bc.a);halo(dhF,bc.b);halo(dhC,bc.c);}
+  var lastActive=-1;
+  function dealsFromProgress(p){
+    var edges=[GF,GC,FC];
+    var zf=p*3, zone=Math.min(2,Math.floor(zf)), local=zf-zone;
+    var from=zone===0?CENB:edges[zone-1], to=edges[zone];
+    var tt=smooth(local/0.30);
+    paintDeals(lerpB(from,to,tt));
+    if(zone!==lastActive){lastActive=zone;for(var k=0;k<dts.length;k++)dts[k].classList.toggle("on",k===zone);}
+    // continuous scroll feedback
+    var pct=(p*100).toFixed(2)+"%";
+    pfill.style.width=pct;phead.style.left=pct;
+    ticks[0].classList.toggle("done",p>=0.12);ticks[1].classList.toggle("done",p>=0.50);ticks[2].classList.toggle("done",p>=0.88);
+    keepscroll.style.opacity=p>0.86?"0":"1";
+  }
+  // init
+  if(reduce){paintDeals(CENB);for(var q=0;q<dts.length;q++)dts[q].classList.add("on");}
+  else{paintDeals(CENB);dts[0].classList.add("on");lastActive=0;}
+
+  /* ===== CONE: fill by scroll ===== */
+  var bands=document.querySelectorAll(".band"),coneWrap=id("coneWrap"),legendLis=id("coneLegend").children;
+  function coneFromProgress(p){
+    for(var i=0;i<4;i++){
+      var lo=i*0.25, o=Math.max(0,Math.min(1,(p-lo)/0.25));
+      bands[i].style.opacity=(o*(i===3?0.95:(i===0?0.92:0.9))).toFixed(3);
+      legendLis[i].classList.toggle("lit",o>0.55);
+    }
+  }
+
+  /* ===== WORD HIGHLIGHT: build spans + paint by scroll ===== */
+  var words=[];
+  function buildWords(){
+    var ps=document.querySelectorAll(".reveal-words");
+    ps.forEach(function(pp){
+      if(pp.dataset.split)return;pp.dataset.split="1";
+      var frag=document.createDocumentFragment();
+      // preserve child elements (strong/em/span) by walking nodes
+      (function walk(node,parent){
+        node.childNodes.forEach(function(n){
+          if(n.nodeType===3){
+            n.textContent.split(/(\s+)/).forEach(function(tok){
+              if(tok.length===0)return;
+              if(/^\s+$/.test(tok)){parent.appendChild(document.createTextNode(tok));}
+              else{var s=document.createElement("span");s.className="rw";s.textContent=tok;parent.appendChild(s);}
+            });
+          }else if(n.nodeType===1){
+            var clone=n.cloneNode(false);parent.appendChild(clone);walk(n,clone);
+          }
+        });
+      })(pp,frag);
+      pp.textContent="";pp.appendChild(frag);
+    });
+    words=[].slice.call(document.querySelectorAll(".rw"));
+  }
+  var wordY=[];
+  function measureWords(){wordY=words.map(function(w){var r=w.getBoundingClientRect();return r.top+window.scrollY+r.height/2;});}
+  function paintWords(){
+    var band=window.scrollY+window.innerHeight*0.58, vh=window.innerHeight;
+    for(var i=0;i<words.length;i++){
+      var y=wordY[i];
+      if(y<window.scrollY-100||y>window.scrollY+vh+100)continue;
+      var d=band-y; // >0 = above reading line (read)
+      var op= d>20?1 : d<-70?0.20 : 0.20+(d+70)/90*0.80;
+      var v=Math.round(60+op*(231-60)), g=Math.round(70+op*(237-70)), b=Math.round(83+op*(245-83));
+      words[i].style.color="rgb("+v+","+g+","+b+")";
+    }
+  }
+  if(!reduce){buildWords();measureWords();}
+
+  /* ===== CARDS + TIMELINE: scroll-linked reveal (come in early, ease, no pop) ===== */
+  var ccards=[],ccardTop=[],tls=[],tlsTop=[],tlEl=id("tlfill"),timelineEl=null;
+  function measureReveal(){
+    ccards=[].slice.call(document.querySelectorAll(".ccard"));
+    ccardTop=ccards.map(function(c){return c.getBoundingClientRect().top+window.scrollY;});
+    tls=[].slice.call(document.querySelectorAll(".tl"));
+    tlsTop=tls.map(function(t){return t.getBoundingClientRect().top+window.scrollY;});
+    timelineEl=document.querySelector(".timeline");
+  }
+  function paintReveal(){
+    var vh=window.innerHeight, sy=window.scrollY, i, p, top;
+    // cards: begin as soon as they enter the bottom, done a bit above center; slight index cascade
+    for(i=0;i<ccards.length;i++){
+      top=ccardTop[i];
+      if(top>sy+vh+100||top+340<sy-100)continue;
+      var start=sy+vh*0.98, end=sy+vh*0.58-i*vh*0.05;
+      p=smooth((start-top)/(start-end));
+      ccards[i].style.opacity=(0.10+0.90*p).toFixed(3);
+      ccards[i].style.clipPath="inset(0 0 "+((1-p)*36).toFixed(1)+"% 0)";
+    }
+    // timeline: draw the line down + light each entry as the reading band reaches it
+    if(timelineEl){
+      var docH=document.documentElement.scrollHeight, maxScroll=Math.max(1,docH-vh);
+      var endBoost=smooth((sy-(maxScroll-vh*0.6))/(vh*0.6)); // ramps to 1 in the last 0.6 screen so it always completes at the bottom
+      var r=timelineEl.getBoundingClientRect(), tlTopAbs=r.top+sy, band=sy+vh*0.62;
+      if(tlEl)tlEl.style.height=Math.max(0,Math.min(r.height,Math.max(band-tlTopAbs+6,r.height*endBoost))).toFixed(1)+"px";
+      for(i=0;i<tls.length;i++){
+        top=tlsTop[i];
+        if(top>sy+vh+100||top+260<sy-100)continue;
+        p=Math.max(smooth((sy+vh*0.95-top)/(vh*0.33)),endBoost);
+        tls[i].style.opacity=(0.12+0.88*p).toFixed(3);
+        tls[i].classList.toggle("lit",p>0.55);
+      }
+    }
+  }
+
+  /* ===== shared scroll loop ===== */
+  function sectionProgress(el){var r=el.getBoundingClientRect(),vh=window.innerHeight,total=r.height-vh;return total>0?Math.max(0,Math.min(1,(-r.top)/total)):0;}
+  function coneProgress(){var r=coneWrap.getBoundingClientRect(),vh=window.innerHeight;var start=vh*0.85,end=vh*0.42,c=r.top+r.height*0.5;return Math.max(0,Math.min(1,(start-c)/(start-end)));}
+  /* ambient grid: always drifts subtly with scroll (velocity-integrated so speed can change without jumping),
+     swells brighter + faster as you enter/pass the deals sequence, then settles back */
+  var bgGrid=id("bgGrid"),lastGridSy=window.scrollY,gridOffset=0;
+  function paintGrid(){
+    var sy=window.scrollY,vh=window.innerHeight,d=sy-lastGridSy;lastGridSy=sy;
+    var gr=dealsScroll.getBoundingClientRect(),swell=0;
+    if(!(gr.bottom<0||gr.top>vh)){var rise=smooth((vh-gr.top)/(vh*0.85)),fall=smooth(gr.bottom/(vh*0.85));swell=Math.min(rise,fall);}
+    var ratio=0.17+swell*0.32;
+    gridOffset-=d*ratio;
+    bgGrid.style.backgroundPosition="0px "+gridOffset.toFixed(1)+"px";
+    bgGrid.style.opacity=(0.42+swell*0.38).toFixed(3);
+  }
+  var ticking=false;
+  function frame(){
+    ticking=false;
+    if(!reduce){dealsFromProgress(sectionProgress(dealsScroll));coneFromProgress(coneProgress());paintWords();paintReveal();paintGrid();}
+  }
+  function onScroll(){if(!ticking){ticking=true;requestAnimationFrame(frame);}}
+  if(!reduce){
+    measureReveal();
+    window.addEventListener("scroll",onScroll,{passive:true});
+    var rez=null;window.addEventListener("resize",function(){clearTimeout(rez);rez=setTimeout(function(){measureWords();measureReveal();frame();},150);});
+    if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){measureWords();measureReveal();frame();});
+    frame();
+  }else{coneFromProgress(1);}
+
+  /* IO label wipes + card build */
+  var io=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){en.target.classList.add("in");io.unobserve(en.target);}});},{threshold:0.28,rootMargin:"0px 0px -12% 0px"});
+  document.querySelectorAll(".lbl.io").forEach(function(el){io.observe(el);});
+
+  /* WASTE */
+  var demo=id("demo"),wasteBtn=id("wasteBtn"),clean=false;
+  function setBars(cheap,fast){id("wCheap").style.width=cheap+"%";id("vwCheap").textContent=cheap;id("wFast").style.width=fast+"%";id("vwFast").textContent=fast;}
+  wasteBtn.addEventListener("click",function(){clean=!clean;if(clean){demo.classList.add("clean");setBars(74,78);wasteBtn.textContent="Put the waste back";}else{demo.classList.remove("clean");setBars(48,44);wasteBtn.textContent="Remove the wasted steps";}});
+
+  /* badge */
+  var toast=id("toast"),tt=null;
+  id("badge").addEventListener("click",function(){toast.textContent="Production Triangle "+VERSION;toast.classList.add("show");clearTimeout(tt);tt=setTimeout(function(){toast.classList.remove("show");},1600);});
+})();
+</script>
+</body>
+</html>
