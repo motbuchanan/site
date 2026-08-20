@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Rummy</title>
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{margin:0;font-family:system-ui,-apple-system,sans-serif;color:#e9e4f2;overflow:hidden;
+    background:radial-gradient(120% 80% at 50% 12%,#1c3b32,#0c1f1b 62%,#081512 100%)}
+  #app{display:flex;flex-direction:column;height:100svh;max-width:560px;margin:0 auto;position:relative;z-index:1;
+    padding:0 8px calc(6px + env(safe-area-inset-bottom))}
+  #bar{display:flex;align-items:center;gap:9px;padding:calc(env(safe-area-inset-top) + 9px) 2px 6px;flex:0 0 auto}
+  #bar a.home,#bar button.rules{color:#dfe7dd;text-decoration:none;font-size:13px;border:1px solid #3f6b5c;
+    background:#173029;border-radius:999px;padding:6px 12px;font-weight:700;font-family:inherit;cursor:pointer}
+  #title{font-weight:800;font-size:17px}
+  #score{margin-left:auto;font-size:12px;color:#9ec9b8;font-weight:700;text-align:right;line-height:1.3}
+  #oppRow{display:flex;align-items:center;gap:6px;justify-content:center;min-height:60px;flex:0 0 auto;padding:2px 0}
+  #tableWrap{flex:1 1 auto;overflow-y:auto;min-height:0;padding:4px 2px}
+  .meldgrp{display:inline-flex;gap:2px;margin:3px;padding:4px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);vertical-align:top}
+  .meldgrp.lay{outline:2px dashed rgba(244,197,66,.7)}
+  .meldlabel{font-size:10px;color:#8fb8a8;text-align:center;width:100%;margin:2px 0 0;font-weight:700}
+  #piles{display:flex;gap:20px;align-items:center;justify-content:center;flex:0 0 auto;padding:6px 0}
+  .pilewrap{text-align:center}
+  .pilewrap .cap{font-size:10px;color:#9fc2b4;margin-top:3px;font-weight:700}
+  .pile{width:46px;height:64px;border-radius:6px;cursor:pointer;position:relative;display:flex;align-items:flex-start;justify-content:flex-start;font-weight:800;font-size:16px;padding:3px 4px;line-height:1;color:#1c1c1c;background:linear-gradient(160deg,#fffdf6,#ece3cf);box-shadow:0 3px 8px rgba(0,0,0,.5)}
+  .pile.empty{border:1.5px dashed rgba(255,255,255,.2);background:transparent;cursor:default;box-shadow:none}
+  .pile.stock{color:transparent;background:radial-gradient(circle at 50% 55%,rgba(76,240,224,.34) 0 23%,rgba(40,70,80,.42) 37%,transparent 44%),linear-gradient(160deg,rgba(255,255,255,.07),transparent 45%),repeating-linear-gradient(50deg,rgba(76,240,224,.06) 0 5px,transparent 5px 10px),linear-gradient(160deg,#22323f,#18262f);box-shadow:0 3px 8px rgba(0,0,0,.5),inset 0 0 0 2px rgba(76,240,224,.85),inset 0 0 0 4.5px rgba(245,152,71,.4)}
+  .pile.hot{outline:3px solid #f4c542;outline-offset:1px}
+  #handrow{flex:0 0 auto;padding:4px 0 2px}
+  #hand{display:flex;flex-wrap:wrap;gap:3px;justify-content:center}
+  .card{width:min(11.6vw,46px);height:min(16.2vw,64px);border-radius:6px;position:relative;flex:none;color:#1c1c1c;
+    background:linear-gradient(160deg,#fffdf6,#ece3cf);box-shadow:0 3px 7px rgba(0,0,0,.45),inset 0 1px 0 #fff;
+    display:flex;align-items:flex-start;justify-content:flex-start;font-weight:800;font-size:min(4.4vw,17px);padding:3px 4px;line-height:1;cursor:pointer;transition:transform .1s}
+  .card .rk{display:flex;flex-direction:column;align-items:center}
+  .card .big{position:absolute;bottom:2px;right:4px;font-size:min(5vw,20px);opacity:.9}
+  .card.red{color:#c62828}
+  .card.sel{transform:translateY(-10px);box-shadow:0 8px 14px rgba(0,0,0,.5),0 0 0 3px #f4c542}
+  .card.mini{width:34px;height:48px;font-size:13px;cursor:default;box-shadow:0 2px 4px rgba(0,0,0,.4)}
+  .card.mini .big{font-size:14px}
+  .card.back{color:transparent;background:radial-gradient(circle at 50% 55%,rgba(76,240,224,.34) 0 23%,rgba(40,70,80,.42) 37%,transparent 44%),linear-gradient(160deg,rgba(255,255,255,.07),transparent 45%),repeating-linear-gradient(50deg,rgba(76,240,224,.06) 0 5px,transparent 5px 10px),linear-gradient(160deg,#22323f,#18262f);box-shadow:0 2px 6px rgba(0,0,0,.5),inset 0 0 0 2px rgba(76,240,224,.7),inset 0 0 0 4px rgba(245,152,71,.35)}
+  #actions{flex:0 0 auto;display:flex;gap:7px;justify-content:center;flex-wrap:wrap;padding:7px 0 2px}
+  .act{font-family:inherit;font-size:14px;font-weight:800;padding:11px 16px;border-radius:11px;border:none;color:#13203a;background:#7fa6e8;cursor:pointer;box-shadow:0 4px 0 #4f6fa8}
+  .act:active{transform:translateY(2px);box-shadow:0 2px 0 #4f6fa8}
+  .act.gold{background:#f4c542;color:#3a2c08;box-shadow:0 4px 0 #b08a1e}
+  .act.ghost{background:#173029;color:#cde4d9;box-shadow:0 4px 0 #0b1a16;border:1px solid #3d6a5b}
+  .act[disabled]{opacity:.4;pointer-events:none}
+  #msg{text-align:center;color:#bfe0d3;font-size:13px;min-height:18px;margin:6px 4px 0;flex:0 0 auto;font-weight:600}
+  #toast{position:fixed;left:50%;bottom:calc(74px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#173029;border:1px solid #3f6b5c;color:#eafff5;padding:9px 15px;border-radius:999px;font-size:13px;font-weight:700;opacity:0;transition:opacity .2s;pointer-events:none;z-index:80}
+  #toast.show{opacity:1}
+  .ov{position:fixed;inset:0;background:rgba(8,16,14,.94);display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:70;text-align:center;padding:24px}
+  .ov.show{display:flex;animation:fade .25s ease}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  .ov h1{font-size:26px;margin:0}
+  .ov p{color:#bfe0d3;max-width:340px;font-size:15px;margin:0;line-height:1.5}
+  .ovcard{max-width:520px;background:rgba(10,20,17,.6);border:1px solid #2b5145;border-radius:16px;padding:18px 22px}
+  .ovcard h2{font-size:20px;margin:0 0 10px;color:#9fe8dd}
+  .ovcard p{margin:0 0 9px;font-size:14px;text-align:left}
+.mini,.card{will-change:transform}
+.reveal{animation:cardReveal .3s ease-out;transform-origin:center}
+@keyframes cardReveal{0%{transform:rotateY(85deg)}60%{transform:rotateY(-8deg)}100%{transform:rotateY(0)}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="bar">
+    <a class="home" href="index.html">&#8962; Home</a>
+    <button class="rules" id="rulesBtn">Rules</button>
+    <div id="title">Rummy</div>
+    <div id="score"><span id="youScore">You 0</span><br><span id="botScore">Bot 0</span></div>
+  </div>
+  <div id="oppRow"></div>
+  <div id="tableWrap"><div id="table"></div></div>
+  <div id="piles">
+    <div class="pilewrap"><div class="pile stock" id="stock"></div><div class="cap" id="stockCap">Stock</div></div>
+    <div class="pilewrap"><div class="pile empty" id="discard"></div><div class="cap">Discard</div></div>
+  </div>
+  <div id="handrow"><div id="hand"></div></div>
+  <div id="actions"></div>
+  <div id="msg"></div>
+</div>
+
+<div id="toast"></div>
+
+<div class="ov" id="roundOv"><h1 id="roundTitle">Round over</h1><p id="roundText"></p><button class="act gold" id="roundBtn">Next round</button><button class="act ghost" id="roundHome">Back home</button></div>
+<div class="ov" id="rulesOv"><div class="ovcard"><h2>How to play Rummy</h2>
+  <p>Make <b>melds</b>: a <b>set</b> is 3 or 4 cards of the same rank; a <b>run</b> is 3 or more in a row of the same suit (aces are low).</p>
+  <p>On your turn: <b>draw</b> one card (from the stock or the discard pile), lay down any melds you can, add cards to melds already on the table, then <b>discard</b> one card.</p>
+  <p>Go <b>out</b> by melding every card and discarding your last one. The other player's leftover cards count against them: face cards and tens are 10, aces are 1, everything else its number.</p>
+  <p>First to <b>100</b> points wins the match.</p>
+  <button class="act gold" id="rulesClose">Got it</button></div></div>
+
+<script>
+/* self-back home in the site iframe */
+document.addEventListener('click',function(e){
+  var a=e.target&&e.target.closest?e.target.closest('.home,#roundHome'):null;
+  if(a){e.preventDefault();try{if(window.parent!==window){parent.history.back();return;}}catch(err){}window.location.href='index.html';}
+},true);
+
+/* sound */
+var AC=null;
+function beep(t){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();var o=AC.createOscillator(),g=AC.createGain(),n=AC.currentTime;var f={deal:520,draw:440,meld:720,discard:360,win:880,lose:200}[t]||440;o.frequency.value=f;o.type=t==='lose'?'sawtooth':'sine';g.gain.setValueAtTime(.0001,n);g.gain.exponentialRampToValueAtTime(.1,n+.01);g.gain.exponentialRampToValueAtTime(.0001,n+(t==='win'?.5:.15));o.connect(g);g.connect(AC.destination);o.start(n);o.stop(n+(t==='win'?.5:.17));}catch(e){}}
+
+/* ---------- cards ---------- */
+var SUITS=["\u2660","\u2665","\u2666","\u2663"],RED={1:1,2:1};
+function val(r){return r>=10?10:(r===1?1:r);}
+function rankStr(r){return r===1?"A":r===11?"J":r===12?"Q":r===13?"K":(""+r);}
+function newDeck(){var d=[];for(var s=0;s<4;s++)for(var r=1;r<=13;r++)d.push({r:r,s:s});return d;}
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=(Math.random()*(i+1))|0,t=a[i];a[i]=a[j];a[j]=t;}return a;}
+
+/* ---------- meld engine ---------- */
+function isSet(cards){if(cards.length<3||cards.length>4)return false;var r=cards[0].r,seen={};for(var i=0;i<cards.length;i++){if(cards[i].r!==r)return false;if(seen[cards[i].s])return false;seen[cards[i].s]=1;}return true;}
+function isRun(cards){if(cards.length<3)return false;var s=cards[0].s,rs=[];for(var i=0;i<cards.length;i++){if(cards[i].s!==s)return false;rs.push(cards[i].r);}rs.sort(function(a,b){return a-b;});for(var j=1;j<rs.length;j++)if(rs[j]!==rs[j-1]+1)return false;return true;}
+function isMeld(cards){return isSet(cards)||isRun(cards);}
+function meldType(cards){return isSet(cards)?"set":"run";}
+
+function combos(arr,k){var res=[];(function go(start,cur){if(cur.length===k){res.push(cur.slice());return;}for(var i=start;i<arr.length;i++){cur.push(arr[i]);go(i+1,cur);cur.pop();}})(0,[]);return res;}
+
+function candidateMelds(hand){
+  var melds=[],i,r,s;
+  var byRank={};for(i=0;i<hand.length;i++){r=hand[i].r;(byRank[r]=byRank[r]||[]).push(i);}
+  for(r in byRank){var g=byRank[r];if(g.length>=3){combos(g,3).forEach(function(m){melds.push(m);});if(g.length>=4)combos(g,4).forEach(function(m){melds.push(m);});}}
+  var bySuit={};for(i=0;i<hand.length;i++){s=hand[i].s;(bySuit[s]=bySuit[s]||[]).push(i);}
+  for(s in bySuit){var idx=bySuit[s].slice().sort(function(a,b){return hand[a].r-hand[b].r;});
+    for(i=0;i<idx.length;i++)for(var j=i+2;j<idx.length;j++){var seq=idx.slice(i,j+1),ok=true;for(var k=1;k<seq.length;k++)if(hand[seq[k]].r!==hand[seq[k-1]].r+1){ok=false;break;}if(ok)melds.push(seq);}
+  }
+  return melds;
+}
+/* choose non-overlapping melds to MINIMIZE leftover deadwood (recurse over cards, bounded) */
+function bestPartition(hand){
+  var melds=candidateMelds(hand),n=hand.length,i;
+  var meldsByCard=[];for(i=0;i<n;i++)meldsByCard.push([]);
+  melds.forEach(function(m,mi){m.forEach(function(ci){meldsByCard[ci].push(mi);});});
+  var best={dw:1e9,melds:[],used:null};
+  function go(pos,used,chosen,dw){
+    while(pos<n&&used[pos])pos++;
+    if(pos>=n){if(dw<best.dw)best={dw:dw,melds:chosen.slice(),used:used.slice()};return;}
+    if(dw>=best.dw)return;
+    // A: leave card pos as deadwood
+    used[pos]=1;go(pos+1,used,chosen,dw+val(hand[pos].r));used[pos]=0;
+    // B: assign pos to a meld containing it whose cards are all free
+    var cand=meldsByCard[pos];
+    for(var mi=0;mi<cand.length;mi++){
+      var m=melds[cand[mi]],free=true,k;
+      for(k=0;k<m.length;k++)if(used[m[k]]){free=false;break;}
+      if(free){for(k=0;k<m.length;k++)used[m[k]]=1;chosen.push(m);go(pos,used,chosen,dw);chosen.pop();for(k=0;k<m.length;k++)used[m[k]]=0;}
+    }
+  }
+  go(0,new Array(n).fill(0),[],0);
+  return best;
+}
+
+/* ---------- state ---------- */
+var stock=[],discard=[],hands=[[],[]],table=[],turn=0,phase="draw",sel=[],youScore=0,botScore=0,over=false,dealer=1;
+var YOU=0,BOT=1;
+function $(id){return document.getElementById(id);}
+
+function deal(){
+  var d=shuffle(newDeck());
+  hands=[[],[]];table=[];sel=[];over=false;
+  for(var i=0;i<10;i++){hands[0].push(d.pop());hands[1].push(d.pop());}
+  discard=[d.pop()];stock=d;
+  dealer=1-dealer;turn=1-dealer;phase="draw";
+  sortHand(hands[0]);
+  beep("deal");render();
+  msg((turn===YOU?"Your turn. Draw a card.":"Bot's turn."));
+  if(turn===BOT)setTimeout(botTurn,700);
+}
+function sortHand(h){h.sort(function(a,b){return a.s-b.s||a.r-b.r;});}
+
+/* ---------- rendering ---------- */
+function cardEl(c,cls){
+  var el=document.createElement("div");el.className="card"+(cls?" "+cls:"")+((c.s===1||c.s===2)?" red":"");el.dataset.fid=flipId(c);
+  el.innerHTML='<span class="rk">'+rankStr(c.r)+'<span style="font-size:.8em">'+SUITS[c.s]+'</span></span><span class="big">'+SUITS[c.s]+'</span>';
+  return el;
+}
+/* ---- card motion: FLIP (First, Last, Invert, Play) ---- */
+var __fu=0,__ff=null,__RED=false;try{__RED=matchMedia('(prefers-reduced-motion:reduce)').matches;}catch(e){}
+function flipId(o){return o.__fid||(o.__fid=++__fu);}
+function _isDown(el){return el.classList.contains('back')||el.classList.contains('down')||el.classList.contains('facedown');}
+function flipRecord(){__ff={};document.querySelectorAll('[data-fid]').forEach(function(el){var r=el.getBoundingClientRect();__ff[el.dataset.fid]={l:r.left,t:r.top,d:_isDown(el)};});}
+function flipPlay(srcSel){
+  if(!__ff)return;var f=__ff;__ff=null;var s=srcSel?document.querySelector(srcSel):null;var sr=s?s.getBoundingClientRect():null;var n=0;
+  document.querySelectorAll('[data-fid]').forEach(function(el){
+    var L=el.getBoundingClientRect(),p=f[el.dataset.fid],isNew=!p,dx,dy,dl=0,ex='';
+    if(isNew){if(!sr)return;dx=sr.left-L.left;dy=sr.top-L.top;ex=' scale(.9)';dl=n++*22;}
+    else{dx=p.l-L.left;dy=p.t-L.top;if(Math.abs(dx)<.5&&Math.abs(dy)<.5){if(p.d&&!_isDown(el)){el.classList.add('reveal');setTimeout(function(){el.classList.remove('reveal');},360);}return;}}
+    el.style.transition='none';el.style.transform='translate('+dx+'px,'+dy+'px)'+ex;el.style.zIndex='400';void el.offsetWidth;
+    requestAnimationFrame(function(){el.style.transition='transform 300ms cubic-bezier(.2,.75,.3,1) '+dl+'ms';el.style.transform='';});
+    var c=function(){el.style.transition='';el.style.zIndex='';el.style.transform='';};el.addEventListener('transitionend',c,{once:true});setTimeout(c,400+dl);
+  });
+}
+function flipWrap(paint,src){if(__RED){paint();return;}flipRecord();paint();flipPlay(src);}
+function render(){flipWrap(paintBoard,'#stock');}
+function paintBoard(){
+  // opponent
+  var opp=$("oppRow");opp.innerHTML="";
+  var lab=document.createElement("div");lab.style.cssText="font-size:12px;color:#9ec9b8;font-weight:700;margin-right:6px";
+  lab.textContent="Bot: "+hands[1].length+" cards";opp.appendChild(lab);
+  for(var i=0;i<Math.min(hands[1].length,12);i++){var b=document.createElement("div");b.className="card mini back";opp.appendChild(b);}
+  // table melds
+  var tb=$("table");tb.innerHTML="";
+  if(!table.length){tb.innerHTML='<div style="color:#6f9385;font-size:13px;text-align:center;padding:14px">Melds you lay down appear here.</div>';}
+  table.forEach(function(m,mi){
+    var g=document.createElement("div");g.className="meldgrp";g.dataset.mi=mi;
+    m.cards.forEach(function(c){g.appendChild(cardEl(c,"mini"));});
+    var l=document.createElement("div");l.className="meldlabel";l.textContent=(m.owner===YOU?"you":"bot")+" \u00b7 "+meldType(m.cards);
+    g.appendChild(l);
+    g.addEventListener("click",function(){tryLayOff(mi);});
+    tb.appendChild(g);
+  });
+  // piles
+  var st=$("stock");st.className="pile stock"+((phase==="draw"&&turn===YOU&&stock.length)?" hot":"");
+  $("stockCap").textContent="Stock ("+stock.length+")";
+  var dc=$("discard");
+  if(discard.length){var top=discard[discard.length-1];dc.className="pile"+((phase==="draw"&&turn===YOU)?" hot":"")+((top.s===1||top.s===2)?" red":"");dc.style.color=(top.s===1||top.s===2)?"#c62828":"#1c1c1c";dc.innerHTML='<span class="rk">'+rankStr(top.r)+' '+SUITS[top.s]+'</span>';}
+  else{dc.className="pile empty";dc.innerHTML="";}
+  // your hand
+  var hd=$("hand");hd.innerHTML="";
+  hands[0].forEach(function(c,i){var el=cardEl(c,sel.indexOf(i)>=0?"sel":"");el.addEventListener("click",function(){toggleSel(i);});hd.appendChild(el);});
+  renderActions();
+  // score
+  $("youScore").textContent="You "+youScore;$("botScore").textContent="Bot "+botScore;
+}
+function renderActions(){
+  var a=$("actions");a.innerHTML="";
+  if(turn!==YOU||over)return;
+  if(phase==="draw"){
+    add(a,"Draw stock","gold",function(){playerDraw("stock");});
+    if(discard.length)add(a,"Take discard","",function(){playerDraw("discard");});
+  }else{ // meld/discard phase
+    var canMeld=sel.length>=3&&isMeld(sel.map(function(i){return hands[0][i];}));
+    add(a,"Lay down meld",canMeld?"gold":"",function(){layDown();},!canMeld);
+    add(a,"Discard",sel.length===1?"":"",function(){playerDiscard();},sel.length!==1);
+  }
+}
+function add(parent,label,cls,fn,disabled){var b=document.createElement("button");b.className="act"+(cls?" "+cls:"")+((label==="Discard"&&!disabled)?" ghost":"");b.textContent=label;if(disabled)b.setAttribute("disabled","");else b.addEventListener("click",fn);parent.appendChild(b);}
+function toggleSel(i){var k=sel.indexOf(i);if(k>=0)sel.splice(k,1);else sel.push(i);render();}
+function msg(t){$("msg").textContent=t;}
+function toast(t){var el=$("toast");el.textContent=t;el.classList.add("show");setTimeout(function(){el.classList.remove("show");},1400);}
+
+/* ---------- player actions ---------- */
+function playerDraw(src){
+  if(turn!==YOU||phase!=="draw")return;
+  if(src==="stock"){if(!stock.length){endRoundByCount();return;}hands[0].push(stock.pop());beep("draw");}
+  else{hands[0].push(discard.pop());beep("draw");}
+  sortHand(hands[0]);sel=[];phase="play";render();msg("Lay down melds, or select one card and discard.");
+}
+function layDown(){
+  var cards=sel.map(function(i){return hands[0][i];});
+  if(!isMeld(cards)){toast("Not a valid set or run");return;}
+  table.push({owner:YOU,cards:cards.slice().sort(function(a,b){return a.r-b.r;})});
+  // remove from hand (by identity)
+  cards.forEach(function(c){var idx=hands[0].indexOf(c);if(idx>=0)hands[0].splice(idx,1);});
+  sel=[];beep("meld");
+  if(hands[0].length===0){goOut(YOU);return;}
+  render();msg("Nice meld. Lay down more, or discard.");
+}
+function tryLayOff(mi){
+  if(turn!==YOU||phase!=="play"||sel.length!==1)return;
+  var c=hands[0][sel[0]],m=table[mi],test=m.cards.concat([c]);
+  if(isMeld(test)||(meldType(m.cards)==="run"&&isRun(test))||(meldType(m.cards)==="set"&&isSet(test))){
+    m.cards.push(c);m.cards.sort(function(a,b){return a.r-b.r;});
+    hands[0].splice(sel[0],1);sel=[];beep("meld");
+    if(hands[0].length===0){goOut(YOU);return;}
+    render();msg("Laid off. Keep going or discard.");
+  }else{toast("That card doesn't fit there");}
+}
+function playerDiscard(){
+  if(sel.length!==1)return;
+  var c=hands[0].splice(sel[0],1)[0];discard.push(c);sel=[];beep("discard");
+  endTurn();
+}
+
+/* ---------- turn flow ---------- */
+function endTurn(){
+  render();
+  if(over)return;
+  turn=BOT;phase="draw";render();msg("Bot's turn.");
+  setTimeout(botTurn,750);
+}
+function reshuffleOrEnd(){endRoundByCount();}
+
+/* ---------- bot ---------- */
+function botTurn(){
+  if(over)return;
+  // draw: take discard if it lowers deadwood more than an average stock draw
+  var base=bestPartition(hands[1]).dw;
+  var takeDiscard=false;
+  if(discard.length){
+    var withD=hands[1].concat([discard[discard.length-1]]);
+    var dwD=bestPartition(withD).dw - val(discard[discard.length-1].r);
+    if(dwD<base-1)takeDiscard=true; // the discard meaningfully helps
+  }
+  if(takeDiscard){hands[1].push(discard.pop());}
+  else{if(!stock.length){endRoundByCount();return;}hands[1].push(stock.pop());}
+  beep("draw");render();
+  // meld: lay down best partition melds
+  setTimeout(function(){
+    var bp=bestPartition(hands[1]);
+    bp.melds.forEach(function(m){
+      var cards=m.map(function(i){return hands[1][i];});
+      // guard: cards still valid meld
+      if(isMeld(cards)){table.push({owner:BOT,cards:cards.slice().sort(function(a,b){return a.r-b.r;})});}
+    });
+    // rebuild hand minus melded
+    var meldedSet={};bp.melds.forEach(function(m){m.forEach(function(i){meldedSet[i]=1;});});
+    hands[1]=hands[1].filter(function(_,i){return !meldedSet[i];});
+    // lay off remaining onto any table meld
+    var changed=true;
+    while(changed){changed=false;
+      for(var h=0;h<hands[1].length;h++){for(var t=0;t<table.length;t++){var test=table[t].cards.concat([hands[1][h]]);if((meldType(table[t].cards)==="run"&&isRun(test))||(meldType(table[t].cards)==="set"&&isSet(test))){table[t].cards.push(hands[1][h]);table[t].cards.sort(function(a,b){return a.r-b.r;});hands[1].splice(h,1);changed=true;break;}}if(changed)break;}
+    }
+    if(hands[1].length){beep("meld");}
+    if(hands[1].length===0){goOut(BOT);return;}
+    render();
+    // discard: highest deadwood card not part of a near-run/near-set
+    setTimeout(function(){
+      var bp2=bestPartition(hands[1]);
+      var deadIdx=[];for(var i=0;i<hands[1].length;i++)if(!bp2.used[i])deadIdx.push(i);
+      var pool=deadIdx.length?deadIdx:hands[1].map(function(_,i){return i;});
+      pool.sort(function(a,b){return val(hands[1][b].r)-val(hands[1][a].r);});
+      var c=hands[1].splice(pool[0],1)[0];discard.push(c);beep("discard");
+      turn=YOU;phase="draw";render();msg("Your turn. Draw a card.");
+    },450);
+  },500);
+}
+
+/* ---------- round end / scoring ---------- */
+function handDeadwood(h){return bestPartition(h).dw;}
+function goOut(who){
+  over=true;beep(who===YOU?"win":"lose");
+  var loser=1-who,dw=hands[loser].reduce(function(s,c){return s+val(c.r);},0);
+  if(who===YOU)youScore+=dw;else botScore+=dw;
+  showRound(who,dw,false);
+}
+function endRoundByCount(){
+  over=true;
+  var y=handDeadwood(hands[0]),b=handDeadwood(hands[1]);
+  var who=y<=b?YOU:BOT,margin=Math.abs(y-b);
+  if(who===YOU)youScore+=margin;else botScore+=margin;
+  beep(who===YOU?"win":"lose");
+  showRound(who,margin,true);
+}
+function showRound(who,pts,byCount){
+  render();
+  var matchOver=youScore>=100||botScore>=100;
+  var winName=who===YOU?"You":"Bot";
+  $("roundTitle").textContent=matchOver?((youScore>=100&&youScore>botScore)||(youScore>=100&&botScore<100)?"You win the match!":(botScore>=100?"Bot wins the match":"Match over")):(winName+" went out");
+  if(matchOver&&youScore>=100&&youScore>=botScore)$("roundTitle").textContent="You win the match!";
+  if(matchOver&&botScore>=100&&botScore>youScore)$("roundTitle").textContent="Bot wins the match";
+  var line=byCount?(winName+" had the least left over (+"+pts+").") :(winName+" went out. "+(who===YOU?"Bot":"You")+" had "+pts+" in deadwood.");
+  $("roundText").textContent=line+"  Score: You "+youScore+", Bot "+botScore+".";
+  $("roundBtn").textContent=matchOver?"New match":"Next round";
+  $("roundBtn").dataset.match=matchOver?"1":"";
+  $("roundOv").classList.add("show");
+}
+
+/* ---------- wiring ---------- */
+$("stock").addEventListener("click",function(){if(turn===YOU&&phase==="draw")playerDraw("stock");});
+$("discard").addEventListener("click",function(){if(turn===YOU&&phase==="draw"&&discard.length)playerDraw("discard");});
+$("roundBtn").addEventListener("click",function(){if(this.dataset.match){youScore=0;botScore=0;}$("roundOv").classList.remove("show");deal();});
+$("rulesBtn").addEventListener("click",function(){$("rulesOv").classList.add("show");});
+$("rulesClose").addEventListener("click",function(){$("rulesOv").classList.remove("show");});
+
+deal();
+</script>
+</body>
+</html>
