@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Texas Hold'em</title>
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{margin:0;font-family:system-ui,-apple-system,sans-serif;color:#e9e4f2;overflow:hidden;background:radial-gradient(120% 80% at 50% 12%,#1c3b32,#0c1f1b 62%,#081512 100%)}
+  #app{display:flex;flex-direction:column;height:100svh;max-width:560px;margin:0 auto;position:relative;z-index:1;padding:0 8px calc(6px + env(safe-area-inset-bottom))}
+  #bar{display:flex;align-items:center;gap:9px;padding:calc(env(safe-area-inset-top) + 9px) 2px 6px;flex:0 0 auto}
+  #bar a.home,#bar button.rules{color:#dfe7dd;text-decoration:none;font-size:13px;border:1px solid #3f6b5c;background:#173029;border-radius:999px;padding:6px 12px;font-weight:700;font-family:inherit;cursor:pointer}
+  #title{font-weight:800;font-size:16px}
+  #chips{margin-left:auto;font-size:12px;color:#9ec9b8;font-weight:700;text-align:right;line-height:1.3}
+  .fan{display:flex;gap:5px;justify-content:center;flex:0 0 auto;padding:4px 0}
+  .lab{font-size:12px;color:#9ec9b8;font-weight:700;text-align:center}
+  .card{width:min(15vw,58px);height:min(21vw,81px);border-radius:7px;position:relative;flex:none;color:#1c1c1c;background:linear-gradient(160deg,#fffdf6,#ece3cf);box-shadow:0 3px 7px rgba(0,0,0,.45),inset 0 1px 0 #fff;display:flex;align-items:flex-start;justify-content:flex-start;font-weight:800;font-size:min(5.6vw,22px);padding:4px 5px;line-height:1;transition:transform .1s}
+  .card .big{position:absolute;bottom:3px;right:5px;font-size:min(6.4vw,26px);opacity:.9}
+  .card.red{color:#c62828}
+  .card.mini{width:min(12vw,46px);height:min(16.8vw,64px);font-size:16px}
+  .card.mini .big{font-size:17px}
+  .card.slot{background:rgba(255,255,255,.05);border:1.4px dashed rgba(255,255,255,.16);box-shadow:none}
+  .card.back{color:transparent;background:radial-gradient(circle at 50% 55%,rgba(76,240,224,.34) 0 23%,rgba(40,70,80,.42) 37%,transparent 44%),linear-gradient(160deg,rgba(255,255,255,.07),transparent 45%),repeating-linear-gradient(50deg,rgba(76,240,224,.06) 0 5px,transparent 5px 10px),linear-gradient(160deg,#22323f,#18262f);box-shadow:0 3px 7px rgba(0,0,0,.5),inset 0 0 0 2px rgba(76,240,224,.7),inset 0 0 0 4px rgba(245,152,71,.35)}
+  #mid{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:0}
+  #board{display:flex;gap:5px;justify-content:center}
+  #pot{font-size:14px;color:#f4c542;font-weight:800}
+  #handName{font-size:14px;color:#bfe0d3;font-weight:700;min-height:18px}
+  #actions{flex:0 0 auto;display:flex;gap:7px;justify-content:center;flex-wrap:wrap;padding:8px 0 2px}
+  .act{font-family:inherit;font-size:15px;font-weight:800;padding:12px 16px;border-radius:11px;border:none;color:#13203a;background:#7fa6e8;cursor:pointer;box-shadow:0 4px 0 #4f6fa8}
+  .act:active{transform:translateY(2px);box-shadow:0 2px 0 #4f6fa8}
+  .act.gold{background:#f4c542;color:#3a2c08;box-shadow:0 4px 0 #b08a1e}
+  .act.ghost{background:#173029;color:#cde4d9;box-shadow:0 4px 0 #0b1a16;border:1px solid #3d6a5b}
+  .act.red{background:#c05a4e;color:#fff;box-shadow:0 4px 0 #7d342b}
+  .act[disabled]{opacity:.4;pointer-events:none}
+  #msg{text-align:center;color:#bfe0d3;font-size:13px;min-height:18px;margin:6px 4px 0;flex:0 0 auto;font-weight:600}
+  .ov{position:fixed;inset:0;background:rgba(8,16,14,.94);display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:70;text-align:center;padding:24px}
+  .ov.show{display:flex;animation:fade .25s ease}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  .ov h1{font-size:25px;margin:0}
+  .ov p{color:#bfe0d3;max-width:340px;font-size:15px;margin:0;line-height:1.5}
+  .ovcard{max-width:520px;background:rgba(10,20,17,.6);border:1px solid #2b5145;border-radius:16px;padding:18px 22px}
+  .ovcard h2{font-size:20px;margin:0 0 10px;color:#9fe8dd}.ovcard p{margin:0 0 9px;font-size:14px;text-align:left}
+  .card{will-change:transform}.reveal{animation:cardReveal .3s ease-out;transform-origin:center}
+  @keyframes cardReveal{0%{transform:rotateY(85deg)}60%{transform:rotateY(-8deg)}100%{transform:rotateY(0)}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="bar"><a class="home" href="index.html">&#8962; Home</a><button class="rules" id="rulesBtn">Rules</button><div id="title">Texas Hold'em</div><div id="chips"><span id="botChips">Bot 200</span><br><span id="youChips">You 200</span></div></div>
+  <div class="lab" id="botLab"></div>
+  <div class="fan" id="botFan"></div>
+  <div id="mid">
+    <div id="pot">Pot 0</div>
+    <div id="board"></div>
+    <div id="handName"></div>
+  </div>
+  <div class="fan" id="youFan"></div>
+  <div class="lab">You</div>
+  <div id="actions"></div>
+  <div id="msg"></div>
+</div>
+<div class="ov" id="roundOv"><h1 id="roundTitle"></h1><p id="roundText"></p><button class="act gold" id="roundBtn">Next hand</button><button class="act ghost" id="roundHome">Back home</button></div>
+<div class="ov" id="rulesOv"><div class="ovcard"><h2>How to play Hold'em</h2>
+  <p>You and the bot each get 2 private cards. Five shared cards come out in the middle over three stages (flop, turn, river). Make your best 5-card hand from your 2 plus the 5.</p>
+  <p>There is a betting round before the flop and after each stage. <b>Check</b> or <b>Bet</b> when no one has bet; <b>Call</b>, <b>Raise</b>, or <b>Fold</b> when they have.</p>
+  <p>Best hand at the showdown wins the pot, or take it early when the other folds. Bust the bot to win.</p>
+  <button class="act gold" id="rulesClose">Got it</button></div></div>
+
+<script>
+document.addEventListener('click',function(e){var a=e.target&&e.target.closest?e.target.closest('.home,#roundHome'):null;if(a){e.preventDefault();try{if(window.parent!==window){parent.history.back();return;}}catch(err){}window.location.href='index.html';}},true);
+var AC=null;function beep(t){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();var o=AC.createOscillator(),g=AC.createGain(),n=AC.currentTime;var f={deal:520,card:600,chip:660,win:880,lose:200,fold:300}[t]||440;o.frequency.value=f;o.type=t==='lose'?'sawtooth':'sine';g.gain.setValueAtTime(.0001,n);g.gain.exponentialRampToValueAtTime(.1,n+.01);g.gain.exponentialRampToValueAtTime(.0001,n+(t==='win'?.5:.14));o.connect(g);g.connect(AC.destination);o.start(n);o.stop(n+.17);}catch(e){}}
+var SUITS=["\u2660","\u2665","\u2666","\u2663"];
+function rankStr(r){return r===1?"A":r===11?"J":r===12?"Q":r===13?"K":(""+r);}
+function newDeck(){var d=[];for(var s=0;s<4;s++)for(var r=1;r<=13;r++)d.push({r:r,s:s});return d;}
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=(Math.random()*(i+1))|0,t=a[i];a[i]=a[j];a[j]=t;}return a;}
+/* evaluator (same as Poker) */
+var HAND_NAMES=["High card","Pair","Two pair","Three of a kind","Straight","Flush","Full house","Four of a kind","Straight flush"];
+function eval5(cards){var rs=cards.map(function(c){return c.r===1?14:c.r;}).sort(function(a,b){return b-a;});var flush=cards.every(function(c){return c.s===cards[0].s;});var uniq=[];rs.forEach(function(r){if(uniq.indexOf(r)<0)uniq.push(r);});var straight=false,sHigh=0;if(uniq.length===5){if(rs[0]-rs[4]===4){straight=true;sHigh=rs[0];}else if(rs[0]===14&&rs[1]===5&&rs[4]===2){straight=true;sHigh=5;}}var cnt={};rs.forEach(function(r){cnt[r]=(cnt[r]||0)+1;});var groups=Object.keys(cnt).map(function(r){return{r:+r,n:cnt[r]};}).sort(function(a,b){return b.n-a.n||b.r-a.r;});var pat=groups.map(function(g){return g.n;}).join("");var tb=[];groups.forEach(function(g){for(var i=0;i<g.n;i++)tb.push(g.r);});if(straight&&flush)return{rank:8,tb:[sHigh]};if(pat==="41")return{rank:7,tb:tb};if(pat==="32")return{rank:6,tb:tb};if(flush)return{rank:5,tb:rs};if(straight)return{rank:4,tb:[sHigh]};if(pat==="311")return{rank:3,tb:tb};if(pat==="221")return{rank:2,tb:tb};if(pat==="2111")return{rank:1,tb:tb};return{rank:0,tb:rs};}
+function cmp(a,b){if(a.rank!==b.rank)return a.rank-b.rank;for(var i=0;i<Math.min(a.tb.length,b.tb.length);i++){if(a.tb[i]!==b.tb[i])return a.tb[i]-b.tb[i];}return 0;}
+function best7(cards){var best=null;for(var i=0;i<cards.length;i++)for(var j=i+1;j<cards.length;j++){var five=[];for(var k=0;k<cards.length;k++)if(k!==i&&k!==j)five.push(cards[k]);var e=eval5(five);if(!best||cmp(e,best)>0)best=e;}return best;}
+/* FLIP */
+var __fu=0,__ff=null,__RED=false;try{__RED=matchMedia('(prefers-reduced-motion:reduce)').matches;}catch(e){}
+function flipId(o){return o.__fid||(o.__fid=++__fu);}function _d(el){return el.classList.contains('back');}
+function flipRecord(){__ff={};document.querySelectorAll('[data-fid]').forEach(function(el){var r=el.getBoundingClientRect();__ff[el.dataset.fid]={l:r.left,t:r.top,d:_d(el)};});}
+function flipPlay(){if(!__ff)return;var f=__ff;__ff=null;document.querySelectorAll('[data-fid]').forEach(function(el){var L=el.getBoundingClientRect(),p=f[el.dataset.fid];if(!p)return;var dx=p.l-L.left,dy=p.t-L.top;if(Math.abs(dx)<.5&&Math.abs(dy)<.5){if(p.d&&!_d(el)){el.classList.add('reveal');setTimeout(function(){el.classList.remove('reveal');},360);}return;}el.style.transition='none';el.style.transform='translate('+dx+'px,'+dy+'px)';el.style.zIndex='400';void el.offsetWidth;requestAnimationFrame(function(){el.style.transition='transform 300ms cubic-bezier(.2,.75,.3,1)';el.style.transform='';});var c=function(){el.style.transition='';el.style.zIndex='';el.style.transform='';};el.addEventListener('transitionend',c,{once:true});setTimeout(c,400);});}
+function paintWrap(paint){if(__RED){paint();return;}flipRecord();paint();flipPlay();}
+
+/* ---------- state ---------- */
+var BET=20;
+var deck=[],you=[],bot=[],board=[],youChips=200,botChips=200,pot=0,youChipsIn=0,botChipsIn=0;
+var street=0,toAct=0,betOn=false,raised=false,over=false,revealed=false,button=1,acts=0;
+var YOU=0,BOT=1;
+function $(id){return document.getElementById(id);}
+function deal(){
+  if(youChips<10||botChips<10){return;}
+  deck=shuffle(newDeck());you=[deck.pop(),deck.pop()];bot=[deck.pop(),deck.pop()];board=[];
+  over=false;revealed=false;pot=0;street=0;betOn=false;raised=false;youChipsIn=0;botChipsIn=0;
+  button=1-button;
+  // small ante-style blinds: both post 10
+  youChips-=10;botChips-=10;pot=20;
+  openStreet(button); // button acts first preflop
+  beep("deal");render();
+  msg("Pre-flop. "+(toAct===YOU?"Your move.":"Bot to act."));
+  if(toAct===BOT)setTimeout(botAct,700);
+}
+/* ---------- render ---------- */
+function cardEl(c,cls){var el=document.createElement("div");el.className="card"+(cls?" "+cls:"")+((c.s===1||c.s===2)?" red":"");el.dataset.fid=flipId(c);el.innerHTML='<span>'+rankStr(c.r)+SUITS[c.s]+'</span><span class="big">'+SUITS[c.s]+'</span>';return el;}
+function backEl(c){var el=document.createElement("div");el.className="card mini back";if(c)el.dataset.fid=flipId(c);return el;}
+function render(){paintWrap(paint);}
+function paint(){
+  var bf=$("botFan");bf.innerHTML="";bot.forEach(function(c){bf.appendChild(revealed?cardEl(c,"mini"):backEl(c));});
+  $("botLab").textContent="Bot"+(revealed?"":" \u00b7 in "+botChipsIn);
+  var bd=$("board");bd.innerHTML="";
+  for(var i=0;i<5;i++){if(board[i])bd.appendChild(cardEl(board[i],"mini"));else{var s=document.createElement("div");s.className="card mini slot";bd.appendChild(s);}}
+  var yf=$("youFan");yf.innerHTML="";you.forEach(function(c){yf.appendChild(cardEl(c));});
+  $("pot").textContent="Pot "+pot;
+  var seen=you.concat(board);
+  $("handName").textContent=seen.length>=5?("Your best: "+HAND_NAMES[best7(seen).rank]):"";
+  $("youChips").textContent="You "+youChips;$("botChips").textContent="Bot "+botChips;
+  renderActions();
+}
+function renderActions(){
+  var a=$("actions");a.innerHTML="";if(over||toAct!==YOU)return;
+  if(betOn){
+    add(a,"Call "+BET,"gold",function(){youAct("call");});
+    if(!raised&&youChips>=BET*2)add(a,"Raise","",function(){youAct("raise");});
+    add(a,"Fold","red",function(){youAct("fold");});
+  }else{
+    add(a,"Check","ghost",function(){youAct("check");});
+    add(a,"Bet "+BET,"gold",function(){youAct("bet");},youChips<1);
+  }
+}
+function add(p,label,cls,fn,dis){var b=document.createElement("button");b.className="act"+(cls?" "+cls:"");b.textContent=label;if(dis)b.setAttribute("disabled","");else b.addEventListener("click",fn);p.appendChild(b);}
+function msg(t){$("msg").textContent=t;}
+function put(who,amt){amt=Math.min(amt,who===YOU?youChips:botChips);if(who===YOU){youChips-=amt;youChipsIn+=amt;}else{botChips-=amt;botChipsIn+=amt;}pot+=amt;beep("chip");}
+
+/* ---------- betting flow (heads-up, one bet + one raise per street) ---------- */
+function openStreet(firstActor){ betOn=false; raised=false; acts=0; toAct=firstActor; }
+function resolve(kind){
+  acts++;
+  if(kind==="fold"){beep("fold");endHand(1-toAct,"fold");return;}
+  if(kind==="call"){closeStreet();return;}
+  if(kind==="check"){ if(acts>=2&&!betOn){closeStreet();return;} passAction(); return; }
+  passAction();
+}
+function youAct(a){
+  if(toAct!==YOU||over)return;
+  if(a==="fold"){resolve("fold");return;}
+  if(a==="check"){msg("You check.");resolve("check");return;}
+  if(a==="bet"){put(YOU,BET);betOn=true;msg("You bet "+BET+".");resolve("bet");return;}
+  if(a==="call"){put(YOU,botChipsIn-youChipsIn);msg("You call.");resolve("call");return;}
+  if(a==="raise"){put(YOU,botChipsIn-youChipsIn+BET);raised=true;msg("You raise.");resolve("raise");return;}
+}
+function passAction(){ toAct=1-toAct; render(); if(over)return; if(toAct===BOT)setTimeout(botAct,650); else msg(betOn?"They bet. Call, raise, or fold.":"Your move."); }
+function botAct(){
+  if(over||toAct!==BOT)return;
+  var seen=bot.concat(board);
+  var strength=seen.length>=5?best7(seen).rank:(bot[0].r===bot[1].r?1:(Math.max(bot[0].r===1?14:bot[0].r,bot[1].r===1?14:bot[1].r)>=12?0.5:0));
+  var r=Math.random();
+  if(betOn){
+    var need=youChipsIn-botChipsIn;
+    if(!raised && strength>=3 && botChips>=need+BET && r<0.5){ put(BOT,need+BET); raised=true; msg("Bot raises."); resolve("raise"); return; }
+    var callOK = strength>=1 || (strength>=0.5&&r<0.6) || r<0.15;
+    if(callOK && botChips>0){ put(BOT,need); msg("Bot calls."); resolve("call"); return; }
+    msg("Bot folds.");resolve("fold");return;
+  }else{
+    var betNow = strength>=2 || (strength>=1&&r<0.5) || r<0.12;
+    if(betNow && botChips>=BET){ put(BOT,BET); betOn=true; msg("Bot bets "+BET+"."); resolve("bet"); return; }
+    msg("Bot checks.");resolve("check");
+  }
+}
+function closeStreet(){
+  if(street>=3){ showdown(); return; }
+  street++;
+  if(street===1){board.push(deck.pop(),deck.pop(),deck.pop());beep("card");}
+  else{board.push(deck.pop());beep("card");}
+  openStreet(1-button);
+  render();
+  var names=["","Flop","Turn","River"];
+  msg(names[street]+". "+(toAct===YOU?"Your move.":"Bot to act."));
+  if(toAct===BOT)setTimeout(botAct,700);
+}
+
+/* ---------- showdown ---------- */
+function showdown(){
+  revealed=true;render();
+  var ye=best7(you.concat(board)),be=best7(bot.concat(board)),c=cmp(ye,be);
+  setTimeout(function(){ if(c>0)endHand(YOU,"show",ye,be); else if(c<0)endHand(BOT,"show",ye,be); else endHand(-1,"split",ye,be); },600);
+}
+function endHand(who,how,ye,be){
+  over=true;
+  if(who===YOU){youChips+=pot;beep("win");}else if(who===BOT){botChips+=pot;beep("lose");}else{var h=Math.floor(pot/2);youChips+=h;botChips+=pot-h;}
+  var title,text;
+  if(how==="fold"){title=who===YOU?"They folded":"You folded";text=(who===YOU?"Bot folds. You take ":"You fold. Bot takes ")+pot+".";}
+  else if(how==="split"){title="Split pot";text="Tie on "+HAND_NAMES[ye.rank]+". Pot of "+pot+" split.";}
+  else{title=who===YOU?"You win":"Bot wins";text="You: "+HAND_NAMES[ye.rank]+" \u00b7 Bot: "+HAND_NAMES[be.rank]+". "+(who===YOU?"You":"Bot")+" take "+pot+".";}
+  pot=0;render();
+  var matchOver=youChips<10||botChips<10;
+  $("roundTitle").textContent=matchOver?(youChips<10?"Bot cleans you out":"You win the match!"):title;
+  $("roundText").textContent=text+"  Chips: You "+youChips+", Bot "+botChips+".";
+  $("roundBtn").textContent=matchOver?"New match":"Next hand";$("roundBtn").dataset.match=matchOver?"1":"";
+  $("roundOv").classList.add("show");
+}
+$("roundBtn").addEventListener("click",function(){if(this.dataset.match){youChips=200;botChips=200;}$("roundOv").classList.remove("show");deal();});
+$("rulesBtn").addEventListener("click",function(){$("rulesOv").classList.add("show");});
+$("rulesClose").addEventListener("click",function(){$("rulesOv").classList.remove("show");});
+deal();
+</script>
+</body>
+</html>

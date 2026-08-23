@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Poker</title>
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{margin:0;font-family:system-ui,-apple-system,sans-serif;color:#e9e4f2;overflow:hidden;
+    background:radial-gradient(120% 80% at 50% 12%,#1c3b32,#0c1f1b 62%,#081512 100%)}
+  #app{display:flex;flex-direction:column;height:100svh;max-width:560px;margin:0 auto;position:relative;z-index:1;padding:0 8px calc(6px + env(safe-area-inset-bottom))}
+  #bar{display:flex;align-items:center;gap:9px;padding:calc(env(safe-area-inset-top) + 9px) 2px 6px;flex:0 0 auto}
+  #bar a.home,#bar button.rules{color:#dfe7dd;text-decoration:none;font-size:13px;border:1px solid #3f6b5c;background:#173029;border-radius:999px;padding:6px 12px;font-weight:700;font-family:inherit;cursor:pointer}
+  #title{font-weight:800;font-size:17px}
+  #chips{margin-left:auto;font-size:12px;color:#9ec9b8;font-weight:700;text-align:right;line-height:1.3}
+  .fan{display:flex;gap:4px;justify-content:center;flex:0 0 auto;padding:4px 0}
+  .card{width:min(15vw,58px);height:min(21vw,81px);border-radius:7px;position:relative;flex:none;color:#1c1c1c;
+    background:linear-gradient(160deg,#fffdf6,#ece3cf);box-shadow:0 3px 7px rgba(0,0,0,.45),inset 0 1px 0 #fff;
+    display:flex;align-items:flex-start;justify-content:flex-start;font-weight:800;font-size:min(5.6vw,22px);padding:4px 5px;line-height:1;cursor:pointer;transition:transform .1s}
+  .card .big{position:absolute;bottom:3px;right:5px;font-size:min(6.4vw,26px);opacity:.9}
+  .card.red{color:#c62828}
+  .card.mini{width:min(11vw,42px);height:min(15.4vw,59px);font-size:15px;cursor:default}
+  .card.mini .big{font-size:16px}
+  .card.sel{transform:translateY(-14px);box-shadow:0 10px 16px rgba(0,0,0,.5),0 0 0 3px #f4c542}
+  .card.hold::after{content:'HOLD';position:absolute;top:-16px;left:0;right:0;text-align:center;font-size:9px;font-weight:800;color:#f4c542;letter-spacing:.05em}
+  .card.back,.card.mini.back{color:transparent;background:radial-gradient(circle at 50% 55%,rgba(76,240,224,.34) 0 23%,rgba(40,70,80,.42) 37%,transparent 44%),linear-gradient(160deg,rgba(255,255,255,.07),transparent 45%),repeating-linear-gradient(50deg,rgba(76,240,224,.06) 0 5px,transparent 5px 10px),linear-gradient(160deg,#22323f,#18262f);box-shadow:0 3px 7px rgba(0,0,0,.5),inset 0 0 0 2px rgba(76,240,224,.7),inset 0 0 0 4px rgba(245,152,71,.35)}
+  #mid{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:0;text-align:center}
+  #pot{font-family:inherit;font-size:15px;color:#f4c542;font-weight:800}
+  #potBig{font-family:var(--disp);font-size:34px;font-weight:800;color:#f4e9d6}
+  #handName{font-size:15px;color:#bfe0d3;font-weight:700;min-height:20px}
+  #botName{font-size:12px;color:#9ec9b8;font-weight:700;text-align:center;padding-top:2px}
+  #actions{flex:0 0 auto;display:flex;gap:7px;justify-content:center;flex-wrap:wrap;padding:8px 0 2px}
+  .act{font-family:inherit;font-size:15px;font-weight:800;padding:12px 18px;border-radius:11px;border:none;color:#13203a;background:#7fa6e8;cursor:pointer;box-shadow:0 4px 0 #4f6fa8}
+  .act:active{transform:translateY(2px);box-shadow:0 2px 0 #4f6fa8}
+  .act.gold{background:#f4c542;color:#3a2c08;box-shadow:0 4px 0 #b08a1e}
+  .act.ghost{background:#173029;color:#cde4d9;box-shadow:0 4px 0 #0b1a16;border:1px solid #3d6a5b}
+  .act.red{background:#c05a4e;color:#fff;box-shadow:0 4px 0 #7d342b}
+  .act[disabled]{opacity:.4;pointer-events:none}
+  #msg{text-align:center;color:#bfe0d3;font-size:13px;min-height:18px;margin:6px 4px 0;flex:0 0 auto;font-weight:600}
+  #toast{position:fixed;left:50%;bottom:calc(78px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#173029;border:1px solid #3f6b5c;color:#eafff5;padding:9px 15px;border-radius:999px;font-size:13px;font-weight:700;opacity:0;transition:opacity .2s;pointer-events:none;z-index:80}
+  #toast.show{opacity:1}
+  .ov{position:fixed;inset:0;background:rgba(8,16,14,.94);display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:70;text-align:center;padding:24px}
+  .ov.show{display:flex;animation:fade .25s ease}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  .ov h1{font-size:26px;margin:0}
+  .ov p{color:#bfe0d3;max-width:340px;font-size:15px;margin:0;line-height:1.5}
+  .ovcard{max-width:520px;background:rgba(10,20,17,.6);border:1px solid #2b5145;border-radius:16px;padding:18px 22px}
+  .ovcard h2{font-size:20px;margin:0 0 10px;color:#9fe8dd}
+  .ovcard p{margin:0 0 9px;font-size:14px;text-align:left}
+  .card{will-change:transform}
+  .reveal{animation:cardReveal .3s ease-out;transform-origin:center}
+  @keyframes cardReveal{0%{transform:rotateY(85deg)}60%{transform:rotateY(-8deg)}100%{transform:rotateY(0)}}
+  :root{--disp:system-ui}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="bar">
+    <a class="home" href="index.html">&#8962; Home</a>
+    <button class="rules" id="rulesBtn">Rules</button>
+    <div id="title">Poker</div>
+    <div id="chips"><span id="youChips">You 100</span><br><span id="botChips">Bot 100</span></div>
+  </div>
+  <div class="fan" id="botFan"></div>
+  <div id="botName"></div>
+  <div id="mid">
+    <div id="pot">POT</div>
+    <div id="potBig">0</div>
+    <div id="handName"></div>
+  </div>
+  <div class="fan" id="youFan"></div>
+  <div id="actions"></div>
+  <div id="msg"></div>
+</div>
+
+<div id="toast"></div>
+
+<div class="ov" id="roundOv"><h1 id="roundTitle"></h1><p id="roundText"></p><button class="act gold" id="roundBtn">Next hand</button><button class="act ghost" id="roundHome">Back home</button></div>
+<div class="ov" id="rulesOv"><div class="ovcard"><h2>How to play (5-card draw)</h2>
+  <p>You and the bot each ante, then get 5 cards. Tap the cards you want to throw away (up to 3), then <b>Draw</b> to swap them for new ones.</p>
+  <p>After the draw there is one round of betting. <b>Check</b> to pass, <b>Bet</b> to put chips in. If someone bets, the other must <b>Call</b> to see the hands or <b>Fold</b> and give up the pot.</p>
+  <p>Best 5-card hand wins the pot: straight flush, four of a kind, full house, flush, straight, three of a kind, two pair, pair, high card. Run a player out of chips to win the match.</p>
+  <button class="act gold" id="rulesClose">Got it</button></div></div>
+
+<script>
+document.addEventListener('click',function(e){var a=e.target&&e.target.closest?e.target.closest('.home,#roundHome'):null;if(a){e.preventDefault();try{if(window.parent!==window){parent.history.back();return;}}catch(err){}window.location.href='index.html';}},true);
+var AC=null;
+function beep(t){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();var o=AC.createOscillator(),g=AC.createGain(),n=AC.currentTime;var f={deal:520,draw:440,chip:660,win:880,lose:200,fold:300}[t]||440;o.frequency.value=f;o.type=t==='lose'?'sawtooth':'sine';g.gain.setValueAtTime(.0001,n);g.gain.exponentialRampToValueAtTime(.1,n+.01);g.gain.exponentialRampToValueAtTime(.0001,n+(t==='win'?.5:.15));o.connect(g);g.connect(AC.destination);o.start(n);o.stop(n+(t==='win'?.5:.17));}catch(e){}}
+
+/* ---------- cards ---------- */
+var SUITS=["\u2660","\u2665","\u2666","\u2663"];
+function rankStr(r){return r===1?"A":r===11?"J":r===12?"Q":r===13?"K":(""+r);}
+function newDeck(){var d=[];for(var s=0;s<4;s++)for(var r=1;r<=13;r++)d.push({r:r,s:s});return d;}
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=(Math.random()*(i+1))|0,t=a[i];a[i]=a[j];a[j]=t;}return a;}
+
+/* ---------- hand evaluator (reused by Hold'em later) ---------- */
+var HAND_NAMES=["High card","Pair","Two pair","Three of a kind","Straight","Flush","Full house","Four of a kind","Straight flush"];
+function eval5(cards){
+  var rs=cards.map(function(c){return c.r===1?14:c.r;}).sort(function(a,b){return b-a;});
+  var flush=cards.every(function(c){return c.s===cards[0].s;});
+  var uniq=[];rs.forEach(function(r){if(uniq.indexOf(r)<0)uniq.push(r);});
+  var straight=false,sHigh=0;
+  if(uniq.length===5){
+    if(rs[0]-rs[4]===4){straight=true;sHigh=rs[0];}
+    else if(rs[0]===14&&rs[1]===5&&rs[4]===2){straight=true;sHigh=5;} // wheel A-2-3-4-5
+  }
+  var cnt={};rs.forEach(function(r){cnt[r]=(cnt[r]||0)+1;});
+  var groups=Object.keys(cnt).map(function(r){return {r:+r,n:cnt[r]};}).sort(function(a,b){return b.n-a.n||b.r-a.r;});
+  var pat=groups.map(function(g){return g.n;}).join("");
+  var tb=[];groups.forEach(function(g){for(var i=0;i<g.n;i++)tb.push(g.r);});
+  if(straight&&flush)return {rank:8,tb:[sHigh]};
+  if(pat==="41")return {rank:7,tb:tb};
+  if(pat==="32")return {rank:6,tb:tb};
+  if(flush)return {rank:5,tb:rs};
+  if(straight)return {rank:4,tb:[sHigh]};
+  if(pat==="311")return {rank:3,tb:tb};
+  if(pat==="221")return {rank:2,tb:tb};
+  if(pat==="2111")return {rank:1,tb:tb};
+  return {rank:0,tb:rs};
+}
+function cmp(a,b){if(a.rank!==b.rank)return a.rank-b.rank;for(var i=0;i<Math.min(a.tb.length,b.tb.length);i++){if(a.tb[i]!==b.tb[i])return a.tb[i]-b.tb[i];}return 0;}
+
+/* ---------- card motion: FLIP ---------- */
+var __fu=0,__ff=null,__RED=false;try{__RED=matchMedia('(prefers-reduced-motion:reduce)').matches;}catch(e){}
+function flipId(o){return o.__fid||(o.__fid=++__fu);}
+function _isDown(el){return el.classList.contains('back');}
+function flipRecord(){__ff={};document.querySelectorAll('[data-fid]').forEach(function(el){var r=el.getBoundingClientRect();__ff[el.dataset.fid]={l:r.left,t:r.top,d:_isDown(el)};});}
+function flipPlay(){
+  if(!__ff)return;var f=__ff;__ff=null;
+  document.querySelectorAll('[data-fid]').forEach(function(el){
+    var L=el.getBoundingClientRect(),p=f[el.dataset.fid];if(!p)return;
+    var dx=p.l-L.left,dy=p.t-L.top;
+    if(Math.abs(dx)<.5&&Math.abs(dy)<.5){if(p.d&&!_isDown(el)){el.classList.add('reveal');setTimeout(function(){el.classList.remove('reveal');},360);}return;}
+    el.style.transition='none';el.style.transform='translate('+dx+'px,'+dy+'px)';el.style.zIndex='400';void el.offsetWidth;
+    requestAnimationFrame(function(){el.style.transition='transform 300ms cubic-bezier(.2,.75,.3,1)';el.style.transform='';});
+    var c=function(){el.style.transition='';el.style.zIndex='';el.style.transform='';};el.addEventListener('transitionend',c,{once:true});setTimeout(c,400);
+  });
+}
+function paintWrap(paint){if(__RED){paint();return;}flipRecord();paint();flipPlay();}
+
+/* ---------- state ---------- */
+var ANTE=5,BET=10;
+var deck=[],you=[],bot=[],youChips=100,botChips=100,pot=0,phase="draw",sel=[],dealer=1,over=false,betOn=false,revealed=false;
+var YOU=0,BOT=1;
+function $(id){return document.getElementById(id);}
+
+function deal(){
+  if(youChips<ANTE||botChips<ANTE){matchEnd();return;}
+  deck=shuffle(newDeck());you=[];bot=[];sel=[];phase="draw";over=false;betOn=false;revealed=false;
+  youChips-=ANTE;botChips-=ANTE;pot=ANTE*2;
+  for(var i=0;i<5;i++){you.push(deck.pop());bot.push(deck.pop());}
+  sortHand(you);
+  dealer=1-dealer;
+  beep("deal");render();
+  msg("Tap up to 3 cards to throw away, then Draw.");
+}
+function sortHand(h){h.sort(function(a,b){return (b.r===1?14:b.r)-(a.r===1?14:a.r);});}
+
+/* ---------- render ---------- */
+function cardEl(c,cls){
+  var el=document.createElement("div");el.className="card"+(cls?" "+cls:"")+((c.s===1||c.s===2)?" red":"");
+  el.dataset.fid=flipId(c);
+  el.innerHTML='<span class="rk">'+rankStr(c.r)+SUITS[c.s]+'</span><span class="big">'+SUITS[c.s]+'</span>';
+  return el;
+}
+function backEl(c){var el=document.createElement("div");el.className="card mini back";if(c)el.dataset.fid=flipId(c);return el;}
+function render(){paintWrap(paint);}
+function paint(){
+  // bot fan
+  var bf=$("botFan");bf.innerHTML="";
+  bot.forEach(function(c){ if(revealed){bf.appendChild(cardEl(c,"mini"));} else {bf.appendChild(backEl(c));} });
+  $("botName").textContent="Bot"+(revealed?"":" \u00b7 5 cards");
+  // your fan
+  var yf=$("youFan");yf.innerHTML="";
+  you.forEach(function(c,i){
+    var el=cardEl(c,(phase==="draw"&&sel.indexOf(i)>=0)?"sel":"");
+    if(phase==="draw"){ (function(ix){el.addEventListener("click",function(){toggleSel(ix);});})(i); }
+    yf.appendChild(el);
+  });
+  // pot + names
+  $("potBig").textContent=pot;
+  $("handName").textContent=(phase!=="draw")?("Your hand: "+HAND_NAMES[eval5(you).rank]):"";
+  $("youChips").textContent="You "+youChips;$("botChips").textContent="Bot "+botChips;
+  renderActions();
+}
+function renderActions(){
+  var a=$("actions");a.innerHTML="";
+  if(over)return;
+  if(phase==="draw"){
+    add(a,"Draw ("+sel.length+")","gold",function(){doDraw();});
+    add(a,"Stand pat","ghost",function(){sel=[];doDraw();});
+  }else if(phase==="bet-you"){
+    if(betOn){ add(a,"Call "+BET,"gold",function(){youCall();}); add(a,"Fold","red",function(){youFold();}); }
+    else { add(a,"Check","ghost",function(){youCheck();}); add(a,"Bet "+BET,"gold",function(){youBet();},youChips<1); }
+  }
+}
+function add(p,label,cls,fn,dis){var b=document.createElement("button");b.className="act"+(cls?" "+cls:"");b.textContent=label;if(dis)b.setAttribute("disabled","");else b.addEventListener("click",fn);p.appendChild(b);}
+function toggleSel(i){if(phase!=="draw")return;var k=sel.indexOf(i);if(k>=0)sel.splice(k,1);else{if(sel.length>=3){toast("Throw away at most 3");return;}sel.push(i);}render();}
+function msg(t){$("msg").textContent=t;}
+function toast(t){var el=$("toast");el.textContent=t;el.classList.add("show");setTimeout(function(){el.classList.remove("show");},1300);}
+
+/* ---------- draw phase ---------- */
+function doDraw(){
+  if(phase!=="draw")return;
+  var n=sel.length;
+  // remove selected, draw replacements
+  sel.sort(function(a,b){return b-a;}).forEach(function(i){you.splice(i,1);});
+  for(var k=0;k<n;k++)you.push(deck.pop());
+  sortHand(you);sel=[];beep("draw");
+  // bot draws
+  botDraw();
+  phase="bet-"+((dealer===YOU)?"you":"bot");
+  render();
+  if(phase==="bet-bot")setTimeout(botBet,700);
+  else msg("Your move: check or bet.");
+}
+function botDraw(){
+  // keep the best kept-subset: evaluate what to hold. Simple: keep pairs+, flush/straight draws, high cards.
+  var keep=bestKeep(bot);
+  var newHand=[];bot.forEach(function(c,i){if(keep.indexOf(i)>=0)newHand.push(c);});
+  var need=5-newHand.length;
+  for(var k=0;k<need;k++)newHand.push(deck.pop());
+  bot=newHand;sortHand(bot);
+}
+function bestKeep(h){
+  // rank counts
+  var cnt={};h.forEach(function(c){cnt[c.r]=(cnt[c.r]||0)+1;});
+  var keep=[];
+  // keep any card that is part of a pair/trip/quad
+  h.forEach(function(c,i){if(cnt[c.r]>=2)keep.push(i);});
+  if(keep.length>=2)return keep; // pair or better: hold them, draw the rest
+  // flush draw: 4 of a suit
+  var suits={};h.forEach(function(c,i){(suits[c.s]=suits[c.s]||[]).push(i);});
+  for(var s in suits){if(suits[s].length>=4)return suits[s];}
+  // otherwise keep high cards (>=11) plus the single pair card if any
+  var hi=[];h.forEach(function(c,i){if((c.r===1||c.r>=11))hi.push(i);});
+  if(keep.length)hi=hi.concat(keep);
+  // unique
+  var u=[];hi.forEach(function(i){if(u.indexOf(i)<0)u.push(i);});
+  if(u.length>3)u=u.slice(0,3);
+  return u.length?u:[]; // draw everything if junk (keep 0-... actually keep best high card)
+}
+
+/* ---------- betting (one round, heads-up) ---------- */
+function youCheck(){msg("You check.");phase="bet-bot";render();setTimeout(botBet,600);}
+function youBet(){var b=Math.min(BET,youChips);youChips-=b;pot+=b;betOn=true;beep("chip");msg("You bet "+b+".");phase="bet-bot";render();setTimeout(botBet,600);}
+function youCall(){var b=Math.min(BET,youChips);youChips-=b;pot+=b;beep("chip");showdown();}
+function youFold(){beep("fold");award(BOT,"fold");}
+function botBet(){
+  if(over)return;
+  var strength=eval5(bot).rank; // 0..8
+  if(betOn){
+    // you bet; bot calls with a pair or better, or a decent high card sometimes
+    var call = strength>=1 || (strength===0 && Math.random()<0.25);
+    if(call){var b=Math.min(BET,botChips);botChips-=b;pot+=b;beep("chip");msg("Bot calls.");render();setTimeout(showdown,500);}
+    else{msg("Bot folds.");beep("fold");setTimeout(function(){award(YOU,"fold");},400);}
+  }else{
+    // you checked; bot bets a strong hand, sometimes bluffs
+    var betNow = strength>=2 || (strength<=1 && Math.random()<0.2);
+    if(betNow && botChips>=1){var b=Math.min(BET,botChips);botChips-=b;pot+=b;betOn=true;beep("chip");msg("Bot bets "+b+".");phase="bet-you";render();}
+    else{msg("Bot checks.");render();setTimeout(showdown,500);}
+  }
+}
+
+/* ---------- showdown + scoring ---------- */
+function showdown(){
+  revealed=true;phase="show";render();
+  var ye=eval5(you),be=eval5(bot),c=cmp(ye,be);
+  setTimeout(function(){
+    if(c>0)award(YOU,"show",ye,be);
+    else if(c<0)award(BOT,"show",ye,be);
+    else award(-1,"split",ye,be);
+  },500);
+}
+function award(who,how,ye,be){
+  over=true;
+  if(who===YOU){youChips+=pot;beep("win");}
+  else if(who===BOT){botChips+=pot;beep("lose");}
+  else {var half=Math.floor(pot/2);youChips+=half;botChips+=pot-half;}
+  var title,text;
+  if(how==="fold"){title=who===YOU?"They folded":"You folded";text=(who===YOU?"Bot folded. ":"You folded. ")+(who===YOU?"You":"Bot")+" take the pot of "+pot+".";}
+  else if(how==="split"){title="Split pot";text="Tie on "+HAND_NAMES[ye.rank]+". Pot of "+pot+" is split.";}
+  else{title=who===YOU?"You win":"Bot wins";text="You: "+HAND_NAMES[ye.rank]+" \u00b7 Bot: "+HAND_NAMES[be.rank]+". "+(who===YOU?"You":"Bot")+" take "+pot+".";}
+  pot=0;render();
+  var matchOver=youChips<ANTE||botChips<ANTE;
+  $("roundTitle").textContent=matchOver?(youChips<ANTE?"Bot cleans you out":"You win the match!"):title;
+  $("roundText").textContent=text+"  Chips: You "+youChips+", Bot "+botChips+".";
+  $("roundBtn").textContent=matchOver?"New match":"Next hand";
+  $("roundBtn").dataset.match=matchOver?"1":"";
+  $("roundOv").classList.add("show");
+}
+function matchEnd(){ /* reached if deal cannot ante */ }
+
+/* ---------- wiring ---------- */
+$("roundBtn").addEventListener("click",function(){if(this.dataset.match){youChips=100;botChips=100;}$("roundOv").classList.remove("show");deal();});
+$("rulesBtn").addEventListener("click",function(){$("rulesOv").classList.add("show");});
+$("rulesClose").addEventListener("click",function(){$("rulesOv").classList.remove("show");});
+deal();
+</script>
+</body>
+</html>

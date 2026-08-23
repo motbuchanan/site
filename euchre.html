@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Euchre</title>
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{margin:0;font-family:system-ui,-apple-system,sans-serif;color:#e9e4f2;overflow:hidden;background:radial-gradient(120% 80% at 50% 12%,#1c3b32,#0c1f1b 62%,#081512 100%)}
+  #app{display:flex;flex-direction:column;height:100svh;max-width:560px;margin:0 auto;position:relative;z-index:1;padding:0 8px calc(6px + env(safe-area-inset-bottom))}
+  #bar{display:flex;align-items:center;gap:9px;padding:calc(env(safe-area-inset-top) + 9px) 2px 6px;flex:0 0 auto}
+  #bar a.home,#bar button.rules{color:#dfe7dd;text-decoration:none;font-size:13px;border:1px solid #3f6b5c;background:#173029;border-radius:999px;padding:6px 12px;font-weight:700;font-family:inherit;cursor:pointer}
+  #title{font-weight:800;font-size:17px}
+  #scoreHud{margin-left:auto;font-size:11px;color:#9ec9b8;font-weight:700;text-align:right;line-height:1.35}
+  #table{flex:1 1 auto;position:relative;min-height:0}
+  .seat{position:absolute;font-size:12px;font-weight:700;color:#9ec9b8;text-align:center}
+  .seat.on{color:#f4c542}
+  #seatN{top:2px;left:0;right:0}#seatW{left:2px;top:42%;width:70px}#seatE{right:2px;top:42%;width:70px}
+  #upcardWrap{position:absolute;top:38%;left:50%;transform:translateX(-50%);text-align:center}
+  #upcardWrap .cap{font-size:10px;color:#9fc2b4;font-weight:700;margin-top:2px}
+  .trick{position:absolute;width:min(15vw,56px);height:min(21vw,78px)}
+  .card{border-radius:7px;position:relative;color:#1c1c1c;background:linear-gradient(160deg,#fffdf6,#ece3cf);box-shadow:0 3px 7px rgba(0,0,0,.4),inset 0 1px 0 #fff;display:flex;align-items:flex-start;justify-content:flex-start;font-weight:800;line-height:1;padding:3px 4px}
+  .card .big{position:absolute;bottom:2px;right:4px;opacity:.9}.card.red{color:#c62828}
+  .trick .card,#upcardWrap .card{width:min(13vw,50px);height:min(18.2vw,70px);font-size:min(5vw,19px)}
+  .trick .card .big,#upcardWrap .card .big{font-size:min(5.6vw,21px)}
+  #hand{flex:0 0 auto;display:flex;flex-wrap:wrap;gap:4px;justify-content:center;padding:6px 0 2px}
+  .hcard{width:min(15vw,60px);height:min(21vw,84px);border-radius:7px;position:relative;flex:none;color:#1c1c1c;background:linear-gradient(160deg,#fffdf6,#ece3cf);box-shadow:0 3px 6px rgba(0,0,0,.4),inset 0 1px 0 #fff;display:flex;align-items:flex-start;justify-content:flex-start;font-weight:800;font-size:min(5.6vw,22px);padding:4px 5px;line-height:1;cursor:pointer;transition:transform .1s}
+  .hcard .big{position:absolute;bottom:3px;right:5px;font-size:min(6.2vw,25px);opacity:.9}.hcard.red{color:#c62828}
+  .hcard.illegal{opacity:.3}.hcard.trumpc{box-shadow:0 3px 6px rgba(0,0,0,.4),inset 0 1px 0 #fff,0 0 0 2px rgba(244,197,66,.55)}
+  #actions{flex:0 0 auto;display:flex;gap:6px;justify-content:center;align-items:center;flex-wrap:wrap;padding:6px 0 2px;min-height:20px}
+  .act{font-family:inherit;font-size:14px;font-weight:800;padding:11px 14px;border-radius:11px;border:none;color:#3a2c08;background:#f4c542;cursor:pointer;box-shadow:0 4px 0 #b08a1e}
+  .act:active{transform:translateY(2px);box-shadow:0 2px 0 #b08a1e}
+  .act.ghost{background:#173029;color:#cde4d9;box-shadow:0 4px 0 #0b1a16;border:1px solid #3d6a5b}
+  .act.suit{font-size:20px;padding:9px 13px}.act.suit.red{color:#c62828}
+  #msg{text-align:center;color:#bfe0d3;font-size:13px;min-height:18px;margin:4px 4px 0;flex:0 0 auto;font-weight:600}
+  .ov{position:fixed;inset:0;background:rgba(8,16,14,.94);display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:70;text-align:center;padding:24px}
+  .ov.show{display:flex}.ov h1{font-size:24px;margin:0}.ov p{color:#bfe0d3;max-width:340px;font-size:15px;margin:0;line-height:1.5}
+  .ovcard{max-width:520px;background:rgba(10,20,17,.6);border:1px solid #2b5145;border-radius:16px;padding:18px 22px}
+  .ovcard h2{font-size:20px;margin:0 0 10px;color:#9fe8dd}.ovcard p{margin:0 0 9px;font-size:14px;text-align:left}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="bar"><a class="home" href="index.html">&#8962; Home</a><button class="rules" id="rulesBtn">Rules</button><div id="title">Euchre</div><div id="scoreHud"></div></div>
+  <div id="table"><div class="seat" id="seatN"></div><div class="seat" id="seatW"></div><div class="seat" id="seatE"></div><div id="upcardWrap"></div></div>
+  <div id="hand"></div>
+  <div id="actions"></div>
+  <div id="msg"></div>
+</div>
+<div class="ov" id="ov"><h1 id="ovTitle"></h1><p id="ovText"></p><button class="act" id="ovBtn">Next hand</button><button class="act ghost" id="ovHome">Back home</button></div>
+<div class="ov" id="rulesOv"><div class="ovcard"><h2>How to play Euchre</h2>
+  <p>Four players in two teams (you + North). A 24-card deck (9 up to Ace). Everyone gets 5 cards and one card is turned up.</p>
+  <p>Pick trump: order the turned-up suit up, or if all pass, name a different suit. The Jack of trump is the <b>right bower</b> (highest); the other Jack of the same color is the <b>left bower</b> and also counts as trump.</p>
+  <p>Follow suit if you can. Highest trump wins a trick, else the highest card of the led suit. Make 3-4 tricks for 1 point, all 5 for 2, going alone and sweeping for 4. Get euchred and the other team scores 2. First to 10 wins.</p>
+  <button class="act" id="rulesClose">Got it</button></div></div>
+
+<script>
+document.addEventListener('click',function(e){var a=e.target&&e.target.closest?e.target.closest('.home,#ovHome'):null;if(a){e.preventDefault();try{if(window.parent!==window){parent.history.back();return;}}catch(err){}window.location.href='index.html';}},true);
+var AC=null;function beep(t){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();var o=AC.createOscillator(),g=AC.createGain(),n=AC.currentTime;var f={play:500,take:360,call:640,win:880,trump:300}[t]||440;o.frequency.value=f;o.type='sine';g.gain.setValueAtTime(.0001,n);g.gain.exponentialRampToValueAtTime(.08,n+.01);g.gain.exponentialRampToValueAtTime(.0001,n+.14);o.connect(g);g.connect(AC.destination);o.start(n);o.stop(n+.16);}catch(e){}}
+var SUITS=["\u2660","\u2665","\u2666","\u2663"],SAMECOLOR={0:3,3:0,1:2,2:1};
+function rankStr(r){return r===14?"A":r===11?"J":r===12?"Q":r===13?"K":(""+r);}
+function newDeck(){var d=[];for(var s=0;s<4;s++)for(var r=9;r<=14;r++)d.push({r:r,s:s});return d;}
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=(Math.random()*(i+1))|0,t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function cardKey(c){return c.s+"_"+c.r;}
+
+var NAMES=["You","West","North","East"]; // teams {0,2} vs {1,3}
+var hands=[[],[],[],[]],won=[0,0,0,0],teamScore=[0,0];
+var deck=[],upcard=null,trump=-1,maker=-1,alone=-1,sitOut=-1;
+var trick=[],leader=0,turn=0,leadSuit=-1,phase="bid1",bidTurn=0,dealer=3,over=false;
+function team(p){return p%2===0?0:1;}
+function $(id){return document.getElementById(id);}
+/* ---- trump helpers (bowers) ---- */
+function effSuit(c){return (c.r===11 && (c.s===trump || c.s===SAMECOLOR[trump])) ? trump : c.s;}
+function isTrump(c){return trump>=0 && effSuit(c)===trump;}
+function trumpVal(c){if(c.r===11&&c.s===trump)return 16;if(c.r===11&&c.s===SAMECOLOR[trump])return 15;return c.r;}
+
+function deal(){
+  deck=shuffle(newDeck());hands=[[],[],[],[]];won=[0,0,0,0];trick=[];leadSuit=-1;trump=-1;maker=-1;alone=-1;sitOut=-1;over=false;
+  var k=0;for(var r=0;r<5;r++)for(var p=0;p<4;p++)hands[p].push(deck[k++]);
+  upcard=deck[k++];deck=deck.slice(k); // remaining kitty
+  hands.forEach(function(h){sortHand(h);});
+  dealer=(dealer+1)%4;
+  phase="bid1";bidTurn=(dealer+1)%4;
+  render();
+  if(bidTurn===0)msg("Order up "+SUITS[upcard.s]+"? Or pass.");
+  else{msg(NAMES[bidTurn]+" is thinking..."); setTimeout(botBid,700);}
+}
+function sortHand(h){h.sort(function(a,b){return a.s-b.s||a.r-b.r;});}
+
+/* ---------- bidding ---------- */
+function trumpStrength(h,t){var s=0;h.forEach(function(c){var et=(c.r===11&&(c.s===t||c.s===SAMECOLOR[t]))?t:c.s;if(et===t){if(c.r===11&&c.s===t)s+=3;else if(c.r===11&&c.s===SAMECOLOR[t])s+=2.4;else s+=1+(c.r-9)*0.14;}else if(c.r===14)s+=0.5;});return s;}
+function bestCallSuit(h,exclude){var best=-1,bs=-1;for(var t=0;t<4;t++){if(t===exclude)continue;var v=trumpStrength(h,t);if(v>bs){bs=v;best=t;}}return {suit:best,val:bs};}
+function botBid(){
+  if(over)return;var p=bidTurn;
+  if(phase==="bid1"){
+    var extra=(p===dealer)?1.0:0; // dealer will get the upcard
+    var v=trumpStrength(hands[p],upcard.s)+extra;
+    if(v>=3.2){ makeTrump(p,upcard.s,true); return; }
+    passBid();
+  }else{ // bid2
+    var bc=bestCallSuit(hands[p],upcard.s);
+    var mustCall=(p===dealer); // stick the dealer
+    if(bc.val>=3.0||mustCall){ makeTrump(p,bc.suit,false); return; }
+    passBid();
+  }
+}
+function passBid(){
+  beep("play");
+  if(bidTurn===dealer){ // round over
+    if(phase==="bid1"){phase="bid2";bidTurn=(dealer+1)%4;
+      render();
+      if(bidTurn===0)msg("All passed. Name a trump suit (not "+SUITS[upcard.s]+"), or pass.");
+      else setTimeout(botBid,700);
+      return;
+    } else { // bid2 ended without a call -> stick the dealer already handled for bots; if player is dealer, force
+      // should not reach here because dealer must call in bid2
+    }
+  }
+  bidTurn=(bidTurn+1)%4;
+  render();
+  if(bidTurn===0){
+    if(phase==="bid1")msg("Order up "+SUITS[upcard.s]+"? Or pass.");
+    else msg("Name a trump suit (not "+SUITS[upcard.s]+"), or pass.");
+  } else setTimeout(botBid,700);
+}
+function makeTrump(p,suit,ordered){
+  trump=suit;maker=p;beep("call");
+  if(ordered){ // dealer picks up the upcard and discards
+    hands[dealer].push(upcard);
+    if(dealer===0){ phase="discard"; sortHand(hands[0]); render(); msg("You picked up the "+rankStr(upcard.s)+SUITS[upcard.s]+". Discard a card."); return; }
+    else{ // bot dealer discards weakest non-trump
+      var h=hands[dealer], worst=h.slice().sort(function(a,b){return score1(a)-score1(b);})[0];
+      var i=h.indexOf(worst);h.splice(i,1);
+    }
+  }
+  upcard=null; // turned down or picked up
+  afterTrumpSet();
+}
+function score1(c){ // for discard/lead low: trumps high, then rank
+  if(isTrump(c))return 100+trumpVal(c);
+  return c.r;
+}
+function playerDiscard(c){
+  var i=hands[0].indexOf(c);hands[0].splice(i,1);sortHand(hands[0]);
+  afterTrumpSet();
+}
+function afterTrumpSet(){
+  // going alone: maker may choose. Player choice if maker===0; bots decide by strength.
+  if(maker===0){ phase="alone"; render(); msg("Trump is "+SUITS[trump]+". Go alone, or play with North?"); return; }
+  var v=trumpStrength(hands[maker],trump);
+  if(v>=5.5){ alone=maker; sitOut=(maker+2)%4; }
+  startPlay();
+}
+function chooseAlone(go){
+  if(go){alone=0;sitOut=2;}
+  startPlay();
+}
+
+/* ---------- play ---------- */
+function nextP(p){ p=(p+1)%4; if(p===sitOut)p=(p+1)%4; return p; }
+function startPlay(){
+  phase="play";
+  leader=(dealer+1)%4; if(leader===sitOut)leader=nextP(leader);
+  turn=leader;trick=[];leadSuit=-1;
+  render();
+  if(turn===0)msg("Trump: "+SUITS[trump]+". Your lead.");
+  else{msg(NAMES[turn]+" leads. Trump "+SUITS[trump]+".");setTimeout(botPlay,650);}
+}
+function legal(p){
+  var h=hands[p];
+  if(trick.length===0)return h.slice();
+  var follow=h.filter(function(c){return effSuit(c)===leadSuit;});
+  return follow.length?follow:h.slice();
+}
+function winnerIndex(){
+  var best=0;
+  for(var i=1;i<trick.length;i++){
+    var a=trick[best].c,b=trick[i].c,aT=isTrump(a),bT=isTrump(b);
+    if(bT&&!aT)best=i;
+    else if(bT&&aT){if(trumpVal(b)>trumpVal(a))best=i;}
+    else if(!bT&&!aT){var bl=effSuit(b)===leadSuit,al=effSuit(a)===leadSuit;if(bl&&al&&b.r>a.r)best=i;else if(bl&&!al)best=i;}
+  }
+  return best;
+}
+function playCard(p,c){
+  var i=hands[p].indexOf(c);hands[p].splice(i,1);
+  if(trick.length===0)leadSuit=effSuit(c);
+  trick.push({p:p,c:c});
+  beep(isTrump(c)?"trump":"play");
+  var need=(alone>=0)?3:4;
+  if(trick.length===need){render();setTimeout(resolveTrick,750);}
+  else{turn=nextP(turn);render();if(turn!==0)setTimeout(botPlay,600);else msg("Your turn.");}
+}
+function botPlay(){
+  if(over)return;var p=turn,opts=legal(p);var c;
+  if(trick.length===0){
+    // lead a trump if strong, else a high offsuit, else low
+    var tr=opts.filter(isTrump);
+    if(tr.length>=2)c=tr.sort(function(a,b){return trumpVal(b)-trumpVal(a);})[0];
+    else{var off=opts.filter(function(x){return !isTrump(x);});var pool=off.length?off:opts;var hi=pool.filter(function(x){return x.r>=14;});c=hi.length?hi[0]:pool.sort(function(a,b){return a.r-b.r;})[0];}
+  }else{
+    var wi=winnerIndex(),winP=trick[wi].p,partnerWinning=(team(winP)===team(p));
+    var canFollow=hands[p].some(function(x){return effSuit(x)===leadSuit;});
+    if(canFollow){
+      var follow=opts;
+      if(partnerWinning)c=follow.slice().sort(function(a,b){return rankLow(a)-rankLow(b);})[0];
+      else{var beat=follow.filter(function(x){return beats(x,trick[wi].c);});c=beat.length?beat.sort(function(a,b){return rankLow(a)-rankLow(b);})[0]:follow.slice().sort(function(a,b){return rankLow(a)-rankLow(b);})[0];}
+    }else{
+      var trumps=opts.filter(isTrump);
+      if(!partnerWinning&&trumps.length){var ov=trumps.filter(function(x){return beats(x,trick[wi].c);});c=ov.length?ov.sort(function(a,b){return trumpVal(a)-trumpVal(b);})[0]:opts.filter(function(x){return !isTrump(x);}).sort(function(a,b){return a.r-b.r;})[0]||trumps[0];}
+      else c=opts.filter(function(x){return !isTrump(x);}).sort(function(a,b){return a.r-b.r;})[0]||opts.sort(function(a,b){return rankLow(a)-rankLow(b);})[0];
+    }
+  }
+  if(!c)c=opts[0];
+  playCard(p,c);
+}
+function rankLow(c){return isTrump(c)?100+trumpVal(c):c.r;}
+function beats(x,y){var xT=isTrump(x),yT=isTrump(y);if(xT&&!yT)return true;if(xT&&yT)return trumpVal(x)>trumpVal(y);if(!xT&&!yT)return effSuit(x)===leadSuit&&effSuit(y)===leadSuit&&x.r>y.r||(effSuit(x)===leadSuit&&effSuit(y)!==leadSuit);return false;}
+function resolveTrick(){
+  var wi=winnerIndex(),w=trick[wi].p;won[w]++;beep("take");
+  leader=w;turn=w;trick=[];leadSuit=-1;render();
+  var handCards=(alone>=0)?hands[0].length:hands[0].length; // player always has cards unless sitting out
+  var anyLeft=hands.some(function(h,idx){return idx!==sitOut&&h.length>0;});
+  if(!anyLeft){endHand();return;}
+  if(turn===0&&sitOut!==0)msg("You took it. Your lead.");
+  else{msg(NAMES[turn]+" leads.");setTimeout(botPlay,650);}
+}
+/* ---------- scoring ---------- */
+function endHand(){
+  var mk=team(maker);
+  var tricksMk=(mk===0)?(won[0]+won[2]):(won[1]+won[3]);
+  var pts=0,who=mk;
+  if(tricksMk>=3){
+    if(tricksMk===5){ pts=(alone>=0)?4:2; }
+    else pts=1;
+    who=mk;
+  }else{ pts=2; who=1-mk; } // euchred
+  teamScore[who]+=pts;
+  var line=(mk===0?"You + North":"West + East")+" called trump ("+SUITS[trump]+") and took "+tricksMk+" trick"+(tricksMk===1?"":"s")+". ";
+  line+=(tricksMk>=3?((who===0?"You + North":"West + East")+" score "+pts+"."):((who===0?"You + North":"West + East")+" euchred them for "+pts+"."));
+  var done=teamScore[0]>=10||teamScore[1]>=10;
+  over=true;render();
+  $("ovTitle").textContent=done?((teamScore[0]>teamScore[1])?"You win!":"West + East win"):"Hand over";
+  $("ovText").textContent=line+"  Score: You + North "+teamScore[0]+", West + East "+teamScore[1]+".";
+  $("ovBtn").textContent=done?"New game":"Next hand";$("ovBtn").dataset.done=done?"1":"";
+  $("ov").classList.add("show");
+}
+/* ---------- render ---------- */
+function mk(el,c,cls){el.className=cls+((c.s===1||c.s===2)?" red":"");el.innerHTML='<span>'+rankStr(c.r)+SUITS[c.s]+'</span><span class="big">'+SUITS[c.s]+'</span>';}
+function seatTxt(p){var s=NAMES[p]+" \u00b7 "+hands[p].length;if(phase==="play")s+=" \u00b7 "+won[p]+"\u2713";if(p===maker)s+=" (called)";if(p===sitOut)s+=" (out)";return s;}
+function render(){
+  $("seatN").textContent=seatTxt(2);$("seatW").textContent=seatTxt(1);$("seatE").textContent=seatTxt(3);
+  $("seatN").className="seat"+((turn===2&&phase==="play")||(bidTurn===2&&phase.indexOf("bid")===0)?" on":"");
+  $("seatW").className="seat"+((turn===1&&phase==="play")||(bidTurn===1&&phase.indexOf("bid")===0)?" on":"");
+  $("seatE").className="seat"+((turn===3&&phase==="play")||(bidTurn===3&&phase.indexOf("bid")===0)?" on":"");
+  var uw=$("upcardWrap");uw.innerHTML="";
+  if(upcard&&(phase==="bid1")){var cc=document.createElement("div");mk(cc,upcard,"card");uw.appendChild(cc);var cap=document.createElement("div");cap.className="cap";cap.textContent="turned up";uw.appendChild(cap);}
+  var tb=$("table");[].slice.call(tb.querySelectorAll('.trick')).forEach(function(n){n.remove();});
+  var pos={0:{left:'50%',bottom:'4px',tf:'translateX(-50%)'},1:{left:'8px',top:'40%'},2:{left:'50%',top:'2px',tf:'translateX(-50%)'},3:{right:'8px',top:'40%'}};
+  trick.forEach(function(t){var d=document.createElement("div");d.className="trick";var pp=pos[t.p];for(var kk in pp)if(kk!=='tf')d.style[kk]=pp[kk];if(pp.tf)d.style.transform=pp.tf;var cc=document.createElement("div");mk(cc,t.c,"card");d.appendChild(cc);tb.appendChild(d);});
+  var legalSet={};if(phase==="play"&&turn===0){legal(0).forEach(function(c){legalSet[cardKey(c)]=1;});}
+  var hd=$("hand");hd.innerHTML="";
+  hands[0].forEach(function(c){var el=document.createElement("div");var illegal=(phase==="play"&&turn===0&&!legalSet[cardKey(c)]);var tc=(trump>=0&&isTrump(c));mk(el,c,"hcard"+(illegal?" illegal":"")+(tc?" trumpc":""));el.addEventListener("click",function(){onCard(c);});hd.appendChild(el);});
+  $("scoreHud").innerHTML="You + North "+teamScore[0]+"<br>West + East "+teamScore[1];
+  renderActions();
+}
+function renderActions(){
+  var a=$("actions");a.innerHTML="";
+  if(phase==="bid1"&&bidTurn===0){
+    add(a,"Order up "+SUITS[upcard.s],"",function(){makeTrump(0,upcard.s,true);});
+    add(a,"Pass","ghost",function(){passBid();});
+  }else if(phase==="bid2"&&bidTurn===0){
+    for(var s=0;s<4;s++){if(s===upcard.s)continue;(function(su){add(a,SUITS[su],"suit"+((su===1||su===2)?" red":""),function(){makeTrump(0,su,false);});})(s);}
+    if(dealer!==0)add(a,"Pass","ghost",function(){passBid();}); // stick the dealer: dealer must call in round 2
+  }else if(phase==="alone"){
+    add(a,"Go alone","",function(){chooseAlone(true);});
+    add(a,"With partner","ghost",function(){chooseAlone(false);});
+  }
+}
+function add(p,label,cls,fn){var b=document.createElement("button");b.className="act"+(cls?" "+cls:"");b.innerHTML=label;b.addEventListener("click",fn);p.appendChild(b);}
+function onCard(c){
+  if(phase==="discard"){playerDiscard(c);return;}
+  if(phase!=="play"||turn!==0)return;
+  var ok=legal(0).some(function(x){return x===c;});if(!ok){msg("You must follow the led suit.");return;}
+  playCard(0,c);
+}
+function msg(t){$("msg").textContent=t;}
+$("ovBtn").addEventListener("click",function(){if(this.dataset.done){teamScore=[0,0];}$("ov").classList.remove("show");deal();});
+$("rulesBtn").addEventListener("click",function(){$("rulesOv").classList.add("show");});
+$("rulesClose").addEventListener("click",function(){$("rulesOv").classList.remove("show");});
+deal();
+</script>
+</body>
+</html>
