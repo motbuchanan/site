@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1512">
+<title>The Second After You Tap: What the Internet Actually Is</title>
+<meta name="description" content="A beginner explainer of the internet: servers, DNS, packets hopping router to router, and status codes, with a real routable network you can break.">
+<style>
+:root{
+  --bg:#0b1512; --panel:#12211c; --panel2:#182b24; --ink:#e6f2ec; --dim:#8fa89c;
+  --gr:#3ddc84; --gr2:#7cecab; --amb:#ffb84d; --bl:#6fc3ff;
+  --line:#24463a; --term:#07100c; --good:#3ddc84; --bad:#ff7f6e;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);
+  background-image:radial-gradient(1100px 500px at 50% -140px,#12271f 0%,transparent 60%);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font-size:16px;line-height:1.55}
+code,.mono,.cheat,.httpout,#dnsIn,#addIn,#pathIn,.dnstable{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace}
+main{max-width:680px;margin:0 auto;padding:8px 14px 90px}
+section{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px 16px;margin:18px 0}
+.kick{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gr);font-weight:700;margin:0 0 6px}
+h1{font-size:34px;line-height:1.1;margin:4px 0 8px;letter-spacing:-.01em}
+h2{font-size:22px;line-height:1.2;margin:2px 0 10px}
+h3{font-size:16px;margin:14px 0 6px}
+p{margin:8px 0}
+.sub{color:var(--dim)}
+.small{font-size:13px;color:var(--dim)}
+code{background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:13.5px;color:var(--gr2)}
+.btn{display:inline-block;background:var(--gr);color:#04170d;font-weight:700;border:0;border-radius:12px;
+  padding:12px 18px;font-size:16px;cursor:pointer;touch-action:manipulation}
+.btn:active{transform:scale(.97)}
+.btn.ghost{background:transparent;color:var(--gr2);border:1.5px solid var(--gr)}
+.btn.amber{background:var(--amb);color:#221302}
+.btn[disabled]{opacity:.45}
+.btnrow{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 4px}
+.hero{padding-top:24px}
+.topline{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+#vbadge{background:var(--panel2);border:1px solid var(--line);color:var(--dim);border-radius:999px;
+  padding:5px 11px;font-size:12px;cursor:pointer;white-space:nowrap;margin-top:6px}
+.herosvg{display:block;margin:14px auto 6px;max-width:280px;width:100%;height:auto}
+.fgrid{display:grid;gap:10px;margin:12px 0}
+.fcard{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:14px;cursor:pointer}
+.fcard .fr{font-weight:700}
+.fcard .bk{display:none;color:var(--dim);margin-top:8px;font-size:14.5px}
+.fcard .tap{color:var(--gr2);font-size:12px;margin-top:8px;letter-spacing:.06em;text-transform:uppercase}
+.fcard.open .bk{display:block}
+.fcard.open .tap{display:none}
+.fcard.open{border-color:var(--gr)}
+@media (min-width:560px){ .fgrid{grid-template-columns:1fr 1fr} .fgrid.three{grid-template-columns:1fr 1fr 1fr} }
+/* missions */
+#missions{display:grid;gap:8px;margin:12px 0}
+.mission{display:flex;gap:10px;align-items:flex-start;background:var(--panel2);border:1px solid var(--line);
+  border-radius:12px;padding:10px 12px}
+.mnum{flex:0 0 26px;height:26px;border-radius:50%;border:1.5px solid var(--gr);color:var(--gr2);
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
+.mission .mt{font-weight:700;font-size:14.5px}
+.mission .md{font-size:13px;color:var(--dim)}
+.mission.done{border-color:var(--good)}
+.mission.done .mnum{border-color:var(--good);background:var(--good);color:#04170d}
+/* dns */
+.dnsbox{background:var(--term);border:1px solid var(--line);border-radius:14px;padding:12px;margin:12px 0}
+.dnstable{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:10px}
+.dnstable td{border-bottom:1px solid var(--line);padding:6px 4px}
+.dnstable td:last-child{color:var(--gr2);text-align:right}
+.dnstable tr.new td{color:var(--amb)}
+.inprow{display:flex;gap:8px;margin:8px 0}
+.inprow input{flex:1;background:var(--panel2);border:1px solid var(--line);border-radius:8px;color:var(--ink);
+  padding:10px;font-size:14px;min-width:0}
+.inprow input:focus{outline:2px solid var(--gr)}
+.dnsres{min-height:24px;font-size:14px;margin-top:6px}
+.ok{color:var(--good)} .err{color:var(--bad)} .warn{color:var(--amb)} .hint{color:var(--bl)}
+.gym{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;margin:14px 0}
+.gymstats{display:flex;gap:18px;font-size:12.5px;color:var(--dim);margin-bottom:10px;letter-spacing:.04em}
+.gymstats b{color:var(--gr2);font-size:15px;margin-left:4px}
+.gymtabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.gtab{font-size:12px;padding:6px 11px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--dim);cursor:pointer}
+.gtab.on{border-color:var(--gr);color:var(--gr2);font-weight:700}
+.gymcard{border:1px dashed var(--line);border-radius:10px;padding:12px}
+.gymcard.active{border-style:solid;border-color:var(--gr)}
+.gymcard.win{border-style:solid;border-color:var(--good)}
+.gymcard.lose{border-style:solid;border-color:var(--bad)}
+.ggoal{font-size:15px;line-height:1.5}
+.ggoal b{color:var(--gr2)}
+.gstep{font-size:12px;color:var(--good);margin-top:6px}
+.gopts{display:grid;gap:8px;margin:10px 0}
+.gopts button{text-align:left;background:var(--panel);border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:11px 12px;font-size:14.5px;cursor:pointer}
+.gopts button.right{border-color:var(--good);color:var(--good);font-weight:700}
+.gopts button.wrong{border-color:var(--bad);color:var(--bad)}
+.gopts button.lock{pointer-events:none;opacity:.85}
+.ghint{font-size:13.5px;color:var(--bl);margin-top:8px;display:none}
+.ghint.show{display:block}
+.gbtns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+/* network map */
+.netwrap{background:var(--term);border:1px solid var(--line);border-radius:14px;padding:8px;margin:12px 0;overflow-x:auto}
+.netwrap svg{display:block;margin:0 auto}
+.nnode circle{cursor:pointer}
+.nnode.dead circle{fill:#26170f !important;stroke:#ff7f6e !important}
+.nnode.dead text.nl{fill:#ff7f6e}
+.nnode text{pointer-events:none}
+.cap{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;
+  font-size:14.5px;min-height:58px;margin:10px 0}
+.cap b{color:var(--gr2)}
+/* http */
+.httpbox{background:var(--term);border:1px solid var(--line);border-radius:14px;padding:12px;margin:12px 0}
+.httpout{max-height:220px;overflow-y:auto;font-size:13.5px;line-height:1.55}
+.httpout div{white-space:pre-wrap;word-break:break-word}
+.h-req{color:var(--amb);font-weight:700}
+.h-200{color:var(--good)} .h-404{color:var(--bad)} .h-301{color:var(--bl)} .h-body{color:var(--ink)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.chip{background:var(--panel2);border:1px solid var(--line);color:var(--gr2);border-radius:999px;
+  padding:7px 12px;font-size:12.5px;cursor:pointer;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.chip:active{background:var(--gr);color:#04170d}
+/* verdict */
+.vgrid{display:grid;gap:10px;margin:12px 0}
+.vcard{background:var(--panel2);border-radius:12px;padding:12px 14px;font-size:14.5px}
+.vkeep{border:1.5px solid var(--good)} .vskip{border:1.5px solid var(--line)}
+.vcard h4{margin:0 0 6px}
+.vkeep h4{color:var(--good)} .vskip h4{color:var(--dim)}
+.cheat{background:var(--term);border:1px solid var(--line);border-radius:12px;padding:12px;font-size:12.5px;
+  line-height:1.8;overflow-x:auto;white-space:pre}
+.cheat b{color:var(--gr2)} .cheat span{color:var(--dim)}
+/* quiz */
+.q{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;margin:10px 0}
+.q .qt{font-weight:700;margin-bottom:8px}
+.opts{display:grid;gap:8px}
+.opts button{text-align:left;background:var(--panel);border:1px solid var(--line);color:var(--ink);
+  border-radius:10px;padding:11px 12px;font-size:14.5px;cursor:pointer}
+.opts button.right{border-color:var(--good);color:var(--good);font-weight:700}
+.opts button.wrong{border-color:var(--bad);color:var(--bad)}
+.opts button.lock{pointer-events:none;opacity:.85}
+#scoreEl{font-weight:700;color:var(--gr2);margin:10px 0}
+#retryBtn{display:none}
+footer{color:#4c6156;font-size:12.5px;text-align:center;margin:30px 0 10px;line-height:1.7}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(80px);
+  background:var(--panel2);border:1px solid var(--gr);color:var(--ink);border-radius:999px;
+  padding:10px 18px;font-size:13.5px;transition:transform .25s;z-index:50;pointer-events:none;white-space:nowrap}
+#toast.show{transform:translateX(-50%) translateY(0)}
+:focus-visible{outline:2px solid var(--gr2);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}html{scroll-behavior:auto}}
+  .mascotspot{text-align:center;margin:6px 0 2px;}
+  .mascotspot img{height:230px;width:auto;filter:drop-shadow(0 10px 22px rgba(0,0,0,.5));}
+  .tipbox{position:relative;background:var(--panel,#101b16);border:1px solid var(--line,#24463a);border-left:3px solid #3ddc84;border-radius:0 12px 12px 0;padding:16px 16px 16px 118px;margin:22px 0;min-height:96px;}
+  .tipbox .poke{position:absolute;left:-14px;bottom:-8px;height:150px;width:auto;transform:rotate(-8deg);filter:drop-shadow(0 8px 16px rgba(0,0,0,.45));pointer-events:none;}
+  .tipbox.right{border-left:none;border-right:3px solid #3ddc84;border-radius:12px 0 0 12px;padding:16px 118px 16px 16px;}
+  .tipbox.right .poke{left:auto;right:-14px;transform:rotate(8deg);}
+  .tipbox .tt{font-weight:700;color:#3ddc84;font-size:15px;}
+  .tipbox .tp{margin:4px 0 0;font-size:14.5px;color:var(--soft,#a9c3b6);line-height:1.55;}
+  .tracktoggle{display:flex;gap:8px;margin:14px 0 10px;align-items:center;flex-wrap:wrap;}
+  .tracktoggle .tlabel{font-family:monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim,#7c9a8b);margin-right:2px;}
+  .ttab{font-family:monospace;font-size:12.5px;padding:7px 14px;border-radius:999px;border:1px solid var(--line,#24463a);background:var(--panel,#101b16);color:var(--soft,#a9c3b6);cursor:pointer;}
+  .ttab.on.general{border-color:#3ddc84;color:#3ddc84;background:rgba(61,220,132,.1);font-weight:700;}
+  .ttab.on.trail{border-color:#c8a4f0;color:#c8a4f0;background:rgba(200,164,240,.12);font-weight:700;}
+  .trailbanner{font-family:monospace;font-size:11.5px;color:#c8a4f0;background:rgba(200,164,240,.08);border:1px solid rgba(200,164,240,.3);border-radius:8px;padding:7px 11px;margin:8px 0;display:none;}
+  .trailbanner.show{display:block;}
+  .backhub{display:inline-flex;align-items:center;gap:7px;font-family:monospace;font-size:12px;color:var(--soft,#a9c3b6);border:1px solid var(--line,#24463a);border-radius:999px;padding:7px 13px;background:var(--panel,#101b16);text-decoration:none;}
+</style>
+</head>
+<body>
+<main>
+<!-- S1 HERO -->
+<section class="hero">
+  <div class="topline">
+    <div>
+      <div class="kick">small explainer · signals</div>
+      <h1>The Second After You Tap</h1>
+      <p class="sub" style="font-size:18px">What the internet actually is, and where your request goes.</p>
+    </div>
+    <button id="vbadge" aria-label="version">v3.1</button>
+  </div>
+  <svg class="herosvg" viewBox="0 0 280 110" aria-hidden="true">
+    <line x1="30" y1="80" x2="90" y2="55" stroke="#24463a" stroke-width="2.5"/>
+    <line x1="90" y1="55" x2="150" y2="70" stroke="#24463a" stroke-width="2.5"/>
+    <line x1="90" y1="55" x2="150" y2="30" stroke="#24463a" stroke-width="2.5"/>
+    <line x1="150" y1="70" x2="210" y2="45" stroke="#24463a" stroke-width="2.5"/>
+    <line x1="150" y1="30" x2="210" y2="45" stroke="#24463a" stroke-width="2.5"/>
+    <line x1="210" y1="45" x2="255" y2="60" stroke="#24463a" stroke-width="2.5"/>
+    <circle cx="30" cy="80" r="10" fill="#3ddc84"/>
+    <circle cx="90" cy="55" r="8" fill="#182b24" stroke="#3ddc84" stroke-width="2"/>
+    <circle cx="150" cy="70" r="8" fill="#182b24" stroke="#3ddc84" stroke-width="2"/>
+    <circle cx="150" cy="30" r="8" fill="#182b24" stroke="#3ddc84" stroke-width="2"/>
+    <circle cx="210" cy="45" r="8" fill="#182b24" stroke="#3ddc84" stroke-width="2"/>
+    <circle cx="255" cy="60" r="10" fill="#ffb84d"/>
+    <circle cx="120" cy="63" r="4" fill="#ffb84d"/>
+    <text x="30" y="103" fill="#8fa89c" font-size="10" text-anchor="middle" font-family="monospace">you</text>
+    <text x="255" y="88" fill="#8fa89c" font-size="10" text-anchor="middle" font-family="monospace">server</text>
+  </svg>
+  <div class="mascotspot"><img src="thumb-internet.png" alt="mascot holding an envelope"></div>
+  <p>The internet is not a cloud and not magic. It is millions of computers passing little envelopes to their neighbors, very fast. Once you can picture the envelope's trip, half the error messages you have ever seen start making sense.</p>
+  <h3>You already live with this</h3>
+  <div class="fgrid three">
+    <div class="fcard" tabindex="0"><div class="fr">"Can't connect to server"</div>
+      <div class="bk">You asked, and nobody answered. By the end of this page you will know exactly what a server is and what it means when one goes quiet.</div>
+      <div class="tap">tap</div></div>
+    <div class="fcard" tabindex="0"><div class="fr">Wifi is on, but nothing loads</div>
+      <div class="bk">Your connection to your own router is fine. The road beyond it is broken. Those are two different links in the chain, and you will see the chain below.</div>
+      <div class="tap">tap</div></div>
+    <div class="fcard" tabindex="0"><div class="fr">The spinning wheel</div>
+      <div class="bk">Your request is out there, hopping between routers, waiting in lines. The spinner is a trip in progress.</div>
+      <div class="tap">tap</div></div>
+  </div>
+</section>
+
+<!-- S2 ROLES -->
+<section>
+  <div class="kick">part 1 · the three roles</div>
+  <h2>Ask, answer, pass along</h2>
+  <p>Strip away the jargon and there are only three jobs on the internet.</p>
+  <div class="fgrid three">
+    <div class="fcard" tabindex="0"><div class="fr">Client: asks</div>
+      <div class="bk">Your phone, your laptop, your TV. A client sends requests: "give me this page." That is the whole job.</div><div class="tap">tap</div></div>
+    <div class="fcard" tabindex="0"><div class="fr">Server: answers</div>
+      <div class="bk">Just a computer that answers requests. Not a special machine, not a vault. A computer, usually in a big room with thousands of others, running a program that replies.</div><div class="tap">tap</div></div>
+    <div class="fcard" tabindex="0"><div class="fr">Router: passes along</div>
+      <div class="bk">Routers move envelopes one hop closer. No router knows the whole internet. Each one only knows its neighbors, and that turns out to be enough.</div><div class="tap">tap</div></div>
+  </div>
+  <h3>Missions</h3>
+  <div id="missions"></div>
+</section>
+
+<!-- S3 DNS -->
+<section>
+  <div class="kick">part 2 · the address book</div>
+  <h2>Names are for you, numbers are for machines</h2>
+  <p>Machines find each other by number. Nobody wants to memorize numbers, so the internet keeps a giant shared address book called <b>DNS</b>: type a name, get back the number. This one is real and working:</p>
+  <div class="dnsbox">
+    <table class="dnstable" id="dnsTable"></table>
+    <div class="inprow">
+      <input id="dnsIn" type="text" placeholder="type a name, like games.example" autocomplete="off" autocapitalize="off" aria-label="name to look up">
+      <button id="dnsBtn" class="btn">Look up</button>
+    </div>
+    <div class="dnsres" id="dnsRes"></div>
+    <h3 style="margin-top:14px">Claim your own name</h3>
+    <div class="inprow">
+      <input id="addIn" type="text" placeholder="yourname.example" autocomplete="off" autocapitalize="off" aria-label="name to register">
+      <button id="addBtn" class="btn amber">Register</button>
+    </div>
+    <div class="dnsres" id="addRes"></div>
+  </div>
+  <p class="small">When a real lookup fails you get <code>NXDOMAIN</code>: "that name is not in the book." You have probably seen it in an error message without knowing it was just a failed address-book check.</p>
+</section>
+
+<!-- S4 NETWORK MAP -->
+<section>
+  <div class="kick">part 3 · the trip</div>
+  <h2>Break the internet (it reroutes)</h2>
+  <p>This is a real routable network. Send a request and a genuine pathfinder computes the route hop by hop. Then <b>tap routers to knock them out</b> and send again. The reroute you will see is not scripted: the path is recomputed each time from whatever is still alive.</p>
+  <div class="netwrap" id="netwrap"></div>
+  <div id="netCap" class="cap">Tap <b>Send request</b> to mail an envelope from your phone to the server.</div>
+  <div class="btnrow">
+    <button id="sendBtn" class="btn">Send request</button>
+    <button id="healBtn" class="btn ghost">Repair network</button>
+  </div>
+  <p class="small">This is the internet's founding trick: no single computer is in charge, so losing machines does not lose the network. Notice what happens if you knock out the one router your home connects through, though.</p>
+
+  <h3>The Gym: reps until it sticks</h3>
+  <p class="small">Mixed reps: address-book lookups, routing challenges on the live map above, status-code collection from the mini server below, and field calls where you diagnose a symptom. Wrong field calls reset your streak.</p>
+  <div class="tracktoggle">
+    <span class="tlabel">practice</span>
+    <button class="ttab general on" id="trackGeneral" type="button">General</button>
+    <button class="ttab trail" id="trackTrail" type="button">The Trail</button>
+  </div>
+  <div class="trailbanner" id="trailBanner">The Trail: real 404s, cache misses, and origin traps from shipping these apps.</div>
+  <div class="gym">
+    <div class="gymstats"><span>reps<b id="repN">0</b></span><span>streak<b id="strN">0</b></span><span>best<b id="bestN">0</b></span></div>
+    <div class="gymtabs" id="gymTabs"></div>
+    <div class="gymcard" id="gymCard">
+      <div class="ggoal" id="gGoal">Pick a level (or Surprise me) and tap <b>Start drill</b>. Your tools are the address book above, the map above, and the mini server below.</div>
+      <div class="gopts" id="gOpts"></div>
+      <div class="ghint" id="gHint"></div>
+      <div class="gbtns">
+        <button class="btn" id="gStart" type="button">Start drill</button>
+        <button class="btn ghost" id="gHintBtn" type="button" style="display:none">Hint</button>
+        <button class="btn ghost" id="gSkip" type="button" style="display:none">Skip</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- S5 HTTP -->
+<section>
+  <div class="kick">part 4 · the envelope's contents</div>
+  <h2>Requests, responses, and 404</h2>
+  <p>What is actually written in the envelope? Barely anything. A request is mostly one line: an action and a path, like <code>GET /menu</code>. The answer comes back with a <b>status code</b>. This mini server is real: it has exactly four pages and it computes every response.</p>
+  <div class="httpbox">
+    <div class="httpout" id="httpOut"></div>
+    <div class="inprow">
+      <input id="pathIn" type="text" placeholder="/menu" autocomplete="off" autocapitalize="off" aria-label="path to request">
+      <button id="reqBtn" class="btn">GET</button>
+    </div>
+  </div>
+  <div class="chips" id="httpChips"></div>
+  <div class="fgrid">
+    <div class="fcard" tabindex="0"><div class="fr">200 OK</div>
+      <div class="bk">Everything worked. You get this hundreds of times a day and never see it, because good news is invisible.</div><div class="tap">tap</div></div>
+    <div class="fcard" tabindex="0"><div class="fr">404 Not Found</div>
+      <div class="bk">The connection worked. The server answered. The answer is: no such page. A 404 is a successful conversation about a missing thing.</div><div class="tap">tap</div></div>
+    <div class="fcard" tabindex="0"><div class="fr">301 Moved</div>
+      <div class="bk">"That page lives at a new address now." Your browser follows the forwarding note automatically, usually before you notice.</div><div class="tap">tap</div></div>
+    <div class="fcard" tabindex="0"><div class="fr">500 Server Error</div>
+      <div class="bk">The server answered, but its own program crashed while building the reply. Not your fault, not your device. Their kitchen caught fire.</div><div class="tap">tap</div></div>
+  </div>
+</section>
+
+<!-- S6 HOME -->
+<section>
+  <div class="kick">part 5 · at your house</div>
+  <h2>The last few feet</h2>
+  <div class="fgrid">
+    <div class="fcard" tabindex="0"><div class="fr">What your router actually is</div>
+      <div class="bk">Your house's post office: a small computer that passes envelopes between your devices and the wider network. Everything on your wifi goes through it.</div><div class="tap">tap</div></div>
+    <div class="fcard" tabindex="0"><div class="fr">Why restarting the router works</div>
+      <div class="bk">It is a small computer, and restarting wipes its memory clean, exactly like the previous explainer in this course. A confused post office gets a fresh start.</div><div class="tap">tap</div></div>
+    <div class="fcard" tabindex="0"><div class="fr">Wifi vs cell data</div>
+      <div class="bk">Two different first hops to the same internet. Wifi hands your envelope to your router; cell data hands it to a tower. After that, same roads.</div><div class="tap">tap</div></div>
+    <div class="fcard" tabindex="0"><div class="fr">Why video calls stutter</div>
+      <div class="bk">Envelopes take turns on busy roads. When too many pile up at one hop, some arrive late, and late video is stutter. Congestion, not distance.</div><div class="tap">tap</div></div>
+  </div>
+</section>
+
+<!-- S7 VERDICT -->
+<section>
+  <div class="kick">part 6 · the honest verdict</div>
+  <h2>What to keep, what to skip</h2>
+  <div class="vgrid">
+    <div class="vcard vkeep"><h4>Keep this</h4>
+      Request and response is the whole conversation. A server is just a computer that answers. DNS turns names into numbers. Envelopes hop router to router, each knowing only its neighbors, and the network reroutes around damage. Status codes are the server talking to you: 404 means it answered.</div>
+    <div class="vcard vskip"><h4>Skip for now</h4>
+      TCP handshakes, ports, IP address math, the protocol zoo. All real machinery under the model above, none of it needed to reason clearly about "why is this not loading."</div>
+  </div>
+  <h3>Pocket reference: message to meaning</h3>
+  <div class="cheat"><b>can't connect to server</b>  <span>you asked, nobody answered</span>
+<b>DNS error / NXDOMAIN</b>    <span>the address book has no such name</span>
+<b>404 not found</b>           <span>server answered: that page does not exist</span>
+<b>500 server error</b>        <span>their program crashed, not yours</span>
+<b>wifi ok, nothing loads</b>  <span>your first hop works, the road beyond is out</span>
+<b>everything is slow</b>      <span>envelopes stuck in line at a busy hop</span></div>
+</section>
+
+<!-- S8 QUIZ -->
+<section>
+  <div class="kick">part 7 · prove it</div>
+  <h2>Five questions</h2>
+  <div id="quizwrap"></div>
+  <div id="scoreEl"></div>
+  <button id="retryBtn" class="btn ghost">Try again</button>
+</section>
+
+<footer>
+  The Second After You Tap · a small explainer · made on a phone<br>
+  Course order: the computer first, this one second, the browser next.
+</footer>
+<div style="text-align:center;margin:24px 0 8px;"><a class="backhub" href="index.html">&larr; back to All Thumbs</a></div>
+</main>
+<div id="toast" role="status"></div>
+<script>
+"use strict";
+var VERSION = "v3.1 · Aug 26";
+
+/* ============ ENGINE (DOM-free) ============ */
+function makeDNS(){
+  return {
+    entries: [
+      { name:"mysite.example",  num:"10.0.4.7",  user:false },
+      { name:"photos.example",  num:"10.0.9.2",  user:false },
+      { name:"games.example",   num:"10.0.2.5",  user:false },
+      { name:"search.example",  num:"10.0.1.1",  user:false }
+    ],
+    nextUser: 20
+  };
+}
+function dnsLookup(book, name){
+  var n = (name || "").trim().toLowerCase();
+  if(!n) return { ok:false, error:"empty" };
+  for(var i = 0; i < book.entries.length; i++){
+    if(book.entries[i].name === n) return { ok:true, entry: book.entries[i] };
+  }
+  return { ok:false, error:"NXDOMAIN" };
+}
+function dnsAdd(book, name){
+  var n = (name || "").trim().toLowerCase().replace(/[^a-z0-9.\-]/g, "");
+  if(!n) return { ok:false, error:"empty" };
+  if(n.indexOf(".") === -1) n = n + ".example";
+  if(dnsLookup(book, n).ok) return { ok:false, error:"taken", name:n };
+  var rec = { name:n, num:"10.0.7." + (book.nextUser++), user:true };
+  book.entries.push(rec);
+  return { ok:true, entry:rec };
+}
+
+/* network: nodes and edges, BFS pathfinder */
+var NET_NODES = [
+  { id:"you",    label:"you",     x:40,  y:140, fixed:true },
+  { id:"home",   label:"router",  x:110, y:90,  fixed:true },
+  { id:"isp",    label:"ISP",     x:180, y:140, fixed:false },
+  { id:"r1",     label:"A",       x:260, y:70,  fixed:false },
+  { id:"r2",     label:"B",       x:270, y:190, fixed:false },
+  { id:"r3",     label:"C",       x:350, y:110, fixed:false },
+  { id:"r4",     label:"D",       x:360, y:220, fixed:false },
+  { id:"server", label:"server",  x:440, y:150, fixed:true }
+];
+var NET_EDGES = [
+  ["you","home"],["home","isp"],["isp","r1"],["isp","r2"],
+  ["r1","r2"],["r1","r3"],["r2","r4"],["r3","r4"],
+  ["r3","server"],["r4","server"]
+];
+function neighborsOf(edges, id){
+  var out = [];
+  edges.forEach(function(e){
+    if(e[0] === id) out.push(e[1]);
+    if(e[1] === id) out.push(e[0]);
+  });
+  return out;
+}
+function bfsPath(edges, from, to, dead){
+  dead = dead || {};
+  if(dead[from] || dead[to]) return null;
+  var q = [[from]], seen = {};
+  seen[from] = true;
+  while(q.length){
+    var path = q.shift();
+    var last = path[path.length - 1];
+    if(last === to) return path;
+    neighborsOf(edges, last).forEach(function(n){
+      if(seen[n] || dead[n]) return;
+      seen[n] = true;
+      q.push(path.concat([n]));
+    });
+  }
+  return null;
+}
+
+/* mini http server */
+function serveRequest(path){
+  var p = (path || "").trim();
+  if(!p) p = "/";
+  if(p[0] !== "/") p = "/" + p;
+  var routes = {
+    "/":        "Welcome. This server is just a computer that answers.",
+    "/menu":    "Menu: request, response, repeat.",
+    "/cat.jpg": "(a very good cat picture arrives, as a list of numbers)"
+  };
+  if(p === "/old") return { status:301, location:"/", body:"" };
+  if(routes[p] !== undefined) return { status:200, body:routes[p] };
+  return { status:404, body:"" };
+}
+
+/* ============ UI ============ */
+function initApp(){
+  function $(id){ return document.getElementById(id); }
+  var store = (function(){
+    var ok = true, mem = {};
+    try { localStorage.setItem("__nt","1"); localStorage.removeItem("__nt"); } catch(e){ ok = false; }
+    return {
+      load: function(){ try { if(ok){ var raw = localStorage.getItem("internet101_v1"); return raw ? JSON.parse(raw) : {}; } } catch(e){} return mem; },
+      save: function(s){ try { if(ok){ localStorage.setItem("internet101_v1", JSON.stringify(s)); return; } } catch(e){} mem = s; }
+    };
+  })();
+  var state = store.load();
+  state.m = state.m || {};
+
+  var toastT = null;
+  function toast(msg){
+    var el = $("toast");
+    el.textContent = msg; el.classList.add("show");
+    clearTimeout(toastT);
+    toastT = setTimeout(function(){ el.classList.remove("show"); }, 1800);
+  }
+  $("vbadge").addEventListener("click", function(){ toast(VERSION + " · loaded"); });
+
+  Array.prototype.forEach.call(document.querySelectorAll(".fcard"), function(cd){
+    function flip(){ cd.classList.toggle("open"); }
+    cd.addEventListener("click", flip);
+    cd.addEventListener("keydown", function(e){ if(e.key === "Enter" || e.key === " "){ e.preventDefault(); flip(); } });
+  });
+
+  /* missions */
+  var FL = {};
+  var MISSIONS = [
+    { id:"n1", t:"Look up a name", d:"Use the address book below. Try games.example." },
+    { id:"n2", t:"Claim a name and resolve it", d:"Register your own name, then look it up and get your number back." },
+    { id:"n3", t:"Deliver a request", d:"On the map, send an envelope from you to the server." },
+    { id:"n4", t:"Break the road, deliver anyway", d:"Knock out a router on the path, send again, and watch a real reroute." },
+    { id:"n5", t:"Cause a total outage", d:"Knock out enough routers that no path exists. See the real error." },
+    { id:"n6", t:"Collect a 200 and a 404", d:"Use the mini server: get one page that exists and one that does not." }
+  ];
+  function buildMissions(){
+    var wrap = $("missions"); wrap.innerHTML = "";
+    MISSIONS.forEach(function(m, i){
+      var d = document.createElement("div");
+      d.className = "mission" + (state.m[m.id] ? " done" : "");
+      d.id = "ms_" + m.id;
+      d.innerHTML = "<div class=\"mnum\">" + (state.m[m.id] ? "\u2713" : (i + 1)) + "</div>" +
+        "<div><div class=\"mt\">" + m.t + "</div><div class=\"md\">" + m.d + "</div></div>";
+      wrap.appendChild(d);
+    });
+  }
+  function checkMissions(){
+    MISSIONS.forEach(function(m){
+      if(state.m[m.id] || !FL[m.id]) return;
+      state.m[m.id] = true; store.save(state);
+      var el = $("ms_" + m.id);
+      el.classList.add("done");
+      el.querySelector(".mnum").textContent = "\u2713";
+      toast("Mission done: " + m.t);
+    });
+  }
+  buildMissions();
+
+  /* ---- DNS ---- */
+  var book = makeDNS();
+  function renderDNS(hl){
+    $("dnsTable").innerHTML = book.entries.map(function(e){
+      return "<tr" + (e.name === hl ? " class=\"new\"" : "") + "><td>" + e.name + "</td><td>" + e.num + "</td></tr>";
+    }).join("");
+  }
+  renderDNS();
+  function doLookup(){
+    var res = dnsLookup(book, $("dnsIn").value);
+    var el = $("dnsRes");
+    if(res.ok){
+      el.innerHTML = "<span class=\"ok\">" + res.entry.name + " \u2192 " + res.entry.num + "</span> <span class=\"small\">(now the machines can talk)</span>";
+      FL.n1 = 1;
+      if(res.entry.user) FL.n2 = 1;
+      checkMissions();
+      gymAfter({ lookup: res.entry.name });
+    } else if(res.error === "NXDOMAIN"){
+      el.innerHTML = "<span class=\"err\">NXDOMAIN</span> <span class=\"small\">that name is not in the book</span>";
+    } else {
+      el.innerHTML = "<span class=\"hint\">type a name first</span>";
+    }
+  }
+  $("dnsBtn").addEventListener("click", doLookup);
+  $("dnsIn").addEventListener("keydown", function(e){ if(e.key === "Enter") doLookup(); });
+  function doAdd(){
+    var res = dnsAdd(book, $("addIn").value);
+    var el = $("addRes");
+    if(res.ok){
+      renderDNS(res.entry.name);
+      el.innerHTML = "<span class=\"ok\">registered: " + res.entry.name + " \u2192 " + res.entry.num + "</span> <span class=\"small\">now look it up above</span>";
+      $("dnsIn").value = res.entry.name;
+      gymAfter({ registered: res.entry.name });
+    } else if(res.error === "taken"){
+      el.innerHTML = "<span class=\"warn\">" + res.name + " is already taken</span>";
+    } else {
+      el.innerHTML = "<span class=\"hint\">type a name first</span>";
+    }
+  }
+  $("addBtn").addEventListener("click", doAdd);
+  $("addIn").addEventListener("keydown", function(e){ if(e.key === "Enter") doAdd(); });
+
+  /* ---- network map ---- */
+  var dead = {};
+  var animating = false;
+  var baselineHops = null;
+  function nodeById(id){
+    for(var i = 0; i < NET_NODES.length; i++) if(NET_NODES[i].id === id) return NET_NODES[i];
+    return null;
+  }
+  function renderNet(packetAt, pathIds, returning){
+    var W = 480, H = 270;
+    var svg = "<svg width=\"" + W + "\" height=\"" + H + "\" viewBox=\"0 0 " + W + " " + H + "\">";
+    NET_EDGES.forEach(function(e){
+      var a = nodeById(e[0]), b = nodeById(e[1]);
+      var onPath = false;
+      if(pathIds){
+        for(var i = 0; i < pathIds.length - 1; i++){
+          if((pathIds[i] === e[0] && pathIds[i+1] === e[1]) || (pathIds[i] === e[1] && pathIds[i+1] === e[0])) onPath = true;
+        }
+      }
+      svg += "<line x1=\"" + a.x + "\" y1=\"" + a.y + "\" x2=\"" + b.x + "\" y2=\"" + b.y +
+        "\" stroke=\"" + (onPath ? "#3ddc84" : "#24463a") + "\" stroke-width=\"" + (onPath ? 3 : 2) + "\"/>";
+    });
+    NET_NODES.forEach(function(n){
+      var isDead = !!dead[n.id];
+      var big = n.id === "you" || n.id === "server";
+      var fill = n.id === "you" ? "#3ddc84" : (n.id === "server" ? "#ffb84d" : "#182b24");
+      var stroke = big ? "none" : "#3ddc84";
+      svg += "<g class=\"nnode" + (isDead ? " dead" : "") + "\" data-node=\"" + n.id + "\">";
+      svg += "<circle cx=\"" + n.x + "\" cy=\"" + n.y + "\" r=\"" + (big ? 14 : 12) + "\" fill=\"" + fill + "\"" +
+        (stroke !== "none" ? " stroke=\"" + stroke + "\" stroke-width=\"2\"" : "") + "/>";
+      if(isDead){
+        svg += "<text x=\"" + n.x + "\" y=\"" + (n.y + 4) + "\" fill=\"#ff7f6e\" font-size=\"13\" text-anchor=\"middle\" font-weight=\"bold\">\u2715</text>";
+      }
+      svg += "<text class=\"nl\" x=\"" + n.x + "\" y=\"" + (n.y + 28) + "\" fill=\"#8fa89c\" font-size=\"10\" text-anchor=\"middle\" font-family=\"monospace\">" + n.label + "</text>";
+      svg += "</g>";
+    });
+    if(packetAt){
+      var pn = nodeById(packetAt);
+      svg += "<circle cx=\"" + pn.x + "\" cy=\"" + (pn.y - 18) + "\" r=\"6\" fill=\"" + (returning ? "#6fc3ff" : "#ffb84d") + "\" stroke=\"#07100c\" stroke-width=\"1.5\"/>";
+    }
+    svg += "</svg>";
+    $("netwrap").innerHTML = svg;
+    Array.prototype.forEach.call(document.querySelectorAll(".nnode"), function(g){
+      var id = g.getAttribute("data-node");
+      var n = nodeById(id);
+      if(n.fixed) return;
+      g.addEventListener("click", function(){
+        if(animating) return;
+        dead[id] = !dead[id];
+        renderNet(null, null, false);
+        $("netCap").innerHTML = dead[id] ?
+          "<b>" + n.label + "</b> is down. The pathfinder will have to work around it. Send a request and see." :
+          "<b>" + n.label + "</b> is back online.";
+      });
+    });
+  }
+  renderNet(null, null, false);
+  var HOPTEXT = {
+    home:"your router takes the envelope. First hop.",
+    isp:"your internet provider passes it toward the backbone.",
+    r1:"backbone router A passes it along. It only knows its neighbors.",
+    r2:"backbone router B passes it along. It only knows its neighbors.",
+    r3:"backbone router C is one hop from the server.",
+    r4:"backbone router D is one hop from the server.",
+    server:"the server has it. It reads the request and writes an answer."
+  };
+  $("sendBtn").addEventListener("click", function(){
+    if(animating) return;
+    var path = bfsPath(NET_EDGES, "you", "server", dead);
+    if(!path){
+      renderNet(null, null, false);
+      $("netCap").innerHTML = "<span class=\"err\"><b>no route to host.</b></span> Every path is broken. This is the error behind many a spinning wheel. Tap Repair network, or bring a router back.";
+      FL.n5 = 1; checkMissions();
+      gymAfter({ outage: true });
+      return;
+    }
+    animating = true;
+    var deadCount = Object.keys(dead).filter(function(k){ return dead[k]; }).length;
+    var i = 0;
+    function fwd(){
+      renderNet(path[i], path, false);
+      var id = path[i];
+      $("netCap").innerHTML = i === 0 ?
+        "the envelope leaves your phone. Hop 0." :
+        "hop " + i + ": " + (HOPTEXT[id] || "passed along.");
+      i++;
+      if(i < path.length){ setTimeout(fwd, 420); }
+      else {
+        var j = path.length - 1;
+        setTimeout(function back(){
+          renderNet(path[j], path, true);
+          $("netCap").innerHTML = j === 0 ?
+            "<span class=\"ok\"><b>200 OK arrived.</b></span> Round trip complete: " + (2 * (path.length - 1)) + " hops in a blink." +
+            (deadCount ? " And it worked around " + deadCount + " dead router" + (deadCount > 1 ? "s" : "") + "." : "") :
+            "the answer hops back: " + (path.length - 1 - j) + " of " + (path.length - 1) + " return hops.";
+          j--;
+          if(j >= 0){ setTimeout(back, 320); }
+          else {
+            animating = false;
+            if(baselineHops === null) baselineHops = path.length;
+            FL.n3 = 1;
+            if(deadCount > 0) FL.n4 = 1;
+            checkMissions();
+            gymAfter({ delivered: true, deadCount: deadCount, path: path });
+          }
+        }, 500);
+      }
+    }
+    fwd();
+  });
+  $("healBtn").addEventListener("click", function(){
+    if(animating) return;
+    dead = {};
+    renderNet(null, null, false);
+    $("netCap").innerHTML = "Network repaired. Every router is back.";
+  });
+
+  /* ---- http ---- */
+  function hprint(txt, cls){
+    var d = document.createElement("div");
+    d.className = cls; d.textContent = txt;
+    $("httpOut").appendChild(d);
+    $("httpOut").scrollTop = $("httpOut").scrollHeight;
+  }
+  hprint("This server has four pages: /  /menu  /cat.jpg  and /old (which moved).", "small");
+  hprint("Ask for anything. Even things that do not exist. Especially those.", "small");
+  function doRequest(rawPath, isFollow){
+    var res = serveRequest(rawPath);
+    var shown = (rawPath || "/").trim();
+    if(shown[0] !== "/") shown = "/" + shown;
+    hprint("GET " + shown, "h-req");
+    if(res.status === 200){
+      hprint("200 OK", "h-200");
+      hprint(res.body, "h-body");
+      FL.http200 = 1;
+    } else if(res.status === 404){
+      hprint("404 Not Found", "h-404");
+      hprint("the server answered. The answer is: that page does not exist.", "h-body");
+      FL.http404 = 1;
+    } else if(res.status === 301){
+      hprint("301 Moved Permanently \u2192 " + res.location, "h-301");
+      hprint("(your browser follows forwarding notes automatically, like this)", "small");
+      setTimeout(function(){ doRequest(res.location, true); }, 500);
+    }
+    if(FL.http200 && FL.http404){ FL.n6 = 1; }
+    checkMissions();
+    gymAfter({ status: res.status, path: shown });
+  }
+  $("reqBtn").addEventListener("click", function(){ doRequest($("pathIn").value); $("pathIn").value = ""; });
+  $("pathIn").addEventListener("keydown", function(e){ if(e.key === "Enter"){ doRequest($("pathIn").value); $("pathIn").value = ""; } });
+  ["/","/menu","/cat.jpg","/old","/secret"].forEach(function(p){
+    var b = document.createElement("button");
+    b.className = "chip"; b.textContent = "GET " + p;
+    b.addEventListener("click", function(){ doRequest(p); });
+    $("httpChips").appendChild(b);
+  });
+
+  /* ---- The Gym ---- */
+  state.gym = state.gym || { reps:0, streak:0, best:0 };
+  var GYM_LEVELS = ["Address book","Routing","Status codes","Field calls","Your work"];
+  var gymLevel = -1;
+  var drill = null;
+  function pickFrom(arr, not){
+    var v, guard = 0;
+    do { v = arr[Math.floor(Math.random()*arr.length)]; } while(not && not.indexOf(v) > -1 && guard++ < 50);
+    return v;
+  }
+  var I_WORDS = ["harbor","copper","lantern","meadow","bluejay","walnut"];
+  var FIELD_CALLS = [
+    { sym:"Wifi bars are full, but no page will load on any site.",
+      opts:["Your phone's wifi antenna has failed","Your link to the router works; the road beyond it is out","DNS deleted your favorite sites"], r:1 },
+    { sym:"One website shows 404. Every other site works fine.",
+      opts:["Your internet connection is failing","That server answered: the page does not exist","Your router needs a restart"], r:1 },
+    { sym:"The browser says DNS error / NXDOMAIN.",
+      opts:["The name lookup failed; the address book has no such entry","The server crashed","Your wifi password expired"], r:0 },
+    { sym:"Every site is slow tonight, but nothing is actually broken.",
+      opts:["The internet is running out of space","Congestion: envelopes waiting in line at busy hops","Your device is too old"], r:1 },
+    { sym:"A site shows 500 Server Error.",
+      opts:["Your device caused it","Their program crashed while building the reply; not your machine","Your connection dropped mid-page"], r:1 },
+    { sym:"Your video call stutters, but web pages load fine.",
+      opts:["Late packets; live calls hate waiting in line more than pages do","The other person's camera is broken","DNS is slow today"], r:0 }
+  ];
+  function gymStats(){
+    $("repN").textContent = state.gym.reps;
+    $("strN").textContent = state.gym.streak;
+    $("bestN").textContent = state.gym.best;
+  }
+  var GYM_TPLS = [
+    { id:"i01", lv:0, make:function(){
+        var W = pickFrom(I_WORDS);
+        var rec = dnsAdd(book, W + "-cove");
+        renderDNS(rec.entry ? rec.entry.name : null);
+        var nm = rec.entry ? rec.entry.name : W + "-cove.example";
+        return { goal:"A new site just joined the book: <b>" + nm + "</b>. Look up its number in the address book above.",
+          steps:[function(evt){ return evt.lookup === nm; }],
+          hints:["Type the full name into the lookup box.","Look up: <code>" + nm + "</code>"],
+          fillEl:"dnsIn", fill:nm,
+          sol:function(d){ d.getElementById("dnsIn").value = nm; d.getElementById("dnsBtn").click(); } };
+      } },
+    { id:"i02", lv:0, make:function(){
+        var W = pickFrom(I_WORDS);
+        return { goal:"Claim territory: register a brand new name that contains the word <b>" + W + "</b>, then look it up and get your number back.",
+          steps:[
+            function(evt, data){ if(evt.registered && evt.registered.indexOf(W) > -1){ data.reg = evt.registered; } return !!data.reg; },
+            function(evt, data){ return evt.lookup === data.reg; }
+          ],
+          hints:["Register first (bottom box), then look it up (top box). Registering fills the lookup box for you.","Register something like <code>" + W + "-place</code>, then tap Look up."],
+          fillEl:"addIn", fill:W + "-place",
+          sol:function(d){ d.getElementById("addIn").value = W + "-place"; d.getElementById("addBtn").click(); d.getElementById("dnsBtn").click(); } };
+      } },
+    { id:"i10", lv:1, make:function(){
+        var R = pickFrom(["r1","r2","r3","r4"]);
+        var label = { r1:"A", r2:"B", r3:"C", r4:"D" }[R];
+        dead = {}; dead[R] = true;
+        renderNet(null, null, false);
+        $("netCap").innerHTML = "Drill setup: router <b>" + label + "</b> just went down.";
+        return { goal:"Backbone router <b>" + label + "</b> is down (already marked on the map). Deliver a request anyway; the network should route around it.",
+          steps:[function(evt, data){ return evt.delivered && evt.path && evt.path.indexOf(R) === -1 && dead[R]; }],
+          hints:["You do not steer the packet. Just send; the pathfinder does the work.","Tap <b>Send request</b> on the map and watch the detour."],
+          sol:function(d){ d.getElementById("sendBtn").click(); }, slow:true };
+      } },
+    { id:"i11", lv:1, make:function(){
+        dead = {}; renderNet(null, null, false);
+        return { goal:"Two-parter. First <b>break the network completely</b> (knock out routers until a send fails with no route). Then <b>repair it and deliver</b>.",
+          steps:[
+            function(evt){ return !!evt.outage; },
+            function(evt){ return evt.delivered && evt.deadCount === 0; }
+          ],
+          hints:["One router is a single point of failure for your whole house side.","Kill <b>ISP</b>, send (instant failure), tap Repair network, send again."],
+          sol:function(d, dm){
+            var isp = d.querySelector('.nnode[data-node="isp"]');
+            isp.dispatchEvent(new dm.window.Event("click", { bubbles:true }));
+            d.getElementById("sendBtn").click();
+            d.getElementById("healBtn").click();
+            d.getElementById("sendBtn").click();
+          }, slow:true };
+      } },
+    { id:"i20", lv:2, make:function(){
+        return { goal:"Collector run on the mini server below: get a <b>200 from /menu</b> and hit <b>/old</b> to watch a redirect get auto-followed. Any order.",
+          steps:[function(evt, data){
+            if(evt.status === 200 && evt.path === "/menu") data.a = 1;
+            if(evt.status === 301) data.b = 1;
+            return !!(data.a && data.b);
+          }],
+          hints:["The chips under the server are the fast way.","Tap <code>GET /menu</code> and <code>GET /old</code>."],
+          fillEl:"pathIn", fill:"/menu",
+          sol:function(d){
+            d.getElementById("pathIn").value = "/menu"; d.getElementById("reqBtn").click();
+            d.getElementById("pathIn").value = "/old"; d.getElementById("reqBtn").click();
+          } };
+      } },
+    { id:"i21", lv:2, make:function(){
+        return { goal:"Ask the server for a page that <b>does not exist</b> (make up any path) and read what actually comes back.",
+          steps:[function(evt){ return evt.status === 404; }],
+          hints:["The server has four pages. Anything else earns the famous number.","Try <code>GET /unicorn</code>."],
+          fillEl:"pathIn", fill:"/unicorn",
+          sol:function(d){ d.getElementById("pathIn").value = "/unicorn"; d.getElementById("reqBtn").click(); } };
+      } },
+    { id:"i30", lv:3, make:function(){
+        var sc = FIELD_CALLS[Math.floor(Math.random() * FIELD_CALLS.length)];
+        return { goal:"<b>Field call.</b> A friend reports: \u201C" + sc.sym + "\u201D What actually happened?",
+          scenario: sc,
+          hints:["Which layer does the symptom point at: your device, your router, the road, the name lookup, or the server?","Re-read the pocket reference in part 6; the answer is one of its lines."] };
+      } },
+    { id:"w01", lv:4, make:function(){
+        var sc = WORK_CALLS[Math.floor(Math.random() * WORK_CALLS.length)];
+        return { goal:"<b>Your deploy desk.</b> " + sc.sym,
+          scenario: sc,
+          hints:[sc.hint || "Think about which link in the chain the symptom points at.", "The right read is one of the options; the others confuse two different layers."] };
+      } }
+  ];
+  var WORK_CALLS = [
+    { sym:"You uploaded a new game to your GitHub Pages repo, opened the live URL, and got a 404 for that page. Other pages in the repo load fine. What is the most likely cause?",
+      opts:["The internet is down","The file name or path does not match what you typed in the URL (case matters), so the server has no such page","GitHub deleted your repo"], r:1,
+      hint:"A 404 means the server answered: no page at that path. That is about the name, not the connection." },
+    { sym:"Your single-file app works perfectly when you open it from your phone's Downloads, but progress never saves between sessions. Where is the real problem?",
+      opts:["The internet connection is too slow to save","Opened from Downloads it runs as a quarantined local file, so storage is blocked; it must be opened from the https GitHub Pages URL","The app has a bug in its save code"], r:1,
+      hint:"This is not a network symptom at all. It is about WHERE the file is opened from: a local file origin versus a real https origin." },
+    { sym:"You pushed a fix and refreshed the live site, but you still see the OLD version. A friend on their phone sees the new one. What is going on?",
+      opts:["Your fix never uploaded","Your browser (or service worker) served a cached copy; the new version is live, your device just held onto the old one","The server sent the wrong file"], r:1,
+      hint:"Two people, two different results, from the same URL. That points at something local to your device holding a stored copy, not the server." },
+    { sym:"A tester says your app 'won't load at all, just a blank page.' It loads fine for you. First thing to suspect?",
+      opts:["The whole internet is broken for them","Something specific to their load: a cached/old version, or a file that did not fully upload for everyone yet","Their phone is too old to run any website"], r:1,
+      hint:"Works for you, not for them, same URL. Suspect a per-device or per-upload issue before blaming the whole network." },
+    { sym:"You typed your custom domain into the browser and got a DNS / site-not-found error, but the raw github.io URL loads fine. What broke?",
+      opts:["Your app code is broken","The name-to-number lookup for your custom domain is not set up or not propagated yet; the site itself is fine","GitHub Pages is down"], r:1,
+      hint:"The github.io address works, the custom name does not. That isolates the problem to the address book (DNS), not the server." }
+  ,
+    { sym:"You changed your custom setup so the hub lives at index.html, then visited the bare repo URL with no file name. It loads the hub. Why does the bare address work now?",
+      opts:["Bare URLs always show the newest file","The server serves index.html by default when no file is named", "GitHub picks a random file"], r:1,
+      hint:"index.html is the one special name a server reaches for when you ask for a folder with no page named. That is why the hub is named index.html." },
+    { sym:"Your mascot images showed as broken on the live site. The code asked for img/thumb-git.png but you had uploaded the PNGs loose to the repo root. What did the server answer?",
+      opts:["It resized the images","404 for each image, there is no img/ folder, so nothing lives at that path","It served the wrong images"], r:1,
+      hint:"The request went to a path with nothing at it (no img/ folder). No file there means 404, which shows as a broken image." }];
+  function gymEnd(win, msg){
+    if(win){
+      state.gym.reps++;
+      state.gym.streak++;
+      if(state.gym.streak > state.gym.best) state.gym.best = state.gym.streak;
+    } else {
+      state.gym.streak = 0;
+    }
+    store.save(state);
+    $("gymCard").className = "gymcard " + (win ? "win" : "lose");
+    $("gGoal").innerHTML = msg;
+    $("gHint").className = "ghint";
+    $("gOpts").innerHTML = "";
+    drill = null;
+    $("gStart").style.display = ""; $("gStart").textContent = win ? "Next drill" : "Start drill";
+    $("gHintBtn").style.display = "none"; $("gSkip").style.display = "none";
+    gymStats();
+    if(win) toast("Rep logged \u00b7 streak " + state.gym.streak);
+  }
+  function gymGoalRender(){
+    if(!drill) return;
+    var extra = "";
+    if(drill.tpl.steps && drill.tpl.steps.length > 1){
+      extra = "<div class=\"gstep\">step " + Math.min(drill.stepIdx + 1, drill.tpl.steps.length) + " of " + drill.tpl.steps.length + (drill.stepIdx > 0 ? " \u00b7 first part done \u2713" : "") + "</div>";
+    }
+    $("gGoal").innerHTML = drill.tpl.goal + extra;
+  }
+  function gymAfter(evt){
+    if(!drill || !drill.tpl.steps) return;
+    var guard = 0;
+    while(drill.stepIdx < drill.tpl.steps.length && drill.tpl.steps[drill.stepIdx](evt, drill.data) && guard++ < 10){
+      drill.stepIdx++;
+      evt = {};
+    }
+    if(drill.stepIdx >= drill.tpl.steps.length){
+      gymEnd(true, "<b>Done.</b> Rep logged" + (drill && drill.hintsUsed === 0 ? ", no hints. Clean." : ".") + " Total reps: " + (state.gym.reps + 1) + ".");
+    } else { gymGoalRender(); }
+  }
+  function gymStart(forceId){
+    var pool = GYM_TPLS.filter(function(t){ return gymLevel === -1 || t.lv === gymLevel; });
+    var chosen = null;
+    if(forceId){ GYM_TPLS.forEach(function(t){ if(t.id === forceId) chosen = t; }); }
+    if(!chosen) chosen = pool[Math.floor(Math.random() * pool.length)];
+    drill = { tpl: chosen.make(), tplId: chosen.id, stepIdx: 0, hintsUsed: 0, data: {} };
+    $("gymCard").className = "gymcard active";
+    $("gHint").className = "ghint"; $("gHint").innerHTML = "";
+    $("gStart").style.display = "none";
+    $("gHintBtn").style.display = "";
+    $("gSkip").style.display = "";
+    var opts = $("gOpts");
+    opts.innerHTML = "";
+    if(drill.tpl.scenario){
+      var sc = drill.tpl.scenario;
+      sc.opts.forEach(function(o, i){
+        var b = document.createElement("button");
+        b.type = "button"; b.textContent = o;
+        b.addEventListener("click", function(){
+          Array.prototype.forEach.call(opts.children, function(x){ x.classList.add("lock"); });
+          opts.children[sc.r].classList.add("right");
+          if(i === sc.r){
+            gymEnd(true, "<b>Correct call.</b> Rep logged. Total: " + (state.gym.reps + 1) + ".");
+          } else {
+            b.classList.add("wrong");
+            gymEnd(false, "<b>Not this one.</b> The right read: " + sc.opts[sc.r] + ". Streak reset.");
+          }
+        });
+        opts.appendChild(b);
+      });
+    }
+    gymGoalRender();
+    gymStats();
+  }
+  $("gStart").addEventListener("click", function(){ gymStart(); });
+  $("gHintBtn").addEventListener("click", function(){
+    if(!drill) return;
+    drill.hintsUsed++;
+    var h = $("gHint");
+    h.className = "ghint show";
+    h.innerHTML = drill.hintsUsed === 1 ? drill.tpl.hints[0] : drill.tpl.hints[0] + "<br>" + drill.tpl.hints[1];
+    if(drill.hintsUsed >= 2 && drill.tpl.fillEl){
+      $(drill.tpl.fillEl).value = drill.tpl.fill;
+    }
+  });
+  $("gSkip").addEventListener("click", function(){
+    if(!drill) return;
+    state.gym.streak = 0; store.save(state);
+    $("gymCard").className = "gymcard";
+    $("gGoal").innerHTML = "Skipped. " + (drill.tpl.scenario ? "The right read: " + drill.tpl.scenario.opts[drill.tpl.scenario.r] + "." : drill.tpl.hints[1]) + " Streak reset.";
+    $("gHint").className = "ghint";
+    $("gOpts").innerHTML = "";
+    drill = null;
+    $("gStart").style.display = ""; $("gStart").textContent = "Start drill";
+    $("gHintBtn").style.display = "none"; $("gSkip").style.display = "none";
+    gymStats();
+  });
+  (function(){
+    var tabs = ["Surprise me"].concat(GYM_LEVELS.slice(0,4));
+    tabs.forEach(function(name, i){
+      var b = document.createElement("button");
+      b.className = "gtab" + (i === 0 ? " on" : ""); b.type = "button"; b.textContent = name;
+      b.addEventListener("click", function(){
+        gymLevel = i - 1;
+        Array.prototype.forEach.call(document.querySelectorAll(".gtab"), function(x, xi){ x.classList.toggle("on", xi === i); });
+      });
+      $("gymTabs").appendChild(b);
+    });
+  })();
+  function setTrack(t){
+    var g = $("trackGeneral"), tr = $("trackTrail"), tabs = $("gymTabs"), ban = $("trailBanner");
+    if(g) g.classList.toggle("on", t === "general");
+    if(tr) tr.classList.toggle("on", t === "trail");
+    if(tabs) tabs.style.display = (t === "trail") ? "none" : "";
+    if(ban) ban.className = "trailbanner" + (t === "trail" ? " show" : "");
+    if(t === "trail"){ gymLevel = 4; }
+    else { gymLevel = -1; Array.prototype.forEach.call(document.querySelectorAll(".gtab"), function(x, xi){ x.classList.toggle("on", xi === 0); }); }
+    if($("gymCard")) $("gymCard").className = "gymcard";
+    if($("gGoal")) $("gGoal").innerHTML = (t === "trail") ? "Real cases from shipping these apps. Tap <b>Start drill</b>." : "Pick a level (or Surprise me) and tap <b>Start drill</b>.";
+    if($("gOpts")) $("gOpts").innerHTML = "";
+    if($("gHint")){ $("gHint").className = "ghint"; $("gHint").innerHTML = ""; }
+    ["gRun","gHintBtn","gSkip"].forEach(function(id){ if($(id)) $(id).style.display = "none"; });
+    if($("gStart")) $("gStart").style.display = "";
+  }
+  if($("trackGeneral")) $("trackGeneral").addEventListener("click", function(){ setTrack("general"); });
+  if($("trackTrail")) $("trackTrail").addEventListener("click", function(){ setTrack("trail"); });
+  gymStats();
+  if(typeof window !== "undefined"){
+    window._gym = {
+      start: gymStart,
+      solve: function(d, dm){ if(drill && drill.tpl.sol) drill.tpl.sol(d, dm); },
+      pick: function(i){ var b = $("gOpts").children[i]; if(b) b.click(); },
+      state: function(){ return { drill: drill, gym: state.gym } ; }
+    };
+  }
+
+  /* ---- quiz ---- */
+  var QUIZ = [
+    { q:"A server is...", a:["A special vault only companies can own","A computer running a program that answers requests","The box your wifi comes out of"], r:1 },
+    { q:"DNS exists to...", a:["Turn names people remember into numbers machines use","Make the internet faster","Block dangerous websites"], r:0 },
+    { q:"How does your request actually travel?", a:["In one direct line to the server","It hops router to router, each one only knowing its neighbors","It is broadcast to every computer at once"], r:1 },
+    { q:"A 404 error means...", a:["Your internet connection is broken","The server crashed","The server answered: that page does not exist"], r:2 },
+    { q:"Wifi is on but nothing loads. Most likely:", a:["Your device is broken","Your link to your router works, the road beyond it is out","DNS deleted your favorite sites"], r:1 }
+  ];
+  function renderQuiz(){
+    var wrap = $("quizwrap");
+    wrap.innerHTML = ""; $("scoreEl").textContent = ""; $("retryBtn").style.display = "none";
+    var answered = 0, correct = 0;
+    QUIZ.forEach(function(item, qi){
+      var qd = document.createElement("div");
+      qd.className = "q";
+      qd.innerHTML = "<div class=\"qt\">" + (qi + 1) + ". " + item.q + "</div>";
+      var opts = document.createElement("div"); opts.className = "opts";
+      item.a.forEach(function(opt, oi){
+        var b = document.createElement("button");
+        b.textContent = opt;
+        function pick(){
+          if(b.classList.contains("lock")) return;
+          answered++;
+          if(oi === item.r){ b.classList.add("right"); correct++; }
+          else { b.classList.add("wrong"); opts.children[item.r].classList.add("right"); }
+          Array.prototype.forEach.call(opts.children, function(x){ x.classList.add("lock"); });
+          if(answered === QUIZ.length){
+            $("scoreEl").textContent = "Score: " + correct + "/5" + (correct >= 4 ? "  \u2713 you have the model" : "");
+            $("retryBtn").style.display = "inline-block";
+            if(correct > (state.quizBest || 0)){ state.quizBest = correct; store.save(state); }
+          }
+        }
+        b.addEventListener("click", pick);
+        b.addEventListener("keydown", function(e){ if(e.key === "Enter" || e.key === " "){ e.preventDefault(); pick(); } });
+        opts.appendChild(b);
+      });
+      qd.appendChild(opts);
+      wrap.appendChild(qd);
+    });
+  }
+  $("retryBtn").addEventListener("click", renderQuiz);
+  renderQuiz();
+}
+
+if(typeof window !== "undefined" && typeof document !== "undefined"){
+  if(document.readyState === "loading"){ document.addEventListener("DOMContentLoaded", initApp); }
+  else { initApp(); }
+}
+if(typeof module !== "undefined" && module.exports){
+  module.exports = { makeDNS: makeDNS, dnsLookup: dnsLookup, dnsAdd: dnsAdd, bfsPath: bfsPath, serveRequest: serveRequest, NET_EDGES: NET_EDGES };
+}
+</script>
+</body>
+</html>

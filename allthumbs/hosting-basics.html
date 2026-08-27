@@ -1,0 +1,1023 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14181d">
+<title>Ship It: Hosting</title>
+<style>
+  :root{
+    --canvas:#14181d; --panel:#1c2229; --card:#171c22; --line:#2c3540;
+    --ink:#e8ecf0; --soft:#97a3ae; --dim:#6b7682;
+    --green:#6fe08c; --amber:#f5b04c; --blue:#5aa7e8; --red:#e87a6d;
+    --mono:ui-monospace,'SF Mono','Cascadia Mono','Roboto Mono',Consolas,Menlo,monospace;
+    --sans:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',sans-serif;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; background:var(--canvas); color:var(--ink);
+    font-family:var(--sans); font-size:17px; line-height:1.6;
+    padding-bottom:70px;
+  }
+  header{
+    padding:26px 20px 10px; max-width:760px; margin:0 auto;
+    display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+  }
+  .wordmark{font-family:var(--mono); font-size:12px; letter-spacing:.22em; color:var(--soft); text-transform:uppercase;}
+  h1{margin:6px 0 2px; font-size:30px; line-height:1.15; letter-spacing:-.01em;}
+  .subtitle{color:var(--soft); margin:0; font-size:15px;}
+  .vbadge{
+    font-family:var(--mono); font-size:11px; color:var(--soft);
+    border:1px solid var(--line); border-radius:999px; padding:5px 10px;
+    background:var(--panel); cursor:pointer; white-space:nowrap; margin-top:4px;
+  }
+  nav{
+    position:sticky; top:0; z-index:30; background:rgba(20,24,29,.92);
+    backdrop-filter:blur(8px); border-bottom:1px solid var(--line);
+    overflow-x:auto; -webkit-overflow-scrolling:touch;
+  }
+  .navrow{display:flex; gap:8px; padding:10px 16px; max-width:760px; margin:0 auto; width:max-content;}
+  .navchip{
+    font-family:var(--mono); font-size:12px; color:var(--soft);
+    border:1px solid var(--line); border-radius:999px; padding:7px 13px;
+    background:var(--card); text-decoration:none; white-space:nowrap;
+  }
+  .navchip:active{color:var(--ink); border-color:var(--amber);}
+  main{max-width:760px; margin:0 auto; padding:0 16px;}
+  section{
+    background:var(--panel); border:1px solid var(--line); border-radius:16px;
+    padding:22px 18px; margin:18px 0;
+  }
+  .eyebrow{
+    font-family:var(--mono); font-size:11px; letter-spacing:.2em; text-transform:uppercase;
+    color:var(--amber); margin:0 0 6px;
+  }
+  h2{margin:0 0 10px; font-size:23px; line-height:1.2;}
+  h3{margin:20px 0 8px; font-size:17px;}
+  p{margin:10px 0; color:var(--ink);}
+  .soft{color:var(--soft);}
+  .small{font-size:14px;}
+  code, .code{font-family:var(--mono); font-size:.92em; background:var(--card); border:1px solid var(--line); border-radius:6px; padding:1px 6px; color:var(--green);}
+  .note{
+    border-left:3px solid var(--amber); background:var(--card);
+    border-radius:0 10px 10px 0; padding:10px 14px; margin:14px 0; font-size:15px; color:var(--soft);
+  }
+  .btn{
+    display:inline-block; font-family:var(--mono); font-size:14px; color:var(--ink);
+    background:var(--card); border:1px solid var(--line); border-radius:10px;
+    padding:11px 16px; cursor:pointer; user-select:none;
+  }
+  .btn:active{border-color:var(--amber); transform:translateY(1px);}
+  .btn.primary{border-color:var(--amber); color:var(--amber);}
+  .mfill{margin-left:8px; flex:0 0 auto; font-size:11px; padding:3px 9px; border:1px solid var(--line); border-radius:999px; background:transparent; color:var(--amber); cursor:pointer;}
+  .mfill:active{border-color:var(--amber);}
+  .gym{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px; margin:14px 0;}
+  .gymstats{display:flex; gap:18px; font-size:12.5px; color:#9aa5b1; margin-bottom:10px; letter-spacing:.04em;}
+  .gymstats b{color:var(--green); font-size:15px; margin-left:4px;}
+  .gymtabs{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;}
+  .gtab{font-size:12px; padding:6px 11px; border-radius:999px; border:1px solid var(--line); background:transparent; color:inherit; cursor:pointer;}
+  .gtab.on{border-color:var(--amber); color:var(--amber); font-weight:700;}
+  .gymcard{border:1px dashed var(--line); border-radius:10px; padding:12px;}
+  .gymcard.active{border-style:solid; border-color:var(--amber);}
+  .gymcard.win{border-style:solid; border-color:var(--green);}
+  .ggoal{font-size:15px; line-height:1.5;}
+  .ggoal b{color:var(--amber);}
+  .gstep{font-size:12px; color:var(--green); margin-top:6px;}
+  .ghint{font-size:13.5px; color:var(--blue); margin-top:8px; display:none;}
+  .ghint.show{display:block;}
+  .gbtns{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;}
+  .tracktoggle{display:flex;gap:8px;margin:14px 0 10px;align-items:center;flex-wrap:wrap}
+  .tracktoggle .tlabel{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin-right:2px}
+  .ttab{font-family:var(--mono);font-size:12.5px;padding:7px 14px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--soft);cursor:pointer;}
+  .ttab.on.general{border-color:var(--blue);color:var(--blue);background:rgba(90,167,232,.1);font-weight:700;}
+  .ttab.on.trail{border-color:#c8a4f0;color:#c8a4f0;background:rgba(200,164,240,.12);font-weight:700;}
+  .trailbanner{font-family:var(--mono);font-size:11.5px;color:#c8a4f0;background:rgba(200,164,240,.08);border:1px solid rgba(200,164,240,.3);border-radius:8px;padding:7px 11px;margin:8px 0;display:none;}
+  .trailbanner.show{display:block;}
+  .gymcard.trailmode.active{border-color:#c8a4f0;}
+  .gymcard.trailmode.win{border-color:var(--green);}
+
+
+  /* hero */
+  .hero{display:flex; flex-direction:column; align-items:center; text-align:center; gap:10px;}
+  .hero svg{width:120px; height:auto;}
+  .hook{font-size:21px; font-weight:650; margin:4px 0 0;}
+  .flips{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; width:100%; margin-top:14px;}
+  .flip{
+    border:1px solid var(--line); border-radius:12px; background:var(--card);
+    padding:14px; text-align:left; cursor:pointer; min-height:104px; position:relative;
+  }
+  .flip .front{font-weight:650;}
+  .flip .tapcue{font-family:var(--mono); font-size:11px; color:var(--dim); margin-top:8px;}
+  .flip .back{display:none; font-size:14.5px; color:var(--soft);}
+  .flip.open .front,.flip.open .tapcue{display:none;}
+  .flip.open .back{display:block; animation:fadeup .35s ease;}
+  .flip.open{border-color:var(--green);}
+  @keyframes fadeup{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+
+  /* layer stack */
+  .stack{display:flex; flex-direction:column; gap:8px; margin:14px 0;}
+  .layer{
+    border:1px solid var(--line); border-radius:12px; background:var(--card);
+    padding:13px 14px; cursor:pointer; display:flex; align-items:center; gap:12px;
+    transition:border-color .25s, box-shadow .25s;
+  }
+  .layer .lname{font-weight:650;}
+  .layer .ltag{font-family:var(--mono); font-size:11px; color:var(--dim); margin-left:auto;}
+  .layer.active{border-color:var(--amber); box-shadow:0 0 0 1px var(--amber) inset;}
+  .layer.pulseglow{border-color:var(--green); box-shadow:0 0 14px rgba(111,224,140,.25);}
+  .layerinfo{
+    min-height:78px; border:1px dashed var(--line); border-radius:12px;
+    padding:12px 14px; color:var(--soft); font-size:15px; margin-top:10px;
+  }
+  .layerinfo b{color:var(--ink);}
+
+  /* comparison */
+  .acc{border:1px solid var(--line); border-radius:12px; background:var(--card); margin:10px 0; overflow:hidden;}
+  .acc>button{
+    all:unset; display:flex; width:100%; padding:14px; cursor:pointer;
+    font-weight:650; align-items:center; gap:10px; box-sizing:border-box;
+  }
+  .acc>button .plus{margin-left:auto; font-family:var(--mono); color:var(--dim);}
+  .acc .body{display:none; padding:0 14px 14px;}
+  .acc.open .body{display:block; animation:fadeup .3s ease;}
+  .acc.open>button .plus{color:var(--amber);}
+  .duel{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  @media(max-width:480px){.duel{grid-template-columns:1fr;}}
+  .duelcard{border-radius:10px; padding:11px 12px; font-size:14.5px; line-height:1.5;}
+  .duelcard .who{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; margin-bottom:5px;}
+  .win{background:rgba(90,167,232,.09); border:1px solid rgba(90,167,232,.35);}
+  .win .who{color:var(--blue);}
+  .lin{background:rgba(111,224,140,.08); border:1px solid rgba(111,224,140,.3);}
+  .lin .who{color:var(--green);}
+
+  /* distro hub */
+  .hubwrap{display:flex; justify-content:center; margin:16px 0 4px;}
+  .hubwrap svg{width:100%; max-width:420px; height:auto;}
+
+  /* tree explorer */
+  .xsplit{display:grid; grid-template-columns:1fr; gap:12px;}
+  .xtree{
+    font-family:var(--mono); font-size:14.5px; background:var(--card);
+    border:1px solid var(--line); border-radius:12px; padding:12px 10px;
+  }
+  .xtree ul{list-style:none; margin:0; padding-left:18px; border-left:1px solid var(--line);}
+  .xtree>ul{padding-left:4px; border-left:none;}
+  .xnode{
+    display:inline-flex; align-items:center; gap:7px; padding:6px 9px; margin:2px 0;
+    border-radius:8px; cursor:pointer; border:1px solid transparent;
+  }
+  .xnode:active{background:var(--panel);}
+  .xnode.dir{color:var(--amber);}
+  .xnode.file{color:var(--ink);}
+  .xnode.sel{border-color:var(--amber); background:var(--panel);}
+  .xkids.closed{display:none;}
+  .xinfo{
+    border:1px dashed var(--line); border-radius:12px; padding:12px 14px;
+    color:var(--soft); font-size:15px; min-height:74px;
+  }
+  .xinfo b{color:var(--ink);}
+  .pathduel{margin-top:14px;}
+
+  /* terminal */
+  .missions{display:flex; flex-direction:column; gap:7px; margin:12px 0;}
+  .mission{
+    display:flex; gap:10px; align-items:flex-start; font-size:14.5px;
+    border:1px solid var(--line); background:var(--card); border-radius:10px; padding:9px 12px;
+  }
+  .mission .mk{
+    font-family:var(--mono); flex:0 0 auto; width:22px; height:22px; border-radius:50%;
+    border:1px solid var(--line); color:var(--dim); display:flex; align-items:center; justify-content:center; font-size:12px;
+  }
+  .mission.done{border-color:rgba(111,224,140,.5);}
+  .mission.done .mk{border-color:var(--green); color:var(--green); background:rgba(111,224,140,.1);}
+  .mission.done .mtext{color:var(--soft); text-decoration:line-through; text-decoration-color:var(--dim);}
+  .mission code{padding:0 5px;}
+  .term{
+    background:#0d1114; border:1px solid var(--line); border-radius:12px;
+    overflow:hidden; margin:12px 0;
+  }
+  .termbar{
+    display:flex; align-items:center; gap:6px; padding:8px 12px;
+    border-bottom:1px solid var(--line); background:#11161b;
+  }
+  .dot{width:10px; height:10px; border-radius:50%; background:var(--line);}
+  .termbar .ttitle{font-family:var(--mono); font-size:11px; color:var(--dim); margin-left:6px;}
+  .termout{
+    font-family:var(--mono); font-size:14px; line-height:1.55; padding:12px;
+    height:230px; overflow-y:auto; white-space:pre-wrap; word-break:break-word;
+  }
+  .tl-cmd{color:var(--ink);}
+  .tl-out{color:var(--green);}
+  .tl-dir{color:var(--amber);}
+  .tl-err{color:var(--red);}
+  .tl-hint{color:var(--dim); font-style:italic;}
+  .termin{
+    display:flex; align-items:center; gap:8px; padding:10px 12px;
+    border-top:1px solid var(--line); background:#11161b;
+  }
+  .prompt{font-family:var(--mono); font-size:13px; color:var(--green); white-space:nowrap;}
+  .termin input{
+    flex:1; background:transparent; border:none; outline:none; color:var(--ink);
+    font-family:var(--mono); font-size:16px; min-width:0;
+  }
+  .runbtn{
+    font-family:var(--mono); font-size:13px; color:var(--green);
+    background:transparent; border:1px solid var(--line); border-radius:8px;
+    padding:8px 13px; cursor:pointer;
+  }
+  .chips{display:flex; flex-wrap:wrap; gap:7px; margin:10px 0 4px;}
+  .chip{
+    font-family:var(--mono); font-size:13px; color:var(--soft);
+    border:1px solid var(--line); border-radius:999px; background:var(--card);
+    padding:7px 12px; cursor:pointer;
+  }
+  .chip:active{color:var(--amber); border-color:var(--amber);}
+  .mirror{
+    border:1px solid var(--line); border-radius:12px; background:var(--card);
+    padding:12px 10px; font-family:var(--mono); font-size:14px; margin-top:12px;
+  }
+  .mirror .mtitle{font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--dim); margin:0 0 8px 4px;}
+  .mirror ul{list-style:none; margin:0; padding-left:18px; border-left:1px solid var(--line);}
+  .mirror>ul{padding-left:4px; border-left:none;}
+  .mnode{display:inline-block; padding:3px 8px; margin:1px 0; border-radius:7px; border:1px solid transparent;}
+  .mnode.dir{color:var(--amber);}
+  .mnode.file{color:var(--ink);}
+  .mnode.here{border-color:var(--green); color:var(--green);}
+  .mnode.grow{animation:grow .5s ease;}
+  @keyframes grow{from{opacity:0; transform:scale(.6);} to{opacity:1; transform:scale(1);}}
+
+  /* verdict */
+  .verd{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:14px 0;}
+  @media(max-width:520px){.verd{grid-template-columns:1fr;}}
+  .verdcard{border-radius:12px; padding:13px 14px; font-size:15px;}
+  .keep{background:rgba(111,224,140,.07); border:1px solid rgba(111,224,140,.3);}
+  .skip{background:rgba(232,122,109,.06); border:1px solid rgba(232,122,109,.3);}
+  .verdcard .vt{font-family:var(--mono); font-size:11px; letter-spacing:.16em; text-transform:uppercase; margin-bottom:7px;}
+  .keep .vt{color:var(--green);}
+  .skip .vt{color:var(--red);}
+  .verdcard ul{margin:0; padding-left:18px; color:var(--soft);}
+  .verdcard li{margin:5px 0;}
+  .cheat{
+    background:#0d1114; border:1px solid var(--line); border-radius:12px;
+    padding:14px; font-family:var(--mono); font-size:14px; line-height:1.9;
+  }
+  .cheat .c{color:var(--green);}
+  .cheat .d{color:var(--dim);}
+
+  /* quiz */
+  .q{border:1px solid var(--line); border-radius:12px; background:var(--card); padding:14px; margin:12px 0;}
+  .q .qt{font-weight:650; margin-bottom:10px;}
+  .opts{display:flex; flex-direction:column; gap:8px;}
+  .opt{
+    border:1px solid var(--line); border-radius:10px; padding:11px 13px;
+    cursor:pointer; font-size:15px; color:var(--soft);
+  }
+  .opt.right{border-color:var(--green); color:var(--green);}
+  .opt.wrong{border-color:var(--red); color:var(--red);}
+  .opt.lock{pointer-events:none;}
+  .score{font-family:var(--mono); color:var(--amber); font-size:15px; margin-top:10px; min-height:24px;}
+
+  footer{max-width:760px; margin:8px auto 30px; padding:0 20px; color:var(--dim); font-size:13px; text-align:center;}
+  #toast{
+    position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(80px);
+    background:var(--card); color:var(--ink); border:1px solid var(--amber);
+    border-radius:999px; padding:10px 18px; font-family:var(--mono); font-size:13px;
+    transition:transform .3s ease; z-index:99; pointer-events:none; max-width:88vw; text-align:center;
+  }
+  #toast.show{transform:translateX(-50%) translateY(0);}
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.001s !important; transition-duration:.001s !important;}
+    html{scroll-behavior:auto;}
+  }
+  .btn:focus-visible,.chip:focus-visible,.opt:focus-visible,.xnode:focus-visible,
+  .layer:focus-visible,.flip:focus-visible,.acc>button:focus-visible,.navchip:focus-visible{
+    outline:2px solid var(--amber); outline-offset:2px;
+  }
+</style>
+<style>
+  .simwrap{margin:14px 0;}
+  .repo{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin:10px 0;}
+  .repohead{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12.5px;color:var(--soft);margin-bottom:8px;}
+  .repohead .dot{width:9px;height:9px;border-radius:50%;background:var(--green);}
+  .filerow{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:13.5px;padding:6px 8px;border-radius:8px;}
+  .filerow:nth-child(odd){background:rgba(255,255,255,.02);}
+  .filerow .fi{color:var(--amber);}
+  .filerow .fp{color:var(--ink);}
+  .filerow.folder .fp{color:var(--blue);}
+  .filerow .badge{margin-left:auto;font-size:10.5px;color:var(--dim);}
+  .urlbar{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-family:var(--mono);font-size:13px;color:var(--soft);margin:10px 0;}
+  .urlbar .lock{color:var(--green);}
+  .urlbar .path{color:var(--ink);word-break:break-all;}
+  .browser{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:10px 0;background:#0e1216;}
+  .browserbar{background:var(--card);border-bottom:1px solid var(--line);padding:8px 12px;font-family:var(--mono);font-size:11.5px;color:var(--soft);display:flex;gap:6px;align-items:center;}
+  .browserbar .b{width:9px;height:9px;border-radius:50%;background:var(--line);}
+  .viewport{padding:20px 16px;min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+  .viewport.ok{color:var(--ink);}
+  .viewport.err{color:var(--red);}
+  .viewport .big{font-size:40px;margin-bottom:6px;}
+  .viewport h4{margin:4px 0;font-size:18px;}
+  .viewport .u{font-family:var(--mono);font-size:12px;color:var(--dim);word-break:break-all;margin-top:8px;}
+  .simbtns{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0;}
+  .picker{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;}
+  .chipbtn{font-family:var(--mono);font-size:12.5px;padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--soft);cursor:pointer;}
+  .chipbtn.on{border-color:var(--amber);color:var(--amber);}
+  /* big hero-spotlight mascot inside a section (light panel so glow/phone shadows vanish) */
+  .mascotspot{text-align:center;margin:6px 0 2px;}
+  .mascotspot img{height:230px;width:auto;filter:drop-shadow(0 10px 22px rgba(0,0,0,.5));}
+  /* tip boxes: mascot is BIG and pokes in at an angle, overlapping the card edge */
+  .tipbox{position:relative;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--amber);border-radius:0 12px 12px 0;padding:16px 16px 16px 118px;margin:22px 0;min-height:96px;}
+  .tipbox .poke{position:absolute;left:-14px;bottom:-8px;height:150px;width:auto;transform:rotate(-8deg);filter:drop-shadow(0 8px 16px rgba(0,0,0,.45));pointer-events:none;}
+  .tipbox.right{border-left:none;border-right:3px solid var(--amber);border-radius:12px 0 0 12px;padding:16px 118px 16px 16px;}
+  .tipbox.right .poke{left:auto;right:-14px;transform:rotate(8deg);}
+  .tipbox.big{padding-left:150px;min-height:130px;}
+  .tipbox.big .poke{height:200px;left:-22px;}
+  .tipbox .tt{font-weight:700;color:var(--amber);font-size:15px;}
+  .tipbox .tp{margin:4px 0 0;font-size:14.5px;color:var(--soft);line-height:1.55;}
+  .missions{margin:14px 0;}
+  .mission{display:flex;gap:10px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin:8px 0;}
+  .mission .mx{flex:0 0 auto;width:22px;height:22px;border-radius:50%;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--dim);margin-top:1px;}
+  .mission.done .mx{border-color:var(--green);color:var(--green);background:rgba(111,224,140,.12);}
+  .mission .mtext{font-size:14.5px;}
+  .mission .mtext b{color:var(--amber);}
+  .backhub{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:12px;color:var(--soft);border:1px solid var(--line);border-radius:999px;padding:7px 13px;background:var(--card);text-decoration:none;}
+  .backhub:active{border-color:var(--amber);color:var(--amber);}
+  .quizq{margin:16px 0;}
+  .quizq .q{font-weight:600;margin-bottom:8px;}
+  .quizopt{display:block;width:100%;text-align:left;font-size:14.5px;padding:11px 14px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;margin:6px 0;font-family:var(--sans);}
+  .quizopt.sel{border-color:var(--amber);}
+  .quizopt.right{border-color:var(--green);background:rgba(111,224,140,.1);}
+  .quizopt.wrong{border-color:var(--red);background:rgba(232,122,109,.1);}
+  .qresult{font-weight:700;margin-top:10px;}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="wordmark">All Thumbs &middot; chapter 7</div>
+    <h1>Ship It</h1>
+    <p class="subtitle">How a file on your phone becomes a web address anyone can open.</p>
+  </div>
+  <button class="vbadge" id="vbadge" type="button">v0.6</button>
+</header>
+
+<nav>
+  <div class="navrow">
+    <a class="navchip" href="#idea">the idea</a>
+    <a class="navchip" href="#repo">the repo</a>
+    <a class="navchip" href="#paths">root vs folder</a>
+    <a class="navchip" href="#trap">the phone trap</a>
+    <a class="navchip" href="#missions">missions</a>
+    <a class="navchip" href="#gym">gym</a>
+    <a class="navchip" href="#quiz">quiz</a>
+  </div>
+</nav>
+
+<main>
+
+<section id="idea">
+  <p class="eyebrow">what hosting actually is</p>
+  <h2>A file nobody can reach isn't a website yet</h2>
+  <div class="mascotspot"><img src="thumb-hosting.png" alt="mascot holding a globe"></div>
+  <p>You built something. It works when you open it on your own phone. But nobody else can see it, because it only exists on your device. <b>Hosting</b> is the step that puts a copy of your file on a computer that is always on and always reachable, and hands you a web address that points at it.</p>
+  <p>That's the whole trick. A host is just a computer that stays awake so your file has an address. When someone types that address, the host sends them a copy of your file. GitHub Pages is one of these hosts, and it's free.</p>
+  <div class="note">You already did this. This course lives on GitHub Pages. Everything below is the thing you fought with to get the mascots to show up, taken apart slowly.</div>
+</section>
+
+<section id="repo">
+  <p class="eyebrow">the repo</p>
+  <h2>The repo is the box you put files in</h2>
+  <p>A <b>repository</b> (repo) is a folder that lives on GitHub. You put your files in it. GitHub Pages watches one repo and serves whatever is inside it to the web. Add a file, it appears at the address. Delete a file, it's gone from the address.</p>
+  <p>Try it. Add a couple of files to this pretend repo, then hit <b>Publish</b> and see what address each one gets.</p>
+
+  <div class="simwrap">
+    <div class="repo">
+      <div class="repohead"><span class="dot"></span> <span>motbuchanan / <b style="color:var(--ink)">demo</b></span></div>
+      <div id="repoFiles"></div>
+    </div>
+    <div class="picker" id="addPicker">
+      <button class="chipbtn" data-add="index.html" type="button">+ index.html</button>
+      <button class="chipbtn" data-add="about.html" type="button">+ about.html</button>
+      <button class="chipbtn" data-add="thumb-git.png" type="button">+ thumb-git.png</button>
+      <button class="chipbtn" data-add="style.css" type="button">+ style.css</button>
+    </div>
+    <div class="simbtns">
+      <button class="btn primary" id="publishBtn" type="button">Publish</button>
+      <button class="btn" id="repoReset" type="button">Empty the repo</button>
+    </div>
+    <div id="repoUrls"></div>
+  </div>
+
+  <div class="tipbox big">
+    <img class="poke" src="thumb-tip.png" alt="">
+    <div class="tt">The address is built from the name</div><p class="tp">A file called <code>about.html</code> in the repo root becomes <code>&hellip;/about.html</code>. The name you give the file IS part of the address. Rename the file, the address changes, and old links break.</p>
+  </div>
+</section>
+
+<section id="home">
+  <p class="eyebrow">the front door</p>
+  <h2>index.html is the front door</h2>
+  <p>When someone visits your address with no file name on the end, like <code>&hellip;/demo/</code>, the host looks for one special file: <b>index.html</b>. That's the front door. If it's there, the visitor sees it. If it's missing, they get an error instead of your site.</p>
+  <p>This is why the course hub is named <code>index.html</code> and not <code>hub.html</code>. Type the bare address, the host serves index.html automatically.</p>
+
+  <div class="simwrap">
+    <div class="urlbar"><span class="lock">&#128274;</span><span class="path" id="doorUrl">motbuchanan.github.io/demo/</span></div>
+    <div class="browser">
+      <div class="browserbar"><span class="b"></span><span class="b"></span><span class="b"></span></div>
+      <div class="viewport" id="doorView"><span class="soft">Tap a button below.</span></div>
+    </div>
+    <div class="simbtns">
+      <button class="btn" id="doorWith" type="button">Visit with index.html</button>
+      <button class="btn" id="doorWithout" type="button">Visit without index.html</button>
+    </div>
+  </div>
+</section>
+
+<section id="paths">
+  <p class="eyebrow">root vs folder</p>
+  <h2>Where a file sits decides how you point at it</h2>
+  <p>This is the exact thing that broke your mascots. A file's address depends on <b>where it lives in the repo</b>. Two choices:</p>
+  <p><b>Flat (root):</b> the image sits right next to index.html. Your code points at it by bare name: <code>thumb-git.png</code>.</p>
+  <p><b>In a folder:</b> the image sits inside a folder called <code>img</code>. Now the same code has to say <code>img/thumb-git.png</code>, with the folder name and a slash in front.</p>
+  <p>If the code and the file disagree, the browser asks for an address that has nothing at it, and the image shows broken. Line them up below.</p>
+
+  <div class="simwrap">
+    <p class="small soft">Your code is looking for:</p>
+    <div class="urlbar"><span class="path" id="codeWants">thumb-git.png</span></div>
+    <p class="small soft">Put the file where it actually lives:</p>
+    <div class="picker" id="placePicker">
+      <button class="chipbtn on" data-place="root" type="button">root (next to index.html)</button>
+      <button class="chipbtn" data-place="folder" type="button">inside img/ folder</button>
+    </div>
+    <div class="picker" id="codePicker">
+      <span class="small soft" style="width:100%">and the code says:</span>
+      <button class="chipbtn on" data-code="thumb-git.png" type="button">thumb-git.png</button>
+      <button class="chipbtn" data-code="img/thumb-git.png" type="button">img/thumb-git.png</button>
+    </div>
+    <div class="browser">
+      <div class="browserbar"><span class="b"></span><span class="b"></span><span class="b"></span></div>
+      <div class="viewport" id="pathView"></div>
+    </div>
+  </div>
+
+  <div class="tipbox right">
+    <img class="poke" src="thumb-oops.png" alt="">
+    <div class="tt">The zip trap you hit</div><p class="tp">GitHub's web uploader does not unpack a zip. It just stores the zip as one file. To get a folder up, either upload the loose files into a folder, or go flat and keep everything in the root. Flat is the simplest on a phone.</p>
+  </div>
+</section>
+
+<section id="trap">
+  <p class="eyebrow">the phone trap</p>
+  <h2>Opening from Downloads is not the same as opening from the web</h2>
+  <div class="mascotspot"><img src="thumb-on-phone.png" alt="mascot standing on a phone"></div>
+  <p>Here's the one that fools everyone on a phone. When you open your HTML file straight from your Downloads folder, the address bar shows something like <code>content://</code> or <code>file://</code>. That is <b>not the web</b>. It's your phone handing you the raw file off local storage.</p>
+  <p>Things that quietly break in that mode: saved progress vanishes between opens, images by relative name may not load, and anything that needs a real web address (like a service worker) just won't run. Then you upload it, open the real <code>https://</code> address, and suddenly it all works. The file was never broken. The way you opened it was.</p>
+
+  <div class="simwrap">
+    <div class="picker" id="openPicker">
+      <button class="chipbtn on" data-open="web" type="button">open the https:// address</button>
+      <button class="chipbtn" data-open="file" type="button">open from Downloads</button>
+    </div>
+    <div class="urlbar"><span class="lock" id="trapLock">&#128274;</span><span class="path" id="trapUrl"></span></div>
+    <div class="browser">
+      <div class="browserbar"><span class="b"></span><span class="b"></span><span class="b"></span></div>
+      <div class="viewport" id="trapView"></div>
+    </div>
+  </div>
+
+  <div class="tipbox big">
+    <img class="poke" src="thumb-aha.png" alt="">
+    <div class="tt">The fix is always the same</div><p class="tp">If something works in Downloads but not once uploaded, or the reverse, check the address bar first. If it doesn't start with <code>https://</code>, you're not testing the real thing. Open the Pages URL instead.</p>
+  </div>
+</section>
+
+<section id="missions">
+  <p class="eyebrow">missions</p>
+  <h2>Prove it</h2>
+  <p>Six things to make happen using the sandboxes above. They tick off as you go.</p>
+  <div class="missions" id="missionList"></div>
+</section>
+
+<section id="gym">
+  <p class="eyebrow">the gym</p>
+  <h2>Practice: will this address work?</h2>
+  <p class="small soft">Randomized drills. You're shown a repo layout and the code's path, and you call whether the browser finds the file or gets a 404. Hints cost nothing but pride; skipping resets your streak.</p>
+  <div class="tracktoggle">
+    <span class="tlabel">practice</span>
+    <button class="ttab general on" id="trackGeneral" type="button">General</button>
+    <button class="ttab trail" id="trackTrail" type="button">The Trail</button>
+  </div>
+  <div class="trailbanner" id="trailBanner">The Trail: real cases from Mot's one-thumb-on-a-phone builds. Same rules, actual stakes.</div>
+  <div class="gym">
+    <div class="gymstats"><span>reps<b id="repN">0</b></span><span>streak<b id="strN">0</b></span><span>best<b id="bestN">0</b></span></div>
+    <div class="gymtabs" id="gymTabs"></div>
+    <div class="gymcard" id="gymCard">
+      <div class="ggoal" id="gGoal">Pick a level (or Surprise me) and tap <b>Start drill</b>.</div>
+      <div id="gymBoard"></div>
+      <div class="ghint" id="gHint"></div>
+      <div class="gbtns">
+        <button class="btn primary" id="gStart" type="button">Start drill</button>
+        <button class="btn" id="gAnswerYes" type="button" style="display:none">It loads</button>
+        <button class="btn" id="gAnswerNo" type="button" style="display:none">404</button>
+        <button class="btn" id="gHintBtn" type="button" style="display:none">Hint</button>
+        <button class="btn" id="gSkip" type="button" style="display:none">Skip</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="quiz">
+  <p class="eyebrow">quiz</p>
+  <h2>Five questions</h2>
+  <div id="quizBox"></div>
+</section>
+
+<div style="text-align:center;margin:24px 0 8px;">
+  <a class="backhub" href="index.html">&larr; back to All Thumbs</a>
+</div>
+
+</main>
+<footer>Ship It &middot; a curiosity tool &middot; nothing here uploads anywhere real</footer>
+<div id="toast" role="status"></div>
+</body>
+
+<script>
+"use strict";
+var VERSION = "v0.6 \u00B7 Aug 26";
+var STORE_KEY = "hosting101_v1";
+
+/* ---------- guarded storage ---------- */
+var memStore = {};
+function loadState(){
+  try{
+    var raw = localStorage.getItem(STORE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return memStore[STORE_KEY] || { m:{}, quizBest:0, gym:{ reps:0, streak:0, best:0 } };
+}
+function saveState(s){
+  memStore[STORE_KEY] = s;
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(s)); }catch(e){}
+}
+function getState(){
+  var s = loadState();
+  if(!s.m) s.m = {};
+  if(!s.gym) s.gym = { reps:0, streak:0, best:0 };
+  if(typeof s.quizBest !== "number") s.quizBest = 0;
+  return s;
+}
+
+/* ---------- HOSTING ENGINE (pure, testable) ----------
+   A repo is a list of file paths (strings), each relative to repo root.
+   "index.html", "about.html", "img/thumb-git.png".
+   servePath(repo, requestPath) returns {status:200, file} or {status:404}.
+   A bare directory request ("" or "sub/") serves that dir's index.html if present.
+*/
+function normalizePath(p){
+  p = String(p || "");
+  p = p.replace(/^\/+/, "");        // strip leading slashes
+  return p;
+}
+function repoHas(repo, path){
+  path = normalizePath(path);
+  for(var i=0;i<repo.length;i++){ if(normalizePath(repo[i]) === path) return true; }
+  return false;
+}
+function servePath(repo, requestPath){
+  var p = normalizePath(requestPath);
+  // bare directory -> look for index.html in that dir
+  if(p === "" || p.charAt(p.length-1) === "/"){
+    var idx = p + "index.html";
+    if(repoHas(repo, idx)) return { status:200, file: idx };
+    return { status:404, file:null };
+  }
+  if(repoHas(repo, p)) return { status:200, file: p };
+  return { status:404, file:null };
+}
+/* resolve what address a piece of code is REQUESTING given where a file was placed.
+   codeRef is the string in the code (e.g. "thumb-git.png" or "img/thumb-git.png").
+   placedAt is the actual path in the repo. Returns true if the request would 200. */
+function wouldLoad(placedAt, codeRef){
+  var repo = [ normalizePath(placedAt) ];
+  return servePath(repo, codeRef).status === 200;
+}
+
+/* ---------- small DOM helpers ---------- */
+function $(id){ return document.getElementById(id); }
+function el(tag, cls, html){
+  var e = document.createElement(tag);
+  if(cls) e.className = cls;
+  if(html != null) e.innerHTML = html;
+  return e;
+}
+function toast(msg){
+  var t = $("toast"); if(!t) return;
+  t.textContent = msg; t.className = "show";
+  setTimeout(function(){ t.className = ""; }, 1600);
+}
+
+/* ---------- repo sandbox ---------- */
+var repoState = [];
+function renderRepo(){
+  var box = $("repoFiles"); if(!box) return;
+  box.innerHTML = "";
+  if(repoState.length === 0){
+    box.appendChild(el("div","filerow","<span class='soft' style='color:var(--dim)'>empty repo &mdash; add a file</span>"));
+    return;
+  }
+  repoState.forEach(function(f){
+    var isFolder = f.indexOf("/") > -1;
+    var row = el("div","filerow" + (isFolder ? " folder" : ""));
+    row.innerHTML = "<span class='fi'>" + (isFolder ? "&#128193;" : "&#128196;") + "</span><span class='fp'>" + f + "</span>";
+    box.appendChild(row);
+  });
+}
+function publishRepo(){
+  var box = $("repoUrls"); if(!box) return;
+  box.innerHTML = "";
+  if(repoState.length === 0){ box.appendChild(el("div","note","Nothing to publish. Add a file first.")); return; }
+  var head = el("p","small soft","Published. Each file now has an address:");
+  box.appendChild(head);
+  repoState.forEach(function(f){
+    var u = el("div","urlbar");
+    u.innerHTML = "<span class='lock'>&#128274;</span><span class='path'>motbuchanan.github.io/demo/" + f + "</span>";
+    box.appendChild(u);
+  });
+  // bare address note
+  var bare = servePath(repoState, "");
+  var b = el("div","note", bare.status === 200 ?
+    "The bare address <code>&hellip;/demo/</code> works too &mdash; it serves <code>index.html</code>." :
+    "Heads up: the bare address <code>&hellip;/demo/</code> would 404 &mdash; there's no <code>index.html</code> yet.");
+  box.appendChild(b);
+  markMission("publish");
+}
+function initRepoSandbox(){
+  var picker = $("addPicker");
+  if(picker){
+    picker.addEventListener("click", function(e){
+      var b = e.target.closest("[data-add]"); if(!b) return;
+      var name = b.getAttribute("data-add");
+      if(!repoHas(repoState, name)){ repoState.push(name); renderRepo(); markMission("add"); }
+      else toast("already in the repo");
+    });
+  }
+  var pub = $("publishBtn"); if(pub) pub.addEventListener("click", publishRepo);
+  var rst = $("repoReset"); if(rst) rst.addEventListener("click", function(){ repoState = []; renderRepo(); var u=$("repoUrls"); if(u) u.innerHTML=""; });
+  renderRepo();
+}
+
+/* ---------- front-door sandbox ---------- */
+function initDoorSandbox(){
+  var demo = ["index.html","about.html"];
+  var withB = $("doorWith"), withoutB = $("doorWithout"), view = $("doorView");
+  function show(hasIndex){
+    var repo = hasIndex ? demo.slice() : ["about.html"];
+    var res = servePath(repo, "");
+    if(res.status === 200){
+      view.className = "viewport ok";
+      view.innerHTML = "<span class='big'>&#127968;</span><h4>Your page loads</h4><div class='soft small'>the host found <code>index.html</code> and served it</div><div class='u'>motbuchanan.github.io/demo/</div>";
+      markMission("door");
+    } else {
+      view.className = "viewport err";
+      view.innerHTML = "<span class='big'>&#10060;</span><h4>404 &mdash; not found</h4><div class='soft small'>no <code>index.html</code> at the front door</div><div class='u'>motbuchanan.github.io/demo/</div>";
+    }
+  }
+  if(withB) withB.addEventListener("click", function(){ show(true); });
+  if(withoutB) withoutB.addEventListener("click", function(){ show(false); });
+}
+
+/* ---------- path (root vs folder) sandbox ---------- */
+var placeChoice = "root", codeChoice = "thumb-git.png";
+function renderPathView(){
+  var view = $("pathView"); if(!view) return;
+  var placedAt = placeChoice === "root" ? "thumb-git.png" : "img/thumb-git.png";
+  var loads = wouldLoad(placedAt, codeChoice);
+  if(loads){
+    view.className = "viewport ok";
+    view.innerHTML = "<span class='big'>&#9989;</span><h4>Image loads</h4><div class='soft small'>the code asked for exactly where the file is</div><div class='u'>asked: " + codeChoice + "<br>file at: " + placedAt + "</div>";
+    markMission("path");
+  } else {
+    view.className = "viewport err";
+    view.innerHTML = "<span class='big'>&#128444;&#65039;</span><h4>Broken image</h4><div class='soft small'>the code asked for an address with nothing at it</div><div class='u'>asked: " + codeChoice + "<br>file at: " + placedAt + "</div>";
+  }
+}
+function initPathSandbox(){
+  var pp = $("placePicker"), cp = $("codePicker");
+  if(pp) pp.addEventListener("click", function(e){
+    var b = e.target.closest("[data-place]"); if(!b) return;
+    placeChoice = b.getAttribute("data-place");
+    [].forEach.call(pp.querySelectorAll(".chipbtn"), function(x){ x.classList.remove("on"); });
+    b.classList.add("on"); renderPathView();
+  });
+  if(cp) cp.addEventListener("click", function(e){
+    var b = e.target.closest("[data-code]"); if(!b) return;
+    codeChoice = b.getAttribute("data-code");
+    [].forEach.call(cp.querySelectorAll(".chipbtn"), function(x){ x.classList.remove("on"); });
+    b.classList.add("on"); renderPathView();
+  });
+  renderPathView();
+}
+
+/* ---------- content:// trap sandbox ---------- */
+function initTrapSandbox(){
+  var picker = $("openPicker"), urlEl = $("trapUrl"), lockEl = $("trapLock"), view = $("trapView");
+  function show(mode){
+    if(mode === "web"){
+      urlEl.textContent = "https://motbuchanan.github.io/reveal/";
+      lockEl.innerHTML = "&#128274;";
+      view.className = "viewport ok";
+      view.innerHTML = "<span class='big'>&#9989;</span><h4>Everything works</h4><div class='soft small'>progress saves, images load, service worker runs</div>";
+      markMission("trap");
+    } else {
+      urlEl.textContent = "content://downloads/12/index.html";
+      lockEl.innerHTML = "&#9888;&#65039;";
+      view.className = "viewport err";
+      view.innerHTML = "<span class='big'>&#128533;</span><h4>Runs, but things break</h4><div class='soft small'>progress may not save, some images fail, no service worker &mdash; this is not the web</div>";
+    }
+  }
+  if(picker) picker.addEventListener("click", function(e){
+    var b = e.target.closest("[data-open]"); if(!b) return;
+    [].forEach.call(picker.querySelectorAll(".chipbtn"), function(x){ x.classList.remove("on"); });
+    b.classList.add("on"); show(b.getAttribute("data-open"));
+  });
+  show("web");
+}
+
+/* ---------- missions ---------- */
+var MISSIONS = [
+  { id:"add",     text:"Add any file to the repo." },
+  { id:"publish", text:"Publish the repo and see the addresses." },
+  { id:"door",    text:"Make the bare address load by having <b>index.html</b> present." },
+  { id:"path",    text:"Get the image to load by lining up the file's place and the code's path." },
+  { id:"trap",    text:"Open the real <b>https://</b> address in the phone-trap sandbox." },
+  { id:"gym",     text:"Land one gym drill correct." }
+];
+function renderMissions(){
+  var box = $("missionList"); if(!box) return;
+  var s = getState();
+  box.innerHTML = "";
+  MISSIONS.forEach(function(m){
+    var done = !!s.m[m.id];
+    var row = el("div","mission" + (done ? " done" : ""));
+    row.innerHTML = "<span class='mx'>" + (done ? "&#10003;" : "") + "</span><span class='mtext'>" + m.text + "</span>";
+    box.appendChild(row);
+  });
+}
+function markMission(id){
+  var s = getState();
+  if(!s.m[id]){ s.m[id] = true; saveState(s); renderMissions(); toast("mission done"); }
+}
+function countDone(st){
+  st = st || getState();
+  var n = 0; MISSIONS.forEach(function(m){ if(st.m && st.m[m.id]) n++; }); return n;
+}
+
+/* ---------- GYM: will this address load? ---------- */
+function rn(list){ return list[Math.floor(Math.random()*list.length)]; }
+var GYM_NAMES = ["thumb-git.png","logo.png","style.css","app.js","photo.jpg","hero.png","index.html","data.json"];
+var GYM_FOLDERS = ["img","assets","css","js","pics","static"];
+
+function makeDrill(level){
+  // level 0: root file, code matches (loads) OR code adds folder (404)
+  // level 1: folder file, code with folder (loads) OR bare (404)
+  // level 2: bare-directory request, index.html present or not
+  // level 3: mixed / trickier (wrong folder name, or file at root but code wrong case-of-folder)
+  var name = rn(GYM_NAMES.filter(function(n){ return n !== "index.html"; }));
+  var folder = rn(GYM_FOLDERS);
+  var placedAt, codeRef, loads, story;
+  if(level === 0){
+    placedAt = name;
+    if(Math.random() < 0.5){ codeRef = name; }
+    else { codeRef = folder + "/" + name; }
+    loads = wouldLoad(placedAt, codeRef);
+    story = "File sits in the <b>repo root</b>. The code asks for <code>" + codeRef + "</code>.";
+  } else if(level === 1){
+    placedAt = folder + "/" + name;
+    if(Math.random() < 0.5){ codeRef = folder + "/" + name; }
+    else { codeRef = name; }
+    loads = wouldLoad(placedAt, codeRef);
+    story = "File sits inside the <b>" + folder + "/</b> folder. The code asks for <code>" + codeRef + "</code>.";
+  } else if(level === 2){
+    var hasIndex = Math.random() < 0.5;
+    var repo = hasIndex ? ["index.html","about.html"] : ["about.html","style.css"];
+    loads = servePath(repo, "").status === 200;
+    story = "Someone visits the <b>bare address</b> <code>&hellip;/site/</code>. The repo contains: " +
+            repo.map(function(f){ return "<code>"+f+"</code>"; }).join(", ") + ".";
+    return { story: story, loads: loads, hint: hasIndex ?
+      "There's an index.html at the root, so the front door opens." :
+      "No index.html at the root, so the bare address has no front door." };
+  } else {
+    // level 3: wrong folder name in code
+    placedAt = folder + "/" + name;
+    var wrongFolder = rn(GYM_FOLDERS.filter(function(f){ return f !== folder; }));
+    if(Math.random() < 0.5){ codeRef = folder + "/" + name; }
+    else { codeRef = wrongFolder + "/" + name; }
+    loads = wouldLoad(placedAt, codeRef);
+    story = "File sits in <b>" + folder + "/</b>. The code asks for <code>" + codeRef + "</code>.";
+  }
+  var hint = loads ?
+    "The requested address matches exactly where the file lives. It loads." :
+    "The requested address points somewhere the file is not. The host has nothing there, so 404.";
+  return { story: story, loads: loads, hint: hint };
+}
+
+
+/* ---------- TRAIL drills: real cases from Mot's actual builds ---------- */
+var TRAIL_CASES = [
+  { story:"The mascot upload. Your code says <code>img/thumb-git.png</code> but you uploaded the PNGs loose to the repo <b>root</b> (no img folder, because the zip wouldn't unpack). Does the image load?",
+    loads:false, hint:"The file is at the root (thumb-git.png) but the code asks for img/thumb-git.png. No img folder exists, so 404. The fix you used: change the code to the bare name." },
+  { story:"After the fix. You rewrote index.html to point at <code>thumb-git.png</code> (bare) and the PNGs sit in the repo root. Does it load?",
+    loads:true, hint:"Code and file agree: both root, bare name. Loads. This is the flat layout you shipped." },
+  { story:"The 404 that started it all. You opened <code>motbuchanan.github.io/reveal</code> with no trailing slash and no index.html yet (the hub was named course.html). Front door?",
+    loads:false, hint:"No index.html at the root means the bare address has no front door. You fixed it by renaming course.html to index.html." },
+  { story:"The rename fix. Hub is now <code>index.html</code> at the repo root. Someone visits <code>motbuchanan.github.io/reveal/</code>. Loads?",
+    loads:true, hint:"index.html at the root IS the front door. The bare address serves it. This is why the hub is index.html, not hub.html." },
+  { story:"The content:// trap on Garrett's iPad. You opened the game shelf HTML straight from Downloads to test. Address bar shows <code>content://</code>. Does saved progress persist between opens?",
+    loads:false, hint:"content:// is local storage, not the web. Progress may not persist and the service worker won't run. Open the https:// Pages URL to really test." },
+  { story:"measureup/ inside the gameshelf repo. The game lives in a subfolder <code>measureup/</code> with its own index.html and all-relative paths. Someone visits <code>&hellip;/gameshelf/measureup/</code>. Loads?",
+    loads:true, hint:"A subfolder with its own index.html serves at that subfolder's bare address. This is the folder-in-repo pattern you now use for self-contained apps." },
+  { story:"The zip you tried to upload. You zipped index.html + an img folder and uploaded the .zip to GitHub web. Do the images appear on the site?",
+    loads:false, hint:"GitHub web upload stores the zip as one file, it does not unpack it. The images are trapped inside the zip. You have to upload loose files." },
+  { story:"Reframe deployed as a subfolder. Self-contained app, all-relative paths, its own scoped sw.js, dropped into an existing repo as its own folder. Visiting its folder address. Loads?",
+    loads:true, hint:"Self-contained + all-relative paths + own sw.js = safe as a folder-in-repo. This is the pattern that works for your single-file apps." }
+];
+function makeTrailDrill(){
+  return TRAIL_CASES[Math.floor(Math.random()*TRAIL_CASES.length)];
+}
+
+var gym = { level:-1, drill:null, answered:false, track:"general" };
+var GYM_LEVELS = [
+  { lv:0, name:"root files" },
+  { lv:1, name:"folders" },
+  { lv:2, name:"front door" },
+  { lv:3, name:"gotchas" }
+];
+function gymStatsRender(){
+  var s = getState();
+  if($("repN")) $("repN").textContent = s.gym.reps || 0;
+  if($("strN")) $("strN").textContent = s.gym.streak || 0;
+  if($("bestN")) $("bestN").textContent = s.gym.best || 0;
+}
+function renderGymTabs(){
+  var box = $("gymTabs"); if(!box) return;
+  box.innerHTML = "";
+  var all = el("button","gtab" + (gym.level === -1 ? " on" : ""),"Surprise me");
+  all.addEventListener("click", function(){ gym.level = -1; renderGymTabs(); });
+  box.appendChild(all);
+  GYM_LEVELS.forEach(function(L){
+    var t = el("button","gtab" + (gym.level === L.lv ? " on" : ""), L.name);
+    t.addEventListener("click", function(){ gym.level = L.lv; renderGymTabs(); });
+    box.appendChild(t);
+  });
+}
+function gymStart(){
+  if(gym.track === "trail"){
+    gym.drill = makeTrailDrill();
+  } else {
+    var lv = gym.level === -1 ? Math.floor(Math.random()*4) : gym.level;
+    gym.drill = makeDrill(lv);
+  }
+  gym.answered = false;
+  var card = $("gymCard"); card.className = "gymcard active" + (gym.track === "trail" ? " trailmode" : "");
+  $("gGoal").innerHTML = "Will this load, or 404?";
+  $("gymBoard").innerHTML = "<div class='note' style='margin-top:10px'>" + gym.drill.story + "</div>";
+  $("gHint").className = "ghint"; $("gHint").innerHTML = "";
+  $("gStart").style.display = "none";
+  $("gAnswerYes").style.display = ""; $("gAnswerNo").style.display = "";
+  $("gHintBtn").style.display = ""; $("gSkip").style.display = "";
+}
+function gymAnswer(saidLoads){
+  if(gym.answered || !gym.drill) return;
+  gym.answered = true;
+  var s = getState();
+  var correct = (saidLoads === gym.drill.loads);
+  var card = $("gymCard");
+  if(correct){
+    s.gym.reps = (s.gym.reps||0) + 1;
+    s.gym.streak = (s.gym.streak||0) + 1;
+    if(s.gym.streak > (s.gym.best||0)) s.gym.best = s.gym.streak;
+    saveState(s);
+    card.className = "gymcard win" + (gym.track === "trail" ? " trailmode" : "");
+    $("gGoal").innerHTML = "Correct. " + (gym.drill.loads ? "It loads." : "404.");
+    markMission("gym");
+  } else {
+    s.gym.streak = 0; saveState(s);
+    card.className = "gymcard" + (gym.track === "trail" ? " trailmode" : "");
+    $("gGoal").innerHTML = "Not quite. " + (gym.drill.loads ? "It actually loads." : "It's actually a 404.");
+  }
+  $("gHint").className = "ghint show"; $("gHint").innerHTML = gym.drill.hint;
+  gymStatsRender();
+  $("gAnswerYes").style.display = "none"; $("gAnswerNo").style.display = "none";
+  $("gHintBtn").style.display = "none";
+  $("gSkip").style.display = "none";
+  $("gStart").style.display = ""; $("gStart").textContent = "Next drill";
+}
+function gymSkip(){
+  var s = getState(); s.gym.streak = 0; saveState(s); gymStatsRender();
+  if(gym.drill){ $("gHint").className = "ghint show"; $("gHint").innerHTML = "Answer was: " + (gym.drill.loads ? "it loads." : "404.") + " " + gym.drill.hint; }
+  gym.answered = true;
+  $("gAnswerYes").style.display = "none"; $("gAnswerNo").style.display = "none";
+  $("gHintBtn").style.display = "none"; $("gSkip").style.display = "none";
+  $("gStart").style.display = ""; $("gStart").textContent = "Next drill";
+}
+function setTrack(t){
+  gym.track = t;
+  var g = $("trackGeneral"), tr = $("trackTrail"), tabs = $("gymTabs"), ban = $("trailBanner");
+  if(g) g.classList.toggle("on", t === "general");
+  if(tr) tr.classList.toggle("on", t === "trail");
+  if(tabs) tabs.style.display = (t === "trail") ? "none" : "";
+  if(ban) ban.className = "trailbanner" + (t === "trail" ? " show" : "");
+  // reset the card to a fresh start prompt
+  var card = $("gymCard"); if(card){ card.className = "gymcard"; }
+  if($("gGoal")) $("gGoal").innerHTML = (t === "trail")
+    ? "Real cases from the build. Tap <b>Start drill</b>."
+    : "Pick a level (or Surprise me) and tap <b>Start drill</b>.";
+  if($("gymBoard")) $("gymBoard").innerHTML = "";
+  if($("gHint")){ $("gHint").className = "ghint"; $("gHint").innerHTML = ""; }
+  ["gAnswerYes","gAnswerNo","gHintBtn","gSkip"].forEach(function(id){ if($(id)) $(id).style.display = "none"; });
+  if($("gStart")){ $("gStart").style.display = ""; $("gStart").textContent = "Start drill"; }
+}
+function initGym(){
+  renderGymTabs(); gymStatsRender();
+  if($("trackGeneral")) $("trackGeneral").addEventListener("click", function(){ setTrack("general"); });
+  if($("trackTrail")) $("trackTrail").addEventListener("click", function(){ setTrack("trail"); });
+  if($("gStart")) $("gStart").addEventListener("click", gymStart);
+  if($("gAnswerYes")) $("gAnswerYes").addEventListener("click", function(){ gymAnswer(true); });
+  if($("gAnswerNo")) $("gAnswerNo").addEventListener("click", function(){ gymAnswer(false); });
+  if($("gHintBtn")) $("gHintBtn").addEventListener("click", function(){ if(gym.drill){ $("gHint").className="ghint show"; $("gHint").innerHTML = gym.drill.hint; } });
+  if($("gSkip")) $("gSkip").addEventListener("click", gymSkip);
+}
+
+/* ---------- quiz ---------- */
+var QUIZ = [
+  { q:"What does a host (like GitHub Pages) actually do for you?",
+    opts:["Writes your code for you","Keeps a copy of your files on an always-on computer with a web address","Makes your phone faster","Backs up your photos"],
+    a:1 },
+  { q:"You visit \u2026/demo/ with no file name. What does the host look for?",
+    opts:["home.html","main.html","index.html","start.html"], a:2 },
+  { q:"Your code says <code>img/logo.png</code> but the file is in the repo root. What happens?",
+    opts:["It loads fine","Broken image \u2014 404","It moves the file automatically","The page won't open at all"], a:1 },
+  { q:"You open your file from Downloads and the address bar shows content:// . Progress isn't saving. Why?",
+    opts:["The file is corrupted","You need a new phone","That's local storage, not the web \u2014 open the https:// address","GitHub is down"], a:2 },
+  { q:"Easiest way to get images onto GitHub Pages from a phone?",
+    opts:["Upload a zip and it unpacks","Keep files flat in the repo root and point at them by bare name","Email them to GitHub","You can't host images"], a:1 }
+];
+var quizAnswered = {};
+function renderQuiz(){
+  var box = $("quizBox"); if(!box) return;
+  box.innerHTML = "";
+  QUIZ.forEach(function(item, qi){
+    var wrap = el("div","quizq");
+    wrap.appendChild(el("div","q", (qi+1) + ". " + item.q));
+    item.opts.forEach(function(opt, oi){
+      var b = el("button","quizopt", opt);
+      b.addEventListener("click", function(){
+        if(quizAnswered[qi] != null) return;
+        quizAnswered[qi] = oi;
+        var kids = wrap.querySelectorAll(".quizopt");
+        kids[item.a].classList.add("right");
+        if(oi !== item.a) b.classList.add("wrong");
+        var got = 0, ans = 0;
+        for(var k in quizAnswered){ ans++; if(quizAnswered[k] === QUIZ[k].a) got++; }
+        var res = wrap.querySelector(".qresult");
+        if(ans === QUIZ.length){
+          var s = getState();
+          if(got > (s.quizBest||0)){ s.quizBest = got; saveState(s); }
+          var tot = el("div","qresult","You got " + got + " / " + QUIZ.length + (got===QUIZ.length ? " \u2014 perfect." : "."));
+          box.appendChild(tot);
+        }
+      });
+      wrap.appendChild(b);
+    });
+    box.appendChild(wrap);
+  });
+}
+
+/* ---------- version badge ---------- */
+function initBadge(){
+  var b = $("vbadge"); if(!b) return;
+  b.textContent = VERSION.split(" ")[0];
+  b.addEventListener("click", function(){ toast("Ship It \u00B7 " + VERSION); });
+}
+
+/* ---------- boot ---------- */
+function initApp(){
+  initBadge();
+  initRepoSandbox();
+  initDoorSandbox();
+  initPathSandbox();
+  initTrapSandbox();
+  renderMissions();
+  initGym();
+  renderQuiz();
+}
+if(typeof window !== "undefined" && typeof document !== "undefined"){
+  if(document.readyState === "loading"){ document.addEventListener("DOMContentLoaded", initApp); }
+  else { initApp(); }
+}
+if(typeof module !== "undefined" && module.exports){
+  module.exports = { normalizePath: normalizePath, repoHas: repoHas, servePath: servePath, wouldLoad: wouldLoad, makeDrill: makeDrill };
+}
+
+</script>
+</html>

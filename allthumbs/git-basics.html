@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#171219">
+<title>Save Points: What Git Actually Does</title>
+<meta name="description" content="A beginner explainer of Git: snapshots, the staging area, branches, merging, and GitHub, with a real working sandbox.">
+<style>
+:root{
+  --bg:#171219; --panel:#211a24; --panel2:#2a2130; --ink:#ede6f0; --dim:#a396ad;
+  --or:#f0653a; --or2:#ff9066; --teal:#45d4b8; --lav:#b7a4e3; --amb:#f0b153;
+  --line:#3a2e40; --term:#120d14; --good:#7dd6a0; --bad:#ff7a6e;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  background-image:radial-gradient(1100px 500px at 50% -140px, #2a1c26 0%, transparent 60%);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font-size:16px; line-height:1.55;
+}
+code,kbd,.mono,.term,.chip,.cheat,#promptEl,#termin{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+main{max-width:680px;margin:0 auto;padding:8px 14px 90px}
+section{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px 16px;margin:18px 0}
+.kick{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--or2);font-weight:700;margin:0 0 6px}
+h1{font-size:34px;line-height:1.1;margin:4px 0 8px;letter-spacing:-.01em}
+h2{font-size:22px;line-height:1.2;margin:2px 0 10px}
+h3{font-size:16px;margin:14px 0 6px}
+p{margin:8px 0;color:var(--ink)}
+.sub{color:var(--dim)}
+.small{font-size:13px;color:var(--dim)}
+code{background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:13.5px;color:var(--or2)}
+.btn{display:inline-block;background:var(--or);color:#1c0c06;font-weight:700;border:0;border-radius:12px;
+  padding:12px 18px;font-size:16px;cursor:pointer;touch-action:manipulation}
+.btn:active{transform:scale(.97)}
+.btn.ghost{background:transparent;color:var(--or2);border:1.5px solid var(--or)}
+.btn.teal{background:var(--teal);color:#062019}
+.btn[disabled]{opacity:.45}
+.btnrow{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 4px}
+.hero{padding-top:24px}
+.topline{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+#vbadge{background:var(--panel2);border:1px solid var(--line);color:var(--dim);border-radius:999px;
+  padding:5px 11px;font-size:12px;cursor:pointer;white-space:nowrap;margin-top:6px}
+.herosvg{display:block;margin:14px auto 6px;max-width:300px;width:100%;height:auto}
+
+/* flip / tap-reveal cards */
+.fgrid{display:grid;gap:10px;margin:12px 0}
+.fcard{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:14px;cursor:pointer}
+.fcard .fr{font-weight:700}
+.fcard .bk{display:none;color:var(--dim);margin-top:8px;font-size:14.5px}
+.fcard .tap{color:var(--or2);font-size:12px;margin-top:8px;letter-spacing:.06em;text-transform:uppercase}
+.fcard.open .bk{display:block}
+.fcard.open .tap{display:none}
+.fcard.open{border-color:var(--or)}
+
+/* chaos */
+.chaos{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+.cfile{background:var(--panel2);border:1px dashed var(--line);border-radius:10px;padding:10px;cursor:pointer;font-size:13px}
+.cfile .nm{font-weight:700;word-break:break-all}
+.cfile .groan{display:none;color:var(--amb);margin-top:6px;font-size:12.5px}
+.cfile.open{border-color:var(--amb)}
+.cfile.open .groan{display:block}
+#timelinePanel{display:none}
+#timelinePanel.on{display:block}
+.tlrow{display:flex;gap:10px;align-items:baseline;background:var(--panel2);border:1px solid var(--line);
+  border-left:4px solid var(--or);border-radius:10px;padding:10px 12px;margin:8px 0}
+.tlrow .cid{color:var(--or2);font-weight:700;font-size:14px}
+.tlrow .cm{flex:1}
+.tlrow .cd{color:var(--dim);font-size:13px;white-space:nowrap}
+
+/* three rooms */
+.zones{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:12px 0}
+.zone{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 8px;min-height:118px}
+.zone h4{margin:0 0 2px;font-size:14px}
+.zone .zsub{font-size:11px;color:var(--dim);line-height:1.35;margin-bottom:8px}
+.z-work h4{color:var(--amb)} .z-tray h4{color:var(--or2)} .z-vault h4{color:var(--teal)}
+.fchip{display:inline-block;border-radius:8px;padding:3px 8px;font-size:12px;margin:2px 2px 2px 0;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.st-un{border:1.5px dashed var(--amb);color:var(--amb)}
+.st-mod{border:1.5px solid var(--or);color:var(--or2)}
+.st-clean{border:1px solid var(--line);color:var(--dim)}
+.st-staged{background:var(--or);color:#1c0c06;font-weight:700}
+.st-conf{border:1.5px solid var(--bad);color:var(--bad)}
+.st-vault{border:1px solid #2c4a44;color:var(--teal)}
+.zempty{color:#5d5266;font-size:12px}
+.cap{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;
+  color:var(--ink);font-size:14.5px;min-height:58px;margin:10px 0}
+.cap b{color:var(--or2)}
+
+/* terminal */
+.term{background:var(--term);border:1px solid var(--line);border-radius:14px;padding:12px;margin:12px 0}
+#termout{max-height:280px;overflow-y:auto;font-size:13.5px;line-height:1.5}
+#termout div{white-space:pre-wrap;word-break:break-word}
+.tl-out{color:var(--ink)} .tl-err{color:var(--bad)} .tl-ok{color:var(--good)}
+.tl-hint{color:var(--lav)} .tl-cmd{color:var(--or2);font-weight:700} .tl-warn{color:var(--amb)}
+.trow{display:flex;gap:8px;align-items:center;margin-top:10px}
+#promptEl{color:var(--or2);font-size:13px;white-space:nowrap}
+#termin{flex:1;background:var(--panel2);border:1px solid var(--line);border-radius:8px;color:var(--ink);
+  padding:10px;font-size:14px;min-width:0}
+#termin:focus{outline:2px solid var(--or)}
+#runBtn{padding:10px 14px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.chip{background:var(--panel2);border:1px solid var(--line);color:var(--or2);border-radius:999px;
+  padding:7px 12px;font-size:12.5px;cursor:pointer}
+.chip:active{background:var(--or);color:#1c0c06}
+
+/* missions */
+#missions{display:grid;gap:8px;margin:12px 0}
+.mission{display:flex;gap:10px;align-items:flex-start;background:var(--panel2);border:1px solid var(--line);
+  border-radius:12px;padding:10px 12px}
+.mnum{flex:0 0 26px;height:26px;border-radius:50%;border:1.5px solid var(--or);color:var(--or2);
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
+.mission .mt{font-weight:700;font-size:14.5px}
+.mission .md{font-size:13px;color:var(--dim)}
+.mission.done{border-color:var(--teal)}
+.mission.done .mnum{border-color:var(--teal);color:#062019;background:var(--teal)}
+.boss{background:linear-gradient(135deg,#241a2b,#2a1a20);border:1.5px solid var(--lav);border-radius:12px;
+  padding:12px;margin:10px 0;font-size:14px}
+.boss .bt{color:var(--lav);font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:12px}
+.boss.done{border-color:var(--good)}
+.boss.done .bt{color:var(--good)}
+.gym{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;margin:14px 0}
+.gymstats{display:flex;gap:18px;font-size:12.5px;color:var(--dim);margin-bottom:10px;letter-spacing:.04em}
+.gymstats b{color:var(--teal);font-size:15px;margin-left:4px}
+.gymtabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.gtab{font-size:12px;padding:6px 11px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--dim);cursor:pointer}
+.gtab.on{border-color:var(--or);color:var(--or2);font-weight:700}
+.gymcard{border:1px dashed var(--line);border-radius:10px;padding:12px}
+.gymcard.active{border-style:solid;border-color:var(--or)}
+.gymcard.win{border-style:solid;border-color:var(--good)}
+.ggoal{font-size:15px;line-height:1.5}
+.ggoal b{color:var(--or2)}
+.gstep{font-size:12px;color:var(--good);margin-top:6px}
+.ghint{font-size:13.5px;color:var(--lav);margin-top:8px;display:none}
+.ghint.show{display:block}
+.gbtns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+
+/* graph */
+.gwrap{background:var(--term);border:1px solid var(--line);border-radius:14px;padding:10px;margin:12px 0;
+  overflow-x:auto;-webkit-overflow-scrolling:touch}
+.gwrap svg{display:block}
+.gph{color:#5d5266;font-size:13px;padding:14px 6px}
+.gnode{animation:none}
+.pop circle{animation:gpop .45s cubic-bezier(.2,1.4,.4,1)}
+@keyframes gpop{from{r:0}to{r:10}}
+.glabel-head rect{fill:var(--or)} .glabel-head text{fill:#1c0c06;font-weight:700}
+.glabel rect{fill:none;stroke:var(--teal)} .glabel text{fill:var(--teal)}
+
+/* cloud */
+#cloudStatus{min-height:44px}
+#aheadEl{color:var(--amb);font-size:14px;margin:8px 0}
+
+/* verdict */
+.vgrid{display:grid;gap:10px;margin:12px 0}
+.vcard{background:var(--panel2);border-radius:12px;padding:12px 14px;font-size:14.5px}
+.vkeep{border:1.5px solid var(--teal)} .vskip{border:1.5px solid var(--line)}
+.vcard h4{margin:0 0 6px}
+.vkeep h4{color:var(--teal)} .vskip h4{color:var(--dim)}
+.cheat{background:var(--term);border:1px solid var(--line);border-radius:12px;padding:12px;font-size:12.5px;
+  line-height:1.7;overflow-x:auto;white-space:pre}
+.cheat b{color:var(--or2);font-weight:700}
+.cheat span{color:var(--dim)}
+
+/* quiz */
+.q{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;margin:10px 0}
+.q .qt{font-weight:700;margin-bottom:8px}
+.opts{display:grid;gap:8px}
+.opts button{text-align:left;background:var(--panel);border:1px solid var(--line);color:var(--ink);
+  border-radius:10px;padding:11px 12px;font-size:14.5px;cursor:pointer}
+.opts button.right{border-color:var(--good);color:var(--good);font-weight:700}
+.opts button.wrong{border-color:var(--bad);color:var(--bad)}
+.opts button.lock{pointer-events:none;opacity:.85}
+#scoreEl{font-weight:700;color:var(--or2);margin:10px 0}
+#retryBtn{display:none}
+
+footer{color:#5d5266;font-size:12.5px;text-align:center;margin:30px 0 10px;line-height:1.7}
+
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(80px);
+  background:var(--panel2);border:1px solid var(--or);color:var(--ink);border-radius:999px;
+  padding:10px 18px;font-size:13.5px;transition:transform .25s;z-index:50;pointer-events:none;white-space:nowrap}
+#toast.show{transform:translateX(-50%) translateY(0)}
+
+:focus-visible{outline:2px solid var(--or2);outline-offset:2px}
+@media (min-width:560px){ .fgrid{grid-template-columns:1fr 1fr 1fr} .chaos{grid-template-columns:1fr 1fr 1fr} }
+@media (prefers-reduced-motion:reduce){
+  *{animation:none !important;transition:none !important}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+<main>
+<!-- S1 HERO -->
+<section class="hero">
+  <div class="topline">
+    <div>
+      <div class="kick">small explainer · save points</div>
+      <h1>Save Points</h1>
+      <p class="sub" style="font-size:18px">What Git actually does, shown with a working time machine.</p>
+    </div>
+    <button id="vbadge" aria-label="version">v2.0</button>
+  </div>
+  <svg class="herosvg" viewBox="0 0 300 120" aria-hidden="true">
+    <path d="M30 70 H130" stroke="#5b4a63" stroke-width="3" fill="none"/>
+    <path d="M130 70 C160 70 160 38 190 38 H240" stroke="#45d4b8" stroke-width="3" fill="none"/>
+    <path d="M130 70 H200 C230 70 230 70 262 70" stroke="#5b4a63" stroke-width="3" fill="none"/>
+    <path d="M240 38 C258 38 256 62 268 68" stroke="#45d4b8" stroke-width="3" fill="none" stroke-dasharray="5 5"/>
+    <circle cx="30" cy="70" r="10" fill="#f0653a"/>
+    <circle cx="80" cy="70" r="10" fill="#f0653a"/>
+    <circle cx="130" cy="70" r="10" fill="#f0653a"/>
+    <circle cx="190" cy="38" r="10" fill="#45d4b8"/>
+    <circle cx="240" cy="38" r="10" fill="#45d4b8"/>
+    <circle cx="200" cy="70" r="10" fill="#f0653a"/>
+    <circle cx="268" cy="70" r="12" fill="#f0653a" stroke="#ff9066" stroke-width="3"/>
+    <text x="268" y="98" fill="#a396ad" font-size="10" text-anchor="middle" font-family="monospace">you are here</text>
+  </svg>
+  <p>Git has a scary reputation. Under the costume it is one simple idea: <b>save your project the way a video game saves your progress.</b> Snapshots, on a timeline, that you can always go back to.</p>
+  <h3>You already use Git</h3>
+  <div class="fgrid">
+    <div class="fcard" tabindex="0"><div class="fr">You updated a website by uploading a file</div>
+      <div class="bk">Uploading a file on a code hosting site quietly makes a commit for you. You have been committing all along, through a friendlier door.</div>
+      <div class="tap">tap</div></div>
+    <div class="fcard" tabindex="0"><div class="fr">A site that rebuilds itself after you upload</div>
+      <div class="bk">Free static hosts watch the repository. Every new commit triggers a rebuild. The commit is the publish button.</div>
+      <div class="tap">tap</div></div>
+    <div class="fcard" tabindex="0"><div class="fr">AI coding tools</div>
+      <div class="bk">Coding assistants run git constantly: saving checkpoints, branching experiments, undoing mistakes. Read the commands and you can read over their shoulder.</div>
+      <div class="tap">tap</div></div>
+  </div>
+</section>
+
+<!-- S2 THE PROBLEM -->
+<section>
+  <div class="kick">part 1 · the problem git solves</div>
+  <h2>Which file is the real one?</h2>
+  <p>Before version control, keeping history meant making copies. You have seen this folder. You may own this folder. Tap the files.</p>
+  <div id="chaosGrid" class="chaos">
+    <div class="cfile" tabindex="0"><div class="nm">final.html</div><div class="groan">Made in March. Definitely not final.</div></div>
+    <div class="cfile" tabindex="0"><div class="nm">final_v2.html</div><div class="groan">Better. For a week.</div></div>
+    <div class="cfile" tabindex="0"><div class="nm">final_FINAL.html</div><div class="groan">The caps mean it is serious.</div></div>
+    <div class="cfile" tabindex="0"><div class="nm">final_REAL(2).html</div><div class="groan">A copy of a copy. Of something.</div></div>
+    <div class="cfile" tabindex="0"><div class="nm">final_v2_REAL_final.html</div><div class="groan">At this point the file name is a diary.</div></div>
+    <div class="cfile" tabindex="0"><div class="nm">final OLD DO NOT USE.html</div><div class="groan">Narrator: someone used it.</div></div>
+  </div>
+  <div class="btnrow"><button id="fixBtn" class="btn">Put it on a timeline</button></div>
+  <div id="timelinePanel">
+    <div class="tlrow"><span class="cid">c1</span><span class="cm">first working page</span><span class="cd">Mar 3</span></div>
+    <div class="tlrow"><span class="cid">c2</span><span class="cm">add photo gallery</span><span class="cd">Mar 9</span></div>
+    <div class="tlrow"><span class="cid">c3</span><span class="cm">fix menu on phones</span><span class="cd">Apr 2</span></div>
+    <div class="tlrow"><span class="cid">c4</span><span class="cm">new spring colors</span><span class="cd">Apr 18</span></div>
+    <p class="small">Same history. One file name. Every version kept, labeled, dated, and ordered, with a note about why it changed. That is a <b>repository</b>: your folder plus its entire past.</p>
+    <button id="messBtn" class="btn ghost">show the mess again</button>
+  </div>
+</section>
+
+<!-- S3 THREE ROOMS -->
+<section>
+  <div class="kick">part 2 · the mental model</div>
+  <h2>The three rooms</h2>
+  <p>Every Git command makes sense once you can see the three places a change can live.</p>
+  <div class="zones">
+    <div class="zone z-work"><h4>Workbench</h4><div class="zsub">the folder you actually see and edit</div><div id="dWork"><span class="zempty">empty</span></div></div>
+    <div class="zone z-tray"><h4>Tray</h4><div class="zsub">changes you chose for the next save (git calls it the staging area)</div><div id="dTray"><span class="zempty">empty</span></div></div>
+    <div class="zone z-vault"><h4>Vault</h4><div class="zsub">every snapshot ever saved (the history)</div><div id="dVault"><span class="zempty">empty</span></div></div>
+  </div>
+  <div id="travelCap" class="cap">Tap <b>Follow one file</b> to watch a single file travel through all three rooms.</div>
+  <div class="btnrow">
+    <button id="travelBtn" class="btn">Follow one file</button>
+    <button id="travelReset" class="btn ghost">Reset</button>
+  </div>
+</section>
+
+<!-- S4 TERMINAL -->
+<section>
+  <div class="kick">part 3 · hands on</div>
+  <h2>Drive the time machine</h2>
+  <p>A real sandbox. The commands are real, the little project folder is real, and the map below redraws from the actual repository state. Nothing is faked, and nothing can break.</p>
+  <h3>Missions</h3>
+  <div id="missions"></div>
+  <div id="bossCard" class="boss">
+    <div class="bt">boss level · optional</div>
+    <div>Survive a merge conflict. Make a branch, <code>edit home.html</code> and commit on <b>both</b> branches, then merge. Git will stop and ask you to decide. <code>edit</code> the file, <code>git add</code> it, <code>git commit</code>. Most people fear this moment. You will have already beaten it in a sandbox.</div>
+  </div>
+  <h3>The Gym: reps until it sticks</h3>
+  <p class="small">Small real repo situations with randomized names, checked live against the actual repository state. Every drill resets the sandbox repo. Hints cost nothing but pride; skipping resets your streak.</p>
+  <div class="gym">
+    <div class="gymstats"><span>reps<b id="repN">0</b></span><span>streak<b id="strN">0</b></span><span>best<b id="bestN">0</b></span></div>
+    <div class="gymtabs" id="gymTabs"></div>
+    <div class="gymcard" id="gymCard">
+      <div class="ggoal" id="gGoal">Pick a level (or Surprise me) and tap <b>Start drill</b>. The terminal below is your workbench.</div>
+      <div class="ghint" id="gHint"></div>
+      <div class="gbtns">
+        <button class="btn" id="gStart" type="button">Start drill</button>
+        <button class="btn ghost" id="gHintBtn" type="button" style="display:none">Hint</button>
+        <button class="btn ghost" id="gFillBtn" type="button" style="display:none">Type it for me</button>
+        <button class="btn ghost" id="gSkip" type="button" style="display:none">Skip</button>
+      </div>
+    </div>
+  </div>
+  <div class="term">
+    <div id="termout"></div>
+    <div class="trow">
+      <span id="promptEl">you@laptop:project$</span>
+      <input id="termin" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="terminal input">
+      <button id="runBtn" class="btn">Run</button>
+    </div>
+  </div>
+  <div class="chips" id="chips"></div>
+  <h3>The map</h3>
+  <p class="small">Your commit timeline, drawn live from the sandbox. Orange lane is main, teal lanes are branches.</p>
+  <div class="gwrap" id="graphwrap"><div class="gph">run <span style="color:#ff9066">git init</span> to build the vault</div></div>
+  <div class="zones">
+    <div class="zone z-work"><h4>Workbench</h4><div id="zWork"><span class="zempty">empty</span></div></div>
+    <div class="zone z-tray"><h4>Tray</h4><div id="zTray"><span class="zempty">empty</span></div></div>
+    <div class="zone z-vault"><h4>Vault</h4><div id="zVault"><span class="zempty">empty</span></div></div>
+  </div>
+</section>
+
+<!-- S5 BRANCHES -->
+<section>
+  <div class="kick">part 4 · branches</div>
+  <h2>Parallel timelines, one sticker at a time</h2>
+  <p>A branch is <b>not</b> a copy of your project. It is a label. A sticky note pointing at one commit. New saves move the note forward.</p>
+  <p class="sub">That is why branches are cheap and instant. Making one writes a tiny text file. You are not duplicating anything. You are planting a flag, trying an idea, and merging it back if it works.</p>
+  <div class="gwrap" id="bdemoWrap"><div class="gph">tap play to watch a project branch and merge</div></div>
+  <div id="bcap" class="cap">A scripted project will run through the same real engine as your sandbox above: two commits, a branch, work on both timelines, then a merge.</div>
+  <div class="btnrow"><button id="bplayBtn" class="btn teal">Play the timeline</button></div>
+</section>
+
+<!-- S6 GIT VS GITHUB -->
+<section>
+  <div class="kick">part 5 · git vs github</div>
+  <h2>The tool and the town square</h2>
+  <p><b>Git</b> runs entirely on your machine. No account, no internet. <b>GitHub</b> is a website that keeps a copy of your repository and adds sharing on top. Different things, constantly confused.</p>
+  <div class="fgrid">
+    <div class="fcard" tabindex="0"><div class="fr">git push</div>
+      <div class="bk">Uploads your new commits to the cloud copy. Push only sends snapshots the cloud has not seen yet, which is why it is fast.</div><div class="tap">tap</div></div>
+    <div class="fcard" tabindex="0"><div class="fr">git clone and git pull</div>
+      <div class="bk">Clone copies the whole vault, history and all, to any machine. Pull grabs just the commits you are missing.</div><div class="tap">tap</div></div>
+    <div class="fcard" tabindex="0"><div class="fr">Free hosting reads your commits</div>
+      <div class="bk">Static site hosting serves files straight from the repository. Newest commit on the main branch = the live site. The commit is the deploy.</div><div class="tap">tap</div></div>
+    <div class="fcard" tabindex="0"><div class="fr">The upload button is a costume</div>
+      <div class="bk">Editing or uploading a file on the website makes a real commit underneath, message and all. The web page is just a friendly face on git commit.</div><div class="tap">tap</div></div>
+  </div>
+  <h3>Try a push</h3>
+  <p class="small">This uses your actual sandbox repository from part 3. Commit something up there, then push it here.</p>
+  <div id="aheadEl">GitHub has never seen this project.</div>
+  <div class="btnrow"><button id="pushBtn" class="btn">git push</button></div>
+  <div class="gwrap" id="cloudwrap"><div class="gph">the cloud copy is empty</div></div>
+  <div id="cloudStatus" class="cap">Push sends your snapshots to the cloud. Nothing more mysterious than that.</div>
+</section>
+
+<!-- S7 VERDICT -->
+<section>
+  <div class="kick">part 6 · the honest verdict</div>
+  <h2>What to keep, what to skip</h2>
+  <div class="vgrid">
+    <div class="vcard vkeep"><h4>Keep this</h4>
+      The loop: change, <code>git add</code>, <code>git commit -m</code>. Run <code>git status</code> before anything, it is always safe and never changes a thing. A branch is a movable label; merge brings labels back together. Push sends snapshots to the cloud copy. That is 90 percent of daily Git.</div>
+    <div class="vcard vskip"><h4>Skip for now</h4>
+      rebase, stash, cherry-pick, submodules, detached HEAD. All real, none required. Learn each one the day you actually need it, not before.</div>
+  </div>
+  <h3>Pocket reference</h3>
+  <div class="cheat"><b>git init</b>              <span>start tracking this folder</span>
+<b>git status</b>            <span>what changed? always safe</span>
+<b>git add .</b>             <span>put every change in the tray</span>
+<b>git commit -m "msg"</b>   <span>seal the tray into a snapshot</span>
+<b>git log</b>               <span>read the timeline</span>
+<b>git branch NAME</b>       <span>plant a new label here</span>
+<b>git switch NAME</b>       <span>move to that label</span>
+<b>git merge NAME</b>        <span>pull that timeline into this one</span>
+<b>git push</b>              <span>send new snapshots to the cloud</span></div>
+</section>
+
+<!-- S8 QUIZ -->
+<section>
+  <div class="kick">part 7 · prove it</div>
+  <h2>Five questions</h2>
+  <div id="quizwrap"></div>
+  <div id="scoreEl"></div>
+  <button id="retryBtn" class="btn ghost">Try again</button>
+</section>
+
+<footer>
+  Save Points · a small explainer · made on a phone<br>
+  Others on this shelf: an operating systems explainer and a Python explainer.
+</footer>
+</main>
+<div id="toast" role="status"></div>
+<script>
+"use strict";
+var VERSION = "v3.0 · Aug 22";
+
+/* ================= ENGINE (DOM-free) ================= */
+function freshRepo(){
+  return {
+    initialized:false, working:{}, staged:{},
+    commits:{}, order:[], seq:0,
+    branches:{}, branchOrder:[], HEAD:null,
+    merging:null, conflicted:[], hadConflict:false
+  };
+}
+function headId(r){
+  if(!r.HEAD) return null;
+  return r.branches[r.HEAD] !== undefined ? r.branches[r.HEAD] : null;
+}
+function headFiles(r){
+  var h = headId(r);
+  return h ? r.commits[h].files : {};
+}
+function ancestorsOf(r, id){
+  var seen = {}, st = [id];
+  while(st.length){
+    var c = st.pop();
+    if(!c || seen[c]) continue;
+    seen[c] = 1;
+    var p = r.commits[c].parents;
+    for(var i=0;i<p.length;i++) st.push(p[i]);
+  }
+  return seen;
+}
+function isAncestor(r, a, b){
+  if(a === null) return true;
+  return !!ancestorsOf(r, b)[a];
+}
+function lca(r, a, b){
+  var sa = ancestorsOf(r, a), sb = ancestorsOf(r, b);
+  for(var i = r.order.length - 1; i >= 0; i--){
+    var id = r.order[i];
+    if(sa[id] && sb[id]) return id;
+  }
+  return null;
+}
+function statusOf(r){
+  var base = headFiles(r);
+  var s = { untracked:[], modified:[], stagedList:[], clean:true };
+  Object.keys(r.working).sort().forEach(function(f){
+    var inBase = base[f] !== undefined, inStag = r.staged[f] !== undefined;
+    if(!inBase && !inStag){ s.untracked.push(f); }
+    else {
+      var ref = inStag ? r.staged[f] : base[f];
+      if(r.working[f] !== ref) s.modified.push(f);
+    }
+  });
+  Object.keys(r.staged).sort().forEach(function(f){
+    if(r.staged[f] !== base[f]) s.stagedList.push(f);
+  });
+  s.clean = !s.untracked.length && !s.modified.length && !s.stagedList.length;
+  return s;
+}
+function bumpEdit(v){
+  var m = v.match(/^(.*) v(\d+)$/);
+  if(m) return m[1] + " v" + (parseInt(m[2],10) + 1);
+  return v + " v2";
+}
+function tokenizeCmd(line){
+  var out = [], re = /"([^"]*)"|'([^']*)'|(\S+)/g, m;
+  while((m = re.exec(line))){
+    out.push(m[1] !== undefined ? m[1] : (m[2] !== undefined ? m[2] : m[3]));
+  }
+  return out;
+}
+function newCommit(r, msg, parents, files){
+  var id = "c" + (++r.seq);
+  var lane = r.branchOrder.indexOf(r.HEAD);
+  if(lane < 0) lane = 0;
+  if(lane > 3) lane = 3;
+  r.commits[id] = { id:id, msg:msg, parents:parents, files:files, lane:lane };
+  r.order.push(id);
+  r.branches[r.HEAD] = id;
+  return id;
+}
+function runGit(r, line){
+  var lines = [], flags = {}, clear = false;
+  function o(txt, cls){ lines.push({ txt:txt, cls:cls || "tl-out" }); }
+  var t = tokenizeCmd(line);
+  if(!t.length) return { lines:lines, flags:flags };
+  var c = t[0];
+
+  if(c === "clear"){ clear = true; }
+  else if(c === "help"){
+    o("folder:  ls · touch NAME · edit NAME", "tl-hint");
+    o("git:     git init · git status · git add NAME|. · git commit -m \"msg\"", "tl-hint");
+    o("         git log · git branch [NAME] · git switch NAME · git merge NAME", "tl-hint");
+    o("other:   clear · help", "tl-hint");
+  }
+  else if(c === "ls"){
+    var names = Object.keys(r.working).sort();
+    if(!names.length) o("(empty folder)", "tl-hint");
+    else names.forEach(function(n){ o(n, "tl-out"); });
+    flags.ls = 1;
+  }
+  else if(c === "touch"){
+    var tn = t[1];
+    if(!tn) o("touch needs a file name: touch home.html", "tl-hint");
+    else if(r.working[tn] !== undefined) o("that file already exists. Try edit " + tn + " to change it.", "tl-hint");
+    else { r.working[tn] = tn + " v1"; o("created " + tn, "tl-ok"); flags.touched = tn; }
+  }
+  else if(c === "edit"){
+    var en = t[1];
+    if(!en) o("edit needs a file name: edit home.html", "tl-hint");
+    else if(r.working[en] === undefined) o("no file called " + en + ". Try touch " + en + " first.", "tl-err");
+    else {
+      if(r.merging && r.conflicted.indexOf(en) > -1){
+        r.working[en] = en + " merged";
+        o("you opened " + en + ", kept the parts you wanted, and removed the conflict markers.", "tl-ok");
+        o("now mark it resolved: git add " + en, "tl-hint");
+      } else {
+        r.working[en] = bumpEdit(r.working[en]);
+        o("changed " + en + " (now \"" + r.working[en] + "\")", "tl-ok");
+      }
+      flags.edited = en;
+    }
+  }
+  else if(c === "git"){
+    var sub = t[1];
+    if(!sub){
+      o("git needs a subcommand. Try git status, or help for the list.", "tl-hint");
+    }
+    else if(sub === "init"){
+      if(r.initialized){
+        o("Reinitialized existing Git repository in /project/.git/", "tl-out");
+      } else {
+        r.initialized = true; r.HEAD = "main"; r.branchOrder = ["main"];
+        o("Initialized empty Git repository in /project/.git/", "tl-out");
+        o("Git is now watching this folder. It has not saved anything yet.", "tl-hint");
+        flags.init = 1;
+      }
+    }
+    else if(!r.initialized){
+      o("fatal: not a git repository (or any of the parent directories): .git", "tl-err");
+      o("this folder has no vault yet. Run git init first.", "tl-hint");
+    }
+    else if(sub === "status"){
+      flags.status = 1;
+      var st = statusOf(r);
+      o("On branch " + r.HEAD, "tl-out");
+      if(r.merging){
+        o("You are in the middle of merging branch '" + r.merging.from + "'.", "tl-out");
+        if(r.conflicted.length) o("Unresolved conflicts: " + r.conflicted.join(", "), "tl-err");
+        else o("All conflicts fixed. Run git commit -m \"...\" to finish the merge.", "tl-hint");
+      }
+      if(st.stagedList.length){
+        o("Ready to save (in the tray):", "tl-out");
+        st.stagedList.forEach(function(n){ o("  " + n, "tl-ok"); });
+        flags.statusStaged = 1;
+      }
+      if(st.modified.length){
+        o("Changed but not staged:", "tl-out");
+        st.modified.forEach(function(n){ o("  " + n, "tl-warn"); });
+        flags.statusModified = 1;
+      }
+      if(st.untracked.length){
+        o("Untracked (Git is not watching these yet):", "tl-out");
+        st.untracked.forEach(function(n){ o("  " + n, "tl-warn"); });
+        flags.statusUntracked = 1;
+      }
+      if(st.clean && !r.merging){
+        o("nothing to commit, working tree clean", "tl-out");
+        o("the workbench matches the last snapshot exactly.", "tl-hint");
+      }
+    }
+    else if(sub === "add"){
+      var an = t[2];
+      if(!an){
+        o("add what? Try git add NAME, or git add . for everything.", "tl-hint");
+      } else if(an !== "." && r.working[an] === undefined){
+        o("fatal: pathspec '" + an + "' did not match any files", "tl-err");
+      } else {
+        var st2 = statusOf(r);
+        var targets = an === "." ? st2.untracked.concat(st2.modified).concat(r.conflicted.slice()) : [an];
+        var any = false, done = {};
+        targets.forEach(function(f){
+          if(done[f] || r.working[f] === undefined) return;
+          done[f] = 1;
+          var base2 = r.staged[f] !== undefined ? r.staged[f] : headFiles(r)[f];
+          var conf = r.merging && r.conflicted.indexOf(f) > -1;
+          if(r.working[f] !== base2 || conf){
+            r.staged[f] = r.working[f];
+            any = true;
+            if(conf){
+              r.conflicted.splice(r.conflicted.indexOf(f), 1);
+              o("conflict in " + f + " marked resolved", "tl-ok");
+            } else {
+              o("staged " + f + " (a copy is in the tray)", "tl-ok");
+            }
+          }
+        });
+        if(any) flags.added = 1;
+        else o("nothing new to stage. The tray already matches.", "tl-hint");
+      }
+    }
+    else if(sub === "commit"){
+      var mi = t.indexOf("-m");
+      if(mi === -1){
+        o("error: your commit needs a message", "tl-err");
+        o("tell future-you what changed: git commit -m \"what you did\"", "tl-hint");
+      } else if(!t[mi+1]){
+        o("error: -m needs a message right after it, in quotes", "tl-err");
+      } else if(r.merging && r.conflicted.length){
+        o("error: you still have unresolved conflicts: " + r.conflicted.join(", "), "tl-err");
+        o("edit each file, then git add it, then commit.", "tl-hint");
+      } else if(!Object.keys(r.staged).length && !r.merging){
+        o("nothing staged. The tray is empty.", "tl-hint");
+        o("choose changes first: git add NAME (or git add .)", "tl-hint");
+      } else {
+        var msg = t[mi+1], id2;
+        if(r.merging){
+          var mergedFiles = Object.assign({}, r.merging.files, r.staged);
+          id2 = newCommit(r, msg, [headId(r), r.merging.targetId], mergedFiles);
+          r.working = Object.assign({}, mergedFiles);
+          o("Merge finished. " + id2 + " has two parents. Both timelines live inside it.", "tl-ok");
+          if(r.hadConflict){ flags.survivedConflict = 1; r.hadConflict = false; }
+          r.merging = null; r.conflicted = [];
+        } else {
+          var parents = headId(r) !== null ? [headId(r)] : [];
+          id2 = newCommit(r, msg, parents, Object.assign({}, headFiles(r), r.staged));
+        }
+        r.staged = {};
+        o("[" + r.HEAD + " " + id2 + "] " + msg, "tl-out");
+        o(Object.keys(r.commits[id2].files).length + " file(s) in this snapshot", "tl-out");
+        flags.committed = id2;
+      }
+    }
+    else if(sub === "log"){
+      if(headId(r) === null){
+        o("fatal: your current branch '" + r.HEAD + "' does not have any commits yet", "tl-err");
+      } else {
+        flags.logged = 1;
+        var tips = {};
+        Object.keys(r.branches).forEach(function(b){
+          (tips[r.branches[b]] = tips[r.branches[b]] || []).push(b);
+        });
+        var reach = ancestorsOf(r, headId(r));
+        for(var i = r.order.length - 1; i >= 0; i--){
+          var cid = r.order[i];
+          if(!reach[cid]) continue;
+          var refs = (tips[cid] || []).map(function(b){
+            return (b === r.HEAD ? "HEAD -> " : "") + b;
+          });
+          o(cid + " " + (refs.length ? "(" + refs.join(", ") + ") " : "") + r.commits[cid].msg, "tl-out");
+        }
+      }
+    }
+    else if(sub === "branch"){
+      var bn = t[2];
+      if(!bn){
+        var bs = Object.keys(r.branches).sort();
+        if(!bs.length) o("no branches yet. A branch label needs a first commit to point at.", "tl-hint");
+        else bs.forEach(function(b){ o((b === r.HEAD ? "* " : "  ") + b, b === r.HEAD ? "tl-ok" : "tl-out"); });
+      }
+      else if(r.branches[bn] !== undefined){
+        o("fatal: a branch named '" + bn + "' already exists", "tl-err");
+      }
+      else if(headId(r) === null){
+        o("make a first commit before branching. The label needs a snapshot to point at.", "tl-hint");
+      }
+      else {
+        r.branches[bn] = headId(r);
+        if(r.branchOrder.indexOf(bn) < 0) r.branchOrder.push(bn);
+        o("created branch '" + bn + "' (a new label pointing at " + headId(r) + ")", "tl-ok");
+        flags.branched = bn;
+      }
+    }
+    else if(sub === "switch" || sub === "checkout"){
+      var sn = t[2];
+      if(sub === "checkout") o("(checkout works, but switch is the newer, clearer word for this)", "tl-hint");
+      if(!sn){
+        o("switch to which branch? git switch NAME", "tl-hint");
+      } else if(r.branches[sn] === undefined){
+        o("fatal: invalid reference: " + sn, "tl-err");
+        o("no branch called " + sn + ". See them with: git branch", "tl-hint");
+      } else if(sn === r.HEAD){
+        o("Already on '" + sn + "'", "tl-out");
+      } else {
+        var st3 = statusOf(r);
+        if(!st3.clean){
+          o("error: your changes would be overwritten by switching", "tl-err");
+          o("save them first: git add . then git commit -m \"...\"", "tl-hint");
+        } else {
+          r.HEAD = sn;
+          r.working = Object.assign({}, r.commits[r.branches[sn]].files);
+          r.staged = {};
+          o("Switched to branch '" + sn + "'", "tl-out");
+          flags.switched = sn;
+        }
+      }
+    }
+    else if(sub === "merge"){
+      var mn = t[2];
+      if(!mn){
+        o("merge which branch? git merge NAME", "tl-hint");
+      } else if(r.branches[mn] === undefined){
+        o("fatal: invalid reference: " + mn, "tl-err");
+      } else if(mn === r.HEAD){
+        o("you are already on " + mn + ". Merge pulls ANOTHER branch into this one.", "tl-hint");
+      } else if(r.merging){
+        o("finish the current merge first (edit, git add, git commit).", "tl-hint");
+      } else {
+        var st4 = statusOf(r);
+        if(!st4.clean){
+          o("commit your changes before merging, so nothing gets tangled.", "tl-hint");
+        } else {
+          var hid = headId(r), tid = r.branches[mn];
+          if(isAncestor(r, tid, hid)){
+            o("Already up to date.", "tl-out");
+            flags.merged = "uptodate";
+          } else if(isAncestor(r, hid, tid)){
+            r.branches[r.HEAD] = tid;
+            r.working = Object.assign({}, r.commits[tid].files);
+            o("Updating " + hid + ".." + tid, "tl-out");
+            o("Fast-forward. Your " + r.HEAD + " label just slid ahead. No new snapshot needed.", "tl-ok");
+            flags.merged = "ff";
+          } else {
+            var baseId = lca(r, hid, tid);
+            var baseF = baseId ? r.commits[baseId].files : {};
+            var hF = headFiles(r), tF = r.commits[tid].files;
+            var merged = {}, conflicts = [];
+            var keys = {};
+            Object.keys(hF).forEach(function(k){ keys[k] = 1; });
+            Object.keys(tF).forEach(function(k){ keys[k] = 1; });
+            Object.keys(keys).forEach(function(f){
+              var hv = hF[f], tv = tF[f], bv = baseF[f];
+              if(hv === tv) merged[f] = hv;
+              else if(hv === bv) merged[f] = tv;
+              else if(tv === bv) merged[f] = hv;
+              else if(hv === undefined) merged[f] = tv;
+              else if(tv === undefined) merged[f] = hv;
+              else conflicts.push(f);
+            });
+            if(conflicts.length){
+              r.merging = { from:mn, targetId:tid, files:merged };
+              r.conflicted = conflicts.slice();
+              r.hadConflict = true;
+              r.working = Object.assign({}, merged);
+              conflicts.forEach(function(f){
+                r.working[f] = "<<<<<<< " + r.HEAD + " | " + hF[f] + " ======= " + tF[f] + " | >>>>>>> " + mn;
+                o("CONFLICT (content): Merge conflict in " + f, "tl-err");
+              });
+              o("Automatic merge failed; fix conflicts and then commit the result.", "tl-err");
+              o("Not scary. 1) edit the file  2) git add it  3) git commit -m \"merge\"", "tl-hint");
+              flags.conflict = 1;
+            } else {
+              var mid = newCommit(r, "Merge branch '" + mn + "'", [hid, tid], merged);
+              r.working = Object.assign({}, merged);
+              o("Merge made. Two timelines became one snapshot (" + mid + " has two parents).", "tl-ok");
+              flags.merged = "merge";
+              flags.committed = mid;
+            }
+          }
+        }
+      }
+    }
+    else if(sub === "push"){
+      o("this sandbox terminal has no internet. Use the push demo in part 5 below.", "tl-hint");
+    }
+    else {
+      o("git: '" + sub + "' is not a git command. Type help.", "tl-err");
+    }
+  }
+  else {
+    o("command not found: " + c, "tl-err");
+    o("type help to see what this sandbox understands.", "tl-hint");
+  }
+  return { lines:lines, flags:flags, clear:clear };
+}
+
+/* ================= UI ================= */
+function initApp(){
+  function $(id){ return document.getElementById(id); }
+
+  var store = (function(){
+    var ok = true, mem = {};
+    try { localStorage.setItem("__gt","1"); localStorage.removeItem("__gt"); } catch(e){ ok = false; }
+    return {
+      load: function(){
+        try { if(ok){ var raw = localStorage.getItem("git101_v1"); return raw ? JSON.parse(raw) : {}; } } catch(e){}
+        return mem;
+      },
+      save: function(s){
+        try { if(ok){ localStorage.setItem("git101_v1", JSON.stringify(s)); return; } } catch(e){}
+        mem = s;
+      }
+    };
+  })();
+  var state = store.load();
+  state.m = state.m || {};
+
+  var toastT = null;
+  function toast(msg){
+    var el = $("toast");
+    el.textContent = msg;
+    el.classList.add("show");
+    clearTimeout(toastT);
+    toastT = setTimeout(function(){ el.classList.remove("show"); }, 1800);
+  }
+  $("vbadge").addEventListener("click", function(){ toast(VERSION + " · loaded"); });
+
+  /* tap-reveal cards (hero + github) */
+  Array.prototype.forEach.call(document.querySelectorAll(".fcard"), function(cd){
+    function flip(){ cd.classList.toggle("open"); }
+    cd.addEventListener("click", flip);
+    cd.addEventListener("keydown", function(e){ if(e.key === "Enter" || e.key === " "){ e.preventDefault(); flip(); } });
+  });
+
+  /* chaos */
+  Array.prototype.forEach.call(document.querySelectorAll(".cfile"), function(cf){
+    function open(){ cf.classList.toggle("open"); }
+    cf.addEventListener("click", open);
+    cf.addEventListener("keydown", function(e){ if(e.key === "Enter" || e.key === " "){ e.preventDefault(); open(); } });
+  });
+  $("fixBtn").addEventListener("click", function(){
+    $("chaosGrid").style.display = "none";
+    $("fixBtn").style.display = "none";
+    $("timelinePanel").classList.add("on");
+  });
+  $("messBtn").addEventListener("click", function(){
+    $("chaosGrid").style.display = "";
+    $("fixBtn").style.display = "";
+    $("timelinePanel").classList.remove("on");
+  });
+
+  /* three rooms travel */
+  var TRAV = [
+    { w:[], t:[], v:[], cap:"Tap <b>Follow one file</b> to watch a single file travel through all three rooms." },
+    { w:[["home.html","st-un"]], t:[], v:[],
+      cap:"You create <b>home.html</b> on the workbench. Git sees a stranger it is not tracking yet." },
+    { w:[["home.html","st-clean"]], t:[["home.html","st-staged"]], v:[],
+      cap:"<b>git add home.html</b>. A copy goes to the tray. This is you choosing what the next save includes." },
+    { w:[["home.html","st-clean"]], t:[], v:[["c1","st-vault"]],
+      cap:"<b>git commit</b>. The tray is sealed into snapshot c1. The vault keeps it forever." },
+    { w:[["home.html","st-mod"]], t:[], v:[["c1","st-vault"]],
+      cap:"You edit the file. The workbench copy changes. The vault copy does not. That is the safety." },
+    { w:[["home.html","st-clean"]], t:[["home.html","st-staged"]], v:[["c1","st-vault"]],
+      cap:"<b>git add</b> again. The new version is chosen for the next save." },
+    { w:[["home.html","st-clean"]], t:[], v:[["c1","st-vault"],["c2","st-vault"]],
+      cap:"<b>git commit</b> again. Snapshot c2 joins the chain. That is the whole loop: change, choose, save." }
+  ];
+  var ti = 0;
+  function chipHTML(list){
+    if(!list.length) return "<span class=\"zempty\">empty</span>";
+    return list.map(function(p){ return "<span class=\"fchip " + p[1] + "\">" + p[0] + "</span>"; }).join("");
+  }
+  function travRender(){
+    var s = TRAV[ti];
+    $("dWork").innerHTML = chipHTML(s.w);
+    $("dTray").innerHTML = chipHTML(s.t);
+    $("dVault").innerHTML = chipHTML(s.v);
+    $("travelCap").innerHTML = s.cap + (ti > 0 ? " <span class=\"small\">(" + ti + "/" + (TRAV.length - 1) + ")</span>" : "");
+    $("travelBtn").textContent = ti === 0 ? "Follow one file" : (ti >= TRAV.length - 1 ? "Loop starts over" : "Next");
+  }
+  $("travelBtn").addEventListener("click", function(){
+    ti = ti >= TRAV.length - 1 ? 1 : ti + 1;
+    travRender();
+  });
+  $("travelReset").addEventListener("click", function(){ ti = 0; travRender(); });
+  travRender();
+
+  /* ---------- graph renderer (shared) ---------- */
+  function renderGraph(rl, sel, lastId){
+    var host = document.querySelector(sel);
+    if(!rl || !rl.initialized){
+      host.innerHTML = "<div class=\"gph\">run <span style=\"color:#ff9066\">git init</span> to build the vault</div>";
+      return;
+    }
+    if(!rl.order.length){
+      host.innerHTML = "<div class=\"gph\">the timeline is empty. Make a save: git add, then git commit.</div>";
+      return;
+    }
+    var pos = {}, maxLane = 0;
+    rl.order.forEach(function(id, i){
+      var c = rl.commits[id];
+      if(c.lane > maxLane) maxLane = c.lane;
+      pos[id] = { x: 36 + i * 58, y: 62 + c.lane * 48 };
+    });
+    var W = Math.max(300, 60 + rl.order.length * 58);
+    var H = 62 + maxLane * 48 + 44;
+    var laneColor = ["#f0653a", "#45d4b8", "#b7a4e3", "#f0b153"];
+    var svg = "<svg width=\"" + W + "\" height=\"" + H + "\" viewBox=\"0 0 " + W + " " + H + "\">";
+    rl.order.forEach(function(id){
+      var c = rl.commits[id];
+      c.parents.forEach(function(p){
+        if(!pos[p]) return;
+        var a = pos[p], b = pos[id];
+        if(a.y === b.y){
+          svg += "<line x1=\"" + a.x + "\" y1=\"" + a.y + "\" x2=\"" + b.x + "\" y2=\"" + b.y + "\" stroke=\"#5b4a63\" stroke-width=\"2.5\"/>";
+        } else {
+          var mx = (a.x + b.x) / 2;
+          svg += "<path d=\"M" + a.x + " " + a.y + " C" + mx + " " + a.y + " " + mx + " " + b.y + " " + b.x + " " + b.y + "\" stroke=\"#5b4a63\" stroke-width=\"2.5\" fill=\"none\"/>";
+        }
+      });
+    });
+    var tips = {};
+    Object.keys(rl.branches).forEach(function(b){
+      (tips[rl.branches[b]] = tips[rl.branches[b]] || []).push(b);
+    });
+    rl.order.forEach(function(id){
+      var c = rl.commits[id], p = pos[id];
+      var fill = laneColor[c.lane % 4];
+      var pop = id === lastId ? " pop" : "";
+      svg += "<g class=\"gnode" + pop + "\">";
+      svg += "<circle cx=\"" + p.x + "\" cy=\"" + p.y + "\" r=\"10\" fill=\"" + fill + "\"" +
+             (c.parents.length > 1 ? " stroke=\"#ede6f0\" stroke-width=\"2.5\"" : "") + "/>";
+      svg += "<text x=\"" + p.x + "\" y=\"" + (p.y + 26) + "\" fill=\"#a396ad\" font-size=\"10\" text-anchor=\"middle\" font-family=\"monospace\">" + id + "</text>";
+      svg += "</g>";
+      (tips[id] || []).forEach(function(b, bi){
+        var isHead = rl.HEAD === b;
+        var lw = b.length * 6.6 + 14;
+        var ly = p.y - 24 - bi * 19;
+        svg += "<g class=\"" + (isHead ? "glabel-head" : "glabel") + "\">";
+        svg += "<rect x=\"" + (p.x - lw/2) + "\" y=\"" + (ly - 12) + "\" width=\"" + lw + "\" height=\"15\" rx=\"7.5\"/>";
+        svg += "<text x=\"" + p.x + "\" y=\"" + (ly - 1) + "\" font-size=\"10\" text-anchor=\"middle\" font-family=\"monospace\">" + b + "</text>";
+        svg += "</g>";
+      });
+    });
+    svg += "</svg>";
+    host.innerHTML = svg;
+    if(host.parentNode === null) return;
+    host.scrollLeft = host.scrollWidth;
+  }
+
+  /* ---------- terminal ---------- */
+  var repo = freshRepo();
+  var FL = { commitsCount: 0 };
+  var cloud = null;
+
+  function print(linesArr){
+    var out = $("termout");
+    linesArr.forEach(function(l){
+      var d = document.createElement("div");
+      d.className = l.cls;
+      d.textContent = l.txt;
+      out.appendChild(d);
+    });
+    out.scrollTop = out.scrollHeight;
+  }
+  function welcome(){
+    print([
+      { txt: "project/ is an ordinary folder with nothing in it.", cls: "tl-hint" },
+      { txt: "Git is installed but not watching yet. Type git init to build the time machine.", cls: "tl-hint" },
+      { txt: "Tap a chip below or type. This sandbox is yours to break.", cls: "tl-hint" }
+    ]);
+  }
+  function updatePrompt(){
+    $("promptEl").textContent = "you@laptop:project" + (repo.initialized ? " (" + repo.HEAD + ")" : "") + "$";
+  }
+  function renderZones(){
+    var st = statusOf(repo);
+    var w = Object.keys(repo.working).sort().map(function(f){
+      var cls = "st-clean";
+      if(repo.conflicted.indexOf(f) > -1) cls = "st-conf";
+      else if(st.untracked.indexOf(f) > -1) cls = "st-un";
+      else if(st.modified.indexOf(f) > -1) cls = "st-mod";
+      return [f, cls];
+    });
+    $("zWork").innerHTML = chipHTML(w);
+    $("zTray").innerHTML = chipHTML(st.stagedList.map(function(f){ return [f, "st-staged"]; }));
+    var h = headId(repo);
+    if(h){
+      var vf = Object.keys(repo.commits[h].files).sort().map(function(f){ return [f, "st-vault"]; });
+      $("zVault").innerHTML = "<span class=\"fchip st-vault\" style=\"font-weight:700\">" + h + "</span>" + chipHTML(vf);
+    } else {
+      $("zVault").innerHTML = "<span class=\"zempty\">empty</span>";
+    }
+  }
+  function updateAhead(){
+    var el = $("aheadEl");
+    if(!repo.initialized || !repo.order.length){
+      el.textContent = "GitHub has never seen this project.";
+      return;
+    }
+    if(!cloud){
+      el.textContent = "GitHub has never seen this project. Push to upload your " + repo.order.length + " commit" + (repo.order.length > 1 ? "s" : "") + ".";
+      return;
+    }
+    var n = 0;
+    repo.order.forEach(function(id){ if(!cloud.commits[id]) n++; });
+    el.textContent = n ? "Your machine is ahead by " + n + " commit" + (n > 1 ? "s" : "") + "." : "In sync with GitHub.";
+  }
+
+  var MISSIONS = [
+    { id:"m1", t:"Build the vault", d:"git init turns this ordinary folder into a repository.",
+      check:function(){ return FL.init; } },
+    { id:"m2", t:"Make a file, then ask Git about it", d:"touch home.html, then git status. Git will call it untracked.",
+      check:function(){ return FL.statusUntracked; } },
+    { id:"m3", t:"Stage it", d:"git add home.html puts a copy in the tray.",
+      check:function(){ return FL.added; } },
+    { id:"m4", t:"First save", d:"git commit -m \"first save\" seals the tray into snapshot c1.",
+      check:function(){ return FL.commitsCount >= 1; } },
+    { id:"m5", t:"Change it and save again", d:"edit home.html, git add ., git commit -m \"...\". The chain grows.",
+      check:function(){ return FL.edited && FL.commitsCount >= 2; } },
+    { id:"m6", t:"Branch off and work there", d:"git branch idea, git switch idea, then commit something on it.",
+      check:function(){ return FL.branchCommit; } },
+    { id:"m7", t:"Merge it home", d:"git switch main, then git merge idea. Watch the label slide.",
+      check:function(){ return FL.mergeDone; } }
+  ];
+  function buildMissions(){
+    var wrap = $("missions");
+    wrap.innerHTML = "";
+    MISSIONS.forEach(function(m, i){
+      var d = document.createElement("div");
+      d.className = "mission" + (state.m[m.id] ? " done" : "");
+      d.id = "ms_" + m.id;
+      d.innerHTML = "<div class=\"mnum\">" + (state.m[m.id] ? "\u2713" : (i + 1)) + "</div>" +
+        "<div><div class=\"mt\">" + m.t + "</div><div class=\"md\">" + m.d + "</div></div>";
+      wrap.appendChild(d);
+    });
+    if(state.boss) $("bossCard").classList.add("done");
+  }
+  function checkMissions(){
+    var changed = false;
+    MISSIONS.forEach(function(m, i){
+      if(!state.m[m.id] && m.check()){
+        state.m[m.id] = true;
+        changed = true;
+        var el = $("ms_" + m.id);
+        el.classList.add("done");
+        el.querySelector(".mnum").textContent = "\u2713";
+        toast("Mission " + (i + 1) + " done: " + m.t);
+      }
+    });
+    if(!state.boss && FL.survivedConflict){
+      state.boss = true;
+      changed = true;
+      $("bossCard").classList.add("done");
+      toast("Boss beaten: you survived a merge conflict");
+    }
+    if(changed) store.save(state);
+  }
+  function afterCmd(flags){
+    Object.keys(flags).forEach(function(k){ FL[k] = flags[k]; });
+    if(flags.committed){
+      FL.commitsCount++;
+      if(repo.HEAD !== "main") FL.branchCommit = 1;
+    }
+    if(flags.merged === "ff" || flags.merged === "merge") FL.mergeDone = 1;
+    updatePrompt();
+    renderZones();
+    renderGraph(repo, "#graphwrap", flags.committed || null);
+    updateAhead();
+    checkMissions();
+    gymAfter(flags);
+  }
+  function runLine(line){
+    if(!line.trim()) return;
+    print([{ txt: "$ " + line, cls: "tl-cmd" }]);
+    var res = runGit(repo, line);
+    if(res.clear) $("termout").innerHTML = "";
+    print(res.lines);
+    afterCmd(res.flags);
+  }
+  $("runBtn").addEventListener("click", function(){
+    runLine($("termin").value);
+    $("termin").value = "";
+    $("termin").focus();
+  });
+  $("termin").addEventListener("keydown", function(e){
+    if(e.key === "Enter"){ runLine($("termin").value); $("termin").value = ""; }
+  });
+  var CHIPS = ["git init","git status","touch home.html","git add .","git commit -m \"save\"",
+    "edit home.html","git log","git branch idea","git switch idea","git switch main","git merge idea"];
+  CHIPS.forEach(function(cmd){
+    var b = document.createElement("button");
+    b.className = "chip";
+    b.textContent = cmd;
+    b.addEventListener("click", function(){
+      $("termin").value = cmd;
+      $("termin").focus();
+    });
+    $("chips").appendChild(b);
+  });
+  welcome();
+  updatePrompt();
+  renderZones();
+
+  /* ---------- branch demo ---------- */
+  var DEMO = [
+    { c:"git init", cap:"Turn the folder into a repository.", ms:1300 },
+    { c:"touch page.html", cap:"Make a file.", ms:800 },
+    { c:"git add .", cap:"Stage it.", ms:800 },
+    { c:"git commit -m \"start\"", cap:"First snapshot. The timeline begins.", ms:1500 },
+    { c:"edit page.html", cap:"Change something.", ms:800 },
+    { c:"git add .", cap:"Stage the change.", ms:800 },
+    { c:"git commit -m \"improve page\"", cap:"Second snapshot. A chain now.", ms:1500 },
+    { c:"git branch idea", cap:"A branch. Just a second label on the same commit.", ms:1700 },
+    { c:"git switch idea", cap:"Now new saves move the idea label instead.", ms:1400 },
+    { c:"touch style.css", cap:"Experiment on the idea timeline.", ms:800 },
+    { c:"git add .", cap:"Stage it.", ms:700 },
+    { c:"git commit -m \"try a style\"", cap:"The idea timeline pulls ahead.", ms:1600 },
+    { c:"git switch main", cap:"Jump back. main never saw the experiment.", ms:1500 },
+    { c:"touch notes.txt", cap:"Meanwhile, main does its own work.", ms:800 },
+    { c:"git add .", cap:"Stage it.", ms:700 },
+    { c:"git commit -m \"notes\"", cap:"main moves too. The timelines have split.", ms:1600 },
+    { c:"git merge idea", cap:"Merge. Two parents, one snapshot, nothing lost.", ms:1800 }
+  ];
+  var demoRepo = freshRepo(), di = 0, demoPlaying = false, demoTimer = null;
+  function demoStep(auto){
+    if(di >= DEMO.length){
+      demoPlaying = false;
+      $("bplayBtn").textContent = "Replay the timeline";
+      $("bcap").innerHTML = "<b>Done.</b> The merge commit holds both timelines. This is the exact engine your sandbox uses, nothing staged for show.";
+      return;
+    }
+    var step = DEMO[di++];
+    var res = runGit(demoRepo, step.c);
+    renderGraph(demoRepo, "#bdemoWrap", res.flags.committed || null);
+    $("bcap").innerHTML = "<b>$ " + step.c.replace(/</g, "&lt;") + "</b><br>" + step.cap +
+      " <span class=\"small\">(" + di + "/" + DEMO.length + ")</span>";
+    if(auto && demoPlaying){
+      demoTimer = setTimeout(function(){ demoStep(true); }, step.ms);
+    }
+  }
+  $("bplayBtn").addEventListener("click", function(){
+    if(demoPlaying) return;
+    if(di >= DEMO.length){ demoRepo = freshRepo(); di = 0; }
+    demoPlaying = true;
+    $("bplayBtn").textContent = "Playing...";
+    demoStep(true);
+  });
+  window._gitdemo = function(){ clearTimeout(demoTimer); demoPlaying = false; demoStep(false); };
+
+  /* ---------- push demo ---------- */
+  $("pushBtn").addEventListener("click", function(){
+    var cs = $("cloudStatus");
+    if(!repo.initialized || !repo.order.length){
+      cs.innerHTML = "Nothing to push yet. Push sends <b>commits</b>, and you have not made any. Make one in the terminal above first.";
+      return;
+    }
+    var wasNew = !cloud;
+    cloud = JSON.parse(JSON.stringify({
+      initialized: true, order: repo.order, commits: repo.commits,
+      branches: repo.branches, branchOrder: repo.branchOrder, HEAD: repo.HEAD,
+      working: {}, staged: {}, conflicted: []
+    }));
+    renderGraph(cloud, "#cloudwrap", null);
+    cs.innerHTML = wasNew ?
+      "<b>Pushed.</b> GitHub now holds an exact copy of your snapshots. In sync. A static host would rebuild your site from this, right now." :
+      "<b>Pushed.</b> Only the new commits traveled. In sync again.";
+    updateAhead();
+    toast("Pushed to the cloud copy");
+  });
+
+  /* ---------- The Gym ---------- */
+  state.gym = state.gym || { reps:0, streak:0, best:0 };
+  var GYM_LEVELS = ["The loop","Staging & history","Branching","Real life","Your work"];
+  var gymLevel = -1;
+  var drill = null;
+  function pickFrom(arr, not){
+    var v, guard = 0;
+    do { v = arr[Math.floor(Math.random()*arr.length)]; } while(not && not.indexOf(v) > -1 && guard++ < 50);
+    return v;
+  }
+  var G_FILES = ["home.html","about.html","menu.html","style.css","app.js"];
+  var G_MSGS = ["fix menu","add photos","new colors","update text","first version"];
+  var G_BR = ["idea","feature","spring","cleanup"];
+  var GYM_TPLS = [
+    { id:"g01", lv:0, make:function(){
+        var F = pickFrom(G_FILES), W = pickFrom(G_MSGS);
+        return { goal:"A brand new file <b>" + F + "</b> is sitting untracked. Get it into the vault as a snapshot with the exact message <b>" + W + "</b>.",
+          seedCmds:["git init","touch " + F],
+          steps:[function(r){ var h = headId(r); return !!h && r.commits[h].msg === W && r.commits[h].files[F] !== undefined; }],
+          hints:["The loop is always the same: choose, then seal. Two commands.","<code>git add " + F + "</code> then <code>git commit -m \"" + W + "\"</code>"],
+          fill:"git add " + F, sol:["git add " + F, 'git commit -m "' + W + '"'] };
+      } },
+    { id:"g02", lv:0, make:function(){
+        var F = pickFrom(G_FILES), W = pickFrom(G_MSGS);
+        return { goal:"<b>" + F + "</b> was edited after the last save. Save the new version with the message <b>" + W + "</b>.",
+          seedCmds:["git init","touch " + F,"git add .",'git commit -m "start"',"edit " + F],
+          steps:[function(r){ var h = headId(r); return r.seq >= 2 && !!h && r.commits[h].msg === W; }],
+          hints:["Same loop as always. Changed files need staging too.","<code>git add .</code> then <code>git commit -m \"" + W + "\"</code>"],
+          fill:"git add .", sol:["git add .", 'git commit -m "' + W + '"'] };
+      } },
+    { id:"g03", lv:0, make:function(){
+        var A = pickFrom(G_FILES), U = pickFrom(G_FILES, [A]);
+        return { goal:"This repo is mid-mess: something changed, something new appeared. Run the one always-safe command that shows the whole picture.",
+          seedCmds:["git init","touch " + A,"git add .",'git commit -m "start"',"edit " + A,"touch " + U],
+          steps:[function(r, fl){ return !!fl.status; }],
+          hints:["It never changes anything. It only reports.","<code>git status</code>"],
+          fill:"git status", sol:["git status"] };
+      } },
+    { id:"g10", lv:1, make:function(){
+        var A = pickFrom(G_FILES), B = pickFrom(G_FILES, [A]), W = pickFrom(G_MSGS);
+        return { goal:"Both <b>" + A + "</b> and <b>" + B + "</b> changed, but only " + A + "'s change belongs in the next save. Commit <b>only " + A + "</b> with message <b>" + W + "</b>. Leave " + B + " changed but unsaved.",
+          seedCmds:["git init","touch " + A,"touch " + B,"git add .",'git commit -m "base"',"edit " + A,"edit " + B],
+          post:function(r, data){ data.oldB = headFiles(r)[B]; },
+          steps:[function(r, fl, data){
+            var h = headId(r); if(!h) return false;
+            var c = r.commits[h];
+            return c.msg === W && c.files[A] === r.working[A] && c.files[B] === data.oldB && statusOf(r).modified.indexOf(B) > -1;
+          }],
+          hints:["git add . grabs everything. Name the file instead.","<code>git add " + A + "</code> then <code>git commit -m \"" + W + "\"</code>"],
+          fill:"git add " + A, sol:["git add " + A, 'git commit -m "' + W + '"'] };
+      } },
+    { id:"g11", lv:1, make:function(){
+        var F = pickFrom(G_FILES), N = pickFrom(G_FILES, [F]), W = pickFrom(G_MSGS);
+        return { goal:"Read the timeline first (<b>git log</b>). Then extend it: create <b>" + N + "</b>, stage it, commit with message <b>" + W + "</b>.",
+          seedCmds:["git init","touch " + F,"git add .",'git commit -m "start"',"edit " + F,"git add .",'git commit -m "improve"',"edit " + F,"git add .",'git commit -m "polish"'],
+          steps:[
+            function(r, fl){ return !!fl.logged; },
+            function(r){ var h = headId(r); return !!h && r.commits[h].msg === W && r.commits[h].files[N] !== undefined; }
+          ],
+          hints:["log reads; then the usual loop writes.","<code>git log</code>, <code>touch " + N + "</code>, <code>git add .</code>, <code>git commit -m \"" + W + "\"</code>"],
+          fill:"git log", sol:["git log","touch " + N,"git add .",'git commit -m "' + W + '"'] };
+      } },
+    { id:"g20", lv:2, make:function(){
+        var N = pickFrom(G_BR), W = pickFrom(G_MSGS);
+        return { goal:"Make a branch called <b>" + N + "</b>, move onto it, and put one commit there (any file, message <b>" + W + "</b>).",
+          seedCmds:["git init","touch home.html","git add .",'git commit -m "base"',"edit home.html","git add .",'git commit -m "more"'],
+          steps:[function(r){ return r.HEAD === N && r.branches[N] !== undefined && !!headId(r) && r.commits[headId(r)].msg === W; }],
+          hints:["branch plants the label, switch moves you onto it, then the normal loop.","<code>git branch " + N + "</code>, <code>git switch " + N + "</code>, <code>touch extra.css</code>, <code>git add .</code>, <code>git commit -m \"" + W + "\"</code>"],
+          fill:"git branch " + N, sol:["git branch " + N,"git switch " + N,"touch extra.css","git add .",'git commit -m "' + W + '"'] };
+      } },
+    { id:"g21", lv:2, make:function(){
+        return { goal:"The <b>idea</b> branch finished its work while main stood still. Bring its commits into main.",
+          seedCmds:["git init","touch home.html","git add .",'git commit -m "base"',"git branch idea","git switch idea","touch style.css","git add .",'git commit -m "idea work"',"git switch main"],
+          steps:[function(r){ return r.HEAD === "main" && r.branches.main === r.branches.idea; }],
+          hints:["You pull another branch INTO the one you are standing on.","<code>git merge idea</code> (watch the label slide: fast-forward)"],
+          fill:"git merge idea", sol:["git merge idea"] };
+      } },
+    { id:"g22", lv:2, make:function(){
+        return { goal:"You need to hop to the <b>idea</b> branch, but you have unsaved changes and Git will refuse. Handle your changes, then switch.",
+          seedCmds:["git init","touch home.html","git add .",'git commit -m "base"',"git branch idea","edit home.html"],
+          steps:[function(r){ return r.HEAD === "idea" && statusOf(r).clean; }],
+          hints:["Try the switch and read the refusal. Git tells you what it wants.","<code>git add .</code>, <code>git commit -m \"wip\"</code>, then <code>git switch idea</code>"],
+          fill:"git switch idea", sol:["git add .",'git commit -m "wip"',"git switch idea"] };
+      } },
+    { id:"g30", lv:3, make:function(){
+        var F = pickFrom(G_FILES), W = pickFrom(G_MSGS);
+        return { goal:"Merge <b>idea</b> into main. It <b>will</b> conflict on " + F + ". Survive it: <code>edit " + F + "</code>, <code>git add " + F + "</code>, commit with message <b>" + W + "</b>.",
+          seedCmds:["git init","touch " + F,"git add .",'git commit -m "base"',"git branch idea","edit " + F,"git add .",'git commit -m "main change"',"git switch idea","edit " + F,"edit " + F,"git add .",'git commit -m "idea change"',"git switch main"],
+          steps:[
+            function(r, fl, data){ if(fl.conflict) data.conf = 1; return !!data.conf; },
+            function(r){ var h = headId(r); return !r.merging && !!h && r.commits[h].parents.length === 2 && r.commits[h].msg === W; }
+          ],
+          hints:["Both timelines changed the same file. Git stops and asks you to pick. Not scary: three steps.","<code>git merge idea</code>, then <code>edit " + F + "</code>, <code>git add " + F + "</code>, <code>git commit -m \"" + W + "\"</code>"],
+          fill:"git merge idea", sol:["git merge idea","edit " + F,"git add " + F,'git commit -m "' + W + '"'] };
+      } },
+    { id:"g31", lv:3, make:function(){
+        var Rf = pickFrom(G_FILES, ["home.html"]);
+        return { goal:"Somewhere on the <b>idea</b> branch lives a file main has never seen: <b>" + Rf + "</b>. Go see it with your own eyes (switch, ls), then come home to main.",
+          seedCmds:["git init","touch home.html","git add .",'git commit -m "base"',"git branch idea","git switch idea","touch " + Rf,"git add .",'git commit -m "secret work"',"git switch main"],
+          steps:[
+            function(r, fl, data){ if(r.HEAD === "idea" && fl.ls) data.saw = 1; return !!data.saw; },
+            function(r){ return r.HEAD === "main"; }
+          ],
+          hints:["Switching branches swaps the whole working folder. ls proves it.","<code>git switch idea</code>, <code>ls</code>, <code>git switch main</code>"],
+          fill:"git switch idea", sol:["git switch idea","ls","git switch main"] };
+      } },
+    { id:"g32", lv:3, make:function(){
+        var W = pickFrom(G_MSGS);
+        return { goal:"Brand new project: this folder has two files and no Git at all. Turn it into a repository and make the first snapshot containing both, message <b>" + W + "</b>.",
+          seedCmds:["touch a.html","touch b.css"],
+          steps:[function(r){ var h = headId(r); return r.initialized && r.seq === 1 && !!h && r.commits[h].msg === W && r.commits[h].files["a.html"] !== undefined && r.commits[h].files["b.css"] !== undefined; }],
+          hints:["Init builds the vault; then the loop you know.","<code>git init</code>, <code>git add .</code>, <code>git commit -m \"" + W + "\"</code>"],
+          fill:"git init", sol:["git init","git add .",'git commit -m "' + W + '"'] };
+      } },
+    { id:"w01", lv:4, make:function(){
+        return { goal:"<b>Ship a game to the shelf.</b> Your repo has <b>index.html</b> already live. You just finished a new game file <b>puffkart.html</b>, sitting untracked. Commit it with the message <b>add puff kart</b> so GitHub Pages can serve it.",
+          seedCmds:["git init","touch index.html","git add .",'git commit -m "shelf"',"touch puffkart.html"],
+          steps:[function(r){ var h = headId(r); return !!h && r.commits[h].msg === "add puff kart" && r.commits[h].files["puffkart.html"] !== undefined; }],
+          hints:["A new file is untracked until you stage it. Same loop as always.","<code>git add puffkart.html</code> then <code>git commit -m \"add puff kart\"</code>"],
+          fill:"git add puffkart.html", sol:["git add puffkart.html",'git commit -m "add puff kart"'] };
+      } },
+    { id:"w02", lv:4, make:function(){
+        return { goal:"<b>Two files changed, one is not ready.</b> You edited <b>index.html</b> (the fix you want to ship) and <b>sw.js</b> (half-finished, do NOT ship yet). Commit <b>only index.html</b> with message <b>fix shelf link</b>. Leave sw.js changed but unsaved.",
+          seedCmds:["git init","touch index.html","touch sw.js","git add .",'git commit -m "base"',"edit index.html","edit sw.js"],
+          post:function(r, data){ data.oldSw = headFiles(r)["sw.js"]; },
+          steps:[function(r, fl, data){
+            var h = headId(r); if(!h) return false;
+            var c = r.commits[h];
+            return c.msg === "fix shelf link" && c.files["index.html"] === r.working["index.html"] && c.files["sw.js"] === data.oldSw && statusOf(r).modified.indexOf("sw.js") > -1;
+          }],
+          hints:["git add . would grab the half-done service worker too. Name the one file.","<code>git add index.html</code> then <code>git commit -m \"fix shelf link\"</code>"],
+          fill:"git add index.html", sol:["git add index.html",'git commit -m "fix shelf link"'] };
+      } },
+    { id:"w03", lv:4, make:function(){
+        return { goal:"<b>Try a risky change safely.</b> You want to experiment with the shelf hub without touching the live version. Make a branch called <b>redesign</b>, switch to it, and commit one change there (edit index.html, message <b>new hub layout</b>). main stays untouched.",
+          seedCmds:["git init","touch index.html","git add .",'git commit -m "live shelf"'],
+          steps:[function(r){ return r.HEAD === "redesign" && r.branches.redesign !== undefined && r.branches.main !== r.branches.redesign && !!headId(r) && r.commits[headId(r)].msg === "new hub layout"; }],
+          hints:["Branch, switch, then the normal loop. main will not move while you work on redesign.","<code>git branch redesign</code>, <code>git switch redesign</code>, <code>edit index.html</code>, <code>git add .</code>, <code>git commit -m \"new hub layout\"</code>"],
+          fill:"git branch redesign", sol:["git branch redesign","git switch redesign","edit index.html","git add .",'git commit -m "new hub layout"'] };
+      } },
+    { id:"w04", lv:4, make:function(){
+        return { goal:"<b>The redesign worked. Ship it.</b> Your <b>redesign</b> branch has the finished new hub; main has not changed since you branched. Bring the redesign into main so it goes live.",
+          seedCmds:["git init","touch index.html","git add .",'git commit -m "live shelf"',"git branch redesign","git switch redesign","edit index.html","git add .",'git commit -m "new hub layout"',"edit index.html","git add .",'git commit -m "polish hub"',"git switch main"],
+          steps:[function(r){ return r.HEAD === "main" && r.branches.main === r.branches.redesign; }],
+          hints:["Stand on main, pull redesign in. Since main never moved, the label just slides forward.","<code>git merge redesign</code>"],
+          fill:"git merge redesign", sol:["git merge redesign"] };
+      } },
+    { id:"w05", lv:4, make:function(){
+        return { goal:"<b>You forgot to branch.</b> You started editing <b>index.html</b> straight on main, then realized this should have been safe first. Git will not let you switch to your <b>experiment</b> branch with unsaved changes. Commit what you have (message <b>wip</b>), then switch to experiment.",
+          seedCmds:["git init","touch index.html","git add .",'git commit -m "live shelf"',"git branch experiment","edit index.html"],
+          steps:[function(r){ return r.HEAD === "experiment" && statusOf(r).clean; }],
+          hints:["Try the switch, read the refusal, do what it says: save first.","<code>git add .</code>, <code>git commit -m \"wip\"</code>, then <code>git switch experiment</code>"],
+          fill:"git switch experiment", sol:["git add .",'git commit -m "wip"',"git switch experiment"] };
+      } },
+    { id:"w06", lv:4, make:function(){
+        return { goal:"<b>Merge conflict on a real file.</b> You changed the version badge in <b>index.html</b> on main, and also on the <b>hotfix</b> branch. Merge hotfix into main. It will conflict. Survive it: <code>edit index.html</code>, <code>git add index.html</code>, commit with message <b>merge hotfix</b>.",
+          seedCmds:["git init","touch index.html","git add .",'git commit -m "base"',"git branch hotfix","edit index.html","git add .",'git commit -m "bump badge main"',"git switch hotfix","edit index.html","edit index.html","git add .",'git commit -m "bump badge hotfix"',"git switch main"],
+          steps:[
+            function(r, fl, data){ if(fl.conflict) data.conf = 1; return !!data.conf; },
+            function(r){ var h = headId(r); return !r.merging && !!h && r.commits[h].parents.length === 2 && r.commits[h].msg === "merge hotfix"; }
+          ],
+          hints:["Both sides touched the same file. Git stops and hands you the decision. Three steps to finish.","<code>git merge hotfix</code>, then <code>edit index.html</code>, <code>git add index.html</code>, <code>git commit -m \"merge hotfix\"</code>"],
+          fill:"git merge hotfix", sol:["git merge hotfix","edit index.html","git add index.html",'git commit -m "merge hotfix"'] };
+      } }
+  ];
+  function resetRepoSandbox(seedCmds){
+    repo = freshRepo();
+    (seedCmds || []).forEach(function(c){ runGit(repo, c); });
+    updatePrompt();
+    renderZones();
+    renderGraph(repo, "#graphwrap", null);
+    updateAhead();
+  }
+  function gymStats(){
+    $("repN").textContent = state.gym.reps;
+    $("strN").textContent = state.gym.streak;
+    $("bestN").textContent = state.gym.best;
+  }
+  function gymGoalRender(){
+    if(!drill) return;
+    var extra = "";
+    if(drill.tpl.steps.length > 1){
+      extra = "<div class=\"gstep\">step " + Math.min(drill.stepIdx + 1, drill.tpl.steps.length) + " of " + drill.tpl.steps.length + (drill.stepIdx > 0 ? " \u00b7 first part done \u2713" : "") + "</div>";
+    }
+    $("gGoal").innerHTML = drill.tpl.goal + extra;
+  }
+  function gymStart(forceId){
+    var pool = GYM_TPLS.filter(function(t){ return gymLevel === -1 || t.lv === gymLevel; });
+    var chosen = null;
+    if(forceId){ GYM_TPLS.forEach(function(t){ if(t.id === forceId) chosen = t; }); }
+    if(!chosen) chosen = pool[Math.floor(Math.random() * pool.length)];
+    drill = { tpl: chosen.make(), tplId: chosen.id, stepIdx: 0, hintsUsed: 0, data: {} };
+    resetRepoSandbox(drill.tpl.seedCmds);
+    if(drill.tpl.post) drill.tpl.post(repo, drill.data);
+    $("termout").innerHTML = "";
+    print([
+      { txt:"=== new drill \u00b7 sandbox repo reset to a fresh setup ===", cls:"tl-hint" },
+      { txt:"(the goal is on the drill card above; git status is always a good first move)", cls:"tl-hint" }
+    ]);
+    gymGoalRender();
+    $("gymCard").className = "gymcard active";
+    $("gHint").className = "ghint"; $("gHint").innerHTML = "";
+    $("gStart").style.display = "none";
+    $("gHintBtn").style.display = "";
+    $("gFillBtn").style.display = "none";
+    $("gSkip").style.display = "";
+    gymStats();
+  }
+  function gymWin(){
+    state.gym.reps++;
+    state.gym.streak++;
+    if(state.gym.streak > state.gym.best) state.gym.best = state.gym.streak;
+    store.save(state);
+    $("gymCard").className = "gymcard win";
+    $("gGoal").innerHTML = "<b>Done.</b> Rep logged" + (drill.hintsUsed === 0 ? ", no hints. Clean." : ".") + " Total reps: " + state.gym.reps + ".";
+    $("gHint").className = "ghint";
+    drill = null;
+    $("gStart").style.display = ""; $("gStart").textContent = "Next drill";
+    $("gHintBtn").style.display = "none"; $("gFillBtn").style.display = "none"; $("gSkip").style.display = "none";
+    gymStats();
+    toast("Rep logged \u00b7 streak " + state.gym.streak);
+  }
+  function gymAfter(flags){
+    if(!drill) return;
+    var guard = 0;
+    while(drill.stepIdx < drill.tpl.steps.length && drill.tpl.steps[drill.stepIdx](repo, flags, drill.data) && guard++ < 10){
+      drill.stepIdx++;
+    }
+    if(drill.stepIdx >= drill.tpl.steps.length){ gymWin(); }
+    else { gymGoalRender(); }
+  }
+  $("gStart").addEventListener("click", function(){ gymStart(); });
+  $("gHintBtn").addEventListener("click", function(){
+    if(!drill) return;
+    drill.hintsUsed++;
+    var h = $("gHint");
+    h.className = "ghint show";
+    if(drill.hintsUsed === 1){ h.innerHTML = drill.tpl.hints[0]; }
+    else { h.innerHTML = drill.tpl.hints[0] + "<br>" + drill.tpl.hints[1]; $("gFillBtn").style.display = ""; }
+  });
+  $("gFillBtn").addEventListener("click", function(){
+    if(!drill) return;
+    $("termin").value = drill.tpl.fill;
+    $("termin").focus();
+  });
+  $("gSkip").addEventListener("click", function(){
+    if(!drill) return;
+    state.gym.streak = 0; store.save(state);
+    $("gGoal").innerHTML = "Skipped. The answer was:<br>" + drill.tpl.hints[1] + "<br>Streak reset. Tap Start when ready.";
+    $("gHint").className = "ghint";
+    $("gymCard").className = "gymcard";
+    drill = null;
+    $("gStart").style.display = ""; $("gStart").textContent = "Start drill";
+    $("gHintBtn").style.display = "none"; $("gFillBtn").style.display = "none"; $("gSkip").style.display = "none";
+    gymStats();
+  });
+  (function(){
+    var tabs = ["Surprise me"].concat(GYM_LEVELS);
+    tabs.forEach(function(name, i){
+      var b = document.createElement("button");
+      b.className = "gtab" + (i === 0 ? " on" : ""); b.type = "button"; b.textContent = name;
+      b.addEventListener("click", function(){
+        gymLevel = i - 1;
+        Array.prototype.forEach.call(document.querySelectorAll(".gtab"), function(x, xi){ x.classList.toggle("on", xi === i); });
+      });
+      $("gymTabs").appendChild(b);
+    });
+  })();
+  gymStats();
+  if(typeof window !== "undefined"){
+    window._gym = { start: gymStart, state: function(){ return { drill: drill, gym: state.gym }; } };
+  }
+
+  /* ---------- quiz ---------- */
+  var QUIZ = [
+    { q:"In Git, a commit is...", a:["A saved snapshot of the whole project at one moment","A file being uploaded to the internet","Deleting the old version to make room"], r:0 },
+    { q:"The staging area (the tray) exists so you can...", a:["Choose exactly what goes into the next snapshot","Speed up your internet connection","Store files too big for the folder"], r:0 },
+    { q:"A branch is really just...", a:["A full copy of the entire project folder","A movable label pointing at a commit","A separate account you log into"], r:1 },
+    { q:"Git vs GitHub:", a:["They are two names for the same website","Git is the tool on your machine; GitHub hosts a copy online","GitHub is the offline version of Git"], r:1 },
+    { q:"Which command is always safe, because it changes nothing?", a:["git merge","git commit","git status"], r:2 }
+  ];
+  function renderQuiz(){
+    var wrap = $("quizwrap");
+    wrap.innerHTML = "";
+    $("scoreEl").textContent = "";
+    $("retryBtn").style.display = "none";
+    var answered = 0, correct = 0;
+    QUIZ.forEach(function(item, qi){
+      var qd = document.createElement("div");
+      qd.className = "q";
+      qd.innerHTML = "<div class=\"qt\">" + (qi + 1) + ". " + item.q + "</div>";
+      var opts = document.createElement("div");
+      opts.className = "opts";
+      item.a.forEach(function(opt, oi){
+        var b = document.createElement("button");
+        b.textContent = opt;
+        function pick(){
+          if(b.classList.contains("lock")) return;
+          answered++;
+          if(oi === item.r){ b.classList.add("right"); correct++; }
+          else {
+            b.classList.add("wrong");
+            opts.children[item.r].classList.add("right");
+          }
+          Array.prototype.forEach.call(opts.children, function(x){ x.classList.add("lock"); });
+          if(answered === QUIZ.length){
+            $("scoreEl").textContent = "Score: " + correct + "/5" + (correct >= 4 ? "  \u2713 you have the model" : "");
+            $("retryBtn").style.display = "inline-block";
+            if(correct > (state.quizBest || 0)){ state.quizBest = correct; store.save(state); }
+          }
+        }
+        b.addEventListener("click", pick);
+        b.addEventListener("keydown", function(e){ if(e.key === "Enter" || e.key === " "){ e.preventDefault(); pick(); } });
+        opts.appendChild(b);
+      });
+      qd.appendChild(opts);
+      wrap.appendChild(qd);
+    });
+  }
+  $("retryBtn").addEventListener("click", renderQuiz);
+  renderQuiz();
+  buildMissions();
+}
+
+if(typeof window !== "undefined" && typeof document !== "undefined"){
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", initApp);
+  } else {
+    initApp();
+  }
+}
+if(typeof module !== "undefined" && module.exports){
+  module.exports = { freshRepo: freshRepo, runGit: runGit, statusOf: statusOf, isAncestor: isAncestor, lca: lca, headId: headId };
+}
+</script>
+</body>
+</html>

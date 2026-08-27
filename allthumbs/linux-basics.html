@@ -1,0 +1,1518 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14181d">
+<title>Under the Hood: Linux</title>
+<style>
+  :root{
+    --canvas:#14181d; --panel:#1c2229; --card:#171c22; --line:#2c3540;
+    --ink:#e8ecf0; --soft:#97a3ae; --dim:#6b7682;
+    --green:#6fe08c; --amber:#f5b04c; --blue:#5aa7e8; --red:#e87a6d;
+    --mono:ui-monospace,'SF Mono','Cascadia Mono','Roboto Mono',Consolas,Menlo,monospace;
+    --sans:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',sans-serif;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; background:var(--canvas); color:var(--ink);
+    font-family:var(--sans); font-size:17px; line-height:1.6;
+    padding-bottom:70px;
+  }
+  header{
+    padding:26px 20px 10px; max-width:760px; margin:0 auto;
+    display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+  }
+  .wordmark{font-family:var(--mono); font-size:12px; letter-spacing:.22em; color:var(--soft); text-transform:uppercase;}
+  h1{margin:6px 0 2px; font-size:30px; line-height:1.15; letter-spacing:-.01em;}
+  .subtitle{color:var(--soft); margin:0; font-size:15px;}
+  .vbadge{
+    font-family:var(--mono); font-size:11px; color:var(--soft);
+    border:1px solid var(--line); border-radius:999px; padding:5px 10px;
+    background:var(--panel); cursor:pointer; white-space:nowrap; margin-top:4px;
+  }
+  nav{
+    position:sticky; top:0; z-index:30; background:rgba(20,24,29,.92);
+    backdrop-filter:blur(8px); border-bottom:1px solid var(--line);
+    overflow-x:auto; -webkit-overflow-scrolling:touch;
+  }
+  .navrow{display:flex; gap:8px; padding:10px 16px; max-width:760px; margin:0 auto; width:max-content;}
+  .navchip{
+    font-family:var(--mono); font-size:12px; color:var(--soft);
+    border:1px solid var(--line); border-radius:999px; padding:7px 13px;
+    background:var(--card); text-decoration:none; white-space:nowrap;
+  }
+  .navchip:active{color:var(--ink); border-color:var(--amber);}
+  main{max-width:760px; margin:0 auto; padding:0 16px;}
+  section{
+    background:var(--panel); border:1px solid var(--line); border-radius:16px;
+    padding:22px 18px; margin:18px 0;
+  }
+  .eyebrow{
+    font-family:var(--mono); font-size:11px; letter-spacing:.2em; text-transform:uppercase;
+    color:var(--amber); margin:0 0 6px;
+  }
+  h2{margin:0 0 10px; font-size:23px; line-height:1.2;}
+  h3{margin:20px 0 8px; font-size:17px;}
+  p{margin:10px 0; color:var(--ink);}
+  .soft{color:var(--soft);}
+  .small{font-size:14px;}
+  code, .code{font-family:var(--mono); font-size:.92em; background:var(--card); border:1px solid var(--line); border-radius:6px; padding:1px 6px; color:var(--green);}
+  .note{
+    border-left:3px solid var(--amber); background:var(--card);
+    border-radius:0 10px 10px 0; padding:10px 14px; margin:14px 0; font-size:15px; color:var(--soft);
+  }
+  .btn{
+    display:inline-block; font-family:var(--mono); font-size:14px; color:var(--ink);
+    background:var(--card); border:1px solid var(--line); border-radius:10px;
+    padding:11px 16px; cursor:pointer; user-select:none;
+  }
+  .btn:active{border-color:var(--amber); transform:translateY(1px);}
+  .btn.primary{border-color:var(--amber); color:var(--amber);}
+  .mfill{margin-left:8px; flex:0 0 auto; font-size:11px; padding:3px 9px; border:1px solid var(--line); border-radius:999px; background:transparent; color:var(--amber); cursor:pointer;}
+  .mfill:active{border-color:var(--amber);}
+  .gym{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px; margin:14px 0;}
+  .gymstats{display:flex; gap:18px; font-size:12.5px; color:#9aa5b1; margin-bottom:10px; letter-spacing:.04em;}
+  .gymstats b{color:var(--green); font-size:15px; margin-left:4px;}
+  .gymtabs{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;}
+  .gtab{font-size:12px; padding:6px 11px; border-radius:999px; border:1px solid var(--line); background:transparent; color:inherit; cursor:pointer;}
+  .gtab.on{border-color:var(--amber); color:var(--amber); font-weight:700;}
+  .gymcard{border:1px dashed var(--line); border-radius:10px; padding:12px;}
+  .gymcard.active{border-style:solid; border-color:var(--amber);}
+  .gymcard.win{border-style:solid; border-color:var(--green);}
+  .ggoal{font-size:15px; line-height:1.5;}
+  .ggoal b{color:var(--amber);}
+  .gstep{font-size:12px; color:var(--green); margin-top:6px;}
+  .ghint{font-size:13.5px; color:var(--blue); margin-top:8px; display:none;}
+  .ghint.show{display:block;}
+  .gbtns{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;}
+
+  /* hero */
+  .hero{display:flex; flex-direction:column; align-items:center; text-align:center; gap:10px;}
+  .hero svg{width:120px; height:auto;}
+  .hook{font-size:21px; font-weight:650; margin:4px 0 0;}
+  .flips{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; width:100%; margin-top:14px;}
+  .flip{
+    border:1px solid var(--line); border-radius:12px; background:var(--card);
+    padding:14px; text-align:left; cursor:pointer; min-height:104px; position:relative;
+  }
+  .flip .front{font-weight:650;}
+  .flip .tapcue{font-family:var(--mono); font-size:11px; color:var(--dim); margin-top:8px;}
+  .flip .back{display:none; font-size:14.5px; color:var(--soft);}
+  .flip.open .front,.flip.open .tapcue{display:none;}
+  .flip.open .back{display:block; animation:fadeup .35s ease;}
+  .flip.open{border-color:var(--green);}
+  @keyframes fadeup{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+
+  /* layer stack */
+  .stack{display:flex; flex-direction:column; gap:8px; margin:14px 0;}
+  .layer{
+    border:1px solid var(--line); border-radius:12px; background:var(--card);
+    padding:13px 14px; cursor:pointer; display:flex; align-items:center; gap:12px;
+    transition:border-color .25s, box-shadow .25s;
+  }
+  .layer .lname{font-weight:650;}
+  .layer .ltag{font-family:var(--mono); font-size:11px; color:var(--dim); margin-left:auto;}
+  .layer.active{border-color:var(--amber); box-shadow:0 0 0 1px var(--amber) inset;}
+  .layer.pulseglow{border-color:var(--green); box-shadow:0 0 14px rgba(111,224,140,.25);}
+  .layerinfo{
+    min-height:78px; border:1px dashed var(--line); border-radius:12px;
+    padding:12px 14px; color:var(--soft); font-size:15px; margin-top:10px;
+  }
+  .layerinfo b{color:var(--ink);}
+
+  /* comparison */
+  .acc{border:1px solid var(--line); border-radius:12px; background:var(--card); margin:10px 0; overflow:hidden;}
+  .acc>button{
+    all:unset; display:flex; width:100%; padding:14px; cursor:pointer;
+    font-weight:650; align-items:center; gap:10px; box-sizing:border-box;
+  }
+  .acc>button .plus{margin-left:auto; font-family:var(--mono); color:var(--dim);}
+  .acc .body{display:none; padding:0 14px 14px;}
+  .acc.open .body{display:block; animation:fadeup .3s ease;}
+  .acc.open>button .plus{color:var(--amber);}
+  .duel{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  @media(max-width:480px){.duel{grid-template-columns:1fr;}}
+  .duelcard{border-radius:10px; padding:11px 12px; font-size:14.5px; line-height:1.5;}
+  .duelcard .who{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; margin-bottom:5px;}
+  .win{background:rgba(90,167,232,.09); border:1px solid rgba(90,167,232,.35);}
+  .win .who{color:var(--blue);}
+  .lin{background:rgba(111,224,140,.08); border:1px solid rgba(111,224,140,.3);}
+  .lin .who{color:var(--green);}
+
+  /* distro hub */
+  .hubwrap{display:flex; justify-content:center; margin:16px 0 4px;}
+  .hubwrap svg{width:100%; max-width:420px; height:auto;}
+
+  /* tree explorer */
+  .xsplit{display:grid; grid-template-columns:1fr; gap:12px;}
+  .xtree{
+    font-family:var(--mono); font-size:14.5px; background:var(--card);
+    border:1px solid var(--line); border-radius:12px; padding:12px 10px;
+  }
+  .xtree ul{list-style:none; margin:0; padding-left:18px; border-left:1px solid var(--line);}
+  .xtree>ul{padding-left:4px; border-left:none;}
+  .xnode{
+    display:inline-flex; align-items:center; gap:7px; padding:6px 9px; margin:2px 0;
+    border-radius:8px; cursor:pointer; border:1px solid transparent;
+  }
+  .xnode:active{background:var(--panel);}
+  .xnode.dir{color:var(--amber);}
+  .xnode.file{color:var(--ink);}
+  .xnode.sel{border-color:var(--amber); background:var(--panel);}
+  .xkids.closed{display:none;}
+  .xinfo{
+    border:1px dashed var(--line); border-radius:12px; padding:12px 14px;
+    color:var(--soft); font-size:15px; min-height:74px;
+  }
+  .xinfo b{color:var(--ink);}
+  .pathduel{margin-top:14px;}
+
+  /* terminal */
+  .missions{display:flex; flex-direction:column; gap:7px; margin:12px 0;}
+  .mission{
+    display:flex; gap:10px; align-items:flex-start; font-size:14.5px;
+    border:1px solid var(--line); background:var(--card); border-radius:10px; padding:9px 12px;
+  }
+  .mission .mk{
+    font-family:var(--mono); flex:0 0 auto; width:22px; height:22px; border-radius:50%;
+    border:1px solid var(--line); color:var(--dim); display:flex; align-items:center; justify-content:center; font-size:12px;
+  }
+  .mission.done{border-color:rgba(111,224,140,.5);}
+  .mission.done .mk{border-color:var(--green); color:var(--green); background:rgba(111,224,140,.1);}
+  .mission.done .mtext{color:var(--soft); text-decoration:line-through; text-decoration-color:var(--dim);}
+  .mission code{padding:0 5px;}
+  .term{
+    background:#0d1114; border:1px solid var(--line); border-radius:12px;
+    overflow:hidden; margin:12px 0;
+  }
+  .termbar{
+    display:flex; align-items:center; gap:6px; padding:8px 12px;
+    border-bottom:1px solid var(--line); background:#11161b;
+  }
+  .dot{width:10px; height:10px; border-radius:50%; background:var(--line);}
+  .termbar .ttitle{font-family:var(--mono); font-size:11px; color:var(--dim); margin-left:6px;}
+  .termout{
+    font-family:var(--mono); font-size:14px; line-height:1.55; padding:12px;
+    height:230px; overflow-y:auto; white-space:pre-wrap; word-break:break-word;
+  }
+  .tl-cmd{color:var(--ink);}
+  .tl-out{color:var(--green);}
+  .tl-dir{color:var(--amber);}
+  .tl-err{color:var(--red);}
+  .tl-hint{color:var(--dim); font-style:italic;}
+  .termin{
+    display:flex; align-items:center; gap:8px; padding:10px 12px;
+    border-top:1px solid var(--line); background:#11161b;
+  }
+  .prompt{font-family:var(--mono); font-size:13px; color:var(--green); white-space:nowrap;}
+  .termin input{
+    flex:1; background:transparent; border:none; outline:none; color:var(--ink);
+    font-family:var(--mono); font-size:16px; min-width:0;
+  }
+  .runbtn{
+    font-family:var(--mono); font-size:13px; color:var(--green);
+    background:transparent; border:1px solid var(--line); border-radius:8px;
+    padding:8px 13px; cursor:pointer;
+  }
+  .chips{display:flex; flex-wrap:wrap; gap:7px; margin:10px 0 4px;}
+  .chip{
+    font-family:var(--mono); font-size:13px; color:var(--soft);
+    border:1px solid var(--line); border-radius:999px; background:var(--card);
+    padding:7px 12px; cursor:pointer;
+  }
+  .chip:active{color:var(--amber); border-color:var(--amber);}
+  .mirror{
+    border:1px solid var(--line); border-radius:12px; background:var(--card);
+    padding:12px 10px; font-family:var(--mono); font-size:14px; margin-top:12px;
+  }
+  .mirror .mtitle{font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--dim); margin:0 0 8px 4px;}
+  .mirror ul{list-style:none; margin:0; padding-left:18px; border-left:1px solid var(--line);}
+  .mirror>ul{padding-left:4px; border-left:none;}
+  .mnode{display:inline-block; padding:3px 8px; margin:1px 0; border-radius:7px; border:1px solid transparent;}
+  .mnode.dir{color:var(--amber);}
+  .mnode.file{color:var(--ink);}
+  .mnode.here{border-color:var(--green); color:var(--green);}
+  .mnode.grow{animation:grow .5s ease;}
+  @keyframes grow{from{opacity:0; transform:scale(.6);} to{opacity:1; transform:scale(1);}}
+
+  /* verdict */
+  .verd{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:14px 0;}
+  @media(max-width:520px){.verd{grid-template-columns:1fr;}}
+  .verdcard{border-radius:12px; padding:13px 14px; font-size:15px;}
+  .keep{background:rgba(111,224,140,.07); border:1px solid rgba(111,224,140,.3);}
+  .skip{background:rgba(232,122,109,.06); border:1px solid rgba(232,122,109,.3);}
+  .verdcard .vt{font-family:var(--mono); font-size:11px; letter-spacing:.16em; text-transform:uppercase; margin-bottom:7px;}
+  .keep .vt{color:var(--green);}
+  .skip .vt{color:var(--red);}
+  .verdcard ul{margin:0; padding-left:18px; color:var(--soft);}
+  .verdcard li{margin:5px 0;}
+  .cheat{
+    background:#0d1114; border:1px solid var(--line); border-radius:12px;
+    padding:14px; font-family:var(--mono); font-size:14px; line-height:1.9;
+  }
+  .cheat .c{color:var(--green);}
+  .cheat .d{color:var(--dim);}
+
+  /* quiz */
+  .q{border:1px solid var(--line); border-radius:12px; background:var(--card); padding:14px; margin:12px 0;}
+  .q .qt{font-weight:650; margin-bottom:10px;}
+  .opts{display:flex; flex-direction:column; gap:8px;}
+  .opt{
+    border:1px solid var(--line); border-radius:10px; padding:11px 13px;
+    cursor:pointer; font-size:15px; color:var(--soft);
+  }
+  .opt.right{border-color:var(--green); color:var(--green);}
+  .opt.wrong{border-color:var(--red); color:var(--red);}
+  .opt.lock{pointer-events:none;}
+  .score{font-family:var(--mono); color:var(--amber); font-size:15px; margin-top:10px; min-height:24px;}
+
+  footer{max-width:760px; margin:8px auto 30px; padding:0 20px; color:var(--dim); font-size:13px; text-align:center;}
+  #toast{
+    position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(80px);
+    background:var(--card); color:var(--ink); border:1px solid var(--amber);
+    border-radius:999px; padding:10px 18px; font-family:var(--mono); font-size:13px;
+    transition:transform .3s ease; z-index:99; pointer-events:none; max-width:88vw; text-align:center;
+  }
+  #toast.show{transform:translateX(-50%) translateY(0);}
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.001s !important; transition-duration:.001s !important;}
+    html{scroll-behavior:auto;}
+  }
+  .btn:focus-visible,.chip:focus-visible,.opt:focus-visible,.xnode:focus-visible,
+  .layer:focus-visible,.flip:focus-visible,.acc>button:focus-visible,.navchip:focus-visible{
+    outline:2px solid var(--amber); outline-offset:2px;
+  }
+  .mascotspot{text-align:center;margin:6px 0 2px;}
+  .mascotspot img{height:230px;width:auto;filter:drop-shadow(0 10px 22px rgba(0,0,0,.5));}
+  .tipbox{position:relative;background:var(--card);border:1px solid var(--line);border-left:3px solid #5aa7e8;border-radius:0 12px 12px 0;padding:16px 16px 16px 118px;margin:22px 0;min-height:96px;}
+  .tipbox .poke{position:absolute;left:-14px;bottom:-8px;height:150px;width:auto;transform:rotate(-8deg);filter:drop-shadow(0 8px 16px rgba(0,0,0,.45));pointer-events:none;}
+  .tipbox.right{border-left:none;border-right:3px solid #5aa7e8;border-radius:12px 0 0 12px;padding:16px 118px 16px 16px;}
+  .tipbox.right .poke{left:auto;right:-14px;transform:rotate(8deg);}
+  .tipbox .tt{font-weight:700;color:#5aa7e8;font-size:15px;}
+  .tipbox .tp{margin:4px 0 0;font-size:14.5px;color:var(--soft);line-height:1.55;}
+  .tracktoggle{display:flex;gap:8px;margin:14px 0 10px;align-items:center;flex-wrap:wrap;}
+  .tracktoggle .tlabel{font-family:monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin-right:2px;}
+  .ttab{font-family:monospace;font-size:12.5px;padding:7px 14px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--soft);cursor:pointer;}
+  .ttab.on.general{border-color:#5aa7e8;color:#5aa7e8;background:rgba(90,167,232,.1);font-weight:700;}
+  .ttab.on.trail{border-color:#c8a4f0;color:#c8a4f0;background:rgba(200,164,240,.12);font-weight:700;}
+  .trailbanner{font-family:monospace;font-size:11.5px;color:#c8a4f0;background:rgba(200,164,240,.08);border:1px solid rgba(200,164,240,.3);border-radius:8px;padding:7px 11px;margin:8px 0;display:none;}
+  .trailbanner.show{display:block;}
+  .backhub{display:inline-flex;align-items:center;gap:7px;font-family:monospace;font-size:12px;color:var(--soft);border:1px solid var(--line);border-radius:999px;padding:7px 13px;background:var(--card);text-decoration:none;}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="wordmark">Under the Hood</div>
+    <h1>What Linux Is</h1>
+    <p class="subtitle">In plain words, with a safe terminal to try.</p>
+  </div>
+  <button class="vbadge" id="vbadge">v3.1</button>
+</header>
+<div class="mascotspot"><img src="thumb-linux.png" alt="mascot with cap and wrench"></div>
+
+<nav><div class="navrow">
+  <a class="navchip" href="#os101">OS 101</a>
+  <a class="navchip" href="#vs">vs Windows</a>
+  <a class="navchip" href="#tree">The Tree</a>
+  <a class="navchip" href="#term">Terminal</a>
+  <a class="navchip" href="#verdict">Verdict</a>
+  <a class="navchip" href="#quiz">Quiz</a>
+</div></nav>
+
+<main>
+
+<!-- HERO -->
+<section class="hero">
+  <svg viewBox="0 0 120 130" aria-hidden="true">
+    <ellipse cx="60" cy="122" rx="34" ry="6" fill="#0d1114"/>
+    <path d="M60 8 C30 8 24 42 24 70 C24 102 40 118 60 118 C80 118 96 102 96 70 C96 42 90 8 60 8 Z" fill="#232a32"/>
+    <path d="M60 34 C44 34 38 56 38 76 C38 100 48 112 60 112 C72 112 82 100 82 76 C82 56 76 34 60 34 Z" fill="#e8ecf0"/>
+    <circle cx="48" cy="30" r="6.5" fill="#e8ecf0"/>
+    <circle cx="72" cy="30" r="6.5" fill="#e8ecf0"/>
+    <circle cx="49.5" cy="31" r="3" fill="#14181d"/>
+    <circle cx="70.5" cy="31" r="3" fill="#14181d"/>
+    <path d="M52 42 L68 42 L60 52 Z" fill="#f5b04c"/>
+    <path d="M40 114 L56 114 L48 124 Z" fill="#f5b04c"/>
+    <path d="M64 114 L80 114 L72 124 Z" fill="#f5b04c"/>
+    <path d="M26 60 C16 70 14 86 20 94 C26 90 30 78 30 68 Z" fill="#232a32"/>
+    <path d="M94 60 C104 70 106 86 100 94 C94 90 90 78 90 68 Z" fill="#232a32"/>
+  </svg>
+  <p class="hook">You already used Linux today.</p>
+  <p class="soft small">Probably three times before breakfast. Tap each card.</p>
+  <div class="flips">
+    <div class="flip" data-flip tabindex="0">
+      <div class="front">Your Android phone</div>
+      <div class="tapcue">tap to reveal</div>
+      <div class="back">Android is built on the Linux kernel. Every tap you make gets handled by Linux underneath.</div>
+    </div>
+    <div class="flip" data-flip tabindex="0">
+      <div class="front">Every site you visited</div>
+      <div class="tapcue">tap to reveal</div>
+      <div class="back">Most of the web is served from Linux machines, including GitHub Pages, where single-file apps like this one live.</div>
+    </div>
+    <div class="flip" data-flip tabindex="0">
+      <div class="front">Your AI assistant's computer</div>
+      <div class="tapcue">tap to reveal</div>
+      <div class="back">When an AI runs code, builds a file, or crunches data for you, it is usually typing commands into a Linux machine.</div>
+    </div>
+  </div>
+</section>
+
+<!-- OS 101 -->
+<section id="os101">
+  <p class="eyebrow">Part 1 &middot; The big idea</p>
+  <h2>What an operating system even is</h2>
+  <p>Your computer's hardware is just parts: a chip, memory, a screen, storage. Apps are just instructions. Something has to stand in the middle, managing who gets the chip, who gets memory, and how a tap becomes pixels.</p>
+  <p>That middle manager is the <b>operating system</b>. Windows is one. Linux is another. Same job, different builds.</p>
+  <div class="stack" id="stack">
+    <div class="layer" data-layer="you" tabindex="0"><span class="lname">You</span><span class="ltag">taps &amp; clicks</span></div>
+    <div class="layer" data-layer="apps" tabindex="0"><span class="lname">Apps</span><span class="ltag">browser, games, editors</span></div>
+    <div class="layer" data-layer="os" tabindex="0"><span class="lname">Operating system</span><span class="ltag">the manager (kernel)</span></div>
+    <div class="layer" data-layer="hw" tabindex="0"><span class="lname">Hardware</span><span class="ltag">chip, memory, screen</span></div>
+  </div>
+  <div class="layerinfo" id="layerinfo">Tap a layer to see its job, or send a tap through the whole stack.</div>
+  <button class="btn primary" id="pulseBtn">Send a tap through the stack</button>
+  <p class="note">The heart of Linux is called the <b>kernel</b>: the core program that talks to hardware directly. Everything else, windows and icons and terminals, is stacked on top of it.</p>
+</section>
+
+<!-- VS WINDOWS -->
+<section id="vs">
+  <p class="eyebrow">Part 2 &middot; The comparison</p>
+  <h2>Linux vs Windows</h2>
+  <p class="soft">Same job, very different philosophy. Tap a topic to open it.</p>
+
+  <div class="acc"><button type="button">Who makes it<span class="plus">+</span></button><div class="body">
+    <div class="duel">
+      <div class="duelcard win"><div class="who">Windows</div>One product, made and owned by Microsoft. You get the version they ship.</div>
+      <div class="duelcard lin"><div class="who">Linux</div>A free, open-source kernel that thousands of people maintain together. Anyone can read the code, change it, or build their own version on top.</div>
+    </div>
+  </div></div>
+
+  <div class="acc"><button type="button">Flavors and distros<span class="plus">+</span></button><div class="body">
+    <div class="duel">
+      <div class="duelcard win"><div class="who">Windows</div>Basically one flavor: Windows 11 Home or Pro. Small menu.</div>
+      <div class="duelcard lin"><div class="who">Linux</div>Because anyone can build on the kernel, there are many complete packaged versions called <b>distributions</b> (distros): Ubuntu, Mint, Debian, Raspberry Pi OS, and hundreds more. Same engine, different body kits.</div>
+    </div>
+    <div class="hubwrap">
+      <svg viewBox="0 0 420 240" aria-hidden="true">
+        <line x1="210" y1="120" x2="80" y2="46" stroke="#2c3540" stroke-width="1.5"/>
+        <line x1="210" y1="120" x2="340" y2="46" stroke="#2c3540" stroke-width="1.5"/>
+        <line x1="210" y1="120" x2="60" y2="150" stroke="#2c3540" stroke-width="1.5"/>
+        <line x1="210" y1="120" x2="360" y2="150" stroke="#2c3540" stroke-width="1.5"/>
+        <line x1="210" y1="120" x2="140" y2="212" stroke="#2c3540" stroke-width="1.5"/>
+        <line x1="210" y1="120" x2="285" y2="212" stroke="#2c3540" stroke-width="1.5"/>
+        <circle cx="210" cy="120" r="46" fill="#171c22" stroke="#6fe08c" stroke-width="1.5"/>
+        <text x="210" y="115" text-anchor="middle" fill="#6fe08c" font-size="13" font-family="monospace">LINUX</text>
+        <text x="210" y="132" text-anchor="middle" fill="#97a3ae" font-size="10" font-family="monospace">kernel</text>
+        <g font-size="11.5" font-family="monospace" fill="#e8ecf0">
+          <rect x="38" y="32" width="86" height="26" rx="13" fill="#171c22" stroke="#2c3540"/>
+          <text x="81" y="49" text-anchor="middle">Ubuntu</text>
+          <rect x="298" y="32" width="86" height="26" rx="13" fill="#171c22" stroke="#2c3540"/>
+          <text x="341" y="49" text-anchor="middle">Mint</text>
+          <rect x="16" y="137" width="90" height="26" rx="13" fill="#171c22" stroke="#2c3540"/>
+          <text x="61" y="154" text-anchor="middle">Debian</text>
+          <rect x="316" y="137" width="90" height="26" rx="13" fill="#171c22" stroke="#2c3540"/>
+          <text x="361" y="154" text-anchor="middle">Android</text>
+          <rect x="82" y="199" width="118" height="26" rx="13" fill="#171c22" stroke="#2c3540"/>
+          <text x="141" y="216" text-anchor="middle">Raspberry Pi</text>
+          <rect x="240" y="199" width="92" height="26" rx="13" fill="#171c22" stroke="#2c3540"/>
+          <text x="286" y="216" text-anchor="middle">Servers</text>
+        </g>
+      </svg>
+    </div>
+  </div></div>
+
+  <div class="acc"><button type="button">Price<span class="plus">+</span></button><div class="body">
+    <div class="duel">
+      <div class="duelcard win"><div class="who">Windows</div>A paid license, usually bundled into the price of the computer.</div>
+      <div class="duelcard lin"><div class="who">Linux</div>Free. Download it, install it on anything, run it on a thousand servers, no bill.</div>
+    </div>
+  </div></div>
+
+  <div class="acc"><button type="button">Where you meet it<span class="plus">+</span></button><div class="body">
+    <div class="duel">
+      <div class="duelcard win"><div class="who">Windows</div>Desktops and laptops, especially at work. If a machine has Excel on it, it is probably Windows.</div>
+      <div class="duelcard lin"><div class="who">Linux</div>Almost everywhere that is not a desk: web servers, Android phones, smart TVs, routers, Raspberry Pi boards driving digital signage, the machines AI assistants run code on.</div>
+    </div>
+  </div></div>
+
+  <div class="acc"><button type="button">How files are organized<span class="plus">+</span></button><div class="body">
+    <div class="duel">
+      <div class="duelcard win"><div class="who">Windows</div>Drive letters. Each disk is its own island: <code>C:\</code>, <code>D:\</code>, a USB stick shows up as <code>E:\</code>.</div>
+      <div class="duelcard lin"><div class="who">Linux</div>One single tree that starts at <code>/</code> (called root). Every disk and USB stick gets grafted onto a branch of that same tree. More on this in Part 3.</div>
+    </div>
+  </div></div>
+
+  <div class="acc"><button type="button">Small spelling differences<span class="plus">+</span></button><div class="body">
+    <div class="duel">
+      <div class="duelcard win"><div class="who">Windows</div>Backslashes in paths: <code>C:\Users\You</code>. Capital letters do not matter: <code>Notes.txt</code> and <code>notes.txt</code> are the same file.</div>
+      <div class="duelcard lin"><div class="who">Linux</div>Forward slashes: <code>/home/you</code>. Capital letters DO matter: <code>Notes.txt</code> and <code>notes.txt</code> are two different files. This one bites every beginner once.</div>
+    </div>
+  </div></div>
+
+  <div class="acc"><button type="button">The terminal culture<span class="plus">+</span></button><div class="body">
+    <div class="duel">
+      <div class="duelcard win"><div class="who">Windows</div>Built around the mouse. The terminal exists (PowerShell) but most people never open it.</div>
+      <div class="duelcard lin"><div class="who">Linux</div>The terminal is the front door. Typing short commands is faster, scriptable, and works on a server on the other side of the planet. It is why developers love it, and it is what Part 4 teaches you.</div>
+    </div>
+  </div></div>
+</section>
+
+<!-- THE TREE -->
+<section id="tree">
+  <p class="eyebrow">Part 3 &middot; The filesystem</p>
+  <h2>One tree, everything on it</h2>
+  <p>On Linux, every file on the machine hangs off one tree. The trunk is <code>/</code>, called <b>root</b>. Folders are branches. Files are leaves. That is the whole model.</p>
+  <p class="soft small">Tap folders to open them. Tap anything to learn what it is for.</p>
+  <div class="xsplit">
+    <div class="xtree" id="xtree"></div>
+    <div class="xinfo" id="xinfo">Tap a folder or file above.</div>
+  </div>
+  <div class="pathduel">
+    <h3>The same idea, two spellings</h3>
+    <div class="duel">
+      <div class="duelcard win"><div class="who">Windows path</div><code>C:\Users\You\Documents\notes.txt</code></div>
+      <div class="duelcard lin"><div class="who">Linux path</div><code>/home/you/documents/notes.txt</code></div>
+    </div>
+    <p class="note">A <b>path</b> is just an address: the turns you take from the trunk to reach one file. Read <code>/home/you/documents/notes.txt</code> as: start at root, into <code>home</code>, into <code>you</code>, into <code>documents</code>, stop at <code>notes.txt</code>. Your home folder <code>/home/you</code> has a nickname: <code>~</code> (the squiggle).</p>
+  </div>
+</section>
+
+<!-- TERMINAL -->
+<section id="term">
+  <p class="eyebrow">Part 4 &middot; Hands on</p>
+  <h2>Drive the terminal</h2>
+  <p>The terminal is a text conversation with the operating system. You type a short command, it answers. This one is a safe practice terminal built into this page: it behaves like real Linux for these commands, and nothing you do here can touch a real machine.</p>
+
+  <h3>Missions</h3>
+  <p class="note" style="margin-top:4px">Do these once, in order. The <b>type it</b> button fills the command in for you; you still press run. Then hit the Gym below for the reps that make it stick.</p>
+  <div class="missions" id="missions"></div>
+
+  <h3>The Gym: reps until it sticks</h3>
+  <p>Small real tasks with randomized names, checked live against the actual filesystem below. Every drill resets the sandbox to a fresh setup. Hints cost nothing but pride; skipping resets your streak.</p>
+  <div class="tracktoggle">
+    <span class="tlabel">practice</span>
+    <button class="ttab general on" id="trackGeneral" type="button">General</button>
+    <button class="ttab trail" id="trackTrail" type="button">The Trail</button>
+  </div>
+  <div class="trailbanner" id="trailBanner">The Trail (light for Linux): the file and folder moves that map to real GitHub work, folders, backups, .nojekyll, cleanup.</div>
+  <div class="gym">
+    <div class="gymstats"><span>reps<b id="repN">0</b></span><span>streak<b id="strN">0</b></span><span>best<b id="bestN">0</b></span></div>
+    <div class="gymtabs" id="gymTabs"></div>
+    <div class="gymcard" id="gymCard">
+      <div class="ggoal" id="gGoal">Pick a level (or Surprise me) and tap <b>Start drill</b>. The terminal below is your workbench.</div>
+      <div class="ghint" id="gHint"></div>
+      <div class="gbtns">
+        <button class="btn primary" id="gStart" type="button">Start drill</button>
+        <button class="btn" id="gHintBtn" type="button" style="display:none">Hint</button>
+        <button class="btn" id="gFillBtn" type="button" style="display:none">Type it for me</button>
+        <button class="btn" id="gSkip" type="button" style="display:none">Skip</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="chips" id="chips"></div>
+
+  <div class="term">
+    <div class="termbar">
+      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      <span class="ttitle">practice terminal</span>
+    </div>
+    <div class="termout" id="termout"></div>
+    <div class="termin">
+      <span class="prompt" id="promptEl">you@laptop:~$</span>
+      <input id="termin" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="terminal input" placeholder="type a command">
+      <button class="runbtn" id="runBtn">run</button>
+    </div>
+  </div>
+
+  <div class="mirror">
+    <p class="mtitle">Live map of your home folder</p>
+    <div id="mirror"></div>
+  </div>
+  <p class="note">Watch the map while you work. When you <code>mkdir</code> or <code>touch</code>, the new branch grows in real time. The green outline is where you are standing right now.</p>
+</section>
+
+<!-- VERDICT -->
+<section id="verdict">
+  <p class="eyebrow">Part 5 &middot; The honest verdict</p>
+  <h2>Do you need to learn this?</h2>
+  <p>If you build web apps and work with AI tools: yes to the small stuff, no to the deep end. You do not need to install Linux or become a server admin. You do need the mental model, because it keeps showing up:</p>
+  <p class="soft">GitHub runs on it. AI coding assistants run their code on it. Raspberry Pi signage boards run it. When any tool shows you a path like <code>/home/user/project/index.html</code>, that is Linux talking. Being able to read that fluently is the actual skill.</p>
+  <div class="verd">
+    <div class="verdcard keep"><div class="vt">Worth learning</div>
+      <ul>
+        <li>The tree model and how paths work</li>
+        <li>The eight commands below, cold</li>
+        <li>Reading terminal output without flinching</li>
+        <li>Knowing that <code>~</code> means your home folder</li>
+      </ul>
+    </div>
+    <div class="verdcard skip"><div class="vt">Safe to skip for now</div>
+      <ul>
+        <li>Installing Linux on your own machine</li>
+        <li>Server administration and networking</li>
+        <li>Permissions, users, and sudo depth</li>
+        <li>Memorizing distro differences</li>
+      </ul>
+    </div>
+  </div>
+  <h3>The cheat sheet</h3>
+  <div class="cheat">
+    <span class="c">pwd</span>          <span class="d">where am I</span><br>
+    <span class="c">ls</span>           <span class="d">what is in here</span><br>
+    <span class="c">cd folder</span>    <span class="d">go into a folder (cd .. goes up)</span><br>
+    <span class="c">mkdir name</span>   <span class="d">make a folder</span><br>
+    <span class="c">touch name</span>   <span class="d">make an empty file</span><br>
+    <span class="c">echo "hi" &gt; f</span> <span class="d">put text into a file</span><br>
+    <span class="c">cat file</span>     <span class="d">show what is inside a file</span><br>
+    <span class="c">rm file</span>      <span class="d">delete a file (careful, no trash can)</span>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section id="quiz">
+  <p class="eyebrow">Part 6 &middot; Prove it</p>
+  <h2>Five questions</h2>
+  <div id="quizwrap"></div>
+  <div class="score" id="scoreEl"></div>
+  <button class="btn" id="retryBtn" style="display:none">Try again</button>
+</section>
+
+<div style="text-align:center;margin:24px 0 8px;"><a class="backhub" href="index.html">&larr; back to All Thumbs</a></div>
+</main>
+<footer>Under the Hood &middot; a curiosity tool &middot; nothing here touches a real machine</footer>
+<div id="toast" role="status"></div>
+
+<script>
+"use strict";
+var VERSION = "v3.1 \u00B7 Aug 26";
+var STORE_KEY = "linux101_v1";
+
+/* ---------- guarded storage ---------- */
+var memStore = {};
+function loadState(){
+  try{
+    var raw = localStorage.getItem(STORE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return memStore[STORE_KEY] || { missions:{}, quizBest:0 };
+}
+function saveState(s){
+  memStore[STORE_KEY] = s;
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(s)); }catch(e){}
+}
+
+/* ---------- simulated filesystem (pure logic, DOM-free) ---------- */
+function freshFS(){
+  return {
+    root: { t:"d", c:{
+      "bin":  { t:"d", c:{ "ls":{t:"f",body:"(program)"}, "cat":{t:"f",body:"(program)"} } },
+      "etc":  { t:"d", c:{ "hosts":{t:"f",body:"127.0.0.1  localhost"} } },
+      "tmp":  { t:"d", c:{} },
+      "home": { t:"d", c:{
+        "you": { t:"d", c:{
+          "projects":  { t:"d", c:{ "site.html":{t:"f",body:"<h1>hello<\/h1>"} } },
+          "documents": { t:"d", c:{ "todo.txt":{t:"f",body:"learn linux basics\nfinish the app"} } }
+        } }
+      } }
+    } },
+    cwd: ["home","you"]
+  };
+}
+function nodeAt(fs, parts){
+  var n = fs.root;
+  for(var i=0;i<parts.length;i++){
+    if(n.t !== "d" || !n.c[parts[i]]) return null;
+    n = n.c[parts[i]];
+  }
+  return n;
+}
+function resolvePath(fs, input){
+  var parts;
+  if(input === "~" || input.indexOf("~/") === 0){
+    parts = ["home","you"].concat(input === "~" ? [] : input.slice(2).split("/"));
+  } else if(input.charAt(0) === "/"){
+    parts = input.split("/");
+  } else {
+    parts = fs.cwd.concat(input.split("/"));
+  }
+  var out = [];
+  for(var i=0;i<parts.length;i++){
+    var p = parts[i];
+    if(p === "" || p === ".") continue;
+    if(p === ".."){ out.pop(); continue; }
+    out.push(p);
+  }
+  return out;
+}
+function pathString(parts){ return "/" + parts.join("/"); }
+function prettyCwd(fs){
+  var s = pathString(fs.cwd);
+  if(s === "/home/you") return "~";
+  if(s.indexOf("/home/you/") === 0) return "~" + s.slice(9);
+  return s;
+}
+/* runCommand(fs, line) -> { lines:[{txt,cls}], flags:{...}, clear:bool } */
+function runCommand(fs, line){
+  var out = [];
+  var flags = {};
+  var trimmed = line.trim();
+  if(!trimmed) return { lines:out, flags:flags };
+  var m = trimmed.match(/^(\S+)\s*(.*)$/);
+  var cmd = m[1], rest = m[2];
+
+  function err(t){ out.push({txt:t, cls:"tl-err"}); }
+  function ok(t, cls){ out.push({txt:t, cls:cls||"tl-out"}); }
+  function hint(t){ out.push({txt:t, cls:"tl-hint"}); }
+
+  if(cmd === "help"){
+    ok("pwd            where am I");
+    ok("ls             list what is here");
+    ok("cd FOLDER      go into a folder   (cd .. = up, cd = home)");
+    ok("mkdir NAME     make a folder");
+    ok("touch NAME     make an empty file");
+    ok('echo "TEXT" > FILE   put text into a file');
+    ok("cat FILE       show a file's contents");
+    ok("rm FILE        delete a file");
+    ok("cp FILE DEST   copy a file (DEST can be a folder)");
+    ok("mv FILE DEST   move or rename (files and folders)");
+    ok("clear          wipe the screen");
+  }
+  else if(cmd === "pwd"){
+    ok(pathString(fs.cwd));
+    flags.pwd = true;
+  }
+  else if(cmd === "ls"){
+    var target = rest ? resolvePath(fs, rest) : fs.cwd;
+    var n = nodeAt(fs, target);
+    if(!n){ err("ls: no such file or folder: " + rest); }
+    else if(n.t === "f"){ ok(rest); }
+    else {
+      var names = Object.keys(n.c).sort(function(a,b){
+        var da = n.c[a].t === "d" ? 0 : 1, db = n.c[b].t === "d" ? 0 : 1;
+        return da - db || a.localeCompare(b);
+      });
+      if(names.length === 0){ hint("(this folder is empty)"); }
+      for(var i=0;i<names.length;i++){
+        var kid = n.c[names[i]];
+        ok(names[i] + (kid.t === "d" ? "/" : ""), kid.t === "d" ? "tl-dir" : "tl-out");
+      }
+      flags.ls = true;
+      flags.lsPath = pathString(target);
+    }
+  }
+  else if(cmd === "cd"){
+    var dest = rest ? resolvePath(fs, rest) : ["home","you"];
+    var dn = nodeAt(fs, dest);
+    if(!dn){ err("cd: no such folder: " + rest); }
+    else if(dn.t !== "d"){ err("cd: not a folder: " + rest); }
+    else { fs.cwd = dest; flags.cd = true; }
+  }
+  else if(cmd === "mkdir"){
+    if(!rest){ err("mkdir: give it a name, like: mkdir ideas"); }
+    else{
+      var mp = resolvePath(fs, rest);
+      var mname = mp[mp.length-1];
+      var parent = nodeAt(fs, mp.slice(0,-1));
+      if(!parent || parent.t !== "d"){ err("mkdir: cannot create there"); }
+      else if(parent.c[mname]){ err("mkdir: '" + mname + "' already exists"); }
+      else { parent.c[mname] = { t:"d", c:{} }; flags.made = pathString(mp); }
+    }
+  }
+  else if(cmd === "touch"){
+    if(!rest){ err("touch: give it a name, like: touch notes.txt"); }
+    else{
+      var tp = resolvePath(fs, rest);
+      var tname = tp[tp.length-1];
+      var tparent = nodeAt(fs, tp.slice(0,-1));
+      if(!tparent || tparent.t !== "d"){ err("touch: cannot create there"); }
+      else if(!tparent.c[tname]){ tparent.c[tname] = { t:"f", body:"" }; flags.made = pathString(tp); }
+      /* touching an existing file is a quiet no-op, like real touch */
+    }
+  }
+  else if(cmd === "echo"){
+    var redir = rest.match(/^(.*?)\s*>\s*(\S+)\s*$/);
+    if(redir){
+      var text = redir[1].replace(/^"(.*)"$/, "$1").replace(/^'(.*)'$/, "$1");
+      var ep = resolvePath(fs, redir[2]);
+      var ename = ep[ep.length-1];
+      var eparent = nodeAt(fs, ep.slice(0,-1));
+      if(!eparent || eparent.t !== "d"){ err("echo: cannot write there"); }
+      else{
+        var existed = !!eparent.c[ename];
+        eparent.c[ename] = { t:"f", body:text };
+        if(!existed) flags.made = pathString(ep);
+        flags.wrote = pathString(ep);
+      }
+    } else {
+      ok(rest.replace(/^"(.*)"$/, "$1").replace(/^'(.*)'$/, "$1"));
+    }
+  }
+  else if(cmd === "cat"){
+    if(!rest){ err("cat: give it a file, like: cat todo.txt"); }
+    else{
+      var cp = resolvePath(fs, rest);
+      var cn = nodeAt(fs, cp);
+      if(!cn){ err("cat: no such file: " + rest); }
+      else if(cn.t === "d"){ err("cat: '" + rest + "' is a folder, not a file"); }
+      else{
+        flags.catPath = pathString(cp);
+        if(cn.body){
+          var lines = cn.body.split("\n");
+          for(var ci=0;ci<lines.length;ci++) ok(lines[ci]);
+          flags.catRead = true;
+        } else {
+          hint("(cat shows a file's contents; this one is empty so far)");
+        }
+      }
+    }
+  }
+  else if(cmd === "rm"){
+    if(!rest){ err("rm: give it a file, like: rm old.txt"); }
+    else{
+      var rp = resolvePath(fs, rest);
+      var rname = rp[rp.length-1];
+      var rparent = nodeAt(fs, rp.slice(0,-1));
+      var rn = nodeAt(fs, rp);
+      if(!rn){ err("rm: no such file: " + rest); }
+      else if(rn.t === "d"){ err("rm: cannot remove '" + rest + "': it is a folder. Real Linux wants rm -r for that; this playground keeps folders safe."); }
+      else { delete rparent.c[rname]; flags.removed = pathString(rp); }
+    }
+  }
+  else if(cmd === "cp"){
+    var kparts = rest.split(/\s+/).filter(Boolean);
+    if(kparts.length < 2){ err("cp: needs a source and a destination, like: cp notes.txt backup.txt"); }
+    else{
+      var ksp = resolvePath(fs, kparts[0]);
+      var ksn = nodeAt(fs, ksp);
+      if(!ksn){ err("cp: no such file: " + kparts[0]); }
+      else if(ksn.t === "d"){ err("cp: '" + kparts[0] + "' is a folder; this playground copies files only"); }
+      else{
+        var kdp = resolvePath(fs, kparts[1]);
+        var kdn = nodeAt(fs, kdp);
+        if(kdn && kdn.t === "d"){ kdp = kdp.concat([ksp[ksp.length-1]]); }
+        var kdparent = nodeAt(fs, kdp.slice(0,-1));
+        if(!kdparent || kdparent.t !== "d"){ err("cp: cannot copy there (the destination folder does not exist)"); }
+        else{
+          kdparent.c[kdp[kdp.length-1]] = { t:"f", body:ksn.body };
+          ok("copied " + kparts[0] + " \u2192 " + pathString(kdp), "tl-hint");
+          flags.copied = pathString(kdp);
+        }
+      }
+    }
+  }
+  else if(cmd === "mv"){
+    var vparts = rest.split(/\s+/).filter(Boolean);
+    if(vparts.length < 2){ err("mv: needs a source and a destination, like: mv old.txt new.txt"); }
+    else{
+      var vsp = resolvePath(fs, vparts[0]);
+      var vsn = nodeAt(fs, vsp);
+      if(!vsn){ err("mv: no such file or folder: " + vparts[0]); }
+      else{
+        var vdp = resolvePath(fs, vparts[1]);
+        var vdn = nodeAt(fs, vdp);
+        if(vdn && vdn.t === "d"){ vdp = vdp.concat([vsp[vsp.length-1]]); vdn = nodeAt(fs, vdp); }
+        if(vsn.t === "d" && (pathString(vdp) + "/").indexOf(pathString(vsp) + "/") === 0){
+          err("mv: cannot move a folder inside itself");
+        }
+        else if(vsn.t === "d" && (pathString(fs.cwd) + "/").indexOf(pathString(vsp) + "/") === 0){
+          err("mv: you are standing inside that folder. Step out first (cd ..)");
+        }
+        else if(vdn){ err("mv: '" + vparts[1] + "' already exists"); }
+        else{
+          var vdparent = nodeAt(fs, vdp.slice(0,-1));
+          if(!vdparent || vdparent.t !== "d"){ err("mv: cannot move there (the destination folder does not exist)"); }
+          else{
+            var vsparent = nodeAt(fs, vsp.slice(0,-1));
+            vdparent.c[vdp[vdp.length-1]] = vsn;
+            delete vsparent.c[vsp[vsp.length-1]];
+            ok("moved " + pathString(vsp) + " \u2192 " + pathString(vdp), "tl-hint");
+            flags.moved = pathString(vdp);
+          }
+        }
+      }
+    }
+  }
+  else if(cmd === "clear"){
+    return { lines:[], flags:{}, clear:true };
+  }
+  else {
+    err("bash: " + cmd + ": command not found");
+    hint("type help to see what this terminal understands");
+  }
+  return { lines:out, flags:flags };
+}
+
+/* ---------- app (DOM) ---------- */
+function initApp(){
+  var state = loadState();
+
+  function $(id){ return document.getElementById(id); }
+  function toast(msg){
+    var t = $("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(toast._h);
+    toast._h = setTimeout(function(){ t.classList.remove("show"); }, 2200);
+  }
+  $("vbadge").addEventListener("click", function(){ toast("Under the Hood " + VERSION); });
+
+  /* hero flips */
+  var flips = document.querySelectorAll("[data-flip]");
+  flips.forEach(function(f){
+    function open(){ f.classList.toggle("open"); }
+    f.addEventListener("click", open);
+    f.addEventListener("keydown", function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); open(); } });
+  });
+
+  /* layer stack */
+  var layerText = {
+    you:  "<b>You.</b> You tap, type, and click. You never talk to hardware directly; you always go through the layers below.",
+    apps: "<b>Apps.</b> Browsers, games, editors. Apps do not own the machine. When an app wants to save a file or draw a pixel, it has to ask the operating system.",
+    os:   "<b>Operating system.</b> The manager. It decides which app gets the chip right now, hands out memory, and turns requests like 'save this file' into hardware moves. Linux and Windows both live here. The core of Linux is called the kernel.",
+    hw:   "<b>Hardware.</b> The physical parts: processor, memory, storage, screen. It only understands electrical signals, which is exactly why the layer above exists."
+  };
+  var info = $("layerinfo");
+  document.querySelectorAll(".layer").forEach(function(el){
+    function pick(){
+      document.querySelectorAll(".layer").forEach(function(x){ x.classList.remove("active"); });
+      el.classList.add("active");
+      info.innerHTML = layerText[el.getAttribute("data-layer")];
+    }
+    el.addEventListener("click", pick);
+    el.addEventListener("keydown", function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); pick(); } });
+  });
+  var pulseRunning = false;
+  $("pulseBtn").addEventListener("click", function(){
+    if(pulseRunning) return;
+    pulseRunning = true;
+    var order = ["you","apps","os","hw","os","apps","you"];
+    var captions = [
+      "1. You tap the screen.",
+      "2. The app catches the tap and asks the OS for help.",
+      "3. The kernel translates the request for the hardware.",
+      "4. The hardware does the physical work.",
+      "5. The kernel carries the result back up.",
+      "6. The app updates what it shows.",
+      "7. Pixels change under your finger. Total trip: a few milliseconds."
+    ];
+    var i = 0;
+    document.querySelectorAll(".layer").forEach(function(x){ x.classList.remove("active"); });
+    function step(){
+      document.querySelectorAll(".layer").forEach(function(x){ x.classList.remove("pulseglow"); });
+      if(i >= order.length){ pulseRunning = false; info.innerHTML = "<b>That round trip is the whole job of an operating system,</b> repeated millions of times a second."; return; }
+      var el = document.querySelector('.layer[data-layer="' + order[i] + '"]');
+      el.classList.add("pulseglow");
+      info.innerHTML = captions[i];
+      i++;
+      setTimeout(step, 650);
+    }
+    step();
+  });
+
+  /* comparison accordions */
+  document.querySelectorAll(".acc > button").forEach(function(b){
+    b.addEventListener("click", function(){ b.parentElement.classList.toggle("open"); });
+  });
+
+  /* tree explorer */
+  var treeInfo = {
+    "/":                    "<b>/ (root).</b> The trunk. Every single file on a Linux machine lives somewhere under this.",
+    "/bin":                 "<b>/bin.</b> Where core programs live. Commands like ls and cat are actually just small files stored here.",
+    "/bin/ls":              "<b>ls is a file.</b> On Linux, even the commands are files. When you type ls, the system finds this file and runs it.",
+    "/bin/cat":             "<b>cat is a file too.</b> Its odd name is short for 'concatenate'. Mostly it is used to print a file's contents to the screen.",
+    "/etc":                 "<b>/etc.</b> Settings and configuration files for the whole system live here, as plain text files you can read.",
+    "/etc/hosts":           "<b>hosts.</b> A real config file: a plain-text list mapping names to network addresses. Notice it is just text, not a special format.",
+    "/tmp":                 "<b>/tmp.</b> Scratch space. Programs park temporary files here, and the system is free to wipe it.",
+    "/home":                "<b>/home.</b> The neighborhood where every user gets a personal folder.",
+    "/home/you":            "<b>/home/you.</b> Your house. Your files, projects, and downloads live here. This folder has the nickname ~ (the squiggle).",
+    "/home/you/projects":   "<b>projects.</b> Just a normal folder a user made. Nothing sacred, it is yours to organize.",
+    "/home/you/projects/site.html": "<b>site.html.</b> A web app as a plain file on disk. A web server on Linux would hand this exact file to a browser.",
+    "/home/you/documents":  "<b>documents.</b> Another ordinary user folder.",
+    "/home/you/documents/todo.txt": "<b>todo.txt.</b> A plain text file. Try reading it later in the terminal below with cat."
+  };
+  var xfs = freshFS();
+  var xsel = null;
+  function buildTree(node, path){
+    var ul = document.createElement("ul");
+    var names = Object.keys(node.c).sort(function(a,b){
+      var da = node.c[a].t==="d"?0:1, db = node.c[b].t==="d"?0:1;
+      return da-db || a.localeCompare(b);
+    });
+    names.forEach(function(name){
+      var kid = node.c[name];
+      var li = document.createElement("li");
+      var span = document.createElement("span");
+      var p = path + "/" + name;
+      span.className = "xnode " + (kid.t==="d" ? "dir" : "file");
+      span.textContent = (kid.t==="d" ? "\uD83D\uDCC1 " : "\uD83D\uDCC4 ") + name + (kid.t==="d" ? "/" : "");
+      span.tabIndex = 0;
+      li.appendChild(span);
+      var kidsUl = null;
+      if(kid.t === "d"){
+        kidsUl = buildTree(kid, p);
+        kidsUl.className = "xkids" + (p==="/home" || p==="/home/you" ? "" : " closed");
+        li.appendChild(kidsUl);
+      }
+      function tap(){
+        if(xsel) xsel.classList.remove("sel");
+        span.classList.add("sel"); xsel = span;
+        $("xinfo").innerHTML = treeInfo[p] || ("<b>" + name + "</b>");
+        if(kidsUl) kidsUl.classList.toggle("closed");
+      }
+      span.addEventListener("click", tap);
+      span.addEventListener("keydown", function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); tap(); } });
+      ul.appendChild(li);
+    });
+    return ul;
+  }
+  var rootUl = document.createElement("ul");
+  var rootLi = document.createElement("li");
+  var rootSpan = document.createElement("span");
+  rootSpan.className = "xnode dir"; rootSpan.tabIndex = 0;
+  rootSpan.textContent = "\uD83D\uDCC1 /  (root)";
+  rootSpan.addEventListener("click", function(){
+    if(xsel) xsel.classList.remove("sel");
+    rootSpan.classList.add("sel"); xsel = rootSpan;
+    $("xinfo").innerHTML = treeInfo["/"];
+  });
+  rootLi.appendChild(rootSpan);
+  rootLi.appendChild(buildTree(xfs.root, ""));
+  rootUl.appendChild(rootLi);
+  $("xtree").appendChild(rootUl);
+
+  /* ---------- terminal ---------- */
+  var fs = freshFS();
+  var seen = {};  /* paths already drawn in mirror, for grow animation */
+  var termout = $("termout");
+  var input = $("termin");
+  var promptEl = $("promptEl");
+
+  var MISSIONS = [
+    { id:"m1", cmd:"pwd", html:'Find out where you are standing: <code>pwd</code>' },
+    { id:"m2", cmd:"ls", html:'Look around: <code>ls</code>' },
+    { id:"m3", cmd:"mkdir ideas", html:'Make a folder called <code>ideas</code>: <code>mkdir ideas</code>' },
+    { id:"m4", cmd:"cd ideas", html:'Step inside it: <code>cd ideas</code>' },
+    { id:"m5", cmd:"touch app.html", html:'Create a file in there: <code>touch app.html</code>' },
+    { id:"m6", cmd:'echo "hello" > note.txt', html:'Write into a file: <code>echo "hello" &gt; note.txt</code>. The <code>&gt;</code> means "pour the text into that file." Then read it back: <code>cat note.txt</code>' }
+  ];
+  function renderMissions(){
+    var wrap = $("missions");
+    wrap.innerHTML = "";
+    MISSIONS.forEach(function(ms, i){
+      var d = document.createElement("div");
+      d.className = "mission" + (state.missions[ms.id] ? " done" : "");
+      d.innerHTML = '<span class="mk">' + (state.missions[ms.id] ? "\u2713" : (i+1)) + '</span><span class="mtext">' + ms.html + '</span>';
+      if(!state.missions[ms.id] && ms.cmd){
+        var fb = document.createElement("button");
+        fb.className = "mfill"; fb.type = "button"; fb.textContent = "type it";
+        (function(cmdStr){
+          fb.addEventListener("click", function(ev){ ev.stopPropagation(); input.value = cmdStr; input.focus(); });
+        })(ms.cmd);
+        d.appendChild(fb);
+      }
+      wrap.appendChild(d);
+    });
+  }
+  function completeMission(id, label){
+    if(state.missions[id]) return;
+    state.missions[id] = true;
+    saveState(state);
+    renderMissions();
+    toast("Mission done: " + label);
+  }
+  function checkMissions(flags){
+    if(flags.pwd) completeMission("m1", "pwd");
+    if(flags.ls) completeMission("m2", "ls");
+    var home = nodeAt(fs, ["home","you"]);
+    if(home && home.c["ideas"] && home.c["ideas"].t === "d"){
+      completeMission("m3", "mkdir ideas");
+      if(fs.cwd.join("/") === "home/you/ideas") completeMission("m4", "cd ideas");
+      var ideas = home.c["ideas"];
+      var hasFile = Object.keys(ideas.c).some(function(k){ return ideas.c[k].t === "f"; });
+      if(hasFile) completeMission("m5", "a file inside ideas");
+    }
+    if(flags.wrote) state._wrote = true;
+    if(flags.catRead && state._wrote) completeMission("m6", "echo + cat");
+  }
+
+  function print(txt, cls){
+    var div = document.createElement("div");
+    div.className = cls || "tl-out";
+    div.textContent = txt;
+    termout.appendChild(div);
+    termout.scrollTop = termout.scrollHeight;
+  }
+  function refreshPrompt(){
+    promptEl.textContent = "you@laptop:" + prettyCwd(fs) + "$";
+  }
+  function renderMirror(){
+    var wrap = $("mirror");
+    wrap.innerHTML = "";
+    var home = nodeAt(fs, ["home","you"]);
+    function walk(node, path){
+      var ul = document.createElement("ul");
+      var names = Object.keys(node.c).sort(function(a,b){
+        var da = node.c[a].t==="d"?0:1, db = node.c[b].t==="d"?0:1;
+        return da-db || a.localeCompare(b);
+      });
+      names.forEach(function(name){
+        var kid = node.c[name];
+        var p = path + "/" + name;
+        var li = document.createElement("li");
+        var span = document.createElement("span");
+        span.className = "mnode " + (kid.t==="d" ? "dir" : "file");
+        if(pathString(fs.cwd) === p) span.className += " here";
+        if(!seen[p]){ span.className += " grow"; seen[p] = true; }
+        span.textContent = (kid.t==="d" ? "\uD83D\uDCC1 " : "\uD83D\uDCC4 ") + name;
+        li.appendChild(span);
+        if(kid.t === "d") li.appendChild(walk(kid, p));
+        ul.appendChild(li);
+      });
+      return ul;
+    }
+    var top = document.createElement("div");
+    var topSpan = document.createElement("span");
+    topSpan.className = "mnode dir" + (pathString(fs.cwd)==="/home/you" ? " here" : "");
+    topSpan.textContent = "\uD83C\uDFE0 ~  (/home/you)";
+    top.appendChild(topSpan);
+    wrap.appendChild(top);
+    wrap.appendChild(walk(home, "/home/you"));
+  }
+  /* mark starting files as seen so they don't all grow on load */
+  (function primeSeen(){
+    function prime(node, path){
+      Object.keys(node.c).forEach(function(name){
+        var p = path + "/" + name;
+        seen[p] = true;
+        if(node.c[name].t === "d") prime(node.c[name], p);
+      });
+    }
+    prime(nodeAt(fs, ["home","you"]), "/home/you");
+  })();
+
+  function exec(line){
+    if(!line.trim()) return;
+    print(promptEl.textContent + " " + line, "tl-cmd");
+    var result = runCommand(fs, line);
+    if(result.clear){ termout.innerHTML = ""; }
+    else{
+      result.lines.forEach(function(l){ print(l.txt, l.cls); });
+    }
+    checkMissions(result.flags || {});
+    gymAfter(result.flags || {});
+    refreshPrompt();
+    renderMirror();
+  }
+  $("runBtn").addEventListener("click", function(){
+    exec(input.value); input.value = ""; input.focus();
+  });
+  input.addEventListener("keydown", function(e){
+    if(e.key === "Enter"){ exec(input.value); input.value = ""; }
+  });
+
+  /* ---------- The Gym: practice drills ---------- */
+  state.gym = state.gym || { reps:0, streak:0, best:0 };
+  var GYM_LEVELS = ["Looking around","Making things","Moving & cleaning","Real life","Your work"];
+  var gymLevel = -1; /* -1 = surprise me */
+  var drill = null;
+  function pickFrom(arr, not){
+    var v, guard = 0;
+    do { v = arr[Math.floor(Math.random()*arr.length)]; } while(not && not.indexOf(v) > -1 && guard++ < 50);
+    return v;
+  }
+  var P_FOLDERS = ["photos2","music","archive","work","recipes","letters"];
+  var P_FILES = ["notes.txt","plan.txt","list.txt","recipe.txt","log.txt","draft.txt"];
+  var P_WORDS = ["sunflower","harbor","bluejay","copper","lantern","meadow"];
+  var P_JPGS = ["beach.jpg","dog.jpg","sunset.jpg","garden.jpg"];
+  function gHome(){ return nodeAt(fs, ["home","you"]); }
+  function gFile(parts){ var n = nodeAt(fs, parts); return n && n.t === "f" ? n : null; }
+  function gDir(parts){ var n = nodeAt(fs, parts); return n && n.t === "d" ? n : null; }
+  var GYM_TPLS = [
+    { id:"t01", lv:0, make:function(){
+        return { goal:"Print the full path of the folder you are standing in.",
+          seed:function(){},
+          steps:[function(f, fl){ return !!fl.pwd; }],
+          hints:["There is a three-letter command that prints the working directory.","Type: <code>pwd</code>"],
+          fill:"pwd", sol:["pwd"] };
+      } },
+    { id:"t02", lv:0, make:function(){
+        var F = pickFrom(P_FOLDERS);
+        var a = pickFrom(P_FILES), b = pickFrom(P_FILES, [a]);
+        return { goal:"List what is inside the <b>" + F + "</b> folder <i>without going into it</i>.",
+          seed:function(){ gHome().c[F] = { t:"d", c:{} }; gHome().c[F].c[a] = {t:"f",body:""}; gHome().c[F].c[b] = {t:"f",body:""}; },
+          steps:[function(f, fl){ return fl.lsPath === "/home/you/" + F; }],
+          hints:["ls can take a folder name after it.","Type: <code>ls " + F + "</code>"],
+          fill:"ls " + F, sol:["ls " + F] };
+      } },
+    { id:"t03", lv:0, make:function(){
+        return { goal:"Go into your <b>documents</b> folder, then come back home. (Two commands.)",
+          seed:function(){},
+          steps:[
+            function(f){ return pathString(f.cwd) === "/home/you/documents"; },
+            function(f){ return pathString(f.cwd) === "/home/you"; }
+          ],
+          hints:["cd goes in. Two dots mean the folder above you.","<code>cd documents</code> then <code>cd ..</code>"],
+          fill:"cd documents", sol:["cd documents","cd .."] };
+      } },
+    { id:"t10", lv:1, make:function(){
+        var A = pickFrom(P_FOLDERS), B = pickFrom(P_FOLDERS, [A]);
+        return { goal:"Make a folder called <b>" + A + "</b> with a folder called <b>" + B + "</b> inside it.",
+          seed:function(){ delete gHome().c[A]; },
+          steps:[function(f){ return !!gDir(["home","you",A,B]); }],
+          hints:["mkdir makes one. A path like a/b makes one inside another.","<code>mkdir " + A + "</code> then <code>mkdir " + A + "/" + B + "</code>"],
+          fill:"mkdir " + A, sol:["mkdir " + A, "mkdir " + A + "/" + B] };
+      } },
+    { id:"t11", lv:1, make:function(){
+        var F = pickFrom(P_FOLDERS), X = pickFrom(P_FILES);
+        return { goal:"Create an empty file called <b>" + X + "</b> inside the <b>" + F + "</b> folder.",
+          seed:function(){ gHome().c[F] = { t:"d", c:{} }; },
+          steps:[function(f){ return !!gFile(["home","you",F,X]); }],
+          hints:["touch creates files, and it accepts a path.","<code>touch " + F + "/" + X + "</code> (or cd into the folder first)"],
+          fill:"touch " + F + "/" + X, sol:["touch " + F + "/" + X] };
+      } },
+    { id:"t12", lv:1, make:function(){
+        var X = pickFrom(P_FILES), W = pickFrom(P_WORDS);
+        return { goal:"Put the word <b>" + W + "</b> into a file called <b>" + X + "</b> (right here in home), then read it back to prove it.",
+          seed:function(){ delete gHome().c[X]; },
+          steps:[
+            function(f){ var n = gFile(["home","you",X]); return !!n && n.body === W; },
+            function(f, fl){ return fl.catPath === "/home/you/" + X; }
+          ],
+          hints:["echo with a &gt; pours text into a file; cat reads it back.","<code>echo \"" + W + "\" &gt; " + X + "</code> then <code>cat " + X + "</code>"],
+          fill:'echo "' + W + '" > ' + X, sol:['echo "' + W + '" > ' + X, "cat " + X] };
+      } },
+    { id:"t20", lv:2, make:function(){
+        var X = pickFrom(P_FILES), Y = pickFrom(P_FILES, [X]), W = pickFrom(P_WORDS);
+        return { goal:"Rename <b>" + X + "</b> to <b>" + Y + "</b>.",
+          seed:function(){ gHome().c[X] = {t:"f", body:W}; delete gHome().c[Y]; },
+          steps:[function(f){ var n = gFile(["home","you",Y]); return !!n && n.body === W && !nodeAt(f, ["home","you",X]); }],
+          hints:["mv means move, and moving to a new name is a rename.","<code>mv " + X + " " + Y + "</code>"],
+          fill:"mv " + X + " " + Y, sol:["mv " + X + " " + Y] };
+      } },
+    { id:"t21", lv:2, make:function(){
+        var X = pickFrom(P_FILES), F = pickFrom(P_FOLDERS);
+        return { goal:"Move <b>" + X + "</b> into the <b>" + F + "</b> folder.",
+          seed:function(){ gHome().c[X] = {t:"f", body:"cargo"}; gHome().c[F] = { t:"d", c:{} }; },
+          steps:[function(f){ return !!gFile(["home","you",F,X]) && !nodeAt(f, ["home","you",X]); }],
+          hints:["mv FILE FOLDER drops the file inside the folder.","<code>mv " + X + " " + F + "</code>"],
+          fill:"mv " + X + " " + F, sol:["mv " + X + " " + F] };
+      } },
+    { id:"t22", lv:2, make:function(){
+        var X = pickFrom(P_FILES), W = pickFrom(P_WORDS);
+        return { goal:"Make a backup copy of <b>" + X + "</b> called <b>" + X + ".bak</b>. Keep the original.",
+          seed:function(){ gHome().c[X] = {t:"f", body:W}; delete gHome().c[X + ".bak"]; },
+          steps:[function(f){ var o = gFile(["home","you",X]), b = gFile(["home","you",X + ".bak"]); return !!o && !!b && b.body === W; }],
+          hints:["cp copies. Source first, new name second.","<code>cp " + X + " " + X + ".bak</code>"],
+          fill:"cp " + X + " " + X + ".bak", sol:["cp " + X + " " + X + ".bak"] };
+      } },
+    { id:"t23", lv:2, make:function(){
+        var K = pickFrom(P_FILES), J = "junk-" + pickFrom(P_WORDS) + ".tmp";
+        return { goal:"Delete <b>" + J + "</b>. Leave <b>" + K + "</b> alone. (Peek with ls or cat first if unsure.)",
+          seed:function(){ gHome().c[K] = {t:"f", body:"important, keep me"}; gHome().c[J] = {t:"f", body:"junk"}; },
+          steps:[function(f){ return !nodeAt(f, ["home","you",J]) && !!gFile(["home","you",K]); }],
+          hints:["rm removes a file, permanently. Look before you delete.","<code>rm " + J + "</code>"],
+          fill:"rm " + J, sol:["rm " + J] };
+      } },
+    { id:"t30", lv:3, make:function(){
+        var a = pickFrom(P_JPGS), b = pickFrom(P_JPGS, [a]);
+        return { goal:"Organize: make a folder called <b>photos</b> and move <b>" + a + "</b> and <b>" + b + "</b> into it.",
+          seed:function(){ delete gHome().c["photos"]; gHome().c[a] = {t:"f", body:"(picture)"}; gHome().c[b] = {t:"f", body:"(picture)"}; },
+          steps:[function(f){ return !!gFile(["home","you","photos",a]) && !!gFile(["home","you","photos",b]) && !nodeAt(f, ["home","you",a]) && !nodeAt(f, ["home","you",b]); }],
+          hints:["Three moves: mkdir once, mv twice.","<code>mkdir photos</code>, <code>mv " + a + " photos</code>, <code>mv " + b + " photos</code>"],
+          fill:"mkdir photos", sol:["mkdir photos","mv " + a + " photos","mv " + b + " photos"] };
+      } },
+    { id:"t31", lv:3, make:function(){
+        var S = pickFrom(P_FOLDERS);
+        return { goal:"Project setup: inside your existing <b>projects</b> folder, make a folder called <b>" + S + "</b> containing an empty <b>index.html</b>.",
+          seed:function(){ if(!gDir(["home","you","projects"])){ gHome().c["projects"] = {t:"d", c:{}}; } delete gHome().c["projects"].c[S]; },
+          steps:[function(f){ return !!gFile(["home","you","projects",S,"index.html"]); }],
+          hints:["Paths work in mkdir and touch.","<code>mkdir projects/" + S + "</code> then <code>touch projects/" + S + "/index.html</code>"],
+          fill:"mkdir projects/" + S, sol:["mkdir projects/" + S, "touch projects/" + S + "/index.html"] };
+      } },
+    { id:"t32", lv:3, make:function(){
+        return { goal:"Clean up: the <b>downloads</b> folder has two .tmp junk files. Delete both, keep <b>keep.txt</b>.",
+          seed:function(){ gHome().c["downloads"] = { t:"d", c:{ "junk1.tmp":{t:"f",body:"x"}, "junk2.tmp":{t:"f",body:"x"}, "keep.txt":{t:"f",body:"do not delete"} } }; },
+          steps:[function(f){ return !nodeAt(f, ["home","you","downloads","junk1.tmp"]) && !nodeAt(f, ["home","you","downloads","junk2.tmp"]) && !!gFile(["home","you","downloads","keep.txt"]); }],
+          hints:["rm takes a path too, or cd in first. ls downloads shows the mess.","<code>rm downloads/junk1.tmp</code> then <code>rm downloads/junk2.tmp</code>"],
+          fill:"ls downloads", sol:["rm downloads/junk1.tmp","rm downloads/junk2.tmp"] };
+      } },
+    { id:"t33", lv:3, make:function(){
+        var X = pickFrom(P_FILES), W = pickFrom(P_WORDS), OLD = "old " + pickFrom(P_WORDS, [W]);
+        return { goal:"Safe edit: copy <b>" + X + "</b> to <b>" + X + ".bak</b> <i>first</i>, then replace the text inside <b>" + X + "</b> with the word <b>" + W + "</b>.",
+          seed:function(){ gHome().c[X] = {t:"f", body:OLD}; delete gHome().c[X + ".bak"]; },
+          steps:[function(f){ var b = gFile(["home","you",X + ".bak"]), o = gFile(["home","you",X]); return !!b && b.body === OLD && !!o && o.body === W; }],
+          hints:["Backup with cp, then overwrite with echo and &gt;. Order matters.","<code>cp " + X + " " + X + ".bak</code> then <code>echo \"" + W + "\" &gt; " + X + "</code>"],
+          fill:"cp " + X + " " + X + ".bak", sol:["cp " + X + " " + X + ".bak", 'echo "' + W + '" > ' + X] };
+      } },
+    { id:"w01", lv:4, make:function(){
+        return { goal:"<b>New single-file app.</b> Start a project folder called <b>puff-kart</b> and create its <b>index.html</b> inside it. (Every GitHub Pages repo serves index.html.)",
+          seed:function(){ delete gHome().c["puff-kart"]; },
+          steps:[function(f){ return !!gFile(["home","you","puff-kart","index.html"]); }],
+          hints:["mkdir the folder, then touch a file with a path into it.","<code>mkdir puff-kart</code> then <code>touch puff-kart/index.html</code>"],
+          fill:"mkdir puff-kart", sol:["mkdir puff-kart","touch puff-kart/index.html"] };
+      } },
+    { id:"w02", lv:4, make:function(){
+        var V = pickFrom(["v3","v4","v5"]);
+        return { goal:"<b>Version-stamp check.</b> Your app folder <b>shelf</b> has an index.html. Write the version <b>" + V + "</b> into a tracking file <b>shelf/VERSION.txt</b>, then read it back to confirm.",
+          seed:function(){ gHome().c["shelf"] = { t:"d", c:{ "index.html":{t:"f",body:"the app"} } }; },
+          steps:[
+            function(f){ var n = gFile(["home","you","shelf","VERSION.txt"]); return !!n && n.body === V; },
+            function(f, fl){ return fl.catPath === "/home/you/shelf/VERSION.txt"; }
+          ],
+          hints:["echo pours text into a file (path works); cat reads it back.","<code>echo \"" + V + "\" &gt; shelf/VERSION.txt</code> then <code>cat shelf/VERSION.txt</code>"],
+          fill:'echo "' + V + '" > shelf/VERSION.txt', sol:['echo "' + V + '" > shelf/VERSION.txt', "cat shelf/VERSION.txt"] };
+      } },
+    { id:"w03", lv:4, make:function(){
+        return { goal:"<b>Flat repo rule.</b> GitHub's phone uploader cannot pick folders, so this repo must be flat. An asset got misfiled at <b>img/logo.png</b>. Move it up to the repo root (home), where your uploader can reach it.",
+          seed:function(){ gHome().c["img"] = { t:"d", c:{ "logo.png":{t:"f",body:"(image)"} } }; delete gHome().c["logo.png"]; },
+          steps:[function(f){ return !!gFile(["home","you","logo.png"]) && !nodeAt(f, ["home","you","img","logo.png"]); }],
+          hints:["mv the file out of the subfolder to here. A single dot means the current folder.","<code>mv img/logo.png .</code> (or <code>mv img/logo.png logo.png</code>)"],
+          fill:"mv img/logo.png .", sol:["mv img/logo.png ."] };
+      } },
+    { id:"w04", lv:4, make:function(){
+        return { goal:"<b>Back up before a risky rebuild.</b> Before you let an AI rewrite <b>index.html</b>, make a safety copy called <b>index.backup.html</b> in the same folder. Keep the original untouched.",
+          seed:function(){ gHome().c["index.html"] = { t:"f", body:"the working app" }; delete gHome().c["index.backup.html"]; },
+          steps:[function(f){ var o = gFile(["home","you","index.html"]), b = gFile(["home","you","index.backup.html"]); return !!o && o.body === "the working app" && !!b && b.body === "the working app"; }],
+          hints:["cp makes a copy and leaves the original alone.","<code>cp index.html index.backup.html</code>"],
+          fill:"cp index.html index.backup.html", sol:["cp index.html index.backup.html"] };
+      } },
+    { id:"w05", lv:4, make:function(){
+        return { goal:"<b>Add a .nojekyll file.</b> New GitHub Pages repos need an empty file named <b>.nojekyll</b> at the root so the site serves your files as-is. Create it here in home.",
+          seed:function(){ delete gHome().c[".nojekyll"]; },
+          steps:[function(f){ return !!gFile(["home","you",".nojekyll"]); }],
+          hints:["It is just an empty file. touch makes empty files.","<code>touch .nojekyll</code>"],
+          fill:"touch .nojekyll", sol:["touch .nojekyll"] };
+      } },
+    { id:"w06", lv:4, make:function(){
+        return { goal:"<b>Clean a messy repo before upload.</b> Your project folder has two junk files (<b>index.html.bak</b> and <b>notes.tmp</b>) mixed in with the real ones. Delete both. Leave <b>index.html</b> and <b>style.css</b> alone.",
+          seed:function(){ gHome().c["index.html"] = {t:"f",body:"app"}; gHome().c["style.css"] = {t:"f",body:"css"}; gHome().c["index.html.bak"] = {t:"f",body:"old"}; gHome().c["notes.tmp"] = {t:"f",body:"scratch"}; },
+          steps:[function(f){ return !nodeAt(f, ["home","you","index.html.bak"]) && !nodeAt(f, ["home","you","notes.tmp"]) && !!gFile(["home","you","index.html"]) && !!gFile(["home","you","style.css"]); }],
+          hints:["ls first to see the mess, then rm the two junk files. Look before you delete.","<code>rm index.html.bak</code> then <code>rm notes.tmp</code>"],
+          fill:"ls", sol:["rm index.html.bak","rm notes.tmp"] };
+      } }
+  ];
+  function resetSandbox(seedFn){
+    fs = freshFS();
+    if(seedFn) seedFn();
+    (function prime(node, path){
+      Object.keys(node.c).forEach(function(name){
+        var p = path + "/" + name;
+        seen[p] = true;
+        if(node.c[name].t === "d") prime(node.c[name], p);
+      });
+    })(nodeAt(fs, ["home","you"]), "/home/you");
+    refreshPrompt();
+    renderMirror();
+  }
+  function gymStats(){
+    $("repN").textContent = state.gym.reps;
+    $("strN").textContent = state.gym.streak;
+    $("bestN").textContent = state.gym.best;
+  }
+  function gymGoalRender(){
+    if(!drill) return;
+    var extra = "";
+    if(drill.tpl.steps.length > 1){
+      extra = '<div class="gstep">step ' + Math.min(drill.stepIdx + 1, drill.tpl.steps.length) + " of " + drill.tpl.steps.length + (drill.stepIdx > 0 ? " \u00b7 first part done \u2713" : "") + "</div>";
+    }
+    $("gGoal").innerHTML = drill.tpl.goal + extra;
+  }
+  function gymStart(forceId){
+    var pool = GYM_TPLS.filter(function(t){ return gymLevel === -1 || t.lv === gymLevel; });
+    var chosen = null;
+    if(forceId){ GYM_TPLS.forEach(function(t){ if(t.id === forceId) chosen = t; }); }
+    if(!chosen) chosen = pool[Math.floor(Math.random() * pool.length)];
+    drill = { tpl: chosen.make(), tplId: chosen.id, stepIdx: 0, hintsUsed: 0 };
+    resetSandbox(drill.tpl.seed);
+    termout.innerHTML = "";
+    print("=== new drill \u00b7 sandbox reset to a fresh setup ===", "tl-hint");
+    print("(the goal is on the drill card above; ls is always a good first move)", "tl-hint");
+    gymGoalRender();
+    $("gymCard").className = "gymcard active";
+    $("gHint").className = "ghint"; $("gHint").innerHTML = "";
+    $("gStart").style.display = "none";
+    $("gHintBtn").style.display = "";
+    $("gFillBtn").style.display = "none";
+    $("gSkip").style.display = "";
+    gymStats();
+  }
+  function gymWin(){
+    state.gym.reps++;
+    state.gym.streak++;
+    if(state.gym.streak > state.gym.best) state.gym.best = state.gym.streak;
+    saveState(state);
+    $("gymCard").className = "gymcard win";
+    $("gGoal").innerHTML = "<b>Done.</b> Rep logged" + (drill.hintsUsed === 0 ? ", no hints. Clean." : ".") + " Total reps: " + state.gym.reps + ".";
+    $("gHint").className = "ghint";
+    drill = null;
+    $("gStart").style.display = ""; $("gStart").textContent = "Next drill";
+    $("gHintBtn").style.display = "none"; $("gFillBtn").style.display = "none"; $("gSkip").style.display = "none";
+    gymStats();
+    toast("Rep logged \u00b7 streak " + state.gym.streak);
+  }
+  function gymAfter(flags){
+    if(!drill) return;
+    var guard = 0;
+    while(drill.stepIdx < drill.tpl.steps.length && drill.tpl.steps[drill.stepIdx](fs, flags) && guard++ < 10){
+      drill.stepIdx++;
+    }
+    if(drill.stepIdx >= drill.tpl.steps.length){ gymWin(); }
+    else { gymGoalRender(); }
+  }
+  $("gStart").addEventListener("click", function(){ gymStart(); });
+  $("gHintBtn").addEventListener("click", function(){
+    if(!drill) return;
+    drill.hintsUsed++;
+    var h = $("gHint");
+    h.className = "ghint show";
+    if(drill.hintsUsed === 1){ h.innerHTML = drill.tpl.hints[0]; }
+    else { h.innerHTML = drill.tpl.hints[0] + "<br>" + drill.tpl.hints[1]; $("gFillBtn").style.display = ""; }
+  });
+  $("gFillBtn").addEventListener("click", function(){
+    if(!drill) return;
+    input.value = drill.tpl.fill;
+    input.focus();
+  });
+  $("gSkip").addEventListener("click", function(){
+    if(!drill) return;
+    state.gym.streak = 0; saveState(state);
+    $("gGoal").innerHTML = "Skipped. The answer was:<br>" + drill.tpl.hints[1] + "<br>Streak reset. Tap Start when ready.";
+    $("gHint").className = "ghint";
+    $("gymCard").className = "gymcard";
+    drill = null;
+    $("gStart").style.display = ""; $("gStart").textContent = "Start drill";
+    $("gHintBtn").style.display = "none"; $("gFillBtn").style.display = "none"; $("gSkip").style.display = "none";
+    gymStats();
+  });
+  (function(){
+    var tabs = ["Surprise me"].concat(GYM_LEVELS.slice(0,4));
+    tabs.forEach(function(name, i){
+      var b = document.createElement("button");
+      b.className = "gtab" + (i === 0 ? " on" : ""); b.type = "button"; b.textContent = name;
+      b.addEventListener("click", function(){
+        gymLevel = i - 1;
+        Array.prototype.forEach.call(document.querySelectorAll(".gtab"), function(x, xi){ x.classList.toggle("on", xi === i); });
+      });
+      $("gymTabs").appendChild(b);
+    });
+  })();
+  function setTrack(t){
+    var g = $("trackGeneral"), tr = $("trackTrail"), tabs = $("gymTabs"), ban = $("trailBanner");
+    if(g) g.classList.toggle("on", t === "general");
+    if(tr) tr.classList.toggle("on", t === "trail");
+    if(tabs) tabs.style.display = (t === "trail") ? "none" : "";
+    if(ban) ban.className = "trailbanner" + (t === "trail" ? " show" : "");
+    if(t === "trail"){ gymLevel = 4; }
+    else { gymLevel = -1; Array.prototype.forEach.call(document.querySelectorAll(".gtab"), function(x, xi){ x.classList.toggle("on", xi === 0); }); }
+    if($("gymCard")) $("gymCard").className = "gymcard";
+    if($("gGoal")) $("gGoal").innerHTML = (t === "trail") ? "File and folder moves from real GitHub work. Tap <b>Start drill</b>." : "Pick a level (or Surprise me) and tap <b>Start drill</b>.";
+    if($("gHint")){ $("gHint").className = "ghint"; $("gHint").innerHTML = ""; }
+  }
+  if($("trackGeneral")) $("trackGeneral").addEventListener("click", function(){ setTrack("general"); });
+  if($("trackTrail")) $("trackTrail").addEventListener("click", function(){ setTrack("trail"); });
+  gymStats();
+  if(typeof window !== "undefined"){
+    window._gym = { start: gymStart, state: function(){ return { drill: drill, gym: state.gym }; } };
+  }
+
+  var CHIPS = ["help","pwd","ls","cd ","cd ..","mkdir ","touch ",'echo "hello" > ',"cat ","cp ","mv ","rm ","clear"];
+  var chipwrap = $("chips");
+  CHIPS.forEach(function(c){
+    var b = document.createElement("button");
+    b.className = "chip"; b.type = "button"; b.textContent = c.trim() + (c.slice(-1)===" " ? " \u2026" : "");
+    b.addEventListener("click", function(){
+      if(c.slice(-1) === " "){ input.value = c; input.focus(); }
+      else { exec(c); input.focus(); }
+    });
+    chipwrap.appendChild(b);
+  });
+
+  print("Welcome. This terminal is yours to break. Type help, or tap a chip.", "tl-hint");
+  renderMissions();
+  refreshPrompt();
+  renderMirror();
+
+  /* ---------- quiz ---------- */
+  var QUIZ = [
+    { q:"Linux is best described as...",
+      opts:["A product made and sold by one company",
+            "A free open-source operating system core that many systems are built on",
+            "A brand of computer",
+            "A programming language"], a:1 },
+    { q:"On Linux, all files live...",
+      opts:["On separate drive letters like C: and D:",
+            "In one tree that starts at /",
+            "Inside the browser",
+            "In the cloud only"], a:1 },
+    { q:"Which of these runs Linux under the hood?",
+      opts:["Most web servers","Android phones","Raspberry Pi boards","All of these"], a:3 },
+    { q:"The command pwd tells you...",
+      opts:["Your password","Which folder you are standing in right now","The system power level","The weather"], a:1 },
+    { q:"mkdir ideas does what?",
+      opts:["Makes a file called ideas","Makes a folder called ideas","Deletes ideas","Opens ideas in a browser"], a:1 }
+  ];
+  var answered = 0, correct = 0;
+  function renderQuiz(){
+    answered = 0; correct = 0;
+    var wrap = $("quizwrap");
+    wrap.innerHTML = "";
+    $("scoreEl").textContent = state.quizBest ? ("Best so far: " + state.quizBest + "/5") : "";
+    $("retryBtn").style.display = "none";
+    QUIZ.forEach(function(item){
+      var qd = document.createElement("div");
+      qd.className = "q";
+      var qt = document.createElement("div");
+      qt.className = "qt"; qt.textContent = item.q;
+      qd.appendChild(qt);
+      var opts = document.createElement("div");
+      opts.className = "opts";
+      item.opts.forEach(function(o, oi){
+        var b = document.createElement("div");
+        b.className = "opt"; b.tabIndex = 0; b.textContent = o;
+        function pick(){
+          if(qd.getAttribute("data-done")) return;
+          qd.setAttribute("data-done","1");
+          answered++;
+          if(oi === item.a){ b.classList.add("right"); correct++; }
+          else{
+            b.classList.add("wrong");
+            opts.children[item.a].classList.add("right");
+          }
+          Array.prototype.forEach.call(opts.children, function(x){ x.classList.add("lock"); });
+          if(answered === QUIZ.length){
+            $("scoreEl").textContent = "Score: " + correct + "/5" + (correct >= 4 ? "  \u2713 you have the basics" : "");
+            $("retryBtn").style.display = "inline-block";
+            if(correct > (state.quizBest||0)){ state.quizBest = correct; saveState(state); }
+          }
+        }
+        b.addEventListener("click", pick);
+        b.addEventListener("keydown", function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); pick(); } });
+        opts.appendChild(b);
+      });
+      qd.appendChild(opts);
+      wrap.appendChild(qd);
+    });
+  }
+  $("retryBtn").addEventListener("click", renderQuiz);
+  renderQuiz();
+}
+
+if(typeof window !== "undefined" && typeof document !== "undefined"){
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", initApp);
+  } else {
+    initApp();
+  }
+}
+if(typeof module !== "undefined" && module.exports){
+  module.exports = { freshFS: freshFS, runCommand: runCommand, resolvePath: resolvePath, nodeAt: nodeAt, pathString: pathString };
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0e1320">
+<title>The Fast Idiot: What a Computer Actually Is</title>
+<meta name="description" content="A beginner explainer of what a computer actually does: processor, memory, storage, what a file is, and what a program is, with a real toy CPU you can run.">
+<style>
+:root{
+  --bg:#0e1320; --panel:#151c2c; --panel2:#1c2536; --ink:#e7edf7; --dim:#93a0b5;
+  --cy:#45c8ff; --cy2:#8adcff; --cop:#e0904a; --sil:#c9d4e3; --amb:#f0c66a;
+  --line:#2a3650; --term:#0a0f1a; --good:#6fe3a1; --bad:#ff7a7a;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);
+  background-image:radial-gradient(1100px 500px at 50% -140px,#182338 0%,transparent 60%);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font-size:16px;line-height:1.55}
+code,.mono,.cheat,.instr,.regbox,.pixrow,.bytecode{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace}
+main{max-width:680px;margin:0 auto;padding:8px 14px 90px}
+section{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px 16px;margin:18px 0}
+.kick{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--cy);font-weight:700;margin:0 0 6px}
+h1{font-size:34px;line-height:1.1;margin:4px 0 8px;letter-spacing:-.01em}
+h2{font-size:22px;line-height:1.2;margin:2px 0 10px}
+h3{font-size:16px;margin:14px 0 6px}
+p{margin:8px 0}
+.sub{color:var(--dim)}
+.small{font-size:13px;color:var(--dim)}
+code{background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:13.5px;color:var(--cy2)}
+.btn{display:inline-block;background:var(--cy);color:#04121e;font-weight:700;border:0;border-radius:12px;
+  padding:12px 18px;font-size:16px;cursor:pointer;touch-action:manipulation}
+.btn:active{transform:scale(.97)}
+.btn.ghost{background:transparent;color:var(--cy2);border:1.5px solid var(--cy)}
+.btn.warm{background:var(--cop);color:#1c0e04}
+.btn[disabled]{opacity:.45}
+.btnrow{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 4px}
+.hero{padding-top:24px}
+.topline{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+#vbadge{background:var(--panel2);border:1px solid var(--line);color:var(--dim);border-radius:999px;
+  padding:5px 11px;font-size:12px;cursor:pointer;white-space:nowrap;margin-top:6px}
+.herosvg{display:block;margin:14px auto 6px;max-width:270px;width:100%;height:auto}
+.fgrid{display:grid;gap:10px;margin:12px 0}
+.fcard{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:14px;cursor:pointer}
+.fcard .fr{font-weight:700}
+.fcard .bk{display:none;color:var(--dim);margin-top:8px;font-size:14.5px}
+.fcard .tap{color:var(--cy2);font-size:12px;margin-top:8px;letter-spacing:.06em;text-transform:uppercase}
+.fcard.open .bk{display:block}
+.fcard.open .tap{display:none}
+.fcard.open{border-color:var(--cy)}
+/* three parts */
+.zones{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:12px 0}
+.zone{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 8px;min-height:120px}
+.zone h4{margin:0 0 2px;font-size:14px}
+.zone .zsub{font-size:11px;color:var(--dim);line-height:1.35;margin-bottom:8px}
+.z-cpu h4{color:var(--cop)} .z-mem h4{color:var(--cy2)} .z-sto h4{color:var(--sil)}
+.fchip{display:inline-block;border-radius:8px;padding:3px 8px;font-size:12px;margin:2px 2px 2px 0;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.st-file{border:1px solid var(--sil);color:var(--sil)}
+.st-edit{border:1.5px solid var(--cop);color:var(--cop)}
+.st-busy{background:var(--cop);color:#1c0e04;font-weight:700}
+.st-idle{border:1px dashed var(--line);color:var(--dim)}
+.zempty{color:#54617a;font-size:12px}
+.cap{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;
+  font-size:14.5px;min-height:58px;margin:10px 0}
+.cap b{color:var(--cy2)}
+/* byte inspector */
+.bytebox{background:var(--term);border:1px solid var(--line);border-radius:14px;padding:12px;margin:12px 0}
+#byteIn{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:8px;color:var(--ink);
+  padding:10px;font-size:16px;letter-spacing:.08em}
+#byteIn:focus{outline:2px solid var(--cy)}
+.costume{margin:12px 0 4px}
+.costume .ct{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
+.bytecode{font-size:14px;color:var(--cy2);word-break:break-all;line-height:1.8}
+.charrow{display:flex;gap:6px;flex-wrap:wrap}
+.charcell{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:6px 8px;text-align:center;min-width:44px}
+.charcell .ch{font-size:16px;font-weight:700}
+.charcell .cd{font-size:12px;color:var(--cy2)}
+.pixrow{display:flex;gap:4px;flex-wrap:wrap}
+.pix{width:34px;height:34px;border-radius:6px;border:1px solid var(--line)}
+/* cpu sim */
+#missions{display:grid;gap:8px;margin:12px 0}
+.mission{display:flex;gap:10px;align-items:flex-start;background:var(--panel2);border:1px solid var(--line);
+  border-radius:12px;padding:10px 12px}
+.mnum{flex:0 0 26px;height:26px;border-radius:50%;border:1.5px solid var(--cy);color:var(--cy2);
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
+.mission .mt{font-weight:700;font-size:14.5px}
+.mission .md{font-size:13px;color:var(--dim)}
+.mission.done{border-color:var(--good)}
+.mission.done .mnum{border-color:var(--good);background:var(--good);color:#04180d}
+.cpubox{background:var(--term);border:1px solid var(--line);border-radius:14px;padding:12px;margin:12px 0}
+.ptabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.ptab{background:var(--panel2);border:1px solid var(--line);color:var(--dim);border-radius:999px;padding:7px 12px;font-size:13px;cursor:pointer}
+.ptab.on{border-color:var(--cy);color:var(--cy2);font-weight:700}
+.cpugrid{display:grid;grid-template-columns:1fr;gap:10px}
+@media (min-width:560px){ .cpugrid{grid-template-columns:1.2fr 1fr} .fgrid{grid-template-columns:1fr 1fr} }
+.instrlist{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px}
+.instr{display:flex;gap:8px;padding:5px 8px;border-radius:8px;font-size:13.5px;color:var(--ink)}
+.instr .ln{color:#54617a;min-width:16px}
+.instr.cur{background:#173049;outline:1.5px solid var(--cy)}
+.numchip{display:inline-block;background:var(--cy);color:#04121e;font-weight:700;border-radius:6px;padding:0 8px;cursor:pointer}
+.regs{display:flex;gap:8px;margin-bottom:8px}
+.regbox{flex:1;background:var(--panel2);border:1px solid var(--cop);border-radius:10px;padding:8px;text-align:center}
+.regbox .rl{font-size:11px;color:var(--cop);letter-spacing:.1em}
+.regbox .rv{font-size:22px;font-weight:700}
+.outbox{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px 10px;min-height:40px;font-size:14px}
+.outbox b{color:var(--good)}
+.stepline{color:var(--dim);font-size:12.5px;margin-top:8px}
+.gym{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;margin:14px 0}
+.gymstats{display:flex;gap:18px;font-size:12.5px;color:var(--dim);margin-bottom:10px;letter-spacing:.04em}
+.gymstats b{color:var(--good);font-size:15px;margin-left:4px}
+.gymtabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.gtab{font-size:12px;padding:6px 11px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--dim);cursor:pointer}
+.gtab.on{border-color:var(--cy);color:var(--cy2);font-weight:700}
+.gymcard{border:1px dashed var(--line);border-radius:10px;padding:12px}
+.gymcard.active{border-style:solid;border-color:var(--cy)}
+.gymcard.win{border-style:solid;border-color:var(--good)}
+.gymcard.lose{border-style:solid;border-color:var(--bad)}
+.ggoal{font-size:15px;line-height:1.5}
+.ggoal b{color:var(--cy2)}
+.gstep{font-size:12px;margin-top:6px}
+.gprog{background:var(--term);border:1px solid var(--line);border-radius:10px;padding:8px;margin:10px 0}
+.gopts{display:grid;gap:8px;margin:10px 0}
+.gopts button{text-align:left;background:var(--panel);border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:11px 12px;font-size:14.5px;cursor:pointer;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.gopts button.right{border-color:var(--good);color:var(--good);font-weight:700}
+.gopts button.wrong{border-color:var(--bad);color:var(--bad)}
+.gopts button.lock{pointer-events:none;opacity:.85}
+.ghint{font-size:13.5px;color:var(--amb);margin-top:8px;display:none}
+.ghint.show{display:block}
+.gbtns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+/* verdict */
+.vgrid{display:grid;gap:10px;margin:12px 0}
+.vcard{background:var(--panel2);border-radius:12px;padding:12px 14px;font-size:14.5px}
+.vkeep{border:1.5px solid var(--good)} .vskip{border:1.5px solid var(--line)}
+.vcard h4{margin:0 0 6px}
+.vkeep h4{color:var(--good)} .vskip h4{color:var(--dim)}
+.cheat{background:var(--term);border:1px solid var(--line);border-radius:12px;padding:12px;font-size:12.5px;
+  line-height:1.8;overflow-x:auto;white-space:pre}
+.cheat b{color:var(--cy2)} .cheat span{color:var(--dim)}
+/* quiz */
+.q{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;margin:10px 0}
+.q .qt{font-weight:700;margin-bottom:8px}
+.opts{display:grid;gap:8px}
+.opts button{text-align:left;background:var(--panel);border:1px solid var(--line);color:var(--ink);
+  border-radius:10px;padding:11px 12px;font-size:14.5px;cursor:pointer}
+.opts button.right{border-color:var(--good);color:var(--good);font-weight:700}
+.opts button.wrong{border-color:var(--bad);color:var(--bad)}
+.opts button.lock{pointer-events:none;opacity:.85}
+#scoreEl{font-weight:700;color:var(--cy2);margin:10px 0}
+#retryBtn{display:none}
+footer{color:#54617a;font-size:12.5px;text-align:center;margin:30px 0 10px;line-height:1.7}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(80px);
+  background:var(--panel2);border:1px solid var(--cy);color:var(--ink);border-radius:999px;
+  padding:10px 18px;font-size:13.5px;transition:transform .25s;z-index:50;pointer-events:none;white-space:nowrap}
+#toast.show{transform:translateX(-50%) translateY(0)}
+:focus-visible{outline:2px solid var(--cy2);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}html{scroll-behavior:auto}}
+  .mascotspot{text-align:center;margin:6px 0 2px;}
+  .mascotspot img{height:230px;width:auto;filter:drop-shadow(0 10px 22px rgba(0,0,0,.5));}
+  .tipbox{position:relative;background:var(--panel,#141a28);border:1px solid var(--line,#243049);border-left:3px solid #45c8ff;border-radius:0 12px 12px 0;padding:16px 16px 16px 118px;margin:22px 0;min-height:96px;}
+  .tipbox .poke{position:absolute;left:-14px;bottom:-8px;height:150px;width:auto;transform:rotate(-8deg);filter:drop-shadow(0 8px 16px rgba(0,0,0,.45));pointer-events:none;}
+  .tipbox.right{border-left:none;border-right:3px solid #45c8ff;border-radius:12px 0 0 12px;padding:16px 118px 16px 16px;}
+  .tipbox.right .poke{left:auto;right:-14px;transform:rotate(8deg);}
+  .tipbox .tt{font-weight:700;color:#45c8ff;font-size:15px;}
+  .tipbox .tp{margin:4px 0 0;font-size:14.5px;color:var(--soft,#aeb9cc);line-height:1.55;}
+  .tracktoggle{display:flex;gap:8px;margin:14px 0 10px;align-items:center;flex-wrap:wrap;}
+  .tracktoggle .tlabel{font-family:monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim,#7c8aa5);margin-right:2px;}
+  .ttab{font-family:monospace;font-size:12.5px;padding:7px 14px;border-radius:999px;border:1px solid var(--line,#243049);background:var(--panel,#141a28);color:var(--soft,#aeb9cc);cursor:pointer;}
+  .ttab.on.general{border-color:#45c8ff;color:#45c8ff;background:rgba(69,200,255,.1);font-weight:700;}
+  .ttab.on.trail{border-color:#c8a4f0;color:#c8a4f0;background:rgba(200,164,240,.12);font-weight:700;}
+  .trailbanner{font-family:monospace;font-size:11.5px;color:#c8a4f0;background:rgba(200,164,240,.08);border:1px solid rgba(200,164,240,.3);border-radius:8px;padding:7px 11px;margin:8px 0;display:none;}
+  .trailbanner.show{display:block;}
+  .backhub{display:inline-flex;align-items:center;gap:7px;font-family:monospace;font-size:12px;color:var(--soft,#aeb9cc);border:1px solid var(--line,#243049);border-radius:999px;padding:7px 13px;background:var(--panel,#141a28);text-decoration:none;}
+</style>
+</head>
+<body>
+<main>
+<!-- S1 HERO -->
+<section class="hero">
+  <div class="topline">
+    <div>
+      <div class="kick">small explainer · bare metal</div>
+      <h1>The Fast Idiot</h1>
+      <p class="sub" style="font-size:18px">What a computer actually is: a very fast worker following a very dumb list.</p>
+    </div>
+    <button id="vbadge" aria-label="version">v3.1</button>
+  </div>
+  <svg class="herosvg" viewBox="0 0 270 110" aria-hidden="true">
+    <rect x="95" y="25" width="80" height="60" rx="10" fill="#1c2536" stroke="#45c8ff" stroke-width="2.5"/>
+    <text x="135" y="60" fill="#45c8ff" font-size="14" text-anchor="middle" font-family="monospace" font-weight="bold">CPU</text>
+    <line x1="95" y1="40" x2="70" y2="40" stroke="#45c8ff" stroke-width="2.5"/>
+    <line x1="95" y1="55" x2="70" y2="55" stroke="#45c8ff" stroke-width="2.5"/>
+    <line x1="95" y1="70" x2="70" y2="70" stroke="#45c8ff" stroke-width="2.5"/>
+    <line x1="175" y1="40" x2="200" y2="40" stroke="#e0904a" stroke-width="2.5"/>
+    <line x1="175" y1="55" x2="200" y2="55" stroke="#e0904a" stroke-width="2.5"/>
+    <line x1="175" y1="70" x2="200" y2="70" stroke="#e0904a" stroke-width="2.5"/>
+    <circle cx="62" cy="40" r="4" fill="#45c8ff"/><circle cx="62" cy="55" r="4" fill="#45c8ff"/><circle cx="62" cy="70" r="4" fill="#45c8ff"/>
+    <circle cx="208" cy="40" r="4" fill="#e0904a"/><circle cx="208" cy="55" r="4" fill="#e0904a"/><circle cx="208" cy="70" r="4" fill="#e0904a"/>
+    <text x="135" y="103" fill="#93a0b5" font-size="10" text-anchor="middle" font-family="monospace">billions of tiny steps per second</text>
+  </svg>
+  <div class="mascotspot"><img src="thumb-computer.png" alt="mascot holding a CPU chip"></div>
+  <p>Every device you own is the same machine wearing different cases. A phone, a laptop, a smart TV, a game console: one worker, one desk, one filing cabinet. Learn those three and half of tech support suddenly makes sense.</p>
+  <h3>You already live with this</h3>
+  <div class="fgrid">
+    <div class="fcard" tabindex="0"><div class="fr">Your phone gets warm in a game</div>
+      <div class="bk">The worker is sprinting: billions of instructions per second. That warmth is the work. The heat is the list being run.</div>
+      <div class="tap">tap</div></div>
+    <div class="fcard" tabindex="0"><div class="fr">"Storage almost full" but apps still freeze</div>
+      <div class="bk">Two different parts. Storage is the filing cabinet (your photos live there). Freezing is usually the desk or the worker being overwhelmed. Deleting photos rarely fixes a freeze.</div>
+      <div class="tap">tap</div></div>
+    <div class="fcard" tabindex="0"><div class="fr">Airplane mode, and games still work</div>
+      <div class="bk">The computer is a complete machine without the internet. The network is a door, not an organ. Everything in this explainer happens inside the case.</div>
+      <div class="tap">tap</div></div>
+  </div>
+</section>
+
+<!-- S2 THREE PARTS -->
+<section>
+  <div class="kick">part 1 · the mental model</div>
+  <h2>Worker, desk, cabinet</h2>
+  <p>Three parts do almost everything. The <b>processor</b> (CPU) is a worker: incredibly fast, tiny attention span. <b>Memory</b> (RAM) is the worker's desk: fast to reach, small, and wiped clean at power off. <b>Storage</b> is the filing cabinet: huge, slower, permanent.</p>
+  <div class="zones">
+    <div class="zone z-cpu"><h4>Worker</h4><div class="zsub">the processor. Does one tiny step at a time, billions per second</div><div id="dCpu"><span class="fchip st-idle">idle</span></div></div>
+    <div class="zone z-mem"><h4>Desk</h4><div class="zsub">memory (RAM). Fast, small, erased at power off</div><div id="dMem"><span class="zempty">empty</span></div></div>
+    <div class="zone z-sto"><h4>Cabinet</h4><div class="zsub">storage. Big, slower, keeps things forever</div><div id="dSto"><span class="zempty">empty</span></div></div>
+  </div>
+  <div id="travelCap" class="cap">Tap <b>Follow one photo</b> to watch what actually happens when you open, edit, and save.</div>
+  <div class="btnrow">
+    <button id="travelBtn" class="btn">Follow one photo</button>
+    <button id="travelReset" class="btn ghost">Reset</button>
+  </div>
+</section>
+
+<!-- S3 WHAT A FILE IS -->
+<section>
+  <div class="kick">part 2 · what a file actually is</div>
+  <h2>Numbers with a name tag</h2>
+  <p>A file is not mysterious. It is a list of numbers, plus a name. That is the entire secret. What matters is how the numbers get <b>read</b>. Type something:</p>
+  <div class="bytebox">
+    <input id="byteIn" type="text" maxlength="10" value="HELLO" autocomplete="off" autocapitalize="characters" aria-label="text to inspect">
+    <div class="costume"><div class="ct">costume 1 · read as letters</div><div class="charrow" id="charOut"></div></div>
+    <div class="costume"><div class="ct">costume 2 · the raw numbers actually stored</div><div class="bytecode" id="numOut"></div></div>
+    <div class="costume"><div class="ct">costume 3 · read as pixel brightness</div><div class="pixrow" id="pixOut"></div></div>
+  </div>
+  <p class="small">This is real: those are the actual character codes of what you typed, and each square's brightness is that same number. One list, three costumes. A text file, an image, a song: all lists of numbers. The <code>.txt</code> or <code>.jpg</code> on the end is just a hint about which costume to use.</p>
+</section>
+
+<!-- S4 WHAT A PROGRAM IS -->
+<section>
+  <div class="kick">part 3 · what a program is</div>
+  <h2>A to-do list for the worker</h2>
+  <p>A program is a list of tiny instructions. The worker reads one line, does it, moves to the next. That is all "running an app" means. Below is a real, working toy processor. Nothing is faked: tapping Step genuinely executes the highlighted line.</p>
+  <h3>Missions</h3>
+  <div id="missions"></div>
+  <div class="cpubox">
+    <div class="ptabs" id="ptabs"></div>
+    <div class="cpugrid">
+      <div class="instrlist" id="instrList"></div>
+      <div>
+        <div class="regs">
+          <div class="regbox"><div class="rl">REGISTER A</div><div class="rv" id="regA">0</div></div>
+          <div class="regbox"><div class="rl">REGISTER B</div><div class="rv" id="regB">0</div></div>
+        </div>
+        <div class="outbox" id="cpuOut">output appears here</div>
+      </div>
+    </div>
+    <div class="btnrow">
+      <button id="stepBtn" class="btn">Step</button>
+      <button id="runBtn" class="btn warm">Run</button>
+      <button id="resetBtn" class="btn ghost">Reset</button>
+    </div>
+    <div class="stepline" id="stepLine">0 steps executed</div>
+  </div>
+  <p class="small">A register is a tiny scratch pad inside the worker, big enough for one number. Real chips run lists like this billions of times per second. The warmth of a busy phone is one of these lists, sprinting.</p>
+
+  <h3>The Gym: reps until it sticks</h3>
+  <p class="small">Two kinds of reps: <b>predict</b> what a short program will output before it runs (then it really runs to check you), and <b>build</b> a program to hit a target by tapping the blue numbers. Wrong predictions reset your streak; that is the workout.</p>
+  <div class="tracktoggle">
+    <span class="tlabel">practice</span>
+    <button class="ttab general on" id="trackGeneral" type="button">General</button>
+    <button class="ttab trail" id="trackTrail" type="button">The Trail</button>
+  </div>
+  <div class="trailbanner" id="trailBanner">The Trail: real moments from building these apps on a phone. The fast-idiot model, applied.</div>
+  <div class="gym">
+    <div class="gymstats"><span>reps<b id="repN">0</b></span><span>streak<b id="strN">0</b></span><span>best<b id="bestN">0</b></span></div>
+    <div class="gymtabs" id="gymTabs"></div>
+    <div class="gymcard" id="gymCard">
+      <div class="ggoal" id="gGoal">Pick a level (or Surprise me) and tap <b>Start drill</b>.</div>
+      <div class="gprog" id="gProg" style="display:none"></div>
+      <div class="gopts" id="gOpts"></div>
+      <div class="ghint" id="gHint"></div>
+      <div class="gbtns">
+        <button class="btn" id="gStart" type="button">Start drill</button>
+        <button class="btn warm" id="gRun" type="button" style="display:none">Run it</button>
+        <button class="btn ghost" id="gHintBtn" type="button" style="display:none">Hint</button>
+        <button class="btn ghost" id="gSkip" type="button" style="display:none">Skip</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- S5 EVERYDAY -->
+<section>
+  <div class="kick">part 4 · everyday payoffs</div>
+  <h2>Tech support, decoded</h2>
+  <div class="fgrid">
+    <div class="fcard" tabindex="0"><div class="fr">"Storage almost full"</div>
+      <div class="bk">Cabinet problem. Delete files, photos, and apps you do not use. Buying a phone with more storage means buying a bigger cabinet.</div><div class="tap">tap</div></div>
+    <div class="fcard" tabindex="0"><div class="fr">Everything is laggy with lots of apps open</div>
+      <div class="bk">Desk problem. Every open app keeps papers on the desk. When the desk is full, the worker wastes time shuffling. Closing apps clears desk space.</div><div class="tap">tap</div></div>
+    <div class="fcard" tabindex="0"><div class="fr">"Have you tried turning it off and on?"</div>
+      <div class="bk">It works because power off wipes the desk. Whatever tangled mess was sitting in memory is gone, and everything reloads fresh from the cabinet.</div><div class="tap">tap</div></div>
+    <div class="fcard" tabindex="0"><div class="fr">Updates need a restart</div>
+      <div class="bk">An update swaps out instruction lists in the cabinet. The safe moment to swap a to-do list is when nobody is reading it, so the machine restarts to let go of everything first.</div><div class="tap">tap</div></div>
+  </div>
+</section>
+
+<!-- S6 VERDICT -->
+<section>
+  <div class="kick">part 5 · the honest verdict</div>
+  <h2>What to keep, what to skip</h2>
+  <div class="vgrid">
+    <div class="vcard vkeep"><h4>Keep this</h4>
+      Worker, desk, cabinet. A file is numbers plus a name tag; the extension is a costume hint. A program is an instruction list, and running it means the worker walking the list. Memory is wiped at power off; storage is not. That model explains most everyday computer behavior.</div>
+    <div class="vcard vskip"><h4>Skip for now</h4>
+      Transistor physics, binary arithmetic, assembly language, instruction pipelines, cache levels. All real, none needed for the mental model. The toy CPU above is closer to the truth than you might think.</div>
+  </div>
+  <h3>Pocket reference: symptom to part</h3>
+  <div class="cheat"><b>storage full</b>        <span>cabinet: delete files and apps</span>
+<b>laggy, freezing</b>     <span>desk or worker: close apps, restart</span>
+<b>restart fixed it</b>    <span>the desk got wiped clean</span>
+<b>hot phone</b>           <span>worker sprinting through a heavy list</span>
+<b>battery draining</b>    <span>same sprint, measured in power</span>
+<b>update wants restart</b><span>swapping instruction lists safely</span></div>
+</section>
+
+<!-- S7 QUIZ -->
+<section>
+  <div class="kick">part 6 · prove it</div>
+  <h2>Five questions</h2>
+  <div id="quizwrap"></div>
+  <div id="scoreEl"></div>
+  <button id="retryBtn" class="btn ghost">Try again</button>
+</section>
+
+<footer>
+  The Fast Idiot · a small explainer · made on a phone<br>
+  Course order: this one first, then the internet, then the browser.
+</footer>
+<div style="text-align:center;margin:24px 0 8px;"><a class="backhub" href="index.html">&larr; back to All Thumbs</a></div>
+</main>
+<div id="toast" role="status"></div>
+<script>
+"use strict";
+var VERSION = "v3.1 · Aug 26";
+
+/* ============ ENGINE (DOM-free) ============ */
+/* Instructions: ["SET",r,n] ["ADD",r,n] ["SUB",r,n] ["ADDR",r,r2] ["SHOW",r] ["JUMPIF",r,line] ["HALT"] */
+function freshMachine(prog){
+  return { prog: prog, pc: 0, regs: { A:0, B:0 }, out: [], halted: false, steps: 0 };
+}
+function stepMachine(m){
+  if(m.halted || m.pc >= m.prog.length){ m.halted = true; return m; }
+  var ins = m.prog[m.pc], op = ins[0];
+  m.steps++;
+  if(op === "SET"){ m.regs[ins[1]] = ins[2]; m.pc++; }
+  else if(op === "ADD"){ m.regs[ins[1]] += ins[2]; m.pc++; }
+  else if(op === "SUB"){ m.regs[ins[1]] -= ins[2]; m.pc++; }
+  else if(op === "ADDR"){ m.regs[ins[1]] += m.regs[ins[2]]; m.pc++; }
+  else if(op === "SHOW"){ m.out.push(m.regs[ins[1]]); m.pc++; }
+  else if(op === "JUMPIF"){ m.pc = m.regs[ins[1]] > 0 ? ins[2] - 1 : m.pc + 1; }
+  else if(op === "HALT"){ m.halted = true; }
+  else { m.pc++; }
+  if(m.pc >= m.prog.length) m.halted = true;
+  return m;
+}
+function runMachine(m, maxSteps){
+  var cap = maxSteps || 500;
+  while(!m.halted && m.steps < cap) stepMachine(m);
+  return m;
+}
+function bytesOf(text){
+  var out = [];
+  for(var i = 0; i < text.length; i++) out.push(text.charCodeAt(i));
+  return out;
+}
+
+/* ============ UI ============ */
+function initApp(){
+  function $(id){ return document.getElementById(id); }
+  var store = (function(){
+    var ok = true, mem = {};
+    try { localStorage.setItem("__ct","1"); localStorage.removeItem("__ct"); } catch(e){ ok = false; }
+    return {
+      load: function(){ try { if(ok){ var raw = localStorage.getItem("computer101_v1"); return raw ? JSON.parse(raw) : {}; } } catch(e){} return mem; },
+      save: function(s){ try { if(ok){ localStorage.setItem("computer101_v1", JSON.stringify(s)); return; } } catch(e){} mem = s; }
+    };
+  })();
+  var state = store.load();
+  state.m = state.m || {};
+
+  var toastT = null;
+  function toast(msg){
+    var el = $("toast");
+    el.textContent = msg; el.classList.add("show");
+    clearTimeout(toastT);
+    toastT = setTimeout(function(){ el.classList.remove("show"); }, 1800);
+  }
+  $("vbadge").addEventListener("click", function(){ toast(VERSION + " · loaded"); });
+
+  Array.prototype.forEach.call(document.querySelectorAll(".fcard"), function(cd){
+    function flip(){ cd.classList.toggle("open"); }
+    cd.addEventListener("click", flip);
+    cd.addEventListener("keydown", function(e){ if(e.key === "Enter" || e.key === " "){ e.preventDefault(); flip(); } });
+  });
+
+  /* ---- travel: follow one photo ---- */
+  function chips(list){
+    if(!list.length) return "<span class=\"zempty\">empty</span>";
+    return list.map(function(p){ return "<span class=\"fchip " + p[1] + "\">" + p[0] + "</span>"; }).join("");
+  }
+  var TRAV = [
+    { c:[["idle","st-idle"]], m:[], s:[], cap:"Tap <b>Follow one photo</b> to watch what actually happens when you open, edit, and save." },
+    { c:[["idle","st-idle"]], m:[], s:[["photo.jpg","st-file"]],
+      cap:"Your photo lives in the <b>cabinet</b> (storage). Permanent and safe, even with the power off." },
+    { c:[["opening","st-busy"]], m:[["photo.jpg","st-file"]], s:[["photo.jpg","st-file"]],
+      cap:"You open the gallery. A <b>copy</b> is pulled onto the desk, because the worker can only work on what is on the desk." },
+    { c:[["editing","st-busy"]], m:[["photo.jpg *","st-edit"]], s:[["photo.jpg","st-file"]],
+      cap:"You add a filter. The <b>desk copy</b> changes. The cabinet copy has not. If the app crashed right now, the edit would be lost." },
+    { c:[["saving","st-busy"]], m:[["photo.jpg *","st-edit"]], s:[["photo.jpg *","st-edit"]],
+      cap:"You tap save. The edited copy is <b>written back</b> to the cabinet. Now it is permanent." },
+    { c:[["off","st-idle"]], m:[], s:[["photo.jpg *","st-edit"]],
+      cap:"Power off. The <b>desk is wiped clean</b>, every single time. The cabinet keeps everything. That is the entire difference between memory and storage." },
+    { c:[["idle","st-idle"]], m:[], s:[["photo.jpg *","st-edit"]],
+      cap:"The whole loop: copy out, work on the desk, save back. <b>Every app you have ever used does exactly this.</b>" }
+  ];
+  var ti = 0;
+  function travRender(){
+    var s = TRAV[ti];
+    $("dCpu").innerHTML = chips(s.c);
+    $("dMem").innerHTML = chips(s.m);
+    $("dSto").innerHTML = chips(s.s);
+    $("travelCap").innerHTML = s.cap + (ti > 0 ? " <span class=\"small\">(" + ti + "/" + (TRAV.length - 1) + ")</span>" : "");
+    $("travelBtn").textContent = ti === 0 ? "Follow one photo" : (ti >= TRAV.length - 1 ? "Loop starts over" : "Next");
+  }
+  $("travelBtn").addEventListener("click", function(){ ti = ti >= TRAV.length - 1 ? 1 : ti + 1; travRender(); });
+  $("travelReset").addEventListener("click", function(){ ti = 0; travRender(); });
+  travRender();
+
+  /* ---- missions ---- */
+  var FL = {};
+  var MISSIONS = [
+    { id:"c1", t:"Put your own word in a file", d:"Change the text in the byte inspector above. Watch all three costumes update." },
+    { id:"c2", t:"Run your first program", d:"Pick Count up. Step or Run it until it halts." },
+    { id:"c3", t:"Run the adder", d:"Pick Add two numbers and run it. Two registers, one answer." },
+    { id:"c4", t:"Reprogram it: make it output 10", d:"Tap the blue numbers in the adder to change them, then run again." },
+    { id:"c5", t:"Watch a loop", d:"Pick The loop and run it. One JUMPIF line is how computers repeat anything." }
+  ];
+  function buildMissions(){
+    var wrap = $("missions"); wrap.innerHTML = "";
+    MISSIONS.forEach(function(m, i){
+      var d = document.createElement("div");
+      d.className = "mission" + (state.m[m.id] ? " done" : "");
+      d.id = "ms_" + m.id;
+      d.innerHTML = "<div class=\"mnum\">" + (state.m[m.id] ? "\u2713" : (i + 1)) + "</div>" +
+        "<div><div class=\"mt\">" + m.t + "</div><div class=\"md\">" + m.d + "</div></div>";
+      wrap.appendChild(d);
+    });
+  }
+  function done(id, i, t){
+    if(state.m[id]) return;
+    state.m[id] = true; store.save(state);
+    var el = $("ms_" + id);
+    el.classList.add("done");
+    el.querySelector(".mnum").textContent = "\u2713";
+    toast("Mission done: " + t);
+  }
+  function checkMissions(){
+    MISSIONS.forEach(function(m, i){ if(FL[m.id]) done(m.id, i, m.t); });
+  }
+  buildMissions();
+
+  /* ---- byte inspector ---- */
+  function renderBytes(){
+    var text = $("byteIn").value;
+    var codes = bytesOf(text);
+    $("charOut").innerHTML = text.length ?
+      codes.map(function(c, i){
+        var ch = text[i] === " " ? "\u2423" : text[i];
+        return "<div class=\"charcell\"><div class=\"ch\">" + ch.replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/&(?!lt;|gt;|amp;)/g,"&amp;") + "</div><div class=\"cd\">" + c + "</div></div>";
+      }).join("") : "<span class=\"zempty\">type something above</span>";
+    $("numOut").textContent = codes.length ? codes.join(" ") : "";
+    $("pixOut").innerHTML = codes.map(function(c){
+      var g = Math.max(0, Math.min(255, c));
+      return "<div class=\"pix\" style=\"background:rgb(" + g + "," + g + "," + g + ")\"></div>";
+    }).join("");
+    if(text.length >= 2 && text !== "HELLO"){ FL.c1 = 1; checkMissions(); }
+  }
+  $("byteIn").addEventListener("input", renderBytes);
+  renderBytes();
+
+  /* ---- toy CPU ---- */
+  var PROGRAMS = [
+    { name:"Count up", missionId:"c2", edit:false, prog:[
+      ["SET","A",1],["SHOW","A"],["ADD","A",1],["SHOW","A"],["ADD","A",1],["SHOW","A"],["HALT"]
+    ]},
+    { name:"Add two numbers", missionId:"c3", edit:true, prog:[
+      ["SET","A",4],["SET","B",3],["ADDR","A","B"],["SHOW","A"],["HALT"]
+    ]},
+    { name:"The loop", missionId:"c5", edit:false, prog:[
+      ["SET","A",3],["SHOW","A"],["SUB","A",1],["JUMPIF","A",2],["HALT"]
+    ]}
+  ];
+  var pIdx = 0, mach = null, runTimer = null;
+  function cloneProg(p){ return p.map(function(row){ return row.slice(); }); }
+  function insText(ins){
+    return ins.map(function(x, i){ return (i === 0 ? x : x); }).join(" ");
+  }
+  function loadProgram(i){
+    pIdx = i;
+    clearInterval(runTimer); runTimer = null;
+    mach = freshMachine(cloneProg(PROGRAMS[i].prog));
+    Array.prototype.forEach.call(document.querySelectorAll(".ptab"), function(tb, ix){
+      tb.classList.toggle("on", ix === i);
+    });
+    $("runBtn").textContent = "Run";
+    renderCPU();
+  }
+  function renderCPU(){
+    var P = PROGRAMS[pIdx];
+    var list = $("instrList");
+    list.innerHTML = "";
+    mach.prog.forEach(function(ins, li){
+      var d = document.createElement("div");
+      d.className = "instr" + (li === mach.pc && !mach.halted ? " cur" : "");
+      var parts = "<span class=\"ln\">" + (li + 1) + "</span>";
+      ins.forEach(function(tok, tix){
+        if(P.edit && ins[0] === "SET" && tix === 2){
+          parts += " <span class=\"numchip\" data-line=\"" + li + "\" role=\"button\" tabindex=\"0\">" + tok + "</span>";
+        } else {
+          parts += " <span>" + tok + "</span>";
+        }
+      });
+      d.innerHTML = parts;
+      list.appendChild(d);
+    });
+    Array.prototype.forEach.call(list.querySelectorAll(".numchip"), function(nc){
+      function bump(){
+        var li = parseInt(nc.getAttribute("data-line"), 10);
+        var cur = PROGRAMS[pIdx].prog[li][2];
+        PROGRAMS[pIdx].prog[li][2] = cur >= 9 ? 1 : cur + 1;
+        loadProgram(pIdx);
+      }
+      nc.addEventListener("click", bump);
+      nc.addEventListener("keydown", function(e){ if(e.key === "Enter" || e.key === " "){ e.preventDefault(); bump(); } });
+    });
+    $("regA").textContent = mach.regs.A;
+    $("regB").textContent = mach.regs.B;
+    $("cpuOut").innerHTML = mach.out.length ? "output: <b>" + mach.out.join(", ") + "</b>" : "output appears here";
+    $("stepLine").textContent = mach.steps + " steps executed" + (mach.halted ? " · HALT reached" : "");
+  }
+  function afterHalt(){
+    if(!mach.halted) return;
+    var P = PROGRAMS[pIdx];
+    if(P.missionId) FL[P.missionId] = 1;
+    if(pIdx === 1 && mach.out.length && mach.out[mach.out.length - 1] === 10) FL.c4 = 1;
+    checkMissions();
+  }
+  $("stepBtn").addEventListener("click", function(){
+    if(mach.halted) return;
+    stepMachine(mach); renderCPU(); afterHalt();
+  });
+  $("runBtn").addEventListener("click", function(){
+    if(runTimer){ clearInterval(runTimer); runTimer = null; $("runBtn").textContent = "Run"; return; }
+    if(mach.halted) loadProgram(pIdx);
+    $("runBtn").textContent = "Pause";
+    runTimer = setInterval(function(){
+      stepMachine(mach); renderCPU();
+      if(mach.halted){
+        clearInterval(runTimer); runTimer = null;
+        $("runBtn").textContent = "Run";
+        afterHalt();
+      }
+    }, 320);
+  });
+  $("resetBtn").addEventListener("click", function(){ loadProgram(pIdx); });
+  PROGRAMS.forEach(function(P, i){
+    var b = document.createElement("button");
+    b.className = "ptab"; b.textContent = P.name;
+    b.addEventListener("click", function(){ loadProgram(i); });
+    $("ptabs").appendChild(b);
+  });
+  loadProgram(0);
+
+  /* ---- The Gym ---- */
+  state.gym = state.gym || { reps:0, streak:0, best:0 };
+  var GYM_LEVELS = ["Read it","Do the math","Follow the jumps","Build it","Your work"];
+  var gymLevel = -1;
+  var drill = null;
+  function rint(lo, hi){ return lo + Math.floor(Math.random() * (hi - lo + 1)); }
+  function shuffle3(correct, w1, w2){
+    var arr = [ {t:correct, r:true}, {t:w1, r:false}, {t:w2, r:false} ];
+    for(var i = arr.length - 1; i > 0; i--){
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+    }
+    return arr;
+  }
+  function outText(out){ return out.length ? out.join(", ") : "(nothing at all)"; }
+  var GYM_TPLS = [
+    { id:"c01", lv:0, make:function(){
+        var x = rint(1, 6), y = rint(1, 6);
+        return { kind:"predict",
+          goal:"Read this program like the worker would, line by line. <b>What will it output?</b>",
+          prog:[["SET","A",x],["SHOW","A"],["ADD","A",y],["SHOW","A"],["HALT"]],
+          hints:["SHOW prints whatever is in the register at that exact moment.","After line 1, A is " + x + ". SHOW prints it. Then ADD changes A before the second SHOW."] };
+      } },
+    { id:"c02", lv:0, make:function(){
+        var x = rint(1, 6), y = rint(1, 6);
+        return { kind:"predict",
+          goal:"Careful with the order. <b>What will it output?</b>",
+          prog:[["SET","A",x],["SET","B",y],["SHOW","B"],["SHOW","A"],["HALT"]],
+          wrongs:[String(x) + ", " + String(y), String(y) + ", " + String(y)],
+          hints:["Two registers, two SHOWs. Which register does each SHOW name?","Line 3 shows B (" + y + ") first, line 4 shows A (" + x + ")."] };
+      } },
+    { id:"c10", lv:1, make:function(){
+        var x = rint(2, 7), y = rint(2, 7);
+        return { kind:"predict",
+          goal:"ADDR adds one register into another. <b>What will it output?</b>",
+          prog:[["SET","A",x],["SET","B",y],["ADDR","A","B"],["SHOW","A"],["SHOW","B"],["HALT"]],
+          wrongs:[String(x + y) + ", " + String(x + y), String(x) + ", " + String(y)],
+          hints:["ADDR A B changes only A. B is untouched.","A becomes " + x + "+" + y + ". B stays " + y + "."] };
+      } },
+    { id:"c11", lv:1, make:function(){
+        var y = rint(1, 4), x = y + rint(2, 5);
+        return { kind:"predict",
+          goal:"<b>What will it output?</b>",
+          prog:[["SET","A",x],["SUB","A",y],["SHOW","A"],["HALT"]],
+          wrongs:[String(x + y), String(y - x)],
+          hints:["SUB subtracts from the register.","A starts at " + x + ", loses " + y + ", then SHOW prints it."] };
+      } },
+    { id:"c20", lv:2, make:function(){
+        var k = Math.random() < 0.5 ? 0 : rint(1, 5);
+        return { kind:"predict",
+          goal:"JUMPIF jumps to a line number <b>only if the register is above zero</b>. What will it output?",
+          prog:[["SET","A",k],["JUMPIF","A",4],["SHOW","A"],["HALT"]],
+          wrongs:[k === 0 ? "(nothing at all)" : String(k), "4"],
+          correctOverride: k === 0 ? "0" : "(nothing at all)",
+          hints:["Is " + k + " above zero? That decides whether line 2 jumps over the SHOW.","If it jumps to line 4 (HALT), nothing prints. If it falls through, line 3 prints A."] };
+      } },
+    { id:"c21", lv:2, make:function(){
+        var k = rint(2, 4);
+        var seq = []; for(var i = k; i >= 1; i--) seq.push(i);
+        var asc = seq.slice().reverse();
+        return { kind:"predict",
+          goal:"The loop. Follow it around until JUMPIF fails. <b>What will it output?</b>",
+          prog:[["SET","A",k],["SHOW","A"],["SUB","A",1],["JUMPIF","A",2],["HALT"]],
+          wrongs:[asc.join(", "), String(k)],
+          hints:["Each lap: show, subtract, test. It keeps jumping back to line 2 while A is above zero.","First lap prints " + k + ", then " + (k-1) + ", and so on down to 1."] };
+      } },
+    { id:"c30", lv:3, make:function(){
+        var T = rint(6, 12);
+        return { kind:"build",
+          goal:"Reprogram the adder so it outputs exactly <b>" + T + "</b>. Tap the blue numbers, then <b>Run it</b>. As many tries as you need.",
+          prog:[["SET","A",3],["SET","B",2],["ADDR","A","B"],["SHOW","A"],["HALT"]],
+          target:[T], editLines:[0,1],
+          hints:["The output is the two SET numbers added together.","Any pair summing to " + T + " works, like " + Math.min(9, T - 1) + " and " + (T - Math.min(9, T - 1)) + "."],
+          solSet:[{ line:0, val:Math.min(9, T - 1) }, { line:1, val:T - Math.min(9, T - 1) }] };
+      } },
+    { id:"c31", lv:3, make:function(){
+        var N = rint(3, 5);
+        var seq = []; for(var i = N; i >= 1; i--) seq.push(i);
+        return { kind:"build",
+          goal:"Make the loop count down from <b>" + N + "</b> (so it outputs " + seq.join(", ") + "). Tap the blue number, then <b>Run it</b>.",
+          prog:[["SET","A",2],["SHOW","A"],["SUB","A",1],["JUMPIF","A",2],["HALT"]],
+          target:seq, editLines:[0],
+          hints:["The starting value of A decides where the countdown begins.","Set line 1's number to " + N + "."],
+          solSet:[{ line:0, val:N }] };
+      } },
+    { id:"w01", lv:4, make:function(){
+        var loops = rint(2, 4);
+        return { kind:"predict",
+          goal:"<b>A game loop, simplified.</b> Every frame your game does the same work. This tiny version SHOWs the frame number as it counts up. <b>What does it print?</b>",
+          prog:[["SET","A",1],["SHOW","A"],["ADD","A",1],["SHOW","A"],["ADD","A",1],["SHOW","A"],["HALT"]],
+          wrongs:["1, 2, 3, 4","3, 2, 1"],
+          hints:["The worker never gets tired or bored. It just runs the list, fast, over and over. That repeated work is what warms your phone.","SHOW after each ADD: 1, then 2, then 3."] };
+      } },
+    { id:"w02", lv:4, make:function(){
+        var a = rint(2, 6), b = rint(2, 6);
+        return { kind:"predict",
+          goal:"<b>Combining two values.</b> Think of A as a score and B as a bonus. The program adds the bonus into the score, then shows both. <b>What prints?</b>",
+          prog:[["SET","A",a],["SET","B",b],["ADDR","A","B"],["SHOW","A"],["SHOW","B"],["HALT"]],
+          wrongs:[String(a + b) + ", " + String(a + b), String(a) + ", " + String(b)],
+          hints:["ADDR changes only the first register. The bonus B is not consumed.","Score becomes " + a + "+" + b + "=" + (a+b) + ". Bonus B stays " + b + "."] };
+      } },
+    { id:"w03", lv:4, make:function(){
+        var T = rint(6, 12);
+        return { kind:"build",
+          goal:"<b>Tune a score.</b> This adder combines a base and a bonus into a final score. Reprogram the two blue numbers so the final score is exactly <b>" + T + "</b>, then <b>Run it</b>.",
+          prog:[["SET","A",3],["SET","B",2],["ADDR","A","B"],["SHOW","A"],["HALT"]],
+          target:[T], editLines:[0,1],
+          hints:["The score is just the two numbers added. Many pairs work.","Try " + Math.min(9, T-1) + " and " + (T - Math.min(9, T-1)) + "."],
+          solSet:[{ line:0, val:Math.min(9, T-1) }, { line:1, val:T - Math.min(9, T-1) }] };
+      } },
+    { id:"w04", lv:4, make:function(){
+        var lives = rint(3, 5);
+        var seq = []; for(var i = lives; i >= 1; i--) seq.push(i);
+        return { kind:"build",
+          goal:"<b>A lives countdown.</b> This loop shows lives remaining, ticking down to zero then stopping (JUMPIF stops when the register hits 0). Set the starting lives to <b>" + lives + "</b> so it prints " + seq.join(", ") + ". Then <b>Run it</b>.",
+          prog:[["SET","A",2],["SHOW","A"],["SUB","A",1],["JUMPIF","A",2],["HALT"]],
+          target:seq, editLines:[0],
+          hints:["The first number is the starting lives. The loop handles the rest.","Set line 1 to " + lives + "."],
+          solSet:[{ line:0, val:lives }] };
+      } },
+    { id:"t01", lv:4, make:function(){
+        var start = rint(3, 6), bonus = rint(2, 4);
+        return { kind:"predict",
+          goal:"<b>From a real build.</b> A score counter in one of your games: it sets the score, shows it, adds a pickup bonus, shows it again. What does it output?",
+          prog:[["SET","A",start],["SHOW","A"],["ADD","A",bonus],["SHOW","A"],["HALT"]],
+          hints:["The worker does it in order: set, show, add, show. No magic.","First it shows " + start + ", then " + start + " plus " + bonus + "."] };
+      } },
+    { id:"t02", lv:4, make:function(){
+        var frames = rint(3, 5);
+        var seq = []; for(var i = frames; i >= 1; i--) seq.push(i);
+        return { kind:"predict",
+          goal:"<b>The game loop, why BeatForge lagged.</b> A loop ticks a countdown each frame until it hits zero. Every SHOW is one frame of work. How many frames print (what is the output)?",
+          prog:[["SET","A",frames],["SHOW","A"],["SUB","A",1],["JUMPIF","A",2],["HALT"]],
+          hints:["JUMPIF loops back to line 2 while A is still above zero. Each pass is a frame.","It counts down: " + seq.join(", ") + ". That is " + frames + " frames of work every tick, which is why heavy loops lag."] };
+      } },
+    { id:"t03", lv:4, make:function(){
+        var a = rint(2, 5), b = rint(2, 5);
+        return { kind:"predict",
+          goal:"<b>Combining two values.</b> Like adding a base price and a shipping cost in one of your tools: it loads two numbers into named slots and adds them. What prints?",
+          prog:[["SET","A",a],["SET","B",b],["ADDR","A","B"],["SHOW","A"],["HALT"]],
+          hints:["A and B are just labeled boxes. ADDR pours B into A.","" + a + " plus " + b + "."] };
+      } }
+  ];
+  function gymStats(){
+    $("repN").textContent = state.gym.reps;
+    $("strN").textContent = state.gym.streak;
+    $("bestN").textContent = state.gym.best;
+  }
+  function gymProgRender(){
+    var t = drill.tpl;
+    var host = $("gProg");
+    host.style.display = "";
+    host.innerHTML = "";
+    t.prog.forEach(function(ins, li){
+      var row = document.createElement("div");
+      row.className = "instr";
+      var parts = "<span class=\"ln\">" + (li + 1) + "</span>";
+      ins.forEach(function(tok, tix){
+        if(t.kind === "build" && t.editLines.indexOf(li) > -1 && ins[0] === "SET" && tix === 2){
+          parts += " <span class=\"numchip\" data-gline=\"" + li + "\" role=\"button\" tabindex=\"0\">" + tok + "</span>";
+        } else {
+          parts += " <span>" + tok + "</span>";
+        }
+      });
+      row.innerHTML = parts;
+      host.appendChild(row);
+    });
+    Array.prototype.forEach.call(host.querySelectorAll(".numchip"), function(nc){
+      function bump(){
+        var li = parseInt(nc.getAttribute("data-gline"), 10);
+        var cur = drill.tpl.prog[li][2];
+        drill.tpl.prog[li][2] = cur >= 9 ? 1 : cur + 1;
+        gymProgRender();
+      }
+      nc.addEventListener("click", bump);
+      nc.addEventListener("keydown", function(e){ if(e.key === "Enter" || e.key === " "){ e.preventDefault(); bump(); } });
+    });
+  }
+  function gymEnd(win, msg){
+    if(win){
+      state.gym.reps++;
+      state.gym.streak++;
+      if(state.gym.streak > state.gym.best) state.gym.best = state.gym.streak;
+    } else {
+      state.gym.streak = 0;
+    }
+    store.save(state);
+    $("gymCard").className = "gymcard " + (win ? "win" : "lose");
+    $("gGoal").innerHTML = msg;
+    $("gHint").className = "ghint";
+    drill = null;
+    $("gStart").style.display = ""; $("gStart").textContent = win ? "Next drill" : "Start drill";
+    $("gRun").style.display = "none"; $("gHintBtn").style.display = "none"; $("gSkip").style.display = "none";
+    $("gOpts").innerHTML = "";
+    gymStats();
+    if(win) toast("Rep logged \u00b7 streak " + state.gym.streak);
+  }
+  function gymPick(i){
+    if(!drill || drill.tpl.kind !== "predict") return;
+    var m2 = runMachine(freshMachine(drill.tpl.prog.map(function(r){ return r.slice(); })));
+    var actual = outText(m2.out);
+    var btns = $("gOpts").children;
+    var picked = btns[i];
+    var correct = picked.getAttribute("data-t") === actual;
+    Array.prototype.forEach.call(btns, function(b){
+      b.classList.add("lock");
+      if(b.getAttribute("data-t") === actual) b.classList.add("right");
+    });
+    if(correct){
+      gymEnd(true, "<b>Correct.</b> The machine really ran it and printed: " + actual + ". Rep logged. Total: " + (state.gym.reps + 1) + ".");
+    } else {
+      picked.classList.add("wrong");
+      gymEnd(false, "<b>Not this time.</b> The machine really ran it and printed: <b>" + actual + "</b>. Trace it line by line, then grab a fresh drill. Streak reset.");
+    }
+  }
+  function gymRunBuild(){
+    if(!drill || drill.tpl.kind !== "build") return;
+    var m2 = runMachine(freshMachine(drill.tpl.prog.map(function(r){ return r.slice(); })));
+    var actual = outText(m2.out);
+    var want = outText(drill.tpl.target);
+    if(actual === want){
+      gymEnd(true, "<b>Nailed it.</b> Output: " + actual + ". Rep logged. Total: " + (state.gym.reps + 1) + ".");
+    } else {
+      $("gGoal").innerHTML = drill.tpl.goal + "<div class=\"gstep\" style=\"color:var(--amb)\">it output " + actual + " \u00b7 target is " + want + " \u00b7 adjust and run again</div>";
+    }
+  }
+  function gymStart(forceId){
+    var pool = GYM_TPLS.filter(function(t){ return gymLevel === -1 || t.lv === gymLevel; });
+    var chosen = null;
+    if(forceId){ GYM_TPLS.forEach(function(t){ if(t.id === forceId) chosen = t; }); }
+    if(!chosen) chosen = pool[Math.floor(Math.random() * pool.length)];
+    drill = { tpl: chosen.make(), tplId: chosen.id, hintsUsed: 0 };
+    $("gGoal").innerHTML = drill.tpl.goal;
+    $("gymCard").className = "gymcard active";
+    $("gHint").className = "ghint"; $("gHint").innerHTML = "";
+    $("gStart").style.display = "none";
+    $("gHintBtn").style.display = "";
+    $("gSkip").style.display = "";
+    gymProgRender();
+    var opts = $("gOpts");
+    opts.innerHTML = "";
+    if(drill.tpl.kind === "predict"){
+      $("gRun").style.display = "none";
+      var m2 = runMachine(freshMachine(drill.tpl.prog.map(function(r){ return r.slice(); })));
+      var correct = drill.tpl.correctOverride !== undefined && outText(m2.out) !== drill.tpl.correctOverride ? outText(m2.out) : outText(m2.out);
+      var wrongs = drill.tpl.wrongs;
+      if(!wrongs){
+        var o1 = m2.out.slice(); o1[o1.length - 1] = (o1[o1.length - 1] || 0) + 1;
+        var o2 = m2.out.slice().reverse();
+        wrongs = [outText(o1), outText(o2)];
+      }
+      var w1 = wrongs[0] === correct ? wrongs[0] + ", 0" : wrongs[0];
+      var w2 = wrongs[1] === correct || wrongs[1] === w1 ? wrongs[1] + ", 9" : wrongs[1];
+      shuffle3(correct, w1, w2).forEach(function(o, i){
+        var b = document.createElement("button");
+        b.type = "button"; b.textContent = o.t; b.setAttribute("data-t", o.t);
+        b.addEventListener("click", function(){ gymPick(Array.prototype.indexOf.call(opts.children, b)); });
+        opts.appendChild(b);
+      });
+    } else {
+      $("gRun").style.display = "";
+    }
+    gymStats();
+  }
+  $("gStart").addEventListener("click", function(){ gymStart(); });
+  $("gRun").addEventListener("click", gymRunBuild);
+  $("gHintBtn").addEventListener("click", function(){
+    if(!drill) return;
+    drill.hintsUsed++;
+    var h = $("gHint");
+    h.className = "ghint show";
+    h.innerHTML = drill.hintsUsed === 1 ? drill.tpl.hints[0] : drill.tpl.hints[0] + "<br>" + drill.tpl.hints[1];
+  });
+  $("gSkip").addEventListener("click", function(){
+    if(!drill) return;
+    state.gym.streak = 0; store.save(state);
+    var m2 = runMachine(freshMachine(drill.tpl.prog.map(function(r){ return r.slice(); })));
+    $("gymCard").className = "gymcard";
+    $("gGoal").innerHTML = "Skipped. " + (drill.tpl.kind === "predict" ? "It would have printed: <b>" + outText(m2.out) + "</b>." : drill.tpl.hints[1]) + " Streak reset.";
+    $("gHint").className = "ghint";
+    $("gOpts").innerHTML = "";
+    drill = null;
+    $("gStart").style.display = ""; $("gStart").textContent = "Start drill";
+    $("gRun").style.display = "none"; $("gHintBtn").style.display = "none"; $("gSkip").style.display = "none";
+    gymStats();
+  });
+  (function(){
+    var tabs = ["Surprise me"].concat(GYM_LEVELS.slice(0,4));
+    tabs.forEach(function(name, i){
+      var b = document.createElement("button");
+      b.className = "gtab" + (i === 0 ? " on" : ""); b.type = "button"; b.textContent = name;
+      b.addEventListener("click", function(){
+        gymLevel = i - 1;
+        Array.prototype.forEach.call(document.querySelectorAll(".gtab"), function(x, xi){ x.classList.toggle("on", xi === i); });
+      });
+      $("gymTabs").appendChild(b);
+    });
+  })();
+  function setTrack(t){
+    var g = $("trackGeneral"), tr = $("trackTrail"), tabs = $("gymTabs"), ban = $("trailBanner");
+    if(g) g.classList.toggle("on", t === "general");
+    if(tr) tr.classList.toggle("on", t === "trail");
+    if(tabs) tabs.style.display = (t === "trail") ? "none" : "";
+    if(ban) ban.className = "trailbanner" + (t === "trail" ? " show" : "");
+    if(t === "trail"){
+      gymLevel = 4;
+    } else {
+      gymLevel = -1;
+      Array.prototype.forEach.call(document.querySelectorAll(".gtab"), function(x, xi){ x.classList.toggle("on", xi === 0); });
+    }
+    $("gymCard").className = "gymcard";
+    $("gGoal").innerHTML = (t === "trail")
+      ? "Real moments from the build. Tap <b>Start drill</b>."
+      : "Pick a level (or Surprise me) and tap <b>Start drill</b>.";
+    if($("gProg")) $("gProg").style.display = "none";
+    if($("gOpts")) $("gOpts").innerHTML = "";
+    if($("gHint")){ $("gHint").className = "ghint"; $("gHint").innerHTML = ""; }
+    ["gRun","gHintBtn","gSkip"].forEach(function(id){ if($(id)) $(id).style.display = "none"; });
+    if($("gStart")) $("gStart").style.display = "";
+  }
+  if($("trackGeneral")) $("trackGeneral").addEventListener("click", function(){ setTrack("general"); });
+  if($("trackTrail")) $("trackTrail").addEventListener("click", function(){ setTrack("trail"); });
+  gymStats();
+  if(typeof window !== "undefined"){
+    window._gym = {
+      start: gymStart,
+      pickCorrect: function(){
+        var btns = $("gOpts").children;
+        var m2 = runMachine(freshMachine(drill.tpl.prog.map(function(r){ return r.slice(); })));
+        var actual = outText(m2.out);
+        for(var i = 0; i < btns.length; i++){
+          if(btns[i].getAttribute("data-t") === actual){ btns[i].click(); return; }
+        }
+      },
+      pickWrong: function(){
+        var btns = $("gOpts").children;
+        var m2 = runMachine(freshMachine(drill.tpl.prog.map(function(r){ return r.slice(); })));
+        var actual = outText(m2.out);
+        for(var i = 0; i < btns.length; i++){
+          if(btns[i].getAttribute("data-t") !== actual){ btns[i].click(); return; }
+        }
+      },
+      applySol: function(){
+        (drill.tpl.solSet || []).forEach(function(s){ drill.tpl.prog[s.line][2] = s.val; });
+        gymRunBuild();
+      },
+      state: function(){ return { drill: drill, gym: state.gym }; }
+    };
+  }
+
+  /* ---- quiz ---- */
+  var QUIZ = [
+    { q:"Memory (RAM) vs storage:", a:["Memory is the desk (fast, wiped at power off); storage is the cabinet (big, permanent)","They are two words for the same chip","Storage is faster but smaller than memory"], r:0 },
+    { q:"What happens to memory when the power goes off?", a:["It is saved to the cloud automatically","It is wiped clean","It moves itself into storage"], r:1 },
+    { q:"A file is really...", a:["A tiny picture of your data","A list of numbers plus a name tag","Something only computers can read"], r:1 },
+    { q:"A program is...", a:["A list of tiny instructions the processor walks through","A special kind of file only phones use","A picture of buttons"], r:0 },
+    { q:"Your phone is hot during a big game because...", a:["The battery is leaking","The screen is too bright","The processor is sprinting through billions of instructions"], r:2 }
+  ];
+  function renderQuiz(){
+    var wrap = $("quizwrap");
+    wrap.innerHTML = ""; $("scoreEl").textContent = ""; $("retryBtn").style.display = "none";
+    var answered = 0, correct = 0;
+    QUIZ.forEach(function(item, qi){
+      var qd = document.createElement("div");
+      qd.className = "q";
+      qd.innerHTML = "<div class=\"qt\">" + (qi + 1) + ". " + item.q + "</div>";
+      var opts = document.createElement("div"); opts.className = "opts";
+      item.a.forEach(function(opt, oi){
+        var b = document.createElement("button");
+        b.textContent = opt;
+        function pick(){
+          if(b.classList.contains("lock")) return;
+          answered++;
+          if(oi === item.r){ b.classList.add("right"); correct++; }
+          else { b.classList.add("wrong"); opts.children[item.r].classList.add("right"); }
+          Array.prototype.forEach.call(opts.children, function(x){ x.classList.add("lock"); });
+          if(answered === QUIZ.length){
+            $("scoreEl").textContent = "Score: " + correct + "/5" + (correct >= 4 ? "  \u2713 you have the model" : "");
+            $("retryBtn").style.display = "inline-block";
+            if(correct > (state.quizBest || 0)){ state.quizBest = correct; store.save(state); }
+          }
+        }
+        b.addEventListener("click", pick);
+        b.addEventListener("keydown", function(e){ if(e.key === "Enter" || e.key === " "){ e.preventDefault(); pick(); } });
+        opts.appendChild(b);
+      });
+      qd.appendChild(opts);
+      wrap.appendChild(qd);
+    });
+  }
+  $("retryBtn").addEventListener("click", renderQuiz);
+  renderQuiz();
+}
+
+if(typeof window !== "undefined" && typeof document !== "undefined"){
+  if(document.readyState === "loading"){ document.addEventListener("DOMContentLoaded", initApp); }
+  else { initApp(); }
+}
+if(typeof module !== "undefined" && module.exports){
+  module.exports = { freshMachine: freshMachine, stepMachine: stepMachine, runMachine: runMachine, bytesOf: bytesOf };
+}
+</script>
+</body>
+</html>

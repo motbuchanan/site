@@ -1,0 +1,1228 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#191b22">
+<title>Second Language: Python</title>
+<style>
+  :root{
+    --canvas:#191b22; --panel:#21252f; --card:#1a1d26; --line:#303645;
+    --ink:#eceef2; --soft:#9aa0ad; --dim:#6d7480;
+    --gold:#f0c33c; --blue:#7aa2f7; --green:#7dd6a0; --red:#e87a6d;
+    --mono:ui-monospace,'SF Mono','Cascadia Mono','Roboto Mono',Consolas,Menlo,monospace;
+    --sans:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',sans-serif;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; background:var(--canvas); color:var(--ink);
+    font-family:var(--sans); font-size:17px; line-height:1.6; padding-bottom:70px;
+  }
+  header{
+    padding:26px 20px 10px; max-width:760px; margin:0 auto;
+    display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+  }
+  .wordmark{font-family:var(--mono); font-size:12px; letter-spacing:.22em; color:var(--soft); text-transform:uppercase;}
+  h1{margin:6px 0 2px; font-size:30px; line-height:1.15; letter-spacing:-.01em;}
+  .subtitle{color:var(--soft); margin:0; font-size:15px;}
+  .vbadge{
+    font-family:var(--mono); font-size:11px; color:var(--soft);
+    border:1px solid var(--line); border-radius:999px; padding:5px 10px;
+    background:var(--panel); cursor:pointer; white-space:nowrap; margin-top:4px;
+  }
+  nav{
+    position:sticky; top:0; z-index:30; background:rgba(25,27,34,.92);
+    backdrop-filter:blur(8px); border-bottom:1px solid var(--line);
+    overflow-x:auto; -webkit-overflow-scrolling:touch;
+  }
+  .navrow{display:flex; gap:8px; padding:10px 16px; max-width:760px; margin:0 auto; width:max-content;}
+  .navchip{
+    font-family:var(--mono); font-size:12px; color:var(--soft);
+    border:1px solid var(--line); border-radius:999px; padding:7px 13px;
+    background:var(--card); text-decoration:none; white-space:nowrap;
+  }
+  .navchip:active{color:var(--ink); border-color:var(--gold);}
+  main{max-width:760px; margin:0 auto; padding:0 16px;}
+  section{
+    background:var(--panel); border:1px solid var(--line); border-radius:16px;
+    padding:22px 18px; margin:18px 0;
+  }
+  .eyebrow{
+    font-family:var(--mono); font-size:11px; letter-spacing:.2em; text-transform:uppercase;
+    color:var(--gold); margin:0 0 6px;
+  }
+  h2{margin:0 0 10px; font-size:23px; line-height:1.2;}
+  h3{margin:20px 0 8px; font-size:17px;}
+  p{margin:10px 0;}
+  .soft{color:var(--soft);}
+  .small{font-size:14px;}
+  code{font-family:var(--mono); font-size:.92em; background:var(--card); border:1px solid var(--line); border-radius:6px; padding:1px 6px; color:var(--gold);}
+  .note{
+    border-left:3px solid var(--gold); background:var(--card);
+    border-radius:0 10px 10px 0; padding:10px 14px; margin:14px 0; font-size:15px; color:var(--soft);
+  }
+  .note b{color:var(--ink);}
+  .btn{
+    display:inline-block; font-family:var(--mono); font-size:14px; color:var(--ink);
+    background:var(--card); border:1px solid var(--line); border-radius:10px;
+    padding:11px 16px; cursor:pointer; user-select:none;
+  }
+  .btn:active{border-color:var(--gold); transform:translateY(1px);}
+  .btn.primary{border-color:var(--gold); color:var(--gold);}
+  .btn[disabled]{opacity:.4; pointer-events:none;}
+
+  /* hero */
+  .hero{display:flex; flex-direction:column; align-items:center; text-align:center; gap:10px;}
+  .hero svg{width:150px; height:auto;}
+  .hook{font-size:21px; font-weight:650; margin:4px 0 0;}
+
+  /* habitats */
+  .habitats{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0;}
+  @media(max-width:560px){.habitats{grid-template-columns:1fr;}}
+  .hab{
+    border:1px solid var(--line); border-radius:14px; background:var(--card);
+    padding:14px; cursor:pointer;
+  }
+  .hab .ht{font-family:var(--mono); font-size:11px; letter-spacing:.16em; text-transform:uppercase; margin-bottom:8px;}
+  .hab.browser .ht{color:var(--blue);}
+  .hab.machine .ht{color:var(--gold);}
+  .hab svg{width:100%; height:auto; display:block; margin-bottom:10px;}
+  .hab .hb{font-size:14.5px; color:var(--soft);}
+  .hab .more{display:none; margin-top:8px; font-size:14.5px; color:var(--soft);}
+  .hab.open .more{display:block; animation:fadeup .3s ease;}
+  .hab.open{border-color:var(--gold);}
+  .hab.browser.open{border-color:var(--blue);}
+  .hab .tapcue{font-family:var(--mono); font-size:11px; color:var(--dim); margin-top:8px;}
+  .hab.open .tapcue{display:none;}
+  @keyframes fadeup{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+
+  /* translator */
+  .xnav{display:flex; align-items:center; gap:10px; margin:14px 0 10px;}
+  .xtitle{font-weight:650; flex:1; text-align:center;}
+  .codecard{
+    background:#12141b; border:1px solid var(--line); border-radius:12px;
+    overflow:hidden; margin:10px 0;
+  }
+  .codecard .cchead{
+    font-family:var(--mono); font-size:11px; letter-spacing:.16em; text-transform:uppercase;
+    padding:8px 13px; border-bottom:1px solid var(--line); color:var(--dim);
+  }
+  .codecard.jsside .cchead{color:var(--blue);}
+  .codecard.pyside .cchead{color:var(--gold);}
+  .codecard pre{margin:0; padding:8px 0; overflow-x:auto;}
+  .cline{
+    font-family:var(--mono); font-size:14.5px; line-height:1.7; padding:2px 14px;
+    white-space:pre; cursor:pointer; border-left:3px solid transparent;
+  }
+  .cline.hl{background:rgba(240,195,60,.1); border-left-color:var(--gold);}
+  .jsside .cline.hl{background:rgba(122,162,247,.1); border-left-color:var(--blue);}
+  .xnote{
+    min-height:60px; border:1px dashed var(--line); border-radius:12px;
+    padding:11px 14px; color:var(--soft); font-size:14.5px;
+  }
+  .xnote b{color:var(--ink);}
+
+  /* playground */
+  .lessons{display:flex; flex-direction:column; gap:7px; margin:12px 0;}
+  .lesson{
+    display:flex; gap:10px; align-items:flex-start; font-size:14.5px;
+    border:1px solid var(--line); background:var(--card); border-radius:10px; padding:9px 12px;
+  }
+  .lesson .mk{
+    font-family:var(--mono); flex:0 0 auto; width:22px; height:22px; border-radius:50%;
+    border:1px solid var(--line); color:var(--dim); display:flex; align-items:center; justify-content:center; font-size:12px;
+  }
+  .lesson.done{border-color:rgba(125,214,160,.5);}
+  .lesson.done .mk{border-color:var(--green); color:var(--green); background:rgba(125,214,160,.1);}
+  .lesson.done .mtext{color:var(--soft); text-decoration:line-through; text-decoration-color:var(--dim);}
+  .chips{display:flex; flex-wrap:wrap; gap:7px; margin:10px 0 4px;}
+  .gym{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin:14px 0;}
+  .gymstats{display:flex;gap:18px;font-size:12.5px;color:var(--dim);margin-bottom:10px;letter-spacing:.04em;}
+  .gymstats b{color:var(--green);font-size:15px;margin-left:4px;}
+  .gymtabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;}
+  .gtab{font-size:12px;padding:6px 11px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--soft);cursor:pointer;}
+  .gtab.on{border-color:var(--gold);color:var(--gold);font-weight:700;}
+  .gymcard{border:1px dashed var(--line);border-radius:10px;padding:12px;}
+  .gymcard.active{border-style:solid;border-color:var(--gold);}
+  .gymcard.win{border-style:solid;border-color:var(--green);}
+  .ggoal{font-size:15px;line-height:1.5;}
+  .ggoal b{color:var(--gold);}
+  .ghint{font-size:13.5px;color:var(--blue);margin-top:8px;display:none;}
+  .ghint.show{display:block;}
+  .gbtns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+  .gbtn{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:10px;padding:9px 14px;font-size:14px;cursor:pointer;}
+  .gbtn.primary{border-color:var(--gold);color:var(--gold);font-weight:700;}
+  .chip{
+    font-family:var(--mono); font-size:13px; color:var(--soft);
+    border:1px solid var(--line); border-radius:999px; background:var(--card);
+    padding:7px 12px; cursor:pointer;
+  }
+  .chip:active{color:var(--gold); border-color:var(--gold);}
+  .editor{
+    background:#12141b; border:1px solid var(--line); border-radius:12px;
+    overflow:hidden; margin:12px 0;
+  }
+  .edhead{
+    display:flex; align-items:center; padding:8px 13px; border-bottom:1px solid var(--line);
+    font-family:var(--mono); font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--dim);
+  }
+  .edhead .runbtn{margin-left:auto;}
+  .runbtn{
+    font-family:var(--mono); font-size:13px; color:var(--green);
+    background:transparent; border:1px solid var(--line); border-radius:8px;
+    padding:8px 14px; cursor:pointer; letter-spacing:normal; text-transform:none;
+  }
+  .editor textarea{
+    width:100%; min-height:110px; background:transparent; border:none; outline:none;
+    color:var(--ink); font-family:var(--mono); font-size:15px; line-height:1.6;
+    padding:12px 14px; resize:vertical; display:block;
+  }
+  .pyout{
+    border-top:1px solid var(--line); padding:10px 14px; font-family:var(--mono);
+    font-size:14px; line-height:1.6; min-height:44px; white-space:pre-wrap; word-break:break-word;
+  }
+  .po-ok{color:var(--green);}
+  .po-err{color:var(--red);}
+  .po-hint{color:var(--dim); font-style:italic;}
+
+  /* walker */
+  .wtabs{display:flex; gap:8px; margin:12px 0;}
+  .wtab{
+    font-family:var(--mono); font-size:13px; color:var(--soft);
+    border:1px solid var(--line); border-radius:999px; background:var(--card);
+    padding:8px 14px; cursor:pointer;
+  }
+  .wtab.on{color:var(--gold); border-color:var(--gold);}
+  .wcode{
+    background:#12141b; border:1px solid var(--line); border-radius:12px;
+    padding:8px 0; margin:10px 0; overflow-x:auto;
+  }
+  .wline{
+    font-family:var(--mono); font-size:15px; line-height:1.8; padding:2px 14px;
+    white-space:pre; border-left:3px solid transparent; color:var(--soft);
+  }
+  .wline.on{background:rgba(240,195,60,.12); border-left-color:var(--gold); color:var(--ink);}
+  .wpanels{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  @media(max-width:520px){.wpanels{grid-template-columns:1fr;}}
+  .wpanel{
+    border:1px solid var(--line); border-radius:12px; background:var(--card);
+    padding:11px 13px; font-family:var(--mono); font-size:14px; min-height:84px;
+  }
+  .wpanel .wt{font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--dim); margin-bottom:7px; font-family:var(--mono);}
+  .wvar{color:var(--ink); line-height:1.7;}
+  .wvar b{color:var(--gold); font-weight:600;}
+  .wout{color:var(--green); line-height:1.7;}
+  .wnote{
+    border:1px dashed var(--line); border-radius:12px; padding:10px 14px;
+    color:var(--soft); font-size:14.5px; margin:10px 0; min-height:48px;
+  }
+  .wbtns{display:flex; gap:10px; margin-top:10px;}
+
+  /* used-for */
+  .uses{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:14px 0;}
+  @media(max-width:560px){.uses{grid-template-columns:1fr;}}
+  .use{border:1px solid var(--line); border-radius:12px; background:var(--card); padding:13px 14px;}
+  .use .ut{font-weight:650; margin-bottom:5px;}
+  .use .ub{font-size:14.5px; color:var(--soft);}
+
+  /* verdict */
+  .verd{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:14px 0;}
+  @media(max-width:520px){.verd{grid-template-columns:1fr;}}
+  .verdcard{border-radius:12px; padding:13px 14px; font-size:15px;}
+  .keep{background:rgba(125,214,160,.07); border:1px solid rgba(125,214,160,.3);}
+  .skip{background:rgba(232,122,109,.06); border:1px solid rgba(232,122,109,.3);}
+  .verdcard .vt{font-family:var(--mono); font-size:11px; letter-spacing:.16em; text-transform:uppercase; margin-bottom:7px;}
+  .keep .vt{color:var(--green);}
+  .skip .vt{color:var(--red);}
+  .verdcard ul{margin:0; padding-left:18px; color:var(--soft);}
+  .verdcard li{margin:5px 0;}
+  .cheat{
+    background:#12141b; border:1px solid var(--line); border-radius:12px;
+    padding:14px; font-family:var(--mono); font-size:14px; line-height:1.9; overflow-x:auto;
+  }
+  .cheat .c{color:var(--gold);}
+  .cheat .d{color:var(--dim);}
+
+  /* quiz */
+  .q{border:1px solid var(--line); border-radius:12px; background:var(--card); padding:14px; margin:12px 0;}
+  .q .qt{font-weight:650; margin-bottom:10px;}
+  .opts{display:flex; flex-direction:column; gap:8px;}
+  .opt{
+    border:1px solid var(--line); border-radius:10px; padding:11px 13px;
+    cursor:pointer; font-size:15px; color:var(--soft);
+  }
+  .opt.right{border-color:var(--green); color:var(--green);}
+  .opt.wrong{border-color:var(--red); color:var(--red);}
+  .opt.lock{pointer-events:none;}
+  .score{font-family:var(--mono); color:var(--gold); font-size:15px; margin-top:10px; min-height:24px;}
+
+  footer{max-width:760px; margin:8px auto 30px; padding:0 20px; color:var(--dim); font-size:13px; text-align:center;}
+  #toast{
+    position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(80px);
+    background:var(--card); color:var(--ink); border:1px solid var(--gold);
+    border-radius:999px; padding:10px 18px; font-family:var(--mono); font-size:13px;
+    transition:transform .3s ease; z-index:99; pointer-events:none; max-width:88vw; text-align:center;
+  }
+  #toast.show{transform:translateX(-50%) translateY(0);}
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.001s !important; transition-duration:.001s !important;}
+    html{scroll-behavior:auto;}
+  }
+  .btn:focus-visible,.chip:focus-visible,.opt:focus-visible,.hab:focus-visible,
+  .cline:focus-visible,.wtab:focus-visible,.navchip:focus-visible,.runbtn:focus-visible{
+    outline:2px solid var(--gold); outline-offset:2px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="wordmark">Second Language</div>
+    <h1>What Python Is</h1>
+    <p class="subtitle">For people who already half-speak JavaScript.</p>
+  </div>
+  <button class="vbadge" id="vbadge">v1.0 &middot; Aug 21</button>
+</header>
+
+<nav><div class="navrow">
+  <a class="navchip" href="#where">Where it lives</a>
+  <a class="navchip" href="#translate">Side by side</a>
+  <a class="navchip" href="#try">Try it</a>
+  <a class="navchip" href="#walk">Watch it think</a>
+  <a class="navchip" href="#uses">Used for</a>
+  <a class="navchip" href="#verdict">Verdict</a>
+  <a class="navchip" href="#quiz">Quiz</a>
+</div></nav>
+
+<main>
+
+<!-- HERO -->
+<section class="hero">
+  <svg viewBox="0 0 160 110" aria-hidden="true">
+    <path d="M14 78 C14 58 30 52 50 52 C74 52 86 64 104 64 C122 64 134 56 134 42 C134 28 122 20 106 20"
+          fill="none" stroke="#f0c33c" stroke-width="14" stroke-linecap="round"/>
+    <path d="M14 78 C14 58 30 52 50 52 C74 52 86 64 104 64"
+          fill="none" stroke="#e0b12e" stroke-width="14" stroke-linecap="round" opacity=".35"/>
+    <circle cx="106" cy="20" r="13" fill="#f0c33c"/>
+    <circle cx="103" cy="16.5" r="2.6" fill="#191b22"/>
+    <circle cx="111" cy="16.5" r="2.6" fill="#191b22"/>
+    <path d="M103 24 Q107 27 111 24" stroke="#191b22" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+    <path d="M119 19 L128 16 L121 24 Z" fill="#e0b12e"/>
+    <circle cx="14" cy="78" r="7" fill="#f0c33c"/>
+    <g font-family="monospace" font-size="9" fill="#6d7480">
+      <text x="30" y="99">print("hello")</text>
+    </g>
+  </svg>
+  <p class="hook">You build in the browser's language. This is the computer's.</p>
+  <p class="soft small">Python is the plain-spoken language that runs directly on machines: the one automation scripts, data work, and most AI tooling are written in. If you can read a little JavaScript, you are closer than you think.</p>
+</section>
+
+<!-- WHERE IT LIVES -->
+<section id="where">
+  <p class="eyebrow">Part 1 &middot; The map</p>
+  <h2>Two habitats</h2>
+  <p>JavaScript and Python are cousins doing similar work in different places. The single most useful thing to understand is <b>where each one runs</b>. Tap each habitat.</p>
+  <div class="habitats">
+    <div class="hab browser" tabindex="0">
+      <div class="ht">Habitat 1: the browser</div>
+      <svg viewBox="0 0 200 110" aria-hidden="true">
+        <rect x="6" y="6" width="188" height="98" rx="10" fill="#12141b" stroke="#303645"/>
+        <rect x="6" y="6" width="188" height="22" rx="10" fill="#1a1d26" stroke="#303645"/>
+        <circle cx="20" cy="17" r="4" fill="#303645"/>
+        <circle cx="33" cy="17" r="4" fill="#303645"/>
+        <rect x="48" y="11" width="120" height="12" rx="6" fill="#21252f"/>
+        <rect x="18" y="40" width="90" height="10" rx="5" fill="#7aa2f7" opacity=".8"/>
+        <rect x="18" y="58" width="164" height="7" rx="3.5" fill="#303645"/>
+        <rect x="18" y="70" width="140" height="7" rx="3.5" fill="#303645"/>
+        <rect x="18" y="85" width="64" height="13" rx="6.5" fill="#7aa2f7" opacity=".5"/>
+      </svg>
+      <div class="hb"><b>HTML, CSS, JavaScript.</b> The languages of web pages and web apps. They run inside a browser tab, on whatever device opened the page.</div>
+      <div class="more">This is where your single-file apps live. The browser is the bodyguard: code in a tab cannot freely touch the machine's files, which is why web apps are safe to open. That safety is also the limitation.</div>
+      <div class="tapcue">tap for more</div>
+    </div>
+    <div class="hab machine" tabindex="0">
+      <div class="ht">Habitat 2: the computer itself</div>
+      <svg viewBox="0 0 200 110" aria-hidden="true">
+        <rect x="6" y="6" width="188" height="98" rx="10" fill="#12141b" stroke="#303645"/>
+        <g font-family="monospace" font-size="11" fill="#7dd6a0">
+          <text x="18" y="32">$ python sort_photos.py</text>
+          <text x="18" y="52" fill="#9aa0ad">sorting 1,248 files...</text>
+          <text x="18" y="72" fill="#9aa0ad">done in 2.1 seconds</text>
+          <text x="18" y="92" fill="#f0c33c">$ _</text>
+        </g>
+      </svg>
+      <div class="hb"><b>Python.</b> Runs directly on the machine, no browser needed. It can read and write real files, rename a thousand photos, crunch a spreadsheet, or talk to the internet.</div>
+      <div class="more">The trade: nothing sandboxes it, so it runs with real power and real responsibility. This is why automation, data work, servers, and AI tools live here. When an AI assistant generates a PDF or analyzes a file for you, it usually wrote a Python script and ran it in this habitat.</div>
+      <div class="tapcue">tap for more</div>
+    </div>
+  </div>
+  <p class="note"><b>One sentence to keep:</b> JavaScript runs inside a webpage; Python runs on the computer itself. Same kind of language, different side of the glass.</p>
+</section>
+
+<!-- TRANSLATOR -->
+<section id="translate">
+  <p class="eyebrow">Part 2 &middot; Side by side</p>
+  <h2>Read it next to what you know</h2>
+  <p class="soft">Five tiny programs, written twice. Tap any line to see its twin and what changed.</p>
+  <div class="xnav">
+    <button class="btn" id="xprev">&larr;</button>
+    <div class="xtitle" id="xtitle"></div>
+    <button class="btn" id="xnext">&rarr;</button>
+  </div>
+  <div class="codecard jsside">
+    <div class="cchead">JavaScript &middot; what you know</div>
+    <pre id="jscode"></pre>
+  </div>
+  <div class="codecard pyside">
+    <div class="cchead">Python &middot; the same thing</div>
+    <pre id="pycode"></pre>
+  </div>
+  <div class="xnote" id="xnote">Tap a line above.</div>
+</section>
+
+<!-- PLAYGROUND -->
+<section id="try">
+  <p class="eyebrow">Part 3 &middot; Hands on</p>
+  <h2>Write some Python</h2>
+  <p>This page has a small practice slice of Python built into it: enough for these lessons (print, variables, math, and text), honest about what it is not (the whole language). Type below or tap a chip, then run.</p>
+  <h3>Lessons</h3>
+  <div class="lessons" id="lessons"></div>
+  <div class="chips" id="pychips"></div>
+  <div class="editor">
+    <div class="edhead">python practice pad<button class="runbtn" id="pyrun">&#9654; run</button></div>
+    <textarea id="pysrc" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="python code" placeholder='print("hello")'></textarea>
+    <div class="pyout" id="pyout"><span class="po-hint">output appears here</span></div>
+  </div>
+
+  <h3>The Gym: reps until it sticks</h3>
+  <p class="note" style="margin-top:4px">Small write-this-code tasks with randomized words and numbers, checked against the real output of the practice pad above. Hints cost nothing but pride; skipping resets your streak.</p>
+  <div class="gym">
+    <div class="gymstats"><span>reps<b id="repN">0</b></span><span>streak<b id="strN">0</b></span><span>best<b id="bestN">0</b></span></div>
+    <div class="gymtabs" id="gymTabs"></div>
+    <div class="gymcard" id="gymCard">
+      <div class="ggoal" id="gGoal">Pick a level (or Surprise me) and tap <b>Start drill</b>. Write your answer in the practice pad above and hit run.</div>
+      <div class="ghint" id="gHint"></div>
+      <div class="gbtns">
+        <button class="gbtn primary" id="gStart" type="button">Start drill</button>
+        <button class="gbtn" id="gHintBtn" type="button" style="display:none">Hint</button>
+        <button class="gbtn" id="gFillBtn" type="button" style="display:none">Type it for me</button>
+        <button class="gbtn" id="gSkip" type="button" style="display:none">Skip</button>
+      </div>
+    </div>
+  </div>
+  <p class="note"><b>Party trick JavaScript cannot do:</b> in Python, <code>"ha" * 5</code> repeats the text. Try printing it.</p>
+</section>
+
+<!-- WALKER -->
+<section id="walk">
+  <p class="eyebrow">Part 4 &middot; Watch it think</p>
+  <h2>Step through a real program</h2>
+  <p>The two ideas that make code feel like magic are <b>decisions</b> (if / else) and <b>loops</b> (for). Instead of running these blind, walk them one step at a time and watch the variables change.</p>
+  <div class="wtabs">
+    <button class="wtab on" data-prog="0">A decision</button>
+    <button class="wtab" data-prog="1">A loop</button>
+  </div>
+  <div class="wcode" id="wcode"></div>
+  <div class="wpanels">
+    <div class="wpanel"><div class="wt">Variables right now</div><div class="wvar" id="wvars">&nbsp;</div></div>
+    <div class="wpanel"><div class="wt">Output so far</div><div class="wout" id="wout">&nbsp;</div></div>
+  </div>
+  <div class="wnote" id="wnote">Press Step to begin.</div>
+  <div class="wbtns">
+    <button class="btn primary" id="wstep">Step &rarr;</button>
+    <button class="btn" id="wreset">Reset</button>
+  </div>
+  <p class="note"><b>Why Python looks the way it does:</b> the indented lines belong to the <code>if</code> or the <code>for</code> above them. In JavaScript, curly braces mark that. In Python, the indentation itself IS the structure. That is the single biggest difference between the two languages.</p>
+</section>
+
+<!-- USED FOR -->
+<section id="uses">
+  <p class="eyebrow">Part 5 &middot; In the wild</p>
+  <h2>What people actually use it for</h2>
+  <div class="uses">
+    <div class="use"><div class="ut">Automation</div><div class="ub">Rename 500 files, resize a folder of images, fill a template 50 times. Boring jobs, done in seconds, on a schedule if you want.</div></div>
+    <div class="use"><div class="ut">Data and spreadsheets</div><div class="ub">Reading, cleaning, combining, and charting data. Python is the standard tool for turning a messy CSV into an answer.</div></div>
+    <div class="use"><div class="ut">AI and machine learning</div><div class="ub">Nearly the entire AI field is built in Python. The tools, the tutorials, the research: it is the native language of the territory.</div></div>
+    <div class="use"><div class="ut">Servers and backends</div><div class="ub">The code that runs behind websites: accounts, databases, the parts a browser never sees.</div></div>
+    <div class="use"><div class="ut">The glue behind AI assistants</div><div class="ub">When an AI builds you a PDF, converts a file, or analyzes a document, it is usually writing and running Python behind the curtain. Reading Python means you can check its work.</div></div>
+    <div class="use"><div class="ut">Making files</div><div class="ub">PDFs, Word docs, spreadsheets, images: Python has a library for generating just about every file format from code.</div></div>
+  </div>
+</section>
+
+<!-- VERDICT -->
+<section id="verdict">
+  <p class="eyebrow">Part 6 &middot; The honest verdict</p>
+  <h2>Should you learn it?</h2>
+  <p><b>Learn to read it first. Keep building in what you know.</b> If your apps live in the browser, JavaScript remains the right tool, and nothing needs rewriting. Python earns its place the day a task leaves the browser: renaming a pile of files, crunching data, automating something on a schedule.</p>
+  <p class="soft">Reading literacy pays off immediately, though: AI tools constantly write Python in front of you, and being able to skim a script and say "that reads files from this folder and makes a PDF" turns a black box into a glass one.</p>
+  <div class="verd">
+    <div class="verdcard keep"><div class="vt">Worth learning</div>
+      <ul>
+        <li>Reading a short script and saying what it does</li>
+        <li>print, variables, strings, if, for</li>
+        <li>Spotting that indentation is structure</li>
+        <li>Asking an AI for small scripts and checking them</li>
+      </ul>
+    </div>
+    <div class="verdcard skip"><div class="vt">Safe to skip for now</div>
+      <ul>
+        <li>Rewriting your working apps in Python</li>
+        <li>Classes and object-oriented depth</li>
+        <li>Memorizing library names</li>
+        <li>Setting up complex Python environments</li>
+      </ul>
+    </div>
+  </div>
+  <h3>The pocket reference</h3>
+  <div class="cheat">
+    <span class="c">print("hi")</span>        <span class="d">say something</span><br>
+    <span class="c">name = "Sam"</span>       <span class="d">make a variable (no let needed)</span><br>
+    <span class="c">"ha" * 3</span>           <span class="d">repeat text: hahaha</span><br>
+    <span class="c">len("word")</span>        <span class="d">how long something is</span><br>
+    <span class="c">[1, 2, 3]</span>          <span class="d">a list</span><br>
+    <span class="c">if x &gt; 5:</span>          <span class="d">decision (colon, then indent)</span><br>
+    <span class="c">for n in [1, 2]:</span>   <span class="d">loop over a list</span><br>
+    <span class="c"># like this</span>        <span class="d">a comment (JS uses //)</span>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section id="quiz">
+  <p class="eyebrow">Part 7 &middot; Prove it</p>
+  <h2>Five questions</h2>
+  <div id="quizwrap"></div>
+  <div class="score" id="scoreEl"></div>
+  <button class="btn" id="retryBtn" style="display:none">Try again</button>
+</section>
+
+</main>
+<footer>Second Language &middot; a curiosity tool &middot; the practice pad is a teaching slice, not full Python</footer>
+<div id="toast" role="status"></div>
+
+<script>
+"use strict";
+var VERSION = "v3.0 \u00B7 Aug 22";
+var STORE_KEY = "python101_v1";
+
+/* ---------- guarded storage ---------- */
+var memStore = {};
+function loadState(){
+  try{
+    var raw = localStorage.getItem(STORE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return memStore[STORE_KEY] || { lessons:{}, quizBest:0 };
+}
+function saveState(s){
+  memStore[STORE_KEY] = s;
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(s)); }catch(e){}
+}
+
+/* ---------- mini Python (pure logic, DOM-free) ----------
+   Supports: print(...), assignment, numbers, strings, + - * /,
+   parentheses, len(), variables, # comments. A teaching slice. */
+function pyTokenize(src){
+  var toks = [], i = 0;
+  while(i < src.length){
+    var ch = src[i];
+    if(ch === " " || ch === "\t"){ i++; continue; }
+    if(ch === "#"){ break; }
+    if(ch >= "0" && ch <= "9"){
+      var num = "";
+      while(i < src.length && ((src[i] >= "0" && src[i] <= "9") || src[i] === ".")){ num += src[i]; i++; }
+      if((num.match(/\./g)||[]).length > 1) throw { type:"SyntaxError", msg:"invalid number: " + num };
+      toks.push({ k:"num", v:parseFloat(num), isFloat:num.indexOf(".") >= 0 });
+      continue;
+    }
+    if(ch === '"' || ch === "'"){
+      var quote = ch, str = ""; i++;
+      var closed = false;
+      while(i < src.length){
+        if(src[i] === quote){ closed = true; i++; break; }
+        str += src[i]; i++;
+      }
+      if(!closed) throw { type:"SyntaxError", msg:"unterminated string. Did you close the quote?" };
+      toks.push({ k:"str", v:str });
+      continue;
+    }
+    if(/[A-Za-z_]/.test(ch)){
+      var name = "";
+      while(i < src.length && /[A-Za-z0-9_]/.test(src[i])){ name += src[i]; i++; }
+      toks.push({ k:"name", v:name });
+      continue;
+    }
+    if("+-*/(),".indexOf(ch) >= 0){ toks.push({ k:ch }); i++; continue; }
+    throw { type:"SyntaxError", msg:"unexpected character: " + ch };
+  }
+  return toks;
+}
+function pyValToString(val){
+  if(val.k === "str") return val.v;
+  if(val.isFloat){
+    var s = String(val.v);
+    if(s.indexOf(".") < 0 && s.indexOf("e") < 0 && isFinite(val.v)) s += ".0";
+    return s;
+  }
+  return String(val.v);
+}
+function pyTypeName(val){ 
+  if(val.k === "str") return "str";
+  return val.isFloat ? "float" : "int";
+}
+function pyEvalExpr(toks, env, flags){
+  var pos = 0;
+  function peek(){ return toks[pos]; }
+  function next(){ return toks[pos++]; }
+  function expr(){
+    var left = term();
+    while(peek() && (peek().k === "+" || peek().k === "-")){
+      var op = next().k;
+      var right = term();
+      if(op === "+"){
+        if(left.k === "str" && right.k === "str"){
+          if(flags) flags.strConcat = true;
+          left = { k:"str", v:left.v + right.v };
+        }
+        else if(left.k === "str" || right.k === "str"){
+          throw { type:"TypeError", msg:'can only concatenate str to str. Python will not quietly mix text and numbers like JavaScript does. Try str( ) thinking: put quotes around the number, or keep both sides numbers.' };
+        }
+        else left = { k:"num", v:left.v + right.v, isFloat: left.isFloat || right.isFloat };
+      } else {
+        if(left.k === "str" || right.k === "str") throw { type:"TypeError", msg:"unsupported operand: cannot subtract with text" };
+        left = { k:"num", v:left.v - right.v, isFloat: left.isFloat || right.isFloat };
+      }
+    }
+    return left;
+  }
+  function term(){
+    var left = factor();
+    while(peek() && (peek().k === "*" || peek().k === "/")){
+      var op = next().k;
+      var right = factor();
+      if(op === "*"){
+        if(left.k === "str" && right.k === "num" && !right.isFloat){
+          if(flags) flags.strRepeat = true;
+          left = { k:"str", v: new Array(Math.max(0, right.v) + 1).join(left.v) };
+        }
+        else if(right.k === "str" && left.k === "num" && !left.isFloat){
+          if(flags) flags.strRepeat = true;
+          left = { k:"str", v: new Array(Math.max(0, left.v) + 1).join(right.v) };
+        }
+        else if(left.k === "str" || right.k === "str"){
+          throw { type:"TypeError", msg:"can't multiply text by a " + (left.k==="str" ? pyTypeName(right) : pyTypeName(left)) + ". Text times a whole number repeats it; anything else is an error." };
+        }
+        else left = { k:"num", v:left.v * right.v, isFloat: left.isFloat || right.isFloat };
+      } else {
+        if(left.k === "str" || right.k === "str") throw { type:"TypeError", msg:"unsupported operand: cannot divide with text" };
+        if(right.v === 0) throw { type:"ZeroDivisionError", msg:"division by zero" };
+        left = { k:"num", v:left.v / right.v, isFloat:true };
+      }
+    }
+    return left;
+  }
+  function factor(){
+    var t = peek();
+    if(!t) throw { type:"SyntaxError", msg:"the line ends where a value should be" };
+    if(t.k === "num"){ next(); return { k:"num", v:t.v, isFloat:t.isFloat }; }
+    if(t.k === "str"){ next(); return { k:"str", v:t.v }; }
+    if(t.k === "-"){ next(); var f = factor(); if(f.k === "str") throw { type:"TypeError", msg:"cannot negate text" }; return { k:"num", v:-f.v, isFloat:f.isFloat }; }
+    if(t.k === "("){
+      next();
+      var inner = expr();
+      if(!peek() || peek().k !== ")") throw { type:"SyntaxError", msg:"missing a closing )" };
+      next();
+      return inner;
+    }
+    if(t.k === "name"){
+      next();
+      if(t.v === "len" && peek() && peek().k === "("){
+        next();
+        var arg = expr();
+        if(!peek() || peek().k !== ")") throw { type:"SyntaxError", msg:"len( is missing its closing )" };
+        next();
+        if(arg.k !== "str") throw { type:"TypeError", msg:"object of type '" + pyTypeName(arg) + "' has no len()" };
+        return { k:"num", v:arg.v.length, isFloat:false };
+      }
+      if(env.hasOwnProperty(t.v)){
+        if(flags) flags.usedVar = true;
+        var val = env[t.v];
+        return { k:val.k, v:val.v, isFloat:val.isFloat };
+      }
+      throw { type:"NameError", msg:"name '" + t.v + "' is not defined. Variables must be given a value before you use them." };
+    }
+    throw { type:"SyntaxError", msg:"could not read this part of the line" };
+  }
+  var result = expr();
+  if(pos < toks.length) throw { type:"SyntaxError", msg:"extra characters after the expression" };
+  return result;
+}
+/* split token list on top-level commas (for print with several arguments) */
+function splitTopCommas(toks){
+  var groups = [], cur = [], depth = 0;
+  for(var i=0;i<toks.length;i++){
+    var t = toks[i];
+    if(t.k === "(") depth++;
+    if(t.k === ")") depth--;
+    if(t.k === "," && depth === 0){ groups.push(cur); cur = []; continue; }
+    cur.push(t);
+  }
+  groups.push(cur);
+  return groups;
+}
+/* runPython(src) -> { out:[{txt,cls}], flags:{} } */
+function runPython(src){
+  var env = {};
+  var out = [];
+  var flags = {};
+  var lines = src.split("\n");
+  for(var li = 0; li < lines.length; li++){
+    var line = lines[li];
+    var stripped = line.trim();
+    if(!stripped || stripped.charAt(0) === "#") continue;
+    try{
+      var pm = stripped.match(/^print\s*\((.*)\)\s*$/);
+      if(pm){
+        var inner = pm[1].trim();
+        if(inner === ""){ out.push({ txt:"", cls:"po-ok" }); flags.printed = true; continue; }
+        var toks = pyTokenize(inner);
+        var groups = splitTopCommas(toks);
+        var parts = [];
+        for(var g = 0; g < groups.length; g++){
+          if(groups[g].length === 0) throw { type:"SyntaxError", msg:"print has an empty argument" };
+          var val = pyEvalExpr(groups[g], env, flags);
+          if(val.k === "str") flags.printedStr = true;
+          parts.push(pyValToString(val));
+        }
+        out.push({ txt: parts.join(" "), cls:"po-ok" });
+        flags.printed = true;
+        continue;
+      }
+      var am = stripped.match(/^([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.+)$/);
+      if(am && stripped.indexOf("==") < 0){
+        var rtoks = pyTokenize(am[2]);
+        env[am[1]] = pyEvalExpr(rtoks, env, flags);
+        flags.assigned = true;
+        continue;
+      }
+      if(/^(if|for|while|def|else|elif)\b/.test(stripped) || stripped.slice(-1) === ":"){
+        out.push({ txt:"line " + (li+1) + ": if / for / loops are just past this practice pad's edge. Part 4 below walks them step by step instead.", cls:"po-hint" });
+        continue;
+      }
+      /* bare expression: evaluate, teach that scripts stay silent */
+      var btoks = pyTokenize(stripped);
+      var bval = pyEvalExpr(btoks, env, flags);
+      out.push({ txt:"line " + (li+1) + " ran and made " + pyValToString(bval) + ", but a script only shows what you print( ). Wrap it: print(" + stripped + ")", cls:"po-hint" });
+    }catch(e){
+      var etype = e && e.type ? e.type : "Error";
+      var emsg = e && e.msg ? e.msg : "something went wrong";
+      out.push({ txt: etype + " on line " + (li+1) + ": " + emsg, cls:"po-err" });
+      return { out:out, flags:flags };
+    }
+  }
+  if(out.length === 0) out.push({ txt:"(ran with no output. Use print( ) to see results.)", cls:"po-hint" });
+  return { out:out, flags:flags };
+}
+
+/* ---------- app (DOM) ---------- */
+function initApp(){
+  var state = loadState();
+  function $(id){ return document.getElementById(id); }
+  function toast(msg){
+    var t = $("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(toast._h);
+    toast._h = setTimeout(function(){ t.classList.remove("show"); }, 2200);
+  }
+  $("vbadge").addEventListener("click", function(){ toast("Second Language " + VERSION); });
+
+  /* habitats */
+  document.querySelectorAll(".hab").forEach(function(h){
+    function open(){ h.classList.toggle("open"); }
+    h.addEventListener("click", open);
+    h.addEventListener("keydown", function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); open(); } });
+  });
+
+  /* translator */
+  var EXAMPLES = [
+    {
+      title:"1. Say something",
+      js:['console.log("hi");'],
+      py:['print("hi")'],
+      pairs:[ { js:[0], py:[0], note:"<b>Same job, shorter word.</b> Python's print is JavaScript's console.log. Also notice: no semicolon. Python simply ends the line." } ]
+    },
+    {
+      title:"2. Variables and math",
+      js:["let price = 4;","console.log(price * 3);"],
+      py:["price = 4","print(price * 3)"],
+      pairs:[
+        { js:[0], py:[0], note:"<b>No let, const, or var.</b> In Python you just name the thing and give it a value." },
+        { js:[1], py:[1], note:"<b>Math is identical.</b> + - * / work the same in both languages." }
+      ]
+    },
+    {
+      title:"3. Combining text",
+      js:['let name = "Sam";','console.log("Hi " + name);'],
+      py:['name = "Sam"','print("Hi " + name)'],
+      pairs:[
+        { js:[0], py:[0], note:"<b>Strings are the same idea:</b> text in quotes, single or double." },
+        { js:[1], py:[1], note:"<b>+ glues strings in both.</b> One difference to know: Python refuses to mix text and numbers with +, where JavaScript quietly converts. Python makes you be explicit, which catches bugs." }
+      ]
+    },
+    {
+      title:"4. Making a decision",
+      js:["if (score > 10) {",'  console.log("You win");',"} else {",'  console.log("Keep going");',"}"],
+      py:["if score > 10:",'    print("You win")',"else:",'    print("Keep going")'],
+      pairs:[
+        { js:[0], py:[0], note:"<b>No parentheses needed around the test,</b> and a colon opens the block instead of a curly brace." },
+        { js:[1], py:[1], note:"<b>The indentation IS the structure.</b> In JavaScript, spaces are cosmetic and the braces do the work. In Python, those 4 spaces are what puts this line inside the if." },
+        { js:[2], py:[2], note:"<b>else gets its own colon.</b> And notice there is no closing brace anywhere: the block ends when the indentation ends." },
+        { js:[3], py:[3], note:"<b>Same logic, same behavior.</b> Only the costume changed." },
+        { js:[4], py:[], note:"<b>This line has no twin.</b> Python has no closing braces at all. When the indented lines stop, the block is over." }
+      ]
+    },
+    {
+      title:"5. A loop",
+      js:["for (const n of [1, 2, 3]) {","  console.log(n);","}"],
+      py:["for n in [1, 2, 3]:","    print(n)"],
+      pairs:[
+        { js:[0], py:[0], note:"<b>Reads almost like English:</b> for n in the list. The square-bracket list is the same in both languages." },
+        { js:[1], py:[1], note:"<b>The indented line is the loop body.</b> It runs once per item: n is 1, then 2, then 3." },
+        { js:[2], py:[], note:"<b>No closing brace.</b> Outdent and the loop is done." }
+      ]
+    }
+  ];
+  var xi = 0;
+  function renderExample(){
+    var ex = EXAMPLES[xi];
+    $("xtitle").textContent = ex.title;
+    $("xnote").innerHTML = "Tap a line above.";
+    function fill(preId, lines, side){
+      var pre = $(preId);
+      pre.innerHTML = "";
+      lines.forEach(function(txt, idx){
+        var d = document.createElement("div");
+        d.className = "cline"; d.tabIndex = 0;
+        d.textContent = txt;
+        function pick(){
+          document.querySelectorAll(".cline").forEach(function(x){ x.classList.remove("hl"); });
+          var pair = null;
+          for(var p = 0; p < ex.pairs.length; p++){
+            if(ex.pairs[p][side].indexOf(idx) >= 0){ pair = ex.pairs[p]; break; }
+          }
+          if(!pair) return;
+          pair.js.forEach(function(j){ $("jscode").children[j].classList.add("hl"); });
+          pair.py.forEach(function(j){ $("pycode").children[j].classList.add("hl"); });
+          $("xnote").innerHTML = pair.note;
+        }
+        d.addEventListener("click", pick);
+        d.addEventListener("keydown", function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); pick(); } });
+        pre.appendChild(d);
+      });
+    }
+    fill("jscode", ex.js, "js");
+    fill("pycode", ex.py, "py");
+  }
+  $("xprev").addEventListener("click", function(){ xi = (xi + EXAMPLES.length - 1) % EXAMPLES.length; renderExample(); });
+  $("xnext").addEventListener("click", function(){ xi = (xi + 1) % EXAMPLES.length; renderExample(); });
+  renderExample();
+
+  /* playground */
+  var LESSONS = [
+    { id:"p1", html:'Say your first word: <code>print("hello")</code>' },
+    { id:"p2", html:'Make a variable and use it: <code>snacks = 3</code> then <code>print(snacks * 4)</code>' },
+    { id:"p3", html:'Do the party trick: <code>print("ha" * 5)</code>' },
+    { id:"p4", html:'Glue two strings: <code>first = "hot"</code> then <code>print(first + " dog")</code>' }
+  ];
+  function renderLessons(){
+    var wrap = $("lessons");
+    wrap.innerHTML = "";
+    LESSONS.forEach(function(ls, i){
+      var d = document.createElement("div");
+      d.className = "lesson" + (state.lessons[ls.id] ? " done" : "");
+      d.innerHTML = '<span class="mk">' + (state.lessons[ls.id] ? "\u2713" : (i+1)) + '</span><span class="mtext">' + ls.html + '</span>';
+      wrap.appendChild(d);
+    });
+  }
+  function completeLesson(id, label){
+    if(state.lessons[id]) return;
+    state.lessons[id] = true;
+    saveState(state);
+    renderLessons();
+    toast("Lesson done: " + label);
+  }
+  function padRun(){
+    var src = $("pysrc").value;
+    var result = runPython(src);
+    var outEl = $("pyout");
+    outEl.innerHTML = "";
+    result.out.forEach(function(l){
+      var d = document.createElement("div");
+      d.className = l.cls;
+      d.textContent = l.txt === "" ? "\u00A0" : l.txt;
+      outEl.appendChild(d);
+    });
+    var f = result.flags;
+    if(f.printedStr) completeLesson("p1", "print");
+    if(f.printed && f.usedVar && f.assigned) completeLesson("p2", "variables");
+    if(f.strRepeat && f.printed) completeLesson("p3", "the party trick");
+    if(f.strConcat && f.printed) completeLesson("p4", "string glue");
+    gymAfter(result, src);
+  }
+  $("pyrun").addEventListener("click", padRun);
+
+  /* ---------- The Gym ---------- */
+  state.gym = state.gym || { reps:0, streak:0, best:0 };
+  var GYM_LEVELS = ["Say it","Variables","Text tricks","Combos","Your work"];
+  var gymLevel = -1;
+  var drill = null;
+  function pickFrom(arr, not){
+    var v, guard = 0;
+    do { v = arr[Math.floor(Math.random()*arr.length)]; } while(not && not.indexOf(v) > -1 && guard++ < 50);
+    return v;
+  }
+  var Y_WORDS = ["taco","robot","banana","comet","pickle","walrus"];
+  var Y_NAMES = ["snacks","dogs","stars","coins","apples"];
+  function rint(lo, hi){ return lo + Math.floor(Math.random() * (hi - lo + 1)); }
+  function plainOut(result){
+    return result.out.filter(function(l){ return l.cls === "po-ok"; }).map(function(l){ return l.txt; });
+  }
+  var GYM_TPLS = [
+    { id:"y01", lv:0, make:function(){
+        var W = pickFrom(Y_WORDS);
+        return { goal:"Make Python say exactly: <b>" + W + "</b>",
+          expect:[W],
+          hints:["print() says things. Words need quotes.","<code>print(\"" + W + "\")</code>"],
+          fill:'print("' + W + '")', sol:'print("' + W + '")' };
+      } },
+    { id:"y02", lv:0, make:function(){
+        var A = rint(11, 47), B = rint(12, 59);
+        return { goal:"Print the number that is <b>" + A + " + " + B + "</b>. Make Python do the math (a + must appear in your code).",
+          expect:[String(A + B)], needle:"+",
+          hints:["Math does not need quotes. print can hold a whole calculation.","<code>print(" + A + " + " + B + ")</code>"],
+          fill:"print(" + A + " + " + B + ")", sol:"print(" + A + " + " + B + ")" };
+      } },
+    { id:"y10", lv:1, make:function(){
+        var N = pickFrom(Y_NAMES), V = rint(2, 9), M = rint(2, 9);
+        return { goal:"Make a variable called <b>" + N + "</b> holding <b>" + V + "</b>, then print <b>" + N + " times " + M + "</b>.",
+          expect:[String(V * M)], needle:N,
+          hints:["Line one stores it. Line two uses the name, not the number.","<code>" + N + " = " + V + "</code> then <code>print(" + N + " * " + M + ")</code>"],
+          fill:N + " = " + V, sol:N + " = " + V + "\nprint(" + N + " * " + M + ")" };
+      } },
+    { id:"y11", lv:1, make:function(){
+        var N = pickFrom(Y_NAMES), W = pickFrom(Y_WORDS);
+        return { goal:"Store the word <b>" + W + "</b> in a variable called <b>" + N + "</b>, then print it with an exclamation mark glued on the end: <b>" + W + "!</b>",
+          expect:[W + "!"], needle:N,
+          hints:["Text glues with +. The ! needs its own quotes.","<code>" + N + " = \"" + W + "\"</code> then <code>print(" + N + " + \"!\")</code>"],
+          fill:N + ' = "' + W + '"', sol:N + ' = "' + W + '"\nprint(' + N + ' + "!")' };
+      } },
+    { id:"y20", lv:2, make:function(){
+        var W = pickFrom(Y_WORDS), K = rint(3, 6);
+        var rep2 = ""; for(var i = 0; i < K; i++) rep2 += W;
+        return { goal:"Print the word <b>" + W + "</b> repeated <b>" + K + "</b> times as one long string (the party trick).",
+          expect:[rep2],
+          hints:["In Python, text times a number repeats the text.","<code>print(\"" + W + "\" * " + K + ")</code>"],
+          fill:'print("' + W + '" * ' + K + ')', sol:'print("' + W + '" * ' + K + ')' };
+      } },
+    { id:"y21", lv:2, make:function(){
+        var W = pickFrom(Y_WORDS);
+        return { goal:"Use <b>len</b> to make Python count the letters in <b>" + W + "</b> and print the count.",
+          expect:[String(W.length)], needle:"len(",
+          hints:["len() measures. It goes inside the print.","<code>print(len(\"" + W + "\"))</code>"],
+          fill:'print(len("' + W + '"))', sol:'print(len("' + W + '"))' };
+      } },
+    { id:"y30", lv:3, make:function(){
+        var N1 = pickFrom(Y_NAMES), N2 = pickFrom(Y_NAMES, [N1]);
+        var V1 = rint(2, 9), V2 = rint(2, 9);
+        return { goal:"Two variables: <b>" + N1 + " = " + V1 + "</b> and <b>" + N2 + " = " + V2 + "</b>. Print their <b>sum</b>, then print their <b>product</b>. Two print lines, using the names.",
+          expect:[String(V1 + V2), String(V1 * V2)], needle:N1,
+          hints:["Four lines total: two assignments, two prints.","<code>" + N1 + " = " + V1 + "</code>, <code>" + N2 + " = " + V2 + "</code>, <code>print(" + N1 + " + " + N2 + ")</code>, <code>print(" + N1 + " * " + N2 + ")</code>"],
+          fill:N1 + " = " + V1, sol:N1 + " = " + V1 + "\n" + N2 + " = " + V2 + "\nprint(" + N1 + " + " + N2 + ")\nprint(" + N1 + " * " + N2 + ")" };
+      } },
+    { id:"y31", lv:3, make:function(){
+        var N = pickFrom(Y_NAMES), W = pickFrom(Y_WORDS);
+        return { goal:"Store <b>" + W + "</b> in a variable called <b>" + N + "</b>, then use + to print exactly: <b>my favorite is " + W + "</b>",
+          expect:["my favorite is " + W], needle:N,
+          hints:["Glue a quoted sentence-start onto the variable. Mind the space before the word.","<code>" + N + " = \"" + W + "\"</code> then <code>print(\"my favorite is \" + " + N + ")</code>"],
+          fill:N + ' = "' + W + '"', sol:N + ' = "' + W + '"\nprint("my favorite is " + ' + N + ')' };
+      } },
+    { id:"z01", lv:4, make:function(){
+        var maj = rint(1, 5), min = rint(0, 9);
+        return { goal:"<b>Build a version string.</b> Your apps carry a stamp like <code>v3.1</code>. Store the number part in a variable <b>num = \"" + maj + "." + min + "\"</b> (as text), then print exactly: <b>v" + maj + "." + min + "</b>",
+          expect:["v" + maj + "." + min], needle:"num",
+          hints:["Glue a quoted \"v\" onto the front of the variable with +.","<code>num = \"" + maj + "." + min + "\"</code> then <code>print(\"v\" + num)</code>"],
+          fill:'num = "' + maj + "." + min + '"', sol:'num = "' + maj + "." + min + '"\nprint("v" + num)' };
+      } },
+    { id:"z02", lv:4, make:function(){
+        var app = pickFrom(["gameshelf","pigment","reframe","waystone","pocketninja"]);
+        return { goal:"<b>Make a storage key.</b> Every app you build saves progress under a key like <code>gameshelf_v1</code>. Store <b>app = \"" + app + "\"</b>, then print the key: <b>" + app + "_v1</b>",
+          expect:[app + "_v1"], needle:"app",
+          hints:["Glue the variable to the fixed suffix with +.","<code>app = \"" + app + "\"</code> then <code>print(app + \"_v1\")</code>"],
+          fill:'app = "' + app + '"', sol:'app = "' + app + '"\nprint(app + "_v1")' };
+      } },
+    { id:"z03", lv:4, make:function(){
+        var price = rint(3, 12), qty = rint(2, 6);
+        return { goal:"<b>Quick cost math.</b> A run of custom USB drives costs <b>$" + price + "</b> each and you need <b>" + qty + "</b>. Store both as variables and print the total (just the number).",
+          expect:[String(price * qty)], needle:"*",
+          hints:["Two variables, then print their product.","<code>each = " + price + "</code>, <code>count = " + qty + "</code>, <code>print(each * count)</code>"],
+          fill:"each = " + price, sol:"each = " + price + "\ncount = " + qty + "\nprint(each * count)" };
+      } },
+    { id:"z04", lv:4, make:function(){
+        var name = pickFrom(["waystone","pigment","reframe","gameshelf","pocketninja"]);
+        return { goal:"<b>Measure a name.</b> Before you pick a storage key, you want to know how long an app name is. Store <b>app = \"" + name + "\"</b>, then use <b>len</b> to print how many letters it has.",
+          expect:[String(name.length)], needle:"len(",
+          hints:["len() counts the letters in the text a variable holds.","<code>app = \"" + name + "\"</code> then <code>print(len(app))</code>"],
+          fill:'app = "' + name + '"', sol:'app = "' + name + '"\nprint(len(app))' };
+      } },
+    { id:"z05", lv:4, make:function(){
+        var name = pickFrom(["Garrett","a tester","your coworker","the club"]);
+        return { goal:"<b>Personalize a toast message.</b> Store <b>who = \"" + name + "\"</b> and print exactly: <b>Saved for " + name + "!</b> (the kind of confirmation line your apps show)",
+          expect:["Saved for " + name + "!"], needle:"who",
+          hints:["Sandwich the variable between two quoted pieces with +.","<code>who = \"" + name + "\"</code> then <code>print(\"Saved for \" + who + \"!\")</code>"],
+          fill:'who = "' + name + '"', sol:'who = "' + name + '"\nprint("Saved for " + who + "!")' };
+      } }
+  ];
+  function gymStats(){
+    $("repN").textContent = state.gym.reps;
+    $("strN").textContent = state.gym.streak;
+    $("bestN").textContent = state.gym.best;
+  }
+  function gymStart(forceId){
+    var pool = GYM_TPLS.filter(function(t){ return gymLevel === -1 || t.lv === gymLevel; });
+    var chosen = null;
+    if(forceId){ GYM_TPLS.forEach(function(t){ if(t.id === forceId) chosen = t; }); }
+    if(!chosen) chosen = pool[Math.floor(Math.random() * pool.length)];
+    drill = { tpl: chosen.make(), tplId: chosen.id, hintsUsed: 0 };
+    $("pysrc").value = drill.tpl.setup ? drill.tpl.setup() : "";
+    $("pyout").innerHTML = '<span class="po-hint">write your answer above, then run</span>';
+    $("gGoal").innerHTML = drill.tpl.goal;
+    $("gymCard").className = "gymcard active";
+    $("gHint").className = "ghint"; $("gHint").innerHTML = "";
+    $("gStart").style.display = "none";
+    $("gHintBtn").style.display = "";
+    $("gFillBtn").style.display = "none";
+    $("gSkip").style.display = "";
+    gymStats();
+  }
+  function gymWin(){
+    state.gym.reps++;
+    state.gym.streak++;
+    if(state.gym.streak > state.gym.best) state.gym.best = state.gym.streak;
+    saveState(state);
+    $("gymCard").className = "gymcard win";
+    $("gGoal").innerHTML = "<b>Done.</b> Rep logged" + (drill.hintsUsed === 0 ? ", no hints. Clean." : ".") + " Total reps: " + state.gym.reps + ".";
+    $("gHint").className = "ghint";
+    drill = null;
+    $("gStart").style.display = ""; $("gStart").textContent = "Next drill";
+    $("gHintBtn").style.display = "none"; $("gFillBtn").style.display = "none"; $("gSkip").style.display = "none";
+    gymStats();
+    toast("Rep logged \u00b7 streak " + state.gym.streak);
+  }
+  function gymAfter(result, srcCode){
+    if(!drill) return;
+    var t = drill.tpl;
+    if(t.needle && srcCode.indexOf(t.needle) === -1) return;
+    var got = plainOut(result);
+    if(got.length !== t.expect.length) return;
+    for(var i = 0; i < t.expect.length; i++){
+      if(got[i] !== t.expect[i]) return;
+    }
+    gymWin();
+  }
+  $("gStart").addEventListener("click", function(){ gymStart(); });
+  $("gHintBtn").addEventListener("click", function(){
+    if(!drill) return;
+    drill.hintsUsed++;
+    var h = $("gHint");
+    h.className = "ghint show";
+    if(drill.hintsUsed === 1){ h.innerHTML = drill.tpl.hints[0]; }
+    else { h.innerHTML = drill.tpl.hints[0] + "<br>" + drill.tpl.hints[1]; $("gFillBtn").style.display = ""; }
+  });
+  $("gFillBtn").addEventListener("click", function(){
+    if(!drill) return;
+    var ta = $("pysrc");
+    ta.value = ta.value && ta.value.slice(-1) !== "\n" ? ta.value + "\n" + drill.tpl.fill : ta.value + drill.tpl.fill;
+    ta.focus();
+  });
+  $("gSkip").addEventListener("click", function(){
+    if(!drill) return;
+    state.gym.streak = 0; saveState(state);
+    $("gGoal").innerHTML = "Skipped. One answer was:<br>" + drill.tpl.hints[1] + "<br>Streak reset. Tap Start when ready.";
+    $("gHint").className = "ghint";
+    $("gymCard").className = "gymcard";
+    drill = null;
+    $("gStart").style.display = ""; $("gStart").textContent = "Start drill";
+    $("gHintBtn").style.display = "none"; $("gFillBtn").style.display = "none"; $("gSkip").style.display = "none";
+    gymStats();
+  });
+  (function(){
+    var tabs = ["Surprise me"].concat(GYM_LEVELS);
+    tabs.forEach(function(name, i){
+      var b = document.createElement("button");
+      b.className = "gtab" + (i === 0 ? " on" : ""); b.type = "button"; b.textContent = name;
+      b.addEventListener("click", function(){
+        gymLevel = i - 1;
+        Array.prototype.forEach.call(document.querySelectorAll(".gtab"), function(x, xi){ x.classList.toggle("on", xi === i); });
+      });
+      $("gymTabs").appendChild(b);
+    });
+  })();
+  gymStats();
+  if(typeof window !== "undefined"){
+    window._gym = { start: gymStart, state: function(){ return { drill: drill, gym: state.gym }; } };
+  }
+  var PYCHIPS = ['print("hello")', 'snacks = 3', 'print(snacks * 4)', 'print("ha" * 5)', 'first = "hot"', 'print(first + " dog")', 'print(len("balloon"))', 'print(10 / 4)'];
+  var chipwrap = $("pychips");
+  PYCHIPS.forEach(function(c){
+    var b = document.createElement("button");
+    b.className = "chip"; b.type = "button"; b.textContent = c;
+    b.addEventListener("click", function(){
+      var ta = $("pysrc");
+      ta.value = ta.value && ta.value.slice(-1) !== "\n" ? ta.value + "\n" + c : ta.value + c;
+      ta.focus();
+    });
+    chipwrap.appendChild(b);
+  });
+  renderLessons();
+
+  /* walker */
+  var PROGRAMS = [
+    {
+      lines:["temp = 78","if temp > 70:",'    print("shorts weather")',"else:",'    print("grab a jacket")'],
+      steps:[
+        { line:0, vars:{temp:"78"}, out:[], note:"temp is set to 78. One variable now exists." },
+        { line:1, vars:{temp:"78"}, out:[], note:"The test: is temp greater than 70? 78 &gt; 70 is True, so the program takes the indented block under the if." },
+        { line:2, vars:{temp:"78"}, out:["shorts weather"], note:"This line runs because the test was True. It prints." },
+        { line:-1, vars:{temp:"78"}, out:["shorts weather"], note:"Done. The else block never ran at all. Now imagine temp = 60 and replay it in your head: the program would skip straight to the else." }
+      ]
+    },
+    {
+      lines:["total = 0","for n in [4, 7, 2]:","    total = total + n","print(total)"],
+      steps:[
+        { line:0, vars:{total:"0"}, out:[], note:"Start a counter at zero." },
+        { line:1, vars:{total:"0", n:"4"}, out:[], note:"The loop grabs the first item from the list: n becomes 4." },
+        { line:2, vars:{total:"4", n:"4"}, out:[], note:"total = 0 + 4. The counter grows." },
+        { line:1, vars:{total:"4", n:"7"}, out:[], note:"Back to the top of the loop. Next item: n becomes 7." },
+        { line:2, vars:{total:"11", n:"7"}, out:[], note:"total = 4 + 7." },
+        { line:1, vars:{total:"11", n:"2"}, out:[], note:"Last item: n becomes 2." },
+        { line:2, vars:{total:"13", n:"2"}, out:[], note:"total = 11 + 2. The list is now empty, so the loop ends." },
+        { line:3, vars:{total:"13", n:"2"}, out:["13"], note:"Out of the loop (see the indentation end?), print the result: 13. That is the whole trick behind every score counter and running total you have ever seen." }
+      ]
+    }
+  ];
+  var wprog = 0, wstep = -1;
+  function renderWalker(){
+    var prog = PROGRAMS[wprog];
+    var codeEl = $("wcode");
+    codeEl.innerHTML = "";
+    var current = wstep >= 0 ? prog.steps[Math.min(wstep, prog.steps.length-1)] : null;
+    prog.lines.forEach(function(txt, idx){
+      var d = document.createElement("div");
+      d.className = "wline" + (current && current.line === idx ? " on" : "");
+      d.textContent = txt;
+      codeEl.appendChild(d);
+    });
+    var varsEl = $("wvars"), outEl = $("wout"), noteEl = $("wnote");
+    if(!current){
+      varsEl.innerHTML = "<span style='color:var(--dim)'>(none yet)</span>";
+      outEl.innerHTML = "<span style='color:var(--dim)'>(nothing yet)</span>";
+      noteEl.textContent = "Press Step to begin.";
+    } else {
+      var vh = "";
+      for(var key in current.vars){ if(current.vars.hasOwnProperty(key)) vh += "<b>" + key + "</b> = " + current.vars[key] + "<br>"; }
+      varsEl.innerHTML = vh || "<span style='color:var(--dim)'>(none yet)</span>";
+      outEl.innerHTML = current.out.length ? current.out.join("<br>") : "<span style='color:var(--dim)'>(nothing yet)</span>";
+      noteEl.innerHTML = current.note;
+    }
+    $("wstep").disabled = wstep >= prog.steps.length - 1;
+    $("wstep").textContent = wstep >= prog.steps.length - 1 ? "Done \u2713" : "Step \u2192";
+  }
+  document.querySelectorAll(".wtab").forEach(function(t){
+    t.addEventListener("click", function(){
+      document.querySelectorAll(".wtab").forEach(function(x){ x.classList.remove("on"); });
+      t.classList.add("on");
+      wprog = parseInt(t.getAttribute("data-prog"), 10);
+      wstep = -1;
+      renderWalker();
+    });
+  });
+  $("wstep").addEventListener("click", function(){
+    if(wstep < PROGRAMS[wprog].steps.length - 1){ wstep++; renderWalker(); }
+  });
+  $("wreset").addEventListener("click", function(){ wstep = -1; renderWalker(); });
+  renderWalker();
+
+  /* quiz */
+  var QUIZ = [
+    { q:"Python mainly runs...",
+      opts:["Inside every webpage, next to HTML","Directly on a computer, no browser needed","Only on phones","Only in the cloud"], a:1 },
+    { q:"In Python, a block of code (like the inside of an if) is marked by...",
+      opts:["Curly braces","A colon, then indentation","Semicolons","Parentheses"], a:1 },
+    { q:'What does print("ha" * 3) show?',
+      opts:["An error","hahaha","ha3","ha ha ha"], a:1 },
+    { q:"Python's version of console.log is...",
+      opts:["echo","print","say","log"], a:1 },
+    { q:"For someone who already builds in JavaScript, the smart first move with Python is...",
+      opts:["Rewrite every app in Python","Learn to read it, and let it handle tasks outside the browser","Avoid it completely","Memorize every library name"], a:1 }
+  ];
+  var answered = 0, correct = 0;
+  function renderQuiz(){
+    answered = 0; correct = 0;
+    var wrap = $("quizwrap");
+    wrap.innerHTML = "";
+    $("scoreEl").textContent = state.quizBest ? ("Best so far: " + state.quizBest + "/5") : "";
+    $("retryBtn").style.display = "none";
+    QUIZ.forEach(function(item){
+      var qd = document.createElement("div");
+      qd.className = "q";
+      var qt = document.createElement("div");
+      qt.className = "qt"; qt.textContent = item.q;
+      qd.appendChild(qt);
+      var opts = document.createElement("div");
+      opts.className = "opts";
+      item.opts.forEach(function(o, oi){
+        var b = document.createElement("div");
+        b.className = "opt"; b.tabIndex = 0; b.textContent = o;
+        function pick(){
+          if(qd.getAttribute("data-done")) return;
+          qd.setAttribute("data-done","1");
+          answered++;
+          if(oi === item.a){ b.classList.add("right"); correct++; }
+          else{
+            b.classList.add("wrong");
+            opts.children[item.a].classList.add("right");
+          }
+          Array.prototype.forEach.call(opts.children, function(x){ x.classList.add("lock"); });
+          if(answered === QUIZ.length){
+            $("scoreEl").textContent = "Score: " + correct + "/5" + (correct >= 4 ? "  \u2713 you can read the room now" : "");
+            $("retryBtn").style.display = "inline-block";
+            if(correct > (state.quizBest||0)){ state.quizBest = correct; saveState(state); }
+          }
+        }
+        b.addEventListener("click", pick);
+        b.addEventListener("keydown", function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); pick(); } });
+        opts.appendChild(b);
+      });
+      qd.appendChild(opts);
+      wrap.appendChild(qd);
+    });
+  }
+  $("retryBtn").addEventListener("click", renderQuiz);
+  renderQuiz();
+}
+
+if(typeof window !== "undefined" && typeof document !== "undefined"){
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", initApp);
+  } else {
+    initApp();
+  }
+}
+if(typeof module !== "undefined" && module.exports){
+  module.exports = { runPython: runPython, pyTokenize: pyTokenize, pyValToString: pyValToString };
+}
+</script>
+</body>
+</html>

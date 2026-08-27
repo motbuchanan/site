@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#191210">
+<title>The Painter: What a Browser Actually Does</title>
+<meta name="description" content="A beginner explainer of what a browser does with HTML, CSS, and JS: a live parser, a live style playground, and real DOM edits you trigger yourself.">
+<style>
+:root{
+  --bg:#191210; --panel:#221a16; --panel2:#2b211c; --ink:#f2e9dc; --dim:#ab9c8c;
+  --or:#ff8a3d; --or2:#ffab72; --bl:#5aa9ff; --cr:#f2e6d0; --gn:#8fd694;
+  --line:#42332a; --term:#120c09; --good:#8fd694; --bad:#ff8078;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);
+  background-image:radial-gradient(1100px 500px at 50% -140px,#2b1d14 0%,transparent 60%);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font-size:16px;line-height:1.55}
+code,.mono,.cheat,textarea,.treebox,.jscode{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace}
+main{max-width:680px;margin:0 auto;padding:8px 14px 90px}
+section{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px 16px;margin:18px 0}
+.kick{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--or);font-weight:700;margin:0 0 6px}
+h1{font-size:34px;line-height:1.1;margin:4px 0 8px;letter-spacing:-.01em}
+h2{font-size:22px;line-height:1.2;margin:2px 0 10px}
+h3{font-size:16px;margin:14px 0 6px}
+p{margin:8px 0}
+.sub{color:var(--dim)}
+.small{font-size:13px;color:var(--dim)}
+code{background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:13.5px;color:var(--or2)}
+.btn{display:inline-block;background:var(--or);color:#241002;font-weight:700;border:0;border-radius:12px;
+  padding:12px 18px;font-size:16px;cursor:pointer;touch-action:manipulation}
+.btn:active{transform:scale(.97)}
+.btn.ghost{background:transparent;color:var(--or2);border:1.5px solid var(--or)}
+.btn.blue{background:var(--bl);color:#03182e}
+.btn[disabled]{opacity:.45}
+.btnrow{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 4px}
+.hero{padding-top:24px}
+.topline{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+#vbadge{background:var(--panel2);border:1px solid var(--line);color:var(--dim);border-radius:999px;
+  padding:5px 11px;font-size:12px;cursor:pointer;white-space:nowrap;margin-top:6px}
+.herosvg{display:block;margin:14px auto 6px;max-width:260px;width:100%;height:auto}
+.fgrid{display:grid;gap:10px;margin:12px 0}
+.fcard{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:14px;cursor:pointer}
+.fcard .fr{font-weight:700}
+.fcard .bk{display:none;color:var(--dim);margin-top:8px;font-size:14.5px}
+.fcard .tap{color:var(--or2);font-size:12px;margin-top:8px;letter-spacing:.06em;text-transform:uppercase}
+.fcard.open .bk{display:block}
+.fcard.open .tap{display:none}
+.fcard.open{border-color:var(--or)}
+@media (min-width:560px){ .fgrid{grid-template-columns:1fr 1fr} .fgrid.three{grid-template-columns:1fr 1fr 1fr} .duo{grid-template-columns:1fr 1fr} }
+/* pipeline */
+.pipe{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}
+.pstep{background:var(--panel2);border:1px solid var(--line);color:var(--dim);border-radius:999px;
+  padding:6px 11px;font-size:12.5px}
+.pstep.cur{border-color:var(--or);color:var(--or2);font-weight:700}
+.pstep.done{color:var(--gn);border-color:#3c5a3f}
+.cap{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;
+  font-size:14.5px;min-height:58px;margin:10px 0}
+.cap b{color:var(--or2)}
+/* missions */
+#missions{display:grid;gap:8px;margin:12px 0}
+.mission{display:flex;gap:10px;align-items:flex-start;background:var(--panel2);border:1px solid var(--line);
+  border-radius:12px;padding:10px 12px}
+.mnum{flex:0 0 26px;height:26px;border-radius:50%;border:1.5px solid var(--or);color:var(--or2);
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
+.mission .mt{font-weight:700;font-size:14.5px}
+.mission .md{font-size:13px;color:var(--dim)}
+.mission.done{border-color:var(--good)}
+.mission.done .mnum{border-color:var(--good);background:var(--good);color:#12250f}
+/* editors */
+.duo{display:grid;gap:10px;margin:12px 0}
+textarea{width:100%;background:var(--term);border:1px solid var(--line);border-radius:10px;color:var(--ink);
+  padding:10px;font-size:13.5px;line-height:1.5;min-height:120px;resize:vertical}
+textarea:focus{outline:2px solid var(--or)}
+.pane{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px;min-height:120px}
+.pane .pt{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
+.treebox{font-size:12.5px;line-height:1.7}
+.tnode{color:var(--or2)}
+.ttext{color:var(--dim);font-style:italic}
+.countline{color:var(--bl);font-size:13px;margin-top:8px;font-weight:700}
+#htmlPrev,#cssPrev,#jsPrev{background:#fdf9f1;color:#241c14;border-radius:8px;padding:10px;min-height:60px}
+#htmlPrev h1,#cssPrev h1{font-size:22px;margin:4px 0}
+#htmlPrev p,#cssPrev p{margin:4px 0}
+#jsPrev p{margin:4px 0}
+#jsPrev ul{margin:4px 0;padding-left:22px}
+.repair{color:var(--gn);font-size:13px;margin-top:6px;display:none}
+.repair.show{display:block}
+.gym{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;margin:14px 0}
+.gymstats{display:flex;gap:18px;font-size:12.5px;color:var(--dim);margin-bottom:10px;letter-spacing:.04em}
+.gymstats b{color:var(--gn);font-size:15px;margin-left:4px}
+.gymtabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.gtab{font-size:12px;padding:6px 11px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--dim);cursor:pointer}
+.gtab.on{border-color:var(--or);color:var(--or2);font-weight:700}
+.gymcard{border:1px dashed var(--line);border-radius:10px;padding:12px}
+.gymcard.active{border-style:solid;border-color:var(--or)}
+.gymcard.win{border-style:solid;border-color:var(--good)}
+.ggoal{font-size:15px;line-height:1.5}
+.ggoal b{color:var(--or2)}
+.gstep{font-size:12px;color:var(--good);margin-top:6px}
+.ghint{font-size:13.5px;color:var(--bl);margin-top:8px;display:none}
+.ghint.show{display:block}
+.gbtns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+/* js pokes */
+.jsbtnwrap{display:grid;gap:8px;margin:10px 0}
+.jsbtn{display:flex;flex-direction:column;gap:4px;align-items:flex-start;background:var(--panel2);
+  border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;color:var(--ink);text-align:left;font-size:14px}
+.jsbtn .jscode{font-size:12px;color:var(--bl);word-break:break-all}
+.jsbtn:active{border-color:var(--bl)}
+.jsbtn.used{border-color:var(--gn)}
+.inprow{display:flex;gap:8px;margin:8px 0}
+.inprow input{flex:1;background:var(--panel2);border:1px solid var(--line);border-radius:8px;color:var(--ink);
+  padding:10px;font-size:14px;min-width:0}
+.inprow input:focus{outline:2px solid var(--bl)}
+/* verdict */
+.vgrid{display:grid;gap:10px;margin:12px 0}
+.vcard{background:var(--panel2);border-radius:12px;padding:12px 14px;font-size:14.5px}
+.vkeep{border:1.5px solid var(--good)} .vskip{border:1.5px solid var(--line)}
+.vcard h4{margin:0 0 6px}
+.vkeep h4{color:var(--good)} .vskip h4{color:var(--dim)}
+.cheat{background:var(--term);border:1px solid var(--line);border-radius:12px;padding:12px;font-size:12.5px;
+  line-height:1.8;overflow-x:auto;white-space:pre}
+.cheat b{color:var(--or2)} .cheat span{color:var(--dim)}
+/* quiz */
+.q{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;margin:10px 0}
+.q .qt{font-weight:700;margin-bottom:8px}
+.opts{display:grid;gap:8px}
+.opts button{text-align:left;background:var(--panel);border:1px solid var(--line);color:var(--ink);
+  border-radius:10px;padding:11px 12px;font-size:14.5px;cursor:pointer}
+.opts button.right{border-color:var(--good);color:var(--good);font-weight:700}
+.opts button.wrong{border-color:var(--bad);color:var(--bad)}
+.opts button.lock{pointer-events:none;opacity:.85}
+#scoreEl{font-weight:700;color:var(--or2);margin:10px 0}
+#retryBtn{display:none}
+footer{color:#6b5c4d;font-size:12.5px;text-align:center;margin:30px 0 10px;line-height:1.7}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(80px);
+  background:var(--panel2);border:1px solid var(--or);color:var(--ink);border-radius:999px;
+  padding:10px 18px;font-size:13.5px;transition:transform .25s;z-index:50;pointer-events:none;white-space:nowrap}
+#toast.show{transform:translateX(-50%) translateY(0)}
+:focus-visible{outline:2px solid var(--or2);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}html{scroll-behavior:auto}}
+  .mascotspot{text-align:center;margin:6px 0 2px;}
+  .mascotspot img{height:230px;width:auto;filter:drop-shadow(0 10px 22px rgba(0,0,0,.5));}
+  .tipbox{position:relative;background:var(--panel,#1a130c);border:1px solid var(--line,#3a2a1a);border-left:3px solid #ff8a3d;border-radius:0 12px 12px 0;padding:16px 16px 16px 118px;margin:22px 0;min-height:96px;}
+  .tipbox .poke{position:absolute;left:-14px;bottom:-8px;height:150px;width:auto;transform:rotate(-8deg);filter:drop-shadow(0 8px 16px rgba(0,0,0,.45));pointer-events:none;}
+  .tipbox.right{border-left:none;border-right:3px solid #ff8a3d;border-radius:12px 0 0 12px;padding:16px 118px 16px 16px;}
+  .tipbox.right .poke{left:auto;right:-14px;transform:rotate(8deg);}
+  .tipbox .tt{font-weight:700;color:#ff8a3d;font-size:15px;}
+  .tipbox .tp{margin:4px 0 0;font-size:14.5px;color:var(--soft,#c9b8a8);line-height:1.55;}
+  .tracktoggle{display:flex;gap:8px;margin:14px 0 10px;align-items:center;flex-wrap:wrap;}
+  .tracktoggle .tlabel{font-family:monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim,#9a8a7a);margin-right:2px;}
+  .ttab{font-family:monospace;font-size:12.5px;padding:7px 14px;border-radius:999px;border:1px solid var(--line,#3a2a1a);background:var(--panel,#1a130c);color:var(--soft,#c9b8a8);cursor:pointer;}
+  .ttab.on.general{border-color:#ff8a3d;color:#ff8a3d;background:rgba(255,138,61,.1);font-weight:700;}
+  .ttab.on.trail{border-color:#c8a4f0;color:#c8a4f0;background:rgba(200,164,240,.12);font-weight:700;}
+  .trailbanner{font-family:monospace;font-size:11.5px;color:#c8a4f0;background:rgba(200,164,240,.08);border:1px solid rgba(200,164,240,.3);border-radius:8px;padding:7px 11px;margin:8px 0;display:none;}
+  .trailbanner.show{display:block;}
+  .backhub{display:inline-flex;align-items:center;gap:7px;font-family:monospace;font-size:12px;color:var(--soft,#c9b8a8);border:1px solid var(--line,#3a2a1a);border-radius:999px;padding:7px 13px;background:var(--panel,#1a130c);text-decoration:none;}
+</style>
+</head>
+<body>
+<main>
+<!-- S1 HERO -->
+<section class="hero">
+  <div class="topline">
+    <div>
+      <div class="kick">small explainer · the painter</div>
+      <h1>The Painter</h1>
+      <p class="sub" style="font-size:18px">What a browser actually does with HTML, CSS, and JS.</p>
+    </div>
+    <button id="vbadge" aria-label="version">v3.1</button>
+  </div>
+  <svg class="herosvg" viewBox="0 0 260 110" aria-hidden="true">
+    <rect x="20" y="18" width="66" height="76" rx="8" fill="#2b211c" stroke="#42332a" stroke-width="2"/>
+    <text x="53" y="45" fill="#ab9c8c" font-size="9" text-anchor="middle" font-family="monospace">&lt;h1&gt;</text>
+    <text x="53" y="60" fill="#ab9c8c" font-size="9" text-anchor="middle" font-family="monospace">&lt;p&gt;</text>
+    <text x="53" y="75" fill="#ab9c8c" font-size="9" text-anchor="middle" font-family="monospace">&lt;b&gt;</text>
+    <path d="M96 56 H128" stroke="#ff8a3d" stroke-width="3" marker-end="none"/>
+    <path d="M120 48 L132 56 L120 64" fill="none" stroke="#ff8a3d" stroke-width="3"/>
+    <rect x="142" y="18" width="96" height="76" rx="8" fill="#fdf9f1"/>
+    <rect x="152" y="30" width="60" height="10" rx="3" fill="#ff8a3d"/>
+    <rect x="152" y="48" width="76" height="6" rx="3" fill="#c9b8a4"/>
+    <rect x="152" y="60" width="66" height="6" rx="3" fill="#c9b8a4"/>
+    <rect x="152" y="76" width="36" height="10" rx="5" fill="#5aa9ff"/>
+    <text x="130" y="106" fill="#ab9c8c" font-size="10" text-anchor="middle" font-family="monospace">text in, pixels out</text>
+  </svg>
+  <div class="mascotspot"><img src="thumb-browser.png" alt="mascot with beret and paintbrush"></div>
+  <p>A browser is a translator and a painter. It receives plain text, builds a structure from it, dresses that structure up, and paints pixels. Then it stays awake, listening for taps. You use one more than any other program you own, and it hides all of this perfectly.</p>
+  <h3>You already live with this</h3>
+  <div class="fgrid three">
+    <div class="fcard" tabindex="0"><div class="fr">Single-file apps are webpages</div>
+      <div class="bk">Any game or tool built as one HTML file is a webpage wearing an app costume. Everything on this page is the same trick.</div>
+      <div class="tap">tap</div></div>
+    <div class="fcard" tabindex="0"><div class="fr">Every site hands you its recipe</div>
+      <div class="bk">View source, on any page, shows the exact text the server sent. The web is the only medium that ships its own source code to every visitor.</div>
+      <div class="tap">tap</div></div>
+    <div class="fcard" tabindex="0"><div class="fr">Dark mode extensions work on any site</div>
+      <div class="bk">They can restyle pages they have never seen because a page is not a picture. It is a live structure, and anyone with access can re-dress it.</div>
+      <div class="tap">tap</div></div>
+  </div>
+</section>
+
+<!-- S2 PIPELINE -->
+<section>
+  <div class="kick">part 1 · the assembly line</div>
+  <h2>From tap to pixels</h2>
+  <p>Here is the whole trip, in order. Step through it once; the rest of this page lets you do steps 4, 5, and 8 with your own hands.</p>
+  <div class="pipe" id="pipe"></div>
+  <div id="pipeCap" class="cap">Tap <b>Next</b> to walk the assembly line.</div>
+  <div class="btnrow">
+    <button id="pipeBtn" class="btn">Next</button>
+    <button id="pipeReset" class="btn ghost">Reset</button>
+  </div>
+</section>
+
+<!-- S3 HTML TREE -->
+<section>
+  <div class="kick">part 2 · html becomes a tree</div>
+  <h2>The live parser</h2>
+  <p>HTML is not the page. HTML is a recipe for a <b>tree</b>, and the tree (the DOM) is what the browser actually works with. Edit the recipe below. The tree and the painted result update live, parsed by <b>your browser's own parser</b>, the same one that built the app you are inside right now.</p>
+  <h3>Missions</h3>
+  <div id="missions"></div>
+
+  <h3>The Gym: reps until it sticks</h3>
+  <p class="small">Build-to-spec reps using the three workshops on this page: the HTML recipe right below, the CSS dresser in part 3, and the JS mini page in part 4. Each drill names a target; your live edits are checked against it. Hints cost nothing but pride; skipping resets your streak.</p>
+  <div class="tracktoggle">
+    <span class="tlabel">practice</span>
+    <button class="ttab general on" id="trackGeneral" type="button">General</button>
+    <button class="ttab trail" id="trackTrail" type="button">The Trail</button>
+  </div>
+  <div class="trailbanner" id="trailBanner">The Trail: dress your real apps, the header, the accent, the version badge, the game list.</div>
+  <div class="gym">
+    <div class="gymstats"><span>reps<b id="repN">0</b></span><span>streak<b id="strN">0</b></span><span>best<b id="bestN">0</b></span></div>
+    <div class="gymtabs" id="gymTabs"></div>
+    <div class="gymcard" id="gymCard">
+      <div class="ggoal" id="gGoal">Pick a level (or Surprise me) and tap <b>Start drill</b>.</div>
+      <div class="ghint" id="gHint"></div>
+      <div class="gbtns">
+        <button class="btn" id="gStart" type="button">Start drill</button>
+        <button class="btn ghost" id="gHintBtn" type="button" style="display:none">Hint</button>
+        <button class="btn ghost" id="gFillBtn" type="button" style="display:none">Type it for me</button>
+        <button class="btn ghost" id="gSkip" type="button" style="display:none">Skip</button>
+      </div>
+    </div>
+  </div>
+  <textarea id="htmlIn" rows="6" spellcheck="false" aria-label="HTML to parse">&lt;h1&gt;Hi&lt;/h1&gt;
+&lt;p&gt;I am a &lt;b&gt;page&lt;/b&gt;&lt;/p&gt;</textarea>
+  <div class="duo">
+    <div class="pane"><div class="pt">the tree it becomes</div><div class="treebox" id="treeOut"></div>
+      <div class="countline" id="countLine"></div>
+      <div class="repair" id="repairLine">You left a tag open. The parser closed it for you. Browsers are forgiving repairmen; that is why the messy web still loads.</div>
+    </div>
+    <div class="pane"><div class="pt">the painted result</div><div id="htmlPrev"></div></div>
+  </div>
+  <p class="small">Try adding a <code>&lt;p&gt;</code>, a <code>&lt;b&gt;</code>, or an unclosed tag on purpose.</p>
+</section>
+
+<!-- S4 CSS -->
+<section>
+  <div class="kick">part 3 · css dresses the tree</div>
+  <h2>Find and dress</h2>
+  <p>A CSS rule has two halves: a <b>finder</b> (the selector: which nodes?) and a <b>dress code</b> (the properties: look like this). Below, your rules are applied for real to the little page on the right.</p>
+  <textarea id="cssIn" rows="6" spellcheck="false" aria-label="CSS rules">h1 { color: #ff8a3d; }
+.note { font-style: italic; }</textarea>
+  <div class="duo">
+    <div class="pane"><div class="pt">the tree being dressed</div>
+      <div class="treebox">&lt;h1&gt; Style me<br>&lt;p&gt; First paragraph.<br>&lt;p class="note"&gt; The note.</div>
+    </div>
+    <div class="pane"><div class="pt">painted with your rules</div>
+      <div id="cssPrev"><h1>Style me</h1><p>First paragraph.</p><p class="note">The note.</p></div>
+    </div>
+  </div>
+  <p class="small">Selectors to try: <code>h1</code> finds the heading, <code>p</code> finds both paragraphs, <code>.note</code> finds only the one wearing that class. When two rules argue over the same node, the more specific finder wins.</p>
+</section>
+
+<!-- S5 JS -->
+<section>
+  <div class="kick">part 4 · js is the part that acts</div>
+  <h2>Editing the tree while you watch</h2>
+  <p>HTML builds the tree. CSS dresses it. <b>JS is the only one that can change the tree after the page loads.</b> Every tap you have ever tapped ran a little JS that edited the tree. These buttons run the exact code shown, live, on the mini page below.</p>
+  <div class="pane"><div class="pt">the mini page</div>
+    <div id="jsPrev"><p id="msg">Hello there.</p><ul id="list"><li>one</li><li>two</li></ul></div>
+  </div>
+  <div class="jsbtnwrap" id="jsBtns"></div>
+  <div class="inprow">
+    <input id="liIn" type="text" placeholder="type a word, make it a list item" autocomplete="off" aria-label="new list item text">
+    <button id="liBtn" class="btn blue">Add it</button>
+  </div>
+</section>
+
+<!-- S6 THIS PAGE -->
+<section>
+  <div class="kick">part 5 · the reveal</div>
+  <h2>You are inside one right now</h2>
+  <p>This explainer is a single HTML file. Everything you have tapped on this page was JS editing this page's own tree. Want proof?</p>
+  <div class="btnrow"><button id="countBtn" class="btn">Count this page's elements</button></div>
+  <div id="selfCap" class="cap">The number will be real, counted the moment you tap.</div>
+</section>
+
+<!-- S7 VERDICT -->
+<section>
+  <div class="kick">part 6 · the honest verdict</div>
+  <h2>What to keep, what to skip</h2>
+  <div class="vgrid">
+    <div class="vcard vkeep"><h4>Keep this</h4>
+      A page is a tree, not a picture. HTML is the recipe for the tree. CSS is find-and-dress. JS edits the tree live, and that is what "interactive" means. View source is always there, on every site, showing the recipe.</div>
+    <div class="vcard vskip"><h4>Skip for now</h4>
+      Rendering engine internals, layout algorithms, frameworks, build tools. The tree model above is what those are all built on, and it is enough to read real pages and real code.</div>
+  </div>
+  <h3>Pocket reference: the assembly line</h3>
+  <div class="cheat"><b>1 fetch</b>   <span>ask the internet for text (previous explainer)</span>
+<b>2 parse</b>   <span>text becomes the tree (the DOM)</span>
+<b>3 style</b>   <span>CSS rules find nodes and dress them</span>
+<b>4 layout</b>  <span>sizes and positions get calculated</span>
+<b>5 paint</b>   <span>actual pixels hit your screen</span>
+<b>6 listen</b>  <span>JS waits for taps and edits the tree, then repaint</span></div>
+</section>
+
+<!-- S8 QUIZ -->
+<section>
+  <div class="kick">part 7 · prove it</div>
+  <h2>Five questions</h2>
+  <div id="quizwrap"></div>
+  <div id="scoreEl"></div>
+  <button id="retryBtn" class="btn ghost">Try again</button>
+</section>
+
+<footer>
+  The Painter · a small explainer · made on a phone<br>
+  Course order: computer, internet, then this one. The toolbox explainers come next.
+</footer>
+<div style="text-align:center;margin:24px 0 8px;"><a class="backhub" href="index.html">&larr; back to All Thumbs</a></div>
+</main>
+<div id="toast" role="status"></div>
+<script>
+"use strict";
+var VERSION = "v3.1 · Aug 26";
+
+/* ============ ENGINE (pure, testable) ============ */
+function stripComments(css){
+  return (css || "").replace(/\/\*[\s\S]*?\*\//g, " ");
+}
+function cssRules(css){
+  var out = [];
+  var clean = stripComments(css);
+  var blocks = clean.split("}");
+  for(var i = 0; i < blocks.length; i++){
+    var b = blocks[i];
+    if(b.indexOf("{") === -1) continue;
+    var cut = b.indexOf("{");
+    var selPart = b.slice(0, cut).trim();
+    var body = b.slice(cut + 1).trim();
+    if(!selPart || selPart[0] === "@") continue;
+    var sels = selPart.split(",").map(function(s){ return s.trim(); }).filter(Boolean);
+    if(sels.length) out.push({ selectors: sels, body: body });
+  }
+  return out;
+}
+function scopeCSS(css, prefix){
+  var rules = cssRules(css);
+  return rules.map(function(r){
+    var sels = r.selectors.map(function(s){ return prefix + " " + s; }).join(", ");
+    return sels + " { " + r.body + " }";
+  }).join("\n");
+}
+
+/* ============ UI ============ */
+function initApp(){
+  function $(id){ return document.getElementById(id); }
+  var store = (function(){
+    var ok = true, mem = {};
+    try { localStorage.setItem("__bt","1"); localStorage.removeItem("__bt"); } catch(e){ ok = false; }
+    return {
+      load: function(){ try { if(ok){ var raw = localStorage.getItem("browser101_v1"); return raw ? JSON.parse(raw) : {}; } } catch(e){} return mem; },
+      save: function(s){ try { if(ok){ localStorage.setItem("browser101_v1", JSON.stringify(s)); return; } } catch(e){} mem = s; }
+    };
+  })();
+  var state = store.load();
+  state.m = state.m || {};
+
+  var toastT = null;
+  function toast(msg){
+    var el = $("toast");
+    el.textContent = msg; el.classList.add("show");
+    clearTimeout(toastT);
+    toastT = setTimeout(function(){ el.classList.remove("show"); }, 1800);
+  }
+  $("vbadge").addEventListener("click", function(){ toast(VERSION + " · loaded"); });
+
+  Array.prototype.forEach.call(document.querySelectorAll(".fcard"), function(cd){
+    function flip(){ cd.classList.toggle("open"); }
+    cd.addEventListener("click", flip);
+    cd.addEventListener("keydown", function(e){ if(e.key === "Enter" || e.key === " "){ e.preventDefault(); flip(); } });
+  });
+
+  /* missions */
+  var FL = {};
+  var MISSIONS = [
+    { id:"b1", t:"Grow the tree", d:"Add any element to the recipe below and watch the tree gain a node." },
+    { id:"b2", t:"Break it on purpose", d:"Leave a tag unclosed, like a lone <b>. Watch the parser repair it." },
+    { id:"b3", t:"Dress the note", d:"In the CSS section, write a rule that gives .note a color." },
+    { id:"b4", t:"Make the heading huge", d:"Give h1 a font-size of 30px or more." },
+    { id:"b5", t:"Run all four pokes", d:"Use every JS button on the mini page." },
+    { id:"b6", t:"Count this very page", d:"Tap the counter in the reveal section." }
+  ];
+  function buildMissions(){
+    var wrap = $("missions"); wrap.innerHTML = "";
+    MISSIONS.forEach(function(m, i){
+      var d = document.createElement("div");
+      d.className = "mission" + (state.m[m.id] ? " done" : "");
+      d.id = "ms_" + m.id;
+      d.innerHTML = "<div class=\"mnum\">" + (state.m[m.id] ? "\u2713" : (i + 1)) + "</div>" +
+        "<div><div class=\"mt\">" + m.t + "</div><div class=\"md\">" + m.d + "</div></div>";
+      wrap.appendChild(d);
+    });
+  }
+  function checkMissions(){
+    MISSIONS.forEach(function(m){
+      if(state.m[m.id] || !FL[m.id]) return;
+      state.m[m.id] = true; store.save(state);
+      var el = $("ms_" + m.id);
+      el.classList.add("done");
+      el.querySelector(".mnum").textContent = "\u2713";
+      toast("Mission done: " + m.t);
+    });
+  }
+  buildMissions();
+
+  /* ---- pipeline ---- */
+  var STEPS = [
+    ["1 tap", "You tap a link. A URL is just an address: which server, which page."],
+    ["2 ask", "The browser sends a request across the internet. That whole trip is the previous explainer in this course."],
+    ["3 text arrives", "The server answers with plain characters. No pictures, no layout, no buttons. A recipe."],
+    ["4 parse", "The parser reads the text and builds the DOM: a live tree of nodes. You will build one yourself below."],
+    ["5 style", "CSS rules find nodes in the tree and attach looks to them. Find and dress."],
+    ["6 layout", "The browser measures everything: every size, every position, recalculated in milliseconds."],
+    ["7 paint", "The dressed, measured tree becomes actual pixels on your screen."],
+    ["8 listen", "JS stays awake, waiting for taps. Every tap edits the tree, and the painter repaints. Forever."]
+  ];
+  var pi = -1;
+  function renderPipe(){
+    $("pipe").innerHTML = STEPS.map(function(s, i){
+      var cls = i === pi ? " cur" : (i < pi ? " done" : "");
+      return "<span class=\"pstep" + cls + "\">" + s[0] + "</span>";
+    }).join("");
+    $("pipeCap").innerHTML = pi < 0 ?
+      "Tap <b>Next</b> to walk the assembly line." :
+      "<b>" + STEPS[pi][0] + ":</b> " + STEPS[pi][1] + " <span class=\"small\">(" + (pi + 1) + "/8)</span>";
+    $("pipeBtn").textContent = pi >= STEPS.length - 1 ? "Start over" : "Next";
+  }
+  $("pipeBtn").addEventListener("click", function(){
+    pi = pi >= STEPS.length - 1 ? 0 : pi + 1;
+    renderPipe();
+  });
+  $("pipeReset").addEventListener("click", function(){ pi = -1; renderPipe(); });
+  renderPipe();
+
+  /* ---- live html parser ---- */
+  var baselineCount = null;
+  function sanitizeInto(srcBody, target){
+    target.innerHTML = "";
+    var bad = { SCRIPT:1, STYLE:1, IFRAME:1, OBJECT:1, EMBED:1, LINK:1, META:1, BASE:1, FORM:1 };
+    function walk(node, dest){
+      for(var i = 0; i < node.childNodes.length; i++){
+        var ch = node.childNodes[i];
+        if(ch.nodeType === 3){ dest.appendChild(document.createTextNode(ch.nodeValue)); }
+        else if(ch.nodeType === 1){
+          if(bad[ch.tagName]) continue;
+          var el = document.createElement(ch.tagName.toLowerCase());
+          for(var a = 0; a < ch.attributes.length; a++){
+            var at = ch.attributes[a];
+            var nm = at.name.toLowerCase();
+            if(nm.indexOf("on") === 0) continue;
+            if((nm === "href" || nm === "src") && /^\s*javascript:/i.test(at.value)) continue;
+            el.setAttribute(at.name, at.value);
+          }
+          dest.appendChild(el);
+          walk(ch, el);
+        }
+      }
+    }
+    walk(srcBody, target);
+  }
+  function treeHTML(node, depth){
+    var out = "";
+    for(var i = 0; i < node.childNodes.length; i++){
+      var ch = node.childNodes[i];
+      if(ch.nodeType === 3){
+        var t = ch.nodeValue.replace(/\s+/g, " ").trim();
+        if(t){
+          if(t.length > 24) t = t.slice(0, 24) + "\u2026";
+          out += "<div class=\"ttext\" style=\"padding-left:" + (depth * 16) + "px\">\u201C" + t.replace(/</g,"&lt;") + "\u201D</div>";
+        }
+      } else if(ch.nodeType === 1){
+        out += "<div class=\"tnode\" style=\"padding-left:" + (depth * 16) + "px\">&lt;" + ch.tagName.toLowerCase() + "&gt;</div>";
+        out += treeHTML(ch, depth + 1);
+      }
+    }
+    return out;
+  }
+  function unclosedHeuristic(src){
+    var tags = ["b","i","u","em","strong","p","li","span","div","h1","h2"];
+    for(var i = 0; i < tags.length; i++){
+      var tg = tags[i];
+      var opens = (src.match(new RegExp("<" + tg + "(\\s|>)", "gi")) || []).length;
+      var closes = (src.match(new RegExp("</" + tg + ">", "gi")) || []).length;
+      if(opens > closes) return true;
+    }
+    return false;
+  }
+  var htmlT = null;
+  function renderHTML(){
+    var src = $("htmlIn").value;
+    var doc = new DOMParser().parseFromString(src, "text/html");
+    var count = doc.body.querySelectorAll("*").length;
+    $("treeOut").innerHTML = treeHTML(doc.body, 0) || "<span class=\"ttext\">(empty tree)</span>";
+    $("countLine").textContent = count + " element" + (count === 1 ? "" : "s") + " in this tree";
+    sanitizeInto(doc.body, $("htmlPrev"));
+    if(baselineCount === null){ baselineCount = count; }
+    else {
+      if(count > baselineCount){ FL.b1 = 1; }
+      if(unclosedHeuristic(src)){
+        $("repairLine").classList.add("show");
+        FL.b2 = 1;
+      } else {
+        $("repairLine").classList.remove("show");
+      }
+      checkMissions();
+    }
+    gymAfter({ html: 1 });
+  }
+  $("htmlIn").addEventListener("input", function(){
+    clearTimeout(htmlT);
+    htmlT = setTimeout(renderHTML, 200);
+  });
+  renderHTML();
+
+  /* ---- live css ---- */
+  var styleEl = document.createElement("style");
+  document.head.appendChild(styleEl);
+  var cssT = null;
+  function renderCSS(){
+    var css = $("cssIn").value;
+    styleEl.textContent = scopeCSS(css, "#cssPrev");
+    var rules = cssRules(css);
+    var noteEl = document.querySelector("#cssPrev .note");
+    var h1El = document.querySelector("#cssPrev h1");
+    rules.forEach(function(r){
+      var hitsNote = false, hitsH1 = false;
+      r.selectors.forEach(function(s){
+        try {
+          if(noteEl.matches(s)) hitsNote = true;
+          if(h1El.matches(s)) hitsH1 = true;
+        } catch(e){}
+      });
+      if(hitsNote && /(^|[\s;{])color\s*:/i.test(" " + r.body)) FL.b3 = 1;
+      if(hitsH1){
+        var fm = r.body.match(/font-size\s*:\s*(\d+(?:\.\d+)?)px/i);
+        if(fm && parseFloat(fm[1]) >= 30) FL.b4 = 1;
+      }
+    });
+    checkMissions();
+    gymAfter({ css: 1 });
+  }
+  $("cssIn").addEventListener("input", function(){
+    clearTimeout(cssT);
+    cssT = setTimeout(renderCSS, 200);
+  });
+  renderCSS();
+
+  /* ---- js pokes ---- */
+  var POKES = [
+    { label:"Change the words",
+      code:'document.querySelector("#msg").textContent = "The tree just changed."',
+      run:function(){ document.querySelector("#msg").textContent = "The tree just changed."; } },
+    { label:"Paint it blue",
+      code:'document.querySelector("#msg").style.color = "#5aa9ff"',
+      run:function(){ document.querySelector("#msg").style.color = "#5aa9ff"; } },
+    { label:"Grow a new branch",
+      code:'li = document.createElement("li"); li.textContent = "three"; list.appendChild(li)',
+      run:function(){
+        var li = document.createElement("li");
+        li.textContent = "three";
+        document.querySelector("#list").appendChild(li);
+      } },
+    { label:"Count the nodes",
+      code:'document.querySelectorAll("#jsPrev *").length',
+      run:function(){
+        var n = document.querySelectorAll("#jsPrev *").length;
+        toast("The mini page is a tree of " + n + " elements right now.");
+      } }
+  ];
+  var used = {};
+  POKES.forEach(function(p, i){
+    var b = document.createElement("button");
+    b.className = "jsbtn";
+    b.innerHTML = "<span>" + p.label + "</span><span class=\"jscode\">" + p.code.replace(/</g,"&lt;") + "</span>";
+    b.addEventListener("click", function(){
+      p.run();
+      used[i] = 1;
+      b.classList.add("used");
+      if(Object.keys(used).length === POKES.length){ FL.b5 = 1; checkMissions(); }
+      gymAfter({ js: 1 });
+    });
+    $("jsBtns").appendChild(b);
+  });
+  function addLi(){
+    var v = $("liIn").value.trim();
+    if(!v) return;
+    var li = document.createElement("li");
+    li.textContent = v;
+    document.querySelector("#list").appendChild(li);
+    $("liIn").value = "";
+    gymAfter({ js: 1 });
+  }
+  $("liBtn").addEventListener("click", addLi);
+  $("liIn").addEventListener("keydown", function(e){ if(e.key === "Enter") addLi(); });
+
+  /* ---- the reveal ---- */
+  $("countBtn").addEventListener("click", function(){
+    var n = document.querySelectorAll("*").length;
+    $("selfCap").innerHTML = "Right now this app is a live tree of <b>" + n + " elements</b>, repainted as you scroll and tap. Every mission you completed was JS editing this exact tree. You are inside the lesson.";
+    FL.b6 = 1;
+    checkMissions();
+  });
+
+  /* ---- The Gym ---- */
+  state.gym = state.gym || { reps:0, streak:0, best:0 };
+  var GYM_LEVELS = ["Tree building","Find and dress","Act on it","Precision","Your work"];
+  var gymLevel = -1;
+  var drill = null;
+  function pickFrom(arr, not){
+    var v, guard = 0;
+    do { v = arr[Math.floor(Math.random()*arr.length)]; } while(not && not.indexOf(v) > -1 && guard++ < 50);
+    return v;
+  }
+  function rint(lo, hi){ return lo + Math.floor(Math.random() * (hi - lo + 1)); }
+  var B_WORDS = ["Sunflower","Harbor","Bluejay","Copper","Lantern"];
+  var B_COLORS = ["red","green","purple","teal"];
+  function parsedInput(){
+    return new DOMParser().parseFromString($("htmlIn").value, "text/html");
+  }
+  function ruleHits(el, fn){
+    var rules = cssRules($("cssIn").value);
+    for(var i = 0; i < rules.length; i++){
+      var hit = false;
+      for(var s = 0; s < rules[i].selectors.length; s++){
+        try { if(el.matches(rules[i].selectors[s])) hit = true; } catch(e){}
+      }
+      if(hit && fn(rules[i].body)) return true;
+    }
+    return false;
+  }
+  var GYM_TPLS = [
+    { id:"b01", lv:0, make:function(){
+        var K = rint(2, 4);
+        return { goal:"In the HTML recipe below, build a tree with <b>exactly one h1</b> and <b>exactly " + K + " p</b> elements.",
+          seed:function(){},
+          steps:[function(){
+            var doc = parsedInput();
+            return doc.body.querySelectorAll("h1").length === 1 && doc.body.querySelectorAll("p").length === K;
+          }],
+          hints:["Count what is there now (the counter under the tree helps), then add or remove.","You need " + K + " separate <code>&lt;p&gt;...&lt;/p&gt;</code> lines and one <code>&lt;h1&gt;</code>."],
+          fill:"<p>another</p>", fillEl:"htmlIn", append:true };
+      } },
+    { id:"b02", lv:0, make:function(){
+        return { goal:"Nest something: put a <b>b element inside a p</b> (a bold word living inside a paragraph).",
+          seed:function(){},
+          steps:[function(){ return !!parsedInput().querySelector("p b"); }],
+          hints:["Nesting means the b's tags sit between the p's tags.","<code>&lt;p&gt;a &lt;b&gt;bold&lt;/b&gt; word&lt;/p&gt;</code>"],
+          fill:"<p>a <b>bold</b> word</p>", fillEl:"htmlIn", append:true };
+      } },
+    { id:"b03", lv:1, make:function(){
+        var C = pickFrom(B_COLORS);
+        return { goal:"In the CSS dresser (part 3), write a rule that gives <b>.note</b> the color <b>" + C + "</b>.",
+          seed:function(){},
+          steps:[function(){
+            var noteEl = document.querySelector("#cssPrev .note");
+            return ruleHits(noteEl, function(body){ return new RegExp("(^|[\\s;])color\\s*:\\s*" + C, "i").test(" " + body); });
+          }],
+          hints:["The finder for a class starts with a dot.","<code>.note { color: " + C + "; }</code>"],
+          fill:".note { color: " + C + "; }", fillEl:"cssIn", append:true };
+      } },
+    { id:"b04", lv:1, make:function(){
+        var N = rint(30, 44);
+        return { goal:"One rule, both paragraphs: make <b>every p</b> in the dresser preview <b>font-size " + N + "px</b>.",
+          seed:function(){},
+          steps:[function(){
+            var p1 = document.querySelector("#cssPrev p"), p2 = document.querySelector("#cssPrev .note");
+            var test = function(body){ return new RegExp("font-size\\s*:\\s*" + N + "px", "i").test(body); };
+            return ruleHits(p1, test) && ruleHits(p2, test);
+          }],
+          hints:["One finder can catch every paragraph at once.","<code>p { font-size: " + N + "px; }</code>"],
+          fill:"p { font-size: " + N + "px; }", fillEl:"cssIn", append:true };
+      } },
+    { id:"b05", lv:2, make:function(){
+        var N = rint(30, 40);
+        return { goal:"Dress the h1 in <b>one rule</b> that sets both a color (any) and a <b>font-size of at least " + N + "px</b>.",
+          seed:function(){},
+          steps:[function(){
+            var h1El = document.querySelector("#cssPrev h1");
+            return ruleHits(h1El, function(body){
+              var fm = body.match(/font-size\s*:\s*(\d+(?:\.\d+)?)px/i);
+              return /(^|[\s;])color\s*:/i.test(" " + body) && fm && parseFloat(fm[1]) >= N;
+            });
+          }],
+          hints:["Two declarations can share one rule, separated by semicolons.","<code>h1 { color: teal; font-size: " + N + "px; }</code>"],
+          fill:"h1 { color: teal; font-size: " + N + "px; }", fillEl:"cssIn", append:true };
+      } },
+    { id:"b06", lv:2, make:function(){
+        var N = rint(3, 6);
+        return { goal:"On the JS mini page (part 4), get the list to <b>exactly " + N + " items</b>. Grow branches, add your own words, whatever it takes.",
+          seed:function(){ document.querySelector("#list").innerHTML = "<li>one</li><li>two</li>"; },
+          steps:[function(){ return document.querySelectorAll("#list li").length === N; }],
+          hints:["It starts at two. The grow button and the add-a-word box both really append.","You need " + (N - 2) + " more item" + (N - 2 === 1 ? "" : "s") + ": tap Grow a new branch or type words into the box."] };
+      } },
+    { id:"b07", lv:3, make:function(){
+        var W = pickFrom(B_WORDS);
+        return { goal:"Precision build: make the painted page (HTML recipe below) contain an <b>h1 whose text is exactly \u201C" + W + "\u201D</b>.",
+          seed:function(){},
+          steps:[function(){
+            var h = parsedInput().querySelector("h1");
+            return !!h && h.textContent.trim() === W;
+          }],
+          hints:["The tree cares about exact text, spelling and capital letter included.","<code>&lt;h1&gt;" + W + "&lt;/h1&gt;</code>"],
+          fill:"<h1>" + W + "</h1>", fillEl:"htmlIn", append:false };
+      } },
+    { id:"w01", lv:4, make:function(){
+        var title = pickFrom(["Pigment","Waystone","Pocket Ninja","The Brew Deck","Measure Up"]);
+        return { goal:"<b>App header.</b> Build the top of one of your apps: an <b>h1 with the title \u201C" + title + "\u201D</b> and a <b>p right under it</b> (the subtitle line). Two elements, in that order.",
+          seed:function(){},
+          steps:[function(){
+            var doc = parsedInput();
+            var h = doc.body.querySelector("h1");
+            return !!h && h.textContent.trim() === title && doc.body.querySelectorAll("p").length >= 1;
+          }],
+          hints:["An h1 for the name, a p for the tagline beneath it.","<code>&lt;h1&gt;" + title + "&lt;/h1&gt;</code> then <code>&lt;p&gt;a little tool&lt;/p&gt;</code>"],
+          fill:"<h1>" + title + "</h1>\n<p>a little tool</p>", fillEl:"htmlIn", append:false };
+      } },
+    { id:"w02", lv:4, make:function(){
+        var C = pickFrom(["#3ddc84","#ff8a3d","#45c8ff","#b7a4e3"]);
+        return { goal:"<b>Brand the heading.</b> In the CSS dresser (part 3), give the <b>h1 the accent color " + C + "</b>. This is exactly how your apps get their signature look: one selector, one color.",
+          seed:function(){},
+          steps:[function(){
+            var h1El = document.querySelector("#cssPrev h1");
+            return ruleHits(h1El, function(body){ return new RegExp("color\\s*:\\s*" + C.replace("#","#") , "i").test(body); });
+          }],
+          hints:["Find the h1, hand it a color. Hex colors start with #.","<code>h1 { color: " + C + "; }</code>"],
+          fill:"h1 { color: " + C + "; }", fillEl:"cssIn", append:true };
+      } },
+    { id:"w03", lv:4, make:function(){
+        return { goal:"<b>A version badge that stands out.</b> Your apps show a version stamp. In the dresser, style <b>.note</b> so it is both <b>italic</b> and has a <b>color</b> (any). One rule, two declarations, the way a real badge rule looks.",
+          seed:function(){},
+          steps:[function(){
+            var noteEl = document.querySelector("#cssPrev .note");
+            return ruleHits(noteEl, function(body){
+              return /font-style\s*:\s*italic/i.test(body) && /(^|[\s;])color\s*:/i.test(" " + body);
+            });
+          }],
+          hints:["Two declarations in one rule, separated by a semicolon.","<code>.note { font-style: italic; color: #ff8a3d; }</code>"],
+          fill:".note { font-style: italic; color: #ff8a3d; }", fillEl:"cssIn", append:true };
+      } },
+    { id:"w04", lv:4, make:function(){
+        var N = rint(4, 6);
+        return { goal:"<b>Grow a game list.</b> Your shelf shows a list of games. On the JS mini page (part 4), grow the list to <b>exactly " + N + " items</b> using the buttons and the add box, the same DOM moves your apps make when a new game is added.",
+          seed:function(){ document.querySelector("#list").innerHTML = "<li>one</li><li>two</li>"; },
+          steps:[function(){ return document.querySelectorAll("#list li").length === N; }],
+          hints:["JS is the only one that changes the tree after load. Each add really appends a node.","Start is 2; add " + (N-2) + " more with Grow a new branch or the word box."] };
+      } },
+    { id:"w05", lv:4, make:function(){
+        return { goal:"<b>Wire a real interaction.</b> On the JS mini page, use every poke button at least once, then add one custom list item of your own. That full set is what 'interactive' means: JS editing the live tree in response to taps.",
+          seed:function(){ document.querySelector("#list").innerHTML = "<li>one</li><li>two</li>"; },
+          steps:[
+            function(){ return document.querySelectorAll(".jsbtn.used").length === 4; },
+            function(){ return document.querySelectorAll("#list li").length >= 3; }
+          ],
+          hints:["Four poke buttons, then type a word and Add it.","Tap all four jsbtns, then use the add box once."] };
+      } }
+  ];
+  function gymStats(){
+    $("repN").textContent = state.gym.reps;
+    $("strN").textContent = state.gym.streak;
+    $("bestN").textContent = state.gym.best;
+  }
+  function gymStart(forceId){
+    var pool = GYM_TPLS.filter(function(t){ return gymLevel === -1 || t.lv === gymLevel; });
+    var chosen = null;
+    if(forceId){ GYM_TPLS.forEach(function(t){ if(t.id === forceId) chosen = t; }); }
+    if(!chosen) chosen = pool[Math.floor(Math.random() * pool.length)];
+    drill = { tpl: chosen.make(), tplId: chosen.id, stepIdx: 0, hintsUsed: 0 };
+    if(drill.tpl.seed) drill.tpl.seed();
+    $("gGoal").innerHTML = drill.tpl.goal;
+    $("gymCard").className = "gymcard active";
+    $("gHint").className = "ghint"; $("gHint").innerHTML = "";
+    $("gStart").style.display = "none";
+    $("gHintBtn").style.display = "";
+    $("gFillBtn").style.display = "none";
+    $("gSkip").style.display = "";
+    gymStats();
+  }
+  function gymWin(){
+    state.gym.reps++;
+    state.gym.streak++;
+    if(state.gym.streak > state.gym.best) state.gym.best = state.gym.streak;
+    store.save(state);
+    $("gymCard").className = "gymcard win";
+    $("gGoal").innerHTML = "<b>Done.</b> Rep logged" + (drill.hintsUsed === 0 ? ", no hints. Clean." : ".") + " Total reps: " + state.gym.reps + ".";
+    $("gHint").className = "ghint";
+    drill = null;
+    $("gStart").style.display = ""; $("gStart").textContent = "Next drill";
+    $("gHintBtn").style.display = "none"; $("gFillBtn").style.display = "none"; $("gSkip").style.display = "none";
+    gymStats();
+    toast("Rep logged \u00b7 streak " + state.gym.streak);
+  }
+  function gymAfter(evt){
+    if(!drill) return;
+    if(drill.tpl.steps[drill.stepIdx]()){
+      drill.stepIdx++;
+      if(drill.stepIdx >= drill.tpl.steps.length) gymWin();
+    }
+  }
+  $("gStart").addEventListener("click", function(){ gymStart(); });
+  $("gHintBtn").addEventListener("click", function(){
+    if(!drill) return;
+    drill.hintsUsed++;
+    var h = $("gHint");
+    h.className = "ghint show";
+    if(drill.hintsUsed === 1){ h.innerHTML = drill.tpl.hints[0]; }
+    else {
+      h.innerHTML = drill.tpl.hints[0] + "<br>" + drill.tpl.hints[1];
+      if(drill.tpl.fillEl) $("gFillBtn").style.display = "";
+    }
+  });
+  $("gFillBtn").addEventListener("click", function(){
+    if(!drill || !drill.tpl.fillEl) return;
+    var ta = $(drill.tpl.fillEl);
+    ta.value = drill.tpl.append ? ta.value + "\n" + drill.tpl.fill : drill.tpl.fill;
+    ta.dispatchEvent(new Event("input"));
+    ta.focus();
+  });
+  $("gSkip").addEventListener("click", function(){
+    if(!drill) return;
+    state.gym.streak = 0; store.save(state);
+    $("gGoal").innerHTML = "Skipped. One answer was:<br>" + drill.tpl.hints[1] + "<br>Streak reset. Tap Start when ready.";
+    $("gHint").className = "ghint";
+    $("gymCard").className = "gymcard";
+    drill = null;
+    $("gStart").style.display = ""; $("gStart").textContent = "Start drill";
+    $("gHintBtn").style.display = "none"; $("gFillBtn").style.display = "none"; $("gSkip").style.display = "none";
+    gymStats();
+  });
+  (function(){
+    var tabs = ["Surprise me"].concat(GYM_LEVELS.slice(0,4));
+    tabs.forEach(function(name, i){
+      var b = document.createElement("button");
+      b.className = "gtab" + (i === 0 ? " on" : ""); b.type = "button"; b.textContent = name;
+      b.addEventListener("click", function(){
+        gymLevel = i - 1;
+        Array.prototype.forEach.call(document.querySelectorAll(".gtab"), function(x, xi){ x.classList.toggle("on", xi === i); });
+      });
+      $("gymTabs").appendChild(b);
+    });
+  })();
+  function setTrack(t){
+    var g = $("trackGeneral"), tr = $("trackTrail"), tabs = $("gymTabs"), ban = $("trailBanner");
+    if(g) g.classList.toggle("on", t === "general");
+    if(tr) tr.classList.toggle("on", t === "trail");
+    if(tabs) tabs.style.display = (t === "trail") ? "none" : "";
+    if(ban) ban.className = "trailbanner" + (t === "trail" ? " show" : "");
+    if(t === "trail"){ gymLevel = 4; }
+    else { gymLevel = -1; Array.prototype.forEach.call(document.querySelectorAll(".gtab"), function(x, xi){ x.classList.toggle("on", xi === 0); }); }
+    if($("gymCard")) $("gymCard").className = "gymcard";
+    if($("gGoal")) $("gGoal").innerHTML = (t === "trail") ? "Dress your real apps. Tap <b>Start drill</b>." : "Pick a level (or Surprise me) and tap <b>Start drill</b>.";
+    if($("gHint")){ $("gHint").className = "ghint"; $("gHint").innerHTML = ""; }
+  }
+  if($("trackGeneral")) $("trackGeneral").addEventListener("click", function(){ setTrack("general"); });
+  if($("trackTrail")) $("trackTrail").addEventListener("click", function(){ setTrack("trail"); });
+  gymStats();
+  if(typeof window !== "undefined"){
+    window._gym = { start: gymStart, check: function(){ gymAfter({}); }, state: function(){ return { drill: drill, gym: state.gym }; } };
+  }
+
+  /* ---- quiz ---- */
+  var QUIZ = [
+    { q:"What does the browser actually receive from a server?", a:["A finished picture of the page","Plain text characters: a recipe","A small video of the page"], r:1 },
+    { q:"The DOM is...", a:["The live tree the browser builds from HTML","A type of internet connection","A file you have to download"], r:0 },
+    { q:"CSS's job is to...", a:["Build the tree","Describe how tree nodes should look","Send requests to the server"], r:1 },
+    { q:"What can JS do that HTML and CSS cannot?", a:["Make text bold","Choose colors","Change the tree while you are using the page"], r:2 },
+    { q:"View source on any website shows you...", a:["A locked, encrypted blob","Only what the owner allows","The recipe text the site sent you"], r:2 }
+  ];
+  function renderQuiz(){
+    var wrap = $("quizwrap");
+    wrap.innerHTML = ""; $("scoreEl").textContent = ""; $("retryBtn").style.display = "none";
+    var answered = 0, correct = 0;
+    QUIZ.forEach(function(item, qi){
+      var qd = document.createElement("div");
+      qd.className = "q";
+      qd.innerHTML = "<div class=\"qt\">" + (qi + 1) + ". " + item.q + "</div>";
+      var opts = document.createElement("div"); opts.className = "opts";
+      item.a.forEach(function(opt, oi){
+        var b = document.createElement("button");
+        b.textContent = opt;
+        function pick(){
+          if(b.classList.contains("lock")) return;
+          answered++;
+          if(oi === item.r){ b.classList.add("right"); correct++; }
+          else { b.classList.add("wrong"); opts.children[item.r].classList.add("right"); }
+          Array.prototype.forEach.call(opts.children, function(x){ x.classList.add("lock"); });
+          if(answered === QUIZ.length){
+            $("scoreEl").textContent = "Score: " + correct + "/5" + (correct >= 4 ? "  \u2713 you have the model" : "");
+            $("retryBtn").style.display = "inline-block";
+            if(correct > (state.quizBest || 0)){ state.quizBest = correct; store.save(state); }
+          }
+        }
+        b.addEventListener("click", pick);
+        b.addEventListener("keydown", function(e){ if(e.key === "Enter" || e.key === " "){ e.preventDefault(); pick(); } });
+        opts.appendChild(b);
+      });
+      qd.appendChild(opts);
+      wrap.appendChild(qd);
+    });
+  }
+  $("retryBtn").addEventListener("click", renderQuiz);
+  renderQuiz();
+}
+
+if(typeof window !== "undefined" && typeof document !== "undefined"){
+  if(document.readyState === "loading"){ document.addEventListener("DOMContentLoaded", initApp); }
+  else { initApp(); }
+}
+if(typeof module !== "undefined" && module.exports){
+  module.exports = { scopeCSS: scopeCSS, cssRules: cssRules };
+}
+</script>
+</body>
+</html>

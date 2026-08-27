@@ -1,1 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#12141a">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
 
+<title>All Thumbs: build it on a phone</title>
+<meta name="description" content="Six small interactive explainers, one map: computer, internet, browser, Linux, Python, and Git, with live progress tracking.">
+<style>
+:root{
+  --bg:#12141a; --panel:#1a1d26; --panel2:#222633; --ink:#e9ecf3; --dim:#98a0b0;
+  --line:#2e3342; --good:#7ddf9a;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--ink);
+  background-image:radial-gradient(1100px 500px at 50% -140px,#1d2230 0%,transparent 60%);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font-size:16px;line-height:1.55}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace}
+main{max-width:680px;margin:0 auto;padding:8px 14px 90px}
+.hero{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px 16px;margin:18px 0}
+.topline{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.kick{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#9db4ff;font-weight:700;margin:0 0 6px}
+h1{font-size:34px;line-height:1.1;margin:4px 0 8px;letter-spacing:-.01em}
+h2{font-size:15px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin:26px 4px 10px}
+p{margin:8px 0}
+.sub{color:var(--dim)}
+.small{font-size:13px;color:var(--dim)}
+.herowrap{display:flex;gap:16px;align-items:center}
+.heromascot{width:132px;height:auto;flex:0 0 132px}
+@media(max-width:420px){.heromascot{width:110px;flex-basis:110px}}
+.herotitle{flex:1;min-width:0}
+.herolede{margin-top:14px}
+#vbadge{position:absolute;top:14px;right:14px;background:var(--panel2);border:1px solid var(--line);color:var(--dim);border-radius:999px;
+  padding:5px 11px;font-size:12px;cursor:pointer;white-space:nowrap}
+.overall{margin-top:14px}
+.obar{height:14px;background:var(--panel2);border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.obar > div{height:100%;width:0%;border-radius:999px;
+  background:linear-gradient(90deg,#45c8ff,#3ddc84,#ff8a3d,#f0653a);transition:width .5s}
+.oline{display:flex;justify-content:space-between;font-size:13px;color:var(--dim);margin-top:6px}
+.oline b{color:var(--ink)}
+.row{display:block;background:var(--panel);border:1px solid var(--line);border-radius:16px;
+  margin:16px 0;text-decoration:none;color:var(--ink);overflow:hidden}
+.row:active{transform:scale(.99)}
+.rspot{position:relative;display:flex;align-items:flex-end;justify-content:center;
+  min-height:230px;padding:18px 16px 12px}
+.rspotnum{position:absolute;top:12px;left:16px;font-weight:800;font-size:15px}
+.rdone{position:absolute;top:12px;right:16px;font-size:12px;font-weight:700;color:var(--good)}
+.rmascot{height:210px;width:auto;max-width:88%;object-fit:contain;object-position:bottom center;
+  filter:drop-shadow(0 8px 18px rgba(0,0,0,.45))}
+.rbody{padding:14px 18px 18px}
+.rtitle{font-weight:800;font-size:21px;line-height:1.2;display:block}
+.rsub{color:var(--dim);font-size:14.5px;margin:8px 0 14px 0;line-height:1.5}
+.rbar{height:8px;background:var(--panel2);border-radius:999px;overflow:hidden}
+.rbar > div{height:100%;width:0%;border-radius:999px;transition:width .5s}
+.rline{display:flex;justify-content:space-between;font-size:12.5px;color:var(--dim);margin:8px 0 0 0}
+.rchips{display:inline}
+.chip{display:inline-block;border:1px solid #b7a4e3;color:#b7a4e3;border-radius:999px;
+  padding:1px 8px;font-size:11px;margin-left:8px;vertical-align:1px}
+.notewrap{display:flex;gap:14px;align-items:flex-start}
+.notewrap img{height:88px;width:auto;flex:0 0 auto;filter:drop-shadow(0 6px 14px rgba(0,0,0,.4))}
+.footmascot{height:76px;width:auto;margin-bottom:8px;filter:drop-shadow(0 6px 14px rgba(0,0,0,.4))}
+.note{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;margin:18px 0;font-size:14px;color:var(--dim)}
+.note b{color:var(--ink)}
+.btnrow{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 4px}
+.btn{display:inline-block;background:var(--panel2);color:var(--ink);font-weight:700;border:1px solid var(--line);
+  border-radius:12px;padding:11px 16px;font-size:14px;cursor:pointer}
+footer{color:#5b6272;font-size:12.5px;text-align:center;margin:30px 0 10px;line-height:1.7}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(80px);
+  background:var(--panel2);border:1px solid #9db4ff;color:var(--ink);border-radius:999px;
+  padding:10px 18px;font-size:13.5px;transition:transform .25s;z-index:50;pointer-events:none;white-space:nowrap}
+#toast.show{transform:translateX(-50%) translateY(0)}
+:focus-visible{outline:2px solid #9db4ff;outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none !important}}
+</style>
+</head>
+<body>
+<main>
+<div class="hero">
+  <div class="topline">
+    <div class="herowrap">
+      <img class="heromascot" src="thumb-phone-hero.png" alt="All Thumbs mascot holding a phone">
+      <div class="herotitle">
+        <div class="kick">build it on a phone</div>
+        <h1>All Thumbs</h1>
+      </div>
+    </div>
+    <button id="vbadge" aria-label="version">v1.16</button>
+  </div>
+  <p class="sub herolede" style="font-size:18px">I build almost everything on a phone. This is the course I built to teach myself what was actually happening under it, one small explainer at a time.</p>
+  <p>Each part is a standalone interactive explainer with real working sandboxes, missions, a practice gym with randomized drills, and a five-question quiz. Do them in order for the full story: first how anything reaches your screen, then the toolbox people build it all with.</p>
+  <p class="sub">Every gym has a <b>Your work</b> level: drills shaped like the real thing I build with these tools, not textbook exercises. Supposedly all thumbs, I still built the whole thing. I saw what I needed to know, so I built the tool to teach it to myself.</p>
+  <div class="overall">
+    <div class="obar"><div id="obarFill"></div></div>
+    <div class="oline"><span>course progress</span><b id="opct">0%</b></div>
+  </div>
+</div>
+
+<h2>Unit 1 · How anything reaches your screen</h2>
+<div id="unit1"></div>
+
+<h2>Unit 2 · Your toolbox</h2>
+<div id="unit2"></div>
+
+<div class="note">
+  <div class="notewrap">
+    <img src="thumb-think.png" alt="">
+    <div>
+      <b>How progress works:</b> each explainer saves your missions and best quiz score in this browser, on this device. This page reads those saves live. Different device or browser, different progress. Nothing is uploaded anywhere.
+      <div class="btnrow"><button id="refreshBtn" class="btn">Refresh progress</button></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <img class="footmascot" src="thumb-wave.png" alt=""><br>
+  All Thumbs · a small course · built on a phone<br>
+  Suggested rhythm: one part per sitting. Missions first, quiz last.
+</footer>
+</main>
+<div id="toast" role="status"></div>
+<script>
+"use strict";
+var VERSION = "v1.16 · Aug 26";
+
+/* pure helpers (testable) */
+function countDone(state){
+  var map = state && (state.m || state.missions || state.lessons);
+  if(!map) return 0;
+  var n = 0;
+  for(var k in map){ if(map[k]) n++; }
+  return n;
+}
+function pctOf(done, total, quiz){
+  var raw = (done + (quiz || 0)) / (total + 5);
+  return Math.max(0, Math.min(1, raw));
+}
+
+var ROWS = [
+  { key:"computer101_v1", img:"thumb-computer", file:"computer-basics.html", title:"The Fast Idiot",
+    sub:"What a computer actually is: worker, desk, cabinet, and a toy CPU you really run.",
+    total:5, color:"#45c8ff", unit:1 },
+  { key:"internet101_v1", img:"thumb-internet", file:"internet-basics.html", title:"The Second After You Tap",
+    sub:"What the internet actually is: DNS, hopping packets, a network you can break, and 404.",
+    total:6, color:"#3ddc84", unit:1 },
+  { key:"browser101_v1", img:"thumb-browser", file:"browser-basics.html", title:"The Painter",
+    sub:"What a browser does: HTML becomes a live tree, CSS dresses it, JS edits it while you watch.",
+    total:6, color:"#ff8a3d", unit:1 },
+  { key:"linux101_v1", img:"thumb-linux", file:"linux-basics.html", title:"Under the Hood",
+    sub:"What Linux and an operating system are, with a real terminal sandbox.",
+    total:6, color:"#7de38a", unit:2 },
+  { key:"python101_v1", img:"thumb-python", file:"python-basics.html", title:"Second Language",
+    sub:"What Python is, with a working mini interpreter and translator.",
+    total:4, color:"#e8c35a", unit:2 },
+  { key:"git101_v1", img:"thumb-git", file:"git-basics.html", title:"Save Points",
+    sub:"What Git actually does: a real mini git, a live commit map, and a merge-conflict boss level.",
+    total:7, color:"#f0653a", unit:2 },
+  { key:"hosting101_v1", img:"thumb-hosting", file:"hosting-basics.html", title:"Ship It",
+    sub:"How a file on your phone becomes a web address: repos, index.html, root vs folder, and the content:// trap.",
+    total:6, color:"#b7a4e3", unit:2 },
+];
+
+function initApp(){
+  function $(id){ return document.getElementById(id); }
+  var toastT = null;
+  function toast(msg){
+    var el = $("toast");
+    el.textContent = msg; el.classList.add("show");
+    clearTimeout(toastT);
+    toastT = setTimeout(function(){ el.classList.remove("show"); }, 1800);
+  }
+  $("vbadge").addEventListener("click", function(){ toast(VERSION + " · loaded"); });
+
+  function readState(key){
+    try {
+      var raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : null;
+    } catch(e){ return null; }
+  }
+  function buildRows(){
+    $("unit1").innerHTML = "";
+    $("unit2").innerHTML = "";
+    ROWS.forEach(function(r, i){
+      var a = document.createElement("a");
+      a.className = "row";
+      a.href = r.file;
+      a.id = "row_" + r.key;
+      var mascot = r.img ? "<img class=\"rmascot\" src=\"" + r.img + ".png\" alt=\"\">" : "";
+      var spotbg = "background:radial-gradient(120% 80% at 50% 100%, " + r.color + "33, " + r.color + "12 45%, transparent 75%);";
+      a.innerHTML =
+        "<div class=\"rspot\" style=\"" + spotbg + "\">" +
+        "<span class=\"rspotnum\" style=\"color:" + r.color + "\">" + (i + 1) + "</span>" +
+        "<span class=\"rdone\" style=\"display:none\">complete \u2713</span>" +
+        mascot +
+        "</div>" +
+        "<div class=\"rbody\">" +
+        "<span class=\"rtitle\">" + r.title + "<span class=\"rchips\"></span></span>" +
+        "<div class=\"rsub\">" + r.sub + "</div>" +
+        "<div class=\"rbar\"><div style=\"background:" + r.color + "\"></div></div>" +
+        "<div class=\"rline\"><span class=\"rstats\">not started on this device</span><span class=\"rpct\">0%</span></div>" +
+        "</div>";
+      $(r.unit === 1 ? "unit1" : "unit2").appendChild(a);
+    });
+  }
+  function refreshProgress(){
+    var sum = 0;
+    ROWS.forEach(function(r){
+      var st = readState(r.key) || {};
+      var done = countDone(st);
+      var quiz = st.quizBest || 0;
+      var pct = pctOf(done, r.total, quiz);
+      sum += pct;
+      var row = $("row_" + r.key);
+      row.querySelector(".rbar > div").style.width = Math.round(pct * 100) + "%";
+      row.querySelector(".rpct").textContent = Math.round(pct * 100) + "%";
+      var reps = (st.gym && st.gym.reps) || 0;
+      row.querySelector(".rstats").textContent = (done || quiz || reps) ?
+        (done + "/" + r.total + " missions · quiz " + quiz + "/5" + (reps ? " · " + reps + " reps" : "")) :
+        "not started on this device";
+      row.querySelector(".rdone").style.display = pct >= 1 ? "" : "none";
+      var chips = row.querySelector(".rchips");
+      chips.innerHTML = "";
+      if(r.key === "git101_v1" && st.boss){
+        chips.innerHTML = "<span class=\"chip\">boss beaten</span>";
+      }
+    });
+    var overall = Math.round((sum / ROWS.length) * 100);
+    $("obarFill").style.width = overall + "%";
+    $("opct").textContent = overall + "%";
+  }
+  buildRows();
+  refreshProgress();
+  $("refreshBtn").addEventListener("click", function(){
+    refreshProgress();
+    toast("Progress re-read from this device");
+  });
+  window.addEventListener("focus", refreshProgress);
+  window.addEventListener("storage", refreshProgress);
+  document.addEventListener("visibilitychange", function(){
+    if(!document.hidden) refreshProgress();
+  });
+  window.refreshProgress = refreshProgress;
+}
+
+if(typeof window !== "undefined" && typeof document !== "undefined"){
+  if(document.readyState === "loading"){ document.addEventListener("DOMContentLoaded", initApp); }
+  else { initApp(); }
+}
+if(typeof module !== "undefined" && module.exports){
+  module.exports = { countDone: countDone, pctOf: pctOf, ROWS: ROWS };
+}
+</script>
+</body>
+</html>
