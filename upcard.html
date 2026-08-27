@@ -1,0 +1,802 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>The Upcard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#ebedef;--soft:#b9c1ca;--teal:#4cf0e0;--orange:#f59847;--line:#2b323b;--felt:#12181f;--good:#5dff8f;--bad:#ff6a7a;--sys:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:var(--felt);color:var(--ink);font-family:'Archivo',var(--sys);min-height:100svh;display:flex;flex-direction:column;overflow-x:hidden}
+#glow{position:fixed;inset:0;z-index:-1;pointer-events:none;background:conic-gradient(from 118deg at 1.3% -6.9%, transparent 0deg, rgba(254,228,196,.10) 9deg, rgba(254,228,196,.26) 26deg, rgba(254,228,196,.11) 44deg, transparent 52deg),radial-gradient(46vmax 82vmax at 110% 55%, rgba(76,240,224,.08), transparent 60%),var(--felt)}
+#bar{display:flex;align-items:center;gap:12px;padding:12px 14px 12px 84px;border-bottom:1px solid var(--line);font:600 14px 'Archivo',sans-serif;flex:none}
+#bar a{color:var(--soft);text-decoration:none}
+#bar .t{color:var(--ink);font-weight:800}
+#bar .ver{margin-left:auto;font:600 10px 'JetBrains Mono',monospace;color:var(--soft);cursor:pointer}
+.wrap{flex:1;max-width:560px;width:100%;margin:0 auto;padding:14px 16px 28px;display:flex;flex-direction:column}
+.brand{display:flex;flex-direction:column;align-items:center;margin-top:6px}
+.brand .mark{width:46px;height:46px}
+.brand h1{font-size:clamp(26px,8vw,36px);font-weight:800;letter-spacing:-.02em;margin-top:6px}
+.brand h1 .up{color:var(--teal)}
+.brand .sub{font:600 11px 'JetBrains Mono',monospace;letter-spacing:.18em;text-transform:uppercase;color:var(--orange);margin-top:4px}
+#start{margin-top:26px;text-align:center}
+#start .lead{color:var(--soft);font-size:14px;line-height:1.55;max-width:340px;margin:0 auto 20px}
+.startbtns{display:flex;flex-direction:column;gap:10px;max-width:300px;margin:0 auto}
+.pill{font:700 15px var(--sys);padding:14px 18px;border-radius:13px;border:1px solid var(--line);background:linear-gradient(175deg,#171d26,#10161d);color:var(--ink);cursor:pointer}
+.pill.primary{background:var(--teal);color:#06251f;border-color:var(--teal)}
+.pill:active{transform:scale(.98)}
+.pill .k{display:block;font:600 11px 'JetBrains Mono',monospace;color:var(--soft);margin-top:3px;text-transform:none;letter-spacing:0}
+.pill.primary .k{color:#0a3b33}
+#table{display:none;flex:1;flex-direction:column;min-height:0}
+#table.on{display:flex}
+.hud{display:flex;justify-content:space-between;align-items:center;gap:8px;font:600 12px 'JetBrains Mono',monospace;color:var(--soft);margin-bottom:4px;flex:none}
+.hud .bank{color:var(--teal);font-size:15px}
+.felt{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:22px;padding-top:10px}
+.felt.betting{justify-content:flex-start;padding-top:24px;gap:14px}
+.felt.betting .seat .label{opacity:.5}
+.seat{display:flex;flex-direction:column;align-items:center;gap:6px}
+.seat .label{font:600 11px 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.72);display:flex;gap:8px;align-items:center;text-shadow:0 1px 3px rgba(0,0,0,.5)}
+.seat .total{color:#fff;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.18);border-radius:20px;padding:1px 9px;font-size:11px}
+.hand{display:flex;gap:6px;min-height:82px;align-items:center;justify-content:center}
+.card{width:min(15vw,56px);height:min(21vw,79px);border-radius:7px;position:relative;flex:none;color:#1c1c1c;background:linear-gradient(160deg,#fffdf6,#ece3cf);box-shadow:0 3px 7px rgba(0,0,0,.45),inset 0 1px 0 #fff;display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;padding:5px 6px;font-weight:800;animation:deal .26s cubic-bezier(.2,.8,.3,1)}
+@keyframes deal{from{transform:translateY(-16px) rotate(-4deg);opacity:0}to{transform:none;opacity:1}}
+.card.red{color:#c0392b}
+.card .rk{font-size:min(4.6vw,17px);line-height:1}
+.card .su{font-size:min(4.6vw,17px);line-height:1;align-self:flex-end}
+.card .big{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:min(8vw,30px);opacity:.9}
+.card.back{color:transparent;overflow:hidden;background:linear-gradient(160deg,#12303a,#0a1a20);border:1px solid rgba(76,240,224,.25)}
+.card.back .apwrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.card.back .apwrap svg{width:66%;height:66%;opacity:.92}
+.card.back::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(48deg,rgba(76,240,224,.08) 0 4px,transparent 4px 9px)}
+.card.back::after{content:"";position:absolute;inset:3px;border:1px solid rgba(76,240,224,.30);border-radius:5px}
+#betbar{display:none;flex-direction:column;gap:10px;padding-top:8px}
+#betbar.on{display:flex}
+.chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.chip{width:52px;height:52px;border-radius:50%;border:3px dashed rgba(255,255,255,.55);font:800 13px var(--sys);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px rgba(0,0,0,.45)}
+.chip:active{transform:scale(.92)}
+.chip.c5{background:#c0392b}.chip.c25{background:#2a7d4f}.chip.c100{background:#2c3e6b}.chip.c500{background:#6b2c6b}
+.betrow{display:flex;align-items:center;justify-content:center;gap:12px}
+.betrow .amt{font:800 22px var(--sys);color:var(--teal);min-width:80px;text-align:center}
+.clr{font:600 12px 'JetBrains Mono',monospace;color:var(--soft);background:none;border:1px solid var(--line);border-radius:9px;padding:7px 10px;cursor:pointer}
+.deal-btn{font:800 16px var(--sys);padding:14px;border-radius:13px;border:0;background:var(--teal);color:#06251f;cursor:pointer;width:100%}
+.deal-btn:disabled{opacity:.4;cursor:default}
+#actions{display:none;gap:8px;padding-top:8px}
+#actions.on{display:grid;grid-template-columns:repeat(4,1fr)}
+.act{font:800 14px var(--sys);padding:14px 6px;border-radius:12px;border:1px solid var(--line);background:linear-gradient(175deg,#1a212b,#121820);color:var(--ink);cursor:pointer}
+.act:active{transform:scale(.97)}
+.act:disabled{opacity:.35;cursor:default}
+.act .sub{display:block;font:600 9px 'JetBrains Mono',monospace;color:var(--soft);margin-top:2px}
+#msg{text-align:center;font:700 15px var(--sys);min-height:24px;padding:8px 0;color:var(--ink)}
+#msg.good{color:var(--good)}#msg.bad{color:var(--bad)}#msg.push{color:var(--orange)}
+.sheet{position:fixed;inset:0;z-index:50;background:rgba(8,11,15,.86);display:none;align-items:center;justify-content:center;padding:20px}
+.sheet.on{display:flex}
+.sheetcard{background:linear-gradient(175deg,#141a22,#0e141b);border:1px solid var(--line);border-radius:18px;padding:22px;max-width:360px;width:100%;text-align:center}
+.sheetcard h2{font-size:22px;font-weight:800;margin-bottom:14px}
+.sheetcard .stat{display:flex;justify-content:space-between;padding:9px 2px;border-bottom:1px solid var(--line);font-size:14px}
+.sheetcard .stat b{font-variant-numeric:tabular-nums}
+.sheetcard .row{display:flex;gap:10px;margin-top:16px}
+.sheetcard .row .pill{flex:1}
+.toast{position:fixed;left:50%;bottom:14%;transform:translateX(-50%) translateY(16px);background:#000d;color:#fff;padding:10px 16px;border-radius:20px;font:600 13px var(--sys);z-index:60;opacity:0;transition:.25s;pointer-events:none}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+@keyframes dealIn{from{transform:translate(120px,-180px) rotate(14deg);opacity:0}to{transform:none;opacity:1}}
+.card{animation:dealIn .34s cubic-bezier(.2,.9,.3,1) both}
+@keyframes flipReveal{0%{transform:rotateY(90deg);opacity:.3}100%{transform:rotateY(0);opacity:1}}
+.card.flipin{animation:flipReveal .32s ease-out both}
+@keyframes bankPulse{0%{transform:scale(1)}40%{transform:scale(1.18)}100%{transform:scale(1)}}
+.bank.win{animation:bankPulse .6s ease-out;color:var(--good)}
+@keyframes feltWin{0%{box-shadow:inset 0 0 0 0 rgba(93,255,143,0)}40%{box-shadow:inset 0 0 90px 12px rgba(93,255,143,.22)}100%{box-shadow:inset 0 0 0 0 rgba(93,255,143,0)}}
+.tblfelt.fwin{animation:feltWin 1s ease-out}
+@keyframes feltBJ{0%{box-shadow:inset 0 0 0 0 rgba(76,240,224,0)}30%{box-shadow:inset 0 0 120px 22px rgba(76,240,224,.32)}100%{box-shadow:inset 0 0 0 0 rgba(76,240,224,0)}}
+.tblfelt.fbj{animation:feltBJ 1.2s ease-out}
+@keyframes handLose{0%{opacity:1;transform:none}100%{opacity:.4;transform:translateY(6px)}}
+.hand.lose .card{animation:handLose .5s ease-out both}
+.act:active,.deal-btn:active,.chip:active{transform:scale(.94)}
+.act,.deal-btn{transition:transform .06s}
+.betspot{position:absolute;left:50%;bottom:20%;transform:translateX(-50%);z-index:1;display:flex;flex-direction:column;align-items:center;gap:3px;pointer-events:none;opacity:0;transition:opacity .2s}
+.betspot.on{opacity:1}
+.betspot .puck{width:46px;height:46px;border-radius:50%;border:3px dashed rgba(245,152,71,.7);display:flex;align-items:center;justify-content:center;font:800 12px var(--sys);color:#fff;background:rgba(245,152,71,.14)}
+.betspot .blbl{font:600 10px 'JetBrains Mono',monospace;color:var(--orange)}
+
+#chart{display:none;position:fixed;inset:0;z-index:60;background:var(--felt);overflow-y:auto;padding:0 0 40px}
+#chart.on{display:block}
+#chart .chead{position:sticky;top:0;background:linear-gradient(180deg,#0f1620,#0f1620ee);backdrop-filter:blur(6px);display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line);z-index:2}
+#chart .chead h2{font-size:18px;font-weight:800;flex:1}
+#chart .chead .x{background:none;border:1px solid var(--line);border-radius:10px;color:var(--soft);font:700 13px var(--sys);padding:7px 12px;cursor:pointer}
+#chart .cwrap{max-width:560px;margin:0 auto;padding:14px 12px}
+#chart .intro{color:var(--soft);font-size:13px;line-height:1.55;margin-bottom:16px}
+#chart .legend{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;justify-content:center}
+#chart .lg{display:flex;align-items:center;gap:6px;font:700 11px var(--sys)}
+#chart .csw{width:16px;height:16px;border-radius:4px;display:inline-block}
+.mH{background:#2a3746;color:#cfe6ff}
+.mS{background:#c0392b;color:#fff}
+.mD{background:#f59847;color:#161d26}
+.mP{background:#4cf0e0;color:#06251f}
+#chart .ctitle{font:700 11px 'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--orange);margin:20px 0 8px}
+#chart table{border-collapse:separate;border-spacing:2px;width:100%;table-layout:fixed}
+#chart th,#chart td{text-align:center;font:800 11px var(--sys);border-radius:4px;padding:0;height:26px;color:var(--ink)}
+#chart th{font:700 10px 'JetBrains Mono',monospace;color:var(--soft);background:transparent}
+#chart td.k{background:#0e141b;color:var(--soft);font:700 10px 'JetBrains Mono',monospace}
+#chart .foot{color:var(--soft);font-size:11px;line-height:1.5;margin-top:16px;text-align:center}
+
+#stats{display:none;position:fixed;inset:0;z-index:60;background:var(--felt);overflow-y:auto;padding:0 0 40px}
+#stats.on{display:block}
+#stats .shead{position:sticky;top:0;background:linear-gradient(180deg,#0f1620,#0f1620ee);backdrop-filter:blur(6px);display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line);z-index:2}
+#stats .shead h2{font-size:18px;font-weight:800;flex:1}
+#stats .shead .x{background:none;border:1px solid var(--line);border-radius:10px;color:var(--soft);font:700 13px var(--sys);padding:7px 12px;cursor:pointer}
+#stats .swrap{max-width:560px;margin:0 auto;padding:16px 14px}
+#stats .empty{text-align:center;color:var(--soft);font-size:14px;line-height:1.6;padding:40px 20px}
+#stats .kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+#stats .kpi{background:#10181f;border:1px solid var(--line);border-radius:14px;padding:14px}
+#stats .kpi .v{font:800 24px var(--sys);font-variant-numeric:tabular-nums}
+#stats .kpi .l{font:600 11px 'JetBrains Mono',monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);margin-top:2px}
+#stats .kpi .v.teal{color:var(--teal)}#stats .kpi .v.good{color:var(--good)}#stats .kpi .v.bad{color:var(--bad)}#stats .kpi .v.orange{color:var(--orange)}
+#stats .scard{background:#10181f;border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:16px}
+#stats .scard h3{font:700 12px 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--orange);margin-bottom:4px}
+#stats .scard .cap{font-size:11px;color:var(--soft);margin-bottom:12px}
+#stats .chartbox{width:100%;height:120px;min-height:120px;display:block;position:relative}
+#stats svg{width:100%;height:120px;display:block;position:absolute;inset:0}
+#stats .slist{margin-top:4px}
+#stats .srow{display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px solid var(--line);font-size:13px}
+#stats .srow .idx{font:700 11px 'JetBrains Mono',monospace;color:var(--soft);width:26px}
+#stats .srow .meta{flex:1;color:var(--soft);font:600 11px 'JetBrains Mono',monospace}
+#stats .srow .net{font-weight:800;font-variant-numeric:tabular-nums}
+#stats .srow .net.pos{color:var(--good)}#stats .srow .net.neg{color:var(--bad)}
+#stats .srow .acc{font:700 12px var(--sys);color:var(--teal);width:44px;text-align:right}
+#stats .reset{margin-top:20px;width:100%;font:600 12px var(--sys);padding:11px;border-radius:11px;border:1px solid var(--line);background:none;color:var(--soft);cursor:pointer}
+
+.phands{display:flex;gap:14px;justify-content:center;align-items:flex-start;flex-wrap:wrap}
+.phand{display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 8px;border-radius:12px;border:2px solid transparent;transition:border-color .2s,opacity .2s}
+.phand.active{border-color:rgba(76,240,224,.6);box-shadow:0 0 16px rgba(76,240,224,.15)}
+.phand.done{opacity:.55}
+.phand .ht{font:700 11px 'JetBrains Mono',monospace;color:#fff;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.18);border-radius:20px;padding:1px 9px}
+.phand .res{font:800 11px var(--sys);min-height:13px}
+.phand .res.good{color:var(--good)}.phand .res.bad{color:var(--bad)}.phand .res.push{color:var(--orange)}
+.mono{font-family:'JetBrains Mono',monospace}
+/* coach hint strip */
+#coach{display:none;margin:0 4px 6px;padding:10px 12px;border-radius:11px;font:600 12.5px var(--sys);align-items:center;gap:9px;line-height:1.35}
+#coach.on{display:flex}
+#coach .cdot{width:8px;height:8px;border-radius:50%;flex:none}
+#coach.rec{background:rgba(76,240,224,.10);border:1px solid rgba(76,240,224,.32);color:var(--teal)}
+#coach.rec .cdot{background:var(--teal)}
+#coach.right{background:rgba(93,255,143,.10);border:1px solid rgba(93,255,143,.32);color:var(--good)}
+#coach.right .cdot{background:var(--good)}
+#coach.wrong{background:rgba(255,106,122,.10);border:1px solid rgba(255,106,122,.34);color:var(--bad)}
+#coach.wrong .cdot{background:var(--bad)}
+#coach b{color:var(--ink);font-weight:800}
+/* ask button (on-demand mode) */
+#askWrap{display:none;justify-content:center;padding-bottom:6px}
+#askWrap.on{display:flex}
+#askBtn{font:700 12px var(--sys);padding:8px 16px;border-radius:20px;border:1px solid rgba(76,240,224,.4);background:rgba(76,240,224,.08);color:var(--teal);cursor:pointer}
+/* settings sheet */
+#gear{background:none;border:0;color:var(--soft);font-size:18px;cursor:pointer;padding:0 2px;line-height:1}
+.setsheet{position:fixed;inset:0;z-index:55;background:rgba(8,11,15,.86);display:none;align-items:flex-end;justify-content:center}
+.setsheet.on{display:flex}
+.setcard{background:linear-gradient(175deg,#141a22,#0e141b);border:1px solid var(--line);border-top-left-radius:20px;border-top-right-radius:20px;padding:20px 18px 26px;max-width:560px;width:100%}
+.setcard h2{font-size:18px;font-weight:800;margin-bottom:2px}
+.setcard .subh{color:var(--soft);font-size:12px;margin-bottom:16px}
+.setgroup{font:700 10px 'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--orange);margin:16px 0 8px}
+.opt{display:flex;gap:11px;align-items:flex-start;padding:11px 12px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px;cursor:pointer;background:#0f1319}
+.opt.sel{border-color:var(--teal);background:rgba(76,240,224,.06)}
+.opt .rad{width:18px;height:18px;border-radius:50%;border:2px solid var(--line);flex:none;margin-top:1px;position:relative}
+.opt.sel .rad{border-color:var(--teal)}
+.opt.sel .rad::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--teal)}
+.opt .otxt{flex:1}
+.opt .otxt b{font-size:13.5px;font-weight:700}
+.opt .otxt span{display:block;color:var(--soft);font-size:11.5px;margin-top:2px;line-height:1.4}
+.setclose{width:100%;margin-top:14px;font:700 15px var(--sys);padding:13px;border-radius:12px;border:0;background:var(--teal);color:#06251f;cursor:pointer}
+.toggle{display:flex;align-items:center;justify-content:space-between;padding:11px 12px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px}
+.toggle b{font-size:13.5px}
+.sw{width:44px;height:26px;border-radius:20px;background:#2a323d;position:relative;transition:.2s;flex:none;cursor:pointer}
+.sw.on{background:var(--teal)}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s}
+.sw.on::after{left:21px}
+
+/* real wide blackjack table: teal felt, amber arc + bet line */
+#table.on{position:relative;overflow:hidden;display:flex;flex-direction:column;flex:1;min-height:0}
+.tblfloor{position:absolute;inset:0;z-index:0;background:radial-gradient(160% 70% at 50% 130%, #0a1a20, #060d11 72%)}
+.tblrail{position:absolute;left:50%;top:-30%;transform:translateX(-50%);width:280%;height:118%;z-index:0;background:linear-gradient(180deg,#4a3316,#2a1d0d);border-bottom-left-radius:50% 42%;border-bottom-right-radius:50% 42%;box-shadow:0 12px 34px rgba(0,0,0,.55)}
+.tblfelt{position:absolute;left:50%;top:-30%;transform:translateX(-50%);width:272%;height:114%;z-index:0;background:radial-gradient(120% 150% at 50% -10%, #14606f, #0d404c 50%, #0a3038);border-bottom-left-radius:50% 40%;border-bottom-right-radius:50% 40%;box-shadow:inset 0 4px 24px rgba(255,255,255,.06), inset 0 -20px 50px rgba(0,0,0,.30), 0 24px 60px rgba(0,0,0,.5)}
+.tblarc{position:absolute;left:50%;top:-24%;transform:translateX(-50%);width:250%;height:104%;z-index:0;border:0 solid transparent;border-bottom-width:2px;border-bottom-color:rgba(245,152,71,.55);border-bottom-left-radius:50% 40%;border-bottom-right-radius:50% 40%;background:transparent;pointer-events:none}
+#table>.hud,#table>.felt,#table>#betbar,#table>#coach,#table>#askWrap,#table>#actions,#table>.betspot{position:relative;z-index:2}
+</style>
+</head>
+<body>
+<div id="glow"></div>
+<div id="bar"><span class="t">The Upcard</span><span class="ver" id="ver">v0.7</span></div>
+<div class="wrap">
+  <div id="start">
+    <div class="brand">
+      <svg class="mark" viewBox="940 -200 720 880" aria-hidden="true"><path transform="translate(844.9,-213.7) scale(9.2129)" d="M27.6,5.0 L26.5,6.7 L24.6,9.4 L23.0,11.8 L20.7,15.0 L20.4,15.6 L19.4,15.7 L13.5,15.8 L12.3,16.0 L12.3,19.9 L12.7,20.1 L18.6,20.2 L22.7,20.2 L23.8,18.8 L25.5,16.4 L26.6,14.7 L28.5,12.0 L29.9,9.9 L31.0,8.2 L32.3,6.3 L32.5,6.1 L63.5,6.1 L63.8,6.8 L65.4,9.1 L66.8,11.1 L68.6,13.7 L69.6,15.1 L71.1,17.4 L72.8,19.6 L73.5,20.4 L86.2,20.4 L86.3,20.2 L86.3,15.8 L86.2,15.7 L75.9,15.6 L73.9,13.0 L73.0,11.5 L71.8,9.9 L70.1,7.5 L68.6,5.3 L68.5,5.0 Z  M48.5,33.3 L45.9,33.6 L42.7,34.2 L39.4,35.1 L38.0,35.7 L38.0,36.3 L40.8,38.0 L44.4,40.1 L46.6,41.3 L50.3,43.6 L52.5,45.0 L54.5,46.1 L58.5,48.5 L61.4,50.4 L62.1,50.9 L62.5,50.8 L62.3,49.5 L60.8,43.9 L59.0,36.7 L58.6,34.7 L58.0,34.3 L55.4,33.7 L53.7,33.5 L52.0,33.3 Z  M61.4,35.6 L61.3,36.3 L61.5,37.1 L62.1,39.9 L63.8,46.7 L65.4,52.6 L66.1,55.1 L67.2,59.1 L68.0,62.2 L68.2,63.3 L68.7,63.5 L70.4,60.4 L71.7,58.2 L73.7,54.7 L75.1,52.3 L75.9,50.8 L76.8,49.4 L76.6,48.7 L75.6,47.3 L75.1,46.3 L73.4,44.0 L73.1,44.0 L72.8,43.5 L70.1,40.8 L67.3,38.7 L64.8,37.1 L62.5,36.0 L61.7,35.6 Z  M34.6,37.3 L33.1,38.2 L31.4,39.5 L29.9,40.8 L28.2,42.3 L26.5,44.2 L26.5,44.4 L26.2,44.4 L24.8,46.4 L23.8,48.0 L22.5,49.9 L21.7,51.8 L21.3,53.2 L23.0,52.9 L26.2,52.0 L28.0,51.5 L33.5,49.9 L35.2,49.4 L36.3,49.1 L40.3,48.0 L43.5,47.0 L47.0,46.0 L48.3,45.6 L48.3,45.1 L46.8,44.3 L44.1,42.7 L43.1,42.2 L39.2,39.8 L36.9,38.5 L34.8,37.3 Z  M35.2,51.8 L33.7,52.3 L31.3,53.0 L28.5,54.0 L24.9,55.0 L22.1,55.8 L20.3,56.5 L20.1,57.1 L20.4,57.1 L20.4,57.5 L19.9,57.4 L19.4,60.6 L19.4,61.9 L19.7,61.8 L19.9,60.5 L19.9,62.3 L20.0,63.5 L19.7,63.5 L19.7,62.3 L19.6,62.3 L19.4,65.0 L19.4,68.1 L19.7,70.4 L20.3,72.5 L20.8,74.6 L21.4,76.3 L21.8,76.3 L23.2,73.9 L24.6,71.6 L26.6,68.2 L27.3,67.0 L29.2,63.9 L31.5,59.8 L33.5,56.4 L34.8,54.2 L35.9,52.0 L35.9,51.8 Z  M77.9,51.9 L77.0,53.2 L76.2,54.7 L74.5,57.7 L72.5,61.1 L71.7,62.6 L69.6,66.3 L68.2,68.7 L66.3,71.9 L65.2,73.9 L64.1,75.7 L63.5,76.7 L63.7,77.3 L64.2,77.1 L68.2,76.0 L69.7,75.4 L71.7,74.9 L74.9,73.9 L78.9,72.7 L79.7,72.3 L80.1,70.5 L80.6,67.4 L80.7,66.0 L80.7,61.9 L80.3,58.5 L79.9,56.4 L79.2,54.2 L78.5,52.2 Z  M31.0,65.6 L29.3,68.4 L28.3,70.4 L26.9,72.7 L26.1,74.2 L25.2,75.7 L23.7,78.4 L23.0,79.8 L23.9,81.3 L25.2,83.0 L26.5,84.6 L28.0,86.3 L30.1,88.2 L31.8,89.5 L33.7,90.8 L35.5,91.9 L37.7,92.9 L38.2,92.7 L37.9,91.3 L36.9,87.5 L35.6,82.2 L34.5,77.8 L33.9,75.8 L33.2,72.9 L31.5,66.7 L31.3,65.6 Z  M78.2,75.1 L73.8,76.5 L70.4,77.5 L67.3,78.4 L63.7,79.5 L60.7,80.4 L56.5,81.6 L53.0,82.6 L51.3,83.0 L51.1,83.6 L53.9,85.3 L56.9,87.1 L60.8,89.5 L63.5,91.2 L64.4,91.6 L65.2,91.5 L66.6,90.5 L67.5,89.9 L69.4,88.4 L70.1,87.8 L70.1,87.5 L70.7,87.3 L73.0,85.0 L74.5,83.0 L76.1,80.9 L77.0,79.4 L78.3,76.7 L78.7,75.8 L78.7,75.1 Z  M37.2,78.1 L37.0,78.5 L37.6,80.5 L38.5,83.9 L39.2,87.0 L40.3,91.6 L41.0,93.9 L41.1,94.2 L43.4,94.7 L44.8,95.0 L45.1,95.1 L54.5,95.1 L55.6,94.9 L58.0,94.3 L60.6,93.5 L61.7,93.0 L61.5,92.6 L59.9,91.6 L57.3,90.1 L54.6,88.4 L51.5,86.5 L49.6,85.3 L46.9,83.7 L44.9,82.5 L42.0,80.8 L41.0,80.1 L39.4,79.2 L38.5,78.5 L37.6,78.1 Z" fill="#4cf0e0" fill-rule="evenodd"/></svg>
+      <h1>The <span class="up">Upcard</span></h1>
+      <div class="sub">Play &amp; Learn Blackjack</div>
+    </div>
+    <p class="lead">Learn to read the dealer's upcard and play every hand right. Sit down, place a bet, and build your bankroll.</p>
+    <div class="startbtns">
+      <button class="pill primary" id="btnPlay">Sit at the table<span class="k">start a session</span></button>
+      <button class="pill" id="btnResume" style="display:none">Resume session<span class="k" id="resumeK"></span></button>
+      <button class="pill" id="btnChart">Study the strategy chart<span class="k">learn the correct plays</span></button>
+      <button class="pill" id="btnStats">Your progress<span class="k">money and accuracy over time</span></button>
+    </div>
+  </div>
+  <div id="table">
+    <div class="tblfloor"></div><div class="tblrail"></div><div class="tblfelt" id="tblfelt"></div><div class="tblarc"></div>
+    <div class="betspot" id="betspot"><div class="puck" id="betpuck">$0</div><div class="blbl">BET</div></div>
+    <div class="hud">
+      <span class="bank mono" id="bank">$500</span>
+      <span class="mono" id="sessInfo">Hand 1</span>
+      <button id="gear" aria-label="Settings">⚙</button><button class="clr mono" id="cashout">Cash out</button>
+    </div>
+    <div class="felt">
+      <div class="seat">
+        <div class="label">Dealer <span class="total" id="dTotal"></span></div>
+        <div class="hand" id="dHand"></div>
+      </div>
+      <div id="msg"></div>
+      <div class="seat">
+        <div class="label">You <span class="total" id="pTotal"></span></div>
+        <div class="hand" id="pHand"></div>
+      </div>
+    </div>
+    <div id="betbar" class="on">
+      <div class="chips">
+        <button class="chip c5" data-v="5">5</button>
+        <button class="chip c25" data-v="25">25</button>
+        <button class="chip c100" data-v="100">100</button>
+        <button class="chip c500" data-v="500">500</button>
+      </div>
+      <div class="betrow"><button class="clr mono" id="clearBet">clear</button><span class="amt mono" id="betAmt">$0</span><button class="clr mono" id="allIn">max</button></div>
+      <button class="deal-btn" id="dealBtn" disabled>Deal</button>
+    </div>
+    <div id="coach"><span class="cdot"></span><span id="coachText"></span></div>
+    <div id="askWrap"><button id="askBtn">What's the right play?</button></div>
+    <div id="actions">
+      <button class="act" id="aHit">Hit</button>
+      <button class="act" id="aStand">Stand</button>
+      <button class="act" id="aDouble">Double<span class="sub">2x bet</span></button>
+      <button class="act" id="aSplit">Split<span class="sub">pairs</span></button>
+    </div>
+  </div>
+</div>
+<div class="sheet" id="endSheet">
+  <div class="sheetcard">
+    <h2 id="endTitle">Session over</h2>
+    <div id="endStats"></div>
+    <div class="row">
+      <button class="pill" id="endClose">Back</button>
+      <button class="pill primary" id="endAgain">New session</button>
+    </div>
+  </div>
+</div>
+<div class="setsheet" id="setSheet">
+  <div class="setcard">
+    <h2>Coach</h2>
+    <div class="subh">How much the coach helps while you play.</div>
+    <div class="setgroup">When it speaks up</div>
+    <div class="opt" data-mode="after"><div class="rad"></div><div class="otxt"><b>Flag mistakes after</b><span>Play freely. If a move breaks basic strategy, the coach shows the right play.</span></div></div>
+    <div class="opt" data-mode="demand"><div class="rad"></div><div class="otxt"><b>On demand only</b><span>Coach stays quiet. Tap "What's the right play?" whenever you want a hint.</span></div></div>
+    <div class="opt" data-mode="before"><div class="rad"></div><div class="otxt"><b>Warn before you commit</b><span>The recommended move shows before you act, so you can follow it or deviate.</span></div></div>
+    <div class="setgroup">Coach</div>
+    <div class="toggle"><b>Coach on</b><div class="sw on" id="swCoach"></div></div>
+    <div class="setgroup">Reference</div>
+    <button class="pill" id="btnChart2" style="width:100%">Open the strategy chart</button>
+    <button class="pill" id="btnStats2" style="width:100%;margin-top:8px">Your progress</button>
+    <button class="setclose" id="setClose">Done</button>
+  </div>
+</div>
+<div id="chart"><div class="chead"><h2>Basic strategy</h2><button class="x" id="chartClose">Close</button></div><div class="cwrap"><p class="intro">The mathematically correct move for every hand against the dealer upcard (the columns). This is exactly what the coach checks your plays against.</p><div class="legend"><span class="lg"><span class="csw mH"></span>Hit</span><span class="lg"><span class="csw mS"></span>Stand</span><span class="lg"><span class="csw mD"></span>Double</span><span class="lg"><span class="csw mP"></span>Split</span></div><div class="ctitle">Hard totals</div><table><tr><th></th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th><th>A</th></tr><tr><td class="k">8</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td></tr><tr><td class="k">9</td><td class="c mH">H</td><td class="c mD">D</td><td class="c mD">D</td><td class="c mD">D</td><td class="c mD">D</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td></tr><tr><td class="k">10</td><td class="c mD">D</td><td class="c mD">D</td><td class="c mD">D</td><td class="c mD">D</td><td class="c mD">D</td><td class="c mD">D</td><td class="c mD">D</td><td class="c mD">D</td><td class="c mH">H</td><td class="c mH">H</td></tr><tr><td class="k">11</td><td class="c mD">D</td><td class="c mD">D</td><td class="c mD">D</td><td class="c mD">D</td><td class="c mD">D</td><td class="c mD">D</td><td class="c mD">D</td><td class="c mD">D</td><td class="c mD">D</td><td class="c mH">H</td></tr><tr><td class="k">12</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td></tr><tr><td class="k">13</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td></tr><tr><td class="k">14</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td></tr><tr><td class="k">15</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td></tr><tr><td class="k">16</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td></tr><tr><td class="k">17</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mS">S</td></tr></table><div class="ctitle">Soft totals (with an Ace)</div><table><tr><th></th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th><th>A</th></tr><tr><td class="k">A,2</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mD">D</td><td class="c mD">D</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td></tr><tr><td class="k">A,3</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mD">D</td><td class="c mD">D</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td></tr><tr><td class="k">A,4</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mD">D</td><td class="c mD">D</td><td class="c mD">D</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td></tr><tr><td class="k">A,5</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mD">D</td><td class="c mD">D</td><td class="c mD">D</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td></tr><tr><td class="k">A,6</td><td class="c mH">H</td><td class="c mD">D</td><td class="c mD">D</td><td class="c mD">D</td><td class="c mD">D</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td></tr><tr><td class="k">A,7</td><td class="c mS">S</td><td class="c mD">D</td><td class="c mD">D</td><td class="c mD">D</td><td class="c mD">D</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td></tr><tr><td class="k">A,8</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mD">D</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mS">S</td></tr><tr><td class="k">A,9</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mS">S</td></tr></table><div class="ctitle">Pairs</div><table><tr><th></th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th><th>A</th></tr><tr><td class="k">A,A</td><td class="c mP">P</td><td class="c mP">P</td><td class="c mP">P</td><td class="c mP">P</td><td class="c mP">P</td><td class="c mP">P</td><td class="c mP">P</td><td class="c mP">P</td><td class="c mP">P</td><td class="c mP">P</td></tr><tr><td class="k">10,10</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mS">S</td><td class="c mS">S</td></tr><tr><td class="k">9,9</td><td class="c mP">P</td><td class="c mP">P</td><td class="c mP">P</td><td class="c mP">P</td><td class="c mP">P</td><td class="c mS">S</td><td class="c mP">P</td><td class="c mP">P</td><td class="c mS">S</td><td class="c mS">S</td></tr><tr><td class="k">8,8</td><td class="c mP">P</td><td class="c mP">P</td><td class="c mP">P</td><td class="c mP">P</td><td class="c mP">P</td><td class="c mP">P</td><td class="c mP">P</td><td class="c mP">P</td><td class="c mP">P</td><td class="c mP">P</td></tr><tr><td class="k">7,7</td><td class="c mP">P</td><td class="c mP">P</td><td class="c mP">P</td><td class="c mP">P</td><td class="c mP">P</td><td class="c mP">P</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td></tr><tr><td class="k">6,6</td><td class="c mP">P</td><td class="c mP">P</td><td class="c mP">P</td><td class="c mP">P</td><td class="c mP">P</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td></tr><tr><td class="k">5,5</td><td class="c mD">D</td><td class="c mD">D</td><td class="c mD">D</td><td class="c mD">D</td><td class="c mD">D</td><td class="c mD">D</td><td class="c mD">D</td><td class="c mD">D</td><td class="c mH">H</td><td class="c mH">H</td></tr><tr><td class="k">4,4</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mP">P</td><td class="c mP">P</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td></tr><tr><td class="k">3,3</td><td class="c mP">P</td><td class="c mP">P</td><td class="c mP">P</td><td class="c mP">P</td><td class="c mP">P</td><td class="c mP">P</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td></tr><tr><td class="k">2,2</td><td class="c mP">P</td><td class="c mP">P</td><td class="c mP">P</td><td class="c mP">P</td><td class="c mP">P</td><td class="c mP">P</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td><td class="c mH">H</td></tr></table><p class="foot">Rules: 6-deck shoe, dealer stands on all 17, double any two cards. D = double if allowed, otherwise hit.</p></div></div>
+<div id="stats"><div class="shead"><h2>Your progress</h2><button class="x" id="statsClose">Close</button></div><div class="swrap" id="statsBody"></div></div>
+<div class="toast" id="toast"></div>
+<script>
+"use strict";
+var VER="0.7";
+var ls;try{ls=window.localStorage;}catch(e){ls={_d:{},getItem:function(k){return this._d[k]!=null?this._d[k]:null;},setItem:function(k,v){this._d[k]=v;},removeItem:function(k){delete this._d[k];}};}
+function lget(k,d){try{var v=ls.getItem(k);return v==null?d:v;}catch(e){return d;}}
+function lset(k,v){try{ls.setItem(k,v);}catch(e){}}
+function ldel(k){try{ls.removeItem(k);}catch(e){lset(k,"null");}}
+var K={bank:"uc_bank",sess:"uc_sess",lifetime:"uc_life"};
+var SUITS=["\u2660","\u2665","\u2666","\u2663"];
+var RANKS=["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
+function newShoe(decks){var s=[],d,r,su,i,j,t;for(d=0;d<decks;d++){for(r=0;r<13;r++){for(su=0;su<4;su++){s.push({r:r,s:su});}}}
+  for(i=s.length-1;i>0;i--){j=Math.floor(Math.random()*(i+1));t=s[i];s[i]=s[j];s[j]=t;}return s;}
+function draw(){ if(shoe.length<1){shoe=newShoe(6);} return shoe.pop(); }
+function cardVal(c){if(c.r===0)return 11;if(c.r>=9)return 10;return c.r+1;}
+function handTotal(h){var t=0,aces=0,i;for(i=0;i<h.length;i++){t+=cardVal(h[i]);if(h[i].r===0)aces++;}
+  while(t>21&&aces>0){t-=10;aces--;}return t;}
+function isBlackjack(h){return h.length===2 && handTotal(h)===21;}
+function rankStr(r){return RANKS[r];}
+var shoe=[],player=[],dealer=[],bet=0,bank=500,inRound=false,playerDone=false,sess=null;
+var hands=[],activeHand=0,splitMode=false;
+/* ---------- coach ---------- */
+function isSoft(h){var t=0,aces=0,i;for(i=0;i<h.length;i++){t+=cardVal(h[i]);if(h[i].r===0)aces++;}
+  // soft if at least one ace still counted as 11 (i.e. total without demotion <=21)
+  return aces>0 && t<=21;}
+function upVal(c){ // dealer upcard value for chart: A=11, else face (10 for T/J/Q/K)
+  return cardVal(c);}
+function pairRank(h){
+  if(h.length!==2)return 0;
+  var a=cardVal(h[0]), b=cardVal(h[1]);
+  // both aces -> 11; note 10/J/Q/K all =10 so any two tens count as pair of 10s
+  if(a===b)return a;
+  return 0;
+}
+function basicStrategy(hand, up, canDouble, canSplit){
+  var d=upVal(up);            // 2..11 (11=Ace)
+  var total=handTotal(hand);
+  var soft=isSoft(hand) && hand.length>=2 && (function(){
+    // ensure it's genuinely soft (an ace counted as 11)
+    var raw=0,aces=0,i;for(i=0;i<hand.length;i++){raw+=cardVal(hand[i]);if(hand[i].r===0)aces++;}
+    return aces>0 && raw<=21;
+  })();
+
+  // ---- PAIRS ----
+  var pr=pairRank(hand);
+  if(pr && canSplit){
+    switch(pr){
+      case 11: return 'P';                 // A,A always split
+      case 10: return 'S';                 // 10,10 never split (stand 20)
+      case 9:  return (d===7||d===10||d===11)?'S':'P'; // 9,9 split vs 2-9 except 7; stand vs 7,10,A
+      case 8:  return 'P';                 // 8,8 always split
+      case 7:  return (d>=2&&d<=7)?'P':'H';
+      case 6:  return (d>=2&&d<=6)?'P':'H';
+      case 5:  break;                      // 5,5 treat as hard 10 (never split) -> fall through
+      case 4:  return (d===5||d===6)?'P':'H';
+      case 3:  return (d>=2&&d<=7)?'P':'H';
+      case 2:  return (d>=2&&d<=7)?'P':'H';
+    }
+  }
+
+  // ---- SOFT TOTALS (an ace as 11) ----
+  if(soft){
+    // total is the soft total (e.g. A,6 = 17)
+    if(total>=20) return 'S';                      // A,9 (20) stand; A,10 handled as blackjack elsewhere
+    if(total===19){ return (d===6&&canDouble&&hand.length===2)?'D':'S'; } // A,8: double vs 6 (some charts), else stand
+    if(total===18){
+      // A,7: double vs 3-6; stand vs 2,7,8; hit vs 9,10,A
+      if(d>=3&&d<=6) return canDouble&&hand.length===2?'D':'S';
+      if(d===2||d===7||d===8) return 'S';
+      return 'H';
+    }
+    if(total===17){ return (d>=3&&d<=6)?(canDouble&&hand.length===2?'D':'H'):'H'; } // A,6
+    if(total===16||total===15){ return (d>=4&&d<=6)?(canDouble&&hand.length===2?'D':'H'):'H'; } // A,5 A,4
+    if(total===14||total===13){ return (d>=5&&d<=6)?(canDouble&&hand.length===2?'D':'H'):'H'; } // A,3 A,2
+    return 'H';
+  }
+
+  // ---- HARD TOTALS ----
+  if(total>=17) return 'S';
+  if(total>=13&&total<=16) return (d>=2&&d<=6)?'S':'H';
+  if(total===12) return (d>=4&&d<=6)?'S':'H';
+  if(total===11) return (d!==11&&canDouble&&hand.length===2)?'D':'H';
+  if(total===10) return (d>=2&&d<=9)?(canDouble&&hand.length===2?'D':'H'):'H';
+  if(total===9)  return (d>=3&&d<=6)?(canDouble&&hand.length===2?'D':'H'):'H';
+  return 'H'; // 8 or less
+}
+var COACH_ON=true, COACH_MODE="after"; // after | demand | before
+try{COACH_ON=lget("uc_coach_on","1")==="1";COACH_MODE=lget("uc_coach_mode","after");}catch(e){}
+var MOVE_NAMES={H:"Hit",S:"Stand",D:"Double",P:"Split"};
+function curHand(){ return splitMode ? hands[activeHand].cards : player; }
+function curBet(){ return splitMode ? hands[activeHand].bet : bet; }
+function canSplitNow(){
+  var h=curHand();
+  return h.length===2 && cardVal(h[0])===cardVal(h[1]) && bank>=curBet() && hands.length<4;
+}
+function bestMove(){
+  var h=curHand();
+  var canDouble=(h.length===2 && bank>=curBet()*2);
+  var canSplit=canSplitNow();
+  var b=basicStrategy(h, dealer[0], canDouble, canSplit);
+  if(b==="D" && !canDouble) b="H";
+  if(b==="P" && !canSplit) b="H";
+  return b;
+}
+function moveWhy(best){
+  var d=upVal(dealer[0]); var dn=(d===11?"Ace":d);
+  var t=handTotal(curHand());
+  if(best==="P")return "Split this pair against the dealer showing "+dn+" to play two hands.";
+  if(best==="S"){ if(t>=17)return "17 or more always stands."; return "Dealer shows "+dn+" and is likely to bust. Stand and let them."; }
+  if(best==="H"){ if(t<=11)return "You can't bust, so take a card."; return "Dealer's "+dn+" is strong. You need to improve."; }
+  if(best==="D"){ return "Strong spot against the dealer's "+dn+". Double your bet and take one card."; }
+  if(best==="P"){ return "Split this pair against the dealer's "+dn+"."; }
+  return "";
+}
+function showCoach(kind,html){var c=$("coach");c.className="on "+kind;$("coachText").innerHTML=html;}
+function hideCoach(){$("coach").className="";}
+function coachBeforeMove(){
+  // called when actions become available
+  hideCoach();$("askWrap").classList.remove("on");
+  if(!COACH_ON){return;}
+  if(COACH_MODE==="before"){
+    var b=bestMove();
+    showCoach("rec","<b>Recommended: "+MOVE_NAMES[b]+".</b> "+moveWhy(b));
+  } else if(COACH_MODE==="demand"){
+    $("askWrap").classList.add("on");
+  }
+}
+function coachEvaluate(playerMove){
+  if(!COACH_ON){return;}
+  var best=bestMove();
+  var h=curHand();
+  var effectiveBest=best;
+  if(best==="D" && !(h.length===2 && bank>=curBet()*2)) effectiveBest="H";
+  if(best==="P" && !canSplitNow()) effectiveBest="H";
+  var correct=(playerMove===effectiveBest);
+  if(sess){sess.decisions++;if(correct)sess.correct++;lset(K.sess,JSON.stringify(sess));}
+  if(COACH_MODE==="after" && !correct){
+    showCoach("wrong","<b>Better: "+MOVE_NAMES[effectiveBest]+".</b> "+moveWhy(effectiveBest));
+  } else if(COACH_MODE==="after" && correct){
+    showCoach("right","<b>Correct play.</b>");
+    setTimeout(function(){ if($("coach").classList.contains("right"))hideCoach(); },1100);
+  } else {
+    hideCoach();
+  }
+}
+function $(id){return document.getElementById(id);}
+function money(n){return "$"+Math.round(n).toLocaleString();}
+function toast(m){var t=$("toast");t.textContent=m;t.classList.add("on");clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove("on");},1600);}
+function loadBank(){bank=parseFloat(lget(K.bank,"500"))||500;}
+function saveBank(){lset(K.bank,String(bank));}
+function startSession(){
+  loadBank();
+  if(bank<5){bank=500;saveBank();toast("Bankroll reset to $500");}
+  sess={hands:0,correct:0,decisions:0,startBank:bank,wins:0,losses:0,pushes:0,blackjacks:0,started:Date.now()};
+  lset(K.sess,JSON.stringify(sess));
+  $("start").style.display="none";$("table").classList.add("on");
+  newHandUI();updateHUD();
+}
+function resumeSession(){
+  try{sess=JSON.parse(lget(K.sess,"null"));}catch(e){sess=null;}
+  if(!sess){startSession();return;}
+  loadBank();$("start").style.display="none";$("table").classList.add("on");
+  newHandUI();updateHUD();
+}
+function endSession(){
+  if(!sess){return;}
+  var net=bank-sess.startBank;
+  var acc=sess.decisions?Math.round(sess.correct/sess.decisions*100):0;
+  var life;try{life=JSON.parse(lget(K.lifetime,"null"))||{sessions:[]};}catch(e){life={sessions:[]};}
+  life.sessions.push({t:sess.started,hands:sess.hands,net:net,acc:acc,correct:sess.correct,decisions:sess.decisions,wins:sess.wins,losses:sess.losses,pushes:sess.pushes,end:bank});
+  if(life.sessions.length>200)life.sessions=life.sessions.slice(-200);
+  lset(K.lifetime,JSON.stringify(life));
+  ldel(K.sess);
+  $("endTitle").textContent = net>0?"You booked a win":(net<0?"Session over":"You broke even");
+  $("endStats").innerHTML =
+    stat("Net this session",(net>=0?"+":"")+money(net), net>0?"var(--good)":(net<0?"var(--bad)":"var(--orange)"))+
+    stat("Hands played",sess.hands,"var(--ink)")+
+    stat("Correct plays",sess.decisions?(sess.correct+" / "+sess.decisions+" ("+acc+"%)"):"\u2014","var(--teal)")+
+    stat("W / L / Push",sess.wins+" / "+sess.losses+" / "+sess.pushes,"var(--ink)")+
+    stat("Bankroll",money(bank),"var(--teal)");
+  $("endSheet").classList.add("on");$("table").classList.remove("on");
+}
+function stat(label,val,color){return '<div class="stat"><span>'+label+'</span><b style="color:'+(color||"var(--ink)")+'">'+val+'</b></div>';}
+function newHandUI(){
+  player=[];dealer=[];bet=0;inRound=false;playerDone=false;splitMode=false;hands=[];activeHand=0;
+  hideCoach();$("askWrap").classList.remove("on");
+  var bs=$("betspot");if(bs){bs.classList.remove("on");}
+  $("pHand").classList.remove("lose");
+  var fe=document.querySelector(".felt");if(fe)fe.classList.add("betting");
+  $("pHand").innerHTML="";$("dHand").innerHTML="";$("pTotal").textContent="";$("dTotal").textContent="";
+  $("msg").textContent="";$("msg").className="";
+  $("betbar").classList.add("on");$("actions").classList.remove("on");
+  $("betAmt").textContent="$0";$("dealBtn").disabled=true;
+  updateHUD();
+}
+function updateHUD(){$("bank").textContent=money(bank);$("sessInfo").textContent="Hand "+((sess?sess.hands:0)+1);}
+function updateSpot(){var s=$("betspot");if(bet>0){$("betpuck").textContent=money(bet);s.classList.add("on");}else{s.classList.remove("on");}}
+function addChip(v){if(inRound)return;if(bet+v>bank){toast("Not enough bankroll");return;}bet+=v;$("betAmt").textContent=money(bet);$("dealBtn").disabled=bet<=0;updateSpot();}
+function clearBet(){if(inRound)return;bet=0;$("betAmt").textContent="$0";$("dealBtn").disabled=true;updateSpot();}
+function maxBet(){if(inRound)return;bet=Math.min(bank,500);$("betAmt").textContent=money(bet);$("dealBtn").disabled=bet<=0;updateSpot();}
+function cardEl(c){var el=document.createElement("div");el.className="card"+((c.s===1||c.s===2)?" red":"");
+  el.innerHTML='<span class="rk">'+rankStr(c.r)+'</span><span class="big">'+SUITS[c.s]+'</span><span class="su">'+SUITS[c.s]+'</span>';return el;}
+function backCardEl(){var el=document.createElement("div");el.className="card back";
+  el.innerHTML='<div class="apwrap"><svg viewBox="940 -200 720 880" aria-hidden="true"><path transform="translate(844.9,-213.7) scale(9.2129)" d="M27.6,5.0 L26.5,6.7 L24.6,9.4 L23.0,11.8 L20.7,15.0 L20.4,15.6 L19.4,15.7 L13.5,15.8 L12.3,16.0 L12.3,19.9 L12.7,20.1 L18.6,20.2 L22.7,20.2 L23.8,18.8 L25.5,16.4 L26.6,14.7 L28.5,12.0 L29.9,9.9 L31.0,8.2 L32.3,6.3 L32.5,6.1 L63.5,6.1 L63.8,6.8 L65.4,9.1 L66.8,11.1 L68.6,13.7 L69.6,15.1 L71.1,17.4 L72.8,19.6 L73.5,20.4 L86.2,20.4 L86.3,20.2 L86.3,15.8 L86.2,15.7 L75.9,15.6 L73.9,13.0 L73.0,11.5 L71.8,9.9 L70.1,7.5 L68.6,5.3 L68.5,5.0 Z  M48.5,33.3 L45.9,33.6 L42.7,34.2 L39.4,35.1 L38.0,35.7 L38.0,36.3 L40.8,38.0 L44.4,40.1 L46.6,41.3 L50.3,43.6 L52.5,45.0 L54.5,46.1 L58.5,48.5 L61.4,50.4 L62.1,50.9 L62.5,50.8 L62.3,49.5 L60.8,43.9 L59.0,36.7 L58.6,34.7 L58.0,34.3 L55.4,33.7 L53.7,33.5 L52.0,33.3 Z  M61.4,35.6 L61.3,36.3 L61.5,37.1 L62.1,39.9 L63.8,46.7 L65.4,52.6 L66.1,55.1 L67.2,59.1 L68.0,62.2 L68.2,63.3 L68.7,63.5 L70.4,60.4 L71.7,58.2 L73.7,54.7 L75.1,52.3 L75.9,50.8 L76.8,49.4 L76.6,48.7 L75.6,47.3 L75.1,46.3 L73.4,44.0 L73.1,44.0 L72.8,43.5 L70.1,40.8 L67.3,38.7 L64.8,37.1 L62.5,36.0 L61.7,35.6 Z  M34.6,37.3 L33.1,38.2 L31.4,39.5 L29.9,40.8 L28.2,42.3 L26.5,44.2 L26.5,44.4 L26.2,44.4 L24.8,46.4 L23.8,48.0 L22.5,49.9 L21.7,51.8 L21.3,53.2 L23.0,52.9 L26.2,52.0 L28.0,51.5 L33.5,49.9 L35.2,49.4 L36.3,49.1 L40.3,48.0 L43.5,47.0 L47.0,46.0 L48.3,45.6 L48.3,45.1 L46.8,44.3 L44.1,42.7 L43.1,42.2 L39.2,39.8 L36.9,38.5 L34.8,37.3 Z  M35.2,51.8 L33.7,52.3 L31.3,53.0 L28.5,54.0 L24.9,55.0 L22.1,55.8 L20.3,56.5 L20.1,57.1 L20.4,57.1 L20.4,57.5 L19.9,57.4 L19.4,60.6 L19.4,61.9 L19.7,61.8 L19.9,60.5 L19.9,62.3 L20.0,63.5 L19.7,63.5 L19.7,62.3 L19.6,62.3 L19.4,65.0 L19.4,68.1 L19.7,70.4 L20.3,72.5 L20.8,74.6 L21.4,76.3 L21.8,76.3 L23.2,73.9 L24.6,71.6 L26.6,68.2 L27.3,67.0 L29.2,63.9 L31.5,59.8 L33.5,56.4 L34.8,54.2 L35.9,52.0 L35.9,51.8 Z  M77.9,51.9 L77.0,53.2 L76.2,54.7 L74.5,57.7 L72.5,61.1 L71.7,62.6 L69.6,66.3 L68.2,68.7 L66.3,71.9 L65.2,73.9 L64.1,75.7 L63.5,76.7 L63.7,77.3 L64.2,77.1 L68.2,76.0 L69.7,75.4 L71.7,74.9 L74.9,73.9 L78.9,72.7 L79.7,72.3 L80.1,70.5 L80.6,67.4 L80.7,66.0 L80.7,61.9 L80.3,58.5 L79.9,56.4 L79.2,54.2 L78.5,52.2 Z  M31.0,65.6 L29.3,68.4 L28.3,70.4 L26.9,72.7 L26.1,74.2 L25.2,75.7 L23.7,78.4 L23.0,79.8 L23.9,81.3 L25.2,83.0 L26.5,84.6 L28.0,86.3 L30.1,88.2 L31.8,89.5 L33.7,90.8 L35.5,91.9 L37.7,92.9 L38.2,92.7 L37.9,91.3 L36.9,87.5 L35.6,82.2 L34.5,77.8 L33.9,75.8 L33.2,72.9 L31.5,66.7 L31.3,65.6 Z  M78.2,75.1 L73.8,76.5 L70.4,77.5 L67.3,78.4 L63.7,79.5 L60.7,80.4 L56.5,81.6 L53.0,82.6 L51.3,83.0 L51.1,83.6 L53.9,85.3 L56.9,87.1 L60.8,89.5 L63.5,91.2 L64.4,91.6 L65.2,91.5 L66.6,90.5 L67.5,89.9 L69.4,88.4 L70.1,87.8 L70.1,87.5 L70.7,87.3 L73.0,85.0 L74.5,83.0 L76.1,80.9 L77.0,79.4 L78.3,76.7 L78.7,75.8 L78.7,75.1 Z  M37.2,78.1 L37.0,78.5 L37.6,80.5 L38.5,83.9 L39.2,87.0 L40.3,91.6 L41.0,93.9 L41.1,94.2 L43.4,94.7 L44.8,95.0 L45.1,95.1 L54.5,95.1 L55.6,94.9 L58.0,94.3 L60.6,93.5 L61.7,93.0 L61.5,92.6 L59.9,91.6 L57.3,90.1 L54.6,88.4 L51.5,86.5 L49.6,85.3 L46.9,83.7 L44.9,82.5 L42.0,80.8 L41.0,80.1 L39.4,79.2 L38.5,78.5 L37.6,78.1 Z" fill="#4cf0e0" fill-rule="evenodd"/></svg></div>';return el;}
+function deal(){
+  if(bet<=0||bet>bank)return;
+  inRound=true;playerDone=false;splitMode=false;hands=[];activeHand=0;$("betbar").classList.remove("on");
+  var fe=document.querySelector(".felt");if(fe)fe.classList.remove("betting");
+  if(shoe.length<20)shoe=newShoe(6);
+  player=[draw(),draw()];dealer=[draw(),draw()];
+  // deal sequence: player, dealer-up, player, dealer-hole(down)
+  renderProgressive();
+  updateHUD();
+  var total=920; // after last card settles
+  setTimeout(function(){
+    var pBJ=isBlackjack(player),dBJ=isBlackjack(dealer);
+    if(pBJ||dBJ){revealDealer();resolveNaturals(pBJ,dBJ);return;}
+    showActions();
+  }, total);
+}
+function renderProgressive(){
+  var dh=$("dHand"),ph=$("pHand");dh.innerHTML="";ph.innerHTML="";
+  $("pTotal").textContent="";$("dTotal").textContent="";
+  var steps=[
+    function(){ph.appendChild(cardEl(player[0]));$("pTotal").textContent=handTotal([player[0]]);},
+    function(){dh.appendChild(cardEl(dealer[0]));$("dTotal").textContent=cardVal(dealer[0]);},
+    function(){ph.appendChild(cardEl(player[1]));$("pTotal").textContent=handTotal(player);},
+    function(){dh.appendChild(backCardEl());}
+  ];
+  steps.forEach(function(fn,i){setTimeout(fn, i*220);});
+}
+function renderDealer(hideHole){
+  var dh=$("dHand");dh.innerHTML="";
+  dealer.forEach(function(c,i){if(i===1&&hideHole){dh.appendChild(backCardEl());}else{dh.appendChild(cardEl(c));}});
+  $("dTotal").textContent=hideHole?cardVal(dealer[0]):handTotal(dealer);
+}
+function renderPlayer(){
+  var ph=$("pHand");ph.innerHTML="";
+  if(!splitMode){
+    player.forEach(function(c){ph.appendChild(cardEl(c));});
+    $("pTotal").textContent=handTotal(player);
+    return;
+  }
+  // split: build a row of hands
+  $("pTotal").textContent="";
+  var row=document.createElement("div");row.className="phands";
+  hands.forEach(function(hd,idx){
+    var col=document.createElement("div");col.className="phand"+(idx===activeHand&&!hd.done?" active":"")+(hd.done?" done":"");
+    var cards=document.createElement("div");cards.className="hand";
+    hd.cards.forEach(function(c){cards.appendChild(cardEl(c));});
+    col.appendChild(cards);
+    var ht=document.createElement("div");ht.className="ht";ht.textContent=handTotal(hd.cards);col.appendChild(ht);
+    var res=document.createElement("div");res.className="res"+(hd.result?(" "+hd.result.cls):"");res.textContent=hd.result?hd.result.txt:"";col.appendChild(res);
+    row.appendChild(col);
+  });
+  ph.appendChild(row);
+}
+function renderHands(hideHole){ renderDealer(hideHole); renderPlayer(); }
+function showActions(){
+  $("actions").classList.add("on");
+  var h=curHand();
+  var can2=(bank>=curBet()*2);
+  $("aDouble").disabled=!(h.length===2 && can2);
+  $("aSplit").disabled=!canSplitNow();
+  $("aHit").disabled=false;$("aStand").disabled=false;
+  coachBeforeMove();
+}
+function hideActions(){$("actions").classList.remove("on");$("askWrap").classList.remove("on");}
+function playerHit(){
+  if(!inRound||playerDone)return;
+  coachEvaluate("H");
+  var h=curHand();h.push(draw());renderHands(true);
+  $("aDouble").disabled=true;$("aSplit").disabled=true;
+  var t=handTotal(h);
+  if(t>=21){ if(splitMode){ hands[activeHand].stood=true; advanceHand(); } else { playerDone=true;hideActions(); if(t>21){setTimeout(function(){revealDealer();resolve();},350);} else {setTimeout(function(){revealDealer();dealerPlay();},300);} } }
+  else { if(splitMode){ showActions(); } }
+}
+function playerStand(fromUser){
+  if(!inRound||playerDone)return;
+  if(fromUser)coachEvaluate("S");
+  if(splitMode){ hands[activeHand].stood=true; advanceHand(); return; }
+  playerDone=true;hideActions();setTimeout(function(){revealDealer();dealerPlay();},300);
+}
+function playerDouble(){
+  if(!inRound||playerDone)return;
+  var h=curHand();if(h.length!==2)return;
+  if(bank<curBet()*2){toast("Not enough to double");return;}
+  coachEvaluate("D");
+  if(splitMode){
+    hands[activeHand].bet*=2; h.push(draw()); hands[activeHand].stood=true; renderHands(true);
+    advanceHand(); return;
+  }
+  bet*=2;player.push(draw());renderHands(true);playerDone=true;hideActions();
+  setTimeout(function(){revealDealer();if(handTotal(player)>21){resolve();}else{dealerPlay();}},350);
+}
+function doSplit(){
+  if(!inRound||playerDone||!canSplitNow())return;
+  coachEvaluate("P");
+  if(!splitMode){
+    // convert the single hand into two split hands
+    splitMode=true;
+    var c0=player[0],c1=player[1];
+    hands=[{cards:[c0,draw()],bet:bet,done:false,result:null,stood:false},
+           {cards:[c1,draw()],bet:bet,done:false,result:null,stood:false}];
+    activeHand=0;
+  } else {
+    // split the active hand again (up to 4)
+    var h=hands[activeHand];
+    var moved=h.cards.pop();
+    var newHand={cards:[moved,draw()],bet:h.bet,done:false,result:null,stood:false};
+    h.cards.push(draw());
+    hands.splice(activeHand+1,0,newHand);
+  }
+  renderHands(true);
+  showActions();
+}
+function advanceHand(){
+  // mark current done, move to next unfinished hand; if none, dealer plays
+  hands[activeHand].done=true;
+  var next=-1;
+  for(var i=activeHand+1;i<hands.length;i++){ if(!hands[i].done){ next=i;break; } }
+  renderHands(true);
+  if(next>=0){ activeHand=next; setTimeout(function(){ showActions(); },250); }
+  else { playerDone=true;hideActions(); setTimeout(function(){revealDealer();dealerPlay();},300); }
+}
+function revealDealer(){
+  // re-render dealer with hole flipping in
+  var dh=$("dHand");dh.innerHTML="";
+  dealer.forEach(function(c,i){var el=cardEl(c);if(i===1){el.classList.add("flipin");}dh.appendChild(el);});
+  $("dTotal").textContent=handTotal(dealer);
+}
+function dealerPlay(){
+  var step=function(){var t=handTotal(dealer);
+    if(t<17){dealer.push(draw());renderHands(false);setTimeout(step,420);}
+    else{resolve();}};
+  setTimeout(step,300);
+}
+function settle(outcome,amount){
+  if(outcome==="win"||outcome==="bj"){bank+=amount;pulseBank();}
+  else if(outcome==="lose"){bank-=amount;}
+  saveBank();updateHUD();
+}
+function pulseBank(){var b=$("bank");b.classList.remove("win");void b.offsetWidth;b.classList.add("win");}
+function feltFx(kind){var f=$("tblfelt");if(!f)return;f.classList.remove("fwin","fbj");void f.offsetWidth;f.classList.add(kind);}
+function loseHand(){$("pHand").classList.add("lose");}
+function finishHand(resultMsg,cls){
+  $("msg").textContent=resultMsg;$("msg").className=cls||"";
+  var bs=$("betspot");if(bs){bs.classList.remove("on");}
+  sess.hands++;lset(K.sess,JSON.stringify(sess));inRound=false;
+  setTimeout(function(){
+    if(bank<5){toast("Out of chips");endSession();return;}
+    newHandUI();
+  },1400);
+}
+function resolveNaturals(pBJ,dBJ){
+  if(pBJ&&dBJ){sess.pushes++;finishHand("Both blackjack \u2014 push","push");return;}
+  if(pBJ){var win=bet*1.5;settle("bj",win);sess.wins++;sess.blackjacks++;feltFx("fbj");finishHand("Blackjack! +"+money(win),"good");return;}
+  settle("lose",bet);sess.losses++;loseHand();finishHand("Dealer blackjack \u2014 "+money(-bet),"bad");
+}
+function resolve(){
+  if(splitMode){ resolveSplit(); return; }
+  var pt=handTotal(player),dt=handTotal(dealer);
+  if(pt>21){settle("lose",bet);sess.losses++;loseHand();finishHand("Bust \u2014 "+money(-bet),"bad");return;}
+  if(dt>21){settle("win",bet);sess.wins++;feltFx("fwin");finishHand("Dealer busts! +"+money(bet),"good");return;}
+  if(pt>dt){settle("win",bet);sess.wins++;feltFx("fwin");finishHand("You win +"+money(bet),"good");}
+  else if(pt<dt){settle("lose",bet);sess.losses++;loseHand();finishHand("Dealer wins \u2014 "+money(-bet),"bad");}
+  else{sess.pushes++;finishHand("Push","push");}
+}
+function resolveSplit(){
+  var dt=handTotal(dealer), net=0, anyWin=false;
+  hands.forEach(function(h){
+    var pt=handTotal(h.cards);
+    if(pt>21){ bank-=h.bet; net-=h.bet; sess.losses++; h.result={cls:"bad",txt:money(-h.bet)}; }
+    else if(dt>21 || pt>dt){ bank+=h.bet; net+=h.bet; anyWin=true; sess.wins++; h.result={cls:"good",txt:"+"+money(h.bet)}; }
+    else if(pt<dt){ bank-=h.bet; net-=h.bet; sess.losses++; h.result={cls:"bad",txt:money(-h.bet)}; }
+    else { sess.pushes++; h.result={cls:"push",txt:"push"}; }
+    sess.hands++; // each split hand counts as a hand played
+  });
+  saveBank();updateHUD();
+  if(anyWin){pulseBank();feltFx("fwin");}
+  renderPlayer();
+  var msg = net>0?("Split: +"+money(net)) : (net<0?("Split: "+money(net)) : "Split: even");
+  var cls = net>0?"good":(net<0?"bad":"push");
+  // finishHand increments sess.hands once; we already counted per split hand, so decrement its default add
+  $("msg").textContent=msg;$("msg").className=cls;
+  var bs=$("betspot");if(bs){bs.classList.remove("on");}
+  lset(K.sess,JSON.stringify(sess));inRound=false;
+  setTimeout(function(){ if(bank<5){toast("Out of chips");endSession();return;} newHandUI(); },1600);
+}
+document.querySelectorAll(".chip").forEach(function(ch){ch.addEventListener("click",function(){addChip(parseFloat(ch.dataset.v));});});
+$("clearBet").addEventListener("click",clearBet);
+$("allIn").addEventListener("click",maxBet);
+$("dealBtn").addEventListener("click",deal);
+$("aHit").addEventListener("click",playerHit);
+$("aStand").addEventListener("click",function(){playerStand(true);});
+$("aDouble").addEventListener("click",playerDouble);
+$("aSplit").addEventListener("click",doSplit);
+$("cashout").addEventListener("click",function(){if(inRound){toast("Finish this hand first");return;}endSession();});
+$("btnPlay").addEventListener("click",startSession);
+$("btnResume").addEventListener("click",resumeSession);
+$("endClose").addEventListener("click",function(){$("endSheet").classList.remove("on");$("start").style.display="";refreshStart();});
+$("endAgain").addEventListener("click",function(){$("endSheet").classList.remove("on");startSession();});
+$("ver").addEventListener("click",function(){toast("The Upcard v"+VER);});
+function refreshStart(){
+  loadBank();var s=null;try{s=JSON.parse(lget(K.sess,"null"));}catch(e){}
+  if(s){$("btnResume").style.display="";$("resumeK").textContent="hand "+(s.hands+1)+" \u00b7 "+money(bank);}
+  else{$("btnResume").style.display="none";}
+}
+
+/* ---------- settings wiring ---------- */
+function syncSettingsUI(){
+  document.querySelectorAll(".opt").forEach(function(o){o.classList.toggle("sel",o.dataset.mode===COACH_MODE);});
+  $("swCoach").classList.toggle("on",COACH_ON);
+}
+$("gear").addEventListener("click",function(){syncSettingsUI();$("setSheet").classList.add("on");});
+$("setClose").addEventListener("click",function(){$("setSheet").classList.remove("on");});
+document.querySelectorAll(".opt").forEach(function(o){o.addEventListener("click",function(){
+  COACH_MODE=o.dataset.mode;lset("uc_coach_mode",COACH_MODE);syncSettingsUI();
+  // if we're mid-hand with actions up, refresh the before/ask display
+  if(inRound && !playerDone && $("actions").classList.contains("on")){coachBeforeMove();}
+});});
+$("swCoach").addEventListener("click",function(){
+  COACH_ON=!COACH_ON;lset("uc_coach_on",COACH_ON?"1":"0");syncSettingsUI();
+  if(!COACH_ON){hideCoach();$("askWrap").classList.remove("on");}
+  else if(inRound && !playerDone && $("actions").classList.contains("on")){coachBeforeMove();}
+});
+$("askBtn").addEventListener("click",function(){
+  var b=bestMove();showCoach("rec","<b>Recommended: "+MOVE_NAMES[b]+".</b> "+moveWhy(b));
+});
+
+
+function openChart(){$("chart").classList.add("on");}
+function closeChart(){$("chart").classList.remove("on");}
+$("btnChart").addEventListener("click",openChart);
+$("chartClose").addEventListener("click",closeChart);
+var bc2=$("btnChart2");if(bc2){bc2.addEventListener("click",function(){$("setSheet").classList.remove("on");openChart();});}
+
+
+/* ---------- stats dashboard ---------- */
+function loadLife(){try{return JSON.parse(lget(K.lifetime,"null"))||{sessions:[]};}catch(e){return {sessions:[]};}}
+function svgLine(points, w, h, color, fill, yMin, yMax){
+  // points: array of numbers (one per session). Returns an SVG string sized w x h.
+  var n=points.length; if(n===0)return "";
+  var pad=6, iw=w-pad*2, ih=h-pad*2;
+  var lo=(yMin!=null?yMin:Math.min.apply(null,points));
+  var hi=(yMax!=null?yMax:Math.max.apply(null,points));
+  if(hi===lo){hi=lo+1;}
+  function X(i){return pad + (n===1? iw/2 : iw*i/(n-1));}
+  function Y(v){return pad + ih - ih*(v-lo)/(hi-lo);}
+  var d="",da="";
+  for(var i=0;i<n;i++){var x=X(i).toFixed(1),y=Y(points[i]).toFixed(1);d+=(i===0?"M":"L")+x+" "+y+" ";}
+  var area=d+"L"+X(n-1).toFixed(1)+" "+(pad+ih)+" L"+X(0).toFixed(1)+" "+(pad+ih)+" Z";
+  var dots="";
+  for(var j=0;j<n;j++){dots+='<circle cx="'+X(j).toFixed(1)+'" cy="'+Y(points[j]).toFixed(1)+'" r="'+(n>30?1.5:2.6)+'" fill="'+color+'"/>';}
+  var svg='<svg viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none" width="100%" height="'+h+'">';
+  if(fill){svg+='<path d="'+area+'" fill="'+fill+'"/>';}
+  svg+='<path d="'+d.trim()+'" fill="none" stroke="'+color+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>'+dots+'</svg>';
+  return svg;
+}
+function fmtDate(ts){var d=new Date(ts);return (d.getMonth()+1)+"/"+d.getDate();}
+function renderStats(){
+  var life=loadLife(), S=life.sessions||[], body=$("statsBody");
+  if(S.length===0){
+    body.innerHTML='<div class="empty">No sessions logged yet.<br>Play a session and cash out, and your money and accuracy will start charting here.</div>';
+    return;
+  }
+  // aggregates
+  var totNet=0,totHands=0,totCorrect=0,totDec=0,wins=0,losses=0,pushes=0,best=-1e9,bestAcc=0;
+  S.forEach(function(s){totNet+=s.net||0;totHands+=s.hands||0;totCorrect+=s.correct||0;totDec+=s.decisions||0;wins+=s.wins||0;losses+=s.losses||0;pushes+=s.pushes||0;if((s.net||0)>best)best=s.net||0;if((s.acc||0)>bestAcc)bestAcc=s.acc||0;});
+  var lifeAcc=totDec?Math.round(totCorrect/totDec*100):0;
+  var netCls=totNet>0?"good":(totNet<0?"bad":"orange");
+  // cumulative net series
+  var cum=[],run=0;S.forEach(function(s){run+=s.net||0;cum.push(run);});
+  var accSeries=S.map(function(s){return s.acc||0;});
+  var W=520,H=120;
+  var accSvg=svgLine(accSeries,W,H,"#4cf0e0","rgba(76,240,224,.12)",0,100);
+  var netSvg=svgLine(cum,W,H,(run>=0?"#5dff8f":"#ff6a7a"),(run>=0?"rgba(93,255,143,.12)":"rgba(255,106,122,.12)"),null,null);
+  // zero line for net chart if it crosses
+  var html="";
+  html+='<div class="kpis">';
+  html+='<div class="kpi"><div class="v '+netCls+'">'+(totNet>=0?"+":"")+money(totNet)+'</div><div class="l">Lifetime net</div></div>';
+  html+='<div class="kpi"><div class="v teal">'+lifeAcc+'%</div><div class="l">Correct plays</div></div>';
+  html+='<div class="kpi"><div class="v">'+S.length+'</div><div class="l">Sessions</div></div>';
+  html+='<div class="kpi"><div class="v">'+totHands+'</div><div class="l">Hands played</div></div>';
+  html+='</div>';
+  html+='<div class="scard"><h3>Accuracy over time</h3><div class="cap">Percent of correct basic-strategy plays, per session. This is the number that matters.</div><div class="chartbox">'+accSvg+'</div></div>';
+  html+='<div class="scard"><h3>Bankroll growth</h3><div class="cap">Cumulative net across all sessions. Expect swings; correct play wins over the long run.</div><div class="chartbox">'+netSvg+'</div></div>';
+  html+='<div class="scard"><h3>W / L / Push</h3><div class="cap">'+wins+' wins, '+losses+' losses, '+pushes+' pushes across '+totHands+' hands.</div></div>';
+  // session list (most recent first)
+  html+='<div class="scard"><h3>Sessions</h3><div class="slist">';
+  for(var i=S.length-1;i>=0;i--){var s=S[i];var nc=(s.net||0)>0?"pos":((s.net||0)<0?"neg":"");
+    html+='<div class="srow"><span class="idx">#'+(i+1)+'</span><span class="meta">'+fmtDate(s.t)+' \u00b7 '+(s.hands||0)+' hands</span><span class="net '+nc+'">'+((s.net||0)>=0?"+":"")+money(s.net||0)+'</span><span class="acc">'+(s.acc||0)+'%</span></div>';
+  }
+  html+='</div></div>';
+  html+='<button class="reset" id="statsReset">Reset all progress</button>';
+  body.innerHTML=html;
+  var rb=$("statsReset");if(rb){rb.addEventListener("click",function(){
+    if(rb.dataset.armed==="1"){ldel(K.lifetime);renderStats();}
+    else{rb.dataset.armed="1";rb.textContent="Tap again to erase everything";}
+  });}
+}
+function openStats(){renderStats();$("stats").classList.add("on");}
+function closeStats(){$("stats").classList.remove("on");}
+$("btnStats").addEventListener("click",openStats);
+$("statsClose").addEventListener("click",closeStats);
+var bs2=$("btnStats2");if(bs2){bs2.addEventListener("click",function(){$("setSheet").classList.remove("on");openStats();});}
+
+refreshStart();
+</script>
+</body>
+</html>
