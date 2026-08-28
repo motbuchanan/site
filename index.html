@@ -79,7 +79,13 @@ body{background:#0a0d11;font-family:'Archivo',system-ui,sans-serif;color:var(--i
 .w2{margin-top:3px;color:var(--soft);font-size:12.5px}
 
 /* app grid */
-.grid{margin-top:clamp(10px,1.6vh,16px);display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(8px,1.5vh,14px) 8px;justify-items:center;flex:1 1 auto;min-height:0;align-content:start;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:6px}
+.grid{margin-top:clamp(10px,1.6vh,16px);flex:1 1 auto;min-height:0;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .grid::-webkit-scrollbar{display:none}
+  .page{flex:0 0 100%;width:100%;scroll-snap-align:start;display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:min-content;gap:clamp(8px,1.5vh,14px) 8px;justify-items:center;align-content:start;padding:0 2px}
+  /* search mode: flatten pages into one scrollable column */
+  .grid.searching{display:block;overflow-y:auto;overflow-x:hidden;scroll-snap-type:none}
+  .grid.searching .page{display:contents}
+  .grid.searching .app[style*="display: none"]{display:none!important}
 .app{background:none;border:0;font:inherit;color:inherit;cursor:pointer;width:100%;max-width:min(80px,20vw,11.5svh);text-align:center;position:relative}
 .icon{display:block;position:relative;width:100%;aspect-ratio:1/1;border-radius:24%;overflow:hidden;
   clip-path:url(#sqrc);filter:drop-shadow(0 9px 14px rgba(0,0,0,.42))}
@@ -104,6 +110,11 @@ body{background:#0a0d11;font-family:'Archivo',system-ui,sans-serif;color:var(--i
 .spill svg{width:15px;height:15px;flex:none}
 .spill input{background:none;border:0;outline:none;color:var(--ink);font:400 14px var(--sys);width:100%;min-width:0}
 .spill input::placeholder{color:var(--soft)}
+
+.pagedots{display:flex;justify-content:center;gap:7px;padding:8px 0 2px;flex:none}
+.pagedots .pd{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.22);transition:background .2s,width .2s}
+.pagedots .pd.on{background:var(--teal);width:18px;border-radius:4px}
+.pagedots.hide{display:none}
 .dock{gap:20px;background:rgba(14,18,23,.5);border:1px solid rgba(255,255,255,.13);
   border-radius:28px;padding:13px 14px;backdrop-filter:blur(14px);display:flex;justify-content:center;gap:26px}
 .dk{background:none;border:0;cursor:pointer;text-align:center;color:var(--ink);font:inherit;width:60px}
@@ -340,6 +351,7 @@ html.showfps::before{content:"FPS 60 (probably)";position:fixed;top:2px;left:6px
       </button>
     </div>
 
+    <div class="pagedots" id="pagedots"></div>
     <div class="spill"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="5" fill="none" stroke="#c2c9d1" stroke-width="1.8"/><line x1="11" y1="11" x2="14.6" y2="14.6" stroke="#c2c9d1" stroke-width="1.8" stroke-linecap="round"/></svg><input id="sq" type="search" placeholder="Search" aria-label="Search games" autocomplete="off"></div>
     <div class="dock">
       <button class="dk" id="gearBtn" aria-label="Settings">
@@ -366,7 +378,7 @@ html.showfps::before{content:"FPS 60 (probably)";position:fixed;top:2px;left:6px
         </svg></span>
       </button>
     </div>
-    <div class="tagline">made on a phone like this one &middot; v7.16 &middot; aug 27</div>
+    <div class="tagline">made on a phone like this one &middot; v7.17 &middot; aug 28</div>
   </div>
 </div>
 
@@ -388,7 +400,7 @@ html.showfps::before{content:"FPS 60 (probably)";position:fixed;top:2px;left:6px
     <div class="setsec">MOT-1</div>
     <div class="setgroup">
       <div class="setrow tap" data-go="about"><span class="si"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M5 21c0-4 3-7 7-7s7 3 7 7"/></svg></span><span class="st">About this phone</span><span class="chev">&rsaquo;</span></div>
-      <div class="setrow tap" data-go="update"><span class="si"><svg viewBox="0 0 24 24"><path d="M12 4v10M7 11l5 5 5-5M5 20h14"/></svg></span><span class="st">Software Update</span><span class="sv" id="updBadge">v7.16</span><span class="chev">&rsaquo;</span></div>
+      <div class="setrow tap" data-go="update"><span class="si"><svg viewBox="0 0 24 24"><path d="M12 4v10M7 11l5 5 5-5M5 20h14"/></svg></span><span class="st">Software Update</span><span class="sv" id="updBadge">v7.17</span><span class="chev">&rsaquo;</span></div>
     </div>
     <div class="setsec">Make it yours</div>
     <div class="setgroup">
@@ -429,13 +441,13 @@ html.showfps::before{content:"FPS 60 (probably)";position:fixed;top:2px;left:6px
       <div class="setrow"><span class="st">Carrier</span><span class="sv">No SIM. Makes things, not calls.</span></div>
       <div class="setrow"><span class="st">Made in</span><span class="sv">Akron, Ohio</span></div>
     </div>
-    <div class="bigver"><div class="num" id="verNum">7.16</div><div class="lbl">tap the version&hellip; maybe a few times</div></div>
+    <div class="bigver"><div class="num" id="verNum">7.17</div><div class="lbl">tap the version&hellip; maybe a few times</div></div>
   </div>
 
   <!-- SOFTWARE UPDATE -->
   <div class="setpage" data-page="update">
     <div class="sethdr"><button class="bk setback">&larr; Settings</button><h2>Software Update</h2></div>
-    <div class="bigver"><div class="num" id="verNum2">v7.16</div></div>
+    <div class="bigver"><div class="num" id="verNum2">v7.17</div></div>
     <div class="uptodate">This phone is up to date.</div>
     <div class="setsec">Recently shipped</div>
     <div class="setgroup" id="changelog"></div>
@@ -532,7 +544,7 @@ var sc=document.getElementById('clock');
 if(sc){sc.style.cursor='pointer';sc.title='lock';sc.addEventListener('click',lock);}
 
 /* =================== SETTINGS =================== */
-var VER='7.16';
+var VER='7.17';
 function t2(msg){var el=document.getElementById('toast2');el.textContent=msg;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(function(){el.classList.remove('show')},1900);}
 function lsGet(k,d){try{var v=ls.getItem(k);return v===null?d:v}catch(e){return d}}
 function lsSet(k,v){try{ls.setItem(k,v)}catch(e){}}
@@ -790,6 +802,63 @@ setInterval(rotateMsg,12000);
       ptr.style.height='0px'; ptr.classList.remove('armed');
     }
   });
+})();
+
+
+/* ---- home grid pager ---- */
+(function(){
+  var grid=document.querySelector('.grid'), dots=document.getElementById('pagedots');
+  if(!grid||!dots)return;
+  var PER_PAGE=12;
+  var allTiles=[].slice.call(grid.querySelectorAll('.app'));
+  function paginate(){
+    // remove existing page wrappers, keep tiles
+    var tiles=[].slice.call(grid.querySelectorAll('.app'));
+    grid.innerHTML='';
+    var pages=Math.ceil(tiles.length/PER_PAGE);
+    for(var p=0;p<pages;p++){
+      var pg=document.createElement('div');pg.className='page';
+      for(var i=p*PER_PAGE;i<Math.min((p+1)*PER_PAGE,tiles.length);i++){pg.appendChild(tiles[i]);}
+      grid.appendChild(pg);
+    }
+    buildDots(pages);
+    syncDots();
+  }
+  function buildDots(n){
+    dots.innerHTML='';
+    if(n<=1){dots.classList.add('hide');return;}
+    dots.classList.remove('hide');
+    for(var i=0;i<n;i++){var d=document.createElement('div');d.className='pd'+(i===0?' on':'');dots.appendChild(d);}
+  }
+  function syncDots(){
+    if(grid.classList.contains('searching'))return;
+    var pw=grid.clientWidth||1;
+    var idx=Math.round(grid.scrollLeft/pw);
+    var pds=dots.querySelectorAll('.pd');
+    for(var i=0;i<pds.length;i++)pds[i].classList.toggle('on',i===idx);
+  }
+  grid.addEventListener('scroll',function(){requestAnimationFrame(syncDots);},{passive:true});
+  window.addEventListener('resize',function(){requestAnimationFrame(syncDots);});
+  paginate();
+
+  // ---- search integration: flatten when querying, re-paginate when cleared ----
+  var sq=document.getElementById('sq');
+  if(sq){
+    sq.addEventListener('input',function(){
+      var q=sq.value.trim();
+      if(q){
+        grid.classList.add('searching');
+        dots.classList.add('hide');
+      } else {
+        grid.classList.remove('searching');
+        // restore: show all tiles, re-sync dots
+        [].slice.call(grid.querySelectorAll('.app')).forEach(function(a){a.style.display='';});
+        var pages=grid.querySelectorAll('.page').length;
+        if(pages>1)dots.classList.remove('hide');
+        grid.scrollLeft=0; syncDots();
+      }
+    });
+  }
 })();
 
 </script>
