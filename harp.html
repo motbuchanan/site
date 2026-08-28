@@ -552,6 +552,12 @@ const SONGS=[
   {name:'Happy Birthday', tag:'folk · no bends · high', steps:[
     b(6),b(6),d(6),b(6),b(7),d(7), b(6),b(6),d(6),b(6),d(8),b(7),
     b(6),b(6),b(9),b(8),b(7),d(7),d(6), d(9),d(9),b(8),b(7),d(8),b(7)]},
+  {name:'Oh Susanna', tag:'folk · no bends', steps:[
+    b(4),d(4),b(5),b(6),b(6),d(6),
+    b(6),b(5),b(4),d(4),b(5),b(5),d(4),b(4)]},
+  {name:'Swing Low', tag:'spiritual · no bends', steps:[
+    b(8),b(7),b(8),b(7),d(6),b(6),
+    b(7),b(7),b(7),d(8),b(8),b(8),d(8),b(7)]},
 ];
 
 const state={mode:'free', song:null, steps:null, idx:0, timer:null};
@@ -1121,6 +1127,6 @@ const startLevel = gGet('harpLevel') || 'simple';
 setLevel(startLevel);
 if(!wizSeen && startLevel==='simple') startWizard();
 </script>
-<div class="verbadge" id="verbadge" onclick="(function(){var t=document.getElementById('verToast');if(!t){t=document.createElement('div');t.id='verToast';t.style.cssText='position:fixed;left:50%;bottom:20%;transform:translateX(-50%);background:#000d;color:#fff;padding:9px 15px;border-radius:18px;font:600 12px sans-serif;z-index:50';document.body.appendChild(t);}t.textContent='HARP v0.2';t.style.opacity='1';clearTimeout(window._vt);window._vt=setTimeout(function(){t.style.opacity='0';},1500);})()">v0.2</div>
+<div class="verbadge" id="verbadge" onclick="(function(){var t=document.getElementById('verToast');if(!t){t=document.createElement('div');t.id='verToast';t.style.cssText='position:fixed;left:50%;bottom:20%;transform:translateX(-50%);background:#000d;color:#fff;padding:9px 15px;border-radius:18px;font:600 12px sans-serif;z-index:50';document.body.appendChild(t);}t.textContent='HARP v0.3';t.style.opacity='1';clearTimeout(window._vt);window._vt=setTimeout(function(){t.style.opacity='0';},1500);})()">v0.3</div>
 </body>
 </html>
