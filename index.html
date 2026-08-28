@@ -75,8 +75,8 @@ body{background:#0a0d11;font-family:'Archivo',system-ui,sans-serif;color:var(--i
   border-radius:26px;padding:clamp(12px,2vh,16px) 16px clamp(10px,1.6vh,13px);backdrop-filter:blur(12px);text-align:center;
   box-shadow:0 12px 30px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.07)}
 .wm{width:min(66vw,280px);height:auto;display:inline-block}
-.w1{margin-top:clamp(5px,1.1vh,9px);font-weight:800;font-size:16.5px;line-height:1.16;min-height:calc(1.16em * 3);display:flex;align-items:center;justify-content:center;text-align:center}
-.w2{margin-top:3px;color:var(--soft);font-size:12.5px}
+.w1{margin-top:clamp(3px,0.6vh,6px);font-weight:800;font-size:16.5px;line-height:1.15;display:flex;align-items:center;justify-content:center;text-align:center}
+.w2{margin-top:2px;color:var(--soft);font-size:12.5px;line-height:1.25}
 
 /* app grid */
 .grid{margin-top:clamp(10px,1.6vh,16px);flex:1 1 auto;min-height:0;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none}
@@ -194,7 +194,7 @@ body{background:#0a0d11;font-family:'Archivo',system-ui,sans-serif;color:var(--i
 .bigver .num{font:800 40px var(--sys);letter-spacing:-.02em;cursor:pointer;user-select:none}
 .bigver .lbl{color:var(--dim);font-size:13px;margin-top:2px}
 .uptodate{text-align:center;color:var(--teal);font:600 14px var(--sys);padding:6px 0 16px}
-.abtface{display:flex;flex-direction:column;align-items:center;text-align:center;padding:8px 20px 14px;flex:none}
+.abtface{display:flex;flex-direction:column;align-items:center;text-align:center;padding:6px 20px 10px;flex:none}
 .abtface .mk{width:60px;height:60px}
 .abtface .nm{font:800 22px var(--sys);margin-top:12px}
 .abtface .rl{color:var(--soft);font-size:14px;line-height:1.55;margin-top:8px;max-width:260px}
@@ -378,7 +378,7 @@ html.showfps::before{content:"FPS 60 (probably)";position:fixed;top:2px;left:6px
         </svg></span>
       </button>
     </div>
-    <div class="tagline">made on a phone like this one &middot; v7.18 &middot; aug 28</div>
+    <div class="tagline">made on a phone like this one &middot; v7.19 &middot; aug 28</div>
   </div>
 </div>
 
@@ -400,7 +400,7 @@ html.showfps::before{content:"FPS 60 (probably)";position:fixed;top:2px;left:6px
     <div class="setsec">MOT-1</div>
     <div class="setgroup">
       <div class="setrow tap" data-go="about"><span class="si"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M5 21c0-4 3-7 7-7s7 3 7 7"/></svg></span><span class="st">About this phone</span><span class="chev">&rsaquo;</span></div>
-      <div class="setrow tap" data-go="update"><span class="si"><svg viewBox="0 0 24 24"><path d="M12 4v10M7 11l5 5 5-5M5 20h14"/></svg></span><span class="st">Software Update</span><span class="sv" id="updBadge">v7.18</span><span class="chev">&rsaquo;</span></div>
+      <div class="setrow tap" data-go="update"><span class="si"><svg viewBox="0 0 24 24"><path d="M12 4v10M7 11l5 5 5-5M5 20h14"/></svg></span><span class="st">Software Update</span><span class="sv" id="updBadge">v7.19</span><span class="chev">&rsaquo;</span></div>
     </div>
     <div class="setsec">Make it yours</div>
     <div class="setgroup">
@@ -441,13 +441,13 @@ html.showfps::before{content:"FPS 60 (probably)";position:fixed;top:2px;left:6px
       <div class="setrow"><span class="st">Carrier</span><span class="sv">No SIM. Makes things, not calls.</span></div>
       <div class="setrow"><span class="st">Made in</span><span class="sv">Akron, Ohio</span></div>
     </div>
-    <div class="bigver"><div class="num" id="verNum">7.18</div><div class="lbl">tap the version&hellip; maybe a few times</div></div>
+    <div class="bigver"><div class="num" id="verNum">7.19</div><div class="lbl">tap the version&hellip; maybe a few times</div></div>
   </div>
 
   <!-- SOFTWARE UPDATE -->
   <div class="setpage" data-page="update">
     <div class="sethdr"><button class="bk setback">&larr; Settings</button><h2>Software Update</h2></div>
-    <div class="bigver"><div class="num" id="verNum2">v7.18</div></div>
+    <div class="bigver"><div class="num" id="verNum2">v7.19</div></div>
     <div class="uptodate">This phone is up to date.</div>
     <div class="setsec">Recently shipped</div>
     <div class="setgroup" id="changelog"></div>
@@ -544,7 +544,7 @@ var sc=document.getElementById('clock');
 if(sc){sc.style.cursor='pointer';sc.title='lock';sc.addEventListener('click',lock);}
 
 /* =================== SETTINGS =================== */
-var VER='7.18';
+var VER='7.19';
 function t2(msg){var el=document.getElementById('toast2');el.textContent=msg;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(function(){el.classList.remove('show')},1900);}
 function lsGet(k,d){try{var v=ls.getItem(k);return v===null?d:v}catch(e){return d}}
 function lsSet(k,v){try{ls.setItem(k,v)}catch(e){}}
