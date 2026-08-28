@@ -1,5 +1,16 @@
 # All Thumbs — course roadmap and state
 
+## v1.16 (Aug 26 2026) - chapter rebuild pass COMPLETE (all 6) + app icon
+
+- Ch5 python-basics.html v3.1: snake mascot; gold accent. Trail = tiny Python on real build data (version string, gameshelf_v1 storage key, USB cost math, measure app-name length, personalize a toast). All run through the teaching mini-interpreter (print/vars/concat/repeat/len; no str/list/if/for by design).
+- Ch6 git-basics.html v3.1: check-flag mascot; orange accent. Trail is the RICHEST of the course, Mot's actual git history: ship puffkart.html to the shelf, stage only index.html while sw.js is half-done, branch a risky redesign, merge the finished redesign, the forgot-to-branch recovery, the merge conflict on the version badge. All six run on the real mini-git engine.
+- ALL SIX ORIGINAL CHAPTERS now match the standard: spotlight mascot (transparent-on-dark), General/Trail practice toggle (General default in the chapter's accent color, Trail in purple filtering the gym to real cases), back-to-hub link, v3.1. Plus Ship It (ch7) already at this standard. The whole course is now consistent.
+- APP ICON added: the mascot-with-logo-phone-on-digital-rain image wired as the PWA icon + favicons + web manifest. Hub is now an installable PWA ("Add to Home Screen"). Files: icon-512/192.png, apple-touch-icon.png, favicon-32/16.png, favicon.png, manifest.webmanifest.
+- Hub v1.16 (matches project version; standing rule now: bump the badge on ANY touched file so a live deploy is verifiable against a stale phone cache).
+
+Rebuild pass done. Course is walkable start to finish at one consistent standard. Next up is Tier 2 (ch8 data/Firebase, ch9 API, ch10 Shelf Dissected).
+
+
 ## v1.15 (Aug 26 2026) - chapter rebuild pass 1-4 (of 6)
 
 Bringing the original six chapters up to the new standard: spotlight mascot, General/Trail practice toggle, back-to-hub link. General is default (each chapter's accent color); The Trail (purple) filters the gym to real build-history cases. Done so far:

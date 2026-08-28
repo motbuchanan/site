@@ -273,6 +273,22 @@
   .cline:focus-visible,.wtab:focus-visible,.navchip:focus-visible,.runbtn:focus-visible{
     outline:2px solid var(--gold); outline-offset:2px;
   }
+  .mascotspot{text-align:center;margin:6px 0 2px;}
+  .mascotspot img{height:230px;width:auto;filter:drop-shadow(0 10px 22px rgba(0,0,0,.5));}
+  .tipbox{position:relative;background:var(--card);border:1px solid var(--line);border-left:3px solid #f0c33c;border-radius:0 12px 12px 0;padding:16px 16px 16px 118px;margin:22px 0;min-height:96px;}
+  .tipbox .poke{position:absolute;left:-14px;bottom:-8px;height:150px;width:auto;transform:rotate(-8deg);filter:drop-shadow(0 8px 16px rgba(0,0,0,.45));pointer-events:none;}
+  .tipbox.right{border-left:none;border-right:3px solid #f0c33c;border-radius:12px 0 0 12px;padding:16px 118px 16px 16px;}
+  .tipbox.right .poke{left:auto;right:-14px;transform:rotate(8deg);}
+  .tipbox .tt{font-weight:700;color:#f0c33c;font-size:15px;}
+  .tipbox .tp{margin:4px 0 0;font-size:14.5px;color:var(--soft);line-height:1.55;}
+  .tracktoggle{display:flex;gap:8px;margin:14px 0 10px;align-items:center;flex-wrap:wrap;}
+  .tracktoggle .tlabel{font-family:monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin-right:2px;}
+  .ttab{font-family:monospace;font-size:12.5px;padding:7px 14px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--soft);cursor:pointer;}
+  .ttab.on.general{border-color:#f0c33c;color:#f0c33c;background:rgba(240,195,60,.12);font-weight:700;}
+  .ttab.on.trail{border-color:#c8a4f0;color:#c8a4f0;background:rgba(200,164,240,.12);font-weight:700;}
+  .trailbanner{font-family:monospace;font-size:11.5px;color:#c8a4f0;background:rgba(200,164,240,.08);border:1px solid rgba(200,164,240,.3);border-radius:8px;padding:7px 11px;margin:8px 0;display:none;}
+  .trailbanner.show{display:block;}
+  .backhub{display:inline-flex;align-items:center;gap:7px;font-family:monospace;font-size:12px;color:var(--soft);border:1px solid var(--line);border-radius:999px;padding:7px 13px;background:var(--card);text-decoration:none;}
 </style>
 </head>
 <body>
@@ -283,8 +299,9 @@
     <h1>What Python Is</h1>
     <p class="subtitle">For people who already half-speak JavaScript.</p>
   </div>
-  <button class="vbadge" id="vbadge">v1.0 &middot; Aug 21</button>
+  <button class="vbadge" id="vbadge">v3.1</button>
 </header>
+<div class="mascotspot"><img src="thumb-python.png" alt="mascot holding a snake"></div>
 
 <nav><div class="navrow">
   <a class="navchip" href="#where">Where it lives</a>
@@ -398,6 +415,12 @@
 
   <h3>The Gym: reps until it sticks</h3>
   <p class="note" style="margin-top:4px">Small write-this-code tasks with randomized words and numbers, checked against the real output of the practice pad above. Hints cost nothing but pride; skipping resets your streak.</p>
+  <div class="tracktoggle">
+    <span class="tlabel">practice</span>
+    <button class="ttab general on" id="trackGeneral" type="button">General</button>
+    <button class="ttab trail" id="trackTrail" type="button">The Trail</button>
+  </div>
+  <div class="trailbanner" id="trailBanner">The Trail: tiny Python on your real build data, version strings, storage keys, USB cost math.</div>
   <div class="gym">
     <div class="gymstats"><span>reps<b id="repN">0</b></span><span>streak<b id="strN">0</b></span><span>best<b id="bestN">0</b></span></div>
     <div class="gymtabs" id="gymTabs"></div>
@@ -497,13 +520,14 @@
   <button class="btn" id="retryBtn" style="display:none">Try again</button>
 </section>
 
+<div style="text-align:center;margin:24px 0 8px;"><a class="backhub" href="index.html">&larr; back to All Thumbs</a></div>
 </main>
 <footer>Second Language &middot; a curiosity tool &middot; the practice pad is a teaching slice, not full Python</footer>
 <div id="toast" role="status"></div>
 
 <script>
 "use strict";
-var VERSION = "v3.0 \u00B7 Aug 22";
+var VERSION = "v3.1 \u00B7 Aug 26";
 var STORE_KEY = "python101_v1";
 
 /* ---------- guarded storage ---------- */
@@ -1058,7 +1082,7 @@ function initApp(){
     gymStats();
   });
   (function(){
-    var tabs = ["Surprise me"].concat(GYM_LEVELS);
+    var tabs = ["Surprise me"].concat(GYM_LEVELS.slice(0,4));
     tabs.forEach(function(name, i){
       var b = document.createElement("button");
       b.className = "gtab" + (i === 0 ? " on" : ""); b.type = "button"; b.textContent = name;
@@ -1069,6 +1093,20 @@ function initApp(){
       $("gymTabs").appendChild(b);
     });
   })();
+  function setTrack(t){
+    var g = $("trackGeneral"), tr = $("trackTrail"), tabs = $("gymTabs"), ban = $("trailBanner");
+    if(g) g.classList.toggle("on", t === "general");
+    if(tr) tr.classList.toggle("on", t === "trail");
+    if(tabs) tabs.style.display = (t === "trail") ? "none" : "";
+    if(ban) ban.className = "trailbanner" + (t === "trail" ? " show" : "");
+    if(t === "trail"){ gymLevel = 4; }
+    else { gymLevel = -1; Array.prototype.forEach.call(document.querySelectorAll(".gtab"), function(x, xi){ x.classList.toggle("on", xi === 0); }); }
+    if($("gymCard")) $("gymCard").className = "gymcard";
+    if($("gGoal")) $("gGoal").innerHTML = (t === "trail") ? "Tiny Python on your real build data. Tap <b>Start drill</b>." : "Pick a level (or Surprise me) and tap <b>Start drill</b>.";
+    if($("gHint")){ $("gHint").className = "ghint"; $("gHint").innerHTML = ""; }
+  }
+  if($("trackGeneral")) $("trackGeneral").addEventListener("click", function(){ setTrack("general"); });
+  if($("trackTrail")) $("trackTrail").addEventListener("click", function(){ setTrack("trail"); });
   gymStats();
   if(typeof window !== "undefined"){
     window._gym = { start: gymStart, state: function(){ return { drill: drill, gym: state.gym }; } };
