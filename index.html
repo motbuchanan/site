@@ -94,8 +94,7 @@ body{background:#0a0d11;font-family:'Archivo',system-ui,sans-serif;color:var(--i
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.09)}
 .icon svg{position:absolute;inset:0;width:100%;height:100%}
 .icon img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
-.app .nm{display:block;margin-top:7px;font:500 11px var(--sys);color:var(--ink);text-shadow:0 1px 3px rgba(0,0,0,.75);letter-spacing:.01em;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.app .nm{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;margin-top:7px;font:500 11px var(--sys);line-height:1.15;color:var(--ink);text-shadow:0 1px 3px rgba(0,0,0,.75);letter-spacing:.01em;overflow:hidden;text-overflow:ellipsis;max-width:100%;text-align:center;min-height:calc(1.15em * 2)}
 .app:active .icon{transform:scale(.93)}
 .app.installing{cursor:default}
 .app.installing .icon{filter:saturate(.35) brightness(.6)}
@@ -378,7 +377,7 @@ html.showfps::before{content:"FPS 60 (probably)";position:fixed;top:2px;left:6px
         </svg></span>
       </button>
     </div>
-    <div class="tagline">made on a phone like this one &middot; v7.20 &middot; aug 28</div>
+    <div class="tagline">made on a phone like this one &middot; v7.21 &middot; aug 28</div>
   </div>
 </div>
 
@@ -400,7 +399,7 @@ html.showfps::before{content:"FPS 60 (probably)";position:fixed;top:2px;left:6px
     <div class="setsec">MOT-1</div>
     <div class="setgroup">
       <div class="setrow tap" data-go="about"><span class="si"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M5 21c0-4 3-7 7-7s7 3 7 7"/></svg></span><span class="st">About this phone</span><span class="chev">&rsaquo;</span></div>
-      <div class="setrow tap" data-go="update"><span class="si"><svg viewBox="0 0 24 24"><path d="M12 4v10M7 11l5 5 5-5M5 20h14"/></svg></span><span class="st">Software Update</span><span class="sv" id="updBadge">v7.20</span><span class="chev">&rsaquo;</span></div>
+      <div class="setrow tap" data-go="update"><span class="si"><svg viewBox="0 0 24 24"><path d="M12 4v10M7 11l5 5 5-5M5 20h14"/></svg></span><span class="st">Software Update</span><span class="sv" id="updBadge">v7.21</span><span class="chev">&rsaquo;</span></div>
     </div>
     <div class="setsec">Make it yours</div>
     <div class="setgroup">
@@ -441,13 +440,13 @@ html.showfps::before{content:"FPS 60 (probably)";position:fixed;top:2px;left:6px
       <div class="setrow"><span class="st">Carrier</span><span class="sv">No SIM. Makes things, not calls.</span></div>
       <div class="setrow"><span class="st">Made in</span><span class="sv">Akron, Ohio</span></div>
     </div>
-    <div class="bigver"><div class="num" id="verNum">7.20</div><div class="lbl">tap the version&hellip; maybe a few times</div></div>
+    <div class="bigver"><div class="num" id="verNum">7.21</div><div class="lbl">tap the version&hellip; maybe a few times</div></div>
   </div>
 
   <!-- SOFTWARE UPDATE -->
   <div class="setpage" data-page="update">
     <div class="sethdr"><button class="bk setback">&larr; Settings</button><h2>Software Update</h2></div>
-    <div class="bigver"><div class="num" id="verNum2">v7.20</div></div>
+    <div class="bigver"><div class="num" id="verNum2">v7.21</div></div>
     <div class="uptodate">This phone is up to date.</div>
     <div class="setsec">Recently shipped</div>
     <div class="setgroup" id="changelog"></div>
@@ -544,7 +543,7 @@ var sc=document.getElementById('clock');
 if(sc){sc.style.cursor='pointer';sc.title='lock';sc.addEventListener('click',lock);}
 
 /* =================== SETTINGS =================== */
-var VER='7.20';
+var VER='7.21';
 function t2(msg){var el=document.getElementById('toast2');el.textContent=msg;el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(function(){el.classList.remove('show')},1900);}
 function lsGet(k,d){try{var v=ls.getItem(k);return v===null?d:v}catch(e){return d}}
 function lsSet(k,v){try{ls.setItem(k,v)}catch(e){}}
