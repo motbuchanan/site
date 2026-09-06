@@ -1,12 +1,12 @@
-# NAZCA-HANDOFF.md (v0.11 · Sep 6 2026)
+# NAZCA-HANDOFF.md (v0.12 · Sep 6 2026)
 
 ## What this is
 Nazca is Mot's infinite deep-zoom drawing app: kid-friendly fun brushes and pro tools in one UI, with the zoom itself as the identity (draw a world inside a dot, then play the zoom as a story). Single-file HTML PWA, no dependencies, no server. Deploys as a folder in the site repo `motbuchanan/site` at `nazca/` (same pattern as `allthumbs/` and `reframe/`), so the live URL is https://motbuchanan.com/nazca/. Authoritative file: `nazca/index.html` (this package). Icon: `nazca/icon-*.png` from Mot's Nazca-bird artwork.
 
 ## Current state
-- v0.11 · Sep 6. Phases 1 to 5 shipped: deep-zoom tiled engine (levels -4 to 24, 1/64× to 16.7M×), stabilizer, speed taper, hold-to-snap shapes, 2/3-finger tap undo/redo, layers, IndexedDB autosave, `.nazca` project files, brush presets (Pro / Fun / Alive), buffered per-stroke opacity, fill with close-gaps + grow, long-press eyedropper, recent colors + palette, alive layer (wobble, train track, bugs, fireworks), stroke log with replay, timelapse and tour video export (WebM via MediaRecorder), keyframe captions + hold, editable last stroke, symmetry.
+- v0.12 · Sep 6. Phases 1 to 6 shipped: deep-zoom tiled engine (levels -4 to 24, 1/64× to 16.7M×), stabilizer, speed taper, hold-to-snap shapes, 2/3-finger tap undo/redo, layers, IndexedDB autosave, `.nazca` project files, brush presets (Pro / Fun / Alive), buffered per-stroke opacity, fill with close-gaps + grow, long-press eyedropper, recent colors + palette, alive layer (wobble, train track, bugs, fireworks), stroke log with replay, timelapse and tour video export (WebM via MediaRecorder), keyframe captions + hold, editable last stroke, symmetry, depth-locked layers, hidden notes, portals, real-world scale reference, depth map.
 - Verified headless (Chromium): all of the above. Verified on Mot's phone: engine through v0.9 (crash fix confirmed), Deep zoom "works beautifully". Untested on device: v0.10 alive layer, v0.11 replay/video/adjust/symmetry.
-- Not yet done: Phase 6+ (see Open items). No service worker yet (autosave already covers offline reopening; add sw.js only when the site adopts one for its other apps).
+- Not yet done: Phase 7+ (see Open items). No service worker yet (autosave already covers offline reopening; add sw.js only when the site adopts one for its other apps).
 
 ## Locked decisions
 - Name is Nazca. First name slate (Complement, Big Paper, Scribble, Endless, Marks) was rejected; do not re-propose.
@@ -23,12 +23,12 @@ Nazca is Mot's infinite deep-zoom drawing app: kid-friendly fun brushes and pro 
 ## Open items (in order)
 1. Site chat: create `nazca/` in the repo, drop this package in, add a tile to index.html pointing at `nazca/`, ROADMAP.md entry. Icon files are here.
 2. Phone verification of v0.10 and v0.11 features (list above).
-3. Phase 6: depth-locked layers, zoom-triggered reveals, portals, scale stamps, depth heatmap.
-4. Phase 7: reference windows, trace mode, select and transform, alive stamp to paper, seed brush.
-5. Phase 8: living stickers, grow brush. Phase 9: perspective and isometric guides.
-6. Later: tile eviction to IndexedDB for very large drawings; sound pack (opt-in); simple/full UI depth toggle.
+3. Phase 7: reference windows, trace mode, select and transform, alive stamp to paper, seed brush.
+4. Phase 8: living stickers, grow brush. Phase 9: perspective and isometric guides.
+5. Later: tile eviction to IndexedDB for very large drawings; sound pack (opt-in); simple/full UI depth toggle.
 
 ## Gotchas
+- Depth marks live in `doc.marks` (kinds: reveal, portal), undo kind `marks`; scale reference is `doc.scaleRef` (meters per world unit). Portal tap-to-enter is a screen-space label hit test (`portalHits`) checked at the top of pointerdown.
 - Opening the file from Chrome Downloads (`content://`) has no storage: autosave, restore, and settings will not persist there. Test from the https URL.
 - Old saved settings (`nazca.settings.v3`) can leave a tiny/faint brush; the Size panel has Reset.
 - Hold-to-snap needs jitter-proof hold detection (9 px screen radius); a per-event movement threshold fails on real fingers.
@@ -39,7 +39,7 @@ Nazca is Mot's infinite deep-zoom drawing app: kid-friendly fun brushes and pro 
 - MediaRecorder output is WebM on Android/desktop Chrome, MP4 on Safari. Filenames `nazca-tour-*.webm`, `nazca-timelapse-*.webm`.
 
 ## File map
-- Package: `nazca/index.html` (app, v0.11), `nazca/manifest.json`, `nazca/icon-512.png`, `icon-192.png`, `icon-180.png` (apple-touch), `icon-maskable-512.png`, `nazca/NAZCA-HANDOFF.md`.
+- Package: `nazca/index.html` (app, v0.12), `nazca/manifest.json`, `nazca/icon-512.png`, `icon-192.png`, `icon-180.png` (apple-touch), `icon-maskable-512.png`, `nazca/NAZCA-HANDOFF.md`.
 - Repo: `motbuchanan/site`, branch `main`, custom domain via CNAME (motbuchanan.com). `.nojekyll` present.
 - Deployed URL after upload: https://motbuchanan.com/nazca/
 - Storage keys: localStorage `nazca.settings.v3`, `nazca.hint.v2`; IndexedDB db `nazca`, store `projects`, key `current`.
