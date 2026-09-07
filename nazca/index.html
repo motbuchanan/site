@@ -391,7 +391,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--void);font-famil
 
 (() => {
 'use strict';
-const VERSION = 'v0.16 · Sep 7';
+const VERSION = 'v0.17 · Sep 7';
 const TILE = 512, OVER = 0.75;
 const ZMIN = -4, ZMAX = 24;               // levels: pixel density = 2^z per world unit
 const SMIN = Math.pow(2, ZMIN-2), SMAX = Math.pow(2, ZMAX);
@@ -744,7 +744,7 @@ let lastFrame=performance.now();
 function drawAlive(now){ // called inside the world transform
   const dt=Math.min(50, now-lastFrame); lastFrame=now; const vis=visibleWorldRect(); let any=false;
   const list = aliveStroke ? doc.alive.concat([Object.assign({bbox:bboxOf(aliveStroke.pts,aliveStroke.size*3), len:pathLen(aliveStroke.pts), preview:true},aliveStroke)]) : doc.alive;
-  for(const a of list){ if(!rectsMeet(a.bbox,vis)) continue; any=true; const w=a.size; sctx.lineCap='round'; sctx.lineJoin='round';
+  for(const a of list){ if(!rectsMeet(a.bbox,vis)) continue; any=true; const w=a.size; sctx.lineCap='round'; sctx.lineJoin='round'; sctx.globalAlpha=1; sctx.fillStyle='#000'; sctx.setLineDash([]);
     if(a.kind==='wobble'){ sctx.strokeStyle=a.color; sctx.lineWidth=w; sctx.beginPath(); const amp=w*0.9; a.pts.forEach(([x,y],i)=>{ const o=Math.sin(now/260+i*0.55+a.seed)*amp; const o2=Math.cos(now/310+i*0.41+a.seed)*amp*0.6; i?sctx.lineTo(x+o,y+o2):sctx.moveTo(x+o,y+o2); }); sctx.stroke(); }
     else if(a.kind==='track'){ // ties, rails, train
       sctx.strokeStyle='#7a5a3a'; sctx.lineWidth=w*0.22; const tie=w*0.55; for(let d=0; d<a.len; d+=w*0.9){ const q=pointAt(a.pts,d); const nx=-Math.sin(q.ang)*tie, ny=Math.cos(q.ang)*tie; sctx.beginPath(); sctx.moveTo(q.x-nx,q.y-ny); sctx.lineTo(q.x+nx,q.y+ny); sctx.stroke(); }
@@ -755,10 +755,10 @@ function drawAlive(now){ // called inside the world transform
       if(!a.preview){ const n=Math.max(3,Math.min(9,Math.round(a.len/(w*8)))); for(let i=0;i<n;i++){ const speed=(35+((a.seed*7+i*13)%20))/a.scale/1000; const period=a.len*2/speed; const t=(((now+a.seed*3+i*1234)%period)+period)%period/period; const d=t<0.5?t*2*a.len:(1-(t-0.5)*2)*a.len; const q=pointAt(a.pts,d); const wig=Math.sin(now/90+i)*w*0.25;
         sctx.save(); sctx.translate(q.x,q.y); sctx.rotate(q.ang+(t<0.5?0:Math.PI)); sctx.translate(0,wig); sctx.fillStyle=a.color; sctx.beginPath(); sctx.ellipse(0,0,w*0.7,w*0.45,0,0,Math.PI*2); sctx.fill(); sctx.fillStyle='#111'; sctx.beginPath(); sctx.arc(w*0.5,0,w*0.3,0,Math.PI*2); sctx.fill(); sctx.strokeStyle='#111'; sctx.lineWidth=Math.max(0.5/a.scale,w*0.08); for(const sd of [-1,1]) for(let l=0;l<3;l++){ const lx=(l-1)*w*0.4, ph=Math.sin(now/60+l*2+i)*w*0.15; sctx.beginPath(); sctx.moveTo(lx,sd*w*0.3); sctx.lineTo(lx+ph,sd*w*0.75); sctx.stroke(); } sctx.restore(); } } }
   }
-  for(const a of list){ if(!rectsMeet(a.bbox,vis)) continue; const w=a.size;
+  for(const a of list){ if(!rectsMeet(a.bbox,vis)) continue; const w=a.size; sctx.globalAlpha=1; sctx.fillStyle='#000'; sctx.setLineDash([]);
     if(a.kind==='walker'){ sctx.strokeStyle=a.color+'33'; sctx.lineWidth=Math.max(1/a.scale,w*0.08); sctx.setLineDash([w*0.3,w*0.3]); sctx.beginPath(); a.pts.forEach(([x,y],i)=>i?sctx.lineTo(x,y):sctx.moveTo(x,y)); sctx.stroke(); sctx.setLineDash([]);
       if(!a.preview){ const speed=45/a.scale/1000; const period=a.len*2/speed; const t=((now+a.seed)%period)/period; const d=t<0.5?t*2*a.len:(1-(t-0.5)*2)*a.len; const q=pointAt(a.pts,d); const step=Math.abs(Math.sin(now/110)); const bob=-step*w*0.12; const flip=(Math.cos(q.ang)<0)!==(t>=0.5);
-        sctx.save(); sctx.translate(q.x,q.y+bob); sctx.rotate(Math.sin(now/110)*0.12); if(flip) sctx.scale(-1,1); sctx.font=`${w}px system-ui,"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`; sctx.textAlign='center'; sctx.textBaseline='middle'; sctx.fillText(a.emoji||'🐱',0,-w*0.35); sctx.restore();
+        sctx.save(); sctx.translate(q.x,q.y+bob); sctx.rotate(Math.sin(now/110)*0.12); if(flip) sctx.scale(-1,1); sctx.font=`${w}px system-ui,"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`; sctx.textAlign='center'; sctx.textBaseline='middle'; sctx.fillStyle='#000'; sctx.globalAlpha=1; sctx.fillText(a.emoji||'🐱',0,-w*0.35); sctx.restore();
         sctx.fillStyle='rgba(0,0,0,0.12)'; sctx.beginPath(); sctx.ellipse(q.x,q.y+w*0.05,w*0.3*(1-step*0.3),w*0.08,0,0,Math.PI*2); sctx.fill(); } }
     else if(a.kind==='grow'){ const age=a.preview?0:Math.min(1,(Date.now()-(a.born||0))/6000); // sprouts over six seconds, then stays
       sctx.strokeStyle='#3f7d3a'; sctx.lineWidth=Math.max(1/a.scale,w*0.14); sctx.lineCap='round'; sctx.beginPath(); a.pts.forEach(([x,y],i)=>i?sctx.lineTo(x,y):sctx.moveTo(x,y)); sctx.stroke(); // the vine
