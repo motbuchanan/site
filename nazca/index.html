@@ -143,6 +143,28 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--void);font-famil
 #guide .close{position:sticky;top:0;float:right;background:var(--orange);color:#0d1117;border:0;border-radius:999px;height:38px;padding:0 16px;font-weight:700;margin-left:12px}
 #guide .tier{border-left:3px solid var(--teal);padding-left:12px;margin:10px 0 14px}
 #guide .tier.deep{border-color:var(--orange)}
+/* intro: skippable animated walkthrough */
+#intro{position:fixed;inset:0;z-index:16;background:rgba(13,17,23,.92);display:none;align-items:center;justify-content:center;padding:16px}
+#intro.open{display:flex}
+#intro .card{width:min(92vw,400px);background:var(--paper);color:#141a22;border-radius:22px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+#intro canvas{display:block;width:100%;height:220px;background:#f3f1ea}
+#intro .body{padding:16px 18px 14px}
+#intro h2{margin:0 0 6px;font-size:20px}
+#intro p{margin:0;font-size:15px;line-height:1.45;min-height:44px}
+#intro .nav{display:flex;align-items:center;gap:8px;padding:0 14px 14px}
+#intro .dots{flex:1;display:flex;gap:6px;justify-content:center}
+#intro .dots i{width:7px;height:7px;border-radius:50%;background:#c9cdd3;display:block}
+#intro .dots i.on{background:var(--orange);width:18px;border-radius:4px}
+#intro button{height:42px;border:0;border-radius:12px;padding:0 16px;font-weight:700;font-size:14px;background:transparent;color:#5a646f}
+#intro button.go{background:var(--orange);color:#0d1117;min-width:92px}
+#guide details{border-top:1px solid rgba(255,255,255,.1);padding:4px 0}
+#guide summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:10px;padding:12px 0;font-weight:700;color:var(--ink);font-size:16px}
+#guide summary::-webkit-details-marker{display:none}
+#guide summary .ic{width:34px;height:34px;border-radius:10px;background:rgba(76,240,224,.14);display:flex;align-items:center;justify-content:center;font-size:18px;flex:0 0 auto}
+#guide summary::after{content:'+';margin-left:auto;color:var(--muted);font-weight:400;font-size:20px}
+#guide details[open] summary::after{content:'−'}
+#guide details .c{padding:0 0 12px 44px;color:#c9cdd3}
+#guide .intro-btn{width:100%;height:46px;border:0;border-radius:12px;background:var(--teal);color:#0d1117;font-weight:700;font-size:15px;margin:6px 0 14px}
 #toast{position:fixed;left:50%;top:calc(104px + env(safe-area-inset-top));transform:translateX(-50%);background:var(--chrome);color:var(--ink);padding:8px 14px;border-radius:999px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none}
 #toast.show{opacity:1}
 /* first-run hint */
@@ -165,55 +187,63 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--void);font-famil
   <div class="word">NAZCA<small>lines that only make sense from above</small></div>
   <div class="skip">tap to skip</div>
 </div>
+<div id="intro"><div class="card">
+  <canvas id="introC"></canvas>
+  <div class="body"><h2 id="introT"></h2><p id="introP"></p></div>
+  <div class="nav"><button id="introSkip">Skip</button><div class="dots" id="introDots"></div><button class="go" id="introNext">Next</button></div>
+</div></div>
 <div id="guide"><div class="in">
   <button class="close" id="guideClose">Close</button>
   <h2>NAZCA</h2>
   <p class="tag">Draw a world inside a dot.</p>
-  <p>The Nazca lines are giant drawings scratched into a Peruvian desert two thousand years ago. On the ground they are just furrows. From the sky they become a hummingbird, a monkey, a spider. Nazca the app is built on the same idea turned inside out: the paper has no edges and no bottom. Zoom out and a lifetime of drawing shrinks to a speck. Zoom in and every line stays sharp, so you can draw a city inside an eye, a room inside a window, and a story in the trip between them. The inspiration is those videos that keep zooming into a picture and find another picture inside it. Here you can make one.</p>
-  <div class="tier"><b>Tier one:</b> use it as a drawing app. Everything below the line "Going deeper" is optional.</div>
-  <h3>Quick start</h3>
-  <ul>
-    <li><b>One finger</b> draws. <b>Two fingers</b> move, zoom, and rotate the paper.</li>
-    <li><b>Two-finger tap</b> undoes. <b>Three-finger tap</b> redoes. (Or use the buttons.)</li>
-    <li><b>Hold still</b> at the end of a line, circle, or box and it snaps perfect. Turn this off under Size if you draw slowly.</li>
-    <li><b>Press and hold</b> without moving to pick a color from the drawing.</li>
-    <li>Everything autosaves. Reopen the app and you are where you left off.</li>
-  </ul>
-  <h3>Tools in the tray</h3>
-  <ul>
-    <li><b>Brush</b>: tap to draw with it, tap again to choose another. Pro brushes (technical pen, ink, pencil, marker, airbrush, soft round, sprinkle), Fun brushes (crayon, rainbow, neon, glitter, bubbles, confetti, stickers, seed), and Alive tools that keep moving after you draw them.</li>
-    <li><b>Eraser</b>, with its own size and softness.</li>
-    <li><b>Fill</b>: tap inside a shape. "Close gaps" seals small openings so it does not leak; "Grow" tucks the color under the line so there is no white fringe.</li>
-    <li><b>Select</b>: draw a loop around something to lift it. Drag it, pinch it, rotate it, then Done. Copy stamps a duplicate. Seed turns it into a brush.</li>
-    <li><b>Size</b>: size, opacity, hardness, Steady (smooths shaky hands), speed taper (fast strokes go thin), symmetry (mirror, quad, radial).</li>
-    <li><b>Color</b>: recent colors, a palette you can save to, and the full wheel.</li>
-    <li><b>Layers</b>: add, hide, reorder, merge, set opacity. Also reference and trace images, and "Freeze moving things".</li>
-    <li><b>Fit</b> frames what is near you. <b>File</b> saves a PNG, exports the whole project, replays your drawing, or records a timelapse.</li>
-  </ul>
-  <div class="tier deep"><b>Tier two:</b> going deeper. This is where Nazca stops being a drawing app.</div>
-  <h3>Depth</h3>
-  <ul>
-    <li>The <b>teal pill</b> at the top is the depth gauge: 1× is where you started, 512× is five hundred times closer, 1/16× is far above. Pinch in as far as you like; the paper is 16 million times deep. Lines drawn close up stay sharp; lines drawn far away become detail you can zoom into.</li>
-    <li><b>Real-world scale</b> (Tour panel): tell it the screen is 10 m wide and the gauge starts reading in meters, millimeters, kilometers, light-years.</li>
-    <li><b>Depth map</b> (Tour panel): a map of where the deep work is. Tap a spot to fly there.</li>
-    <li><b>Depth-locked layers</b> (Layers panel): a layer that only shows between two zoom levels, so the city inside the eye does not clutter the face.</li>
-    <li><b>Hidden note</b> and <b>Portal</b> (under Brush → Depth): words that appear only when you zoom in far enough, and doorways that dive 100× deeper when you tap their name.</li>
-  </ul>
-  <h3>Tours and video</h3>
-  <ul>
-    <li>Tap the depth gauge to open <b>Tour</b>. "+ Here" drops a keyframe of where you are. Tap keyframes to fly between them; arrows jump start, previous, next, end.</li>
-    <li>Give a keyframe a <b>caption</b> and a hold time. <b>Play tour</b> flies through them with captions. <b>Record tour video</b> saves that flight as a video file, straight from the phone, nothing uploaded.</li>
-    <li>File → <b>Replay drawing</b> watches the whole thing draw itself from the first stroke; <b>Export timelapse</b> records it.</li>
-  </ul>
-  <h3>Alive</h3>
-  <p>Wobbly crayon lines never sit still. Draw a <b>train track</b> and a train shows up. <b>Bug trail</b> puts bugs on any path. <b>Fireworks</b> go where you tap. They zoom with the drawing and save with it. "Freeze moving things" turns them into pixels when you want to draw on them.</p>
-  <h3>Seed</h3>
-  <p>Select something, tap Seed, and it becomes a stamp. Set the brush small, dot it around, zoom into a dot: the whole thing is inside. Do it again inside that one.</p>
-  <h3>Adjust that line</h3>
-  <p>After a stroke, the orange chip lifts it onto handles. Drag them and the line redraws with the same brush. Done keeps it, Cancel puts the original back.</p>
-  <h3>Projects</h3>
-  <p>File → Export project makes one <code>.nazca</code> file with every layer, keyframe, note, and portal. Open it on another phone and keep going. Save PNG exports what is on screen at the current depth, transparent, trimmed.</p>
-  <p style="color:var(--muted);margin-top:24px">Nazca is a single file that runs in the browser. Made by Mot Buchanan in Akron, Ohio, mostly on a phone.</p>
+  <button class="intro-btn" id="guideIntro">▶ Play the 1-minute intro</button>
+  <details open><summary><span class="ic">🏜️</span>Why it is called Nazca</summary><div class="c">
+    <p>The Nazca lines are giant drawings scratched into a Peruvian desert two thousand years ago. On the ground they are furrows. From the sky they become a hummingbird, a monkey, a spider.</p>
+    <p>This app turns that inside out: the paper has no edges and no bottom. Zoom out and a lifetime of drawing becomes a speck. Zoom in and every line stays sharp, so you can draw a city inside an eye and a room inside a window. The inspiration is those videos that keep zooming into a picture and find another picture inside. Here you can make one.</p>
+  </div></details>
+  <details><summary><span class="ic">✋</span>Gestures</summary><div class="c"><ul>
+    <li><b>One finger</b> draws. <b>Two fingers</b> move, zoom, rotate.</li>
+    <li><b>Two-finger tap</b> undo. <b>Three-finger tap</b> redo.</li>
+    <li><b>Hold still</b> at the end of a stroke: it snaps to a line, circle, or box.</li>
+    <li><b>Press and hold</b> without moving: eyedropper.</li>
+    <li>Tap the canvas to close any panel.</li>
+  </ul></div></details>
+  <details><summary><span class="ic">🖌️</span>Brush, Eraser, Fill</summary><div class="c"><ul>
+    <li><b>Brush</b>: tap to draw with it, tap again to choose another. Pro, Fun, Alive, and Depth sections.</li>
+    <li><b>Eraser</b> has its own size and softness.</li>
+    <li><b>Fill</b>: tap inside a shape. "Close gaps" seals small openings; "Grow" hides the white fringe.</li>
+    <li><b>Size</b>: size, opacity, hardness, Steady (smooths shaky hands), speed taper, symmetry.</li>
+    <li><b>Color</b>: recent colors, saved palette, full wheel.</li>
+  </ul></div></details>
+  <details><summary><span class="ic">✂️</span>Select, move, copy</summary><div class="c">
+    <p>Draw a loop around anything to lift it. Drag, pinch, rotate, then <b>Done</b>. <b>Copy</b> places a duplicate and keeps the piece. <b>Seed</b> turns it into a stamp brush.</p>
+    <p>After any stroke, the orange <b>Adjust that line</b> chip lifts it onto handles you can drag.</p>
+  </div></details>
+  <details><summary><span class="ic">🧅</span>Layers, references, tracing</summary><div class="c"><ul>
+    <li>Add, hide, reorder, merge, set opacity.</li>
+    <li><b>Reference image</b> floats over the drawing; <b>Trace image</b> sits under it. Lock either in place.</li>
+    <li><b>Freeze moving things</b> turns alive objects into pixels.</li>
+    <li><b>Shows from here / up to here</b>: a layer that only appears between two zoom levels.</li>
+  </ul></div></details>
+  <details><summary><span class="ic">🔭</span>Depth</summary><div class="c"><ul>
+    <li>The teal pill is the <b>depth gauge</b>. 1× is where you started; 512× is five hundred times closer. The paper is 16 million times deep.</li>
+    <li><b>Real-world scale</b>: say the screen is 10 m wide and the gauge reads in meters, millimeters, light-years.</li>
+    <li><b>Depth map</b>: where the deep work is. Tap to fly there.</li>
+    <li><b>Hidden note</b>: words that appear only when you zoom in far enough.</li>
+    <li><b>Portal</b>: a doorway that dives 100× deeper when you tap its name.</li>
+  </ul></div></details>
+  <details><summary><span class="ic">🎬</span>Tours, replay, video</summary><div class="c"><ul>
+    <li>Tap the depth gauge for <b>Tour</b>. "+ Here" drops a keyframe. Tap keyframes to fly; arrows go start, previous, next, end.</li>
+    <li>Give a keyframe a <b>caption</b> and a hold time. <b>Play tour</b> flies through them. <b>Record tour video</b> saves that as a video, straight from the phone.</li>
+    <li>File → <b>Replay drawing</b> watches it draw itself; <b>Export timelapse</b> records that.</li>
+  </ul></div></details>
+  <details><summary><span class="ic">🚂</span>Alive and fun</summary><div class="c">
+    <p>Wobbly crayon never sits still. Draw a <b>train track</b> and a train shows up. <b>Bug trail</b> puts bugs on any path. <b>Fireworks</b> go where you tap. <b>Walking sticker</b> sends any emoji pacing along a path. <b>Grow</b> sprouts leaves and flowers along a line over a few seconds. Fun brushes: crayon, rainbow, neon, glitter, bubbles, confetti, stickers.</p>
+  </div></details>
+  <details><summary><span class="ic">💾</span>Saving and sharing</summary><div class="c">
+    <p>Everything autosaves on this device. File → <b>Export project</b> makes one <code>.nazca</code> file with every layer, keyframe, note, and portal; open it on another phone. <b>Save PNG</b> exports what is on screen at the current depth, transparent and trimmed.</p>
+  </div></details>
+  <p style="color:var(--muted);margin-top:24px;font-size:13px">Nazca is a single file that runs in the browser. Made by Mot Buchanan in Akron, Ohio, mostly on a phone.</p>
 </div></div>
 <canvas id="stage"></canvas>
 
@@ -352,24 +382,16 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--void);font-famil
 
 <div id="hint"><div class="card">
   <h2>Nazca</h2>
-  <p>Paper with no edges. Zoom out far enough and the whole drawing shows itself.</p>
-  <p><b>One finger</b> draws.</p>
-  <p><b>Two fingers</b> move, zoom, and rotate. Zoom in a million times; every stroke stays sharp. Draw a world inside a dot.</p>
-<p><b>Depth pill</b> at the top shows how deep you are and opens the Tour panel: drop keyframes, jump between them, play the zoom.</p>
-  <p><b>Two-finger tap</b> undoes. <b>Three-finger tap</b> redoes.</p>
-<p><b>Hold still</b> at the end of a line, circle, or box and it snaps perfect. <b>Press and hold</b> without moving to pick a color.</p>
-<p><b>Fun brushes</b> live under the Brush button. Draw a train track and watch what happens.</p>
-<p><b>Select</b> lifts a lassoed piece so you can move, scale, rotate, or copy it. Layers panel adds reference and trace images.</p>
-<p><b>Depth tools</b> (also under Brush): hidden notes that appear only when you zoom in, and portals that dive 100× deeper.</p>
-  <button id="hintOk">Start drawing</button>
-  <button id="hintGuide" style="margin-top:8px;background:transparent;color:#141a22;border:2px solid #141a22">Read the guide</button>
+  <p>Paper with no edges and no bottom. Draw, then zoom in and draw inside what you drew.</p>
+  <button id="hintIntro">Show me (1 minute)</button>
+  <button id="hintOk" style="margin-top:8px;background:transparent;color:#141a22;border:2px solid #141a22">Just let me draw</button>
 </div></div>
 
 <script>
 
 (() => {
 'use strict';
-const VERSION = 'v0.14 · Sep 6';
+const VERSION = 'v0.16 · Sep 7';
 const TILE = 512, OVER = 0.75;
 const ZMIN = -4, ZMAX = 24;               // levels: pixel density = 2^z per world unit
 const SMIN = Math.pow(2, ZMIN-2), SMAX = Math.pow(2, ZMAX);
@@ -558,6 +580,8 @@ const BRUSHES = [
   { id:'track',    name:'Train track',   hint:'Draw a track. A train shows up.',          size:14, opacity:1, fun:true, alive:'track' },
   { id:'bugs',     name:'Bug trail',     hint:'Bugs march along whatever you draw.',      size:8,  opacity:1, fun:true, alive:'bugs' },
   { id:'firework', name:'Fireworks',     hint:'Tap anywhere. Boom.',                      size:40, opacity:1, fun:true, alive:'firework' },
+  { id:'walker',   name:'Walking sticker', hint:'Draw a path. The emoji walks it. Pick one below.', size:36, opacity:1, fun:true, alive:'walker' },
+  { id:'grow',     name:'Grow',          hint:'Draw a line. Leaves and flowers sprout along it.', size:14, opacity:1, fun:true, alive:'grow' },
   // ---- depth marks ----
   { id:'reveal',   name:'Hidden note',   hint:'Tap to leave words that only appear this deep.', size:24, opacity:1, mark:'reveal' },
   { id:'portal',   name:'Portal',        hint:'Tap to make a doorway that dives 100× deeper.',  size:60, opacity:1, mark:'portal' },
@@ -706,10 +730,10 @@ function unlog(rec){ const i=doc.log.lastIndexOf(rec); if(i>=0) doc.log.splice(i
 
 /* ---------- alive layer: things that keep moving after you draw them ---------- */
 doc.alive=[]; let aliveStroke=null; const fx=[]; // fx = transient particles (not saved)
-function beginAlive(b,x,y){ aliveStroke={kind:b.alive, color:settings.color, size:b.size/viewScale(), scale:viewScale(), pts:[[x,y]], seed:Math.random()*1e6, t0:performance.now(), moved:0, anchor:{x,y}}; if(b.alive==='firework'){ spawnFirework(x,y,aliveStroke.size); aliveStroke=null; } }
+function beginAlive(b,x,y){ aliveStroke={kind:b.alive, color:settings.color, size:b.size/viewScale(), scale:viewScale(), pts:[[x,y]], seed:Math.random()*1e6, t0:performance.now(), moved:0, anchor:{x,y}, emoji:settings.emoji, born:Date.now()}; if(b.alive==='firework'){ spawnFirework(x,y,aliveStroke.size); aliveStroke=null; } }
 function moveAlive(x,y){ const a=aliveStroke; if(!a) return; const l=a.pts[a.pts.length-1]; if(Math.hypot(x-l[0],y-l[1])*a.scale>3){ a.pts.push([x,y]); a.moved++; } needRender=true; }
 function endAlive(){ const a=aliveStroke; aliveStroke=null; if(!a||a.pts.length<3) return; a.len=pathLen(a.pts); a.bbox=bboxOf(a.pts, a.size*3);
-  const before=doc.alive.slice(); doc.alive.push(a); const rec=replaying?null:logEvent({k:'a', a:{kind:a.kind,color:a.color,size:a.size,scale:a.scale,seed:a.seed,pts:a.pts}, view:[view.m.a,view.m.b,view.m.c,view.m.d,view.m.e,view.m.f]}); pushUndo({kind:'alive', before, after:doc.alive.slice(), log:rec}); noteRecentColor(a.color); needRender=true; }
+  const before=doc.alive.slice(); doc.alive.push(a); const rec=replaying?null:logEvent({k:'a', a:{kind:a.kind,color:a.color,size:a.size,scale:a.scale,seed:a.seed,pts:a.pts,emoji:a.emoji,born:a.born}, view:[view.m.a,view.m.b,view.m.c,view.m.d,view.m.e,view.m.f]}); pushUndo({kind:'alive', before, after:doc.alive.slice(), log:rec}); noteRecentColor(a.color); needRender=true; }
 function pathLen(p){ let L=0; for(let i=1;i<p.length;i++) L+=Math.hypot(p[i][0]-p[i-1][0],p[i][1]-p[i-1][1]); return L; }
 function bboxOf(p,pad){ let x0=Infinity,y0=Infinity,x1=-Infinity,y1=-Infinity; for(const [x,y] of p){ if(x<x0)x0=x; if(x>x1)x1=x; if(y<y0)y0=y; if(y>y1)y1=y; } return {x0:x0-pad,y0:y0-pad,x1:x1+pad,y1:y1+pad}; }
 function pointAt(p,d){ // position + tangent at arc distance d along polyline
@@ -730,6 +754,21 @@ function drawAlive(now){ // called inside the world transform
     else if(a.kind==='bugs'){ sctx.strokeStyle=a.color+'55'; sctx.lineWidth=w*0.25; sctx.beginPath(); a.pts.forEach(([x,y],i)=>i?sctx.lineTo(x,y):sctx.moveTo(x,y)); sctx.stroke();
       if(!a.preview){ const n=Math.max(3,Math.min(9,Math.round(a.len/(w*8)))); for(let i=0;i<n;i++){ const speed=(35+((a.seed*7+i*13)%20))/a.scale/1000; const period=a.len*2/speed; const t=(((now+a.seed*3+i*1234)%period)+period)%period/period; const d=t<0.5?t*2*a.len:(1-(t-0.5)*2)*a.len; const q=pointAt(a.pts,d); const wig=Math.sin(now/90+i)*w*0.25;
         sctx.save(); sctx.translate(q.x,q.y); sctx.rotate(q.ang+(t<0.5?0:Math.PI)); sctx.translate(0,wig); sctx.fillStyle=a.color; sctx.beginPath(); sctx.ellipse(0,0,w*0.7,w*0.45,0,0,Math.PI*2); sctx.fill(); sctx.fillStyle='#111'; sctx.beginPath(); sctx.arc(w*0.5,0,w*0.3,0,Math.PI*2); sctx.fill(); sctx.strokeStyle='#111'; sctx.lineWidth=Math.max(0.5/a.scale,w*0.08); for(const sd of [-1,1]) for(let l=0;l<3;l++){ const lx=(l-1)*w*0.4, ph=Math.sin(now/60+l*2+i)*w*0.15; sctx.beginPath(); sctx.moveTo(lx,sd*w*0.3); sctx.lineTo(lx+ph,sd*w*0.75); sctx.stroke(); } sctx.restore(); } } }
+  }
+  for(const a of list){ if(!rectsMeet(a.bbox,vis)) continue; const w=a.size;
+    if(a.kind==='walker'){ sctx.strokeStyle=a.color+'33'; sctx.lineWidth=Math.max(1/a.scale,w*0.08); sctx.setLineDash([w*0.3,w*0.3]); sctx.beginPath(); a.pts.forEach(([x,y],i)=>i?sctx.lineTo(x,y):sctx.moveTo(x,y)); sctx.stroke(); sctx.setLineDash([]);
+      if(!a.preview){ const speed=45/a.scale/1000; const period=a.len*2/speed; const t=((now+a.seed)%period)/period; const d=t<0.5?t*2*a.len:(1-(t-0.5)*2)*a.len; const q=pointAt(a.pts,d); const step=Math.abs(Math.sin(now/110)); const bob=-step*w*0.12; const flip=(Math.cos(q.ang)<0)!==(t>=0.5);
+        sctx.save(); sctx.translate(q.x,q.y+bob); sctx.rotate(Math.sin(now/110)*0.12); if(flip) sctx.scale(-1,1); sctx.font=`${w}px system-ui,"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`; sctx.textAlign='center'; sctx.textBaseline='middle'; sctx.fillText(a.emoji||'🐱',0,-w*0.35); sctx.restore();
+        sctx.fillStyle='rgba(0,0,0,0.12)'; sctx.beginPath(); sctx.ellipse(q.x,q.y+w*0.05,w*0.3*(1-step*0.3),w*0.08,0,0,Math.PI*2); sctx.fill(); } }
+    else if(a.kind==='grow'){ const age=a.preview?0:Math.min(1,(Date.now()-(a.born||0))/6000); // sprouts over six seconds, then stays
+      sctx.strokeStyle='#3f7d3a'; sctx.lineWidth=Math.max(1/a.scale,w*0.14); sctx.lineCap='round'; sctx.beginPath(); a.pts.forEach(([x,y],i)=>i?sctx.lineTo(x,y):sctx.moveTo(x,y)); sctx.stroke(); // the vine
+      if(age>0){ let k=0; for(let d=w*0.6; d<a.len; d+=w*0.9, k++){ const g0=(d/a.len); const life=Math.max(0,Math.min(1,(age*1.25-g0)*3)); if(life<=0) break; const q=pointAt(a.pts,d); const side=(k%2?1:-1); const r1=((a.seed*13+k*7919)%1000)/1000, r2=((a.seed*17+k*104729)%1000)/1000;
+        const nx=-Math.sin(q.ang)*side, ny=Math.cos(q.ang)*side; const stem=w*(0.5+r1*0.5)*life; const sway=Math.sin(now/700+k)*w*0.06;
+        sctx.strokeStyle='#3f7d3a'; sctx.lineWidth=Math.max(0.5/a.scale,w*0.06); sctx.beginPath(); sctx.moveTo(q.x,q.y); sctx.quadraticCurveTo(q.x+nx*stem*0.5+sway, q.y+ny*stem*0.5, q.x+nx*stem+sway, q.y+ny*stem); sctx.stroke();
+        const tx=q.x+nx*stem+sway, ty=q.y+ny*stem;
+        if(r2<0.55){ sctx.save(); sctx.translate(tx,ty); sctx.rotate(Math.atan2(ny,nx)); sctx.fillStyle=r1<0.5?'#5aa64f':'#7cc46b'; sctx.beginPath(); sctx.ellipse(w*0.18*life,0,w*0.32*life,w*0.16*life,0,0,Math.PI*2); sctx.fill(); sctx.restore(); }
+        else { const petals=5; const col=shiftHue(a.color,(r1-0.5)*60); sctx.fillStyle=col; for(let pp=0;pp<petals;pp++){ const an=pp/petals*Math.PI*2+now/2500; sctx.beginPath(); sctx.ellipse(tx+Math.cos(an)*w*0.14*life, ty+Math.sin(an)*w*0.14*life, w*0.12*life, w*0.07*life, an, 0, Math.PI*2); sctx.fill(); } sctx.fillStyle='#ffd23f'; sctx.beginPath(); sctx.arc(tx,ty,w*0.07*life,0,Math.PI*2); sctx.fill(); }
+      } if(age<1) any=true; } }
   }
   // fireworks
   for(let i=fx.length-1;i>=0;i--){ const q=fx[i]; q.t+=dt; if(q.t>q.life){ fx.splice(i,1); continue; } q.vy+=q.g*dt; q.x+=q.vx*dt/16; q.y+=q.vy*dt/16; q.vx*=0.985; q.vy*=0.985; const k=1-q.t/q.life; sctx.globalAlpha=k; sctx.fillStyle=q.color; sctx.beginPath(); sctx.arc(q.x,q.y,q.size*(0.5+k*0.5),0,Math.PI*2); sctx.fill(); }
@@ -785,7 +824,7 @@ function renderDepthMap(){ const c=$('dmapC'); const {rects,b,zmin,zmax}=depthMa
 function depthMapTap(ev){ const c=$('dmapC'); const m=c._map; if(!m) return; const r=c.getBoundingClientRect(); const sx=ev.clientX-r.left, sy=ev.clientY-r.top; const wx=m.b.x0+(sx-m.ox)/m.sc, wy=m.b.y0+(sy-m.oy)/m.sc;
   let best=null; for(const t of m.rects){ if(wx>=t.x0&&wx<=t.x1&&wy>=t.y0&&wy<=t.y1){ if(!best||t.z>best.z) best=t; } } if(!best){ return; }
   const z=best.z, sc=Math.pow(2,z); const cx=(best.x0+best.x1)/2, cy=(best.y0+best.y1)/2; closePanels(); flyTo(new DOMMatrix().translate(window.innerWidth/2,window.innerHeight/2).scale(sc*(window.innerWidth/TILE)*0.9).translate(-cx,-cy)); }
-function serializeAlive(){ return doc.alive.map(a=>({kind:a.kind,color:a.color,size:a.size,scale:a.scale,seed:a.seed,pts:a.pts})); }
+function serializeAlive(){ return doc.alive.map(a=>({kind:a.kind,color:a.color,size:a.size,scale:a.scale,seed:a.seed,pts:a.pts,emoji:a.emoji,born:a.born})); }
 function deserializeAlive(list){ doc.alive=(list||[]).map(a=>Object.assign({},a,{len:pathLen(a.pts),bbox:bboxOf(a.pts,a.size*3)})); }
 // keep only the changed rectangle of each touched tile (before + after), so undo memory tracks what you painted, not tile size
 function crop(src, r){ if(!src) return null; const c=document.createElement('canvas'); c.width=r.x1-r.x0; c.height=r.y1-r.y0; c.getContext('2d').drawImage(src, r.x0,r.y0,c.width,c.height, 0,0,c.width,c.height); return {rect:r, canvas:c}; }
@@ -862,7 +901,7 @@ function stepReplay(){ // one animation frame of replay
     const j1=Math.min(rec.pts.length, R.j+perFrame); feedPoints(rec,R.j,j1); R.j=j1;
     if(R.j>=rec.pts.length){ if(stroke.buf) commitBuffer(stroke); stroke=null; R.i++; R.j=0; }
   } else if(rec.k==='f'){ doc.active=Math.min(rec.L,doc.layers.length-1); const keep=stroke; stroke=null; floodFill(rec.x,rec.y,{color:rec.color,tol:rec.tol,grow:rec.grow,gap:rec.gap}); stroke=keep; R.i++; }
-  else if(rec.k==='a'){ const a=Object.assign({},rec.a,{len:pathLen(rec.a.pts),bbox:bboxOf(rec.a.pts,rec.a.size*3)}); doc.alive.push(a); R.i++; }
+  else if(rec.k==='a'){ const a=Object.assign({},rec.a,{len:pathLen(rec.a.pts),bbox:bboxOf(rec.a.pts,rec.a.size*3),born:Date.now()}); doc.alive.push(a); R.i++; }
   else R.i++;
 }
 /* ---------- recording the canvas to WebM ---------- */
@@ -1308,11 +1347,11 @@ function setBrush(id){ settings.brush=id; setTool('brush'); renderBrushList(); s
 function renderBrushList(){ const list=$('brushList'); list.innerHTML='';
   let sec=null;
   for(const b of BRUSHES){ const want=b.mark?'Depth':b.alive?'Alive':(b.fun?'Fun':'Pro'); if(want!==sec){ sec=want; const h=document.createElement('h4'); h.textContent=sec; list.appendChild(h); } const row=document.createElement('div'); row.className='brow'+(b.id===settings.brush?' on':''); const c=document.createElement('canvas'); c.width=120*DPR; c.height=36*DPR; c.style.width='120px'; c.style.height='36px'; previewStroke(c, Object.assign({},b,settings.per[b.id]||{}), settings.color);
-    const t=document.createElement('div'); t.innerHTML='<div class="bn">'+b.name+'</div><div class="bh">'+b.hint+'</div>'; row.append(c,t); row.addEventListener('click',()=>{ setBrush(b.id); if(b.id!=='sticker') closePanels(); else renderBrushList(); }); list.appendChild(row);
-    if(b.id==='sticker'&&settings.brush==='sticker'){ const grid=document.createElement('div'); grid.className='egrid'; for(const em of EMOJI){ const bt=document.createElement('button'); bt.textContent=em; bt.className=em===settings.emoji?'on':''; bt.addEventListener('click',()=>{ settings.emoji=em; saveSettings(); renderBrushList(); }); grid.appendChild(bt); } list.appendChild(grid); } } }
+    const t=document.createElement('div'); t.innerHTML='<div class="bn">'+b.name+'</div><div class="bh">'+b.hint+'</div>'; row.append(c,t); row.addEventListener('click',()=>{ setBrush(b.id); if(b.id!=='sticker'&&b.id!=='walker') closePanels(); else renderBrushList(); }); list.appendChild(row);
+    if((b.id==='sticker'||b.id==='walker')&&settings.brush===b.id){ const grid=document.createElement('div'); grid.className='egrid'; for(const em of EMOJI){ const bt=document.createElement('button'); bt.textContent=em; bt.className=em===settings.emoji?'on':''; bt.addEventListener('click',()=>{ settings.emoji=em; saveSettings(); renderBrushList(); }); grid.appendChild(bt); } list.appendChild(grid); } } }
 function previewStroke(c,b,color){ const g=c.getContext('2d'); g.setTransform(DPR,0,0,DPR,0,0); const w=c.width/DPR,h=c.height/DPR; g.clearRect(0,0,w,h); g.fillStyle='#fbfaf6'; g.fillRect(0,0,w,h);
   if(b.mark){ g.font='22px system-ui'; g.textAlign='center'; g.fillText(b.mark==='portal'?'◎ ⇲':'👁 …', w/2, h/2+8); return; }
-  if(b.alive){ g.strokeStyle=color; g.lineWidth=4; g.lineCap='round'; g.beginPath(); for(let x=8;x<w-8;x+=3){ const y=h/2+Math.sin(x/12)*8; x===8?g.moveTo(x,y):g.lineTo(x,y); } g.stroke(); g.font='18px system-ui'; g.textAlign='right'; g.fillText(b.alive==='track'?'🚂':b.alive==='bugs'?'🐞':b.alive==='firework'?'🎆':'〰️', w-6, h/2+7); return; }
+  if(b.alive){ g.strokeStyle=color; g.lineWidth=4; g.lineCap='round'; g.beginPath(); for(let x=8;x<w-8;x+=3){ const y=h/2+Math.sin(x/12)*8; x===8?g.moveTo(x,y):g.lineTo(x,y); } g.stroke(); g.font='18px system-ui'; g.textAlign='right'; g.fillText(b.alive==='track'?'🚂':b.alive==='bugs'?'🐞':b.alive==='firework'?'🎆':b.alive==='walker'?settings.emoji:b.alive==='grow'?'🌿':'〰️', w-6, h/2+7); return; }
   const buf=document.createElement('canvas'); buf.width=c.width; buf.height=c.height; const bg=buf.getContext('2d'); bg.setTransform(DPR,0,0,DPR,0,0);
   const size=Math.min(b.size,22); let seed=7; const R=()=>{ seed=(seed*9301+49297)%233280; return seed/233280; };
   const n=Math.max(8,Math.round(w/Math.max(0.5,size*b.spacing)));
@@ -1393,11 +1432,82 @@ window.addEventListener('keydown',e=>{ if((e.ctrlKey||e.metaKey)&&e.key.toLowerC
   im.onload=()=>{ g.style.backgroundImage=`url(${im.src})`; setTimeout(finish, 2650); };
   im.onerror=()=>{ g.style.background='radial-gradient(circle at 50% 45%,#f59847,#4cf0e0 70%)'; setTimeout(finish, 2650); };
   im.src='icon-512.png'; el.addEventListener('pointerdown',finish); setTimeout(finish, 4000); })();
+/* ---------- intro: animated, skippable ---------- */
+const INTRO=[
+  {t:'Paper with no edges', p:'Draw anywhere. Zoom out and your drawing becomes a dot. Zoom in and every line is still sharp.', d:'zoomout'},
+  {t:'One finger draws', p:'Any brush, any size. Fast strokes go thin like real ink.', d:'draw'},
+  {t:'Two fingers move', p:'Pinch to zoom, twist to rotate, drag to pan. The paper never ends.', d:'pinch'},
+  {t:'Tap to undo', p:'Two-finger tap undoes. Three-finger tap redoes. No buttons needed.', d:'undo'},
+  {t:'Hold still to snap', p:'Draw a rough circle and pause at the end. It becomes a perfect one. Lines and boxes too.', d:'snap'},
+  {t:'Go deeper', p:'Zoom into a line until it is a road. Draw a town on it. Zoom into a window. Draw the room. The depth gauge counts how far you have gone.', d:'deep'},
+  {t:'Brushes that live', p:'Pro pens and pencils, fun brushes like neon and glitter, and alive tools: draw a track and a train shows up.', d:'train'},
+  {t:'Tell the story', p:'Drop keyframes as you explore, add captions, and Nazca flies through them. Record it as a video straight from your phone.', d:'tour'},
+  {t:'That is it', p:'Start with a simple drawing. The deep stuff is there whenever you are curious. The Guide explains all of it.', d:'end'},
+];
+let intro=null;
+function openIntro(){ closePanels(); closeGuide(); $('hint').classList.add('gone'); store.set('nazca.hint.v2','1'); intro={i:0,t0:performance.now()}; $('intro').classList.add('open'); renderIntro(); introLoop(); }
+function closeIntro(){ intro=null; $('intro').classList.remove('open'); store.set('nazca.intro.v1','1'); }
+function renderIntro(){ const st=INTRO[intro.i]; $('introT').textContent=st.t; $('introP').textContent=st.p; $('introNext').textContent=intro.i===INTRO.length-1?'Start drawing':'Next'; $('introSkip').style.visibility=intro.i===INTRO.length-1?'hidden':'visible';
+  const d=$('introDots'); d.innerHTML=''; INTRO.forEach((_,k)=>{ const i=document.createElement('i'); if(k===intro.i) i.className='on'; d.appendChild(i); }); intro.t0=performance.now(); }
+function introLoop(){ if(!intro) return; const c=$('introC'); const w=c.clientWidth||360,h=220; if(c.width!==w*DPR){ c.width=w*DPR; c.height=h*DPR; } const g=c.getContext('2d'); g.setTransform(DPR,0,0,DPR,0,0); g.clearRect(0,0,w,h); g.fillStyle='#f3f1ea'; g.fillRect(0,0,w,h);
+  const t=(performance.now()-intro.t0)/1000; DEMO[INTRO[intro.i].d](g,w,h,t); requestAnimationFrame(introLoop); }
+// small procedural demos; all loop on t
+const INK='#141a22', TEAL='#4cf0e0', ORANGE='#f59847';
+const ease=u=>u<0.5?2*u*u:1-Math.pow(-2*u+2,2)/2;
+function finger(g,x,y,down=true){ g.fillStyle=down?'rgba(245,152,71,.9)':'rgba(245,152,71,.45)'; g.beginPath(); g.arc(x,y,11,0,Math.PI*2); g.fill(); g.strokeStyle='#fff'; g.lineWidth=2; g.stroke(); }
+function squiggle(g,x0,y0,len,phase,amp){ g.beginPath(); for(let i=0;i<=len;i+=3){ const x=x0+i, y=y0+Math.sin((i+phase)/22)*amp; i?g.lineTo(x,y):g.moveTo(x,y); } }
+function house(g,x,y,s){ g.strokeStyle=INK; g.lineWidth=Math.max(1,s*0.06); g.lineJoin='round'; g.strokeRect(x-s/2,y-s/4,s,s/2); g.beginPath(); g.moveTo(x-s/2-s*0.1,y-s/4); g.lineTo(x,y-s*0.6); g.lineTo(x+s/2+s*0.1,y-s/4); g.stroke(); g.strokeRect(x-s*0.15,y-s*0.05,s*0.3,s*0.3); }
+const DEMO={
+  zoomout(g,w,h,t){ const T=t%5; const zoom = T<2?1: T<4? 1-((T-2)/2)*0.96 : 0.04; g.save(); g.translate(w/2,h/2); g.scale(zoom,zoom); g.translate(-w/2,-h/2);
+    g.strokeStyle=INK; g.lineWidth=5; g.lineCap='round'; const n=Math.min(1,T/1.8); squiggle(g,40,h/2,(w-80)*n,0,40); g.stroke(); house(g,w*0.3,h*0.62,50); house(g,w*0.72,h*0.55,36); g.restore();
+    if(T>4.2){ g.fillStyle=INK; g.beginPath(); g.arc(w/2,h/2,3,0,Math.PI*2); g.fill(); } g.fillStyle='#8e98a4'; g.font='600 12px system-ui'; g.textAlign='right'; g.fillText(fmtScale(zoom),w-12,h-12); },
+  draw(g,w,h,t){ const T=(t%3)/3; g.strokeStyle=INK; g.lineCap='round'; const len=(w-80)*Math.min(1,T*1.3); g.beginPath(); for(let i=0;i<=len;i+=3){ const x=40+i,y=h/2+Math.sin(i/30)*45; i?g.lineTo(x,y):g.moveTo(x,y); } g.lineWidth=6; g.stroke(); const x=40+len,y=h/2+Math.sin(len/30)*45; finger(g,x,y,T<0.8); },
+  pinch(g,w,h,t){ const T=t%4; const f = T<2? 1+T*0.45 : 1.9-(T-2)*0.45; const rot=Math.sin(t/2)*0.35; g.save(); g.translate(w/2,h/2); g.rotate(rot); g.scale(f,f); g.translate(-w/2,-h/2); g.strokeStyle=INK; g.lineWidth=4; house(g,w/2,h/2+10,70); g.restore();
+    const d=38*f; const a=rot+Math.PI/4; finger(g,w/2+Math.cos(a)*d,h/2+Math.sin(a)*d); finger(g,w/2-Math.cos(a)*d,h/2-Math.sin(a)*d); },
+  undo(g,w,h,t){ const T=t%3; g.strokeStyle=INK; g.lineWidth=5; g.lineCap='round'; squiggle(g,40,h/2-20,w-80,0,30); g.stroke(); if(T<1.2){ g.strokeStyle=ORANGE; squiggle(g,60,h/2+40,w-120,50,20); g.stroke(); } if(T>1.0&&T<1.6){ finger(g,w/2-22,h/2+10); finger(g,w/2+22,h/2+10); } if(T>1.2&&T<2.2){ g.fillStyle='#141a22'; g.font='700 14px system-ui'; g.textAlign='center'; g.fillText('Undo',w/2,h-18); } },
+  snap(g,w,h,t){ const T=t%4; g.strokeStyle=INK; g.lineWidth=5; g.lineCap='round'; const cx=w/2, cy=h/2, r=60; const done=Math.min(1,T/1.6); const perfect=T>2.4; g.beginPath(); for(let i=0;i<=200*done;i++){ const a=i/200*Math.PI*2; const rr=perfect?r:r+Math.sin(a*5+1)*8+Math.cos(a*3)*5; const x=cx+Math.cos(a)*rr,y=cy+Math.sin(a)*rr; i?g.lineTo(x,y):g.moveTo(x,y); } g.stroke();
+    if(T>1.6){ const a=Math.PI*2; const rr=perfect?r:r+Math.sin(a*5+1)*8+Math.cos(a*3)*5; finger(g,cx+Math.cos(a)*rr,cy+Math.sin(a)*rr,T<3.6); } if(T>1.9&&T<2.4){ g.fillStyle='#8e98a4'; g.font='600 12px system-ui'; g.textAlign='center'; g.fillText('hold still…',cx,h-14); } if(perfect&&T<3.6){ g.fillStyle=ORANGE; g.font='700 13px system-ui'; g.textAlign='center'; g.fillText('Snapped: circle',cx,h-14); } },
+  deep(g,w,h,t){ // three beats, camera locked on one window: line -> road with houses on it -> the room behind the window
+    const T=t%8; let z; if(T<2.6) z=Math.pow(30, ease(T/2.6)); else if(T<3.4) z=30; else if(T<6.2) z=30*Math.pow(20, ease((T-3.4)/2.8)); else z=600;
+    g.save(); g.translate(w/2,h/2); g.scale(z,z); g.rotate(-0.13); // everything lives in a frame tilted like the line; the window sits at the origin
+    const ROAD=5.1, HS=4.2; // road center below the window; house size
+    g.strokeStyle=INK; g.lineCap='round'; g.lineWidth=6; g.beginPath(); g.moveTo(-300,ROAD); g.lineTo(300,ROAD); g.stroke();
+    if(z>2.5){ const k=Math.min(1,(z-2.5)/6); g.globalAlpha=k;
+      g.strokeStyle='#fbfaf6'; g.lineWidth=0.35; g.setLineDash([1.6,1.2]); g.beginPath(); g.moveTo(-300,ROAD); g.lineTo(300,ROAD); g.stroke(); g.setLineDash([]);
+      for(let i=-3;i<=3;i++){ const x=i*7; g.save(); g.translate(x,0); g.strokeStyle=INK; g.lineWidth=0.18; g.lineJoin='round'; g.fillStyle='#fbfaf6';
+        g.fillRect(-HS/2,-HS/2,HS,HS); g.strokeRect(-HS/2,-HS/2,HS,HS); g.beginPath(); g.moveTo(-HS/2-0.4,-HS/2); g.lineTo(0,-HS*0.95); g.lineTo(HS/2+0.4,-HS/2); g.stroke();
+        g.strokeRect(-0.5,0.6,1,1.5); // door
+        if(i===0){ g.lineWidth=0.07; g.strokeRect(-0.45,-0.45,0.9,0.9); if(z<90){ g.beginPath(); g.moveTo(0,-0.45); g.lineTo(0,0.45); g.moveTo(-0.45,0); g.lineTo(0.45,0); g.stroke(); } } else { g.strokeRect(-1.4,-0.9,0.8,0.8); g.strokeRect(0.6,-0.9,0.8,0.8); }
+        g.restore(); }
+      g.globalAlpha=1; }
+    if(z>90){ const k=Math.min(1,(z-90)/200); g.globalAlpha=k; // the room behind the window
+      g.fillStyle='#fff8ec'; g.fillRect(-0.44,-0.44,0.88,0.88); g.strokeStyle=INK; g.lineWidth=0.012; g.lineJoin='round';
+      g.beginPath(); g.moveTo(-0.44,0.3); g.lineTo(0.44,0.3); g.stroke(); // floor line
+      g.strokeRect(-0.3,0.05,0.3,0.12); g.beginPath(); g.moveTo(-0.28,0.17); g.lineTo(-0.28,0.3); g.moveTo(-0.02,0.17); g.lineTo(-0.02,0.3); g.stroke(); // table
+      g.beginPath(); g.moveTo(0.24,0.3); g.lineTo(0.24,0.0); g.stroke(); g.beginPath(); g.moveTo(0.14,0.0); g.lineTo(0.34,0.0); g.lineTo(0.3,-0.14); g.lineTo(0.18,-0.14); g.closePath(); g.stroke(); // lamp
+      g.fillStyle=ORANGE; g.beginPath(); g.arc(-0.15,-0.06,0.07,0,Math.PI*2); g.fill(); g.beginPath(); g.moveTo(-0.21,-0.1); g.lineTo(-0.19,-0.17); g.lineTo(-0.15,-0.12); g.closePath(); g.fill(); g.beginPath(); g.moveTo(-0.09,-0.1); g.lineTo(-0.11,-0.17); g.lineTo(-0.15,-0.12); g.closePath(); g.fill(); // cat + ears
+      g.fillStyle=INK; g.beginPath(); g.arc(-0.175,-0.07,0.008,0,Math.PI*2); g.arc(-0.125,-0.07,0.008,0,Math.PI*2); g.fill();
+      g.font='0.07px system-ui'; g.textAlign='center'; g.fillText('hi', -0.15, -0.2); g.globalAlpha=1; }
+    g.restore();
+    g.fillStyle=TEAL; g.font='700 13px system-ui'; g.textAlign='right'; roundRect(g,w-84,10,72,26,13); g.fill(); g.fillStyle='#0d1117'; g.fillText(fmtScale(z),w-20,28);
+    const cap = T<2.6?'a line…':T<3.4?'…is a road with houses on it…':T<6.2?'…zoom into one window…':'…and someone lives there.'; g.fillStyle='#8e98a4'; g.font='600 12px system-ui'; g.textAlign='center'; g.fillText(cap,w/2,h-10); },
+  train(g,w,h,t){ const pts=[]; for(let i=0;i<=w-40;i+=6) pts.push([20+i, h/2+Math.sin(i/60)*35]); const len=pathLen(pts); g.strokeStyle='#7a5a3a'; g.lineWidth=3; for(let d=0;d<len;d+=13){ const q=pointAt(pts,d); const nx=-Math.sin(q.ang)*8, ny=Math.cos(q.ang)*8; g.beginPath(); g.moveTo(q.x-nx,q.y-ny); g.lineTo(q.x+nx,q.y+ny); g.stroke(); } g.strokeStyle='#5b6470'; g.lineWidth=2; for(const sd of [-1,1]){ g.beginPath(); for(let d=0;d<=len;d+=4){ const q=pointAt(pts,d); const nx=-Math.sin(q.ang)*5*sd, ny=Math.cos(q.ang)*5*sd; d?g.lineTo(q.x+nx,q.y+ny):g.moveTo(q.x+nx,q.y+ny); } g.stroke(); }
+    const head=((t*70)%(len*2)); const dd=head<len?head:len*2-head; const dir=head<len?1:-1; for(let c=0;c<3;c++){ const d=dd-dir*c*22; if(d<0||d>len) continue; const q=pointAt(pts,d); g.save(); g.translate(q.x,q.y); g.rotate(q.ang); g.fillStyle=c?shiftHue(ORANGE,60*c):ORANGE; g.fillRect(-10,-6,20,12); g.fillStyle='#111'; g.fillRect(-7,4,4,3); g.fillRect(3,4,4,3); g.restore(); }
+    g.fillStyle='#8e98a4'; g.font='600 12px system-ui'; g.textAlign='center'; g.fillText('Brush → Alive → Train track',w/2,h-12); },
+  tour(g,w,h,t){ const T=t%6; const keys=[[70,60,1],[w-80,h-70,3],[w/2,h/2,9]]; const i=Math.floor(T/2), u=(T%2)/2; const e=u<0.5?2*u*u:1-Math.pow(-2*u+2,2)/2; const a=keys[i], b=keys[(i+1)%3]; const z=a[2]*Math.pow(b[2]/a[2],e); const cx=a[0]+(b[0]-a[0])*e, cy=a[1]+(b[1]-a[1])*e;
+    g.save(); g.translate(w/2,h/2); g.scale(z/3,z/3); g.translate(-cx,-cy); g.strokeStyle=INK; g.lineWidth=4; house(g,70,60,60); house(g,w-80,h-70,60); house(g,w/2,h/2,20); squiggle(g,40,h-20,w-80,0,10); g.stroke(); g.restore();
+    keys.forEach((k,j)=>{ g.fillStyle=j===i?ORANGE:'#c9cdd3'; g.beginPath(); g.arc(20+j*16,18,5,0,Math.PI*2); g.fill(); });
+    if(u<0.4){ g.fillStyle='rgba(20,26,34,.9)'; roundRect(g,w/2-90,h-42,180,28,14); g.fill(); g.fillStyle='#ebedef'; g.font='600 13px system-ui'; g.textAlign='center'; g.fillText(['Once upon a hill…','…there was a house…','…with a tiny door.'][i],w/2,h-24); } },
+  end(g,w,h,t){ g.strokeStyle=INK; g.lineWidth=5; g.lineCap='round'; squiggle(g,40,h/2,w-80,t*40,30); g.stroke(); const x=w/2+Math.cos(t)*60, y=h/2+Math.sin(t*1.3)*30; g.fillStyle=TEAL; g.beginPath(); g.arc(x,y,6,0,Math.PI*2); g.fill(); g.fillStyle='#8e98a4'; g.font='600 12px system-ui'; g.textAlign='center'; g.fillText('Tap Start drawing',w/2,h-14); }
+};
+$('introNext').addEventListener('click',()=>{ if(!intro) return; if(intro.i>=INTRO.length-1){ closeIntro(); return; } intro.i++; renderIntro(); });
+$('introSkip').addEventListener('click',closeIntro);
+$('introC').addEventListener('click',()=>{ if(intro&&intro.i<INTRO.length-1){ intro.i++; renderIntro(); } });
+$('hintIntro').addEventListener('click',openIntro); $('guideIntro').addEventListener('click',openIntro);
 function openGuide(){ closePanels(); $('guide').classList.add('open'); $('guide').scrollTop=0; }
 function closeGuide(){ $('guide').classList.remove('open'); }
 $('guideBtn').addEventListener('click',openGuide); $('guideClose').addEventListener('click',closeGuide);
-$('hintGuide').addEventListener('click',()=>{ hint.classList.add('gone'); store.set('nazca.hint.v2','1'); openGuide(); });
-window.addEventListener('keydown',e=>{ if(e.key==='Escape'&&$('guide').classList.contains('open')) closeGuide(); });
+window.addEventListener('keydown',e=>{ if(e.key==='Escape'){ if($('guide').classList.contains('open')) closeGuide(); if(intro) closeIntro(); } });
 /* ---------- boot ---------- */
 window.nazca={doc,view,settings,toWorld,toScreen,drawLevel,floodFill,curBrush,get stroke(){return stroke;}};
 resize(); resetView(); setTool(settings.tool); setColor(settings.color); updateUndoBtns(); renderKeyList(); renderColors();
