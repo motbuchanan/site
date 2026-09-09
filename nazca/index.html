@@ -391,7 +391,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--void);font-famil
 
 (() => {
 'use strict';
-const VERSION = 'v0.17 · Sep 7';
+const VERSION = 'v0.18 · Sep 9';
 const TILE = 512, OVER = 0.75;
 const ZMIN = -4, ZMAX = 24;               // levels: pixel density = 2^z per world unit
 const SMIN = Math.pow(2, ZMIN-2), SMAX = Math.pow(2, ZMAX);
@@ -1508,6 +1508,8 @@ function openGuide(){ closePanels(); $('guide').classList.add('open'); $('guide'
 function closeGuide(){ $('guide').classList.remove('open'); }
 $('guideBtn').addEventListener('click',openGuide); $('guideClose').addEventListener('click',closeGuide);
 window.addEventListener('keydown',e=>{ if(e.key==='Escape'){ if($('guide').classList.contains('open')) closeGuide(); if(intro) closeIntro(); } });
+/* ---------- offline: service worker (only from a real https origin) ---------- */
+if('serviceWorker' in navigator && location.protocol==='https:'){ navigator.serviceWorker.register('sw.js').then(reg=>{ reg.addEventListener('updatefound',()=>{ const nw=reg.installing; nw&&nw.addEventListener('statechange',()=>{ if(nw.state==='installed'&&navigator.serviceWorker.controller) toast('Nazca updated. Reopen to get the new version.'); }); }); }).catch(()=>{}); }
 /* ---------- boot ---------- */
 window.nazca={doc,view,settings,toWorld,toScreen,drawLevel,floodFill,curBrush,get stroke(){return stroke;}};
 resize(); resetView(); setTool(settings.tool); setColor(settings.color); updateUndoBtns(); renderKeyList(); renderColors();

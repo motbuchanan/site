@@ -1,12 +1,13 @@
-# NAZCA-HANDOFF.md (v0.17 · Sep 7 2026)
+# NAZCA-HANDOFF.md (v0.18 · Sep 9 2026)
 
 ## What this is
 Nazca is Mot's infinite deep-zoom drawing app: kid-friendly fun brushes and pro tools in one UI, with the zoom itself as the identity (draw a world inside a dot, then play the zoom as a story). Single-file HTML PWA, no dependencies, no server. Deploys as a folder in the site repo `motbuchanan/site` at `nazca/` (same pattern as `allthumbs/` and `reframe/`), so the live URL is https://motbuchanan.com/nazca/. Authoritative file: `nazca/index.html` (this package). Icon: `nazca/icon-*.png` from Mot's Nazca-bird artwork.
 
 ## Current state
-- v0.17 · Sep 7. Phases 1 to 9 shipped: deep-zoom tiled engine (levels -4 to 24, 1/64× to 16.7M×), stabilizer, speed taper, hold-to-snap shapes, 2/3-finger tap undo/redo, layers, IndexedDB autosave, `.nazca` project files, brush presets (Pro / Fun / Alive), buffered per-stroke opacity, fill with close-gaps + grow, long-press eyedropper, recent colors + palette, alive layer (wobble, train track, bugs, fireworks), stroke log with replay, timelapse and tour video export (WebM via MediaRecorder), keyframe captions + hold, editable last stroke, symmetry, depth-locked layers, hidden notes, portals, real-world scale reference, depth map, reference and trace images (floats), lasso select with move/scale/rotate/copy, freeze moving things to pixels, seed brush, sky loading screen (icon-512.png descent), animated skippable 9-slide intro (procedural canvas demos, first-run and from the Guide), Guide rebuilt as collapsible sections, walking stickers (emoji pacing a path), grow brush (vine sprouts leaves and flowers over 6 s, then stays).
+- v0.18 · Sep 9. Phases 1 to 9 shipped: deep-zoom tiled engine (levels -4 to 24, 1/64× to 16.7M×), stabilizer, speed taper, hold-to-snap shapes, 2/3-finger tap undo/redo, layers, IndexedDB autosave, `.nazca` project files, brush presets (Pro / Fun / Alive), buffered per-stroke opacity, fill with close-gaps + grow, long-press eyedropper, recent colors + palette, alive layer (wobble, train track, bugs, fireworks), stroke log with replay, timelapse and tour video export (WebM via MediaRecorder), keyframe captions + hold, editable last stroke, symmetry, depth-locked layers, hidden notes, portals, real-world scale reference, depth map, reference and trace images (floats), lasso select with move/scale/rotate/copy, freeze moving things to pixels, seed brush, sky loading screen (icon-512.png descent), animated skippable 9-slide intro (procedural canvas demos, first-run and from the Guide), Guide rebuilt as collapsible sections, walking stickers (emoji pacing a path), grow brush (vine sprouts leaves and flowers over 6 s, then stays).
 - Verified headless (Chromium): all of the above. Verified on Mot's phone: engine through v0.9 (crash fix confirmed), Deep zoom "works beautifully". Untested on device: v0.10 alive layer, v0.11 replay/video/adjust/symmetry.
-- Not yet done: Phase 10 (perspective/isometric guides) and the later list. No service worker yet (autosave already covers offline reopening; add sw.js only when the site adopts one for its other apps).
+- Service worker `sw.js` added v0.18 (network-first, offline fallback; bump CACHE name with each version). An illustrator friend with a new iPad + Apple Pencil is testing from Sep 9 2026; his feedback is the next input.
+- Not yet done: Phase 10 (perspective/isometric guides) and the later list. 
 
 ## Locked decisions
 - Name is Nazca. First name slate (Complement, Big Paper, Scribble, Endless, Marks) was rejected; do not re-propose.
@@ -28,6 +29,7 @@ Nazca is Mot's infinite deep-zoom drawing app: kid-friendly fun brushes and pro 
 5. Later: tile eviction to IndexedDB for very large drawings; sound pack (opt-in); simple/full UI depth toggle.
 
 ## Gotchas
+- sw.js caches by CACHE name; when shipping a new version, change `nazca-vX.Y` in sw.js too or installed iPads keep the old shell until the next network load.
 - Color emoji drawn with fillText inherit the ALPHA of the current fillStyle (Chrome). Always reset fillStyle/globalAlpha before drawing an emoji on the shared context; the alive loop now resets paint state per object (v0.17 fixed ghost walkers).
 - Mot rejected the v0.14 guide as a wall of text; the intro (`INTRO` array + `DEMO` functions) is the answer. Keep the guide sectioned and short; add a demo slide when a major feature lands.
 - The sky loading screen loads `icon-512.png` relative to the page; from a standalone file with no icon it falls back to a gradient. It runs every launch (2.65 s), tap skips, 4 s hard timeout. Guide content lives in the `#guide` div; update it when tools change.
@@ -43,7 +45,7 @@ Nazca is Mot's infinite deep-zoom drawing app: kid-friendly fun brushes and pro 
 - MediaRecorder output is WebM on Android/desktop Chrome, MP4 on Safari. Filenames `nazca-tour-*.webm`, `nazca-timelapse-*.webm`.
 
 ## File map
-- Package: `nazca/index.html` (app, v0.17), `nazca/manifest.json`, `nazca/icon-512.png`, `icon-192.png`, `icon-180.png` (apple-touch), `icon-maskable-512.png`, `nazca/NAZCA-HANDOFF.md`.
+- Package: `nazca/index.html` (app, v0.18), `nazca/manifest.json`, `nazca/icon-512.png`, `icon-192.png`, `icon-180.png` (apple-touch), `icon-maskable-512.png`, `nazca/NAZCA-HANDOFF.md`.
 - Repo: `motbuchanan/site`, branch `main`, custom domain via CNAME (motbuchanan.com). `.nojekyll` present.
 - Deployed URL after upload: https://motbuchanan.com/nazca/
 - Storage keys: localStorage `nazca.settings.v3`, `nazca.hint.v2`; IndexedDB db `nazca`, store `projects`, key `current`.
