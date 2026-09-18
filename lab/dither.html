@@ -48,24 +48,24 @@ footer{padding:0 16px 30px;color:#5d636e;font:500 11.5px/1.6 ui-monospace,monosp
 <div><label>black point</label><input type="range" id="blk" min="0" max="200" value="110"></div>
 <div><label>contrast</label><input type="range" id="con" min="50" max="300" value="170"></div>
 <div><label>dither grain</label><input type="range" id="grain" min="0" max="100" value="30"></div>
-<div><label>sweep speed</label><input type="range" id="spd" min="0" max="100" value="40"></div>
-<div><label>bands</label><input type="range" id="bands" min="1" max="8" value="2"></div>
+<div><label>sweep speed</label><input type="range" id="spd" min="0" max="100" value="35"></div>
+<div><label>band width</label><input type="range" id="bands" min="4" max="40" value="14"></div>
 </div>
 <div class="how">
 <h2>How it works (take it)</h2>
 <p><b>Shrink first.</b> The camera frame is drawn onto a tiny canvas (a couple hundred pixels wide). That's where the chunky look comes from. It's scaled back up with <code>image-rendering: pixelated</code> so every block stays crisp.</p>
 <p><b>Dither each color separately.</b> For every pixel, red, green and blue are each forced to fully on or fully off. The trick is an <b>ordered dither</b>: an 8x8 tile of threshold values (a Bayer matrix) decides, pixel by pixel, whether a mid-tone rounds up or down. Your eye blends the pattern back into shading. Doing it per channel is what gives you the pure red, green and blue speckle.</p>
-<p><b>The sweep.</b> This is the part that moves. Instead of a fixed threshold, each channel lights up a <b>band of brightness levels</b>, and that band slides over time. Red, green and blue are offset by a third of a cycle. Because the band is tied to brightness, the color crawls along the light contours of your face like a topographic map, which is what makes it read as 3D and strobing. Bands sets how many rings; speed sets how fast they travel.</p>
+<p><b>The sweep.</b> One brightness threshold rises from black to white over about a second. Only the pixels sitting right at that threshold light up, as a thin contour line. Red, green and blue use three slightly offset thresholds, so the line has a rainbow fringe: red on its leading edge, blue trailing. As the threshold climbs, the line walks up the face like a rising waterline meeting terrain, which is what makes it read as 3D. Band width sets how thick the line is; speed sets how fast it climbs. It bounces at the top and sweeps back down.</p>
 <p><b>Black point and contrast</b> are just a curve applied before the threshold. Push the black point up and the shadows drop to pure black, so only the lit parts of your face survive. That's the look from the reference.</p>
 <p><b>Teal/orange</b> mode is the same math on brightness only, then painted in the site's two colors. <b>cmy</b> paints the off-channel instead of the on-channel.</p>
 <p>About 60 lines of real code. No libraries. Runs at full frame rate on a phone because the working canvas is so small.</p>
 </div>
-<footer>mot buchanan &middot; motion lab 02b &middot; Sep 16 &middot; camera needs https; in previews it falls back to a photo</footer>
+<footer>mot buchanan &middot; motion lab 02c &middot; Sep 18 &middot; camera needs https; in previews it falls back to a photo</footer>
 <script>
 var out=document.getElementById('out'),octx=out.getContext('2d');
 var work=document.getElementById('work'),wctx=work.getContext('2d',{willReadFrequently:true});
 var vid=document.getElementById('vid'),srcEl=document.getElementById('src');
-var img=null,useCam=false,facing='user',stream=null,mode='sweep',invert=false;var SPD=40,BANDS=2;
+var img=null,useCam=false,facing='user',stream=null,mode='sweep',invert=false;var SPD=35,BANDS=2;
 var PX=5,BLK=110,CON=170,GRAIN=30;
 var B=[[0,32,8,40,2,34,10,42],[48,16,56,24,50,18,58,26],[12,44,4,36,14,46,6,38],[60,28,52,20,62,30,54,22],
        [3,35,11,43,1,33,9,41],[51,19,59,27,49,17,57,25],[15,47,7,39,13,45,5,37],[63,31,55,23,61,29,53,21]];
@@ -74,9 +74,9 @@ function fit(){var r=out.parentElement.getBoundingClientRect();out.width=Math.ma
 addEventListener('resize',fit);fit();
 function curve(v){ // black point + contrast, returns 0..255
   var x=(v-BLK)*(CON/100);return x<0?0:x>255?255:x;}
-var ph=0,lastT=performance.now();
+var ph=0,lastT=performance.now(),sweepT=0,BANDW=14,sweepDir=1;
 function frame(now){
-  var w=out.width,h=out.height; now=now||performance.now(); ph+=((now-lastT)/1000)*(SPD/100)*0.9; lastT=now;
+  var w=out.width,h=out.height; now=now||performance.now(); var dt=(now-lastT)/1000; lastT=now; ph+=dt*(SPD/100)*0.9; sweepT+=dt*(SPD/100)*220*sweepDir; if(sweepT>270){sweepT=270;sweepDir=-1;} if(sweepT<-15){sweepT=-15;sweepDir=1;}
   var source=useCam&&vid.readyState>=2?vid:img;
   if(source){
     // cover-fit the source into the tiny canvas
@@ -89,11 +89,16 @@ function frame(now){
       for(var x=0;x<w;x++){var i=(y*w+x)*4;var t=(by[x&7]/64-0.5)*GRAIN*2.55; // dither offset in 0..255 units
         var r=curve(d[i]),g=curve(d[i+1]),b=curve(d[i+2]);
         if(mode==='sweep'){
-          /* contour sweep: each channel lights a moving band of brightness levels, so color crawls along the light contours */
-          var l0=0.299*r+0.587*g+0.114*b; if(l0<=0){r=g=b=0;}
-          else{var u=l0/255*BANDS+ph, e=(t/255)*0.35; /* dither only nudges the band edges */
-            var fr=(u+e)-Math.floor(u+e), fg=(u+e+0.333)-Math.floor(u+e+0.333), fb=(u+e+0.666)-Math.floor(u+e+0.666);
-            r=fr<0.5?255:0; g=fg<0.5?255:0; b=fb<0.5?255:0;}
+          /* ONE brightness threshold T rises over time. Only pixels AT the threshold light up,
+             as a thin band with an RGB fringe: red just above T, green at T, blue just below T.
+             The band walks up the face's topography like a rising waterline. */
+          var l0=0.299*r+0.587*g+0.114*b;
+          var Tn=sweepT; // 0..255, current threshold
+          var W=BANDW;   // half-width of the band in brightness units
+          var dR=l0-(Tn+W*0.6), dG=l0-Tn, dB=l0-(Tn-W*0.6); // channel offsets = chromatic fringe
+          r=(Math.abs(dR)<W+t*0.15)?255:0;
+          g=(Math.abs(dG)<W+t*0.15)?255:0;
+          b=(Math.abs(dB)<W+t*0.15)?255:0;
         }
         else if(mode==='rgb'){r=r+t>128?255:0;g=g+t>128?255:0;b=b+t>128?255:0;}
         else{var l=0.299*r+0.587*g+0.114*b;var on=l+t>128;
@@ -129,7 +134,7 @@ document.getElementById('blk').addEventListener('input',function(){BLK=+this.val
 document.getElementById('con').addEventListener('input',function(){CON=+this.value;});
 document.getElementById('grain').addEventListener('input',function(){GRAIN=+this.value;});
 document.getElementById('spd').addEventListener('input',function(){SPD=+this.value;});
-document.getElementById('bands').addEventListener('input',function(){BANDS=+this.value;});
+document.getElementById('bands').addEventListener('input',function(){BANDW=+this.value;});
 document.getElementById('snap').addEventListener('click',function(){
   var big=document.createElement('canvas');var scale=PX;big.width=out.width*scale;big.height=out.height*scale;
   var c=big.getContext('2d');c.imageSmoothingEnabled=false;c.drawImage(out,0,0,big.width,big.height);
