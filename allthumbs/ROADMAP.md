@@ -126,6 +126,8 @@ Seven single-file HTML apps, same origin, deploy together in one folder. The hub
 | git-basics.html | Save Points | v3.0 | git101_v1 | state.m{m1..m7} + state.boss + quizBest + gym |
 | index.html | All Thumbs (hub) | v1.4 | reads all six | reads .m / .missions / .lessons + .gym |
 
+- Hub v1.17 (Sep 21 2026): site chrome pass on index.html only. Archivo/JetBrains Mono for chrome text, shared .mb-ver badge (fixed bottom-right, taps to toast), Refresh button on shared ghost chrome. Chapters and mascot art untouched.
+
 Course order: computer, internet, browser (Unit 1: how anything reaches your screen), then linux, python, git (Unit 2: your toolbox).
 
 NOTE the three different state shapes (.m vs .missions vs .lessons). The hub already handles all three. Any new app should pick one and the hub must be taught it.

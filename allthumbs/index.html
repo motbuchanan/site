@@ -8,6 +8,8 @@
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
 <title>All Thumbs: build it on a phone</title>
 <meta name="description" content="Six small interactive explainers, one map: computer, internet, browser, Linux, Python, and Git, with live progress tracking.">
@@ -15,19 +17,24 @@
 :root{
   --bg:#12141a; --panel:#1a1d26; --panel2:#222633; --ink:#e9ecf3; --dim:#98a0b0;
   --line:#2e3342; --good:#7ddf9a;
+  --mb-ink:#ebedef; --mb-soft:#c2c9d1; --mb-dim:#7d8794;
+  --mb-teal:#4cf0e0; --mb-orange:#f59847;
+  --mb-glass:rgba(14,18,23,.62); --mb-line:rgba(255,255,255,.12);
+  --mb-ui:'Archivo',system-ui,-apple-system,sans-serif;
+  --mb-mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{margin:0;background:var(--bg);color:var(--ink);
   background-image:radial-gradient(1100px 500px at 50% -140px,#1d2230 0%,transparent 60%);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font-family:var(--mb-ui);
   font-size:16px;line-height:1.55}
-.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace}
+.mono{font-family:var(--mb-mono)}
 main{max-width:680px;margin:0 auto;padding:8px 14px 90px}
 .hero{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px 16px;margin:18px 0}
 .topline{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
-.kick{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#9db4ff;font-weight:700;margin:0 0 6px}
-h1{font-size:34px;line-height:1.1;margin:4px 0 8px;letter-spacing:-.01em}
-h2{font-size:15px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin:26px 4px 10px}
+.kick{font:600 11px var(--mb-mono);letter-spacing:.08em;text-transform:uppercase;color:#9db4ff;margin:0 0 6px}
+h1{font:800 34px var(--mb-ui);line-height:1.1;margin:4px 0 8px;letter-spacing:-.02em}
+h2{font:600 11px var(--mb-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin:26px 4px 10px}
 p{margin:8px 0}
 .sub{color:var(--dim)}
 .small{font-size:13px;color:var(--dim)}
@@ -36,13 +43,12 @@ p{margin:8px 0}
 @media(max-width:420px){.heromascot{width:110px;flex-basis:110px}}
 .herotitle{flex:1;min-width:0}
 .herolede{margin-top:14px}
-#vbadge{position:absolute;top:14px;right:14px;background:var(--panel2);border:1px solid var(--line);color:var(--dim);border-radius:999px;
-  padding:5px 11px;font-size:12px;cursor:pointer;white-space:nowrap}
+.mb-ver{position:fixed;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:900;font:600 10px var(--mb-mono);letter-spacing:.04em;color:var(--mb-teal);background:var(--mb-glass);border:1px solid rgba(76,240,224,.25);border-radius:999px;padding:4px 9px;backdrop-filter:blur(8px);cursor:pointer;user-select:none;opacity:.85}
 .overall{margin-top:14px}
 .obar{height:14px;background:var(--panel2);border:1px solid var(--line);border-radius:999px;overflow:hidden}
 .obar > div{height:100%;width:0%;border-radius:999px;
   background:linear-gradient(90deg,#45c8ff,#3ddc84,#ff8a3d,#f0653a);transition:width .5s}
-.oline{display:flex;justify-content:space-between;font-size:13px;color:var(--dim);margin-top:6px}
+.oline{display:flex;justify-content:space-between;font:600 11px var(--mb-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-top:6px}
 .oline b{color:var(--ink)}
 .row{display:block;background:var(--panel);border:1px solid var(--line);border-radius:16px;
   margin:16px 0;text-decoration:none;color:var(--ink);overflow:hidden}
@@ -50,7 +56,7 @@ p{margin:8px 0}
 .rspot{position:relative;display:flex;align-items:flex-end;justify-content:center;
   min-height:230px;padding:18px 16px 12px}
 .rspotnum{position:absolute;top:12px;left:16px;font-weight:800;font-size:15px}
-.rdone{position:absolute;top:12px;right:16px;font-size:12px;font-weight:700;color:var(--good)}
+.rdone{position:absolute;top:12px;right:16px;font:600 11px var(--mb-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--good)}
 .rmascot{height:210px;width:auto;max-width:88%;object-fit:contain;object-position:bottom center;
   filter:drop-shadow(0 8px 18px rgba(0,0,0,.45))}
 .rbody{padding:14px 18px 18px}
@@ -58,22 +64,22 @@ p{margin:8px 0}
 .rsub{color:var(--dim);font-size:14.5px;margin:8px 0 14px 0;line-height:1.5}
 .rbar{height:8px;background:var(--panel2);border-radius:999px;overflow:hidden}
 .rbar > div{height:100%;width:0%;border-radius:999px;transition:width .5s}
-.rline{display:flex;justify-content:space-between;font-size:12.5px;color:var(--dim);margin:8px 0 0 0}
+.rline{display:flex;justify-content:space-between;font:500 11px var(--mb-mono);letter-spacing:.04em;color:var(--dim);margin:8px 0 0 0}
 .rchips{display:inline}
 .chip{display:inline-block;border:1px solid #b7a4e3;color:#b7a4e3;border-radius:999px;
-  padding:1px 8px;font-size:11px;margin-left:8px;vertical-align:1px}
+  padding:1px 8px;font:600 10px var(--mb-mono);letter-spacing:.08em;text-transform:uppercase;margin-left:8px;vertical-align:1px}
 .notewrap{display:flex;gap:14px;align-items:flex-start}
 .notewrap img{height:88px;width:auto;flex:0 0 auto;filter:drop-shadow(0 6px 14px rgba(0,0,0,.4))}
 .footmascot{height:76px;width:auto;margin-bottom:8px;filter:drop-shadow(0 6px 14px rgba(0,0,0,.4))}
 .note{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;margin:18px 0;font-size:14px;color:var(--dim)}
 .note b{color:var(--ink)}
 .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 4px}
-.btn{display:inline-block;background:var(--panel2);color:var(--ink);font-weight:700;border:1px solid var(--line);
-  border-radius:12px;padding:11px 16px;font-size:14px;cursor:pointer}
+.btn{display:inline-block;background:var(--mb-glass);color:var(--mb-ink);border:1px solid var(--mb-line);
+  border-radius:13px;padding:11px 16px;font:700 14px var(--mb-ui);cursor:pointer}
 footer{color:#5b6272;font-size:12.5px;text-align:center;margin:30px 0 10px;line-height:1.7}
 #toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(80px);
   background:var(--panel2);border:1px solid #9db4ff;color:var(--ink);border-radius:999px;
-  padding:10px 18px;font-size:13.5px;transition:transform .25s;z-index:50;pointer-events:none;white-space:nowrap}
+  padding:10px 18px;font:600 11px var(--mb-mono);transition:transform .25s;z-index:950;pointer-events:none;white-space:nowrap}
 #toast.show{transform:translateX(-50%) translateY(0)}
 :focus-visible{outline:2px solid #9db4ff;outline-offset:2px}
 @media (prefers-reduced-motion:reduce){*{transition:none !important}}
@@ -90,7 +96,6 @@ footer{color:#5b6272;font-size:12.5px;text-align:center;margin:30px 0 10px;line-
         <h1>All Thumbs</h1>
       </div>
     </div>
-    <button id="vbadge" aria-label="version">v1.16</button>
   </div>
   <p class="sub herolede" style="font-size:18px">I build almost everything on a phone. This is the course I built to teach myself what was actually happening under it, one small explainer at a time.</p>
   <p>Each part is a standalone interactive explainer with real working sandboxes, missions, a practice gym with randomized drills, and a five-question quiz. Do them in order for the full story: first how anything reaches your screen, then the toolbox people build it all with.</p>
@@ -124,9 +129,10 @@ footer{color:#5b6272;font-size:12.5px;text-align:center;margin:30px 0 10px;line-
 </footer>
 </main>
 <div id="toast" role="status"></div>
+<button class="mb-ver" id="mbVer" type="button">v1.17 &middot; Sep 21</button>
 <script>
 "use strict";
-var VERSION = "v1.16 · Aug 26";
+var VERSION = "v1.17 · Sep 21";
 
 /* pure helpers (testable) */
 function countDone(state){
@@ -174,7 +180,7 @@ function initApp(){
     clearTimeout(toastT);
     toastT = setTimeout(function(){ el.classList.remove("show"); }, 1800);
   }
-  $("vbadge").addEventListener("click", function(){ toast(VERSION + " · loaded"); });
+  $("mbVer").addEventListener("click", function(){ toast("v1.17 loaded"); });
 
   function readState(key){
     try {
