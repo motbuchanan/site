@@ -27,8 +27,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:ui-
 #fps{position:absolute;bottom:calc(10px + env(safe-area-inset-bottom));left:10px;font-size:11px;opacity:.75;background:rgba(0,0,0,.4);padding:3px 6px;border-radius:4px}
 #toast{position:absolute;left:50%;top:64px;transform:translateX(-50%);background:rgba(0,0,0,.8);padding:8px 14px;border-radius:8px;font-size:13px;opacity:0;transition:opacity .25s;white-space:nowrap}
 #help{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);pointer-events:auto}
-#help.hidden,#log.hidden,#seed.hidden,#dials.hidden,#menu.hidden{display:none!important}
+#help.hidden,#log.hidden,#seed.hidden,#dials.hidden,#menu.hidden,#about.hidden{display:none!important}
 .btn.menu{font-size:14px;padding:9px 14px}
+.shots{display:flex;gap:8px;overflow-x:auto;margin:10px 0;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+.shots img{height:116px;border-radius:8px;flex:0 0 auto;border:1px solid #333;background:#000}
+.card .fsize{background:#17170f;border:1px solid #3a3320;border-radius:8px;padding:8px 10px;font-size:13px;color:#cdd5cf;margin:10px 0}
+.card .fsize b{color:#ffd166}
 .card{background:#111;border:1px solid #444;border-radius:10px;padding:18px 20px;max-width:340px;font-size:14px;line-height:1.5;max-height:min(86vh,720px);overflow:auto}
 .dial-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:6px 0;font-size:13px}
 .dial-row label{flex:1}
@@ -54,20 +58,36 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:ui-
  <div id="stick"><div id="knob"></div></div>
  <div id="fps"></div>
  <div id="toast"></div>
- <div id="help"><div class="card">
-  <h1>The Keep</h1>
-  <p>A living world drawn entirely as characters. Walk it, watch it. It grows one improvement at a time.</p>
+ <div id="help" class="hidden"><div class="card">
+  <h1>How to play</h1>
   <p><b>Move:</b> drag the left half of the screen.<br><b>Look:</b> drag the right half.<br><span style="color:#888">Desktop: WASD + mouse, Shift to run.</span></p>
   <p><b>Water:</b> wade in, look down and move to dive, look up to rise, level off to walk the bottom.</p>
   <p>Tap <b>☰ menu</b>, top right, any time for a new world, the dials, and the changelog.</p>
   <button class="btn go" id="bGo">walk</button>
  </div></div>
+ <div id="about" class="hidden" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.72);pointer-events:auto"><div class="card">
+  <h1>The Keep</h1>
+  <p style="color:#b7c0b9">A whole world drawn as characters. A snow globe you walk around inside.</p>
+  <p><b>It's all text.</b> Everything here, the hills, the water, the wolves, the keep, is drawn with the characters on your keyboard: @ # * = and dots. The screen is a grid of them. Each spot picks a character by how light or dark it should be and tints it a color, and as you move the whole grid gets re-typed dozens of times a second. No 3D engine, no photos. It's ASCII art you can walk around inside.</p>
+  <div class="shots">
+   <img src="07-plane-keep.jpg" alt="the keep" loading="lazy">
+   <img src="09-forest.jpg" alt="the forest" loading="lazy">
+   <img src="05-predation.jpg" alt="a kill" loading="lazy">
+   <img src="04-water.jpg" alt="the lake" loading="lazy">
+  </div>
+  <p class="fsize">The whole world is one HTML file. Right now: <b id="fsize">~86 KB</b>. Smaller than a single phone photo.</p>
+  <p><b>Why I built it.</b> I build things on a phone by asking AI the right questions, the way I would direct a camera. I saw a clip of a tiny 3D world made of nothing but text and wanted to see if I could grow one that was actually alive, and keep growing it in the open instead of ever calling it done.</p>
+  <p><b>What I learned.</b> How far you can get with almost nothing. One idea, a ray walking a height map, turned into characters, with a small world of animals living on top. Every version taught me one concrete thing: how to make a wall read as solid, how to keep the wolves from starving the world empty, how to make a forest look like real woods.</p>
+  <p style="color:#8a938c;font-size:13px"><b style="color:#b7c0b9">Walk:</b> drag the left half of the screen. <b style="color:#b7c0b9">Look:</b> drag the right half. Wade into the water to swim. Tap ☰ menu for a new world and the dials.</p>
+  <button class="btn go" id="aGo">walk the keep</button>
+  <button class="btn" id="aFull" style="width:100%;margin-top:8px">see every version →</button>
+ </div></div>
  <div id="menu" class="hidden" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);pointer-events:auto"><div class="card">
   <h1>Menu</h1>
   <button class="btn go" id="mSeed">new world</button>
   <button class="btn go" id="mDials">dials</button>
+  <button class="btn go" id="mAbout">about this build</button>
   <button class="btn go" id="mLog">changelog</button>
-  <button class="btn go" id="mAbout">dev log &amp; gallery</button>
   <button class="btn go" id="mHelp">how to play</button>
   <button class="btn" id="mClose" style="width:100%;margin-top:10px">close</button>
  </div></div>
@@ -78,8 +98,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:ui-
 <script>
 (function(){
 'use strict';
-const VERSION='The Keep v0.7.10 · Sep 21 2026';
+const VERSION='The Keep v0.7.11 · Sep 21 2026';
 const CHANGELOG=[
+ ['v0.7.11 · Sep 21 2026','New "about this build" card, App Store style: what it is, how it works (it is all just text characters), why I built it, what I learned, and shots from its development. It shows once on your first visit, then lives in the menu. It also shows the live size of this file, which updates itself on every release, because the surprising part is how small it is.'],
  ['v0.7.10 · Sep 21 2026','Trees got real girth. Crown width now varies about six to one from tree to tree, and wide crowns can be tall too, so a stand mixes thin spires, fat firs, squat bushes and broad canopies instead of same-width cones. The app has its own icon now, and the menu has a dev log link to the new project page: the story, how it is built, and a shot from every version.'],
  ['v0.7.9 · Sep 21 2026','Fix: the menu button was dead to the touch. The top bar ignores taps by design (so you can look through it), and the new button was not opting back in, so taps passed straight through. It works now.'],
  ['v0.7.8 · Sep 21 2026','Forest with real variety: trees now spread across a wide range of heights (tall spiry conifers, medium oaks, low broad crowns), each with its own width and a per-tree crown shape, and stands mix species instead of being one kind. New menu: the top bar is a single "menu" button (top right) that reaches new world, dials, changelog, and help, so nothing is cut off in portrait. The intro is short now, one screen, no scrolling.'],
@@ -1284,6 +1305,9 @@ function boot(){
     $('seedClose').addEventListener('click',function(){ $('seed').classList.add('hidden'); });
   }
   function openHelp(){ $('help').classList.remove('hidden'); }
+  function showSize(){ var el=$('fsize'); if(!el) return;
+    try{ fetch(location.href,{cache:'no-store'}).then(function(r){return r.blob();}).then(function(b){ if(b&&b.size) el.textContent=(b.size/1024).toFixed(0)+' KB'; }).catch(function(){}); }catch(e){} }
+  function openAbout(){ $('about').classList.remove('hidden'); showSize(); }
   function readDialsFromCard(){
     const num=function(id,d){ const el=$(id); if(!el) return d; const v=parseFloat(el.value); return isFinite(v)?v:d; };
     const chk=function(id){ const el=$(id); return el?el.checked:true; };
@@ -1332,9 +1356,11 @@ function boot(){
   $('mSeed').addEventListener('click',function(){ closeMenu(); openSeed(); });
   $('mDials').addEventListener('click',function(){ closeMenu(); openDials(); });
   $('mLog').addEventListener('click',function(){ closeMenu(); openLog(); });
-  $('mAbout').addEventListener('click',function(){ location.href='keep-about.html'; });
+  $('mAbout').addEventListener('click',function(){ closeMenu(); openAbout(); });
   $('mHelp').addEventListener('click',function(){ closeMenu(); openHelp(); });
   $('bGo').addEventListener('click',function(){ $('help').classList.add('hidden'); });
+  $('aGo').addEventListener('click',function(){ $('about').classList.add('hidden'); try{localStorage.setItem('keep_about_seen','1');}catch(e){} });
+  $('aFull').addEventListener('click',function(){ location.href='keep-about.html'; });
   let rzT; window.addEventListener('resize',function(){ clearTimeout(rzT); rzT=setTimeout(setupGrid,200); });
   window.addEventListener('keydown',function(e){ IN.keys[e.code]=true; if(e.code.indexOf('Arrow')===0) e.preventDefault(); });
   window.addEventListener('keyup',function(e){ IN.keys[e.code]=false; });
@@ -1359,6 +1385,8 @@ function boot(){
   canvas.addEventListener('pointerup',end); canvas.addEventListener('pointercancel',end);
   // go
   DIALS.seed=20260919; genWorld(DIALS.seed); populate(DIALS.seed); spawn(); setupGrid();
+  // first visit ever: show the "about this build" card once, then it lives in the menu
+  try{ if(!localStorage.getItem('keep_about_seen')) openAbout(); else showSize(); }catch(e){ openAbout(); }
   let last=performance.now(), fAcc=0, fN=0, fT=0, acc=0, ecoAcc=0; const STEP=1/15, ECOSTEP=2.5;
   function frame(now){
     requestAnimationFrame(frame);
