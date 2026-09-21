@@ -7,6 +7,8 @@
 <title>The Keep</title>
 <link rel="icon" type="image/png" href="the-keep-icon.png">
 <link rel="apple-touch-icon" href="the-keep-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 <meta name="description" content="A living world drawn entirely as characters. A seed-generated snow globe you walk around inside, with birds, deer and a wolf pack living out real cycles. Built one improvement at a time.">
 <meta property="og:title" content="The Keep">
 <meta property="og:description" content="A whole world drawn as characters. Walk it, watch it. It grows one improvement at a time.">
@@ -15,34 +17,39 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://motbuchanan.com/thekeep/the-keep-icon.png">
 <style>
+:root{--mb-ink:#ebedef; --mb-soft:#c2c9d1; --mb-dim:#7d8794;
+  --mb-teal:#4cf0e0; --mb-orange:#f59847;
+  --mb-glass:rgba(14,18,23,.62); --mb-line:rgba(255,255,255,.12);
+  --mb-ui:'Archivo',system-ui,-apple-system,sans-serif;
+  --mb-mono:'JetBrains Mono',ui-monospace,Menlo,monospace}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:ui-monospace,Menlo,Consolas,monospace;color:#ddd;user-select:none;-webkit-user-select:none;touch-action:none;position:fixed;inset:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var(--mb-ui);color:var(--mb-ink);user-select:none;-webkit-user-select:none;touch-action:none;position:fixed;inset:0}
 #c{position:absolute;inset:0;width:100%;height:100%;display:block}
 #hud{position:absolute;inset:0;pointer-events:none}
 #bar{position:absolute;top:calc(6px + env(safe-area-inset-top));left:8px;right:8px;display:flex;align-items:flex-start;gap:6px;pointer-events:none;z-index:3}
-.badge{font-size:12px;background:rgba(0,0,0,.55);padding:6px 9px;border-radius:6px;pointer-events:auto;white-space:nowrap;line-height:1.2}
+.mb-ver{position:fixed;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:900;font:600 10px var(--mb-mono);letter-spacing:.04em;color:var(--mb-teal);background:var(--mb-glass);border:1px solid rgba(76,240,224,.25);border-radius:999px;padding:4px 9px;backdrop-filter:blur(8px);cursor:pointer;user-select:none;opacity:.85;pointer-events:auto}
 .bar-sp{flex:1 1 auto}
 .btns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;pointer-events:auto}
-.btn{font:inherit;font-size:12px;color:#eee;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.25);padding:8px 10px;border-radius:6px;pointer-events:auto}
-#fps{position:absolute;bottom:calc(10px + env(safe-area-inset-bottom));left:10px;font-size:11px;opacity:.75;background:rgba(0,0,0,.4);padding:3px 6px;border-radius:4px}
-#toast{position:absolute;left:50%;top:64px;transform:translateX(-50%);background:rgba(0,0,0,.8);padding:8px 14px;border-radius:8px;font-size:13px;opacity:0;transition:opacity .25s;white-space:nowrap}
+.btn{font:700 14px var(--mb-ui);color:var(--mb-ink);background:var(--mb-glass);border:1px solid var(--mb-line);padding:11px 16px;border-radius:13px;pointer-events:auto;cursor:pointer;backdrop-filter:blur(8px)}
+#fps{position:absolute;bottom:calc(10px + env(safe-area-inset-bottom));left:10px;font:600 10px var(--mb-mono);letter-spacing:.04em;color:var(--mb-soft);background:var(--mb-glass);border:1px solid var(--mb-line);padding:4px 9px;border-radius:999px}
+#toast{position:absolute;left:50%;top:64px;transform:translateX(-50%);background:rgba(16,21,28,.92);border:1px solid var(--mb-line);color:var(--mb-ink);padding:9px 16px;border-radius:999px;font:600 11px var(--mb-mono);opacity:0;transition:opacity .25s;white-space:nowrap;z-index:950}
 #help{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);pointer-events:auto}
 #help.hidden,#log.hidden,#seed.hidden,#dials.hidden,#menu.hidden,#about.hidden{display:none!important}
-.btn.menu{font-size:14px;padding:9px 14px}
+.btn.menu{font:700 12px var(--mb-mono);letter-spacing:.04em;padding:9px 14px;border-radius:8px}
 .shots{display:flex;gap:8px;overflow-x:auto;margin:10px 0;padding-bottom:4px;-webkit-overflow-scrolling:touch}
-.shots img{height:116px;border-radius:8px;flex:0 0 auto;border:1px solid #333;background:#000}
-.card .fsize{background:#17170f;border:1px solid #3a3320;border-radius:8px;padding:8px 10px;font-size:13px;color:#cdd5cf;margin:10px 0}
-.card .fsize b{color:#ffd166}
-.card{background:#111;border:1px solid #444;border-radius:10px;padding:18px 20px;max-width:340px;font-size:14px;line-height:1.5;max-height:min(86vh,720px);overflow:auto}
+.shots img{height:116px;border-radius:8px;flex:0 0 auto;border:1px solid var(--mb-line);background:#000}
+.card .fsize{background:var(--mb-glass);border:1px solid var(--mb-line);border-radius:13px;padding:8px 10px;font-size:13px;color:var(--mb-soft);margin:10px 0}
+.card .fsize b{color:var(--mb-teal);font-family:var(--mb-mono)}
+.card{background:rgba(16,21,28,.92);border:1px solid var(--mb-line);border-radius:16px;padding:18px 20px;max-width:340px;font-size:14px;line-height:1.5;max-height:min(86vh,720px);overflow:auto;color:var(--mb-ink)}
 .dial-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:6px 0;font-size:13px}
 .dial-row label{flex:1}
 .dial-row input[type=range]{width:110px}
 .dial-row input[type=checkbox]{width:18px;height:18px}
-.dial-sec{margin-top:10px;padding-top:8px;border-top:1px solid #333;font-size:12px;color:#aaa;letter-spacing:.04em}
-.card h1{font-size:18px;margin-bottom:8px}
+.dial-sec{margin-top:10px;padding-top:8px;border-top:1px solid var(--mb-line);font:600 10px var(--mb-mono);color:var(--mb-dim);letter-spacing:.08em;text-transform:uppercase}
+.card h1{font:800 20px var(--mb-ui);letter-spacing:-.02em;margin-bottom:8px}
 .card p{margin:6px 0}
-.card b{color:#ffd166}
-.card .go{margin-top:12px;width:100%;padding:12px;font-size:15px}
+.card b{color:var(--mb-teal)}
+.card .go{margin-top:12px;width:100%;padding:13px 18px;font:800 15px var(--mb-ui);background:var(--mb-teal);color:#06110f;border:0}
 #stick{position:absolute;width:110px;height:110px;border-radius:50%;border:2px solid rgba(255,255,255,.35);display:none;pointer-events:none;margin-left:-55px;margin-top:-55px}
 #knob{position:absolute;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.35);left:33px;top:33px}
 </style>
@@ -51,23 +58,23 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:ui-
 <canvas id="c"></canvas>
 <div id="hud">
  <div id="bar">
-  <div class="badge" id="badge"></div>
   <div class="bar-sp"></div>
   <button class="btn menu" id="bMenu">☰ menu</button>
  </div>
  <div id="stick"><div id="knob"></div></div>
  <div id="fps"></div>
+ <button class="mb-ver" id="mbVer" type="button">v0.7.12 &middot; Sep 21</button>
  <div id="toast"></div>
  <div id="help" class="hidden"><div class="card">
   <h1>How to play</h1>
-  <p><b>Move:</b> drag the left half of the screen.<br><b>Look:</b> drag the right half.<br><span style="color:#888">Desktop: WASD + mouse, Shift to run.</span></p>
+  <p><b>Move:</b> drag the left half of the screen.<br><b>Look:</b> drag the right half.<br><span style="color:var(--mb-dim)">Desktop: WASD + mouse, Shift to run.</span></p>
   <p><b>Water:</b> wade in, look down and move to dive, look up to rise, level off to walk the bottom.</p>
   <p>Tap <b>☰ menu</b>, top right, any time for a new world, the dials, and the changelog.</p>
   <button class="btn go" id="bGo">walk</button>
  </div></div>
  <div id="about" class="hidden" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.72);pointer-events:auto"><div class="card">
   <h1>The Keep</h1>
-  <p style="color:#b7c0b9">A whole world drawn as characters. A snow globe you walk around inside.</p>
+  <p style="color:var(--mb-soft)">A whole world drawn as characters. A snow globe you walk around inside.</p>
   <p><b>It's all text.</b> Everything here, the hills, the water, the wolves, the keep, is drawn with the characters on your keyboard: @ # * = and dots. The screen is a grid of them. Each spot picks a character by how light or dark it should be and tints it a color, and as you move the whole grid gets re-typed dozens of times a second. No 3D engine, no photos. It's ASCII art you can walk around inside.</p>
   <div class="shots">
    <img src="07-plane-keep.jpg" alt="the keep" loading="lazy">
@@ -78,17 +85,17 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:ui-
   <p class="fsize">The whole world is one HTML file. Right now: <b id="fsize">~86 KB</b>. Smaller than a single phone photo.</p>
   <p><b>Why I built it.</b> I build things on a phone by asking AI the right questions, the way I would direct a camera. I saw a clip of a tiny 3D world made of nothing but text and wanted to see if I could grow one that was actually alive, and keep growing it in the open instead of ever calling it done.</p>
   <p><b>What I learned.</b> How far you can get with almost nothing. One idea, a ray walking a height map, turned into characters, with a small world of animals living on top. Every version taught me one concrete thing: how to make a wall read as solid, how to keep the wolves from starving the world empty, how to make a forest look like real woods.</p>
-  <p style="color:#8a938c;font-size:13px"><b style="color:#b7c0b9">Walk:</b> drag the left half of the screen. <b style="color:#b7c0b9">Look:</b> drag the right half. Wade into the water to swim. Tap ☰ menu for a new world and the dials.</p>
+  <p style="color:var(--mb-dim);font-size:13px"><b style="color:var(--mb-soft)">Walk:</b> drag the left half of the screen. <b style="color:var(--mb-soft)">Look:</b> drag the right half. Wade into the water to swim. Tap ☰ menu for a new world and the dials.</p>
   <button class="btn go" id="aGo">walk the keep</button>
   <button class="btn" id="aFull" style="width:100%;margin-top:8px">see every version →</button>
  </div></div>
  <div id="menu" class="hidden" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);pointer-events:auto"><div class="card">
   <h1>Menu</h1>
   <button class="btn go" id="mSeed">new world</button>
-  <button class="btn go" id="mDials">dials</button>
-  <button class="btn go" id="mAbout">about this build</button>
-  <button class="btn go" id="mLog">changelog</button>
-  <button class="btn go" id="mHelp">how to play</button>
+  <button class="btn" id="mDials" style="width:100%;margin-top:8px">dials</button>
+  <button class="btn" id="mAbout" style="width:100%;margin-top:8px">about this build</button>
+  <button class="btn" id="mLog" style="width:100%;margin-top:8px">changelog</button>
+  <button class="btn" id="mHelp" style="width:100%;margin-top:8px">how to play</button>
   <button class="btn" id="mClose" style="width:100%;margin-top:10px">close</button>
  </div></div>
  <div id="seed" class="hidden" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);pointer-events:auto"><div class="card" id="seedCard"></div></div>
@@ -98,8 +105,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:ui-
 <script>
 (function(){
 'use strict';
-const VERSION='The Keep v0.7.11 · Sep 21 2026';
+const VERSION='The Keep v0.7.12 · Sep 21 2026';
 const CHANGELOG=[
+ ['v0.7.12 · Sep 21 2026','Shared site chrome. The menu, cards, buttons, seed and dial inputs, HUD readouts and the version badge now use the same type, colors and shapes as every other app on motbuchanan.com. The world render is untouched.'],
  ['v0.7.11 · Sep 21 2026','New "about this build" card, App Store style: what it is, how it works (it is all just text characters), why I built it, what I learned, and shots from its development. It shows once on your first visit, then lives in the menu. It also shows the live size of this file, which updates itself on every release, because the surprising part is how small it is.'],
  ['v0.7.10 · Sep 21 2026','Trees got real girth. Crown width now varies about six to one from tree to tree, and wide crowns can be tall too, so a stand mixes thin spires, fat firs, squat bushes and broad canopies instead of same-width cones. The app has its own icon now, and the menu has a dev log link to the new project page: the story, how it is built, and a shot from every version.'],
  ['v0.7.9 · Sep 21 2026','Fix: the menu button was dead to the touch. The top bar ignores taps by design (so you can look through it), and the new button was not opting back in, so taps passed straight through. It works now.'],
@@ -1293,11 +1301,10 @@ function boot(){
     img=new ImageData(new Uint8ClampedArray(FB.px32.buffer),C*cw,R*ch);
     buildGlyphs(cw,ch);
   }
-  $('badge').textContent=VERSION;
-  $('badge').addEventListener('click',function(){ toast(VERSION+' · seed '+W.seed+' · '+RS.C+'x'+RS.R+(RS.letterbox?' · letterboxed':'')); });
+  $('mbVer').addEventListener('click',function(){ toast('v0.7.12 loaded · seed '+W.seed+' · '+RS.C+'x'+RS.R+(RS.letterbox?' · letterboxed':'')); });
   function openSeed(){
     const c=$('seedCard');
-    c.innerHTML='<h1>World seed</h1><p>Type a number for that exact world, or roll a random one.</p><input id="seedIn" inputmode="numeric" value="'+W.seed+'" style="width:100%;padding:12px;font:inherit;font-size:16px;background:#000;color:#eee;border:1px solid #555;border-radius:8px;margin:6px 0"><div style="display:flex;gap:8px"><button class="btn go" id="seedUse" style="flex:1;margin-top:0">grow it</button><button class="btn go" id="seedRnd" style="flex:1;margin-top:0">random</button></div><button class="btn" id="seedClose" style="width:100%;margin-top:8px">cancel</button>';
+    c.innerHTML='<h1>World seed</h1><p>Type a number for that exact world, or roll a random one.</p><input id="seedIn" inputmode="numeric" value="'+W.seed+'" style="width:100%;padding:12px;font:600 16px var(--mb-mono);background:rgba(0,0,0,.5);color:var(--mb-ink);border:1px solid var(--mb-line);border-radius:13px;margin:6px 0"><div style="display:flex;gap:8px"><button class="btn go" id="seedUse" style="flex:1;margin-top:0">grow it</button><button class="btn go" id="seedRnd" style="flex:1;margin-top:0">random</button></div><button class="btn" id="seedClose" style="width:100%;margin-top:8px">cancel</button>';
     $('seed').classList.remove('hidden');
     function apply(sv){ DIALS.seed=sv; genWorld(sv); populate(sv); spawn(); $('seed').classList.add('hidden'); toast('seed '+sv); }
     $('seedUse').addEventListener('click',function(){ const v=parseInt($('seedIn').value,10); apply(isFinite(v)?(v>>>0):(Math.random()*1e9|0)); });
@@ -1326,7 +1333,7 @@ function boot(){
         '<input id="p'+id.slice(1)+'" type="range" min="0.25" max="2" step="0.25" value="'+pv+'"></div>';
     };
     c.innerHTML='<h1>Keeper dials</h1><p>Set the world, then drop in. Life sliders are starting numbers. Forest, water, and landmarks rebuild the ground.</p>'+
-      '<input id="dSeed" inputmode="numeric" value="'+DIALS.seed+'" style="width:100%;padding:10px;font:inherit;font-size:16px;background:#000;color:#eee;border:1px solid #555;border-radius:8px;margin:6px 0">'+
+      '<input id="dSeed" inputmode="numeric" value="'+DIALS.seed+'" style="width:100%;padding:10px;font:600 16px var(--mb-mono);background:rgba(0,0,0,.5);color:var(--mb-ink);border:1px solid var(--mb-line);border-radius:13px;margin:6px 0">'+
       '<div class="dial-sec">LIFE</div>'+
       row('dBird','birds',DIALS.on[0],DIALS.pop[0])+
       row('dRabbit','rabbits',DIALS.on[1],DIALS.pop[1])+
