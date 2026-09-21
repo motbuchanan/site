@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0d1117">
+<title>The Keep — build log</title>
+<link rel="icon" type="image/png" href="the-keep-icon.png">
+<link rel="apple-touch-icon" href="the-keep-icon.png">
+<meta name="description" content="The Keep: a living world drawn entirely as characters. The story, how it is built, and a shot from every version.">
+<meta property="og:title" content="The Keep — build log">
+<meta property="og:description" content="A whole world drawn as characters. The story of how it is being built, one improvement at a time.">
+<meta property="og:image" content="https://motbuchanan.com/thekeep/the-keep-icon.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://motbuchanan.com/thekeep/the-keep-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#ebedef;--soft:#c2c9d1;--dim:#8b96a3;--teal:#4cf0e0;--orange:#f59847;
+  --line:#252c35;--card:#161c24;--bg:#0d1117;
+  --sys:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,system-ui,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
+  --disp:'Archivo',var(--sys)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--sys);line-height:1.6;-webkit-font-smoothing:antialiased;min-height:100svh}
+#glow{position:fixed;inset:0;z-index:-1;pointer-events:none;background:
+  conic-gradient(from 118deg at 1.3% -6.9%, transparent 0deg, rgba(76,240,224,.08) 9deg, rgba(76,240,224,.20) 26deg, rgba(76,240,224,.08) 44deg, transparent 52deg),
+  radial-gradient(46vmax 82vmax at 110% 55%, rgba(245,152,71,.08), transparent 60%),var(--bg)}
+.wrap{max-width:880px;margin:0 auto;padding:0 20px}
+a{color:var(--teal)}
+.mono{font-family:var(--mono)}
+/* hero */
+.hero{text-align:center;padding:54px 20px 40px}
+.icon{width:150px;height:150px;border-radius:28px;display:block;margin:0 auto 22px;box-shadow:0 12px 44px rgba(0,0,0,.6),0 0 0 1px var(--line)}
+.hero h1{font-family:var(--disp);font-weight:800;font-size:42px;letter-spacing:.01em;margin-bottom:8px}
+.hero .tag{font-size:18px;color:var(--soft);max-width:560px;margin:0 auto}
+.hero .sub{font-family:var(--mono);font-size:13px;color:var(--dim);margin-top:10px;letter-spacing:.02em}
+.cta{display:inline-block;margin-top:24px;background:var(--orange);color:#1a1206;font-family:var(--disp);font-weight:700;font-size:16px;text-decoration:none;padding:13px 26px;border-radius:11px}
+.cta:hover{filter:brightness(1.08)}
+.badge{display:inline-block;margin-top:16px;font-family:var(--mono);font-size:12px;color:var(--dim);border:1px solid var(--line);border-radius:20px;padding:5px 12px}
+/* sections */
+section{padding:34px 0;border-top:1px solid var(--line)}
+h2{font-family:var(--mono);font-weight:600;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--teal);margin-bottom:16px}
+p{margin:0 0 14px;color:#cfd6dd}
+p .k{color:var(--orange)}
+.lead{font-size:18px;color:var(--ink)}
+.two{display:grid;grid-template-columns:1fr;gap:12px 22px}
+@media(min-width:620px){.two{grid-template-columns:1fr 1fr}}
+.feat{border:1px solid var(--line);border-radius:12px;padding:16px 18px;background:var(--card)}
+.feat h3{font-family:var(--disp);font-weight:700;font-size:16px;margin:0 0 6px;color:#fff}
+.feat p{font-size:14px;color:var(--dim);margin:0}
+/* gallery */
+.gal{display:grid;grid-template-columns:1fr;gap:22px}
+@media(min-width:620px){.gal{grid-template-columns:1fr 1fr}}
+figure{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+figure img{width:100%;display:block;background:#000}
+figcaption{padding:12px 15px 15px}
+figcaption .v{font-family:var(--mono);font-weight:600;font-size:12px;letter-spacing:.06em;color:var(--teal)}
+figcaption .d{font-size:14px;color:var(--dim);margin-top:3px}
+/* timeline */
+.tl{list-style:none;border-left:2px solid var(--line);margin-left:6px}
+.tl li{position:relative;padding:0 0 16px 20px}
+.tl li:before{content:"";position:absolute;left:-7px;top:7px;width:10px;height:10px;border-radius:50%;background:var(--orange)}
+.tl .v{font-family:var(--mono);font-weight:600;color:var(--ink)}
+.tl .d{color:var(--dim);font-size:14px}
+footer{padding:34px 20px 60px;text-align:center;color:var(--dim);font-size:13px;border-top:1px solid var(--line)}
+footer a{color:var(--soft)}
+</style>
+</head>
+<body>
+<div id="glow"></div>
+
+<header class="hero">
+  <img class="icon" src="the-keep-icon.png" alt="The Keep icon: a stone keep on a wooded hill above a lake">
+  <h1>The Keep</h1>
+  <p class="tag">A whole world drawn as characters. A snow globe you walk around inside.</p>
+  <p class="sub">an ASCII raycaster that grows one improvement at a time</p>
+  <a class="cta" href="index.html">▶ &nbsp;walk the keep</a>
+  <div class="badge">in active development · updated Sep 21, 2026</div>
+</header>
+
+<main class="wrap">
+
+<section>
+  <h2>What it is</h2>
+  <p class="lead">The Keep is a living world rendered entirely as a grid of colored characters. No 3D engine sits underneath it. It is not a game with a score to win, and it is not a building sandbox.</p>
+  <p>It is closer to a <span class="k">snow globe you can stroll around inside</span>, and an <span class="k">ant farm you set the dials on</span>. You type a seed and get a whole reproducible world: hills, a lake, rivers, forests, and a stone keep. Then it runs. Birds flock and roost, deer move in herds, fish school, and a wolf pack hunts, breeds, and thins out. Populations rise and fall on their own and never quite empty the world.</p>
+  <p>You are the keeper, not a character in it. You walk, you look, you notice things. And because it develops live, the world you visit today is not the one you will visit next month.</p>
+</section>
+
+<section>
+  <h2>How it is built</h2>
+  <div class="two">
+    <div class="feat"><h3>One ray per column</h3><p>A heightfield raycaster walks the terrain, one ray for each column of the screen, and draws it as vertical spans of characters. That is the whole renderer.</p></div>
+    <div class="feat"><h3>Water that reflects</h3><p>Every water column runs a second march to mirror what is above it, with a depth gradient and a foam line where you cross the surface.</p></div>
+    <div class="feat"><h3>A keep of flat planes</h3><p>The castle is built from brick planes the ray intersects directly, so the walls read as solid, crenellated stone instead of hollow columns.</p></div>
+    <div class="feat"><h3>A world that lives</h3><p>Under the renderer, every creature is a tiny agent running steering rules and a state machine. Flocking, herding, and the hunt fall out of that, held in balance by soft floors and carrying caps.</p></div>
+    <div class="feat"><h3>Soft sun and shadow</h3><p>A blurred shadow map is sampled per character, so shade falls across the ground and the trees instead of snapping on and off in blocks.</p></div>
+    <div class="feat"><h3>Same on any screen</h3><p>The vertical field of view is locked and the detail auto-sizes, so the world looks correct on a phone, a tablet, or a desktop, in any orientation.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>The story so far</h2>
+  <p>Each of these is a real frame from the engine, one from about every version, in order. The whole thing began as a test level to prove one ray could walk a hill, and grew from there.</p>
+  <div class="gal">
+    <figure><img src="01-first-engine.jpg" alt="Early engine: terrain and the gate"><figcaption><div class="v">v0.1–0.2 · THE ENGINE</div><div class="d">One ray per column walking a heightfield, water reflections, cone trees. The first proof it could work.</div></figcaption></figure>
+    <figure><img src="02-first-life.jpg" alt="Birds and rabbits"><figcaption><div class="v">v0.3 · FIRST LIFE</div><div class="d">Birds flock and roost, rabbits graze and bolt underground. The agent layer arrives, and seeds make worlds repeatable.</div></figcaption></figure>
+    <figure><img src="03-food-web.jpg" alt="A wolf on the move"><figcaption><div class="v">v0.4 · THE FOOD WEB</div><div class="d">Deer herd, squirrels dart, fish school, and a wolf pack hunts. Prey breed, wolves starve when prey is scarce, and the whole system stays balanced.</div></figcaption></figure>
+    <figure><img src="04-water.jpg" alt="The lake"><figcaption><div class="v">v0.5 · INTO THE WATER</div><div class="d">Wade in, dive, and walk the lakebed. Underwater the view goes murky blue-green. Three kinds of tree now stand in mixed groves.</div></figcaption></figure>
+    <figure><img src="05-predation.jpg" alt="A kill on the ground"><figcaption><div class="v">v0.6 · PREDATION</div><div class="d">A wolf kill leaves a carcass, and the pack gathers to feed before it decays. The hunt happens in the open instead of off-screen.</div></figcaption></figure>
+    <figure><img src="06-shadows.jpg" alt="Soft shadows across the ground"><figcaption><div class="v">v0.6 · SOFT SHADOWS</div><div class="d">A blurred shadow map, sampled per character, lays real shade across the land and the trees. Standing stones and ruins appear.</div></figcaption></figure>
+    <figure><img src="07-plane-keep.jpg" alt="The keep as a solid mass"><figcaption><div class="v">v0.7.7 · THE PLANE KEEP</div><div class="d">The castle rebuilt from flat brick planes: a solid, crenellated mass with a taller keep rising in the middle. No more hollow walls.</div></figcaption></figure>
+    <figure><img src="08-crenellated-gate.jpg" alt="Approaching the gate"><figcaption><div class="v">v0.7.7 · THE GATE</div><div class="d">Crenellated curtain walls, corner towers, a gatehouse, and a gate cut at ground level. Walk in, then through the inner door.</div></figcaption></figure>
+    <figure><img src="09-forest.jpg" alt="The keep among a varied forest"><figcaption><div class="v">v0.7.10 · A REAL FOREST</div><div class="d">Trees now vary in height, width, and shape, from thin spires to fat firs to broad low canopies, so a stand reads like real woods.</div></figcaption></figure>
+  </div>
+</section>
+
+<section>
+  <h2>Version history</h2>
+  <ul class="tl">
+    <li><span class="v">v0.7.10</span> <span class="d">— tree girth variety, app icon, this build log</span></li>
+    <li><span class="v">v0.7.7–0.7.9</span> <span class="d">— the plane-built keep: crenellations, towers, gatehouse; portrait menu</span></li>
+    <li><span class="v">v0.7</span> <span class="d">— young that follow adults and age; the keeper's dials panel</span></li>
+    <li><span class="v">v0.6</span> <span class="d">— witnessable predation, soft per-pixel shadows, scattered landmarks</span></li>
+    <li><span class="v">v0.5</span> <span class="d">— swimming and the underwater view, three tree types, a solid keep</span></li>
+    <li><span class="v">v0.4</span> <span class="d">— the full food web, balanced; seed-driven paths</span></li>
+    <li><span class="v">v0.3</span> <span class="d">— first life: birds and rabbits; the seed box</span></li>
+    <li><span class="v">v0.1–0.2</span> <span class="d">— the raycaster, a 512×512 world, the first castle</span></li>
+  </ul>
+</section>
+
+</main>
+
+<footer>
+  <p class="mono">The Keep · built by Mot Buchanan</p>
+  <p>It develops live. Come back and it will have changed.</p>
+  <p style="margin-top:10px"><a href="index.html">▶ walk the keep</a></p>
+</footer>
+
+</body>
+</html>

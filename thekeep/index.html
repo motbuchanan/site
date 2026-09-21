@@ -1,1 +1,1391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#000">
+<title>The Keep</title>
+<link rel="icon" type="image/png" href="the-keep-icon.png">
+<link rel="apple-touch-icon" href="the-keep-icon.png">
+<meta name="description" content="A living world drawn entirely as characters. A seed-generated snow globe you walk around inside, with birds, deer and a wolf pack living out real cycles. Built one improvement at a time.">
+<meta property="og:title" content="The Keep">
+<meta property="og:description" content="A whole world drawn as characters. Walk it, watch it. It grows one improvement at a time.">
+<meta property="og:image" content="https://motbuchanan.com/thekeep/the-keep-icon.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://motbuchanan.com/thekeep/the-keep-icon.png">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:ui-monospace,Menlo,Consolas,monospace;color:#ddd;user-select:none;-webkit-user-select:none;touch-action:none;position:fixed;inset:0}
+#c{position:absolute;inset:0;width:100%;height:100%;display:block}
+#hud{position:absolute;inset:0;pointer-events:none}
+#bar{position:absolute;top:calc(6px + env(safe-area-inset-top));left:8px;right:8px;display:flex;align-items:flex-start;gap:6px;pointer-events:none;z-index:3}
+.badge{font-size:12px;background:rgba(0,0,0,.55);padding:6px 9px;border-radius:6px;pointer-events:auto;white-space:nowrap;line-height:1.2}
+.bar-sp{flex:1 1 auto}
+.btns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;pointer-events:auto}
+.btn{font:inherit;font-size:12px;color:#eee;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.25);padding:8px 10px;border-radius:6px;pointer-events:auto}
+#fps{position:absolute;bottom:calc(10px + env(safe-area-inset-bottom));left:10px;font-size:11px;opacity:.75;background:rgba(0,0,0,.4);padding:3px 6px;border-radius:4px}
+#toast{position:absolute;left:50%;top:64px;transform:translateX(-50%);background:rgba(0,0,0,.8);padding:8px 14px;border-radius:8px;font-size:13px;opacity:0;transition:opacity .25s;white-space:nowrap}
+#help{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);pointer-events:auto}
+#help.hidden,#log.hidden,#seed.hidden,#dials.hidden,#menu.hidden{display:none!important}
+.btn.menu{font-size:14px;padding:9px 14px}
+.card{background:#111;border:1px solid #444;border-radius:10px;padding:18px 20px;max-width:340px;font-size:14px;line-height:1.5;max-height:min(86vh,720px);overflow:auto}
+.dial-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:6px 0;font-size:13px}
+.dial-row label{flex:1}
+.dial-row input[type=range]{width:110px}
+.dial-row input[type=checkbox]{width:18px;height:18px}
+.dial-sec{margin-top:10px;padding-top:8px;border-top:1px solid #333;font-size:12px;color:#aaa;letter-spacing:.04em}
+.card h1{font-size:18px;margin-bottom:8px}
+.card p{margin:6px 0}
+.card b{color:#ffd166}
+.card .go{margin-top:12px;width:100%;padding:12px;font-size:15px}
+#stick{position:absolute;width:110px;height:110px;border-radius:50%;border:2px solid rgba(255,255,255,.35);display:none;pointer-events:none;margin-left:-55px;margin-top:-55px}
+#knob{position:absolute;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.35);left:33px;top:33px}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hud">
+ <div id="bar">
+  <div class="badge" id="badge"></div>
+  <div class="bar-sp"></div>
+  <button class="btn menu" id="bMenu">☰ menu</button>
+ </div>
+ <div id="stick"><div id="knob"></div></div>
+ <div id="fps"></div>
+ <div id="toast"></div>
+ <div id="help"><div class="card">
+  <h1>The Keep</h1>
+  <p>A living world drawn entirely as characters. Walk it, watch it. It grows one improvement at a time.</p>
+  <p><b>Move:</b> drag the left half of the screen.<br><b>Look:</b> drag the right half.<br><span style="color:#888">Desktop: WASD + mouse, Shift to run.</span></p>
+  <p><b>Water:</b> wade in, look down and move to dive, look up to rise, level off to walk the bottom.</p>
+  <p>Tap <b>☰ menu</b>, top right, any time for a new world, the dials, and the changelog.</p>
+  <button class="btn go" id="bGo">walk</button>
+ </div></div>
+ <div id="menu" class="hidden" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);pointer-events:auto"><div class="card">
+  <h1>Menu</h1>
+  <button class="btn go" id="mSeed">new world</button>
+  <button class="btn go" id="mDials">dials</button>
+  <button class="btn go" id="mLog">changelog</button>
+  <button class="btn go" id="mAbout">dev log &amp; gallery</button>
+  <button class="btn go" id="mHelp">how to play</button>
+  <button class="btn" id="mClose" style="width:100%;margin-top:10px">close</button>
+ </div></div>
+ <div id="seed" class="hidden" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);pointer-events:auto"><div class="card" id="seedCard"></div></div>
+ <div id="log" class="hidden" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);pointer-events:auto"><div class="card" id="logCard"></div></div>
+ <div id="dials" class="hidden" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);pointer-events:auto"><div class="card" id="dialsCard"></div></div>
+</div>
+<script>
+(function(){
+'use strict';
+const VERSION='The Keep v0.7.10 · Sep 21 2026';
+const CHANGELOG=[
+ ['v0.7.10 · Sep 21 2026','Trees got real girth. Crown width now varies about six to one from tree to tree, and wide crowns can be tall too, so a stand mixes thin spires, fat firs, squat bushes and broad canopies instead of same-width cones. The app has its own icon now, and the menu has a dev log link to the new project page: the story, how it is built, and a shot from every version.'],
+ ['v0.7.9 · Sep 21 2026','Fix: the menu button was dead to the touch. The top bar ignores taps by design (so you can look through it), and the new button was not opting back in, so taps passed straight through. It works now.'],
+ ['v0.7.8 · Sep 21 2026','Forest with real variety: trees now spread across a wide range of heights (tall spiry conifers, medium oaks, low broad crowns), each with its own width and a per-tree crown shape, and stands mix species instead of being one kind. New menu: the top bar is a single "menu" button (top right) that reaches new world, dials, changelog, and help, so nothing is cut off in portrait. The intro is short now, one screen, no scrolling.'],
+ ['v0.7.7 · Sep 21 2026','My take on the plane-built keep. Footbridges are gone: where a path meets water it is just a bank now, no wooden deck. The keep grew a real silhouette on the same flat-plane foundation: crenellated (toothed) curtain walls, four corner towers, a gatehouse framing the south gate, and a taller central keep with a roof. Everything is solid brick planes, so nothing reads as hollow or concave.'],
+ ['v0.7.6 · Sep 20 2026','Bridge deck is the walking surface now. Water no longer paints through the middle, so you see planks instead of an empty V of railings. Rails sit on the deck, short. Spans stay footbridge-length.'],
+ ['v0.7.5 · Sep 20 2026','Footbridges are plane decks now, not a row of stone posts. Where a path crosses water the seed lays a wooden deck and rails. Dials: bridges on/off and how many. Walk them.'],
+ ['v0.7.4 · Sep 20 2026','Keep is back, built the B/C way. Outer curtain is four brick planes with a ground-level south door. Inner keep is a boxed hall with a roof and its own door. No heightfield columns. You can walk in.'],
+ ['v0.7.3 · Sep 20 2026','Keep removed. Three test walls on the pad. A = heightfield columns (the old way). B = one vertical brick plane. C = a box of planes with a door and a roof. Walk up to each. The door on C is at ground level.'],
+ ['v0.7.2 · Sep 20 2026','Flat curtain. The keep wall is one height and one thickness now, no batter steps and no merlon spines, so the face is a flat stone surface instead of a pile of cubes. South gate is cut all the way through the curtain again. Inner keep is a single block on a filled bailey. (Un-battered the curtain because a flat wall was the request.)'],
+ ['v0.7.1 · Sep 20 2026','Visual pass. The keep is a solid battered mass with a filled bailey and merlons on the outer parapet, so the walls stop reading as hollow rooms. Trees vary more in height and width inside each type. Every animal sprite was redrawn, and they face the way they are walking. Ground, stone, and forest color got a lift so the world reads clearer on the phone.'],
+ ['v0.7 · Sep 20 2026','Young you can watch grow. Rabbits, deer, and wolves now have young that follow a parent and age into adults, drawn smaller until they mature. The keeper panel is in: species on or off, starting numbers, predators, forest and water amounts, the keep, and landmarks. Set the dials, grow the world, drop in.'],
+ ['v0.6 · Sep 19 2026','The world you can watch. Wolves now leave a carcass when they kill, and the pack gathers to feed on it before it decays, so predation happens in the open instead of off-screen. Sun shadows are soft now (a blurred shadow map sampled per pixel) instead of blocky. And the world has landmarks: a seed-placed standing-stone circle, ruined walls, a well, and footbridges wherever a path crosses the water.'],
+ ['v0.5.2 · Sep 19 2026','Keep no longer looks hollow: the outer walls now batter (slope outward at the base in stepped courses) like a real castle, so the engine draws a solid receding face instead of a flat plane. Deer got more detail: antlers, an eye, a dark back with a lighter belly and a white rump, and darker legs. New water-surface line: a bright foam waterline sweeps across the screen as you dive in or climb out, so crossing the surface is a smooth transition instead of a hard pop.'],
+ ['v0.5.1 · Sep 19 2026','Fixed the water underwater: the surface reflection is no longer drawn when the camera is below the waterline, so diving now shows the lakebed through the murk instead of a mirror. The above-water surface is unchanged.'],
+ ['v0.5 · Sep 19 2026','You can go in the water now: wade in, look down and swim to dive, look up to rise, and level off to walk the lakebed. Underwater the whole view goes murky blue-green with light from the surface above. Water calmed down: gentle depth gradient and clean reflections, no more busy glitter. Three kinds of tree now (pointed conifers, round oaks, broad crowns) in mixed stands, wider and more varied in size. Keep reads as solid blocks: taller battlements, and flat lit tops on the stone so it looks like cubes, not planes.'],
+ ['v0.4.2 · Sep 19 2026','Forests thinned and grown: trees now stand apart, taller and fuller, instead of a packed wall of skinny sticks. Keep rebuilt heavier: thicker walls, a bigger, taller central tower, and softer stone seams so it reads solid, not hollow. Water got depth: a stronger shallow-to-deep gradient, rolling swell, deep-water darkening, and sun glitter on the crests. Camera can now look all the way up and down. Fixed the black strobe (the canvas was clearing on every phone resize and quality tick).'],
+ ['v0.4.1 · Sep 19 2026','Same look on every device. Removed the grid setting: detail is now chosen automatically and the world renders at full detail everywhere, with a quality governor that keeps weak devices smooth on its own. The vertical field of view is locked so scale is identical on phone, tablet, and desktop, and in portrait or landscape; ultra-wide screens are letterboxed instead of stretched, so nothing looks fisheye. Controls work the same in any orientation.'],
+ ['v0.4 · Sep 19 2026','The food web. Deer move in herds, squirrels dart through the trees, fish school in the lake, and a wolf pack hunts. Rabbits and deer breed, wolves hunt and can starve, and soft floors plus carrying caps keep the whole system balanced without ever emptying the world. Every animal is now drawn from a little pixel sprite. Polish: seed-driven dirt paths between the gate, meadow and lake, and richer close-up ground texture.'],
+ ['v0.3.1 · Sep 19 2026','Shaped the animals: rabbits now have ears and a head instead of a smooth lump, and birds are a flapping gull silhouette instead of a block. Rebuilt the castle stonework as clean ashlar blocks in running-bond courses, so the walls stop showing noisy seams and ragged edges up close.'],
+ ['v0.3 · Sep 19 2026','First life. Birds flock overhead and roost in the trees; rabbits graze near their burrows and bolt underground when you get close. New seed box: type a number and get that exact world back. Polish: fuller tree canopies with the red trunk streak fixed, and steep dirt faces plus point-blank walls now keep their texture instead of going flat.'],
+ ['v0.2 · Sep 19 2026','World 512x512 (4x area). Two rivers feed the lake. Bigger castle: 5-wide gate, corner towers, tall inner keep. Per-row color gradients kill the terrace banding. Wall faces get sun-side lighting and a stone-course texture. Ground detail noise up close. Two cloud layers, smaller and softer. Shore foam line. Far-distance LOD so the bigger world stays fast. Changelog panel.'],
+ ['v0.1 · Sep 16 2026','First engine: heightfield DDA raycaster, reflection march, shadow map, cone trees, ASCII compose.']
+];
+const IS_NODE=(typeof window==='undefined');
 
+// ---------------- noise ----------------
+function hash2(x,y,s){ let h=(Math.imul(x|0,374761393)+Math.imul(y|0,668265263)+Math.imul(s|0,1442695041))|0; h=Math.imul(h^(h>>>13),1274126177); h^=h>>>16; return (h>>>0)/4294967296; }
+function vnoise(x,y,s){ const xi=Math.floor(x),yi=Math.floor(y),fx=x-xi,fy=y-yi,ux=fx*fx*(3-2*fx),uy=fy*fy*(3-2*fy); const a=hash2(xi,yi,s),b=hash2(xi+1,yi,s),c=hash2(xi,yi+1,s),d=hash2(xi+1,yi+1,s); const t=a+(b-a)*ux,u=c+(d-c)*ux; return t+(u-t)*uy; }
+function fbm(x,y,s,o){ let v=0,a=0.5,f=1,n=0; for(let i=0;i<o;i++){ v+=a*vnoise(x*f,y*f,s+i*131); n+=a; a*=0.5; f*=2.02; } return v/n; }
+function sm(a,b,x){ const t=Math.min(1,Math.max(0,(x-a)/(b-a))); return t*t*(3-2*t); }
+function clamp(v,a,b){ return v<a?a:v>b?b:v; }
+
+// keeper dials: ant-farm controls. Defaults match the v0.6 world.
+const DIALS={
+  seed:20260919,
+  forest:1, water:1, keep:1, structures:1, predators:1,
+  on:[1,1,1,1,1,1],
+  pop:[1,1,1,1,1,1]
+};
+function growOf(c){
+  const s=CR_.sp[c];
+  if(s===SP.RABBIT||s===SP.DEER||s===SP.WOLF) return 0.52+0.48*Math.min(1,CR_.age[c]);
+  return 1;
+}
+function matureTime(s){ return s===SP.RABBIT?18:s===SP.DEER?28:s===SP.WOLF?32:12; }
+function isAdult(c){ return CR_.age[c]>=1; }
+function parentOf(c){
+  const p=CR_.par[c];
+  if(p<0||p>=CR_.n||CR_.al[p]===0||CR_.sp[p]!==CR_.sp[c]) return -1;
+  return p;
+}
+
+// ---------------- world ----------------
+const N=512, WATER=8, EYE=1.7, CLOUDH=95;
+const SUN=(function(){ const az=-0.7, el=0.85; return {x:Math.cos(az)*Math.cos(el), y:Math.sin(az)*Math.cos(el), z:Math.sin(el)}; })();
+const FORT={x:200,y:210,half:18,padH:null};
+const WALLS=[];
+function boxWalls(x0,y0,x1,y1,h,doorFace,doorA,doorB,roof){
+  const dS=doorFace==='s', dN=doorFace==='n', dW=doorFace==='w', dE=doorFace==='e';
+  WALLS.push({axis:'y', p:y1, a:x0, b:x1, h:h, doorA:dS?doorA:0, doorB:dS?doorB:-1});
+  WALLS.push({axis:'y', p:y0, a:x0, b:x1, h:h, doorA:dN?doorA:0, doorB:dN?doorB:-1});
+  WALLS.push({axis:'x', p:x0, a:y0, b:y1, h:h, doorA:dW?doorA:0, doorB:dW?doorB:-1});
+  WALLS.push({axis:'x', p:x1, a:y0, b:y1, h:h, doorA:dE?doorA:0, doorB:dE?doorB:-1});
+  if(roof) WALLS.push({axis:'roof', x0:x0, x1:x1, y0:y0, y1:y1, h:h});
+}
+function tower(cx,cy,half,h){ boxWalls(cx-half,cy-half,cx+half,cy+half,h,'none',0,-1,false); }
+// crenellated top: alternating short merlon planes riding on a wall run (absolute z), skipping the gate
+function merlonRun(axis,p,a,b,zBase,doorA,doorB){
+  const seg=4.0, mer=2.4, zTop=zBase+2.3;
+  for(let s=a;s<b-0.6;s+=seg){
+    const m0=s, m1=Math.min(s+mer,b);
+    if(doorB>doorA && m1>doorA-0.9 && m0<doorB+0.9) continue; // leave the gate opening clear
+    WALLS.push({axis:axis, p:p, a:m0, b:m1, h:0, z0Abs:zBase, z1Abs:zTop, doorA:0, doorB:-1});
+  }
+}
+function buildWalls(){
+  WALLS.length=0;
+  if(!DIALS.keep) return;
+  const cx=FORT.x, cy=FORT.y, H=FORT.half, B=(FORT.padH!=null?FORT.padH:WATER+6);
+  const curH=11, gateA=cx-2.5, gateB=cx+2.5;
+  // outer curtain: four brick planes, ground-level south gate cut through
+  boxWalls(cx-H, cy-H, cx+H, cy+H, curH, 's', gateA, gateB, false);
+  // crenellated parapet along all four runs (gate opening left clear on the south run)
+  const zc=B+curH;
+  merlonRun('y', cy+H, cx-H, cx+H, zc, gateA, gateB); // south (gate)
+  merlonRun('y', cy-H, cx-H, cx+H, zc, 0, -1);        // north
+  merlonRun('x', cx-H, cy-H, cy+H, zc, 0, -1);        // west
+  merlonRun('x', cx+H, cy-H, cy+H, zc, 0, -1);        // east
+  // four corner towers, taller than the curtain
+  tower(cx-H, cy-H, 2.6, 15); tower(cx+H, cy-H, 2.6, 15);
+  tower(cx-H, cy+H, 2.6, 15); tower(cx+H, cy+H, 2.6, 15);
+  // gatehouse towers flanking the south door
+  tower(cx-5, cy+H, 2.2, 13); tower(cx+5, cy+H, 2.2, 13);
+  // inner keep: a tall roofed hall with its own south door
+  boxWalls(cx-6, cy-6, cx+6, cy+6, 20, 's', cx-1.6, cx+1.6, true);
+}
+function allWallHits(px,py,dx,dy){
+  const hits=[];
+  for(let i=0;i<WALLS.length;i++){
+    const w=WALLS[i];
+    if(w.axis==='roof') continue;
+    let t, s;
+    if(w.axis==='y'){
+      if(Math.abs(dy)<1e-6) continue;
+      t=(w.p-py)/dy; s=px+dx*t;
+    } else {
+      if(Math.abs(dx)<1e-6) continue;
+      t=(w.p-px)/dx; s=py+dy*t;
+    }
+    if(t<0.2||t>MAXT) continue;
+    if(s<w.a||s>w.b) continue;
+    if(w.doorB>w.doorA && s>=w.doorA && s<=w.doorB) continue;
+    hits.push({t:t,w:w});
+  }
+  hits.sort(function(a,b){ return a.t-b.t; });
+  return hits;
+}
+function nearestWall(px,py,dx,dy){
+  const h=allWallHits(px,py,dx,dy);
+  return h.length?h[0]:null;
+}
+function wallBlocked(x,y){
+  for(let i=0;i<WALLS.length;i++){
+    const w=WALLS[i];
+    if(w.axis==='roof'||w.open) continue;
+    let along, across;
+    if(w.axis==='y'){ along=x; across=y-w.p; }
+    else { along=y; across=x-w.p; }
+    if(along<w.a-0.15||along>w.b+0.15) continue;
+    if(w.doorB>w.doorA && along>=w.doorA && along<=w.doorB) continue;
+    if(Math.abs(across)<0.42) return true;
+  }
+  return false;
+}
+buildWalls();
+const LAKE={x:300,y:280,r:40};
+const W={
+  h:new Float32Array(N*N), st:new Float32Array(N*N), tree:new Float32Array(N*N), gh:new Float32Array(N*N),
+  cr:new Uint8Array(N*N), cg:new Uint8Array(N*N), cb:new Uint8Array(N*N),
+  tr:new Uint8Array(N*N), tg:new Uint8Array(N*N), tb:new Uint8Array(N*N),
+  cloud:new Uint8Array(256*256), cloud2:new Uint8Array(256*256), detail:new Uint8Array(64*64), path:new Uint8Array(N*N), ttype:new Uint8Array(N*N), shad:new Float32Array(N*N), seed:1, shadowCells:0
+};
+
+function genWorld(seed){
+  W.seed=seed;
+  const h=W.h, st=W.st, tree=W.tree;
+  st.fill(0); tree.fill(0);
+  for(let y=0;y<N;y++)for(let x=0;x<N;x++){
+    const nx=x/N, ny=y/N;
+    let v=14+32*(fbm(x*0.014,y*0.014,seed,5)-0.5);
+    v+=4*(fbm(x*0.07,y*0.07,seed+7,3)-0.5);
+    const r=Math.max(Math.abs(nx-0.5),Math.abs(ny-0.5))*2;
+    v+=60*sm(0.6,1,r)*(0.5+0.5*fbm(x*0.045,y*0.045,seed+3,4));
+    const lakeR=LAKE.r*(0.55+0.70*DIALS.water);
+    const dl=Math.hypot(x-LAKE.x,y-LAKE.y)*(0.85+0.3*fbm(x*0.03,y*0.03,seed+11,2));
+    v-=(8+12*DIALS.water)*(1-sm(lakeR*0.5,lakeR+6,dl));
+    h[y*N+x]=v;
+  }
+  const rvLen=0.45+0.70*DIALS.water;
+  carveRiver(LAKE.x-LAKE.r+6,LAKE.y,-1,0,Math.round(360*rvLen),seed+41);
+  carveRiver(LAKE.x,LAKE.y+LAKE.r-6,0,1,Math.round(300*rvLen),seed+43);
+  // fort plateau + walls
+  {
+    let sum=0,cnt=0;
+    for(let y=FORT.y-20;y<=FORT.y+20;y++)for(let x=FORT.x-20;x<=FORT.x+20;x++){ sum+=h[y*N+x]; cnt++; }
+    const ph=Math.max(WATER+6,sum/cnt);
+    FORT.padH=ph;
+    for(let y=FORT.y-42;y<=FORT.y+42;y++)for(let x=FORT.x-42;x<=FORT.x+42;x++){
+      const d=Math.max(Math.abs(x-FORT.x),Math.abs(y-FORT.y));
+      const k=1-sm(24,42,d);
+      h[y*N+x]+=(ph-h[y*N+x])*k;
+      if(d<=22) h[y*N+x]=ph; // perfectly flat pad under the walls
+    }
+    buildWalls();
+  }
+  // clouds + ground detail
+  for(let y=0;y<256;y++)for(let x=0;x<256;x++){
+    W.cloud[y*256+x]=Math.round(255*fbm(x*0.03,y*0.03,seed+31,5));
+    W.cloud2[y*256+x]=Math.round(255*fbm(x*0.05,y*0.05,seed+37,4));
+  }
+  for(let y=0;y<64;y++)for(let x=0;x<64;x++){ W.detail[y*64+x]=Math.round(120*vnoise(x*0.45,y*0.45,seed+61)+135*vnoise(x*1.3,y*1.3,seed+62)); }
+  // cell center height (tree bases)
+  for(let y=0;y<N-1;y++)for(let x=0;x<N-1;x++){ const i=y*N+x; W.gh[i]=(h[i]+h[i+1]+h[i+N]+h[i+N+1])*0.25+st[i]; }
+  // trees: spaced (local-max thinning), fewer, larger, multiple types
+  W.ttype.fill(0);
+  for(let y=2;y<N-2;y++)for(let x=2;x<N-2;x++){
+    const i=y*N+x; const hh=h[i];
+    if(st[i]>0) continue;
+    if(Math.max(Math.abs(x-FORT.x),Math.abs(y-FORT.y))<34) continue;
+    if(hh<WATER+2.5||hh>42) continue;
+    const sx=(h[i+1]-h[i-1])*0.5, sy=(h[i+N]-h[i-N])*0.5;
+    if(sx*sx+sy*sy>0.55) continue;
+    const forest=fbm(x*0.03,y*0.03,seed+21,3);
+    const fMin=0.58-0.24*DIALS.forest;
+    if(forest<fMin) continue;
+    // spacing: keep only local maxima of a hash field so trees stand apart
+    const hv=hash2(x,y,seed+99); let ok=true;
+    for(let oy=-1;oy<=1&&ok;oy++)for(let ox=-1;ox<=1;ox++){ if(ox===0&&oy===0)continue; if(hash2(x+ox,y+oy,seed+99)>=hv){ ok=false; break; } }
+    if(!ok) continue;
+    // density still thins in sparser forest
+    if(hash2(x,y,seed+97) > 0.22+0.28*DIALS.forest+sm(fMin,0.72,forest)*0.5) continue;
+    const tv=fbm(x*0.02,y*0.02,seed+55,2); let tt = tv<0.40?0 : (tv<0.68?1:2);
+    // mixed stands: a third of trees flip to another type so a stand is not one species
+    if(hash2(x,y,seed+70)<0.34) tt=(tt+1+((hash2(x,y,seed+71)*2)|0))%3;
+    W.ttype[i]=tt; const h1=hash2(x,y,seed+98), h2=hash2(x,y,seed+94);
+    // height bands overlap on purpose so a wide-crowned tree can also be tall, not only the conifers
+    tree[i]= tt===0? (9+22*h1) : tt===1? (9+19*h1) : (7+16*h1);
+    // continuous size multiplier plus rare giants and rare saplings, so no two are twins
+    let sz=0.74+0.54*h2; if(hash2(x,y,seed+92)>0.95) sz*=1.3; else if(h2<0.12) sz*=0.7;
+    tree[i]*=sz;
+  }
+  // paths (seed-driven trail network)
+  W.path.fill(0);
+  const gate=[FORT.x, FORT.y+FORT.half+6];
+  carvePath(gate[0],gate[1], 140,150, seed+81, 1.4);
+  carvePath(gate[0],gate[1], LAKE.x-LAKE.r+4, LAKE.y-6, seed+83, 1.6);
+  carvePath(LAKE.x, LAKE.y+LAKE.r-4, 360,360, seed+85, 1.3);
+  placeStructures(seed);
+  // lighting + colors
+  W.shadowCells=0;
+  for(let y=0;y<N;y++)for(let x=0;x<N;x++){
+    const i=y*N+x;
+    const xl=x>0?x-1:x, xr=x<N-1?x+1:x, yu=y>0?y-1:y, yd=y<N-1?y+1:y;
+    let sx=(h[y*N+xr]-h[y*N+xl])*0.5, sy=(h[yd*N+x]-h[yu*N+x])*0.5;
+    const slope=Math.sqrt(sx*sx+sy*sy);
+    if(st[i]>0){ sx=0; sy=0; }
+    const nl=1/Math.sqrt(sx*sx+sy*sy+1);
+    const diff=Math.max(0,(-sx*SUN.x-sy*SUN.y+1*SUN.z)*nl);
+    // shadow march toward the sun
+    let shadow=false;
+    { let cx=x+0.5, cy=y+0.5, cz=h[i]+st[i]+0.2;
+      for(let k=0;k<110;k++){ cx+=SUN.x*0.8; cy+=SUN.y*0.8; cz+=SUN.z*0.8;
+        const xi=cx|0, yi=cy|0; if(xi<0||yi<0||xi>=N||yi>=N) break;
+        const j=yi*N+xi; if(h[j]+st[j]+tree[j]>cz){ shadow=true; break; } }
+    }
+    W.shad[i]=shadow?0.44:1.0;
+    const L=0.42+0.70*diff;
+    const hh=h[i], v=hash2(x,y,seed+55), w=fbm(x*0.05,y*0.05,seed+77,3);
+    let r,g,b;
+    if(st[i]>0){ const k=28*(v-0.5); r=158+k; g=152+k; b=140+k; }
+    else if(hh<WATER+1.4){ r=214+16*(v-.5); g=196+14*(v-.5); b=138; }
+    else if(hh>58){ r=234; g=238; b=244; }
+    else if(slope>1.0||hh>44){ const k=32*(v-0.5); r=132+k; g=122+k; b=108+k; }
+    else { const m=sm(0.50,0.74,w); const k=18*(v-0.5); r=78+(148-78)*m+k; g=150+(118-150)*m+k; b=42+(70-42)*m+k; }
+    if(W.path[i]&&st[i]===0&&hh>WATER+0.3){ const pv=hash2(x,y,seed+66); r=158+22*(pv-0.5); g=132+16*(pv-0.5); b=92+12*(pv-0.5); }
+    W.cr[i]=clamp(r*L,0,255); W.cg[i]=clamp(g*L,0,255); W.cb[i]=clamp(b*L,0,255);
+    const tl=0.62+0.55*L;
+    const ttp=W.ttype[i]; const tgR=ttp===1?68:ttp===2?96:36, tgG=ttp===1?136:ttp===2?124:108, tgB=ttp===1?50:ttp===2?48:40;
+    W.tr[i]=clamp((tgR+16*v)*tl,0,255); W.tg[i]=clamp((tgG+30*v)*tl,0,255); W.tb[i]=clamp((tgB+12*v)*tl,0,255);
+  }
+  // soft shadows: 3x3 box blur of the cast-shadow map for a penumbra
+  { const src=W.shad, tmp=new Float32Array(N*N);
+    for(let y=1;y<N-1;y++)for(let x=1;x<N-1;x++){ const i=y*N+x;
+      tmp[i]=(src[i-N-1]+src[i-N]+src[i-N+1]+src[i-1]+src[i]+src[i+1]+src[i+N-1]+src[i+N]+src[i+N+1])/9; }
+    for(let i=0;i<N*N;i++) if(tmp[i]>0) W.shad[i]=tmp[i]; }
+}
+
+function carveRiver(x0,y0,dx0,dy0,len,s2){
+  const h=W.h; let x=x0,y=y0, ang=Math.atan2(dy0,dx0);
+  for(let k=0;k<len;k++){
+    ang+=(fbm(k*0.05,s2*0.001,s2,2)-0.5)*0.14;
+    x+=Math.cos(ang); y+=Math.sin(ang);
+    if(x<8||y<8||x>N-9||y>N-9) break;
+    if(Math.max(Math.abs(x-FORT.x),Math.abs(y-FORT.y))<50) break;
+    const xi=Math.round(x), yi=Math.round(y);
+    for(let oy=-7;oy<=7;oy++)for(let ox=-7;ox<=7;ox++){
+      const d=Math.hypot(ox,oy); if(d>7) continue;
+      const i=(yi+oy)*N+xi+ox;
+      const floor=WATER-3.2, t=sm(2.5,7,d);
+      const nv=floor+(h[i]-floor)*t;
+      if(nv<h[i]) h[i]=nv;
+    }
+  }
+}
+function placeStructures(seed){
+  const h=W.h, st=W.st;
+  function meadow(x,y){ if(x<24||y<24||x>N-24||y>N-24) return false; const g=terr(x,y); if(g<WATER+2||g>30) return false;
+    if(Math.max(Math.abs(x-FORT.x),Math.abs(y-FORT.y))<46) return false; if(fbm(x*0.03,y*0.03,seed+21,3)>0.42) return false; return true; }
+  function findSpot(salt){ for(let a=0;a<4000;a++){ const x=24+((hash2(a,salt,seed+301)*(N-48))|0), y=24+((hash2(a,salt+1,seed+302)*(N-48))|0); if(meadow(x,y)) return [x,y]; } return null; }
+  if(DIALS.structures){
+    // standing stone circle
+    let sp=findSpot(3); if(sp){ const [x,y]=sp; for(let s=0;s<8;s++){ const ang=s/8*6.283; const sx=Math.round(x+Math.cos(ang)*6), sy=Math.round(y+Math.sin(ang)*6); const i=sy*N+sx; st[i]=Math.max(st[i],7+2.5*hash2(sx,sy,seed+303)); W.tree[i]=0; W.tree[i+1]=0; } }
+    // ruined walls
+    for(let w=0;w<2;w++){ sp=findSpot(11+w*2); if(!sp) continue; const [x,y]=sp; const horiz=hash2(x,y,seed+315)<0.5; const len=9+(hash2(x,y,seed+316)*8|0);
+      for(let k=0;k<len;k++){ if(hash2(k*3,w,seed+317)<0.28) continue; const sx=horiz?x+k:x, sy=horiz?y:y+k; if(sx<3||sy<3||sx>N-4||sy>N-4)continue; const i=sy*N+sx; st[i]=Math.max(st[i],3+2*hash2(sx,sy,seed+318)); W.tree[i]=0; } }
+    // a well
+    sp=findSpot(21); if(sp){ const [x,y]=sp; for(let oy=-1;oy<=1;oy++)for(let ox=-1;ox<=1;ox++){ const i=(y+oy)*N+x+ox; st[i]=Math.max(st[i],2.6); W.tree[i]=0; } st[y*N+x]=0.3; }
+  }
+}
+function carvePath(x0,y0,x1,y1,sd,wd){
+  const h=W.h; let x=x0,y=y0, steps=0;
+  while(steps++<1400){
+    const dx=x1-x, dy=y1-y, d=Math.hypot(dx,dy); if(d<2) break;
+    const ang=Math.atan2(dy,dx)+(fbm(steps*0.05,sd*0.001,sd,2)-0.5)*0.6;
+    x+=Math.cos(ang); y+=Math.sin(ang);
+    if(x<5||y<5||x>N-6||y>N-6) break;
+    const xi=Math.round(x), yi=Math.round(y);
+    for(let oy=-2;oy<=2;oy++)for(let ox=-2;ox<=2;ox++){ const dd=Math.hypot(ox,oy); if(dd>wd+0.4)continue;
+      const j=(yi+oy)*N+xi+ox; if(j<0||j>=N*N)continue; W.path[j]=1; W.tree[j]=0; }
+  }
+}
+function terr(x,y){
+  const h=W.h;
+  if(x<0)x=0; else if(x>N-1.001)x=N-1.001;
+  if(y<0)y=0; else if(y>N-1.001)y=N-1.001;
+  const xi=x|0, yi=y|0, fx=x-xi, fy=y-yi, i=yi*N+xi;
+  const a=h[i], b=h[i+1], c=h[i+N], d=h[i+N+1];
+  const t=a+(b-a)*fx, u=c+(d-c)*fx; return t+(u-t)*fy;
+}
+function groundAt(x,y){ const xi=clamp(x|0,0,N-1), yi=clamp(y|0,0,N-1); return terr(x,y)+W.st[yi*N+xi]; }
+
+// ---------------- renderer ----------------
+const FOGK=0.0032, MAXT=520, TREE_FAR=210, RC=0.92, RT=0.10;
+const FOG_R=172, FOG_G=196, FOG_B=222;
+const fogLUT=new Float32Array(MAXT*4+16);
+for(let i=0;i<fogLUT.length;i++) fogLUT[i]=1-Math.exp(-(i/4)*FOGK);
+const RS={C:0,R:0,cellW:0,cellH:0,K:0,tanHalf:0,offX:0,offY:0,letterbox:false};
+const FOV_V=0.66;
+const FB={col:null,px32:null};
+const TMP={flag:null,wflag:null,wdepth:null,wt:null,mirror:null,mflag:null};
+let skyTime=0;
+let UW=0;
+
+function allocGrid(C,R,cw,ch){
+  RS.C=C; RS.R=R; RS.cellW=cw; RS.cellH=ch;
+  RS.K=(R/2)/FOV_V;                    // focal in rows: vertical scale, device-independent
+  RS.tanHalf=(C/2)/(RS.K*(ch/cw));     // horizontal half-angle follows the aspect
+  FB.col=new Int32Array(C*R);
+  FB.px32=new Uint32Array(C*cw*R*ch);
+  TMP.flag=new Uint8Array(R); TMP.wflag=new Uint8Array(R); TMP.mflag=new Uint8Array(R);
+  TMP.wdepth=new Float32Array(R); TMP.wt=new Float32Array(R); TMP.mirror=new Int32Array(R);
+}
+function pack(r,g,b,f){
+  r+=(FOG_R-r)*f; g+=(FOG_G-g)*f; b+=(FOG_B-b)*f;
+  return ((r|0)<<16)|((g|0)<<8)|(b|0);
+}
+function sky(dx,dy,sg,px,py,pz){
+  const t=clamp(sg*1.6,0,1), tt=Math.sqrt(t);
+  let r=172+(52-172)*tt, g=196+(104-196)*tt, b=222+(208-222)*tt;
+  const len=Math.sqrt(dx*dx+dy*dy+sg*sg);
+  const d=(dx*SUN.x+dy*SUN.y+sg*SUN.z)/len;
+  if(d>0.9993) return (255<<16)|(250<<8)|215;
+  if(d>0.96){ const k=(d-0.96)/0.04; r+=70*k*k; g+=55*k*k; b+=10*k*k; }
+  if(sg>0.03){
+    const dist2=(CLOUDH+50-pz)/sg;
+    const cx2=px+dx*dist2+skyTime*1.5, cy2=py+dy*dist2;
+    const c2=W.cloud2[(((cx2*0.7)|0)&255)+((((cy2*0.7)|0)&255)<<8)]/255;
+    const a2=sm(0.52,0.74,c2)*clamp(1-dist2/1400,0,1)*0.7;
+    if(a2>0){ const sh=0.88-0.2*sm(0.7,0.95,c2); r+=(240*sh-r)*a2; g+=(242*sh-g)*a2; b+=(248*sh-b)*a2; }
+    const dist=(CLOUDH-pz)/sg;
+    const cx=px+dx*dist+skyTime*3, cy=py+dy*dist;
+    const c=W.cloud[(((cx*1.1)|0)&255)+((((cy*1.1)|0)&255)<<8)]/255;
+    const a=sm(0.50,0.70,c)*clamp(1-dist/900,0,1);
+    if(a>0){ const sh=1-0.3*sm(0.64,0.92,c); r+=(255*sh-r)*a; g+=(252*sh-g)*a; b+=(250*sh-b)*a; }
+  }
+  return (clamp(r,0,255)<<16)|(clamp(g,0,255)<<8)|clamp(b,0,255);
+}
+
+function renderFrame(px,py,pz,yaw,pitch){
+  const C=RS.C,R=RS.R,K=RS.K,tanH=RS.tanHalf;
+  simBin(px,py);
+  const fb=FB.col;
+  const h=W.h, st=W.st, tree=W.tree, gh=W.gh, cr=W.cr,cg=W.cg,cb=W.cb, tr=W.tr,tg=W.tg,tb=W.tb;
+  const fx=Math.cos(yaw), fy=Math.sin(yaw), rx=-fy, ry=fx;
+  const horizon=R*0.5+pitch*K;
+  const flag=TMP.flag, wflag=TMP.wflag, wdepth=TMP.wdepth, wt=TMP.wt, mirror=TMP.mirror, mflag=TMP.mflag;
+  const pz2=2*WATER-pz;
+  const uw=pz<WATER;   // eye below the surface: no reflective surface, see through to the bed
+  for(let i=0;i<C;i++){
+    const u=((i+0.5)/C-0.5)*2*tanH;
+    const dx=fx+rx*u, dy=fy+ry*u;
+    const dd=dx*dx+dy*dy, invLen=1/Math.sqrt(dd);
+    flag.fill(0);
+    let ybuf=R, wMin=R, wMax=-1, wCount=0;
+    const stepX=dx<0?-1:1, stepY=dy<0?-1:1;
+    const deltaX=Math.abs(1/dx), deltaY=Math.abs(1/dy);
+    const mx0=Math.floor(px), my0=Math.floor(py);
+    const sideX0=dx<0?(px-mx0)*deltaX:(mx0+1-px)*deltaX;
+    const sideY0=dy<0?(py-my0)*deltaY:(my0+1-py)*deltaY;
+    let mx=mx0, my=my0, sideX=sideX0, sideY=sideY0, t=0;
+    let prevValid=false, pR=0,pG=0,pB=0, prevH=-1e9, prevSt=0, lodN=0, sideWasX=false;
+    const planeHits=allWallHits(px,py,dx,dy); let planeI=0;
+    // ---- main march ----
+    while(true){
+      let tn,cx,cy;
+      if(sideX<sideY){ tn=sideX; sideX+=deltaX; cx=mx; cy=my; mx+=stepX; sideWasX=true; } else { tn=sideY; sideY+=deltaY; cx=mx; cy=my; my+=stepY; sideWasX=false; }
+      if(tn>MAXT) break;
+      if(cx<0||cx>=N-1||cy<0||cy>=N-1) break;
+      if(tn>140&&((++lodN)&(tn>300?3:1))) continue;
+      const ci=cy*N+cx;
+      t=tn;
+      while(planeI<planeHits.length&&t>=planeHits[planeI].t){
+        const planeHit=planeHits[planeI++];
+        const tw=planeHit.t;
+        const hx=px+dx*tw, hy=py+dy*tw;
+        const z0=planeHit.w.z0Abs!=null?planeHit.w.z0Abs:terr(hx,hy), z1=planeHit.w.z1Abs!=null?planeHit.w.z1Abs:z0+planeHit.w.h;
+        const rowT=Math.floor(horizon-(z1-pz)*K/tw);
+        const rowB=Math.floor(horizon-(z0-pz)*K/tw);
+        const bot=ybuf<rowB?ybuf:rowB;
+        if(rowT<bot){
+          const lo=rowT<0?0:rowT; const f=fogLUT[(tw*4)|0];
+          const nxw=planeHit.w.axis==='y'?0:(dx<0?1:-1);
+          const nyw=planeHit.w.axis==='x'?0:(dy<0?1:-1);
+          const lit=0.66+0.44*Math.max(0,nxw*SUN.x+nyw*SUN.y);
+          const along=planeHit.w.axis==='y'?hx:hy;
+          const tk=tw/K;
+          for(let r=bot-1;r>=lo;r--){ if(flag[r]) continue;
+            const z=pz+(horizon-r)*tk;
+            const wood=planeHit.w.mat==='wood';
+            const cz=z/(wood?0.36:0.72), zi=Math.floor(cz), fzc=cz-zi;
+            const av=(along+(zi&1?0.55:0))/(wood?0.7:1.15), bi=Math.floor(av), fab=av-bi;
+            const mort=(fzc<0.08||fab<0.06)?0.78:1;
+            const bl=(0.90+0.12*hash2(bi,zi*3+1,7))*mort*lit;
+            fb[r*C+i]=pack((wood?142:176)*bl,(wood?98:168)*bl,(wood?54:156)*bl,f); flag[r]=1; }
+          if(lo<ybuf) ybuf=lo;
+        }
+      }
+      let ex=px+dx*t, ey=py+dy*t;
+      if(ex<0)ex=0; else if(ex>N-1.001)ex=N-1.001;
+      if(ey<0)ey=0; else if(ey>N-1.001)ey=N-1.001;
+      const xi=ex|0, yi=ey|0, ffx=ex-xi, ffy=ey-yi, hi=yi*N+xi;
+      const ha=h[hi], hb=h[hi+1], hc=h[hi+N], hd=h[hi+N+1];
+      const t1=ha+(hb-ha)*ffx, t2=hc+(hd-hc)*ffx;
+      let hh=t1+(t2-t1)*ffy+st[ci];
+      const th=tree[ci];
+      const shc=W.shad[ci];
+      const _sa=W.shad[hi],_sb=W.shad[hi+1],_sc=W.shad[hi+N],_sd=W.shad[hi+N+1]; const _s1=_sa+(_sb-_sa)*ffx,_s2=_sc+(_sd-_sc)*ffx; const shd=_s1+(_s2-_s1)*ffy;
+      let colR=cr[ci]*shd, colG=cg[ci]*shd, colB=cb[ci]*shd;
+      if(th>0){
+        const tt=W.ttype[ci];
+        // girth varies ~4x tree to tree, independent of height, so you get thin spires, fat firs, squat bushes and broad canopies
+        const tw=0.55+1.35*hash2(cx,cy,W.seed+96);
+        const tj=hash2(cx,cy,W.seed+93);
+        const rcw=RC*(tt===0?1.05:tt===1?1.85:1.62)*tw;
+        if(t>=TREE_FAR){ hh+=th*0.6; colR=tr[ci]*shc; colG=tg[ci]*shc; colB=tb[ci]*shc; }
+        else {
+          const wx=cx+0.5-px, wy=cy+0.5-py; const sdep=(wx*dx+wy*dy)/dd;
+          if(sdep>0.2){
+            const rho=Math.abs(wx*dy-wy*dx)*invLen;
+            if(rho<rcw){
+              const q=rho/rcw; const base=gh[ci], top=base+th;
+              let cb0, ctop;
+              if(tt===0){ cb0=base+th*(0.06+0.16*tj); ctop=top-(top-cb0)*(0.22*q+0.78*q*q); }
+              else if(tt===1){ cb0=base+th*(0.36+0.22*tj); const cH=top-cb0; ctop=cb0+cH*Math.sqrt(Math.max(0,1-q*q)); }
+              else { cb0=base+th*(0.22+0.24*tj); const cH=top-cb0; ctop=cb0+cH*(1-(0.5+0.4*tj)*q*q); }
+              const f2=fogLUT[(sdep*4)|0]; const shade=0.62+0.38*(1-q);
+              const ccol=pack(tr[ci]*shade*shc,tg[ci]*shade*shc,tb[ci]*shade*shc,f2);
+              let rT=Math.floor(horizon-(ctop-pz)*K/sdep), rB=Math.floor(horizon-(cb0-pz)*K/sdep);
+              if(rT<0)rT=0; if(rB>ybuf-1)rB=ybuf-1;
+              for(let r=rT;r<=rB;r++){ if(!flag[r]){ fb[r*C+i]=ccol; flag[r]=1; } }
+              const trw=(tt===0?0.085:0.12)*(0.85+0.5*hash2(cx,cy,W.seed+91));
+              if(rho<trw&&sdep<48&&sdep>2.0){
+                const tcol=pack(76*shade,54*shade,36*shade,f2);
+                let r0=Math.floor(horizon-(cb0-pz)*K/sdep)+1, r1=Math.floor(horizon-(base-pz)*K/sdep);
+                if(r0<0)r0=0; if(r1>ybuf-1)r1=ybuf-1;
+                for(let r=r0;r<=r1;r++){ if(!flag[r]){ fb[r*C+i]=tcol; flag[r]=1; } }
+              }
+            }
+          }
+        }
+      }
+      for(let cj=CBIN.head[ci]; cj>=0; cj=CBIN.next[cj]){
+        const wx=CR_.x[cj]-px, wy=CR_.y[cj]-py; const sdep=(wx*dx+wy*dy)/dd;
+        if(sdep<0.3) continue;
+        const ssig=(wx*dy-wy*dx)*invLen; const spc=CR_.sp[cj]; const P_=SPP[spc]; const gsz=growOf(cj); const ww=P_.wsize*gsz;
+        const q=ssig/ww; if(q<=-1||q>=1) continue;
+        const f2=fogLUT[(sdep*4)|0]; const cbase=CR_.z[cj];
+        if(spc===0){
+          const aq=q<0?-q:q; const flap=Math.sin(skyTime*7+cj*1.7)*0.42;
+          const wing=0.5+(0.34+flap)*aq-0.28*aq*aq;
+          const bump=aq<0.16?0.42:0, cen=wing+bump-0.55, th=(aq<0.16?0.55:0.26);
+          const ctopc=cbase+P_.hsize*gsz*(cen+th*0.5), cbotc=cbase+P_.hsize*gsz*(cen-th*0.5);
+          let rTc=Math.floor(horizon-(ctopc-pz)*K/sdep), rBc=Math.floor(horizon-(cbotc-pz)*K/sdep);
+          if(rTc<0)rTc=0; if(rBc>ybuf-1)rBc=ybuf-1;
+          for(let r=rTc;r<=rBc;r++){ if(flag[r])continue; fb[r*C+i]=pack(46,44,54,f2); flag[r]=1; }
+        } else {
+          const M=MASKS[spc]; let u=(q*0.5+0.5); if(CR_.vx[cj]*(-Math.sin(yaw))+CR_.vy[cj]*Math.cos(yaw)<0) u=1-u; let mx=(u*M.w)|0; if(mx<0)mx=0; if(mx>=M.w)mx=M.w-1;
+          const H=P_.hsize*gsz;
+          let rTc=Math.floor(horizon-(cbase+H-pz)*K/sdep), rBc=Math.floor(horizon-(cbase-pz)*K/sdep);
+          if(rTc<0)rTc=0; if(rBc>ybuf-1)rBc=ybuf-1; const spn=(rBc-rTc)||1;
+          for(let r=rTc;r<=rBc;r++){ if(flag[r])continue;
+            let my=(((r-rTc)/spn)*M.h)|0; if(my<0)my=0; if(my>=M.h)my=M.h-1;
+            const pi=M.px[my*M.w+mx]; if(pi===0) continue;
+            const cc=M.pal[pi]; const lt=0.82+0.18*(1-(r-rTc)/spn);
+            fb[r*C+i]=pack(cc[0]*lt,cc[1]*lt,cc[2]*lt,f2); flag[r]=1; }
+        }
+      }
+      if(hh<WATER&&!uw){
+        const rowW=Math.floor(horizon-(WATER-pz)*K/t);
+        if(rowW<ybuf){ const lo=rowW<0?0:rowW;
+          for(let r=ybuf-1;r>=lo;r--){ if(!flag[r]){ wflag[r]=1; wdepth[r]=WATER-hh; wt[r]=t; wCount++; if(r<wMin)wMin=r; if(r>wMax)wMax=r; } }
+          ybuf=lo; }
+        prevValid=false; prevH=hh;
+      } else {
+        const rowT=Math.floor(horizon-(hh-pz)*K/t);
+        const sc=st[ci];
+        if(sc===0&&t<52){ const dn=(W.detail[(((ex*1.7)|0)&63)|((((ey*1.7)|0)&63)<<6)]-128)*(1-t/52)*0.0022; colR*=1+dn; colG*=1+dn; colB*=1+dn*0.8; }
+        if(rowT<ybuf){
+          const lo=rowT<0?0:rowT; const f=fogLUT[(t*4)|0];
+          if(sc>0&&(sc-prevSt>0.8||(prevSt<=0&&sc>0))){
+            const nx=sideWasX?-stepX:0, ny=sideWasX?0:-stepY;
+            const lit=0.64+0.46*Math.max(0,nx*SUN.x+ny*SUN.y);
+            const along=(sideWasX?ey:ex), tk=t/K;
+            for(let r=ybuf-1;r>=lo;r--){ if(flag[r]) continue;
+              const z=pz+(horizon-r)*tk;
+              const cz=z/0.72, zi=Math.floor(cz), fzc=cz-zi;
+              const av=(along+(zi&1?0.55:0))/1.15, bi=Math.floor(av), fab=av-bi;
+              const mort=(fzc<0.07||fab<0.05)?0.82:1;
+              const bl=(0.92+0.10*hash2(bi,zi*3+1,7))*mort*lit;
+              const edge=(r>=ybuf-2)?1.10:1;
+              fb[r*C+i]=pack(176*bl*edge*shc,168*bl*edge*shc,156*bl*edge*shc,f); }
+          } else if(sc>0){
+            const nn=0.94+0.14*hash2((ex*1.3)|0,(ey*1.3)|0,5);
+            for(let r=ybuf-1;r>=lo;r--){ if(flag[r]) continue;
+              const edge=(r<=lo+1)?1.16:1;
+              fb[r*C+i]=pack(clamp(206*nn*edge*shc,0,255),clamp(198*nn*edge*shc,0,255),clamp(182*nn*edge*shc,0,255),f); }
+          } else if(hh-prevH>1.5&&t<70){
+            const along=(sideWasX?ey:ex)*0.7, tk=t/K;
+            for(let r=ybuf-1;r>=lo;r--){ if(flag[r]) continue;
+              const z=pz+(horizon-r)*tk; const hs=(0.80+0.32*hash2((along)|0,Math.floor(z*0.8),9));
+              fb[r*C+i]=pack(colR*hs,colG*hs,colB*hs,f); }
+          } else if(prevValid&&ybuf-lo>1){
+            const span=ybuf-lo;
+            for(let r=ybuf-1;r>=lo;r--){ if(flag[r]) continue; const k=(ybuf-1-r)/span;
+              fb[r*C+i]=pack(pR+(colR-pR)*k,pG+(colG-pG)*k,pB+(colB-pB)*k,f); }
+          } else {
+            const col=pack(colR,colG,colB,f);
+            for(let r=ybuf-1;r>=lo;r--){ if(!flag[r]) fb[r*C+i]=col; }
+          }
+          ybuf=lo; prevValid=true;
+        } else prevValid=false;
+        pR=colR; pG=colG; pB=colB; prevH=hh; prevSt=sc;
+      }
+      if(ybuf===0) break;
+    }
+    while(planeI<planeHits.length){
+      const planeHit=planeHits[planeI++];
+      const tw=planeHit.t;
+      const hx=px+dx*tw, hy=py+dy*tw;
+      const z0=planeHit.w.z0Abs!=null?planeHit.w.z0Abs:terr(hx,hy), z1=planeHit.w.z1Abs!=null?planeHit.w.z1Abs:z0+planeHit.w.h;
+      const rowT=Math.floor(horizon-(z1-pz)*K/tw);
+      const rowB=Math.floor(horizon-(z0-pz)*K/tw);
+      const bot=ybuf<rowB?ybuf:rowB;
+      if(rowT<bot){
+        const lo=rowT<0?0:rowT; const f=fogLUT[(tw*4)|0];
+        const nxw=planeHit.w.axis==='y'?0:(dx<0?1:-1);
+        const nyw=planeHit.w.axis==='x'?0:(dy<0?1:-1);
+        const lit=0.66+0.44*Math.max(0,nxw*SUN.x+nyw*SUN.y);
+        const along=planeHit.w.axis==='y'?hx:hy;
+        const tk=tw/K;
+        for(let r=bot-1;r>=lo;r--){ if(flag[r]) continue;
+          const z=pz+(horizon-r)*tk;
+          const wood=planeHit.w.mat==='wood';
+          const cz=z/(wood?0.36:0.72), zi=Math.floor(cz), fzc=cz-zi;
+          const av=(along+(zi&1?0.55:0))/(wood?0.7:1.15), bi=Math.floor(av), fab=av-bi;
+          const mort=(fzc<0.08||fab<0.06)?0.78:1;
+          const bl=(0.90+0.12*hash2(bi,zi*3+1,7))*mort*lit;
+          fb[r*C+i]=pack((wood?142:176)*bl,(wood?98:168)*bl,(wood?54:156)*bl,f); flag[r]=1; }
+        if(lo<ybuf) ybuf=lo;
+      }
+    }
+    // ---- roof planes (method C) ----
+    for(let wi=0;wi<WALLS.length;wi++){
+      const w=WALLS[wi]; if(w.axis!=='roof') continue;
+      const z=w.zAbs!=null?w.zAbs:terr((w.x0+w.x1)*0.5,(w.y0+w.y1)*0.5)+w.h; let tmin=0.25, tmax=MAXT;
+      if(Math.abs(dx)>1e-6){ let ta=(w.x0-px)/dx, tb=(w.x1-px)/dx; if(ta>tb){const q=ta;ta=tb;tb=q;} tmin=Math.max(tmin,ta); tmax=Math.min(tmax,tb); }
+      else if(px<w.x0||px>w.x1) continue;
+      if(Math.abs(dy)>1e-6){ let ta=(w.y0-py)/dy, tb=(w.y1-py)/dy; if(ta>tb){const q=ta;ta=tb;tb=q;} tmin=Math.max(tmin,ta); tmax=Math.min(tmax,tb); }
+      else if(py<w.y0||py>w.y1) continue;
+      if(tmin>=tmax) continue;
+      const rA=horizon-(z-pz)*K/tmin, rB=horizon-(z-pz)*K/tmax;
+      let r0=Math.floor(Math.min(rA,rB)), r1=Math.ceil(Math.max(rA,rB));
+      if(r0<0)r0=0; if(r1>R-1)r1=R-1;
+      for(let r=r0;r<=r1;r++){
+        if(flag[r]) continue;
+        const denom=horizon-r; if(Math.abs(denom)<1e-4) continue;
+        const tr=(z-pz)*K/denom; if(tr<tmin||tr>tmax) continue;
+        const hx=px+dx*tr, hy=py+dy*tr;
+        if(hx<w.x0||hx>w.x1||hy<w.y0||hy>w.y1) continue;
+        const f=fogLUT[(tr*4)|0];
+        const wood=w.mat==='wood';
+        const nn=0.88+0.14*hash2((hx*(wood?2.4:1.2))|0,(hy*(wood?2.4:1.2))|0,5);
+        const plank=wood&&((((hx*2.2)|0)+((hy*2.2)|0))&1)?0.86:1;
+        fb[r*C+i]=pack((wood?150:198)*nn*plank,(wood?108:190)*nn*plank,(wood?62:174)*nn*plank,f); flag[r]=1;
+      }
+    }
+    // ---- sky ----
+    for(let r=0;r<ybuf;r++){ if(!flag[r]) fb[r*C+i]=sky(dx,dy,(horizon-r)/K,px,py,pz); }
+    // ---- reflection march ----
+    if(wCount>0){
+      for(let r=wMin;r<=wMax;r++){ mflag[r]=0; if(wflag[r]) mirror[r]=sky(dx,dy,(r-horizon)/K,px,py,pz); }
+      mx=mx0; my=my0; sideX=sideX0; sideY=sideY0; let done=0; lodN=0;
+      while(done<wCount){
+        let tn,cx,cy;
+        if(sideX<sideY){ tn=sideX; sideX+=deltaX; cx=mx; cy=my; mx+=stepX; } else { tn=sideY; sideY+=deltaY; cx=mx; cy=my; my+=stepY; }
+        if(tn>MAXT) break;
+        if(cx<0||cx>=N-1||cy<0||cy>=N-1) break;
+        if(tn>140&&((++lodN)&(tn>300?3:1))) continue;
+        const ci=cy*N+cx; t=tn;
+        let ex=px+dx*t, ey=py+dy*t;
+        if(ex<0)ex=0; else if(ex>N-1.001)ex=N-1.001;
+        if(ey<0)ey=0; else if(ey>N-1.001)ey=N-1.001;
+        const xi=ex|0, yi=ey|0, ffx=ex-xi, ffy=ey-yi, hi=yi*N+xi;
+        const ha=h[hi], hb=h[hi+1], hc=h[hi+N], hd=h[hi+N+1];
+        const t1=ha+(hb-ha)*ffx, t2=hc+(hd-hc)*ffx;
+        let hh=t1+(t2-t1)*ffy+st[ci];
+        const th=tree[ci]; let isTree=false;
+        if(th>0){ hh+=th*0.85; isTree=true; }
+        if(hh>WATER+0.05){
+          let rF=Math.ceil(horizon+(pz-WATER)*K/t), rT=Math.floor(horizon+(hh-pz2)*K/t);
+          if(rF<wMin)rF=wMin; if(rT>wMax)rT=wMax;
+          if(rF<=rT){
+            const f=fogLUT[(t*4)|0];
+            const col=isTree?pack(tr[ci],tg[ci],tb[ci],f):pack(cr[ci],cg[ci],cb[ci],f);
+            for(let r=rF;r<=rT;r++){ if(wflag[r]&&!mflag[r]){ mirror[r]=col; mflag[r]=1; done++; } }
+          }
+        }
+      }
+      for(let r=wMin;r<=wMax;r++){
+        if(!wflag[r]) continue;
+        const d=wdepth[r]; const k=sm(0,5.0,d);
+        // shallow teal -> deep blue, gentle
+        const wr=78+(20-78)*k, wg=124+(54-124)*k, wb=132+(98-132)*k;
+        const sg=(r-horizon)/K;
+        const rip=0.028*Math.sin(r*0.8+i*0.3+skyTime*2.0);
+        let refl=clamp(0.84-sg*0.85,0.30,0.82)+rip;
+        const m=mirror[r]; const mr=(m>>16)&255, mg=(m>>8)&255, mb=m&255;
+        let fr=wr+(mr-wr)*refl, fg=wg+(mg-wg)*refl, fbb=wb+(mb-wb)*refl;
+        if(d<0.5){ const foam=(1-d/0.5)*0.5; fr+=(232-fr)*foam; fg+=(238-fg)*foam; fbb+=(238-fbb)*foam; }
+        fb[r*C+i]=pack(fr,fg,fbb,fogLUT[(wt[r]*4)|0]);
+        wflag[r]=0;
+      }
+    }
+  }
+  // water surface line: a bright foam waterline that sweeps across as you enter/leave the water
+  { const sd=pz-WATER; if(sd>-3&&sd<3&&terr(px,py)<WATER+0.5){
+      const rowS=Math.floor(horizon+sd*K*0.25), fade=1-Math.abs(sd)/3;
+      const r0=Math.max(0,rowS-2), r1=Math.min(R-1,rowS+2);
+      for(let r=r0;r<=r1;r++){ const a=fade*(1-Math.abs(r-rowS)/3)*0.85; if(a<=0)continue;
+        for(let i=0;i<C;i++){ const c=fb[r*C+i]; let rr=(c>>16)&255,gg=(c>>8)&255,bb=c&255;
+          rr+=(230-rr)*a; gg+=(240-gg)*a; bb+=(246-bb)*a; fb[r*C+i]=((rr|0)<<16)|((gg|0)<<8)|(bb|0); } }
+  } }
+}
+
+// ---------------- glyph compositing ----------------
+const RAMP=" .:-=+*xoO8#%@";
+const GLY={masks:[],n:RAMP.length};
+function buildGlyphs(cw,ch){
+  GLY.masks=[];
+  if(IS_NODE){ for(let g=0;g<RAMP.length;g++){ const m=new Uint8Array(cw*ch); const dens=g/(RAMP.length-1); for(let y=0;y<ch;y++)for(let x=0;x<cw;x++){ m[y*cw+x]=hash2(x,y,g*7+1)<dens?1:0; } GLY.masks.push(m); } return; }
+  const oc=document.createElement('canvas'); oc.width=cw; oc.height=ch;
+  const g2=oc.getContext('2d',{willReadFrequently:true});
+  for(let g=0;g<RAMP.length;g++){
+    g2.fillStyle='#000'; g2.fillRect(0,0,cw,ch);
+    g2.fillStyle='#fff'; g2.font='bold '+Math.round(ch*0.92)+'px ui-monospace,Menlo,Consolas,"Courier New",monospace';
+    g2.textAlign='center'; g2.textBaseline='middle';
+    g2.fillText(RAMP[g],cw/2,ch/2+0.5);
+    const d=g2.getImageData(0,0,cw,ch).data; const m=new Uint8Array(cw*ch);
+    for(let p=0;p<cw*ch;p++) m[p]=d[p*4]>110?1:0;
+    GLY.masks.push(m);
+  }
+}
+function compose(){
+  const C=RS.C,R=RS.R,cw=RS.cellW,ch=RS.cellH,PW=C*cw;
+  const px32=FB.px32, fb=FB.col, G=GLY.masks, nG=GLY.n;
+  const uw=UW;
+  for(let j=0;j<R;j++){
+    let utR=0,utG=0,utB=0,um=0;
+    if(uw>0){ const sgl=1-j/R; utR=12+(46-12)*sgl; utG=46+(118-46)*sgl; utB=72+(150-72)*sgl; um=uw*0.6; }
+    for(let i=0;i<C;i++){
+      const c=fb[j*C+i]; let r=(c>>16)&255, g=(c>>8)&255, b=c&255;
+      if(um>0){ r+=(utR-r)*um; g+=(utG-g)*um; b+=(utB-b)*um; }
+      const lum=(r*77+g*150+b*29)>>8;
+      const mask=G[(lum*nG)>>8];
+      const fg=(0xff000000|(b<<16)|(g<<8)|r)>>>0;
+      const bg=(0xff000000|(((b*0.45)|0)<<16)|(((g*0.45)|0)<<8)|((r*0.45)|0))>>>0;
+      let base=j*ch*PW+i*cw, mi=0;
+      for(let y=0;y<ch;y++){ const o=base+y*PW; for(let x=0;x<cw;x++){ px32[o+x]=mask[mi++]?fg:bg; } }
+    }
+  }
+}
+
+// ---------------- creatures (simulation layer) ----------------
+const SP={BIRD:0,RABBIT:1,DEER:2,SQUIRREL:3,FISH:4,WOLF:5,CARCASS:6};
+const SPP=[
+  { speed:8.0, turn:3.2, sight:16, sep:2.4, wsize:0.86, hsize:0.38, r:52,g:50,b:60 },
+  { speed:3.0, turn:5.0, sight:9,  sep:1.0, wsize:0.70, hsize:0.78, r:168,g:132,b:98 },
+  { speed:4.4, turn:3.4, sight:18, sep:3.2, wsize:1.28, hsize:1.95, r:158,g:118,b:78 },
+  { speed:5.0, turn:6.5, sight:8,  sep:0.8, wsize:0.52, hsize:0.68, r:156,g:92,b:52 },
+  { speed:3.6, turn:5.0, sight:6,  sep:0.9, wsize:0.70, hsize:0.42, r:88,g:138,b:162 },
+  { speed:6.7, turn:4.4, sight:30, sep:2.2, wsize:1.18, hsize:1.22, r:96,g:92,b:88 },
+  { speed:0, turn:0, sight:0, sep:0, wsize:1.20, hsize:0.52, r:110,g:70,b:46 }
+];
+const CMAX=1600, CDRAW=130;
+const CR_={ n:0,
+  sp:new Uint8Array(CMAX), x:new Float32Array(CMAX), y:new Float32Array(CMAX), z:new Float32Array(CMAX),
+  vx:new Float32Array(CMAX), vy:new Float32Array(CMAX), ax:new Float32Array(CMAX), ay:new Float32Array(CMAX),
+  st:new Uint8Array(CMAX), tm:new Float32Array(CMAX), ph:new Float32Array(CMAX),
+  energy:new Float32Array(CMAX), al:new Uint8Array(CMAX), tgt:new Int32Array(CMAX),
+  age:new Float32Array(CMAX), par:new Int32Array(CMAX) };
+const SGRID={ cell:6, w:0, head:null, next:new Int32Array(CMAX) };
+const CBIN={ head:null, next:new Int32Array(CMAX), touched:new Int32Array(CMAX), tn:0 };
+const RESERVE={ burrows:[], meadows:[], dens:[] };
+const ECO={ capR:80, minR:14, capD:38, minD:8, capW:11, minW:3 };
+
+// ---- sprite masks ----
+const MASKS={};
+function defMask(sp,w,h,rows,pal){
+  const px=new Uint8Array(w*h);
+  for(let y=0;y<h;y++){ const rw=rows[y]; for(let x=0;x<w;x++){ const ch=rw.charCodeAt(x); px[y*w+x]=(ch===46||ch===32)?0:(ch-48); } }
+  const P=new Array(10); for(const k in pal) P[+k]=pal[k];
+  MASKS[sp]={w,h,px,pal:P};
+}
+defMask(SP.RABBIT,12,10,[
+ "....5..5....","....5..5....","....5555....","...111111...",
+ "..1114111...","..11111112..",".1111111122.","1111111112..",
+ ".11....11...",".2......2..."],
+ {1:[176,140,108],2:[128,96,72],4:[36,24,20],5:[186,160,148]});
+defMask(SP.DEER,16,16,[
+ ".....4...4....","....4.4.4.4...",".....4444.....","....1333......",
+ "...113631.....","...11363......","..113333......",".1133333335...",
+ "133333333335..","111111111175..","177777777775..",".7777777777...",
+ ".2.2.....2.2..",".2.2.....2.2..",".6.6.....6.6..",".............."],
+ {1:[164,118,78],2:[82,56,36],3:[122,88,54],4:[168,140,100],5:[230,220,200],6:[32,22,16],7:[198,164,118]});
+defMask(SP.SQUIRREL,10,10,[
+ "........22",".11.....22","1141...22.","1111..222.",
+ ".111.222..",".111122...","..111.2...",".11..2....",
+ ".1...1....",".2...2...."],
+ {1:[168,96,52],2:[186,122,70],4:[28,18,14]});
+defMask(SP.FISH,12,6,[
+ "....1111....","..11111112..",".1111411112.","11111111112.",
+ ".111111112..","....1111...."],
+ {1:[72,150,168],2:[40,96,120],4:[16,22,28]});
+defMask(SP.CARCASS,14,6,[
+ "..2..2..2..2..","..2..2..2..2..",".11111111111..","1111111111111.",
+ ".11111111111..","..2........2.."],
+ {1:[118,74,48],2:[72,50,34]});
+defMask(SP.WOLF,14,10,[
+ "...........11.","1.........1111","11......133411","1111111111111.",
+ "11111111111111",".11111111111..",".1111111111...",".1.1....1.1...",
+ ".2.2....2.2...",".2......2....."],
+ {1:[92,88,84],2:[52,48,44],3:[150,144,136],4:[232,196,64]});
+
+function mul32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function addCreature(sp,x,y,ax,ay,age,par){ const c=CR_.n++; CR_.sp[c]=sp; CR_.x[c]=x; CR_.y[c]=y; CR_.ax[c]=ax; CR_.ay[c]=ay;
+  CR_.vx[c]=0; CR_.vy[c]=0; CR_.st[c]=0; CR_.tm[c]=Math.random()*4; CR_.ph[c]=Math.random()*6.283;
+  CR_.z[c]=Math.max(terr(x,y),WATER)+0.3; CR_.al[c]=1; CR_.tgt[c]=-1;
+  CR_.age[c]=age==null?1:age; CR_.par[c]=par==null?-1:par;
+  CR_.energy[c]= sp===SP.WOLF?(CR_.age[c]<1?40:92):(sp===SP.DEER?(CR_.age[c]<1?22:40):(CR_.age[c]<1?16:30)); return c; }
+
+function populate(seed){
+  const rnd=mul32((seed^0x9e3779b9)>>>0); CR_.n=0;
+  RESERVE.burrows.length=0; RESERVE.meadows.length=0; RESERVE.dens.length=0;
+  const on=DIALS.on, pop=DIALS.pop;
+  const wantWolf=!!(DIALS.predators && on[SP.WOLF] && pop[SP.WOLF]>0);
+  // rabbit burrows in open meadow
+  let burrows=0, tries=0;
+  const wantR=!!(on[SP.RABBIT] && pop[SP.RABBIT]>0);
+  const nBur=wantR?Math.max(1,Math.round(11*pop[SP.RABBIT])):0;
+  while(burrows<Math.max(nBur,4) && tries<7000){ tries++;
+    const x=10+rnd()*(N-20), y=10+rnd()*(N-20); const g=terr(x,y);
+    if(g<WATER+2||g>34) continue;
+    if(Math.max(Math.abs(x-FORT.x),Math.abs(y-FORT.y))<42) continue;
+    if(W.tree[(y|0)*N+(x|0)]>0) continue;
+    if(fbm(x*0.03,y*0.03,seed+21,3)>0.42) continue;
+    burrows++; RESERVE.burrows.push(x,y);
+    if(!wantR||burrows>nBur) continue;
+    const pk=Math.max(1,Math.round((4+(rnd()*3|0))*pop[SP.RABBIT]));
+    let parent=-1;
+    for(let k=0;k<pk;k++){ if(CR_.n>=CMAX)break;
+      const young=k>0 && rnd()<0.28;
+      const id=addCreature(SP.RABBIT, x+(rnd()-0.5)*7, y+(rnd()-0.5)*7, x, y, young?0.25+rnd()*0.45:1, young?parent:-1);
+      if(!young && parent<0) parent=id;
+      if(young && parent>=0) CR_.par[id]=parent; }
+  }
+  // deer herds in open meadow / forest edge
+  let herds=0; tries=0;
+  const wantD=!!(on[SP.DEER] && pop[SP.DEER]>0);
+  const nHerd=wantD?Math.max(1,Math.round(4*pop[SP.DEER])):0;
+  while(herds<Math.max(nHerd,3) && tries<7000){ tries++;
+    const x=16+rnd()*(N-32), y=16+rnd()*(N-32); const g=terr(x,y);
+    if(g<WATER+2||g>32) continue;
+    if(Math.max(Math.abs(x-FORT.x),Math.abs(y-FORT.y))<48) continue;
+    const fo=fbm(x*0.03,y*0.03,seed+21,3); if(fo>0.5) continue;
+    herds++; RESERVE.meadows.push(x,y);
+    if(!wantD||herds>nHerd) continue;
+    const hn=Math.max(1,Math.round((5+(rnd()*3|0))*pop[SP.DEER]));
+    let parent=-1;
+    for(let k=0;k<hn;k++){ if(CR_.n>=CMAX)break;
+      const young=k>0 && rnd()<0.32;
+      const id=addCreature(SP.DEER, x+(rnd()-0.5)*10, y+(rnd()-0.5)*10, x, y, young?0.2+rnd()*0.5:1, young?parent:-1);
+      if(!young && parent<0) parent=id;
+      if(young && parent>=0) CR_.par[id]=parent; }
+  }
+  // squirrels in forest
+  if(on[SP.SQUIRREL] && pop[SP.SQUIRREL]>0){
+    let sq=0; tries=0; const nSq=Math.max(1,Math.round(28*pop[SP.SQUIRREL]));
+    while(sq<nSq && tries<9000){ tries++;
+      const x=10+rnd()*(N-20), y=10+rnd()*(N-20);
+      if(fbm(x*0.03,y*0.03,seed+21,3)<0.52) continue;
+      if(terr(x,y)<WATER+2) continue;
+      sq++; addCreature(SP.SQUIRREL, x, y, x, y); }
+  }
+  // fish schools in the lake
+  if(on[SP.FISH] && pop[SP.FISH]>0){
+    let sch=0; tries=0; const nSch=Math.max(1,Math.round(2*pop[SP.FISH]));
+    while(sch<nSch && tries<4000){ tries++;
+      const a=rnd()*6.283, rr=rnd()*(LAKE.r*DIALS.water+8); const x=LAKE.x+Math.cos(a)*rr, y=LAKE.y+Math.sin(a)*rr;
+      if(terr(x,y)>WATER-1.5) continue;
+      sch++; const fn=Math.max(4,Math.round((16+(rnd()*8|0))*pop[SP.FISH]));
+      for(let k=0;k<fn;k++){ if(CR_.n>=CMAX)break; const c=addCreature(SP.FISH, x+(rnd()-0.5)*8, y+(rnd()-0.5)*8, x, y); CR_.z[c]=WATER-0.18; }
+    }
+  }
+  // wolf pack: den near a deer meadow so the pack has prey within range
+  let dx=140, dy=340;
+  if(RESERVE.meadows.length>0){ const mi=(rnd()*(RESERVE.meadows.length/2))|0;
+    dx=clamp(RESERVE.meadows[mi*2]+(rnd()-0.5)*24, 12, N-12);
+    dy=clamp(RESERVE.meadows[mi*2+1]+(rnd()-0.5)*24, 12, N-12); }
+  RESERVE.dens.push(dx,dy);
+  if(wantWolf){
+    const nW=Math.max(1,Math.round(5*pop[SP.WOLF]));
+    let parent=-1;
+    for(let k=0;k<nW;k++){ if(CR_.n>=CMAX)break;
+      const young=k>2 && rnd()<0.4;
+      const wc=addCreature(SP.WOLF, dx+(rnd()-0.5)*8, dy+(rnd()-0.5)*8, dx, dy, young?0.3+rnd()*0.4:1, young?parent:-1);
+      CR_.energy[wc]=young?40:74;
+      if(!young && parent<0) parent=wc;
+      if(young && parent>=0) CR_.par[wc]=parent; }
+  }
+  // bird flocks over forest
+  if(on[SP.BIRD] && pop[SP.BIRD]>0){
+    let flocks=0; tries=0; const nFl=Math.max(1,Math.round(6*pop[SP.BIRD]));
+    while(flocks<nFl && tries<6000){ tries++;
+      const x=14+rnd()*(N-28), y=14+rnd()*(N-28);
+      if(fbm(x*0.03,y*0.03,seed+21,3)<0.5) continue;
+      flocks++; const gc=Math.max(terr(x,y),WATER);
+      const nb=Math.max(3,Math.round((8+(rnd()*6|0))*pop[SP.BIRD]));
+      for(let k=0;k<nb;k++){ if(CR_.n>=CMAX)break;
+        const jx=x+(rnd()-0.5)*16, jy=y+(rnd()-0.5)*16;
+        const c=addCreature(SP.BIRD, jx, jy, jx, jy); CR_.z[c]=gc+10+rnd()*8; CR_.tm[c]=4+rnd()*14; }
+    }
+  }
+}
+
+function buildSGrid(){
+  const cs=SGRID.cell, gw=Math.ceil(N/cs); SGRID.w=gw;
+  if(!SGRID.head||SGRID.head.length!==gw*gw) SGRID.head=new Int32Array(gw*gw);
+  SGRID.head.fill(-1);
+  for(let c=0;c<CR_.n;c++){ if(CR_.al[c]===0)continue; const gx=(CR_.x[c]/cs)|0, gy=(CR_.y[c]/cs)|0; const gi=gy*gw+gx; SGRID.next[c]=SGRID.head[gi]; SGRID.head[gi]=c; }
+}
+function forNeighbors(c,r,cb){
+  const cs=SGRID.cell, gw=SGRID.w, x=CR_.x[c], y=CR_.y[c];
+  const gx=(x/cs)|0, gy=(y/cs)|0, rad=Math.ceil(r/cs), r2=r*r;
+  for(let oy=-rad;oy<=rad;oy++){ const yy=gy+oy; if(yy<0||yy>=gw)continue;
+    for(let ox=-rad;ox<=rad;ox++){ const xx=gx+ox; if(xx<0||xx>=gw)continue;
+      for(let o=SGRID.head[yy*gw+xx]; o>=0; o=SGRID.next[o]){ if(o===c)continue;
+        const dx=CR_.x[o]-x, dy=CR_.y[o]-y, d2=dx*dx+dy*dy; if(d2<r2) cb(o,dx,dy,d2); } } }
+}
+function nearestSp(x,y,range,want){
+  const cs=SGRID.cell, gw=SGRID.w, gx=(x/cs)|0, gy=(y/cs)|0, rad=Math.ceil(range/cs);
+  let best=-1, bd=range*range;
+  for(let oy=-rad;oy<=rad;oy++){ const yy=gy+oy; if(yy<0||yy>=gw)continue;
+    for(let ox=-rad;ox<=rad;ox++){ const xx=gx+ox; if(xx<0||xx>=gw)continue;
+      for(let o=SGRID.head[yy*gw+xx]; o>=0; o=SGRID.next[o]){ if(CR_.sp[o]!==want||CR_.al[o]===0)continue;
+        const dx=CR_.x[o]-x, dy=CR_.y[o]-y, d2=dx*dx+dy*dy; if(d2<bd){ bd=d2; best=o; } } } }
+  return best;
+}
+function integ(c,vx,vy,dt,water){
+  let nx=CR_.x[c]+vx*dt, ny=CR_.y[c]+vy*dt;
+  if(nx<4){nx=4;vx=Math.abs(vx);} if(nx>N-5){nx=N-5;vx=-Math.abs(vx);}
+  if(ny<4){ny=4;vy=Math.abs(vy);} if(ny>N-5){ny=N-5;vy=-Math.abs(vy);}
+  CR_.x[c]=nx; CR_.y[c]=ny; CR_.vx[c]=vx; CR_.vy[c]=vy;
+}
+function followParent(c,dt){
+  const p=parentOf(c); if(p<0){ if(CR_.age[c]<1) CR_.par[c]=-1; return false; }
+  CR_.ax[c]=CR_.ax[p]; CR_.ay[c]=CR_.ay[p];
+  const x=CR_.x[c], y=CR_.y[c];
+  let vx=CR_.vx[c], vy=CR_.vy[c];
+  const tx=CR_.x[p]-1.1*Math.cos(CR_.ph[p]+c*0.7), ty=CR_.y[p]-1.1*Math.sin(CR_.ph[p]+c*0.7);
+  let ax=tx-x, ay=ty-y; const ad=Math.hypot(ax,ay)+1e-4;
+  const pS=SPP[CR_.sp[c]]; const spd=pS.speed*(0.55+0.35*CR_.age[c]);
+  if(ad>0.6){ vx+=(ax/ad*spd-vx)*Math.min(1,dt*5); vy+=(ay/ad*spd-vy)*Math.min(1,dt*5); }
+  else { vx*=0.7; vy*=0.7; }
+  CR_.st[c]=CR_.st[p]===1?1:CR_.st[c];
+  integ(c,vx,vy,dt,false);
+  CR_.z[c]=Math.max(terr(CR_.x[c],CR_.y[c]),WATER)+0.22+0.12*CR_.age[c];
+  return true;
+}
+
+function tickBird(c,dt){
+  const x=CR_.x[c], y=CR_.y[c]; let vx=CR_.vx[c], vy=CR_.vy[c]; const p=SPP[SP.BIRD];
+  CR_.tm[c]-=dt;
+  if(CR_.st[c]===0){
+    let sepx=0,sepy=0,alx=0,aly=0,cox=0,coy=0,cnt=0;
+    forNeighbors(c,p.sight,function(o,dx,dy,d2){ if(CR_.sp[o]!==SP.BIRD||CR_.st[o]!==0)return;
+      const d=Math.sqrt(d2)+1e-4; if(d<p.sep){ sepx-=dx/d; sepy-=dy/d; }
+      alx+=CR_.vx[o]; aly+=CR_.vy[o]; cox+=CR_.x[o]; coy+=CR_.y[o]; cnt++; });
+    let dvx=0,dvy=0;
+    if(cnt>0){ alx/=cnt; aly/=cnt; cox=cox/cnt-x; coy=coy/cnt-y; dvx+=sepx*1.6+alx*0.5+cox*0.02; dvy+=sepy*1.6+aly*0.5+coy*0.02; }
+    CR_.ph[c]+=dt*(0.7+0.5*Math.random());
+    dvx+=Math.cos(CR_.ph[c])*2.2; dvy+=Math.sin(CR_.ph[c]*1.3)*2.2;
+    const hx=CR_.ax[c]-x, hy=CR_.ay[c]-y, hd=Math.hypot(hx,hy);
+    if(hd>60){ dvx+=hx/hd*3.5; dvy+=hy/hd*3.5; }
+    vx+=dvx*dt*p.turn*0.5; vy+=dvy*dt*p.turn*0.5;
+    const s=Math.hypot(vx,vy)||1e-4, mx=p.speed;
+    if(s>mx){ vx=vx/s*mx; vy=vy/s*mx; } else if(s<mx*0.5){ vx=vx/s*mx*0.5; vy=vy/s*mx*0.5; }
+    CR_.z[c]+=(Math.max(terr(x,y),WATER)+12-CR_.z[c])*Math.min(1,dt*1.5);
+    if(CR_.tm[c]<=0){ CR_.st[c]=1; CR_.tm[c]=8+Math.random()*12; }
+  } else {
+    const hx=CR_.ax[c]-x, hy=CR_.ay[c]-y, hd=Math.hypot(hx,hy)+1e-4;
+    if(hd>2){ vx=hx/hd*p.speed*0.6; vy=hy/hd*p.speed*0.6; } else { vx*=0.4; vy*=0.4; }
+    const ax=CR_.ax[c]|0, ay=CR_.ay[c]|0, ti=ay*N+ax;
+    const rz=(W.tree[ti]>0? terr(ax,ay)+W.tree[ti]*0.78 : Math.max(terr(x,y),WATER)+1.6);
+    CR_.z[c]+=(rz-CR_.z[c])*Math.min(1,dt*1.3);
+    if(CR_.tm[c]<=0){ CR_.st[c]=0; CR_.tm[c]=14+Math.random()*20; }
+  }
+  integ(c,vx,vy,dt,false);
+}
+
+function tickRabbit(c,dt,px,py){
+  if(!isAdult(c) && followParent(c,dt)) return;
+  const x=CR_.x[c], y=CR_.y[c]; let vx=CR_.vx[c], vy=CR_.vy[c]; const p=SPP[SP.RABBIT];
+  const pd2=(x-px)*(x-px)+(y-py)*(y-py); CR_.tm[c]-=dt;
+  if(CR_.st[c]===0){
+    if(pd2<64 || nearestSp(x,y,9,SP.WOLF)>=0){ CR_.st[c]=1; }
+    else {
+      if(CR_.tm[c]<=0){ CR_.tm[c]=0.6+Math.random()*1.8; CR_.ph[c]=Math.random()*6.283; }
+      const bx=CR_.ax[c]-x, by=CR_.ay[c]-y, bd=Math.hypot(bx,by);
+      let dvx=Math.cos(CR_.ph[c]), dvy=Math.sin(CR_.ph[c]);
+      if(bd>10){ dvx=bx/bd; dvy=by/bd; }
+      const moving=(CR_.tm[c]*10|0)%12<5, spd=moving?p.speed:p.speed*0.12;
+      vx+=(dvx*spd-vx)*Math.min(1,dt*5); vy+=(dvy*spd-vy)*Math.min(1,dt*5);
+      if(moving) CR_.ph[c]+=dt*7;
+    }
+  } else {
+    const bx=CR_.ax[c]-x, by=CR_.ay[c]-y, bd=Math.hypot(bx,by)+1e-4;
+    vx=bx/bd*p.speed*2.05; vy=by/bd*p.speed*2.05; CR_.ph[c]+=dt*13;
+    if(bd<1.4){ if(pd2>196 && nearestSp(x,y,15,SP.WOLF)<0){ CR_.st[c]=0; } else { vx*=0.15; vy*=0.15; } }
+  }
+  integ(c,vx,vy,dt,false);
+  const hop=Math.max(0,Math.sin(CR_.ph[c]))*0.28; CR_.z[c]=Math.max(terr(CR_.x[c],CR_.y[c]),WATER)+0.28+hop;
+}
+
+function tickDeer(c,dt,px,py){
+  if(!isAdult(c) && followParent(c,dt)) return;
+  const x=CR_.x[c], y=CR_.y[c]; let vx=CR_.vx[c], vy=CR_.vy[c]; const p=SPP[SP.DEER];
+  const pd2=(x-px)*(x-px)+(y-py)*(y-py); CR_.tm[c]-=dt;
+  const w=nearestSp(x,y,14,SP.WOLF);
+  if(w>=0 || pd2<121){ if(CR_.st[c]!==1){ CR_.st[c]=1; CR_.tm[c]=2.2; } }
+  if(CR_.st[c]===1){
+    const tx=(w>=0?CR_.x[w]:px), ty=(w>=0?CR_.y[w]:py);
+    let ax=x-tx, ay=y-ty; const al=Math.hypot(ax,ay)||1e-4; ax/=al; ay/=al;
+    vx+=(ax*p.speed*1.7-vx)*Math.min(1,dt*4); vy+=(ay*p.speed*1.7-vy)*Math.min(1,dt*4);
+    if(CR_.tm[c]<=0 && w<0 && pd2>200) CR_.st[c]=0;
+  } else {
+    let sepx=0,sepy=0,cox=0,coy=0,alx=0,aly=0,cnt=0;
+    forNeighbors(c,14,function(o,dx,dy,d2){ if(CR_.sp[o]!==SP.DEER)return; const d=Math.sqrt(d2)+1e-4;
+      if(d<p.sep){ sepx-=dx/d; sepy-=dy/d; } cox+=CR_.x[o]; coy+=CR_.y[o]; alx+=CR_.vx[o]; aly+=CR_.vy[o]; cnt++; });
+    let dvx=0,dvy=0;
+    if(cnt>0){ cox=cox/cnt-x; coy=coy/cnt-y; alx/=cnt; aly/=cnt; dvx+=sepx*1.2+cox*0.03+alx*0.3; dvy+=sepy*1.2+coy*0.03+aly*0.3; }
+    if(CR_.tm[c]<=0){ CR_.tm[c]=1.5+Math.random()*3; CR_.ph[c]=Math.random()*6.283; }
+    dvx+=Math.cos(CR_.ph[c])*0.6; dvy+=Math.sin(CR_.ph[c])*0.6;
+    const hx=CR_.ax[c]-x, hy=CR_.ay[c]-y, hd=Math.hypot(hx,hy); if(hd>40){ dvx+=hx/hd*1.2; dvy+=hy/hd*1.2; }
+    const moving=(CR_.tm[c]*10|0)%20<8, spd=moving?p.speed*0.6:p.speed*0.12;
+    const dl=Math.hypot(dvx,dvy)||1e-4;
+    vx+=((dvx/dl)*spd-vx)*Math.min(1,dt*3); vy+=((dvy/dl)*spd-vy)*Math.min(1,dt*3);
+  }
+  integ(c,vx,vy,dt,false);
+  CR_.z[c]=Math.max(terr(CR_.x[c],CR_.y[c]),WATER)+0.3;
+}
+
+function tickSquirrel(c,dt,px,py){
+  const x=CR_.x[c], y=CR_.y[c]; let vx=CR_.vx[c], vy=CR_.vy[c]; const p=SPP[SP.SQUIRREL];
+  const pd2=(x-px)*(x-px)+(y-py)*(y-py); CR_.tm[c]-=dt;
+  const w=nearestSp(x,y,9,SP.WOLF);
+  if(w>=0 || pd2<36){ CR_.st[c]=1; }
+  if(CR_.st[c]===1){
+    const tx=(w>=0?CR_.x[w]:px), ty=(w>=0?CR_.y[w]:py);
+    let ax=x-tx, ay=y-ty; const al=Math.hypot(ax,ay)||1e-4;
+    vx=ax/al*p.speed*1.4; vy=ay/al*p.speed*1.4;
+    if(w<0 && pd2>110) CR_.st[c]=0;
+  } else {
+    if(CR_.tm[c]<=0){ CR_.tm[c]=0.4+Math.random()*1.4; CR_.ph[c]=Math.random()*6.283; }
+    const bx=CR_.ax[c]-x, by=CR_.ay[c]-y, bd=Math.hypot(bx,by);
+    let dvx=Math.cos(CR_.ph[c]), dvy=Math.sin(CR_.ph[c]);
+    if(bd>9){ dvx=bx/bd; dvy=by/bd; }
+    const moving=(CR_.tm[c]*10|0)%10<5, spd=moving?p.speed*0.9:0.2;
+    vx+=(dvx*spd-vx)*Math.min(1,dt*6); vy+=(dvy*spd-vy)*Math.min(1,dt*6);
+  }
+  integ(c,vx,vy,dt,false);
+  CR_.z[c]=Math.max(terr(CR_.x[c],CR_.y[c]),WATER)+0.25;
+}
+
+function tickFish(c,dt){
+  const x=CR_.x[c], y=CR_.y[c]; let vx=CR_.vx[c], vy=CR_.vy[c]; const p=SPP[SP.FISH];
+  let sepx=0,sepy=0,alx=0,aly=0,cox=0,coy=0,cnt=0;
+  forNeighbors(c,p.sight,function(o,dx,dy,d2){ if(CR_.sp[o]!==SP.FISH)return; const d=Math.sqrt(d2)+1e-4;
+    if(d<p.sep){ sepx-=dx/d; sepy-=dy/d; } alx+=CR_.vx[o]; aly+=CR_.vy[o]; cox+=CR_.x[o]; coy+=CR_.y[o]; cnt++; });
+  let dvx=0,dvy=0;
+  if(cnt>0){ alx/=cnt; aly/=cnt; cox=cox/cnt-x; coy=coy/cnt-y; dvx+=sepx*1.4+alx*0.5+cox*0.03; dvy+=sepy*1.4+aly*0.5+coy*0.03; }
+  CR_.ph[c]+=dt*(0.8+0.6*Math.random()); dvx+=Math.cos(CR_.ph[c])*1.0; dvy+=Math.sin(CR_.ph[c]*1.2)*1.0;
+  vx+=dvx*dt*p.turn*0.5; vy+=dvy*dt*p.turn*0.5;
+  const s=Math.hypot(vx,vy)||1e-4, mx=p.speed; if(s>mx){ vx=vx/s*mx; vy=vy/s*mx; }
+  let nx=x+vx*dt, ny=y+vy*dt;
+  if(terr(nx,ny)>WATER-0.8){ const hx=CR_.ax[c]-x, hy=CR_.ay[c]-y, hd=Math.hypot(hx,hy)+1e-4;
+    vx=hx/hd*p.speed; vy=hy/hd*p.speed; nx=x+vx*dt; ny=y+vy*dt; }
+  nx=clamp(nx,4,N-5); ny=clamp(ny,4,N-5);
+  CR_.x[c]=nx; CR_.y[c]=ny; CR_.vx[c]=vx; CR_.vy[c]=vy; CR_.z[c]=WATER-0.18;
+}
+
+function tickWolf(c,dt){
+  if(!isAdult(c) && followParent(c,dt)) return;
+  const x=CR_.x[c], y=CR_.y[c]; let vx=CR_.vx[c], vy=CR_.vy[c]; const p=SPP[SP.WOLF];
+  CR_.tm[c]-=dt;
+  if(CR_.st[c]===2){
+    const cg=CR_.tgt[c];
+    if(cg<0||cg>=CR_.n||CR_.al[cg]===0||CR_.sp[cg]!==SP.CARCASS||CR_.energy[cg]<=0){ CR_.tgt[c]=-1; CR_.st[c]=0; }
+    else { let ax=CR_.x[cg]-x, ay=CR_.y[cg]-y; const ad=Math.hypot(ax,ay)+1e-4;
+      if(ad>1.3){ vx+=((ax/ad)*p.speed*0.8-vx)*Math.min(1,dt*4); vy+=((ay/ad)*p.speed*0.8-vy)*Math.min(1,dt*4); }
+      else { vx*=0.55; vy*=0.55; CR_.energy[cg]-=dt*7; CR_.energy[c]=Math.min(100,CR_.energy[c]+dt*11); }
+      if(CR_.tm[c]<=0 && CR_.energy[c]>90){ CR_.tgt[c]=-1; CR_.st[c]=0; } }
+  }
+  else {
+    // draw the pack to a fresh kill
+    if(CR_.energy[c]<75 && CR_.tgt[c]<0){ const carc=nearestSp(x,y,34,SP.CARCASS); if(carc>=0){ CR_.tgt[c]=carc; CR_.st[c]=2; CR_.tm[c]=6; } }
+    if(CR_.st[c]===0 && CR_.energy[c]<62 && CR_.tgt[c]<0){
+      let t=nearestSp(x,y,300,SP.RABBIT); let td=t>=0?((CR_.x[t]-x)*(CR_.x[t]-x)+(CR_.y[t]-y)*(CR_.y[t]-y)):1e9;
+      let t2=nearestSp(x,y,300,SP.DEER); let td2=t2>=0?((CR_.x[t2]-x)*(CR_.x[t2]-x)+(CR_.y[t2]-y)*(CR_.y[t2]-y)):1e9;
+      const pick=(td2<td)?t2:t; if(pick>=0){ CR_.tgt[c]=pick; CR_.st[c]=1; }
+    }
+    if(CR_.st[c]===1){
+      const tg=CR_.tgt[c];
+      if(tg<0||tg>=CR_.n||CR_.al[tg]===0||(CR_.sp[tg]!==SP.RABBIT&&CR_.sp[tg]!==SP.DEER)){ CR_.tgt[c]=-1; CR_.st[c]=0; }
+      else { let ax=CR_.x[tg]-x, ay=CR_.y[tg]-y; const ad=Math.hypot(ax,ay)+1e-4;
+        vx+=((ax/ad)*p.speed*1.35-vx)*Math.min(1,dt*4); vy+=((ay/ad)*p.speed*1.35-vy)*Math.min(1,dt*4);
+        if(ad<2.0){ CR_.sp[tg]=SP.CARCASS; CR_.st[tg]=0; CR_.vx[tg]=0; CR_.vy[tg]=0; CR_.energy[tg]=55; CR_.tm[tg]=50; CR_.z[tg]=Math.max(terr(CR_.x[tg],CR_.y[tg]),WATER)+0.15; CR_.al[tg]=1; CR_.tgt[c]=tg; CR_.st[c]=2; CR_.tm[c]=7; } }
+    } else {
+      let sepx=0,sepy=0,cox=0,coy=0,cnt=0;
+      forNeighbors(c,16,function(o,dx,dy,d2){ if(CR_.sp[o]!==SP.WOLF)return; const d=Math.sqrt(d2)+1e-4;
+        if(d<p.sep){ sepx-=dx/d; sepy-=dy/d; } cox+=CR_.x[o]; coy+=CR_.y[o]; cnt++; });
+      let dvx=0,dvy=0; if(cnt>0){ cox=cox/cnt-x; coy=coy/cnt-y; dvx+=sepx*1.0+cox*0.02; dvy+=sepy*1.0+coy*0.02; }
+      if(CR_.tm[c]<=0){ CR_.tm[c]=1.5+Math.random()*3; CR_.ph[c]=Math.random()*6.283; }
+      dvx+=Math.cos(CR_.ph[c])*0.9; dvy+=Math.sin(CR_.ph[c])*0.9;
+      const hx=CR_.ax[c]-x, hy=CR_.ay[c]-y, hd=Math.hypot(hx,hy); if(hd>90){ dvx+=hx/hd*2.0; dvy+=hy/hd*2.0; }
+      const dl=Math.hypot(dvx,dvy)||1e-4;
+      vx+=((dvx/dl)*p.speed*0.5-vx)*Math.min(1,dt*3); vy+=((dvy/dl)*p.speed*0.5-vy)*Math.min(1,dt*3);
+    }
+  }
+  integ(c,vx,vy,dt,false);
+  CR_.z[c]=Math.max(terr(CR_.x[c],CR_.y[c]),WATER)+0.32;
+}
+
+function tick(dt){
+  if(CR_.n===0) return; buildSGrid(); const px=P.x, py=P.y;
+  for(let c=0;c<CR_.n;c++){ if(CR_.al[c]===0)continue;
+    if(CR_.age[c]<1){ CR_.age[c]+=dt/matureTime(CR_.sp[c]); if(CR_.age[c]>=1){ CR_.age[c]=1; CR_.par[c]=-1; } }
+    const s=CR_.sp[c];
+    if(s===SP.RABBIT) tickRabbit(c,dt,px,py);
+    else if(s===SP.BIRD) tickBird(c,dt);
+    else if(s===SP.DEER) tickDeer(c,dt,px,py);
+    else if(s===SP.SQUIRREL) tickSquirrel(c,dt,px,py);
+    else if(s===SP.FISH) tickFish(c,dt);
+    else if(s===SP.CARCASS) continue;
+    else tickWolf(c,dt); }
+}
+
+function copyC(d,src){ CR_.sp[d]=CR_.sp[src]; CR_.x[d]=CR_.x[src]; CR_.y[d]=CR_.y[src]; CR_.z[d]=CR_.z[src];
+  CR_.vx[d]=CR_.vx[src]; CR_.vy[d]=CR_.vy[src]; CR_.ax[d]=CR_.ax[src]; CR_.ay[d]=CR_.ay[src];
+  CR_.st[d]=CR_.st[src]; CR_.tm[d]=CR_.tm[src]; CR_.ph[d]=CR_.ph[src];
+  CR_.energy[d]=CR_.energy[src]; CR_.al[d]=CR_.al[src]; CR_.tgt[d]=CR_.tgt[src];
+  CR_.age[d]=CR_.age[src]; CR_.par[d]=CR_.par[src]; }
+function compact(){
+  const oldN=CR_.n; const map=new Int32Array(oldN);
+  let n=0;
+  for(let c=0;c<oldN;c++){
+    if(CR_.al[c]===0){ map[c]=-1; continue; }
+    if(n!==c) copyC(n,c);
+    map[c]=n; n++;
+  }
+  CR_.n=n;
+  for(let c=0;c<n;c++){
+    const p=CR_.par[c]; CR_.par[c]=(p>=0&&p<oldN)?map[p]:-1;
+    const tg=CR_.tgt[c]; CR_.tgt[c]=(tg>=0&&tg<oldN)?map[tg]:-1;
+  }
+}
+
+function ecology(){
+  if(CR_.n===0) return;
+  let cR=0,cD=0,cW=0;
+  for(let c=0;c<CR_.n;c++){ if(CR_.al[c]===0)continue; const s=CR_.sp[c]; if(s===SP.RABBIT)cR++; else if(s===SP.DEER)cD++; else if(s===SP.WOLF)cW++; }
+  const allowR=!!DIALS.on[SP.RABBIT], allowD=!!DIALS.on[SP.DEER], allowW=!!(DIALS.predators&&DIALS.on[SP.WOLF]);
+  for(let c=0;c<CR_.n;c++){ if(CR_.al[c]===0)continue; const s=CR_.sp[c];
+    if(s===SP.RABBIT){ CR_.energy[c]+=isAdult(c)?3.2:2.2; if(CR_.energy[c]>100)CR_.energy[c]=100;
+      if(allowR && isAdult(c) && CR_.energy[c]>52 && cR<ECO.capR && CR_.n<CMAX && Math.random()<0.5){ const bx=CR_.x[c]+(Math.random()-0.5)*4, by=CR_.y[c]+(Math.random()-0.5)*4; const ba=Math.random()<0.5?[bx,by]:[CR_.ax[c],CR_.ay[c]]; addCreature(SP.RABBIT, bx, by, ba[0], ba[1], 0, c); cR++; CR_.energy[c]-=26; } }
+    else if(s===SP.DEER){ CR_.energy[c]+=isAdult(c)?2.6:1.8; if(CR_.energy[c]>100)CR_.energy[c]=100;
+      if(allowD && isAdult(c) && CR_.energy[c]>60 && cD<ECO.capD && CR_.n<CMAX && Math.random()<0.4){ const bx=CR_.x[c]+(Math.random()-0.5)*5, by=CR_.y[c]+(Math.random()-0.5)*5; addCreature(SP.DEER, bx, by, CR_.ax[c], CR_.ay[c], 0, c); cD++; CR_.energy[c]-=32; } }
+    else if(s===SP.CARCASS){ CR_.tm[c]-=2.5; if(CR_.tm[c]<=0||CR_.energy[c]<=0) CR_.al[c]=0; }
+    else if(s===SP.WOLF){ CR_.energy[c]-=isAdult(c)?5:3.2;
+      if(CR_.energy[c]<=0){ if(cW>ECO.minW){ CR_.al[c]=0; cW--; } else { CR_.energy[c]=28; } }
+      else if(allowW && isAdult(c) && CR_.energy[c]>80 && cW<ECO.capW && CR_.n<CMAX && Math.random()<0.3){ const b=addCreature(SP.WOLF, CR_.x[c]+(Math.random()-0.5)*4, CR_.y[c]+(Math.random()-0.5)*4, CR_.ax[c], CR_.ay[c], 0, c); CR_.energy[b]=40; cW++; CR_.energy[c]-=38; } }
+  }
+  // floors (immigration from the edges) - adults only, and only if that species is on
+  if(allowR){ let bg=0;
+    while(cR<ECO.minR && RESERVE.burrows.length>0 && CR_.n<CMAX){ const bi=(bg%(RESERVE.burrows.length/2))|0; const bx=RESERVE.burrows[bi*2], by=RESERVE.burrows[bi*2+1]; addCreature(SP.RABBIT, bx+(Math.random()-0.5)*5, by+(Math.random()-0.5)*5, bx, by, 1, -1); cR++; bg++; } }
+  if(allowD){ let mg=0;
+    while(cD<ECO.minD && RESERVE.meadows.length>0 && CR_.n<CMAX){ const mi=(mg%(RESERVE.meadows.length/2))|0; const mx=RESERVE.meadows[mi*2], my=RESERVE.meadows[mi*2+1]; addCreature(SP.DEER, mx+(Math.random()-0.5)*6, my+(Math.random()-0.5)*6, mx, my, 1, -1); cD++; mg++; } }
+  if(allowW){
+    while(cW<ECO.minW && RESERVE.dens.length>0 && CR_.n<CMAX){ const dx=RESERVE.dens[0], dy=RESERVE.dens[1]; const b=addCreature(SP.WOLF, dx+(Math.random()-0.5)*6, dy+(Math.random()-0.5)*6, dx, dy, 1, -1); CR_.energy[b]=50; cW++; } }
+  compact();
+}
+
+function simBin(px,py){
+  if(!CBIN.head){ CBIN.head=new Int32Array(N*N).fill(-1); }
+  for(let k=0;k<CBIN.tn;k++) CBIN.head[CBIN.touched[k]]=-1;
+  CBIN.tn=0; const R2=CDRAW*CDRAW;
+  for(let c=0;c<CR_.n;c++){ if(CR_.al[c]===0)continue; const dx=CR_.x[c]-px, dy=CR_.y[c]-py; if(dx*dx+dy*dy>R2) continue;
+    const cell=(CR_.y[c]|0)*N+(CR_.x[c]|0);
+    if(CBIN.head[cell]<0) CBIN.touched[CBIN.tn++]=cell;
+    CBIN.next[c]=CBIN.head[cell]; CBIN.head[cell]=c; }
+}
+
+// ---------------- player ----------------
+const P={x:200,y:246,z:0,gz:0,yaw:-Math.PI/2,pitch:0.08};
+const IN={f:0,s:0,run:false,keys:{}};
+function spawn(){ P.x=200; P.y=246; P.yaw=-Math.PI/2; P.pitch=0.08; P.gz=Math.max(groundAt(P.x,P.y),WATER-0.6); P.z=P.gz+EYE; }
+function updatePlayer(dt){
+  let mf=IN.f, ms=IN.s;
+  const k=IN.keys;
+  if(k.KeyW||k.ArrowUp) mf+=1; if(k.KeyS||k.ArrowDown) mf-=1;
+  if(k.KeyD||k.ArrowRight) ms+=1; if(k.KeyA||k.ArrowLeft) ms-=1;
+  const l=Math.hypot(mf,ms); if(l>1){ mf/=l; ms/=l; }
+  const run=(IN.run||k.ShiftLeft||k.ShiftRight)?2:1;
+  const fx=Math.cos(P.yaw), fy=Math.sin(P.yaw);
+  const bottom=terr(P.x,P.y);
+  if(bottom<WATER-0.4){
+    // ---- swim / wade: look down + move to dive, up to rise, level on the bed to walk it ----
+    const sp=5.4*run*dt; const mvx=fx*mf-fy*ms, mvy=fy*mf+fx*ms;
+    let nx=clamp(P.x+mvx*sp,2,N-3), ny=clamp(P.y+mvy*sp,2,N-3);
+    if(terr(nx,P.y)<WATER+2||terr(nx,P.y)-bottom<1.5) P.x=nx;
+    if(terr(P.x,ny)<WATER+2||terr(P.x,ny)-bottom<1.5) P.y=ny;
+    let nz=P.z + mf*Math.sin(P.pitch)*sp*1.5;
+    const bedEye=terr(P.x,P.y)+0.55, surfEye=WATER+1.05;
+    if(nz<bedEye)nz=bedEye; if(nz>surfEye)nz=surfEye;
+    P.z=nz; P.gz=P.z-EYE;
+  } else {
+    const sp=6*run*dt;
+    const nx=P.x+(fx*mf-fy*ms)*sp, ny=P.y+(fy*mf+fx*ms)*sp;
+    const g0=Math.max(groundAt(P.x,P.y),WATER-0.6);
+    const bvx=(fx*mf-fy*ms), bvy=(fy*mf+fx*ms), bl=Math.hypot(bvx,bvy)||1;
+    const pbx=nx+bvx/bl*0.45, pby=ny+bvy/bl*0.45;
+    if(nx>1.5&&nx<N-2.5&&groundAt(nx,P.y)-g0<1.6&&groundAt(pbx,P.y)-g0<1.9&&!wallBlocked(nx,P.y)&&!wallBlocked(pbx,P.y)) P.x=nx;
+    if(ny>1.5&&ny<N-2.5&&groundAt(P.x,ny)-g0<1.6&&groundAt(P.x,pby)-g0<1.9&&!wallBlocked(P.x,ny)&&!wallBlocked(P.x,pby)) P.y=ny;
+    const g=Math.max(groundAt(P.x,P.y),WATER-0.6);
+    P.gz+=(g-P.gz)*Math.min(1,dt*12);
+    P.z=P.gz+EYE;
+  }
+  UW=clamp((WATER-P.z)/2.5,0,1);
+}
+
+// ---------------- boot (browser only) ----------------
+function boot(){
+  const canvas=document.getElementById('c');
+  const ctx=canvas.getContext('2d');
+  let qCell=1, lastW=0, lastH=0, lastQ=0, govT=0;
+  let img=null;
+  const $=function(id){ return document.getElementById(id); };
+  function toast(msg){ const t=$('toast'); t.textContent=msg; t.style.opacity=1; clearTimeout(toast.h); toast.h=setTimeout(function(){ t.style.opacity=0; },1600); }
+  function setupGrid(force){
+    const cssW=window.innerWidth, cssH=window.innerHeight;
+    if(!force && cssW===lastW && cssH===lastH && qCell===lastQ) return; // no real change: don't clear the canvas
+    lastW=cssW; lastH=cssH; lastQ=qCell;
+    const dpr=Math.min(window.devicePixelRatio||1, 2);
+    // consistent physical cell size: ~64 cells across the SHORTER side, 5-11px, times the quality governor
+    let chCss=Math.min(cssW,cssH)/90*qCell; if(chCss<4)chCss=4; if(chCss>10)chCss=10;
+    const cwCss=chCss/1.85;
+    const R=Math.max(48,Math.round(cssH/chCss));
+    // horizontal FOV cap (no fisheye on wide screens): pillarbox beyond it
+    const focalCols=(R/2)/FOV_V*(chCss/cwCss);
+    const TANH_MAX=0.82;
+    const Cmax=Math.max(60,Math.round(2*focalCols*TANH_MAX));
+    let C=Math.round(cssW/cwCss); if(C>Cmax)C=Cmax; if(C<40)C=40;
+    const cw=Math.max(2,Math.round(cwCss*dpr)), ch=Math.max(4,Math.round(chCss*dpr));
+    allocGrid(C,R,cw,ch);
+    const nW=Math.round(cssW*dpr), nH=Math.round(cssH*dpr);
+    if(canvas.width!==nW) canvas.width=nW;      // only reassign when it truly changes (reassign clears the canvas)
+    if(canvas.height!==nH) canvas.height=nH;
+    canvas.style.width=cssW+'px'; canvas.style.height=cssH+'px';
+    RS.offX=Math.floor((canvas.width-C*cw)/2); RS.offY=Math.floor((canvas.height-R*ch)/2);
+    RS.letterbox=(RS.offX>0||RS.offY>0);
+    img=new ImageData(new Uint8ClampedArray(FB.px32.buffer),C*cw,R*ch);
+    buildGlyphs(cw,ch);
+  }
+  $('badge').textContent=VERSION;
+  $('badge').addEventListener('click',function(){ toast(VERSION+' · seed '+W.seed+' · '+RS.C+'x'+RS.R+(RS.letterbox?' · letterboxed':'')); });
+  function openSeed(){
+    const c=$('seedCard');
+    c.innerHTML='<h1>World seed</h1><p>Type a number for that exact world, or roll a random one.</p><input id="seedIn" inputmode="numeric" value="'+W.seed+'" style="width:100%;padding:12px;font:inherit;font-size:16px;background:#000;color:#eee;border:1px solid #555;border-radius:8px;margin:6px 0"><div style="display:flex;gap:8px"><button class="btn go" id="seedUse" style="flex:1;margin-top:0">grow it</button><button class="btn go" id="seedRnd" style="flex:1;margin-top:0">random</button></div><button class="btn" id="seedClose" style="width:100%;margin-top:8px">cancel</button>';
+    $('seed').classList.remove('hidden');
+    function apply(sv){ DIALS.seed=sv; genWorld(sv); populate(sv); spawn(); $('seed').classList.add('hidden'); toast('seed '+sv); }
+    $('seedUse').addEventListener('click',function(){ const v=parseInt($('seedIn').value,10); apply(isFinite(v)?(v>>>0):(Math.random()*1e9|0)); });
+    $('seedRnd').addEventListener('click',function(){ apply(Math.random()*1e9|0); });
+    $('seedClose').addEventListener('click',function(){ $('seed').classList.add('hidden'); });
+  }
+  function openHelp(){ $('help').classList.remove('hidden'); }
+  function readDialsFromCard(){
+    const num=function(id,d){ const el=$(id); if(!el) return d; const v=parseFloat(el.value); return isFinite(v)?v:d; };
+    const chk=function(id){ const el=$(id); return el?el.checked:true; };
+    DIALS.seed=(parseInt(($('dSeed')||{}).value,10)>>>0)||DIALS.seed;
+    DIALS.forest=num('dForest',1); DIALS.water=num('dWater',1);
+    DIALS.keep=chk('dKeep')?1:0; DIALS.structures=chk('dStruct')?1:0; DIALS.predators=chk('dPred')?1:0;
+    const ids=['dBird','dRabbit','dDeer','dSquirrel','dFish','dWolf'];
+    const pops=['pBird','pRabbit','pDeer','pSquirrel','pFish','pWolf'];
+    for(let i=0;i<6;i++){ DIALS.on[i]=chk(ids[i])?1:0; DIALS.pop[i]=num(pops[i],1); }
+    if(!DIALS.predators) DIALS.on[SP.WOLF]=0;
+  }
+  function openDials(){
+    const c=$('dialsCard');
+    const row=function(id,label,on,pv){
+      return '<div class="dial-row"><label><input type="checkbox" id="'+id+'"'+(on?' checked':'')+'> '+label+'</label>'+
+        '<input id="p'+id.slice(1)+'" type="range" min="0.25" max="2" step="0.25" value="'+pv+'"></div>';
+    };
+    c.innerHTML='<h1>Keeper dials</h1><p>Set the world, then drop in. Life sliders are starting numbers. Forest, water, and landmarks rebuild the ground.</p>'+
+      '<input id="dSeed" inputmode="numeric" value="'+DIALS.seed+'" style="width:100%;padding:10px;font:inherit;font-size:16px;background:#000;color:#eee;border:1px solid #555;border-radius:8px;margin:6px 0">'+
+      '<div class="dial-sec">LIFE</div>'+
+      row('dBird','birds',DIALS.on[0],DIALS.pop[0])+
+      row('dRabbit','rabbits',DIALS.on[1],DIALS.pop[1])+
+      row('dDeer','deer',DIALS.on[2],DIALS.pop[2])+
+      row('dSquirrel','squirrels',DIALS.on[3],DIALS.pop[3])+
+      row('dFish','fish',DIALS.on[4],DIALS.pop[4])+
+      row('dWolf','wolves',DIALS.on[5],DIALS.pop[5])+
+      '<div class="dial-row"><label><input type="checkbox" id="dPred"'+(DIALS.predators?' checked':'')+'> predators on</label></div>'+
+      '<div class="dial-sec">LAND</div>'+
+      '<div class="dial-row"><label>forest</label><input id="dForest" type="range" min="0.3" max="1.7" step="0.1" value="'+DIALS.forest+'"></div>'+
+      '<div class="dial-row"><label>water</label><input id="dWater" type="range" min="0.3" max="1.7" step="0.1" value="'+DIALS.water+'"></div>'+
+      '<div class="dial-row"><label><input type="checkbox" id="dKeep"'+(DIALS.keep?' checked':'')+'> the keep</label></div>'+
+      '<div class="dial-row"><label><input type="checkbox" id="dStruct"'+(DIALS.structures?' checked':'')+'> landmarks</label></div>'+
+      '<button class="btn go" id="dGrow">grow this world</button>'+
+      '<button class="btn" id="dLife" style="width:100%;margin-top:8px">restock life only</button>'+
+      '<button class="btn" id="dClose" style="width:100%;margin-top:8px">cancel</button>';
+    $('dials').classList.remove('hidden');
+    $('dGrow').addEventListener('click',function(){ readDialsFromCard(); genWorld(DIALS.seed); populate(DIALS.seed); spawn(); $('dials').classList.add('hidden'); toast('world '+DIALS.seed); });
+    $('dLife').addEventListener('click',function(){ readDialsFromCard(); populate(DIALS.seed); $('dials').classList.add('hidden'); toast('life restocked'); });
+    $('dClose').addEventListener('click',function(){ $('dials').classList.add('hidden'); });
+  }
+  function openLog(){ const c=$('logCard'); c.innerHTML='<h1>Changelog</h1>'+CHANGELOG.map(function(e){ return '<p><b>'+e[0]+'</b><br>'+e[1]+'</p>'; }).join('')+'<button class="btn go" id="bLogClose">close</button>'; $('log').classList.remove('hidden'); $('bLogClose').addEventListener('click',function(){ $('log').classList.add('hidden'); }); }
+  // top-right menu: one button that reaches everything, so nothing is off-screen in portrait
+  const closeMenu=function(){ $('menu').classList.add('hidden'); };
+  $('bMenu').addEventListener('click',function(){ $('menu').classList.remove('hidden'); });
+  $('mClose').addEventListener('click',closeMenu);
+  $('mSeed').addEventListener('click',function(){ closeMenu(); openSeed(); });
+  $('mDials').addEventListener('click',function(){ closeMenu(); openDials(); });
+  $('mLog').addEventListener('click',function(){ closeMenu(); openLog(); });
+  $('mAbout').addEventListener('click',function(){ location.href='keep-about.html'; });
+  $('mHelp').addEventListener('click',function(){ closeMenu(); openHelp(); });
+  $('bGo').addEventListener('click',function(){ $('help').classList.add('hidden'); });
+  let rzT; window.addEventListener('resize',function(){ clearTimeout(rzT); rzT=setTimeout(setupGrid,200); });
+  window.addEventListener('keydown',function(e){ IN.keys[e.code]=true; if(e.code.indexOf('Arrow')===0) e.preventDefault(); });
+  window.addEventListener('keyup',function(e){ IN.keys[e.code]=false; });
+  // pointer: touch left = walk, touch right = look, mouse = look
+  const ptr={};
+  const stick=$('stick'), knob=$('knob');
+  canvas.addEventListener('pointerdown',function(e){
+    const isTouch=e.pointerType==='touch';
+    const role=(isTouch&&e.clientX<window.innerWidth/2)?'move':'look';
+    ptr[e.pointerId]={role:role,x:e.clientX,y:e.clientY,ox:e.clientX,oy:e.clientY};
+    canvas.setPointerCapture(e.pointerId);
+    if(role==='move'){ stick.style.display='block'; stick.style.left=e.clientX+'px'; stick.style.top=e.clientY+'px'; knob.style.left='33px'; knob.style.top='33px'; }
+  });
+  canvas.addEventListener('pointermove',function(e){
+    const p=ptr[e.pointerId]; if(!p) return;
+    if(p.role==='look'){ if(e.pointerType!=='touch'&&e.buttons===0) return;
+      P.yaw+=(e.clientX-p.x)*0.0045; P.pitch=clamp(P.pitch-(e.clientY-p.y)*0.0038,-1.52,1.52); p.x=e.clientX; p.y=e.clientY; }
+    else { let vx=(e.clientX-p.ox)/45, vy=(e.clientY-p.oy)/45; const l=Math.hypot(vx,vy); if(l>1){ vx/=l; vy/=l; }
+      IN.s=vx; IN.f=-vy; IN.run=l>0.97; knob.style.left=(33+vx*33)+'px'; knob.style.top=(33+vy*33)+'px'; }
+  });
+  function end(e){ const p=ptr[e.pointerId]; if(!p) return; if(p.role==='move'){ IN.f=0; IN.s=0; IN.run=false; stick.style.display='none'; } delete ptr[e.pointerId]; }
+  canvas.addEventListener('pointerup',end); canvas.addEventListener('pointercancel',end);
+  // go
+  DIALS.seed=20260919; genWorld(DIALS.seed); populate(DIALS.seed); spawn(); setupGrid();
+  let last=performance.now(), fAcc=0, fN=0, fT=0, acc=0, ecoAcc=0; const STEP=1/15, ECOSTEP=2.5;
+  function frame(now){
+    requestAnimationFrame(frame);
+    const dt=Math.min(0.05,(now-last)/1000); last=now; skyTime=now/1000;
+    updatePlayer(dt);
+    acc+=dt; let guard=0; while(acc>=STEP&&guard++<4){ tick(STEP); acc-=STEP; }
+    ecoAcc+=dt; if(ecoAcc>=ECOSTEP){ ecology(); ecoAcc-=ECOSTEP; }
+    const t0=performance.now();
+    renderFrame(P.x,P.y,P.z,P.yaw,P.pitch);
+    compose();
+    if(RS.letterbox){ ctx.fillStyle='#000'; ctx.fillRect(0,0,canvas.width,canvas.height); ctx.putImageData(img,RS.offX,RS.offY); }
+    else ctx.putImageData(img,0,0);
+    fAcc+=performance.now()-t0; fN++; fT+=dt;
+    if(fT>0.5){ const ms=fAcc/fN;
+      $('fps').textContent=Math.round(fN/fT)+' fps · '+ms.toFixed(1)+' ms · '+CR_.n+' alive';
+      if(now-govT>4000){
+        if(ms>30 && qCell<1.9){ qCell=Math.min(1.9,qCell*1.2); govT=now; setupGrid(); }
+        else if(ms<9 && qCell>1.0){ qCell=Math.max(1.0,qCell/1.15); govT=now; setupGrid(); }
+      }
+      fAcc=0; fN=0; fT=0; }
+  }
+  requestAnimationFrame(frame);
+}
+
+if(IS_NODE){ module.exports={genWorld,allocGrid,buildGlyphs,renderFrame,compose,spawn,populate,tick,ecology,simBin,updatePlayer,W,RS,FB,P,IN,CR_,SP,SPP,MASKS,RESERVE,RAMP,N,WATER,EYE,terr,groundAt,DIALS,growOf,isAdult,addCreature,WALLS,buildWalls,nearestWall,allWallHits,wallBlocked,setSkyTime:function(t){skyTime=t;},setUW:function(v){UW=v;}}; }
+else boot();
+})();
+</script>
+</body>
+</html>
