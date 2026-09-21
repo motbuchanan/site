@@ -4,25 +4,32 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Sudoku</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
+  :root{--mb-ink:#ebedef; --mb-soft:#c2c9d1; --mb-dim:#7d8794;
+    --mb-teal:#4cf0e0; --mb-orange:#f59847;
+    --mb-glass:rgba(14,18,23,.62); --mb-line:rgba(255,255,255,.12);
+    --mb-ui:'Archivo',system-ui,-apple-system,sans-serif;
+    --mb-mono:'JetBrains Mono',ui-monospace,Menlo,monospace}
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{height:100%}
-  body{margin:0;font-family:system-ui,-apple-system,sans-serif;color:#e6ddd0;overflow:hidden;
+  body{margin:0;font-family:var(--mb-ui);color:var(--mb-ink);overflow:hidden;
     background:#1b120b;background-image:radial-gradient(ellipse at 50% -10%,#2a1c10,#1b120b 70%)}
   #app{display:flex;flex-direction:column;height:100svh;max-width:520px;margin:0 auto;
     padding:0 10px calc(8px + env(safe-area-inset-bottom))}
   #bar{display:flex;align-items:center;gap:10px;padding:calc(env(safe-area-inset-top) + 9px) 2px 8px;flex:0 0 auto}
-  #bar a.home{color:#e6ddd0;text-decoration:none;font-size:13px;border:1px solid #6e5f50;background:#2a241e;border-radius:999px;padding:6px 12px;font-weight:700}
-  #title{font-weight:800;font-size:17px}
-  #stats{margin-left:auto;display:flex;gap:12px;align-items:center;font-size:13px;color:#c9ab85;font-weight:700}
+  .mb-home{display:inline-flex;align-items:center;gap:6px;background:transparent;color:var(--mb-teal);border:1px solid rgba(76,240,224,.4);border-radius:8px;font:700 12px var(--mb-mono);padding:7px 13px;text-decoration:none;cursor:pointer}
+  #title{font:800 17px var(--mb-ui);letter-spacing:-.02em}
+  #stats{margin-left:auto;display:flex;gap:12px;align-items:center;font:600 11px var(--mb-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mb-soft)}
   #timer{font-variant-numeric:tabular-nums}
-  #ver{font-size:11px;color:#8a745a;border:1px solid #4a3c2c;border-radius:999px;padding:3px 8px;background:transparent;font-family:inherit;font-weight:700;cursor:pointer}
+  .mb-ver{position:fixed;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:900;font:600 10px var(--mb-mono);letter-spacing:.04em;color:var(--mb-teal);background:var(--mb-glass);border:1px solid rgba(76,240,224,.25);border-radius:999px;padding:4px 9px;backdrop-filter:blur(8px);cursor:pointer;user-select:none;opacity:.85}
   #modes{display:flex;gap:6px;flex:0 0 auto;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none}
   #modes::-webkit-scrollbar{display:none}
-  .mode{flex:0 0 auto;font-family:inherit;cursor:pointer;border:1px solid #6e5f50;background:#2a241e;color:#e6ddd0;
-    border-radius:999px;padding:8px 14px;font-size:14px;font-weight:800;white-space:nowrap}
-  .mode.on{background:#f4c542;color:#2a1c0c;border-color:#b8860b}
-  .mode.daily.on{background:#5bb98a;border-color:#2f7d55;color:#0c2014}
+  .mode{flex:0 0 auto;font:700 13px var(--mb-ui);cursor:pointer;border:1px solid var(--mb-line);background:var(--mb-glass);color:var(--mb-ink);
+    border-radius:999px;padding:8px 14px;white-space:nowrap}
+  .mode.on{background:var(--mb-teal);color:#06110f;border-color:var(--mb-teal)}
+  .mode.daily.on{background:var(--mb-teal);border-color:var(--mb-teal);color:#06110f}
   #boardWrap{flex:1 1 auto;display:flex;align-items:center;justify-content:center;min-height:0}
   #board{display:grid;grid-template-columns:repeat(9,1fr);background:#3a2a18;border:3px solid #6b4f2c;
     border-radius:10px;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,.45);touch-action:manipulation;user-select:none;
@@ -51,40 +58,40 @@
   .marks span{display:flex;align-items:center;justify-content:center}
   .marks span.mk{color:#9a6a2a}
   #pad{margin:10px auto 0;display:grid;grid-template-columns:repeat(9,1fr);gap:5px;width:min(94vw,460px);flex:0 0 auto}
-  #pad button{position:relative;font-family:inherit;font-weight:800;font-size:min(5.2vw,22px);padding:11px 0 13px;border-radius:10px;
+  #pad button{position:relative;font-family:var(--mb-ui);font-weight:800;font-size:min(5.2vw,22px);padding:11px 0 13px;border-radius:10px;
     border:1px solid #6e5f50;background:#efe2c4;color:#2a1c0c;cursor:pointer}
   #pad button:active{transform:translateY(1px)}
   #pad button.spent{opacity:.3}
   #pad button em{position:absolute;bottom:2px;left:0;right:0;font-size:9px;font-style:normal;color:#9a6a2a;font-weight:700}
   #tools{margin:8px auto 0;display:flex;gap:6px;width:min(94vw,460px);flex:0 0 auto}
-  #tools button{flex:1;font-family:inherit;font-weight:700;font-size:13px;padding:11px 0;border-radius:10px;
-    border:1px solid #6e5f50;background:#2a241e;color:#e6ddd0;cursor:pointer}
+  #tools button{flex:1;font:700 13px var(--mb-ui);padding:11px 0;border-radius:13px;
+    border:1px solid var(--mb-line);background:var(--mb-glass);color:var(--mb-ink);cursor:pointer}
   #tools button:active{transform:translateY(1px)}
-  #tools button.on{background:#f4c542;color:#2a1c0c;border-color:#b8860b}
-  #tools .sub{display:block;font-size:10px;color:#c9ab85;font-weight:700}
-  #tools button.on .sub{color:#7a5c14}
-  #msg{text-align:center;color:#cfc4b4;font-size:13px;min-height:18px;margin:9px 4px 2px;flex:0 0 auto}
+  #tools button.on{background:var(--mb-teal);color:#06110f;border-color:var(--mb-teal)}
+  #tools .sub{display:block;font:600 9px var(--mb-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mb-dim)}
+  #tools button.on .sub{color:#06110f;opacity:.7}
+  #msg{text-align:center;color:var(--mb-soft);font-size:13px;min-height:18px;margin:9px 4px 2px;flex:0 0 auto}
   #toast{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom));transform:translateX(-50%);
-    background:#2a241e;border:1px solid #6e5f50;color:#f4e9d6;padding:9px 16px;border-radius:999px;font-size:13px;
-    font-weight:700;opacity:0;transition:opacity .2s;pointer-events:none;z-index:80}
+    background:rgba(16,21,28,.92);border:1px solid var(--mb-line);color:var(--mb-ink);padding:9px 16px;border-radius:999px;font:600 11px var(--mb-mono);
+    letter-spacing:.04em;opacity:0;transition:opacity .2s;pointer-events:none;z-index:80}
   #toast.show{opacity:1}
-  .ov{position:fixed;inset:0;background:rgba(16,12,8,.96);display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:60;text-align:center;padding:22px}
+  .ov{position:fixed;inset:0;background:rgba(11,15,20,.95);display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:60;text-align:center;padding:22px}
   .ov.show{display:flex;animation:fade .25s ease}
   @keyframes fade{from{opacity:0}to{opacity:1}}
-  .ov h1{font-size:27px;margin:0}
-  .ov p{color:#cfc4b4;max-width:330px;font-size:15px;margin:0}
+  .ov h1{font:800 27px var(--mb-ui);letter-spacing:-.02em;margin:0}
+  .ov p{color:var(--mb-soft);max-width:330px;font-size:15px;margin:0}
   .ov .big{font-size:46px}
-  .act{font-family:inherit;font-size:15px;font-weight:800;padding:12px 22px;border-radius:11px;border:none;
-    background:#46b06a;color:#0c2014;box-shadow:0 4px 0 #1e6038;cursor:pointer}
-  .ghost{font-size:14px;padding:9px 16px;border-radius:10px;border:1px solid #6e5f50;background:#2a241e;color:#e6ddd0;text-decoration:none;font-family:inherit;cursor:pointer}
+  .act{font:800 15px var(--mb-ui);padding:13px 18px;border-radius:13px;border:0;
+    background:var(--mb-teal);color:#06110f;cursor:pointer}
+  .ghost{font:700 14px var(--mb-ui);padding:11px 16px;border-radius:13px;border:1px solid var(--mb-line);background:var(--mb-glass);color:var(--mb-ink);text-decoration:none;cursor:pointer}
 </style>
 </head>
 <body>
 <div id="app">
   <div id="bar">
-    <a class="home" href="index.html">&#8962; Home</a>
+    <a class="home mb-home" href="index.html">&larr; home</a>
     <div id="title">Sudoku</div>
-    <div id="stats"><span id="timer">0:00</span><button id="ver">v2.0</button></div>
+    <div id="stats"><span id="timer">0:00</span></div>
   </div>
   <div id="modes">
     <button class="mode daily" data-diff="daily">&#9733; Daily</button>
@@ -99,13 +106,14 @@
     <button id="pencil">&#9998; Pencil<span class="sub" id="penState">off</span></button>
     <button id="erase">&#9003; Erase<span class="sub">clear cell</span></button>
     <button id="undo">&#8630; Undo<span class="sub" id="undoN">0</span></button>
-    <button id="hint">&#128161; Hint<span class="sub" id="hintN">0 used</span></button>
+    <button id="hint">Hint<span class="sub" id="hintN">0 used</span></button>
     <button id="newp">&#10227; New<span class="sub">puzzle</span></button>
   </div>
   <div id="msg">Tap a square, then a number.</div>
 </div>
 
 <div id="toast"></div>
+<button class="mb-ver" id="mbVer" type="button">v2.1 &middot; Sep 21</button>
 
 <div class="ov" id="overlay">
   <div class="big">&#127881;</div>
@@ -388,7 +396,7 @@ $("erase").addEventListener("click",eraseCell);
 $("undo").addEventListener("click",undo);
 $("hint").addEventListener("click",doHint);
 $("newp").addEventListener("click",function(){newPuzzle(mode==="daily"?dayRamp():mode);});
-$("ver").addEventListener("click",function(){toast("Sudoku v2.0 loaded");});
+$("mbVer").addEventListener("click",function(){toast("v2.1 loaded");});
 $("ovBtn").addEventListener("click",function(){$("overlay").classList.remove("show");newPuzzle(mode==="daily"?"medium":mode);});
 
 document.addEventListener("keydown",function(e){

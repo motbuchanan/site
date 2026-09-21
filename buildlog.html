@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
-:root{--ink:#ebedef;--soft:#b6bec8;--teal:#4cf0e0;--orange:#f59847;--line:#252c35;--card:#161c24;--sys:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,system-ui,sans-serif}
+:root{--ink:#ebedef;--soft:#b6bec8;--teal:#4cf0e0;--orange:#f59847;--line:#252c35;--card:#161c24;--mb-teal:#4cf0e0;--mb-glass:rgba(14,18,23,.62);--mb-mono:'JetBrains Mono',ui-monospace,Menlo,monospace;--sys:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,system-ui,sans-serif}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
 body{background:#0d1117;color:var(--ink);font-family:var(--sys);min-height:100svh;display:flex;flex-direction:column}
@@ -17,6 +17,10 @@ body{background:#0d1117;color:var(--ink);font-family:var(--sys);min-height:100sv
   radial-gradient(46vmax 82vmax at 110% 55%, rgba(76,240,224,.08), transparent 60%),#0d1117}
 #bar{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line);font:600 14px 'Archivo',sans-serif}
 #bar a{color:var(--soft);text-decoration:none}
+.mb-home{display:inline-flex;align-items:center;gap:6px;background:transparent;color:var(--mb-teal);border:1px solid rgba(76,240,224,.4);border-radius:8px;font:700 12px var(--mb-mono);padding:7px 13px;text-decoration:none;cursor:pointer}
+.mb-ver{position:fixed;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:900;font:600 10px var(--mb-mono);letter-spacing:.04em;color:var(--mb-teal);background:var(--mb-glass);border:1px solid rgba(76,240,224,.25);border-radius:999px;padding:4px 9px;backdrop-filter:blur(8px);cursor:pointer;user-select:none;opacity:.85}
+#mbToast{position:fixed;left:50%;bottom:calc(44px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:901;font:600 11px var(--mb-mono);letter-spacing:.04em;color:var(--mb-ink,#ebedef);background:rgba(16,21,28,.92);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:7px 12px;opacity:0;pointer-events:none;transition:opacity .2s}
+#mbToast.show{opacity:1}
 #bar .t{color:var(--ink)}
 .wrap{flex:1;max-width:520px;width:100%;margin:0 auto;padding:26px 18px 40px}
 h1{font-family:'Archivo',sans-serif;font-weight:800;font-size:22px}
@@ -34,17 +38,20 @@ h1{font-family:'Archivo',sans-serif;font-weight:800;font-size:22px}
 </head>
 <body>
 <div id="glow"></div>
-<div id="bar"><a href="index.html">&#8962; Home</a><span class="t">Build Log</span></div>
+<div id="bar"><a href="index.html" class="mb-home">&larr; home</a><span class="t">Build Log</span></div>
+<button class="mb-ver" id="mbVer" type="button">v1.1 &middot; Sep 21</button><div id="mbToast" role="status"></div>
+
 
 <div class="wrap">
   <h1>What shipped, when</h1>
   <div class="sub">Newest first. This list only grows.</div>
   <div class="log" id="log"></div>
-  <div class="foot">updated every time something ships &middot; log r3 &middot; Sep 21</div>
+  <div class="foot">updated every time something ships &middot; log r4 &middot; Sep 21</div>
 </div>
 
 <script>
 var LOG=[
+["Sep 21","Every app got the same chrome","Same type, same buttons, same home button and a version badge in every corner. Each game keeps its own world, but it all reads as one maker now. Fourteen apps touched in one pass."],
 ["Sep 21","Every app now has a card","Tap any icon and you get the story first: what it is, why I made it, what I learned, screenshots, and how many kilobytes it really is. The button on the card opens the app. Icons now carry a color dot for what kind of thing they are."],
 ["Sep 6","Nazca, an endless drawing canvas","Paper with no edges and no bottom. Draw, then zoom in and draw inside what you drew. Kid brushes and real tools in one app."],
 ["Aug 27","The Upcard, SHARP and HARP","Play and learn blackjack with a coach that catches your mistakes. Plus a piano trainer and a harmonica trainer that light up the next note."],
@@ -83,6 +90,9 @@ document.addEventListener('click',function(e){
   var a=e.target&&e.target.closest?e.target.closest('a[href="index.html"]'):null;
   if(a){e.preventDefault();try{if(window.parent!==window){parent.history.back();return;}}catch(err){}window.location.href='index.html';}
 },true);
+</script>
+<script>
+(function(){var t=document.getElementById("mbToast"),tm=0;document.getElementById("mbVer").onclick=function(){t.textContent="v1.1 loaded";t.classList.add("show");clearTimeout(tm);tm=setTimeout(function(){t.classList.remove("show");},1400);};})();
 </script>
 </body>
 </html>

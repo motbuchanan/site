@@ -5,48 +5,58 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#1b1a24">
 <title>Jigsaw · make a puzzle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#1b1a24; --panel:#252433; --line:rgba(255,255,255,.14);
     --txt:#f2efe9; --dim:#a49fb5; --accent:#ffb34d; --accent2:#7ecfff; --good:#8bd76b;
+    --mb-ink:#ebedef; --mb-soft:#c2c9d1; --mb-dim:#7d8794;
+    --mb-teal:#4cf0e0; --mb-orange:#f59847;
+    --mb-glass:rgba(14,18,23,.62); --mb-line:rgba(255,255,255,.12);
+    --mb-ui:'Archivo',system-ui,-apple-system,sans-serif;
+    --mb-mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html,body{margin:0;padding:0;height:100%;background:var(--bg);color:var(--txt);
-    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overscroll-behavior:none}
+  html,body{margin:0;padding:0;height:100%;background:var(--bg);color:var(--mb-ink);
+    font-family:var(--mb-ui);overscroll-behavior:none}
   body{display:flex;flex-direction:column;height:100vh;height:100svh;max-height:100svh;overflow:hidden}
 
   #top{display:flex;align-items:center;gap:9px;padding:calc(7px + env(safe-area-inset-top)) 11px 7px;
        flex:0 0 auto;border-bottom:1px solid var(--line)}
-  #wordmark{font-weight:800;font-size:17px;letter-spacing:.3px}
+  #wordmark{font:800 17px var(--mb-ui);letter-spacing:-.02em}
   #wordmark span{color:var(--accent)}
-  #ver{margin-left:auto;font-size:11px;color:var(--dim);background:none;border:1px solid var(--line);
-       border-radius:999px;padding:5px 9px;font-family:inherit}
+  .mb-home{display:inline-flex;align-items:center;gap:6px;background:transparent;color:var(--mb-teal);border:1px solid rgba(76,240,224,.4);border-radius:8px;font:700 12px var(--mb-mono);padding:7px 13px;text-decoration:none;cursor:pointer;flex:0 0 auto}
+  .mb-ver{position:fixed;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:900;font:600 10px var(--mb-mono);letter-spacing:.04em;color:var(--mb-teal);background:var(--mb-glass);border:1px solid rgba(76,240,224,.25);border-radius:999px;padding:4px 9px;backdrop-filter:blur(8px);cursor:pointer;user-select:none;opacity:.85}
+  body.playing .mb-ver{bottom:calc(66px + env(safe-area-inset-bottom))}
+  #mbToast{position:fixed;left:50%;bottom:calc(44px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:901;font:600 11px var(--mb-mono);letter-spacing:.04em;color:var(--mb-ink);background:rgba(16,21,28,.92);border:1px solid var(--mb-line);border-radius:999px;padding:7px 12px;opacity:0;pointer-events:none;transition:opacity .2s}
+  #mbToast.show{opacity:1}
 
   main{flex:1;min-height:0;position:relative}
   .screen{position:absolute;inset:0;display:none;flex-direction:column;overflow-y:auto;
           -webkit-overflow-scrolling:touch;padding:14px 13px calc(18px + env(safe-area-inset-bottom))}
   .screen.on{display:flex}
 
-  h2{font-size:17px;margin:2px 0 10px}
-  .sub{font-size:13px;color:var(--dim);line-height:1.45;margin:0 0 14px}
+  h2{font:800 17px var(--mb-ui);letter-spacing:-.02em;margin:2px 0 10px}
+  .sub{font-size:13px;color:var(--mb-soft);line-height:1.45;margin:0 0 14px}
 
-  .btn{font:600 14px/1 inherit;color:var(--txt);background:var(--panel);border:1px solid var(--line);
-       border-radius:12px;padding:13px 15px;cursor:pointer;display:inline-flex;align-items:center;
+  .btn{font:700 14px/1 var(--mb-ui);color:var(--mb-ink);background:var(--mb-glass);border:1px solid var(--mb-line);
+       border-radius:13px;padding:11px 16px;cursor:pointer;display:inline-flex;align-items:center;
        justify-content:center;gap:8px;min-height:46px}
   .btn:active{transform:translateY(1px)}
   .btn.big{width:100%;margin-bottom:9px;font-size:15px}
-  .btn.go{background:var(--accent);border-color:var(--accent);color:#241a06;font-weight:800}
+  .btn.go{background:var(--mb-teal);border-color:var(--mb-teal);color:#06110f;font:800 15px/1 var(--mb-ui);padding:13px 18px}
   .btn.ghost{background:transparent}
   .row{display:flex;gap:8px;flex-wrap:wrap}
 
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:13px;margin-bottom:12px}
-  .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--dim);margin-bottom:8px}
+  .card{background:rgba(16,21,28,.92);border:1px solid var(--mb-line);border-radius:16px;padding:13px;margin-bottom:12px}
+  .lbl{font:600 11px var(--mb-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--mb-dim);margin-bottom:8px}
 
   .chips{display:flex;gap:7px;flex-wrap:wrap}
-  .chip{border:1px solid var(--line);background:rgba(255,255,255,.05);border-radius:999px;
-        padding:9px 13px;font-size:13px;font-weight:600;cursor:pointer;min-height:40px;
+  .chip{border:1px solid var(--mb-line);background:var(--mb-glass);border-radius:999px;
+        padding:9px 13px;font:700 13px var(--mb-ui);cursor:pointer;min-height:40px;
         display:inline-flex;align-items:center}
-  .chip.sel{background:var(--accent);color:#241a06;border-color:var(--accent)}
+  .chip.sel{background:var(--mb-teal);color:#06110f;border-color:var(--mb-teal)}
   .chip.cut{flex-direction:column;gap:4px;padding:8px 10px;border-radius:12px}
   .chip.cut canvas{display:block;border-radius:4px}
   .chip.cut span{font-size:11px}
@@ -72,7 +82,7 @@
 
   /* play */
   #playTop{display:flex;align-items:center;gap:8px;padding:8px 11px;flex:0 0 auto;border-bottom:1px solid var(--line)}
-  #prog{font-size:13px;font-weight:700;color:var(--accent2)}
+  #prog{font:600 11px var(--mb-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mb-teal)}
   #boardWrap{flex:1;min-height:0;position:relative;overflow:hidden;background:#141320}
   #board{display:block;touch-action:none}
   #playBot{display:flex;gap:8px;padding:9px 11px calc(9px + env(safe-area-inset-bottom));
@@ -85,27 +95,27 @@
         background:rgba(10,9,16,.82);z-index:5;padding:22px}
   #done.on{display:flex}
   #done .card{text-align:center;max-width:320px}
-  #done h3{margin:4px 0 8px;font-size:20px}
+  #done h3{margin:4px 0 8px;font:800 20px var(--mb-ui);letter-spacing:-.02em}
 
-  .note{font-size:12px;color:var(--dim);line-height:1.45;margin-top:8px}
+  .note{font-size:12px;color:var(--mb-soft);line-height:1.45;margin-top:8px}
   input[type=file]{display:none}
 </style>
 </head>
 <body>
 
 <div id="top">
-  <a href="index.html" id="gsShelfBtn" aria-label="Back home" style="pointer-events:auto;flex:0 0 auto;display:inline-flex;align-items:center;gap:5px;background:rgba(127,127,127,.18);border:1px solid rgba(127,127,127,.42);color:inherit;font:600 12px/1 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;text-decoration:none;padding:10px 12px;border-radius:999px;white-space:nowrap">&#8962; Home</a>
+  <a href="index.html" id="gsShelfBtn" class="mb-home" aria-label="Back home" style="pointer-events:auto">&larr; home</a>
   <span id="wordmark">Jig<span>saw</span></span>
-  <button id="ver">v1.0</button>
 </div>
+<button class="mb-ver" id="mbVer" type="button">v1.1 &middot; Sep 21</button><div id="mbToast" role="status"></div>
 
 <main>
 
 <section class="screen on" id="s-start">
   <h2>Make a puzzle</h2>
   <p class="sub">Use a photo from this device, or take a new one. Everything stays on this device.</p>
-  <button class="btn big" id="bUpload">&#128247;&nbsp; Choose a photo</button>
-  <button class="btn big" id="bCamera">&#128248;&nbsp; Take a picture</button>
+  <button class="btn big" id="bUpload">Choose a photo</button>
+  <button class="btn big" id="bCamera">Take a picture</button>
   <input type="file" id="fUpload" accept="image/*">
   <input type="file" id="fCamera" accept="image/*" capture="environment">
   <div class="card">
@@ -167,8 +177,8 @@
 <script>
 "use strict";
 var $=function(id){return document.getElementById(id);};
-var VERSION="v1.0 \u00b7 Jul 19";
-$("ver").textContent=VERSION.split(" ")[0];
+var VERSION="v1.1 \u00b7 Sep 21";
+$("mbVer").textContent=VERSION;
 
 /* ---------- tiny IndexedDB store ----------
    Photos go here, NOT localStorage: one phone photo is ~2.7MB once base64'd and
@@ -530,6 +540,7 @@ function renderCuts(){
 /* ---------- nav ---------- */
 function show(id){
   ["s-start","s-setup","s-play"].forEach(function(s){$(s).classList.toggle("on",s===id);});
+  document.body.classList.toggle("playing",id==="s-play");
 }
 
 $("bUpload").onclick=function(){$("fUpload").click();};
@@ -567,7 +578,7 @@ $("bHint").onclick=function(){
   updProg(); draw();
   if(S.placed===S.list.length)finish();
 };
-$("ver").onclick=function(){alert("Jigsaw "+VERSION+"\n\nPictures and puzzles stay on this device.");};
+$("mbVer").onclick=function(){var t=$("mbToast");t.textContent=VERSION.split(" ")[0]+" loaded";t.classList.add("show");clearTimeout(t._tm);t._tm=setTimeout(function(){t.classList.remove("show");},1400);};
 
 var bd=$("board");
 bd.addEventListener("pointerdown",onDown);
