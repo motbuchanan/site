@@ -471,7 +471,7 @@ html.nocc .app .nm::before{display:none}
         </svg></span>
       </button>
     </div>
-    <div class="tagline">made on a phone like this one &middot; v7.42 &middot; Sep 26</div>
+    <div class="tagline">made on a phone like this one &middot; v7.43 &middot; Sep 27</div>
   </div>
 </div>
 
@@ -522,7 +522,7 @@ html.nocc .app .nm::before{display:none}
     <div class="setsec">MOT-1</div>
     <div class="setgroup">
       <div class="setrow tap" data-go="about"><span class="si"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M5 21c0-4 3-7 7-7s7 3 7 7"/></svg></span><span class="st">About this phone</span><span class="chev">&rsaquo;</span></div>
-      <div class="setrow tap" data-go="update"><span class="si"><svg viewBox="0 0 24 24"><path d="M12 4v10M7 11l5 5 5-5M5 20h14"/></svg></span><span class="st">Software Update</span><span class="sv" id="updBadge">v7.42</span><span class="chev">&rsaquo;</span></div>
+      <div class="setrow tap" data-go="update"><span class="si"><svg viewBox="0 0 24 24"><path d="M12 4v10M7 11l5 5 5-5M5 20h14"/></svg></span><span class="st">Software Update</span><span class="sv" id="updBadge">v7.43</span><span class="chev">&rsaquo;</span></div>
     </div>
     <div class="setsec">Make it yours</div>
     <div class="setgroup">
@@ -570,7 +570,7 @@ html.nocc .app .nm::before{display:none}
   <!-- SOFTWARE UPDATE -->
   <div class="setpage" data-page="update">
     <div class="sethdr"><button class="bk setback">&larr; Settings</button><h2>Software Update</h2></div>
-    <div class="bigver"><div class="num" id="verNum2">v7.42</div></div>
+    <div class="bigver"><div class="num" id="verNum2">v7.43</div></div>
     <div class="uptodate">This phone is up to date.</div>
     <div class="setsec">Recently shipped</div>
     <div class="setgroup" id="changelog"></div>
@@ -810,7 +810,7 @@ var dvReset=document.getElementById('dvReset');
 if(dvReset)dvReset.addEventListener('click',function(){t2('Wiping everything...');setTimeout(function(){t2('...just kidding. Nothing was deleted.');},1600);});
 
 /* ---- changelog from build log data (short, static mirror) ---- */
-var CHANGES=[['v7.42','Gather gets its own icon'],['v7.41','Gather joins the phone, in the Tools folder'],['v7.40','New settings icon that matches the dock'],['v7.39','Home screen: the eight I want you to see first, set the way I want them'],['v7.38','Home settles: eight apps up top, the four folders as the bottom row'],['v7.37','Spectra joins the phone, and the tools move into a Tools folder'],['v7.36','The Bloom card gets its first screenshots'],['v7.35','Home screen tidy: all four folders sit on the bottom row now'],['v7.34','Bloom joins the phone, and Pigment, Nazca and Bloom group into a Make folder'],['v7.33','Haunt Inc. joins the phone; Star Stuff moves into the games folder'],['v7.32','Calmer home screen: the tilt is gone, the grid still flows'],['v7.31','A new home screen: folders, a living grid behind the icons, and it tilts'],['v7.30','Measure Up joins the phone'],['v7.29','One look across every app: shared type, buttons and version badges'],['v7.28','App cards: tap any icon for the story, screenshots and file size'],['v7.27','Nazca, the drawing app'],['v7.16','The Upcard, SHARP and HARP'],['v7.15','Camera icon, designed by me in the icon studio'],['v7.11','My real aperture mark, from the source file'],['v7.9','Settings, Camera, themes, and things to find'],['v7.8','Lock screen'],['v7.7','Home screen reordered'],['v7.6','Findable by search engines'],['v7.5','Fresh taglines']];
+var CHANGES=[['v7.43','Gather: Easter and New Year, a countdown that never goes stale, and a guessing game with your own family in it'],['v7.42','Gather gets its own icon'],['v7.41','Gather joins the phone, in the Tools folder'],['v7.40','New settings icon that matches the dock'],['v7.39','Home screen: the eight I want you to see first, set the way I want them'],['v7.38','Home settles: eight apps up top, the four folders as the bottom row'],['v7.37','Spectra joins the phone, and the tools move into a Tools folder'],['v7.36','The Bloom card gets its first screenshots'],['v7.35','Home screen tidy: all four folders sit on the bottom row now'],['v7.34','Bloom joins the phone, and Pigment, Nazca and Bloom group into a Make folder'],['v7.33','Haunt Inc. joins the phone; Star Stuff moves into the games folder'],['v7.32','Calmer home screen: the tilt is gone, the grid still flows'],['v7.31','A new home screen: folders, a living grid behind the icons, and it tilts'],['v7.30','Measure Up joins the phone'],['v7.29','One look across every app: shared type, buttons and version badges'],['v7.28','App cards: tap any icon for the story, screenshots and file size'],['v7.27','Nazca, the drawing app'],['v7.16','The Upcard, SHARP and HARP'],['v7.15','Camera icon, designed by me in the icon studio'],['v7.11','My real aperture mark, from the source file'],['v7.9','Settings, Camera, themes, and things to find'],['v7.8','Lock screen'],['v7.7','Home screen reordered'],['v7.6','Findable by search engines'],['v7.5','Fresh taglines']];
 var cl=document.getElementById('changelog');
 if(cl)CHANGES.forEach(function(x){var r=document.createElement('div');r.className='setrow';r.innerHTML='<span class="st">'+x[1]+'</span><span class="sv">'+x[0]+'</span>';cl.appendChild(r);});
 
