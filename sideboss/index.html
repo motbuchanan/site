@@ -1,1 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#101119">
+<title>Side Boss</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Side Boss">
+<meta name="description" content="Level up your side hustle. A free game for makers and small side hustles.">
+<style>
+:root{--bg:#101119;--bg2:#0b0c12;--panel:#1b1d29;--panel2:#161826;--line:#31344a;--ink:#eef0f7;--muted:#8a8fa8;--gold:#f0c24a;--golddeep:#c8963a;--rose:#ff4d6d;--teal:#33d6c4;--ok:#5bd97f}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{margin:0;background:radial-gradient(140% 90% at 50% -10%,#191b28,#0b0c12 72%);background-attachment:fixed;color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.45;padding-bottom:calc(104px + env(safe-area-inset-bottom));min-height:100vh}
+button{font:inherit;cursor:pointer}
+input,textarea,select{font:inherit}
+.wrap{max-width:560px;margin:0 auto;padding:0 16px}
+/* header */
+header{display:flex;align-items:center;gap:11px;padding:14px 16px 10px;max-width:560px;margin:0 auto}
+header .mk{width:38px;height:38px;flex:0 0 auto}
+header h1{font-size:20px;margin:0;letter-spacing:.02em;font-weight:800;text-transform:uppercase}
+header h1 span{color:var(--gold)}
+header .ver{margin-left:auto;border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--muted);font-family:ui-monospace,Menlo,monospace;font-size:10.5px;cursor:pointer;white-space:nowrap}
+/* character sheet */
+.sheet{margin-top:8px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(158deg,#1d2030,#12131d);padding:16px 15px;display:flex;gap:14px;align-items:center;box-shadow:0 10px 26px rgba(0,0,0,.4)}
+.ava{width:60px;height:60px;flex:0 0 auto;border-radius:14px;border:1px solid var(--line);background:#0e0f18;display:flex;align-items:center;justify-content:center}
+.ava svg{width:38px;height:38px}
+.sheet .who{flex:1;min-width:0}
+.hname{font-size:19px;font-weight:700;line-height:1.1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.htitle{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-top:3px}
+.xpbar{height:9px;border-radius:6px;background:#0c0d15;border:1px solid var(--line);margin-top:9px;overflow:hidden}
+.xpbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--golddeep),var(--gold));transition:width .6s cubic-bezier(.2,.8,.3,1)}
+.xpline{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:5px}
+.skills{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:14px}
+.sk{text-align:center;font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.sk .pips{display:flex;justify-content:center;gap:3px;margin-bottom:5px}
+.sk .pips i{width:7px;height:7px;border-radius:50%;border:1px solid var(--golddeep);background:transparent}
+.sk .pips i.on{background:var(--gold);box-shadow:0 0 6px rgba(240,194,74,.55)}
+/* season */
+.season{margin-top:16px;border:1px solid var(--line);border-radius:14px;background:var(--panel2);padding:13px 15px;display:flex;align-items:center;gap:12px}
+.season .no{font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--teal)}
+.season .nm{font-size:16px;font-weight:600}
+.season .pr{margin-left:auto;text-align:right;font-size:11px;color:var(--muted)}
+.season .pr b{display:block;color:var(--gold);font-size:18px;font-family:ui-monospace,Menlo,monospace}
+/* dm line */
+.dm{margin:18px 4px 6px;font-size:15.5px;line-height:1.5;color:#d7dae8}
+.dm .who{display:block;font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--teal);margin-bottom:6px}
+/* board */
+.h3{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:20px 4px 8px}
+.q{border:1px solid var(--line);border-radius:14px;background:linear-gradient(180deg,#191b27,#131420);padding:14px;margin-top:10px;position:relative;overflow:hidden}
+.q.done{opacity:.55}
+.q.cleared{text-align:center;border-color:var(--golddeep);background:linear-gradient(180deg,#211f16,#15140e)}
+.q .tag{display:inline-block;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--teal);border:1px solid var(--line);border-radius:999px;padding:2px 8px}
+.q .xp{position:absolute;top:12px;right:14px;font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--gold)}
+.q .t{font-size:16px;font-weight:650;margin-top:9px}
+.q.cleared .t{margin-top:0;color:var(--gold)}
+.q .why{font-size:13px;color:var(--muted);margin-top:4px}
+.q .go{margin-top:12px;background:linear-gradient(180deg,var(--gold),var(--golddeep));color:#141312;border:0;border-radius:9px;padding:9px 16px;font-weight:700}
+.q .donemark{margin-top:12px;color:var(--ok);font-size:13px;font-weight:600}
+.foot{display:flex;gap:10px;justify-content:center;margin-top:26px}
+.foot button{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:8px 14px;font-size:12.5px}
+/* ledger */
+.tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:6px}
+.tile{border:1px solid var(--line);border-radius:13px;background:linear-gradient(180deg,#191b27,#131420);padding:12px 13px}
+.tile .lab{display:block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.tile b{display:block;font-family:ui-monospace,Menlo,monospace;font-size:22px;margin-top:5px;color:var(--ink)}
+.lcard{border:1px solid var(--line);border-radius:14px;background:var(--panel2);padding:14px;margin-top:12px}
+.lcard .lh{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.goalrow,.field{display:flex;gap:8px}
+.field{margin-top:9px}
+.field.f0{margin-top:0}
+.lcard input{flex:1;min-width:0;background:#0e0f18;border:1px solid var(--line);border-radius:10px;color:var(--ink);font-size:15px;padding:11px 12px}
+.lcard input.amt{flex:0 0 76px}
+.mini{flex:0 0 auto;border:0;border-radius:10px;padding:0 14px;font-weight:700;font-size:14px;background:#2a2d3d;color:var(--ink)}
+.mini.go2{background:linear-gradient(180deg,var(--ok),#3fae5f);color:#0c1a10}
+.mini.cost{background:#3a2833;color:#ffd0d8}
+.gbar{height:10px;border-radius:6px;background:#0c0d15;border:1px solid var(--line);margin-top:11px;overflow:hidden}
+.gbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--golddeep),var(--gold));transition:width .5s}
+.gtxt{font-size:12.5px;color:var(--muted);margin-top:8px}
+.chart{display:flex;align-items:flex-end;gap:7px;height:96px}
+.chart .col{flex:1;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end}
+.chart .bar{width:100%;max-width:26px;border-radius:5px 5px 0 0;background:linear-gradient(180deg,var(--teal),#1f8f83);min-height:2px;transition:height .5s}
+.chart .lab{font-size:9.5px;color:var(--muted);margin-top:6px}
+.chart .empty{color:var(--muted);font-size:13px;margin:auto;text-align:center}
+.ent{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line)}
+.ent.first{border-top:0}
+.ent .ei{width:8px;height:8px;border-radius:50%;flex:0 0 auto}
+.ent .ei.s{background:var(--ok)}.ent .ei.c{background:var(--rose)}
+.ent .ew{flex:1;min-width:0;overflow:hidden}
+.ent .ew .wt{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ent .ew .ed{font-size:11px;color:var(--muted)}
+.ent .ea{font-family:ui-monospace,Menlo,monospace;font-size:14px;flex:0 0 auto}
+.ent .ea.s{color:var(--ok)}.ent .ea.c{color:var(--rose)}
+.ent .ex{flex:0 0 auto;background:transparent;border:0;color:var(--muted);font-size:17px;line-height:1;padding:2px 4px}
+.emptyline{color:var(--muted);font-size:13.5px}
+/* bosses */
+.bosshead{display:flex;align-items:baseline;gap:8px;margin:20px 4px 2px}
+.bosshead .c{margin-left:auto;font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--gold)}
+.boss{border:1px solid var(--line);border-radius:14px;background:linear-gradient(180deg,#191b27,#131420);padding:14px;margin-top:10px;position:relative;overflow:hidden}
+.boss.win{border-color:var(--golddeep);background:linear-gradient(180deg,#211f16,#14130d)}
+.boss .bn{font-size:16px;font-weight:700}
+.boss.win .bn{color:var(--gold)}
+.boss .bx{position:absolute;top:12px;right:14px;font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--gold)}
+.boss .bh{font-size:13px;color:var(--muted);margin-top:5px}
+.boss .state{display:inline-block;margin-top:9px;font-size:10px;letter-spacing:.16em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:2px 9px;color:var(--muted)}
+.boss.win .state{color:var(--ok);border-color:#2c5b3a}
+.boss .loot{margin-top:9px;font-size:13px;color:#d7dae8}
+.boss .loot b{color:var(--gold)}
+.bprog{height:8px;border-radius:5px;background:#0c0d15;border:1px solid var(--line);margin-top:10px;overflow:hidden}
+.bprog i{display:block;height:100%;background:linear-gradient(90deg,#c8963a,#f0c24a)}
+.bpt{font-size:11px;color:var(--muted);margin-top:6px}
+/* shows */
+.lcard select{flex:1;min-width:0;background:#0e0f18;border:1px solid var(--line);border-radius:10px;color:var(--ink);font-size:15px;padding:11px 12px}
+.lcard input[type="date"]{color-scheme:dark}
+.show{border:1px solid var(--line);border-radius:14px;background:linear-gradient(180deg,#191b27,#131420);padding:13px;margin-top:10px;position:relative}
+.show.past{opacity:.72}
+.show .sn{font-size:15px;font-weight:650;padding-right:22px}
+.show .sd{font-size:12px;color:var(--muted);margin-top:2px}
+.show .srow{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:10px;font-size:12.5px}
+.show .srow .k{color:var(--muted)}
+.show .srow b{font-family:ui-monospace,Menlo,monospace}
+.show .net.pos{color:var(--ok)} .show .net.neg{color:var(--rose)}
+.show .badge{display:inline-block;margin-top:9px;font-size:9px;letter-spacing:.14em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--teal)}
+.show .sx{position:absolute;top:10px;right:11px;background:transparent;border:0;color:var(--muted);font-size:17px;line-height:1;padding:2px 4px}
+.subh{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:18px 4px 2px}
+/* install bar */
+#installBar{display:none;align-items:center;gap:10px;margin-top:12px;border:1px solid var(--golddeep);border-radius:12px;background:linear-gradient(180deg,#211f16,#15140e);padding:11px 13px}
+#installBar .im{flex:1;min-width:0;font-size:13px;color:#e6dfce}
+#installBar .mini{flex:0 0 auto}
+#installBar .ix{flex:0 0 auto;background:transparent;border:0;color:var(--muted);font-size:18px;line-height:1;padding:2px 4px}
+/* bottom nav */
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:50;display:none;background:rgba(12,13,20,.94);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-top:1px solid var(--line);padding:6px 10px calc(6px + env(safe-area-inset-bottom))}
+.tabbar .tb{flex:1;background:transparent;border:0;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0;font-size:11px;letter-spacing:.04em;border-radius:12px}
+.tabbar .tb svg{width:23px;height:23px}
+.tabbar .tb.on{color:var(--gold)}
+/* overlays */
+.ov{position:fixed;inset:0;z-index:60;background:radial-gradient(140% 90% at 50% -10%,#191b28,#0b0c12 72%);display:none;overflow:auto}
+.ov.on{display:block}
+.ov .in{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center;max-width:560px;margin:0 auto}
+#opening .crown{width:min(140px,38vw);height:auto;filter:drop-shadow(0 6px 22px rgba(240,194,74,.35))}
+#opening .wm{margin-top:20px;font-size:clamp(38px,13vw,62px);font-weight:800;letter-spacing:.04em;line-height:.92;text-transform:uppercase}
+#opening .wm .lo{color:var(--gold)}
+#opening .tag{margin-top:14px;color:var(--muted);font-size:15px}
+#opening .tag b{color:var(--teal);font-weight:600}
+#opening .start{margin-top:38px;font-family:ui-monospace,Menlo,monospace;font-size:13px;letter-spacing:.34em;text-transform:uppercase;color:var(--gold);animation:blink 1.2s steps(1) infinite}
+@keyframes blink{50%{opacity:.12}}
+#setup .step{font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--teal)}
+#setup h2{font-family:system-ui;font-size:24px;margin:10px 0 6px;font-weight:700}
+#setup .sub{color:var(--muted);font-size:14px;margin-bottom:18px}
+#setup input,#setup textarea{width:100%;background:#0e0f18;border:1px solid var(--line);border-radius:11px;color:var(--ink);font-size:16px;padding:13px 14px}
+#setup .opts{display:flex;flex-direction:column;gap:9px;width:100%}
+#setup .opt{background:#0e0f18;border:1px solid var(--line);border-radius:11px;color:var(--ink);font-size:15px;padding:13px 14px;text-align:left}
+#setup .opt.sel{border-color:var(--gold);background:rgba(240,194,74,.1)}
+#setup .nav{display:flex;gap:10px;align-items:center;margin-top:20px;width:100%;justify-content:space-between}
+#setup .dots{display:flex;gap:6px}
+#setup .dots i{width:7px;height:7px;border-radius:50%;background:var(--line)}
+#setup .dots i.on{background:var(--gold)}
+.btn{background:linear-gradient(180deg,var(--gold),var(--golddeep));color:#141312;border:0;border-radius:10px;padding:12px 22px;font-weight:700;font-size:15px}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--muted);font-weight:500}
+#reveal .kick{font-family:ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--teal)}
+#reveal h2{font-size:28px;margin:10px 0}
+#reveal .xpup{font-family:ui-monospace,Menlo,monospace;font-size:42px;color:var(--gold);text-shadow:0 0 24px rgba(240,194,74,.5)}
+#reveal .rdm{color:#cfd3e4;font-size:15px;max-width:380px;margin-top:8px}
+#guide .card{border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:18px;text-align:left;max-width:460px;width:100%}
+#guide .card h3{margin:0 0 4px;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+#guide .card p{margin:0 0 16px;font-size:15px;color:#d7dae8;line-height:1.5}
+#guide .card p:last-child{margin-bottom:0}
+#verCard .vcver{font-family:ui-monospace,Menlo,monospace;color:var(--gold);font-size:14px;letter-spacing:.1em;margin:2px 0 16px}
+.vcrows{width:100%;max-width:320px;border:1px solid var(--line);border-radius:12px;background:var(--panel);overflow:hidden}
+.vcrow{display:flex;justify-content:space-between;padding:12px 15px;font-size:14px;border-top:1px solid var(--line)}
+.vcrow:first-child{border-top:0}
+.vcrow span{color:var(--muted)}
+.vcrow b{font-family:ui-monospace,Menlo,monospace}
+.vcstatus{margin-top:16px;font-size:13.5px;color:#cfd3e4;min-height:18px}
+.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:#20222f;border:1px solid var(--line);color:var(--ink);padding:10px 16px;border-radius:10px;font-size:13.5px;opacity:0;transition:opacity .25s;z-index:80;pointer-events:none;max-width:88vw;text-align:center}
+.toast.on{opacity:1}
+@media (prefers-reduced-motion:reduce){#opening .start{animation:none}.xpbar i,.gbar i,.chart .bar{transition:none}}
+</style>
+</head>
+<body>
 
+<div class="ov on" id="opening"><div class="in">
+  <svg class="crown" viewBox="0 0 120 96" aria-hidden="true"><defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd876"/><stop offset="1" stop-color="#c8963a"/></linearGradient></defs><path d="M14 74 L8 30 L36 52 L60 14 L84 52 L112 30 L106 74 Z" fill="url(#cg)" stroke="#7c5a1e" stroke-width="2" stroke-linejoin="round"/><rect x="14" y="74" width="92" height="14" rx="3" fill="#e0ad3f" stroke="#7c5a1e" stroke-width="2"/><circle cx="60" cy="40" r="7" fill="#ff4d6d" stroke="#7c1f30" stroke-width="1.5"/><circle cx="24" cy="58" r="4.5" fill="#33d6c4" stroke="#155e57" stroke-width="1.2"/><circle cx="96" cy="58" r="4.5" fill="#33d6c4" stroke="#155e57" stroke-width="1.2"/></svg>
+  <div class="wm">Side<br><span class="lo">Boss</span></div>
+  <div class="tag">Level up your <b>side hustle</b>.</div>
+  <div class="start" id="pressStart">Press start</div>
+</div></div>
+
+<div class="ov" id="setup"><div class="in">
+  <div class="step" id="setStep"></div>
+  <h2 id="setPrompt"></h2>
+  <div class="sub" id="setSub"></div>
+  <div id="setBody" style="width:100%"></div>
+  <div class="nav">
+    <button class="btn ghost" id="setBack">Back</button>
+    <div class="dots" id="setDots"></div>
+    <button class="btn" id="setNext">Next</button>
+  </div>
+</div></div>
+
+<div class="ov" id="reveal"><div class="in">
+  <div class="kick" id="rKick"></div>
+  <h2 id="rTitle"></h2>
+  <div class="xpup" id="rXp"></div>
+  <div class="rdm" id="rDm"></div>
+  <button class="btn" id="rOk" style="margin-top:22px">Onward</button>
+</div></div>
+
+<div class="ov" id="guide"><div class="in">
+  <svg width="46" height="37" viewBox="0 0 120 96" aria-hidden="true" style="margin-bottom:6px"><path d="M14 74 L8 30 L36 52 L60 14 L84 52 L112 30 L106 74 Z" fill="#f0c24a" stroke="#7c5a1e" stroke-width="3" stroke-linejoin="round"/><rect x="14" y="74" width="92" height="14" rx="3" fill="#e0ad3f"/></svg>
+  <h2 style="font-size:22px;margin:0 0 16px">How Side Boss works</h2>
+  <div class="card">
+    <h3>It is your hustle, as a game</h3><p>Every real move you make to grow your side hustle is a quest. Do it, mark it done, earn XP, level up. That is the whole thing.</p>
+    <h3>The Board</h3><p>Plan your week here. The board shows the moves that matter right now. Tap done when you have actually done one. No busywork, no fake tasks.</p>
+    <h3>The Ledger</h3><p>Log every sale and every cost. See your revenue, your profit, and your growth over the last six weeks. Logging your first sale finishes a quest on its own.</p>
+    <h3>Boss battles</h3><p>The big milestones are boss fights: your first sale, a hundred-dollar day, a thousand in the door, surviving the busy season. You do not grind them, you earn them by running the hustle. Beat one for a pile of XP and a piece of loot.</p>
+    <h3>Shows, if you sell in person</h3><p>Sell at markets or fairs? The Shows tab tracks each one: booth fee against what you sold there, so you can see which shows are worth your weekend. Turn it on any time from the Board with "Sell at markets?"</p>
+    <h3>Level up and unlock seasons</h3><p>XP raises your level and your five skills. Five seasons, timed to how a hustle grows: Getting Ready, First Sales, Find Your People, Busy Season, Level Up. Clear one to open the next.</p>
+    <h3>It saves on this device</h3><p>Your progress lives on this phone. Add it to your home screen so it is one tap away.</p>
+  </div>
+  <button class="btn" id="guideClose" style="margin-top:20px">Got it</button>
+</div></div>
+
+<div class="ov" id="verCard"><div class="in">
+  <svg width="44" height="35" viewBox="0 0 120 96" aria-hidden="true" style="margin-bottom:8px"><path d="M14 74 L8 30 L36 52 L60 14 L84 52 L112 30 L106 74 Z" fill="#f0c24a" stroke="#7c5a1e" stroke-width="3" stroke-linejoin="round"/><rect x="14" y="74" width="92" height="14" rx="3" fill="#e0ad3f"/><circle cx="60" cy="40" r="6" fill="#ff4d6d"/></svg>
+  <h2 style="font-size:22px;margin:0">Side Boss</h2>
+  <div class="vcver" id="vcVer">v0.6</div>
+  <div class="vcrows">
+    <div class="vcrow"><span>Today</span><b id="vcToday"></b></div>
+    <div class="vcrow"><span>Last updated</span><b id="vcLast"></b></div>
+    <div class="vcrow"><span>Since last update</span><b id="vcDays"></b></div>
+  </div>
+  <div class="vcstatus" id="vcStatus"></div>
+  <button class="btn" id="vcRefresh" style="display:none;margin-top:14px">Update now</button>
+  <button class="btn ghost" id="vcClose" style="margin-top:12px">Close</button>
+</div></div>
+
+<header>
+  <svg class="mk" viewBox="0 0 120 96" aria-hidden="true"><path d="M14 74 L8 30 L36 52 L60 14 L84 52 L112 30 L106 74 Z" fill="#f0c24a" stroke="#7c5a1e" stroke-width="3" stroke-linejoin="round"/><rect x="14" y="74" width="92" height="14" rx="3" fill="#e0ad3f" stroke="#7c5a1e" stroke-width="3"/><circle cx="60" cy="40" r="7" fill="#ff4d6d"/></svg>
+  <h1>Side<span>Boss</span></h1>
+  <span class="ver" id="verBadge">v0.6 &middot; Sep 27 2026</span>
+</header>
+
+<div class="wrap" id="app" style="display:none">
+
+  <div id="installBar">
+    <span class="im" id="installMsg">Add Side Boss to your home screen for one-tap access.</span>
+    <button class="mini" id="installBtn">Install</button>
+    <button class="ix" id="installX" aria-label="Dismiss">&times;</button>
+  </div>
+
+  <div id="boardView">
+    <div class="sheet">
+      <div class="ava"><svg viewBox="0 0 120 96" aria-hidden="true"><path d="M14 74 L8 30 L36 52 L60 14 L84 52 L112 30 L106 74 Z" fill="#f0c24a" stroke="#7c5a1e" stroke-width="3" stroke-linejoin="round"/><rect x="14" y="74" width="92" height="14" rx="3" fill="#e0ad3f" stroke="#7c5a1e" stroke-width="3"/><circle cx="60" cy="40" r="7" fill="#ff4d6d"/></svg></div>
+      <div class="who">
+        <div class="hname" id="hName">Your Hustle</div>
+        <div class="htitle" id="hTitle">Level 1 &middot; Rookie</div>
+        <div class="xpbar"><i id="xpFill"></i></div>
+        <div class="xpline"><span id="xpNow">0 XP</span><span id="xpNext">200 to next</span></div>
+      </div>
+    </div>
+    <div class="skills" id="skills"></div>
+
+    <div class="season">
+      <div>
+        <div class="no" id="seasonNo">Season 1</div>
+        <div class="nm" id="seasonNm">Getting Ready</div>
+      </div>
+      <div class="pr"><b id="seasonDone">0/0</b>quests done</div>
+    </div>
+
+    <div class="dm"><span class="who">The Boss</span><span id="dmLine"></span></div>
+
+    <div class="h3">This week's board</div>
+    <div id="board"></div>
+
+    <div class="foot">
+      <button id="guideBtn">How it works</button>
+      <button id="eventsOn" style="display:none">Sell at markets?</button>
+      <button id="resetBtn">Reset</button>
+    </div>
+  </div>
+
+  <div id="bossesView" style="display:none">
+    <div class="bosshead"><div class="h3" style="margin:0">Boss battles</div><span class="c" id="bossCount">0 / 7</span></div>
+    <div class="dm" style="margin-top:4px"><span class="who">The Boss</span><span>Milestones are the boss fights. You do not grind them, you earn them by running a real hustle. Beat one and the loot is yours.</span></div>
+    <div id="bosslist"></div>
+    <div class="foot"><button id="guideBtn3">How it works</button></div>
+  </div>
+
+  <div id="showsView" style="display:none">
+    <div class="h3" style="margin-top:14px">Shows</div>
+    <div class="dm" style="margin-top:2px"><span class="who">The Boss</span><span>Markets and fairs are their own game. Book a table, work the day, and beat the booth fee. A show that costs more than it earns is a lesson, not a loss.</span></div>
+
+    <div class="lcard">
+      <div class="lh">Add a show</div>
+      <div class="field f0"><input id="shName" placeholder="Show name, e.g. Holiday Market"></div>
+      <div class="field"><input id="shDate" type="date"><input id="shFee" class="amt" type="number" inputmode="decimal" min="0" step="1" placeholder="Fee $"></div>
+      <div class="field"><input id="shCity" placeholder="City or venue (optional)"><button class="mini go2" id="shAdd">Add</button></div>
+    </div>
+
+    <div class="lcard" id="boothLogCard" style="display:none">
+      <div class="lh">Log a booth sale</div>
+      <div class="field f0"><select id="bsShow"></select></div>
+      <div class="field"><input id="bsWhat" placeholder="Sold what? (optional)"><input id="bsAmt" class="amt" type="number" inputmode="decimal" min="0" step="0.01" placeholder="$"><button class="mini go2" id="bsAdd">Sale</button></div>
+    </div>
+
+    <div id="showlist"></div>
+    <div class="foot"><button id="guideBtn4">How it works</button><button id="eventsOff">Turn off booth tools</button></div>
+  </div>
+
+  <div id="ledgerView" style="display:none">
+    <div class="h3" style="margin-top:14px">Ledger</div>
+    <div class="tiles">
+      <div class="tile"><span class="lab">Revenue</span><b id="tRev">$0</b></div>
+      <div class="tile"><span class="lab">Costs</span><b id="tCost">$0</b></div>
+      <div class="tile"><span class="lab">Profit</span><b id="tProfit">$0</b></div>
+      <div class="tile"><span class="lab">Sales</span><b id="tCount">0</b></div>
+    </div>
+
+    <div class="lcard">
+      <div class="lh">Money goal</div>
+      <div class="goalrow"><input id="goalInp" type="number" inputmode="decimal" min="0" step="1" placeholder="Set a target, e.g. 500"><button class="mini" id="goalSet">Set</button></div>
+      <div class="gbar" id="goalWrap" style="display:none"><i id="goalFill"></i></div>
+      <div class="gtxt" id="goalTxt"></div>
+    </div>
+
+    <div class="lcard">
+      <div class="lh">Growth &middot; last 6 weeks</div>
+      <div id="chart" class="chart"></div>
+    </div>
+
+    <div class="lcard">
+      <div class="lh">Log it</div>
+      <div class="field f0"><input id="saleWhat" placeholder="Sold what? e.g. 2 candles"><input id="saleAmt" class="amt" type="number" inputmode="decimal" min="0" step="0.01" placeholder="$"><button class="mini go2" id="saleAdd">Sale</button></div>
+      <div class="field"><input id="costWhat" placeholder="Spent on? e.g. wax + wicks"><input id="costAmt" class="amt" type="number" inputmode="decimal" min="0" step="0.01" placeholder="$"><button class="mini cost" id="costAdd">Cost</button></div>
+    </div>
+
+    <div class="lcard">
+      <div class="lh">Recent</div>
+      <div id="entries"></div>
+    </div>
+
+    <div class="foot">
+      <button id="guideBtn2">How it works</button>
+    </div>
+  </div>
+
+</div>
+
+<nav class="tabbar" id="tabbar">
+  <button class="tb on" data-tab="board"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h4M7 13h4M7 17h2"/><path d="M14.5 9l1.5 1.5L19 8"/></svg>Board</button>
+  <button class="tb" data-tab="bosses"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v5c0 4.4-3 7.6-7 8.9C8 18.6 5 15.4 5 11V6z"/><path d="M12 8.5l1.1 2.3 2.4.3-1.8 1.7.5 2.4-2.2-1.2-2.2 1.2.5-2.4-1.8-1.7 2.4-.3z"/></svg>Bosses</button>
+  <button class="tb" data-tab="shows" id="tabShows" style="display:none"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h16l-1 11H5z"/><path d="M8 9V6a4 4 0 0 1 8 0v3"/></svg>Shows</button>
+  <button class="tb" data-tab="ledger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><rect x="7" y="12" width="3" height="5"/><rect x="12" y="8" width="3" height="9"/><rect x="17" y="5" width="3" height="12"/></svg>Ledger</button>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+var $=function(id){return document.getElementById(id);};
+var KEY="sideboss-v1";
+var VER="0.6", BUILD_DATE="2026-09-27";
+var BUILD="Side Boss v"+VER+" · Sep 27 2026";
+
+function todayISO(){ try{ var m=location.search.match(/[?&]today=(\d{4}-\d{2}-\d{2})/); if(m) return m[1]; }catch(e){} return new Date().toISOString().slice(0,10); }
+
+/* ---------- content ---------- */
+var LEVELS=[0,200,450,750,1100,1500,1950,2450,3000,3600,4250,4950,5700];
+var TITLES={1:"Rookie",2:"Side Hustler",4:"Operator",6:"Pro",9:"Boss",12:"Big Boss"};
+var SKILLS=["maker","merchant","herald","steward","scout"];
+var SKILL_NAMES={maker:"Maker",merchant:"Merchant",herald:"Herald",steward:"Steward",scout:"Scout"};
+var RANKS=[0,100,250,500,850,1300];
+var SEASONS=[
+ {n:1,name:"Getting Ready",dm:"Every empire starts with one product and one price. Get the basics down. This is the tutorial level, and it still counts."},
+ {n:2,name:"First Sales",dm:"Now you sell. The first dollar is the hardest and the best. Go get it, and log it in the Ledger."},
+ {n:3,name:"Find Your People",dm:"Sales come from the right eyes on your work. Go where your people already are and give them a reason to follow."},
+ {n:4,name:"Busy Season",dm:"The rush is a boss fight you win by being ready. Stock up, know your bestseller, keep the receipts."},
+ {n:5,name:"Level Up",dm:"Read your numbers like a pro. Cut what drags, raise what sells, put profit back to work, then set a bigger goal."}
+];
+/* quest: id, season, skill, xp, title, why */
+var QUESTS=[
+ /* Season 1 - Getting Ready */
+ {id:"price",   s:1, skill:"merchant", xp:60, title:"Set your prices", why:"You cannot sell what has no price. Write down what each thing costs."},
+ {id:"oneliner",s:1, skill:"herald",   xp:50, title:"Nail your one-liner", why:"One sentence: what you make and who it is for. You will use it everywhere."},
+ {id:"photos",  s:1, skill:"maker",    xp:70, title:"Shoot your first photos", why:"Good light, plain background, three angles. Photos do the selling."},
+ {id:"list",    s:1, skill:"merchant", xp:80, title:"Put one thing up for sale", why:"List one product or post one offer people can actually buy. Live beats perfect."},
+ {id:"goalset", s:1, skill:"steward",  xp:40, title:"Name your first goal", why:"A number or a milestone. Something you can hit in a month."},
+ {id:"hour",    s:1, skill:"steward",  xp:40, title:"Book your weekly hour", why:"Pick one hour a week that is only for the hustle. Put it on the calendar."},
+ /* Season 2 - First Sales */
+ {id:"firstsale",s:2, skill:"merchant", xp:120, title:"Make your first sale", why:"The whole point. One real sale to one real person. Log it in the Ledger and it checks itself off."},
+ {id:"payment", s:2, skill:"steward",  xp:50, title:"Set up how you get paid", why:"Cash, Venmo, Square, whatever. Make it dead easy for someone to pay you."},
+ {id:"pack",    s:2, skill:"maker",    xp:60, title:"Nail your packaging", why:"How does it leave your hands? A clean bag, a thank-you note, a box that survives shipping."},
+ {id:"expense", s:2, skill:"steward",  xp:50, title:"Log your first cost", why:"Materials, fees, gas. Log one cost in the Ledger so tax time is not a nightmare."},
+ {id:"post3",   s:2, skill:"herald",   xp:60, title:"Post three times", why:"Show the work, the making, and the finished thing. Three posts, this week."},
+ {id:"tell5",   s:2, skill:"scout",    xp:50, title:"Tell five people", why:"Text five people who would care that you are open for business."},
+ /* Season 3 - Find Your People */
+ {id:"where",   s:3, skill:"scout",    xp:60, title:"Find where your people gather", why:"One group, hashtag, market, or forum where your buyers already hang out."},
+ {id:"story",   s:3, skill:"herald",   xp:70, title:"Tell your origin", why:"Why you make what you make. People buy the person, not just the product."},
+ {id:"regular", s:3, skill:"herald",   xp:60, title:"Post on a schedule", why:"Pick the days you post every week. Show up before you feel ready."},
+ {id:"review",  s:3, skill:"herald",   xp:70, title:"Ask for one review", why:"Ask your first happy customer for a few words. Proof sells the next one."},
+ {id:"collab",  s:3, skill:"scout",    xp:60, title:"Reach out to one other maker", why:"A shoutout, a trade, a shared booth. Two audiences beat one."},
+ {id:"repeat",  s:3, skill:"merchant", xp:100, title:"Land a repeat customer", why:"Someone who buys twice is worth ten who buy once. Get one back."},
+ /* Season 4 - Busy Season */
+ {id:"stock",   s:4, skill:"maker",    xp:80, title:"Build a stock buffer", why:"Make ahead so a rush does not break you. Have inventory ready to grab."},
+ {id:"bestseller",s:4, skill:"merchant", xp:70, title:"Know your bestseller", why:"Which item sells the most? Make more of it and feature it up front."},
+ {id:"bigpush", s:4, skill:"herald",   xp:90, title:"Run a seasonal push", why:"A holiday drop, a sale, a limited run. Give people a reason to buy now."},
+ {id:"restock", s:4, skill:"steward",  xp:60, title:"Set a reorder trigger", why:"A low-stock number that tells you when to buy materials again, before you run dry."},
+ {id:"help",    s:4, skill:"steward",  xp:60, title:"Line up a second pair of hands", why:"Who helps when it is too much? Ask them before you need them."},
+ {id:"cushion", s:4, skill:"steward",  xp:70, title:"Bank a materials cushion", why:"Set money aside to restock without stress. Pay yourself second, materials first."},
+ /* Season 5 - Level Up */
+ {id:"numbers", s:5, skill:"steward",  xp:70, title:"Read your numbers", why:"Total sales, total costs, what is left. Know your real profit, not a guess."},
+ {id:"cut",     s:5, skill:"steward",  xp:70, title:"Cut one thing that drags", why:"The product, task, or channel that costs more than it returns. Drop it."},
+ {id:"raise",   s:5, skill:"merchant", xp:90, title:"Raise a price", why:"Your best seller can take more. Test a higher price on one item and watch."},
+ {id:"system",  s:5, skill:"maker",    xp:80, title:"Systematize one task", why:"The thing you redo every week: template it, batch it, make it faster."},
+ {id:"reinvest",s:5, skill:"merchant", xp:90, title:"Reinvest in one upgrade", why:"Better tool, better booth, better photos. Put profit back in to earn more."},
+ {id:"nextgoal",s:5, skill:"scout",    xp:80, title:"Set your next big goal", why:"You cleared the ladder. Name the next target and start again, bigger."},
+ /* event quests (only when booth tools are on) */
+ {id:"evscout", s:1, skill:"scout",   ev:true, xp:50, title:"Find a show to apply to", why:"One market, fair, or pop-up near you. Note the date and the booth fee, then add it in Shows."},
+ {id:"evbook",  s:2, skill:"steward", ev:true, xp:70, title:"Book your first show", why:"Apply and pay the booth fee. Now you are committed, and that is the point."},
+ {id:"evkit",   s:2, skill:"maker",   ev:true, xp:60, title:"Pack a booth kit", why:"Table, cover, display, change box, bags, card reader. Build a kit you reuse every time."},
+ {id:"evday",   s:4, skill:"merchant",ev:true, xp:90, title:"Work a booth day", why:"Show up and sell face to face. Log the day in Shows. Talking to buyers is its own skill."}
+];
+/* boss: id, name, skill, xp, hint (before), win (after), loot */
+var BOSSES=[
+ {id:"bfirst", name:"The First Sale",         skill:"merchant", xp:100, hint:"Log your first sale to face this one.",   win:"You made your first sale. You are officially in business.",     loot:"The Open Sign"},
+ {id:"btax",   name:"Tax Time",               skill:"steward",  xp:120, hint:"Log 8 costs so your records are real.",    win:"Your costs are on record. Tax time can not sneak up on you.",   loot:"The Shoebox"},
+ {id:"b100day",name:"The Hundred-Dollar Day", skill:"merchant", xp:150, hint:"Log $100 of sales on a single day.",       win:"One hundred dollars in a single day. That is real momentum.",   loot:"Momentum Badge"},
+ {id:"bdry",   name:"The Dry Spell",          skill:"scout",    xp:150, hint:"Land a repeat customer to break it.",       win:"A customer came back. You beat the quiet stretch.",             loot:"Loyal Regular"},
+ {id:"bbooth", name:"The Booth", ev:true,     skill:"merchant", xp:150, hint:"Turn a profit at a show (beat the booth fee).", win:"You out-earned the booth fee. The table paid for itself and then some.", loot:"The Profitable Table"},
+ {id:"bbusy",  name:"Busy Season",            skill:"maker",    xp:200, hint:"Clear Season 4 to survive the rush.",       win:"You handled the rush without breaking. Boss move.",             loot:"The Rush Kit"},
+ {id:"bgrand", name:"The Grand",              skill:"merchant", xp:300, hint:"Reach $1,000 in total revenue.",           win:"One thousand dollars through the door. Four figures.",          loot:"Four-Figure Crown"},
+ {id:"breck",  name:"The Reckoning",          skill:"steward",  xp:400, hint:"Clear all five seasons, in the black.",     win:"Every season cleared and you are in profit. You ran the whole thing.", loot:"Ledger of the Year"}
+];
+
+/* ---------- state ---------- */
+function fresh(){ return {v:5, opened:false, setup:{}, setupDone:false, xp:0, skillxp:{maker:0,merchant:0,herald:0,steward:0,scout:0}, done:{}, season:1, sales:[], costs:[], goalAmt:0, bosses:{}, artifacts:{}, shows:[], events:false, tab:"board"}; }
+var S=fresh();
+try{ var raw=localStorage.getItem(KEY); if(raw){ S=Object.assign(fresh(), JSON.parse(raw)); if(!S.skillxp) S.skillxp={maker:0,merchant:0,herald:0,steward:0,scout:0}; if(!S.sales) S.sales=[]; if(!S.costs) S.costs=[]; if(!S.bosses) S.bosses={}; if(!S.artifacts) S.artifacts={}; if(!S.shows) S.shows=[]; if(typeof S.events!=="boolean") S.events=isEventWhere((S.setup||{}).where); } }catch(e){}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+function isEventWhere(w){ return !!w && (w.indexOf("In person")===0 || w.indexOf("A mix")===0); }
+function eventsOn(){ return !!S.events; }
+function bossList(){ return BOSSES.filter(function(b){ return !b.ev || eventsOn(); }); }
+function eventSales(showId){ var t=0; S.sales.forEach(function(x){ if(x.event===showId) t+=(+x.amt||0); }); return t; }
+
+function level(){ var l=1; for(var i=1;i<LEVELS.length;i++) if(S.xp>=LEVELS[i]) l=i+1; return Math.min(l,12); }
+function titleFor(l){ var t="Rookie"; for(var k in TITLES) if(l>=Number(k)) t=TITLES[k]; return t; }
+function rank(sk){ var r=0; for(var i=1;i<RANKS.length;i++) if((S.skillxp[sk]||0)>=RANKS[i]) r=i; return r; }
+function seasonQuests(n){ return QUESTS.filter(function(q){return q.s===n && (!q.ev || eventsOn());}); }
+function seasonComplete(n){ var qs=seasonQuests(n); return qs.length>0 && qs.every(function(q){return S.done[q.id];}); }
+function currentSeason(){ var s=1; for(var i=1;i<=5;i++){ if(i===1||seasonComplete(i-1)) s=i; } return s; }
+function revenue(){ var t=0; S.sales.forEach(function(x){t+=(+x.amt||0);}); return t; }
+function costTotal(){ var t=0; S.costs.forEach(function(x){t+=(+x.amt||0);}); return t; }
+function bestDay(){ var m={},mx=0; S.sales.forEach(function(x){ var d=x.date||todayISO(); m[d]=(m[d]||0)+(+x.amt||0); }); for(var k in m) if(m[k]>mx) mx=m[k]; return mx; }
+function bossMet(id){
+  switch(id){
+    case "bfirst":  return !!S.done.firstsale || S.sales.length>0;
+    case "btax":    return S.costs.length>=8;
+    case "b100day": return bestDay()>=100;
+    case "bdry":    return !!S.done.repeat;
+    case "bbooth":  for(var i=0;i<S.shows.length;i++){ var sh=S.shows[i]; if((+sh.fee||0)>0 && eventSales(sh.id)>(+sh.fee||0)) return true; } return false;
+    case "bbusy":   return seasonComplete(4);
+    case "bgrand":  return revenue()>=1000;
+    case "breck":   return seasonComplete(5) && (revenue()-costTotal())>0;
+  }
+  return false;
+}
+function bossProg(id){
+  if(id==="btax") return {have:Math.min(S.costs.length,8), need:8, unit:"costs logged"};
+  if(id==="b100day") return {have:Math.min(bestDay(),100), need:100, unit:"best day", money:true};
+  if(id==="bgrand") return {have:Math.min(revenue(),1000), need:1000, unit:"total revenue", money:true};
+  return null;
+}
+function bossCount(){ var c=0; bossList().forEach(function(b){ if(S.bosses[b.id]) c++; }); return c; }
+function checkBosses(silent){
+  bossList().forEach(function(b){
+    if(S.bosses[b.id]) return;
+    if(bossMet(b.id)){
+      S.bosses[b.id]=true; if(b.loot) S.artifacts[b.loot]=true;
+      if(silent){ S.xp+=b.xp; if(b.skill) S.skillxp[b.skill]=(S.skillxp[b.skill]||0)+b.xp; }
+      else {
+        var before=level(); S.xp+=b.xp; if(b.skill) S.skillxp[b.skill]=(S.skillxp[b.skill]||0)+b.xp; save();
+        showReveal("Boss defeated", b.name, "+"+b.xp+" XP", b.win+" Loot earned: "+b.loot+".");
+        if(level()>before){ showReveal("Level up", "Level "+level()+" · "+titleFor(level()), "", "You leveled up. New title, same grind."); }
+      }
+    }
+  });
+  save();
+}
+
+function money(n){ n=Math.round(n*100)/100; var neg=n<0; n=Math.abs(n); var p=(n%1===0?String(n):n.toFixed(2)).split("."); p[0]=p[0].replace(/\B(?=(\d{3})+(?!\d))/g,","); return (neg?"-$":"$")+p.join("."); }
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+
+/* ---------- toast + reveal ---------- */
+function toast(m){ var t=$("toast"); t.textContent=m; t.classList.add("on"); clearTimeout(t._h); t._h=setTimeout(function(){t.classList.remove("on");},1700); }
+var revealQ=[];
+function showReveal(kick,title,xp,dm){ revealQ.push({kick:kick,title:title,xp:xp,dm:dm}); if(!$("reveal").classList.contains("on")) flushReveal(); }
+function flushReveal(){ if(!revealQ.length){ render(); return; } var r=revealQ.shift(); $("rKick").textContent=r.kick; $("rTitle").textContent=r.title; $("rXp").textContent=r.xp; $("rDm").textContent=r.dm; $("reveal").classList.add("on"); }
+function award(xp, skill, kick, title, dm){
+  var before=level();
+  S.xp+=xp; if(skill) S.skillxp[skill]=(S.skillxp[skill]||0)+xp;
+  save();
+  var after=level();
+  showReveal(kick, title, xp>0?("+"+xp+" XP"):"", dm);
+  if(after>before){ showReveal("Level up", "Level "+after+" · "+titleFor(after), "", "You leveled up. New title, same grind."); }
+}
+
+/* ---------- quests ---------- */
+function completeQuest(id){
+  if(S.done[id]) return;
+  var q=null; for(var i=0;i<QUESTS.length;i++) if(QUESTS[i].id===id) q=QUESTS[i];
+  if(!q) return;
+  S.done[id]=true; save();
+  award(q.xp, q.skill, "Quest done", q.title, q.why);
+  if(seasonComplete(q.s) && q.s<5){ showReveal("Season cleared", SEASONS[q.s-1].name, "", "Season "+(q.s+1)+", "+SEASONS[q.s].name+", is open."); }
+  else if(q.s===5 && seasonComplete(5)){ showReveal("Campaign cleared", "You ran the whole ladder", "", "Every season done. Keep logging sales and leveling up, Boss."); }
+  checkBosses(false);
+}
+
+/* ---------- render ---------- */
+function render(){
+  if(!S.setupDone) return;
+  $("app").style.display="block";
+  $("tabbar").style.display="flex";
+  $("tabShows").style.display = eventsOn() ? "flex" : "none";
+  $("eventsOn").style.display = eventsOn() ? "none" : "inline-block";
+  renderSheet(); renderBoard(); renderBosses(); renderShows(); renderLedger();
+  if(!eventsOn() && S.tab==="shows") S.tab="board";
+  showTab(S.tab||"board");
+  showInstall();
+}
+function renderSheet(){
+  var l=level(), prev=LEVELS[l-1]||0, next=LEVELS[l]||LEVELS[LEVELS.length-1];
+  $("hName").textContent=S.setup.name||"Your Hustle";
+  $("hTitle").textContent="Level "+l+" · "+titleFor(l);
+  var pct=l>=12?100:Math.round((S.xp-prev)/(next-prev)*100);
+  $("xpFill").style.width=Math.max(3,Math.min(100,pct))+"%";
+  $("xpNow").textContent=S.xp+" XP";
+  $("xpNext").textContent=l>=12?"max level":(next-S.xp)+" to next";
+  var sk=""; SKILLS.forEach(function(s){ var r=rank(s), pips=""; for(var i=0;i<5;i++) pips+='<i class="'+(i<r?"on":"")+'"></i>'; sk+='<div class="sk"><div class="pips">'+pips+'</div>'+SKILL_NAMES[s]+'</div>'; });
+  $("skills").innerHTML=sk;
+}
+function renderBoard(){
+  S.season=currentSeason();
+  var seas=SEASONS[S.season-1];
+  $("seasonNo").textContent="Season "+S.season;
+  $("seasonNm").textContent=seas.name;
+  var qs=seasonQuests(S.season), doneN=qs.filter(function(q){return S.done[q.id];}).length;
+  $("seasonDone").textContent=doneN+"/"+qs.length;
+  $("dmLine").textContent=seas.dm;
+  var h="";
+  qs.forEach(function(q){
+    var d=S.done[q.id];
+    h+='<div class="q'+(d?" done":"")+'"><span class="tag">'+SKILL_NAMES[q.skill]+'</span><span class="xp">+'+q.xp+' XP</span>'
+      +'<div class="t">'+esc(q.title)+'</div><div class="why">'+esc(q.why)+'</div>'
+      +(d?'<div class="donemark">✓ Done</div>':'<button class="go" data-done="'+q.id+'">Mark done</button>')+'</div>';
+  });
+  if(seasonComplete(S.season) && S.season<5) h+='<div class="q cleared"><div class="t">Season '+S.season+' cleared</div><div class="why">Season '+(S.season+1)+', '+SEASONS[S.season].name+', is open below. Keep going.</div></div>';
+  else if(S.season===5 && seasonComplete(5)) h+='<div class="q cleared"><div class="t">Campaign cleared</div><div class="why">You ran the whole ladder. Keep logging sales in the Ledger and pushing your level.</div></div>';
+  $("board").innerHTML=h;
+}
+function renderBosses(){
+  var list=bossList();
+  $("bossCount").textContent=bossCount()+" / "+list.length;
+  var h="";
+  list.forEach(function(b){
+    var won=!!S.bosses[b.id];
+    h+='<div class="boss'+(won?" win":"")+'">'
+      +(won?'<span class="bx">+'+b.xp+' XP</span>':'')
+      +'<div class="bn">'+esc(b.name)+'</div>';
+    if(won){
+      h+='<div class="bh">'+esc(b.win)+'</div><span class="state">Defeated</span>'
+        +'<div class="loot">Loot: <b>'+esc(b.loot)+'</b></div>';
+    } else {
+      h+='<div class="bh">'+esc(b.hint)+'</div><span class="state">Not yet</span>';
+      var pr=bossProg(b.id);
+      if(pr){ var pct=Math.round(pr.have/pr.need*100); var hv=pr.money?money(pr.have):pr.have, nd=pr.money?money(pr.need):pr.need;
+        h+='<div class="bprog"><i style="width:'+Math.max(0,Math.min(100,pct))+'%"></i></div><div class="bpt">'+hv+' of '+nd+' · '+pr.unit+'</div>'; }
+    }
+    h+='</div>';
+  });
+  $("bosslist").innerHTML=h;
+}
+function weekly(){
+  var t=new Date(todayISO()+"T12:00:00"); var day=t.getDay();
+  var monday=new Date(t); monday.setDate(t.getDate()-((day+6)%7));
+  var weeks=[];
+  for(var i=5;i>=0;i--){ var ws=new Date(monday); ws.setDate(monday.getDate()-i*7); weeks.push({start:ws,total:0,label:(ws.getMonth()+1)+"/"+ws.getDate()}); }
+  S.sales.forEach(function(x){ var d=new Date((x.date||todayISO())+"T12:00:00"); for(var i=0;i<weeks.length;i++){ var st=weeks[i].start, en=new Date(st); en.setDate(st.getDate()+7); if(d>=st&&d<en){ weeks[i].total+=(+x.amt||0); break; } } });
+  return weeks;
+}
+function renderShows(){
+  if(!eventsOn()) return;
+  var shows=S.shows.slice().sort(function(a,b){ return (a.date||"").localeCompare(b.date||""); });
+  var today=todayISO();
+  // booth-log selector
+  var log=$("boothLogCard");
+  if(shows.length){ log.style.display="block"; var opt=shows.map(function(s){ return '<option value="'+s.id+'">'+esc(s.name)+(s.date?(" · "+s.date):"")+'</option>'; }).join(""); $("bsShow").innerHTML=opt; }
+  else { log.style.display="none"; }
+  var up=shows.filter(function(s){ return !s.date || s.date>=today; });
+  var past=shows.filter(function(s){ return s.date && s.date<today; }).reverse();
+  function card(s, isPast){
+    var sales=eventSales(s.id), fee=(+s.fee||0), net=sales-fee;
+    var h='<div class="show'+(isPast?" past":"")+'"><button class="sx" data-shdel="'+s.id+'" aria-label="Remove">×</button>'
+      +'<div class="sn">'+esc(s.name)+'</div>'
+      +'<div class="sd">'+(s.date?esc(s.date):"No date set")+(s.city?(" · "+esc(s.city)):"")+'</div>'
+      +'<div class="srow">'
+      +(fee>0?'<span><span class="k">Fee</span> <b>'+money(fee)+'</b></span>':'')
+      +'<span><span class="k">Sales</span> <b>'+money(sales)+'</b></span>'
+      +(fee>0?'<span><span class="k">Net</span> <b class="net '+(net>=0?"pos":"neg")+'">'+money(net)+'</b></span>':'')
+      +'</div>';
+    if(fee>0 && sales>fee) h+='<span class="badge">Beat the fee</span>';
+    h+='</div>';
+    return h;
+  }
+  var html="";
+  if(up.length){ html+='<div class="subh">Upcoming</div>'; up.forEach(function(s){ html+=card(s,false); }); }
+  if(past.length){ html+='<div class="subh">Past</div>'; past.forEach(function(s){ html+=card(s,true); }); }
+  if(!shows.length) html='<div class="emptyline" style="margin-top:12px">No shows yet. Add your first market or fair above.</div>';
+  $("showlist").innerHTML=html;
+}
+function renderLedger(){
+  var rev=revenue(), cost=costTotal(), profit=rev-cost;
+  $("tRev").textContent=money(rev);
+  $("tCost").textContent=money(cost);
+  $("tProfit").textContent=money(profit);
+  $("tProfit").style.color = profit<0 ? "#ff4d6d" : (profit>0?"#5bd97f":"#eef0f7");
+  $("tCount").textContent=String(S.sales.length);
+  /* goal */
+  if(document.activeElement!==$("goalInp")) $("goalInp").value = S.goalAmt>0 ? String(S.goalAmt) : "";
+  if(S.goalAmt>0){
+    var gp=Math.max(0,Math.min(100,Math.round(rev/S.goalAmt*100)));
+    $("goalWrap").style.display="block"; $("goalFill").style.width=gp+"%";
+    $("goalTxt").textContent=money(rev)+" of "+money(S.goalAmt)+" · "+gp+"%"+(gp>=100?", goal hit":"");
+  } else { $("goalWrap").style.display="none"; $("goalTxt").textContent="Set a revenue target and watch the bar fill as you log sales."; }
+  /* chart */
+  var wk=weekly(), max=0; wk.forEach(function(w){ if(w.total>max) max=w.total; });
+  if(max<=0){ $("chart").innerHTML='<div class="empty">Log a sale to start your growth chart.</div>'; }
+  else { var ch=""; wk.forEach(function(w){ var hp=Math.round(w.total/max*100); ch+='<div class="col"><div class="bar" style="height:'+Math.max(2,hp)+'%"></div><div class="lab">'+w.label+'</div></div>'; }); $("chart").innerHTML=ch; }
+  /* entries */
+  var all=S.sales.map(function(x){return {t:"sale",e:x};}).concat(S.costs.map(function(x){return {t:"cost",e:x};}));
+  all.sort(function(a,b){return (b.e.ts||0)-(a.e.ts||0);});
+  if(!all.length){ $("entries").innerHTML='<div class="emptyline">Nothing logged yet. Add your first sale or cost above.</div>'; }
+  else {
+    var eh=""; all.slice(0,14).forEach(function(row,idx){
+      var x=row.e, isSale=row.t==="sale";
+      eh+='<div class="ent'+(idx===0?" first":"")+'"><span class="ei '+(isSale?"s":"c")+'"></span>'
+        +'<div class="ew"><div class="wt">'+esc(x.what||(isSale?"Sale":"Cost"))+'</div><div class="ed">'+esc(x.date||"")+'</div></div>'
+        +'<span class="ea '+(isSale?"s":"c")+'">'+(isSale?"+":"−")+money(+x.amt||0).replace(/^-/,"")+'</span>'
+        +'<button class="ex" data-del="'+row.t+':'+x.id+'" aria-label="Remove">×</button></div>';
+    });
+    $("entries").innerHTML=eh;
+  }
+}
+function showTab(t){
+  if(["board","bosses","shows","ledger"].indexOf(t)<0) t="board";
+  if(t==="shows" && !eventsOn()) t="board";
+  S.tab=t; save();
+  $("boardView").style.display = t==="board"?"block":"none";
+  $("bossesView").style.display = t==="bosses"?"block":"none";
+  $("showsView").style.display = t==="shows"?"block":"none";
+  $("ledgerView").style.display = t==="ledger"?"block":"none";
+  var tbs=document.querySelectorAll(".tb"); for(var i=0;i<tbs.length;i++){ tbs[i].classList.toggle("on", tbs[i].getAttribute("data-tab")===t); }
+  try{ window.scrollTo(0,0); }catch(e){}
+}
+
+/* ---------- ledger actions ---------- */
+function uid(){ return String(Date.now())+"-"+Math.random().toString(36).slice(2,6); }
+function addSale(){
+  var amt=parseFloat($("saleAmt").value); if(!(amt>0)){ toast("Enter a sale amount"); return; }
+  var what=($("saleWhat").value||"").trim()||"Sale";
+  var first=S.sales.length===0;
+  S.sales.push({id:uid(), what:what, amt:Math.round(amt*100)/100, date:todayISO(), ts:Date.now()}); save();
+  $("saleWhat").value=""; $("saleAmt").value="";
+  if(first && !S.done.firstsale){ completeQuest("firstsale"); }
+  else { award(15, "merchant", "Sale logged", money(amt)+" · "+what, "Money in. That is the sound of a boss at work."); }
+  checkBosses(false);
+}
+function addCost(){
+  var amt=parseFloat($("costAmt").value); if(!(amt>0)){ toast("Enter a cost amount"); return; }
+  var what=($("costWhat").value||"").trim()||"Cost";
+  var first=S.costs.length===0;
+  S.costs.push({id:uid(), what:what, amt:Math.round(amt*100)/100, date:todayISO(), ts:Date.now()}); save();
+  $("costWhat").value=""; $("costAmt").value="";
+  if(first && !S.done.expense){ completeQuest("expense"); }
+  else { award(8, "steward", "Cost logged", money(amt)+" · "+what, "Track every dollar out. Future you at tax time says thanks."); }
+  checkBosses(false);
+}
+function setGoal(){
+  var v=parseFloat($("goalInp").value); if(!(v>0)){ S.goalAmt=0; save(); renderLedger(); toast("Goal cleared"); return; }
+  S.goalAmt=Math.round(v); save(); renderLedger(); toast("Goal set: "+money(S.goalAmt));
+}
+function delEntry(tok){
+  var p=tok.split(":"), t=p[0], id=p[1];
+  var arr = t==="sale"?S.sales:S.costs;
+  for(var i=0;i<arr.length;i++){ if(arr[i].id===id){ arr.splice(i,1); break; } }
+  save(); renderLedger();
+}
+/* ---------- shows / events ---------- */
+function setEvents(on){ S.events=!!on; save(); if(on){ S.tab="shows"; } render(); toast(on?"Booth tools on":"Booth tools off"); }
+function addShow(){
+  var name=($("shName").value||"").trim(); if(!name){ toast("Name the show first"); return; }
+  var date=($("shDate").value||"").trim();
+  var city=($("shCity").value||"").trim();
+  var fee=parseFloat($("shFee").value); if(!(fee>=0)) fee=0;
+  var first=S.shows.length===0;
+  S.shows.push({id:uid(), name:name, date:date, city:city, fee:Math.round(fee*100)/100}); save();
+  $("shName").value=""; $("shDate").value=""; $("shCity").value=""; $("shFee").value="";
+  if(first && eventsOn() && !S.done.evscout){ completeQuest("evscout"); }
+  else { renderShows(); toast("Show added"); }
+  checkBosses(false);
+}
+function logBoothSale(){
+  if(!S.shows.length){ toast("Add a show first"); return; }
+  var amt=parseFloat($("bsAmt").value); if(!(amt>0)){ toast("Enter a sale amount"); return; }
+  var showId=$("bsShow").value; var sh=null;
+  for(var i=0;i<S.shows.length;i++){ if(S.shows[i].id===showId){ sh=S.shows[i]; break; } }
+  var what=($("bsWhat").value||"").trim()||"Booth sale";
+  var first=S.sales.length===0;
+  S.sales.push({id:uid(), what:what, amt:Math.round(amt*100)/100, date:todayISO(), ts:Date.now(), event:showId, evname:sh?sh.name:""}); save();
+  $("bsWhat").value=""; $("bsAmt").value="";
+  if(first && !S.done.firstsale){ completeQuest("firstsale"); }
+  else { award(15, "merchant", "Booth sale logged", money(amt)+(sh?(" · "+sh.name):""), "Cash at the table. Nothing beats selling face to face."); }
+  checkBosses(false);
+}
+function delShow(id){
+  for(var i=0;i<S.shows.length;i++){ if(S.shows[i].id===id){ S.shows.splice(i,1); break; } }
+  save(); renderShows();
+}
+
+/* ---------- setup ---------- */
+var SETUP=[
+ {k:"name", type:"text", prompt:"Name your hustle", sub:"What do you call it? A business name, your name, a working title. You can change it later.", ph:"e.g. Maple Lane Candles"},
+ {k:"make", type:"text", prompt:"What do you make or do?", sub:"One plain line. This is your class.", ph:"e.g. hand-poured soy candles"},
+ {k:"who",  type:"text", prompt:"Who is it for?", sub:"The people most likely to buy. Be specific.", ph:"e.g. folks who love cozy home scents"},
+ {k:"where",type:"choice", prompt:"Where do you sell?", sub:"Pick the closest. It shapes your quests.", opts:["Online (Etsy, socials, my site)","In person (markets, fairs, booths)","Local and word of mouth","A mix of these"]},
+ {k:"goal", type:"choice", prompt:"Your first goal", sub:"What would make the next month a win?", opts:["Make my first sales","Hit a money target","Launch or list something","Build a steady habit"]},
+ {k:"time", type:"choice", prompt:"Time you can give it", sub:"Honest, not aspirational.", opts:["An hour here and there","A few hours a week","Most evenings and weekends","This is close to full time"]}
+];
+var setI=0, setVal={};
+function showSetup(){
+  var s=SETUP[setI];
+  $("setStep").textContent="Character creation · "+(setI+1)+" of "+SETUP.length;
+  $("setPrompt").textContent=s.prompt; $("setSub").textContent=s.sub;
+  var b="";
+  if(s.type==="text"){ b='<input id="setInput" type="text" placeholder="'+esc(s.ph)+'" value="'+esc(setVal[s.k]||"")+'">'; }
+  else { b='<div class="opts">'+s.opts.map(function(o){ return '<button class="opt'+(setVal[s.k]===o?" sel":"")+'" data-opt="'+esc(o)+'">'+esc(o)+'</button>'; }).join("")+'</div>'; }
+  $("setBody").innerHTML=b;
+  var dots=""; for(var i=0;i<SETUP.length;i++) dots+='<i class="'+(i===setI?"on":"")+'"></i>'; $("setDots").innerHTML=dots;
+  $("setBack").style.visibility=setI===0?"hidden":"visible";
+  $("setNext").textContent=setI===SETUP.length-1?"Begin":"Next";
+}
+function setupNext(){
+  var s=SETUP[setI];
+  if(s.type==="text"){ var v=($("setInput").value||"").trim(); if(!v){ toast("Fill this in first"); return; } setVal[s.k]=v; }
+  else { if(!setVal[s.k]){ toast("Pick one"); return; } }
+  if(setI<SETUP.length-1){ setI++; showSetup(); return; }
+  S.setup=setVal; S.setupDone=true; S.events=isEventWhere(setVal.where); save();
+  $("setup").classList.remove("on");
+  award(60, "steward", "Character created", (setVal.name||"Your hustle")+" is live", "Your character sheet is set. The board is ready. Go be the boss.");
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click", function(e){
+  var t=e.target;
+  if(t.closest("#pressStart")||t.closest("#opening")){ if(!$("opening").classList.contains("on")) return; S.opened=true; save(); $("opening").classList.remove("on"); if(S.setupDone){ render(); } else { setI=0; setVal=S.setup||{}; $("setup").classList.add("on"); showSetup(); } return; }
+  if(t.closest("#setBack")){ if(setI>0){ setI--; showSetup(); } return; }
+  if(t.closest("#setNext")){ setupNext(); return; }
+  var opt=t.closest("[data-opt]"); if(opt){ setVal[SETUP[setI].k]=opt.getAttribute("data-opt"); showSetup(); return; }
+  var dq=t.closest("[data-done]"); if(dq){ completeQuest(dq.getAttribute("data-done")); return; }
+  var tab=t.closest("[data-tab]"); if(tab){ showTab(tab.getAttribute("data-tab")); return; }
+  var del=t.closest("[data-del]"); if(del){ delEntry(del.getAttribute("data-del")); return; }
+  if(t.closest("#saleAdd")){ addSale(); return; }
+  if(t.closest("#costAdd")){ addCost(); return; }
+  if(t.closest("#goalSet")){ setGoal(); return; }
+  if(t.closest("#shAdd")){ addShow(); return; }
+  if(t.closest("#bsAdd")){ logBoothSale(); return; }
+  var shd=t.closest("[data-shdel]"); if(shd){ delShow(shd.getAttribute("data-shdel")); return; }
+  if(t.closest("#eventsOn")){ setEvents(true); return; }
+  if(t.closest("#eventsOff")){ setEvents(false); return; }
+  if(t.closest("#rOk")){ $("reveal").classList.remove("on"); flushReveal(); return; }
+  if(t.closest("#guideBtn")||t.closest("#guideBtn2")||t.closest("#guideBtn3")||t.closest("#guideBtn4")){ $("guide").classList.add("on"); return; }
+  if(t.closest("#guideClose")){ $("guide").classList.remove("on"); return; }
+  if(t.closest("#verBadge")){ versionTap(); return; }
+  if(t.closest("#vcClose")){ $("verCard").classList.remove("on"); return; }
+  if(t.closest("#vcRefresh")){ hardRefresh(); return; }
+  if(t.closest("#installBtn")){ doInstall(); return; }
+  if(t.closest("#installX")){ hideInstall(true); return; }
+  if(t.closest("#resetBtn")){ if(confirm("Start over? This erases your progress on this device.")){ S=fresh(); save(); location.reload(); } return; }
+});
+
+/* ---------- pwa + version ---------- */
+function fmtDate(iso){ try{ return new Date(iso+"T12:00:00").toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"}); }catch(e){ return iso; } }
+function daysBetween(a,b){ try{ return Math.max(0,Math.round((new Date(b+"T12:00:00")-new Date(a+"T12:00:00"))/86400000)); }catch(e){ return 0; } }
+function hardRefresh(){ try{ if("caches" in window){ caches.keys().then(function(ks){ return Promise.all(ks.map(function(k){return caches.delete(k);})); }).then(function(){ location.reload(); }, function(){ location.reload(); }); return; } }catch(e){} location.reload(); }
+function versionTap(){
+  var today=todayISO(), d=daysBetween(BUILD_DATE,today);
+  $("vcVer").textContent="v"+VER;
+  $("vcToday").textContent=fmtDate(today);
+  $("vcLast").textContent=fmtDate(BUILD_DATE);
+  $("vcDays").textContent=d+" day"+(d===1?"":"s");
+  $("vcRefresh").style.display="none";
+  $("vcStatus").textContent="Checking for updates...";
+  $("verCard").classList.add("on");
+  var done=false;
+  function settle(txt, showBtn){ if(done) return; done=true; $("vcStatus").textContent=txt; $("vcRefresh").style.display=showBtn?"inline-block":"none"; }
+  try{
+    fetch("version.json?ts="+Date.now(),{cache:"no-store"}).then(function(r){return r.json();}).then(function(j){
+      if(j&&j.v&&j.v!==VER) settle("Version "+j.v+" is available.", true);
+      else settle("You are on the latest version.", false);
+    }).catch(function(){ settle("Update check needs the live site.", false); });
+    setTimeout(function(){ settle("Update check needs the live site.", false); }, 2500);
+  }catch(e){ settle("Update check needs the live site.", false); }
+}
+var deferredPrompt=null;
+function isStandalone(){ try{ return (window.matchMedia&&window.matchMedia("(display-mode: standalone)").matches) || navigator.standalone===true; }catch(e){ return false; } }
+function isIOS(){ return /iphone|ipad|ipod/i.test(navigator.userAgent||""); }
+function installDismissed(){ try{ return localStorage.getItem("sb-install-x")==="1"; }catch(e){ return false; } }
+function showInstall(){
+  if(!S.setupDone || isStandalone() || installDismissed()) return;
+  var bar=$("installBar"); if(!bar) return;
+  if(deferredPrompt){ $("installBtn").style.display=""; $("installMsg").textContent="Add Side Boss to your home screen for one-tap access."; }
+  else if(isIOS()){ $("installBtn").style.display="none"; $("installMsg").textContent="To install: tap the Share icon, then Add to Home Screen."; }
+  else { return; }
+  bar.style.display="flex";
+}
+function hideInstall(remember){ var bar=$("installBar"); if(bar) bar.style.display="none"; if(remember){ try{ localStorage.setItem("sb-install-x","1"); }catch(e){} } }
+function doInstall(){ if(!deferredPrompt){ hideInstall(false); return; } deferredPrompt.prompt(); deferredPrompt.userChoice.then(function(){ deferredPrompt=null; hideInstall(false); }); }
+window.addEventListener("beforeinstallprompt", function(e){ e.preventDefault(); deferredPrompt=e; showInstall(); });
+window.addEventListener("appinstalled", function(){ deferredPrompt=null; hideInstall(false); });
+if("serviceWorker" in navigator){ try{ window.addEventListener("load", function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); }); }catch(e){} }
+
+/* ---------- boot ---------- */
+if(S.setupDone){ checkBosses(true); $("opening").classList.remove("on"); render(); showInstall(); }
+else if(S.opened){ $("opening").classList.remove("on"); setI=0; setVal=S.setup||{}; $("setup").classList.add("on"); showSetup(); }
+</script>
+</body>
+</html>
