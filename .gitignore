@@ -1,0 +1,4 @@
+# Local validation tooling only. Never served by GitHub Pages.
+node_modules/
+package.json
+package-lock.json
