@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Build Log</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#ebedef;--soft:#b6bec8;--teal:#4cf0e0;--orange:#f59847;--line:#252c35;--card:#161c24;--mb-teal:#4cf0e0;--mb-glass:rgba(14,18,23,.62);--mb-mono:'JetBrains Mono',ui-monospace,Menlo,monospace;--sys:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,system-ui,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:#0d1117;color:var(--ink);font-family:var(--sys);min-height:100svh;display:flex;flex-direction:column}
+#glow{position:fixed;inset:0;z-index:-1;pointer-events:none;background:
+  conic-gradient(from 118deg at 1.3% -6.9%, transparent 0deg, rgba(254,228,196,.1) 9deg, rgba(254,228,196,.28) 26deg, rgba(254,228,196,.1) 44deg, transparent 52deg),
+  radial-gradient(46vmax 82vmax at 110% 55%, rgba(76,240,224,.08), transparent 60%),#0d1117}
+#bar{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line);font:600 14px 'Archivo',sans-serif}
+#bar a{color:var(--soft);text-decoration:none}
+.mb-home{display:inline-flex;align-items:center;gap:6px;background:transparent;color:var(--mb-teal);border:1px solid rgba(76,240,224,.4);border-radius:8px;font:700 12px var(--mb-mono);padding:7px 13px;text-decoration:none;cursor:pointer}
+.mb-ver{position:fixed;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:900;font:600 10px var(--mb-mono);letter-spacing:.04em;color:var(--mb-teal);background:var(--mb-glass);border:1px solid rgba(76,240,224,.25);border-radius:999px;padding:4px 9px;backdrop-filter:blur(8px);cursor:pointer;user-select:none;opacity:.85}
+#mbToast{position:fixed;left:50%;bottom:calc(44px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:901;font:600 11px var(--mb-mono);letter-spacing:.04em;color:var(--mb-ink,#ebedef);background:rgba(16,21,28,.92);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:7px 12px;opacity:0;pointer-events:none;transition:opacity .2s}
+#mbToast.show{opacity:1}
+#bar .t{color:var(--ink)}
+.wrap{flex:1;max-width:520px;width:100%;margin:0 auto;padding:26px 18px 40px}
+h1{font-family:'Archivo',sans-serif;font-weight:800;font-size:22px}
+.sub{color:var(--soft);font-size:13px;margin:6px 0 20px}
+.log{position:relative;padding-left:20px}
+.log::before{content:"";position:absolute;left:5px;top:8px;bottom:8px;width:2px;background:linear-gradient(var(--teal),rgba(76,240,224,.08))}
+.entry{position:relative;margin-bottom:16px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 15px}
+.entry::before{content:"";position:absolute;left:-19px;top:18px;width:10px;height:10px;border-radius:50%;background:var(--teal);box-shadow:0 0 8px rgba(76,240,224,.6)}
+.entry.new::before{background:var(--orange);box-shadow:0 0 8px rgba(245,152,71,.6)}
+.entry .d{font:600 10.5px 'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--orange)}
+.entry h2{font-family:'Archivo',sans-serif;font-weight:800;font-size:15.5px;margin-top:4px}
+.entry p{color:var(--soft);font-size:13px;margin-top:4px;line-height:1.5}
+.foot{margin-top:26px;text-align:center;font:400 11px 'JetBrains Mono',monospace;color:var(--soft);opacity:.65}
+</style>
+</head>
+<body>
+<div id="glow"></div>
+<div id="bar"><a href="index.html" class="mb-home">&larr; home</a><span class="t">Build Log</span></div>
+<button class="mb-ver" id="mbVer" type="button">v1.2 &middot; Sep 26</button><div id="mbToast" role="status"></div>
+
+
+<div class="wrap">
+  <h1>What shipped, when</h1>
+  <div class="sub">Newest first. This list only grows.</div>
+  <div class="log" id="log"></div>
+  <div class="foot">updated every time something ships &middot; log r12 &middot; Sep 26</div>
+</div>
+
+<script>
+var LOG=[
+["Sep 26","Gather joins the phone","A holiday and party planner that lives on your phone and nowhere else. Add your people once, then plan the gifts and budget, draw names for a Secret Santa that never repeats last year, sort out who brings what, and play a few party games. Four themes: Halloween, Thanksgiving, birthdays and the winter holidays. It lives in the Tools folder."],
+["Sep 22","The home screen settles","Eight apps up top for the ones I want you to see first, and the four folders (Play, Learn, Make, Tools) as the bottom row. Everything else lives in a folder. The top eight will change as I do."],
+["Sep 22","Spectra, and a Tools folder","Spectra is a synesthesia instrument: play a note, capture the color and shape you see, and it tracks whether the same note always looks the same to you. It joins the phone in a new Tools folder alongside Reframe, LiftSafe and the Production Triangle."],
+["Sep 22","Folders on the bottom row","Play, Learn and Make now sit together across the bottom row, with the loose apps up top and Measure Up still in the corner."],
+["Sep 22","Bloom, and a Make folder","Bloom grows a plant out of numbers. Turn the dials for fullness, spread, height and droop, pick the colors, tap the canvas to plant where you touch, and a different baby's-breath-style plant grows one step at a time. Pigment and Bloom are grouped into a Make folder now."],
+["Sep 22","Haunt Inc. joins the phone","A cute-spooky haunted-house idle game where you are the ghost. It links to the live build on my Game Shelf. Star Stuff moved into the games folder to make room."],
+["Sep 22","A new home screen","The icons are grouped into folders now, with the ones I am proudest of loose on top. There is a living circuit-grid moving behind them, the whole screen tilts as you move the phone, and the light shifts with the time of day. The Build Log moved into Settings, under Software Update."],
+["Sep 21","Measure Up joins the phone","A music game that teaches school math: clocks, calendar, fractions, multiplication. You lead a band, and every member turns a subject into something you play. It links to the live build, so it is always current."],
+["Sep 21","Every app got the same chrome","Same type, same buttons, same home button and a version badge in every corner. Each game keeps its own world, but it all reads as one maker now. Fourteen apps touched in one pass."],
+["Sep 21","Every app now has a card","Tap any icon and you get the story first: what it is, why I made it, what I learned, screenshots, and how many kilobytes it really is. The button on the card opens the app. Icons now carry a color dot for what kind of thing they are."],
+["Sep 6","Nazca, an endless drawing canvas","Paper with no edges and no bottom. Draw, then zoom in and draw inside what you drew. Kid brushes and real tools in one app."],
+["Aug 27","The Upcard, SHARP and HARP","Play and learn blackjack with a coach that catches your mistakes. Plus a piano trainer and a harmonica trainer that light up the next note."],
+["Aug 20","The card room is complete","Texas Hold'em, Hearts, Spades, and Euchre join the table, all against the computer. Thirteen games now, every one playable solo."],
+["Aug 20","Poker deals in","Five-card draw against the bot: ante, swap up to three cards, then bet, call, or fold to the showdown."],
+["Aug 20","Card room: two new games, and it all moves","Rummy and Tonk join the table, and every card game now glides, deals, and flips its cards instead of popping."],
+["Aug 20","Sudoku, rebuilt","New engine: fresh puzzles at four levels, a daily with a streak, plus pencil marks, hints, and undo."],
+["Aug 20","LiftSafe forklift training","A forklift operator course from OSHA and NIOSH sources: pick your truck and learn to inspect, fuel, and drive it."],
+["Aug 20","The Production Triangle","Drag a point around the good-fast-cheap triangle and watch chasing one corner cost you the other two."],
+["Aug 20","Kinder, clearer, on your phone","Reframe flags jargon and blame in expert writing and suggests plainer wording. Eight professions, all on-device."],
+["Aug 19","Pigment: a color playground","A giant wheel to find and name colors, mix them, play color games, and check contrast. Built for my son."],
+["Aug 16","Five Letters, redesigned","Rebuilt from the layout up: fits every phone, cleaner tiles, daily word with streaks."],
+["Aug 16","The real mark on the deck","The card shuffle intro dropped its old GAME SHELF label for the aperture mark."],
+["Aug 16","Two new icons","Fresh tile art: a chihuahua jigsaw and a glowing Card Games deck."],
+["Aug 15","Two more games","Jigsaw cuts up your own photos; Five Letters is a daily word puzzle with streaks."],
+["Aug 15","Build log","This page. Shipping the build log is itself a build log entry."],
+["Aug 15","Brighter decks","A brightness pass so the aperture mark on the card backs reads clearly."],
+["Aug 15","33 rotating taglines","The home screen greets you differently every visit and every few seconds."],
+["Aug 15","About page","Who builds this and why: the photo, the story, and a live site-age counter."],
+["Aug 14","Brand on the cards","Every card back in every game now carries the aperture mark."],
+["Aug 14","Chess and checkers fixed","Checkers pieces were invisible with no color; fixed, and chess got tuned."],
+["Aug 14","Cover art","All five app tiles got real cover art with rounded icon masks."],
+["Aug 14","Solitaire dealt in","Klondike joins the card room."],
+["Aug 14","The card room opens","Blackjack, Gin Rummy, Go Fish, Old Maid, and War, all against the computer."],
+["Aug 14","Board games live","Chess with a ten-level engine and a blunder coach, plus checkers."],
+["Aug 14","motbuchanan.com is live","The site becomes a phone. Brick Breaker and Star Stuff playable on day one."]
+];
+var wrap=document.getElementById('log');
+LOG.forEach(function(e,i){
+  var d=document.createElement('div');
+  d.className='entry'+(i===0?' new':'');
+  d.innerHTML='<div class="d">'+e[0]+'</div><h2>'+e[1]+'</h2><p>'+e[2]+'</p>';
+  wrap.appendChild(d);
+});
+document.addEventListener('click',function(e){
+  var a=e.target&&e.target.closest?e.target.closest('a[href="index.html"]'):null;
+  if(a){e.preventDefault();try{if(window.parent!==window){parent.history.back();return;}}catch(err){}window.location.href='index.html';}
+},true);
+</script>
+<script>
+(function(){var t=document.getElementById("mbToast"),tm=0;document.getElementById("mbVer").onclick=function(){t.textContent="v1.1 loaded";t.classList.add("show");clearTimeout(tm);tm=setTimeout(function(){t.classList.remove("show");},1400);};})();
+</script>
+</body>
+</html>
