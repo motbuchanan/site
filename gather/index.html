@@ -42,6 +42,16 @@
     --bone:#eaf4ff; --bone-dim:#9db6cf; --primary:#4aa3ff; --primary-ink:#06121f;
     --accent:#57d6c4; --amber:#ffd98a; --danger:#e0596a; --glow:rgba(74,163,255,.30);
   }
+  [data-theme="easter"]{
+    --bg:#101d18; --bg2:#17332a; --panel:#14251f; --panel2:#1c332b; --line:#2b4a3e;
+    --bone:#f0f7f0; --bone-dim:#a3bfae; --primary:#f5a3c7; --primary-ink:#2a0f1c;
+    --accent:#8fd9a8; --amber:#ffd98a; --danger:#e0596a; --glow:rgba(245,163,199,.30);
+  }
+  [data-theme="nye"]{
+    --bg:#0b0f1e; --bg2:#141d3a; --panel:#101733; --panel2:#18224a; --line:#2a3660;
+    --bone:#f5f1e8; --bone-dim:#a3aac4; --primary:#ffd24a; --primary-ink:#1a1405;
+    --accent:#8f7aff; --amber:#ffb44d; --danger:#e0596a; --glow:rgba(255,210,74,.32);
+  }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{margin:0;height:100%;overflow-x:clip}
   body{
@@ -230,6 +240,44 @@
   .about .size{font:600 12px var(--mb-mono);color:var(--mb-teal)}
   .linkbtn{background:none;border:none;color:var(--bone-dim);font:inherit;text-decoration:underline;cursor:pointer;padding:0}
   #printsheet{display:none}
+  /* ---- Guess the ___ ---- */
+  .gwrap{position:fixed;inset:0;z-index:45;background:var(--bg);display:none;flex-direction:column}
+  .gwrap.open{display:flex}
+  body.gwplay .mb-ver{display:none}
+  .btn:disabled{opacity:.38;pointer-events:none}
+  .gwed{display:grid;place-items:center;margin:2px 0 10px}
+  .gwed svg{width:120px;height:auto;filter:drop-shadow(0 6px 16px rgba(0,0,0,.45))}
+  .gwed .who{font-family:var(--display);font-size:22px;margin-top:6px;text-align:center}
+  .gwrow{display:flex;align-items:center;gap:8px;margin:0 0 7px}
+  .gwrow .k{flex:0 0 76px;font:700 10px var(--mb-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--bone-dim)}
+  .gwrow .opts{flex:1;display:flex;gap:5px;flex-wrap:wrap;min-width:0}
+  .gwopt{background:var(--card);border:1px solid var(--line);color:var(--bone-dim);border-radius:999px;
+         padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer;line-height:1}
+  .gwopt[aria-pressed="true"]{border-color:var(--primary);color:var(--primary);background:color-mix(in srgb,var(--primary) 14%,transparent)}
+  .gwsw{width:22px;height:22px;border-radius:50%;padding:0;border:2px solid var(--line)}
+  .gwsw[aria-pressed="true"]{border-color:var(--primary);box-shadow:0 0 0 2px color-mix(in srgb,var(--primary) 40%,transparent)}
+  .gwtop{flex:0 0 auto;padding:calc(10px + env(safe-area-inset-top)) 14px 10px;border-bottom:1px solid var(--line);background:var(--card)}
+  .gwtop .r1{display:flex;align-items:center;gap:10px}
+  .gwtop .t{font-family:var(--display);font-size:19px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .gwx{background:none;border:1px solid var(--line);color:var(--bone-dim);border-radius:999px;padding:5px 11px;font-size:12px;font-weight:700;cursor:pointer}
+  .gwmode{margin-top:7px;font-size:13px;color:var(--bone-dim);line-height:1.35;min-height:34px}
+  .gwmode b{color:var(--primary)}
+  .gwgrid{flex:1 1 auto;overflow-y:auto;-webkit-overflow-scrolling:touch;display:grid;grid-template-columns:repeat(4,1fr);gap:7px;padding:10px 12px 12px;align-content:start}
+  .gwc{position:relative;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px 3px 3px;cursor:pointer;
+       display:flex;flex-direction:column;align-items:center;gap:1px;transition:transform .12s,opacity .18s;min-width:0}
+  .gwc svg{width:100%;height:auto;display:block;max-width:58px}
+  .gwc .nm{font-size:9.5px;font-weight:800;letter-spacing:.2px;color:var(--bone);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  .gwc.down{opacity:.26;transform:scale(.93)}
+  .gwc.down:after{content:"";position:absolute;inset:0;border-radius:12px;background:repeating-linear-gradient(45deg,rgba(0,0,0,.42) 0 6px,transparent 6px 12px)}
+  .gwc.pickme{border-color:var(--primary);box-shadow:0 0 0 2px var(--primary) inset,0 0 16px color-mix(in srgb,var(--primary) 45%,transparent)}
+  .gwbar{flex:0 0 auto;display:flex;gap:8px;padding:10px 12px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:var(--card)}
+  .gwbar .btn{flex:1;margin:0}
+  .gwcurtain{position:absolute;inset:0;background:var(--bg);display:grid;place-items:center;padding:24px;text-align:center;z-index:2}
+  .gwcurtain h4{font-family:var(--display);font-size:28px;margin:0 0 6px}
+  .gwcurtain p{color:var(--bone-dim);font-size:14px;margin:0 0 18px;line-height:1.45;max-width:300px}
+  .gwpeek{display:grid;place-items:center;margin:0 0 16px}
+  .gwpeek svg{width:104px;height:auto}
+  .gwpeek .nm{font-family:var(--display);font-size:22px;margin-top:4px}
   @media print{
     body.printing > *:not(#printsheet){display:none !important}
     body.printing{background:#fff !important;padding:0}
@@ -333,6 +381,15 @@
       </div>
     </div>
     <div class="card">
+      <div class="name" id="guessTitle">🎭 Guess the Guest</div>
+      <div class="meta">Two players, one phone. Ask out loud, flip down the ones it isn't.</div>
+      <div class="two" style="margin-top:12px">
+        <button class="btn" data-gw="family">Play with my people</button>
+        <button class="btn" data-gw="themed" id="gwThemedBtn">Play with characters</button>
+      </div>
+      <button class="btn ghost block" style="margin-top:8px" data-gwfaces>Set up family faces</button>
+    </div>
+    <div class="card">
       <div class="name" id="fortuneTitle">🔮 Fortune teller</div>
       <div class="meta">Pass it round. Tap for your fate.</div>
       <div class="fortune" id="fortune">Tap below to summon a fortune…</div>
@@ -351,26 +408,32 @@
 
 <nav><div class="navinner" id="nav">
   <button class="navbtn" data-tab="hub"><span class="ic" id="navHubIc">🕯️</span><span id="navHub">Haunt</span></button>
-  <button class="navbtn" data-tab="house"><span class="ic">🏚️</span><span id="navHouse">House</span></button>
-  <button class="navbtn" data-tab="treats"><span class="ic">🍬</span><span id="navTreats">Treats</span></button>
-  <button class="navbtn" data-tab="secret"><span class="ic">🎲</span><span id="navSecret">Secret</span></button>
-  <button class="navbtn" data-tab="potluck"><span class="ic">🍲</span><span id="navPotluck">Cauldron</span></button>
-  <button class="navbtn" data-tab="games"><span class="ic">👻</span><span>Games</span></button>
+  <button class="navbtn" data-tab="house"><span class="ic" id="navHouseIc">🏚️</span><span id="navHouse">House</span></button>
+  <button class="navbtn" data-tab="treats"><span class="ic" id="navTreatsIc">🍬</span><span id="navTreats">Treats</span></button>
+  <button class="navbtn" data-tab="secret"><span class="ic" id="navSecretIc">🎲</span><span id="navSecret">Secret</span></button>
+  <button class="navbtn" data-tab="potluck"><span class="ic" id="navPotluckIc">🍲</span><span id="navPotluck">Cauldron</span></button>
+  <button class="navbtn" data-tab="games"><span class="ic" id="navGamesIc">👻</span><span>Games</span></button>
 </div></nav>
 
 <div class="scrim" id="scrim"><div class="sheet" id="sheet"></div></div>
 <div class="toast" id="toast"></div>
-<button class="mb-ver" id="mbVer" type="button">v0.5.1 · Sep 26</button>
+<button class="mb-ver" id="mbVer" type="button">v0.7 · Sep 27</button>
+<div class="gwrap" id="gwrap">
+  <div class="gwtop"><div class="r1"><div class="t" id="gwTitle">Guess the Guest</div><button class="gwx" id="gwPeek">Peek</button><button class="gwx" id="gwQuit">Quit</button></div><div class="gwmode" id="gwMode"></div></div>
+  <div class="gwgrid" id="gwGrid"></div>
+  <div class="gwbar" id="gwBar"></div>
+  <div class="gwcurtain" id="gwCurtain" style="display:none"></div>
+</div>
 <div id="printsheet"></div>
 
 <script>
 "use strict";
 (function(){
-  var VERSION = "v0.5.1 · Sep 26";
+  var VERSION = "v0.7 · Sep 27";
   var KEY = "gather.v1";
   var THEMES = {
-    halloween:{ label:"Halloween", emoji:"🎃", date:"2026-10-31",
-      terms:{ eyebrow:"All Hallows' Eve", hub:"The Haunt", navHub:"Haunt", hubIc:"🕯️",
+    halloween:{ label:"Halloween", emoji:"🎃", md:[9,31],
+      terms:{ eyebrow:"All Hallows' Eve", hub:"The Haunt", navHub:"Haunt", hubIc:"🕯️", navIc:{house:"🏚️",treats:"🍬",secret:"🎲",potluck:"🍲",games:"👻"}, guessName:"Guess the Ghoul",
         house:"Household", treats:"Treats", treat:"treat", secret:"Secret Ghoul", navSecret:"Ghoul",
         potluck:"The Cauldron", navPotluck:"Cauldron", bingo:"Spooky Bingo", fortuneName:"Fortune teller",
         countLabel:"nights until the haunt", greeting:"The veil is thinning." },
@@ -378,8 +441,8 @@
       bingo:["Ghost","Witch","Pumpkin","Bat","Spider","Candy","Skeleton","Vampire","Zombie","Mummy","Cauldron","Broom","Black Cat","Full Moon","Cobweb","Potion","Goblin","Werewolf","Tombstone","Owl","Fangs","Lantern","Raven","Coffin","Spell","Bones","Slime","Shadow","Grave","Boo","Fright","Haunt","Trick","Scream","Creep","Cape"],
       fortunes:["A black cat crosses your path and drops a full-size candy bar.","You will be the last one brave enough to check the basement.","Beware: the doorbell rings, but no one is there. Only more candy.","Your costume will be mistaken for someone famous. You are not.","A ghost approves of your snack choices tonight.","The pumpkin you carved is judging you. Kindly.","You'll find the good candy at the bottom of the bowl.","Something wicked this way comes. It's just Grandma in a cloak.","The creaky stair knows your name. Step over it tonight.","Your candy trade will be legendary. Hold out for the chocolate."],
       wyr:[["Live in a haunted mansion (rent-free)","Live in a normal house with one friendly ghost roommate"],["Only eat candy corn for a month","Never eat chocolate again"],["Be able to talk to black cats","Be able to see ghosts (they're mostly boring)"],["Wear a costume every day for a year","Never wear a costume again"],["Carve 100 pumpkins in one night","Hand out candy to 1,000 trick-or-treaters"],["Have a broom that flies (walking speed)","Have a cauldron that makes any soup"],["Spend a night in a graveyard","Spend a night in an abandoned mall"],["Turn into a werewolf on full moons","Turn into a vampire but only at brunch"],["Know every scary movie ending in advance","Never be jump-scared again"],["Have cobwebs that clean themselves","Have a doorbell that plays your theme song"],["Trick","Treat, but you must share half"],["Own a talking skeleton (bad jokes only)","Own a silent, judgmental raven"]] },
-    thanksgiving:{ label:"Thanksgiving", emoji:"🦃", date:"2026-11-26",
-      terms:{ eyebrow:"Turkey Day", hub:"The Hearth", navHub:"Hearth", hubIc:"🔥",
+    thanksgiving:{ label:"Thanksgiving", emoji:"🦃", calc:"thanksgiving",
+      terms:{ eyebrow:"Turkey Day", hub:"The Hearth", navHub:"Hearth", hubIc:"🔥", navIc:{house:"🏡",treats:"🎁",secret:"🎲",potluck:"🥗",games:"🦃"}, guessName:"Guess the Guest",
         house:"The Table", treats:"Gifts", treat:"gift", secret:"Secret Gifter", navSecret:"Gifter",
         potluck:"The Spread", navPotluck:"Spread", bingo:"Harvest Bingo", fortuneName:"Wishbone wisdom",
         countLabel:"days until the feast", greeting:"The table is being set." },
@@ -387,8 +450,8 @@
       bingo:["Turkey","Pie","Gravy","Stuffing","Corn","Leaves","Football","Nap","Cranberry","Yams","Rolls","Family","Pilgrim","Harvest","Feast","Thanks","Pumpkin","Cider","Wishbone","Seconds","Leftovers","Parade","Cornucopia","Squash","Butter","Casserole","Toast","Grateful","Apron","Oven","Platter","Carving","Biscuit","Maple","Acorn","Hearth"],
       fortunes:["You will go back for thirds. No regrets.","The wishbone is yours this year.","You'll be trusted with the gravy. Handle it well.","A nap of legendary quality awaits after the meal.","Someone will ask for your recipe. Guard it.","You get the last roll.","Peace at the table lasts the whole meal this year.","You will win the argument by simply passing the pie.","Your seat has the best view of the dessert table. Use it.","Leftovers will taste even better tomorrow. Science agrees."],
       wyr:[["Only eat stuffing forever","Only eat mashed potatoes forever"],["Cook the whole feast alone","Do all the dishes alone"],["Sit at the kids' table for life","Give the toast every single year"],["Pumpkin pie for every dessert","Never have pie again"],["A turkey that cooks itself","A table that sets itself"],["Eat dinner at noon","Eat dinner at 9pm"],["Watch only the parade","Watch only the football"],["Gravy on everything","Cranberry sauce on everything"],["Host every year","Travel every year"],["One giant meal","Grazing all day long"],["Tell everyone what you're thankful for (honestly)","Hear what everyone is thankful for about you"],["Leftover sandwich for a week","Fresh feast but no leftovers ever"]] },
-    birthday:{ label:"Birthday", emoji:"🎂", date:null,
-      terms:{ eyebrow:"The Big Day", hub:"Party HQ", navHub:"Party", hubIc:"🎉",
+    birthday:{ label:"Birthday", emoji:"🎂",
+      terms:{ eyebrow:"The Big Day", hub:"Party HQ", navHub:"Party", hubIc:"🎉", navIc:{house:"🏠",treats:"🎁",secret:"🎲",potluck:"🍰",games:"🎈"}, guessName:"Guess the Guest",
         house:"Guests", treats:"Gifts", treat:"gift", secret:"Secret Gifter", navSecret:"Gifter",
         potluck:"The Spread", navPotluck:"Spread", bingo:"Party Bingo", fortuneName:"Birthday oracle",
         countLabel:"days until the big day", greeting:"Someone's getting older. Gracefully." },
@@ -396,16 +459,34 @@
       bingo:["Cake","Balloon","Candle","Wish","Present","Confetti","Party Hat","Streamer","Sprinkles","Card","Song","Surprise","Piñata","Frosting","Gift Bag","Sparkler","Cheers","Games","Dance","Photo","Slice","Bow","Ribbon","Guest","Wrapping","Wishlist","Toast","Crown","Milestone","Memory","Laughter","Invite","Banner","Favors","Punch","Playlist"],
       fortunes:["Your wish comes true, but not the way you expect.","You get the corner piece with the most frosting.","The best gift is saved for last.","You will win every party game tonight.","Someone secretly loves your present most of all.","The song will be sung slightly off-key, with great love.","You blow out every candle in one breath.","This year is your year. The cake says so.","A photo from tonight becomes a favorite for years.","The playlist lands perfectly. Take the credit."],
       wyr:[["A surprise party every year","Never a surprise again"],["Cake for breakfast all week","Ice cream for dinner all week"],["Unwrap gifts in front of everyone","Open them all alone at midnight"],["Your age in candles (always)","One candle but it never blows out first try"],["A piñata full of your favorite candy","A gift bag you can't peek into for a week"],["Everyone sings loudly and badly","No song at all"],["One huge gift","Ten small mystery gifts"],["Birthday on a weekend forever","Birthday off work/school forever"],["A party with everyone you know","Dinner with your five favorites"],["Relive your best birthday","Fast-forward to your next one"],["Balloons that never pop","Streamers that hang themselves"],["Frosting only","Cake only"]] },
-    winter:{ label:"Winter Holiday", emoji:"❄️", date:"2026-12-25",
-      terms:{ eyebrow:"The Long Night", hub:"The Hearth", navHub:"Hearth", hubIc:"🕯️",
+    winter:{ label:"Winter Holiday", emoji:"❄️", md:[11,25],
+      terms:{ eyebrow:"The Long Night", hub:"The Hearth", navHub:"Hearth", hubIc:"🕯️", navIc:{house:"🏡",treats:"🎁",secret:"🎅",potluck:"🍗",games:"❄️"}, guessName:"Guess the Elf",
         house:"The List", treats:"Gifts", treat:"gift", secret:"Secret Santa", navSecret:"Santa",
         potluck:"The Feast", navPotluck:"Feast", bingo:"Snowfall Bingo", fortuneName:"Snow globe says",
         countLabel:"sleeps until the morning", greeting:"The lights are going up." },
       empty:{ house:"No one on the list yet." },
       bingo:["Snowflake","Tree","Gift","Snowman","Star","Candle","Lights","Cocoa","Sleigh","Bells","Mistletoe","Ornament","Stocking","Cookies","Carol","Wreath","Reindeer","Scarf","Fireplace","Gingerbread","Snowball","Frost","Gift Bow","Mitten","Icicle","Eggnog","Ribbon","Chimney","Tinsel","Garland","Sled","Pinecone","Holly","Angel","North Star","Snow Day"],
       fortunes:["You'll get exactly what's on your list. Every bit of it.","First tracks in fresh snow are yours tomorrow.","The cocoa is best the moment you stop reading this.","You will win the ugly-sweater contest without trying.","A gift you gave becomes someone's favorite thing.","Snow day. Trust the fortune.","The last cookie has your name on it.","Warmth finds you, wherever you are this season.","Your wrapping will be too beautiful to open. They'll open it anyway.","The twinkle lights untangle themselves this year. Believe."],
-      wyr:[["Snow every day of December","One perfect snow day you choose"],["Wrap 100 gifts","Untangle 100 strings of lights"],["Cocoa that never goes cold","Cookies that never run out"],["Sing one carol at every door","Wear jingle bells all month"],["Open one gift early","Save them all and open twice as slowly"],["A real tree that never sheds","A fake tree that smells real"],["Build the world's best snowman","Win every snowball fight"],["Fireplace but no TV","TV fireplace but real cocoa"],["Give perfect gifts, get socks","Get perfect gifts, give socks"],["Sled to work/school all winter","Ice skate everywhere indoors"],["It's the morning forever","It's the night before forever"],["Gingerbread house you can't eat","Ugly cookies that taste incredible"]] }
-  };
+      wyr:[["Snow every day of December","One perfect snow day you choose"],["Wrap 100 gifts","Untangle 100 strings of lights"],["Cocoa that never goes cold","Cookies that never run out"],["Sing one carol at every door","Wear jingle bells all month"],["Open one gift early","Save them all and open twice as slowly"],["A real tree that never sheds","A fake tree that smells real"],["Build the world's best snowman","Win every snowball fight"],["Fireplace but no TV","TV fireplace but real cocoa"],["Give perfect gifts, get socks","Get perfect gifts, give socks"],["Sled to work/school all winter","Ice skate everywhere indoors"],["It's the morning forever","It's the night before forever"],["Gingerbread house you can't eat","Ugly cookies that taste incredible"]] },
+      easter:{ label:"Easter", emoji:"🐣", calc:"easter",
+      terms:{ eyebrow:"Easter Sunday", hub:"The Garden", navHub:"Garden", hubIc:"🌷", navIc:{house:"🪹",treats:"🧺",secret:"🐰",potluck:"🥞",games:"🐣"}, guessName:"Guess the Bunny",
+        house:"The Nest", treats:"Baskets", treat:"basket", secret:"Secret Bunny", navSecret:"Bunny",
+        potluck:"The Brunch", navPotluck:"Brunch", bingo:"Spring Bingo", fortuneName:"The egg says",
+        countLabel:"mornings until the hunt", greeting:"Something is hatching." },
+      empty:{ house:"Nobody in the nest yet." },
+      bingo:["Egg","Bunny","Chick","Basket","Tulip","Daffodil","Lamb","Carrot","Jelly Bean","Chocolate","Ribbon","Bonnet","Grass","Dye","Hunt","Sunrise","Lily","Butterfly","Nest","Duckling","Pastel","Bow","Bloom","Hyacinth","Peep","Clover","Robin","Sprout","Garden","Brunch","Ham","Deviled Egg","Hot Cross","Parade","Bee","Spring Rain"],
+      fortunes:["The best egg is hidden somewhere nobody thought to look. You will find it.","A jelly bean flavor you hate will land in your palm. Be brave.","You get the big chocolate one. Nobody contests it.","The first flower you see today was waiting for you.","Someone will lose an egg in this yard until August. It will not be yours.","Your basket ends up heavier than you expected.","You will be handed a duckling-shaped something and you will keep it for years.","The morning is cold and the afternoon is perfect. Dress in layers.","A photo taken today ends up on somebody's fridge.","You will eat ham for four days and enjoy at least three of them."],
+      wyr:[["Hunt eggs in the rain","Hunt eggs at night with a flashlight"],["Only chocolate in your basket","Only jelly beans in your basket"],["Find every egg first","Hide the eggs so well nobody finds them"],["Wear the fanciest hat at brunch","Wear bunny ears all day"],["A basket that refills once","A basket twice the size, one time only"],["Dye a hundred eggs","Hide a hundred eggs"],["Peeps that never go stale","Chocolate that never melts"],["Brunch at sunrise","Brunch at sunset"],["Be the Easter Bunny for a day","Be the one who gets surprised"],["Ham forever","Lamb forever"],["A yard full of tulips","A yard full of butterflies"],["Win the egg hunt every year","Watch a kid win it for the first time"]] },
+    nye:{ label:"New Year's Eve", emoji:"🎉", md:[11,31],
+      terms:{ eyebrow:"The Last Night", hub:"The Countdown", navHub:"Countdown", hubIc:"🕛", navIc:{house:"📜",treats:"🎁",secret:"🔁",potluck:"🍾",games:"🎆"}, guessName:"Guess the Guest",
+        house:"The Guest List", treats:"Favors", treat:"favor", secret:"Secret Swap", navSecret:"Swap",
+        potluck:"The Spread", navPotluck:"Spread", bingo:"Midnight Bingo", fortuneName:"Next year says",
+        countLabel:"days until midnight", greeting:"One year closing, one opening." },
+      empty:{ house:"Nobody on the guest list yet." },
+      bingo:["Confetti","Balloon","Toast","Midnight","Clock","Fireworks","Sparkler","Streamer","Countdown","Resolution","Ball Drop","Party Hat","Noisemaker","Glitter","Cheers","Song","Calendar","New Year","Horn","Ribbon","Bubbles","Disco","Dance","Rooftop","Skyline","Star","Sequins","Bowtie","Tiara","Snack","Playlist","Photo","Hug","Countdown Clock","Sparkling Cider","Fresh Start"],
+      fortunes:["The resolution you keep this year is not the one you announce tonight.","You will be mid-sentence when the countdown starts. Finish it anyway.","Somebody hugs you at 12:01 and means it.","The last song of the night becomes the song of your year.","You will stay up later than you planned and be glad.","Next year brings one thing you have wanted for a while. It arrives quietly.","The photo nobody posed for is the one worth keeping.","You start something in the first week that lasts all year.","A person you have not talked to in a while gets back in touch.","Tonight you are exactly where you should be."],
+      wyr:[["Stay up for midnight every year","Sleep through it and wake up rested"],["Host the party every year","Be a guest every year"],["Know every resolution you will keep","Know which one you will break"],["Fireworks from a rooftop","Fireworks from a quiet backyard"],["Relive this past year","Fast forward through the next one"],["A midnight toast with a hundred people","A midnight toast with one"],["Confetti that cleans itself up","A playlist that never has a bad song"],["The loudest party on the block","The coziest night in"],["Remember every New Year perfectly","Get a fresh start with no memory of the last one"],["Start the year with a big change","Start it with everything exactly as it is"],["Be the one who makes the toast","Be the one who starts the dancing"],["Sparklers in the snow","Fireworks on a warm night"]] },
+};
   var STATUS = [["idea","Idea"],["got","Got it"],["ready","Ready"],["given","Given"]];
   var CATS = ["Mains","Sides","Desserts","Drinks","Supplies"];
   var NEUTRAL = ["🧑","👩","👨","👧","👦","🧒","👵","👴","🧔","👩‍🦰","👱‍♀️","🧑‍🦱","🐶","🐱"];
@@ -413,7 +494,9 @@
     halloween:{ faces:["🎃","👻","🦇","🕷️","💀","🧙","🐈‍⬛","🦉","🧛","🧟","🍬","🌙"], extraLabel:"Costume idea", extraPh:"Ghostbuster", extraIcon:"🎭", favLabel:"Favorite candy", favPh:"Reese's", favIcon:"🍬" },
     thanksgiving:{ faces:["🦃","🍂","🥧","🌽","🍁","🍽️","🍗","🌻","🧑‍🍳","🍎"], extraLabel:"Famous for bringing", extraPh:"Her pecan pie", extraIcon:"🥧", favLabel:"Favorite treat", favPh:"Pumpkin pie", favIcon:"🥧" },
     birthday:{ faces:["🎂","🎈","🎁","🎉","⭐","🥳","🍰","🎊","👑","🦄"], extraLabel:"Party job", extraPh:"Cake cutter", extraIcon:"🎉", favLabel:"Favorite treat", favPh:"Funfetti", favIcon:"🍰" },
-    winter:{ faces:["❄️","🎄","🎁","⛄","✨","🕯️","🦌","🎅","🍪","🧦","🧣"], extraLabel:"Holiday tradition", extraPh:"Reads the story", extraIcon:"🕯️", favLabel:"Favorite treat", favPh:"Peppermint bark", favIcon:"🍪" }
+    winter:{ faces:["❄️","🎄","🎁","⛄","✨","🕯️","🦌","🎅","🍪","🧦","🧣"], extraLabel:"Holiday tradition", extraPh:"Reads the story", extraIcon:"🕯️", favLabel:"Favorite treat", favPh:"Peppermint bark", favIcon:"🍪" },
+    easter:{ faces:["🐰","🐣","🥚","🌷","🐑","🦋","🌸","🐤","🧺","🌈"], extraLabel:"Basket wish", extraPh:"The big chocolate bunny", extraIcon:"🧺", favLabel:"Favorite candy", favPh:"Jelly beans", favIcon:"🍬" },
+    nye:{ faces:["🎉","🥂","✨","🎊","🕛","🎵","🤳","🎈","🌟","💃"], extraLabel:"Midnight job", extraPh:"Starts the countdown", extraIcon:"🎉", favLabel:"Favorite snack", favPh:"Shrimp cocktail", favIcon:"🍿" }
   };
 
   /* ---------- Storage (guarded, versioned, forward-migrating) ---------- */
@@ -424,8 +507,27 @@
       secret:{participants:[],exclusions:[],assignments:null,revealed:{},relaxed:false,banked:false}, created:Date.now() };
   }
   function yearOf(date){ return date? String(date).slice(0,4) : String(new Date().getFullYear()); }
+  function iso(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+  function nthWeekday(y,mo,wd,n){ var f=new Date(y,mo,1); return new Date(y,mo,1+((wd-f.getDay()+7)%7)+(n-1)*7); }
+  function easterDay(y){ /* anonymous Gregorian algorithm */
+    var a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),
+        h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451);
+    return new Date(y,Math.floor((h+l-7*m+114)/31)-1,((h+l-7*m+114)%31)+1); }
+  function occDateFor(theme,y){
+    var t=THEMES[theme]; if(!t) return null;
+    if(t.calc==="easter") return easterDay(y);
+    if(t.calc==="thanksgiving") return nthWeekday(y,10,4,4);
+    if(t.md) return new Date(y,t.md[0],t.md[1]);
+    return null; }
+  /* the next time this holiday comes around, so a default date never goes stale */
+  function defaultDate(theme){
+    var now=new Date(), today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+    for(var y=today.getFullYear(); y<=today.getFullYear()+2; y++){
+      var d=occDateFor(theme,y); if(d && d>=today) return iso(d); }
+    return ""; }
   function fresh(){
-    var o=newOcc("halloween","Halloween 2026",THEMES.halloween.date);
+    var d0=defaultDate("halloween");
+    var o=newOcc("halloween","Halloween "+yearOf(d0), d0);
     return { v:3, tab:"hub", people:[], occasions:[o], currentId:o.id, drawHistory:[] };
   }
   function moveCostumes(s){
@@ -445,7 +547,7 @@
     if(!s || typeof s!=="object") return fresh();
     if(s.v===3){
       if(!s.people)s.people=[]; s.people.forEach(fixPerson);
-      if(!s.occasions||!s.occasions.length){ var o0=newOcc("halloween","Halloween 2026",THEMES.halloween.date); s.occasions=[o0]; s.currentId=o0.id; }
+      if(!s.occasions||!s.occasions.length){ var dd=defaultDate("halloween"); var o0=newOcc("halloween","Halloween "+yearOf(dd), dd); s.occasions=[o0]; s.currentId=o0.id; }
       s.occasions.forEach(fixOcc);
       if(!s.drawHistory)s.drawHistory=[];
       moveCostumes(s);
@@ -454,7 +556,7 @@
     }
     // v1 / v2 -> v3: wrap the single dataset into one occasion
     var theme=(s.theme&&THEMES[s.theme])? s.theme : "halloween"; var th=THEMES[theme];
-    var date=(s.occDates&&s.occDates[theme])||th.date||null;
+    var date=(s.occDates&&s.occDates[theme])||defaultDate(theme)||null;
     var yr=yearOf(date);
     var o=newOcc(theme, th.label+" "+yr, date);
     o.treats=s.treats||[]; o.potluck=s.potluck||[]; o.overallBudget=Number(s.overallBudget)||0;
@@ -522,7 +624,9 @@
       halloween:{ glyphs:["🦇"], glyphChance:.12, dot:"255,150,60", dir:-1, sway:.4, sizes:[2,4] },
       thanksgiving:{ glyphs:["🍂","🍁"], glyphChance:.55, dot:"224,161,58", dir:1, sway:1.2, sizes:[2,3] },
       birthday:{ glyphs:["🎈"], glyphChance:.18, dot:"255,210,74", dir:-1, sway:.6, sizes:[2,4] },
-      winter:{ glyphs:["❄"], glyphChance:.5, dot:"210,230,255", dir:1, sway:.9, sizes:[1.5,3] }
+      winter:{ glyphs:["❄"], glyphChance:.5, dot:"210,230,255", dir:1, sway:.9, sizes:[1.5,3] },
+      easter:{ glyphs:["🌸","🦋"], glyphChance:.45, dot:"245,163,199", dir:1, sway:1.1, sizes:[2,3.5] },
+      nye:{ glyphs:["✨"], glyphChance:.3, dot:"255,210,74", dir:1, sway:.7, sizes:[1.5,3.5] }
     };
     function theme(){ var o=occ(); return (o&&o.theme)||"halloween"; }
     function resize(){ if(!canvas) return; dpr=Math.min(window.devicePixelRatio||1,1.5); W=window.innerWidth; H=window.innerHeight; canvas.width=W*dpr; canvas.height=H*dpr; canvas.style.width=W+"px"; canvas.style.height=H+"px"; if(ctx) ctx.setTransform(dpr,0,0,dpr,0,0); }
@@ -583,8 +687,12 @@
     $("gamesEyebrow").textContent = th.terms.eyebrow;
     $("navHub").textContent = th.terms.navHub;
     $("navHubIc").textContent = th.terms.hubIc;
+    var ni=th.terms.navIc||{};
+    ["house","treats","secret","potluck","games"].forEach(function(k){ var el=$("nav"+k.charAt(0).toUpperCase()+k.slice(1)+"Ic"); if(el && ni[k]) el.textContent=ni[k]; });
     $("bingoTitle").textContent = th.emoji+" "+th.terms.bingo;
     $("fortuneTitle").textContent = "🔮 "+th.terms.fortuneName;
+    $("guessTitle").textContent = "🎭 "+th.terms.guessName;
+    $("gwThemedBtn").textContent = "Play with the "+th.label+" cast";
     $("mark").innerHTML = markSVG((o&&o.theme)||"halloween");
     var meta=document.querySelector('meta[name="theme-color"]');
     if(meta){ meta.setAttribute("content", getComputedStyle(document.documentElement).getPropertyValue("--bg").trim()||"#160d1f"); }
@@ -592,8 +700,8 @@
     FX.start(); FX.reseed();
   }
   function markSVG(theme){
-    var primary=({halloween:"#ff7518",thanksgiving:"#c8622a",birthday:"#ff5da2",winter:"#4aa3ff"})[theme]||"#ff7518";
-    var amber=({halloween:"#ffb44d",thanksgiving:"#e0a13a",birthday:"#ffd24a",winter:"#ffd98a"})[theme]||"#ffb44d";
+    var primary=({halloween:"#ff7518",thanksgiving:"#c8622a",birthday:"#ff5da2",winter:"#4aa3ff",easter:"#f5a3c7",nye:"#ffd24a"})[theme]||"#ff7518";
+    var amber=({halloween:"#ffb44d",thanksgiving:"#e0a13a",birthday:"#ffd24a",winter:"#ffd98a",easter:"#8fd9a8",nye:"#8f7aff"})[theme]||"#ffb44d";
     return '<svg width="34" height="34" viewBox="0 0 34 34" fill="none" aria-hidden="true">'
       + '<circle cx="17" cy="17" r="16" fill="'+primary+'" opacity="0.16"/>'
       + '<path d="M17 5c4 0 6 3 6 6 0 2-1 3-1 5 3 1 5 4 5 7a10 10 0 0 1-20 0c0-3 2-6 5-7 0-2-1-3-1-5 0-3 2-6 6-6z" fill="'+primary+'"/>'
@@ -630,7 +738,7 @@
     var isNew=!o;
     var base=occ();
     var draft = o? JSON.parse(JSON.stringify(o)) : { id:uid(), name:"", theme:(base&&base.theme)||"halloween", date:"" };
-    if(isNew){ draft.date = THEMES[draft.theme].date || ""; draft.name = THEMES[draft.theme].label+" "+yearOf(draft.date||null); }
+    if(isNew){ draft.date = defaultDate(draft.theme); draft.name = THEMES[draft.theme].label+" "+yearOf(draft.date||null); }
     openSheet(function(sheet){
       sheet.innerHTML='<h3>'+(isNew?"New occasion":"Edit occasion")+'</h3>'
         +'<label class="f">Theme</label><div class="themegrid" id="o-theme">'+Object.keys(THEMES).map(function(k){ return '<button data-th="'+k+'" aria-pressed="'+(k===draft.theme)+'">'+THEMES[k].emoji+' '+THEMES[k].label+'</button>'; }).join("")+'</div>'
@@ -644,7 +752,7 @@
         draft.theme=b.getAttribute("data-th");
         this.querySelectorAll("button").forEach(function(x){ x.setAttribute("aria-pressed", x===b); });
         var nameEl=sheet.querySelector("#o-name"), dateEl=sheet.querySelector("#o-date");
-        if(isNew || nameEl.value.indexOf(prevLabel)===0){ dateEl.value=THEMES[draft.theme].date||dateEl.value||""; nameEl.value=THEMES[draft.theme].label+" "+yearOf(dateEl.value||null); }
+        if(isNew || nameEl.value.indexOf(prevLabel)===0){ dateEl.value=defaultDate(draft.theme)||dateEl.value||""; nameEl.value=THEMES[draft.theme].label+" "+yearOf(dateEl.value||null); }
       });
       sheet.querySelector("#o-save").addEventListener("click",function(){
         draft.name=sheet.querySelector("#o-name").value.trim(); draft.date=sheet.querySelector("#o-date").value||null;
@@ -926,7 +1034,7 @@
 
   /* ---------- Sample ---------- */
   function loadSample(){
-    var o=occ(); if(!o){ var n=newOcc("halloween","Halloween 2026",THEMES.halloween.date); state.occasions.push(n); state.currentId=n.id; o=n; }
+    var o=occ(); if(!o){ var ds=defaultDate("halloween"); var n=newOcc("halloween","Halloween "+yearOf(ds), ds); state.occasions.push(n); state.currentId=n.id; o=n; }
     var s=[
       {id:uid(),sample:true,name:"Ruby",emoji:"👧",kind:"house",birthday:"Oct 12",favorites:"Sour Patch",shirt:"S",shoe:"4",dietary:"",allergies:"",notes:"",budget:30,wishlist:[{text:"Light-up broom",done:false},{text:"Spell book journal",done:false}],history:[{year:"2025",occasion:"Halloween 2025",item:"Glow wand",cost:12}]},
       {id:uid(),sample:true,name:"Theo",emoji:"👦",kind:"house",birthday:"Mar 3",favorites:"Kit Kat",shirt:"M",shoe:"9",dietary:"",allergies:"Peanuts",notes:"",budget:40,wishlist:[{text:"Fog machine",done:false}],history:[{year:"2025",occasion:"Halloween 2025",item:"Skeleton gloves",cost:9}]},
@@ -1159,7 +1267,7 @@
         +'<path d="M50 104 q6 -8 12 0 q6 8 12 0 q6 -8 12 0 q6 8 12 0" stroke="'+eye+'" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="75" cy="92" r="10" fill="'+glow+'" opacity="'+(lit?"0.9":"0.4")+'"/></svg>';
     }
     /* every other theme: a plain lantern, frame and glow in the theme's own colors */
-    var C={thanksgiving:["#c8622a","#e0a13a"],birthday:["#ff5da2","#ffd24a"],winter:["#4aa3ff","#ffd98a"]}[th]||["#4cf0e0","#ffd24a"];
+    var C={thanksgiving:["#c8622a","#e0a13a"],birthday:["#ff5da2","#ffd24a"],winter:["#4aa3ff","#ffd98a"],easter:["#f5a3c7","#ffd98a"],nye:["#ffd24a","#fff0b8"]}[th]||["#4cf0e0","#ffd24a"];
     var frame=lit?C[0]:"#4a4a55", flame=lit?C[1]:"#3a3a44", core=lit?"#fff4d0":"#55555f";
     return '<svg width="150" height="150" viewBox="0 0 96 96" aria-hidden="true">'
       +(lit?'<defs><radialGradient id="lglow" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="'+C[1]+'" stop-opacity="0.75"/><stop offset="0.45" stop-color="'+C[1]+'" stop-opacity="0.22"/><stop offset="1" stop-color="'+C[1]+'" stop-opacity="0"/></radialGradient></defs><circle cx="48" cy="54" r="44" fill="url(#lglow)"/>':"")
@@ -1218,6 +1326,270 @@
   function drawBingo(){ if(!bingoState){ newBingo(); return; } $("bingo").innerHTML=bingoState.cells.map(function(c,i){ var free=c==="FREE"; return '<div class="cell'+(free?" free":"")+(bingoState.daub[i]&&!free?" daub":"")+'" data-cell="'+i+'">'+esc(free?"★ FREE":c)+'</div>'; }).join(""); }
   var wyrIdx=-1;
   function nextWyr(){ var deck=T().wyr; wyrIdx=(wyrIdx+1+Math.floor(Math.random()*(deck.length-1)))%deck.length; var q=deck[wyrIdx]; $("wyrA").textContent=q[0]; $("wyrB").textContent=q[1]; }
+  /* ---------- Guess the ___ (two players, one phone) ---------- */
+  var GW_SKIN=["#f6cfae","#d9a06b","#8d5a3a"];
+  var GW_HAIRC={black:"#23201f",blonde:"#e8c25a",brown:"#7a4a26",red:"#c4502a",white:"#e8e4dd"};
+  var GW_EYE={brown:"#5a3a1e",blue:"#3a6fc4",green:"#3f8a4f"};
+  var GW_BROW={black:"#23201f",brown:"#5a3318",red:"#9c3c1c",blonde:"#a8843a",white:"#8d8a82"};
+  var GW_NOSE=["#e3b58e","#c4884f","#74462b"];
+  /* 24 attribute vectors, balanced so every fair question splits the board */
+  var GW_V=[
+   {sex:"f",skin:2,hair:"black", style:"long", eyes:"brown",hat:0,glasses:0,beard:0,earrings:1,smile:1,bignose:0},
+   {sex:"m",skin:0,hair:"white", style:"short",eyes:"blue", hat:0,glasses:1,beard:1,earrings:0,smile:0,bignose:1},
+   {sex:"f",skin:1,hair:"white", style:"long", eyes:"brown",hat:0,glasses:1,beard:0,earrings:1,smile:1,bignose:0},
+   {sex:"m",skin:1,hair:"black", style:"short",eyes:"brown",hat:1,glasses:0,beard:1,earrings:0,smile:0,bignose:1},
+   {sex:"f",skin:2,hair:"red",   style:"long", eyes:"green",hat:0,glasses:0,beard:0,earrings:0,smile:1,bignose:0},
+   {sex:"m",skin:0,hair:"blonde",style:"short",eyes:"blue", hat:0,glasses:0,beard:0,earrings:0,smile:1,bignose:0},
+   {sex:"f",skin:0,hair:"brown", style:"short",eyes:"brown",hat:1,glasses:0,beard:0,earrings:0,smile:0,bignose:0},
+   {sex:"m",skin:2,hair:"black", style:"short",eyes:"brown",hat:0,glasses:1,beard:0,earrings:0,smile:1,bignose:0},
+   {sex:"f",skin:1,hair:"blonde",style:"long", eyes:"blue", hat:0,glasses:1,beard:0,earrings:0,smile:0,bignose:1},
+   {sex:"m",skin:1,hair:"none",  style:"short",eyes:"brown",hat:0,glasses:0,beard:1,earrings:0,smile:0,bignose:1},
+   {sex:"f",skin:0,hair:"red",   style:"short",eyes:"blue", hat:0,glasses:0,beard:0,earrings:1,smile:0,bignose:0},
+   {sex:"m",skin:0,hair:"none",  style:"short",eyes:"green",hat:0,glasses:0,beard:0,earrings:0,smile:0,bignose:1},
+   {sex:"f",skin:2,hair:"brown", style:"long", eyes:"brown",hat:1,glasses:0,beard:0,earrings:0,smile:1,bignose:0},
+   {sex:"m",skin:1,hair:"white", style:"short",eyes:"brown",hat:0,glasses:0,beard:1,earrings:0,smile:0,bignose:0},
+   {sex:"f",skin:2,hair:"blonde",style:"short",eyes:"blue", hat:0,glasses:1,beard:0,earrings:1,smile:0,bignose:0},
+   {sex:"m",skin:2,hair:"brown", style:"short",eyes:"brown",hat:1,glasses:1,beard:0,earrings:0,smile:1,bignose:0},
+   {sex:"f",skin:0,hair:"white", style:"short",eyes:"green",hat:0,glasses:1,beard:0,earrings:0,smile:1,bignose:1},
+   {sex:"m",skin:0,hair:"red",   style:"short",eyes:"brown",hat:1,glasses:0,beard:1,earrings:0,smile:0,bignose:0},
+   {sex:"f",skin:1,hair:"black", style:"long", eyes:"green",hat:0,glasses:0,beard:0,earrings:0,smile:0,bignose:1},
+   {sex:"m",skin:2,hair:"none",  style:"short",eyes:"brown",hat:0,glasses:0,beard:0,earrings:1,smile:1,bignose:0},
+   {sex:"f",skin:1,hair:"red",   style:"short",eyes:"brown",hat:0,glasses:0,beard:0,earrings:0,smile:1,bignose:1},
+   {sex:"m",skin:1,hair:"blonde",style:"short",eyes:"blue", hat:1,glasses:0,beard:0,earrings:0,smile:1,bignose:0},
+   {sex:"f",skin:0,hair:"brown", style:"long", eyes:"blue", hat:0,glasses:0,beard:0,earrings:1,smile:0,bignose:0},
+   {sex:"m",skin:0,hair:"none",  style:"short",eyes:"brown",hat:0,glasses:1,beard:1,earrings:0,smile:1,bignose:0}];
+  /* themed casts. index order matches GW_V, so f/m alternates */
+  var GW_NAMES={
+    halloween:["Vampira","Grimsby","Morticia","Wolfram","Elvira","Jekyll","Raven","Boris","Morgana","Igor","Wednesday","Draco","Sable","Mortimer","Lenore","Ozric","Nyx","Fang","Thistle","Gorm","Willow","Vlad","Seraphine","Crow"],
+    thanksgiving:["Ruth","Gus","Della","Amos","Hattie","Cyrus","Nell","Otis","Opal","Homer","Ada","Wendell","Pearl","Silas","Iris","Barnaby","Clara","Ambrose","Etta","Jasper","Mabel","Walt","Fern","Roscoe"],
+    birthday:["Pip","Milo","Suki","Dash","Coco","Finn","Lulu","Rex","Bex","Ozzy","Kiki","Theo","Nova","Ace","Zuzu","Gil","Poppy","Jax","Mimi","Roo","Tilly","Bo","Sadie","Wes"],
+    winter:["Holly","Nick","Noelle","Rudy","Merry","Jack","Clementine","Kris","Ginger","Bram","Ivy","Yule","Star","Balthazar","Carol","Gabriel","Juniper","Flint","Belle","Casper","Robin","Nikolai","Snowdrop","Hugo"],
+    easter:["Clover","Pip","Daisy","Hollis","Bluebell","Jasper","Tulip","Barnaby","Fern","Rowan","Poppy","Linus","Sorrel","Bram","Marigold","Wren","Iris","Thistle","Mabel","Flint","Posy","Basil","Hazel","Ambrose"],
+    nye:["Vega","Sterling","Astra","Duke","Velvet","Chance","Luna","Rex","Bijou","Ace","Cleo","Monty","Stella","Cassius","Ruby","Felix","Noir","Griff","Coco","Dash","Sable","Vance","Lux","Orson"]};
+  function gwNames(theme){ return GW_NAMES[theme]||GW_NAMES.birthday; }
+  function gwFace(c){
+    var sk=GW_SKIN[c.skin], hc=GW_HAIRC[c.hair]||null;
+    var s='<svg viewBox="0 0 70 78" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">';
+    s+='<circle cx="14" cy="42" r="5" fill="'+sk+'"/><circle cx="56" cy="42" r="5" fill="'+sk+'"/>';
+    if(c.earrings) s+='<circle cx="14" cy="48" r="2.2" fill="#f4c542"/><circle cx="56" cy="48" r="2.2" fill="#f4c542"/>';
+    s+='<ellipse cx="35" cy="42" rx="22" ry="25" fill="'+sk+'"/>';
+    if(hc){
+      if(c.style==="long") s+='<path d="M13 40 Q10 76 20 74 L20 46 Q20 22 35 22 Q50 22 50 46 L50 74 Q60 76 57 40 Q57 14 35 13 Q13 14 13 40Z" fill="'+hc+'"/>';
+      else s+='<path d="M13 38 Q13 14 35 13 Q57 14 57 38 Q57 27 48 25 Q38 22 26 26 Q15 29 13 38Z" fill="'+hc+'"/>';
+    }
+    if(c.hat){
+      if(hc) s+='<path d="M13 33 Q13 40 17 42 L21 42 Q19 36 19 33Z" fill="'+hc+'"/><path d="M57 33 Q57 40 53 42 L49 42 Q51 36 51 33Z" fill="'+hc+'"/>';
+      var hat=(c.hatC||"#3f6f4f"), brim=(c.hatB||"#2c5039");
+      s+='<path d="M12 28 Q12 12 35 11 Q58 12 58 28 L58 31 L12 31 Z" fill="'+hat+'"/><rect x="8" y="29" width="54" height="5" rx="2.5" fill="'+brim+'"/>';
+    }
+    var ey=GW_EYE[c.eyes]||"#5a3a1e";
+    s+='<circle cx="27" cy="40" r="3.4" fill="#fff"/><circle cx="43" cy="40" r="3.4" fill="#fff"/>';
+    s+='<circle cx="27" cy="40.5" r="1.9" fill="'+ey+'"/><circle cx="43" cy="40.5" r="1.9" fill="'+ey+'"/>';
+    s+='<circle cx="27.6" cy="39.8" r="0.6" fill="#fff"/><circle cx="43.6" cy="39.8" r="0.6" fill="#fff"/>';
+    var bw=GW_BROW[c.hair]||"#6a5a4a";
+    s+='<rect x="23" y="33.5" width="8" height="1.8" rx="0.9" fill="'+bw+'"/><rect x="39" y="33.5" width="8" height="1.8" rx="0.9" fill="'+bw+'"/>';
+    if(c.glasses) s+='<g stroke="#2b2b33" stroke-width="1.8" fill="none"><circle cx="27" cy="40" r="6"/><circle cx="43" cy="40" r="6"/><line x1="33" y1="40" x2="37" y2="40"/><line x1="21" y1="40" x2="15" y2="38"/><line x1="49" y1="40" x2="55" y2="38"/></g>';
+    var ns=GW_NOSE[c.skin];
+    s+= c.bignose ? '<ellipse cx="35" cy="48" rx="4.6" ry="3.6" fill="'+ns+'" stroke="rgba(0,0,0,.22)" stroke-width="0.8"/>'
+                  : '<ellipse cx="35" cy="48" rx="2.5" ry="2" fill="'+ns+'" stroke="rgba(0,0,0,.18)" stroke-width="0.7"/>';
+    s+= c.smile ? '<path d="M28 55 Q35 61 42 55" stroke="#8d3a3a" stroke-width="2.2" fill="none" stroke-linecap="round"/>'
+                : '<line x1="29.5" y1="56.5" x2="40.5" y2="56.5" stroke="#8d3a3a" stroke-width="2.2" stroke-linecap="round"/>';
+    if(c.beard){ var bc=hc||"#56463a";
+      s+='<path d="M17 46 Q18 68 35 68 Q52 68 53 46 Q53 60 44 62 L42 53 Q35 56 28 53 L26 62 Q17 60 17 46Z" fill="'+bc+'"/>';
+      s+='<path d="M26 51.5 Q35 47.5 44 51.5 Q40 49 35 49 Q30 49 26 51.5Z" fill="'+bc+'"/>'; }
+    return s+'</svg>';
+  }
+  var GW_HATS={halloween:["#5a2d82","#3d1d59"],thanksgiving:["#8a4b1e","#5e3213"],birthday:["#c8437a","#8f2e55"],
+               winter:["#a8332f","#7a2320"],easter:["#7fbf8a","#568f61"],nye:["#c9a227","#8f7318"]};
+  function gwHat(theme){ return GW_HATS[theme]||GW_HATS.birthday; }
+  /* deterministic face for a household person, seeded from their id */
+  function gwHash(str){ var h=2166136261; for(var i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=(h*16777619)>>>0; } return h>>>0; }
+  function gwSeeded(person){
+    var h=gwHash(String(person.id)+"|"+String(person.name||""));
+    function bit(n){ return (h>>>n)&1; }
+    function pick(arr,n){ return arr[(h>>>n)%arr.length]; }
+    return { sex: bit(0)?"m":"f", skin:(h>>>1)%3, hair: pick(["black","brown","blonde","red","white","none"],3),
+             style: bit(7)?"long":"short", eyes: pick(["brown","blue","green"],9),
+             hat: bit(12), glasses: bit(13), beard: bit(14)&&bit(0), earrings: bit(15)&&!bit(0),
+             smile: bit(16), bignose: bit(17) };
+  }
+  var GW=null;
+  function gwBuild(mode){
+    var o=occ(), theme=(o&&o.theme)||"halloween", hats=gwHat(theme), names=gwNames(theme), cast=[], filled=0;
+    if(mode==="family"){
+      var ppl=state.people.slice();
+      ppl.forEach(function(pn){
+        var v=(pn.gwFace&&typeof pn.gwFace==="object")? pn.gwFace : gwSeeded(pn);
+        var c={}; for(var k in v) c[k]=v[k];
+        c.n=pn.name; c.hatC=hats[0]; c.hatB=hats[1]; cast.push(c);
+      });
+      var min=12;
+      if(cast.length<min){
+        var used={}; cast.forEach(function(c){ used[c.n.toLowerCase()]=1; });
+        for(var i=0;i<GW_V.length && cast.length<min;i++){
+          var nm=names[i]; if(used[nm.toLowerCase()]) continue;
+          var c2={}; for(var k2 in GW_V[i]) c2[k2]=GW_V[i][k2];
+          c2.n=nm; c2.hatC=hats[0]; c2.hatB=hats[1]; cast.push(c2); filled++;
+        }
+      }
+      if(cast.length>24) cast=cast.slice(0,24);
+    } else {
+      for(var j=0;j<GW_V.length;j++){
+        var c3={}; for(var k3 in GW_V[j]) c3[k3]=GW_V[j][k3];
+        c3.n=names[j]; c3.hatC=hats[0]; c3.hatB=hats[1]; cast.push(c3);
+      }
+    }
+    return {cast:cast, filled:filled};
+  }
+  function gwOpen(mode){
+    if(mode==="family" && state.people.length<2){ toast("Add a couple of people first."); setTab("house"); return; }
+    var built=gwBuild(mode);
+    if(built.cast.length<4){ toast("Not enough faces for a game."); return; }
+    GW={ mode:mode, cast:built.cast, names:{A:"Player 1",B:"Player 2"},
+         secret:{A:-1,B:-1}, flips:{A:{},B:{}}, turn:"A", sub:"pick", guessIx:-1, over:false };
+    $("gwTitle").textContent=T().terms.guessName;
+    $("gwrap").classList.add("open"); document.body.classList.add("gwplay"); document.body.style.overflow="hidden";
+    gwGrid();
+    if(built.filled) toast("Short roster, so "+built.filled+" "+T().label+" characters filled the board.");
+    gwCurtain("Hand the phone to","<b>"+esc(GW.names.A)+"</b> picks first. Nobody else should look.","I'm ready",function(){ GW.sub="pick"; gwPaint(); });
+  }
+  function gwClose(){ $("gwrap").classList.remove("open"); document.body.classList.remove("gwplay"); document.body.style.overflow=""; GW=null; }
+  function gwOther(x){ return x==="A"?"B":"A"; }
+  function gwGrid(){
+    $("gwGrid").innerHTML=GW.cast.map(function(c,i){
+      return '<button class="gwc" data-gwc="'+i+'">'+gwFace(c)+'<span class="nm">'+esc(c.n)+'</span></button>';
+    }).join("");
+  }
+  function gwCurtain(title,html,btn,fn){
+    var el=$("gwCurtain");
+    el.innerHTML='<div><h4>'+esc(title)+'</h4><p>'+html+'</p><button class="btn primary" id="gwGo">'+esc(btn)+'</button></div>';
+    el.style.display="grid";
+    el.querySelector("#gwGo").addEventListener("click",function(){ el.style.display="none"; fn(); });
+  }
+  function gwPaint(){
+    if(!GW) return;
+    var me=GW.turn, them=gwOther(me), mine=GW.flips[me];
+    GW.cast.forEach(function(c,i){
+      var el=$("gwGrid").querySelector('[data-gwc="'+i+'"]'); if(!el) return;
+      el.classList.toggle("down", GW.sub!=="pick" && !!mine[i]);
+      el.classList.toggle("pickme", GW.guessIx===i);
+    });
+    var left=0; GW.cast.forEach(function(c,i){ if(!mine[i]) left++; });
+    var m=$("gwMode"), bar=$("gwBar"), nm=esc(GW.names[me]);
+    $("gwPeek").style.display = (GW.sub==="pick"||GW.secret[me]<0) ? "none" : "";
+    if(GW.sub==="pick"){
+      m.innerHTML='<b>'+nm+'</b>, secretly tap the character <b>you</b> are. Keep it covered.';
+      bar.innerHTML='';
+    } else if(GW.sub==="ask"){
+      m.innerHTML='<b>'+nm+'</b>: ask one out-loud yes or no question, then tap every face it rules out. <b>'+left+'</b> still standing.';
+      bar.innerHTML='<button class="btn" data-gwa="pass">Done, pass over</button><button class="btn primary" data-gwa="guess">I\'ll guess</button>';
+    } else if(GW.sub==="guess"){
+      m.innerHTML='<b>'+nm+'</b>, tap who you think <b>'+esc(GW.names[them])+'</b> is. Wrong and you lose.';
+      bar.innerHTML='<button class="btn" data-gwa="cancel">Never mind</button>'+(GW.guessIx>=0?'<button class="btn primary" data-gwa="lock">Lock in '+esc(GW.cast[GW.guessIx].n)+'</button>':'');
+    }
+  }
+  function gwTap(i){
+    if(!GW||GW.over) return;
+    if(GW.sub==="pick"){
+      GW.secret[GW.turn]=i;
+      if(GW.turn==="A"){
+        GW.turn="B";
+        gwCurtain("Hand the phone to","<b>"+esc(GW.names.B)+"</b> picks next. "+esc(GW.names.A)+", look away.","I'm ready",function(){ GW.sub="pick"; gwPaint(); });
+      } else {
+        GW.turn="A"; GW.sub="ask";
+        gwCurtain("Both picked","Hand it to <b>"+esc(GW.names.A)+"</b>. Ask your first question out loud.","Start",function(){ gwPaint(); });
+      }
+      gwPaint(); return;
+    }
+    if(GW.sub==="ask"){ var f=GW.flips[GW.turn]; if(f[i]) delete f[i]; else f[i]=1; gwPaint(); return; }
+    if(GW.sub==="guess"){ GW.guessIx=(GW.guessIx===i?-1:i); gwPaint(); return; }
+  }
+  function gwAct(a){
+    if(!GW) return;
+    if(a==="pass"){
+      var nxt=gwOther(GW.turn);
+      gwCurtain("Pass the phone","Over to <b>"+esc(GW.names[nxt])+"</b>.","I'm "+GW.names[nxt],function(){ GW.turn=nxt; GW.sub="ask"; GW.guessIx=-1; gwPaint(); });
+      return;
+    }
+    if(a==="guess"){ GW.sub="guess"; GW.guessIx=-1; gwPaint(); return; }
+    if(a==="cancel"){ GW.sub="ask"; GW.guessIx=-1; gwPaint(); return; }
+    if(a==="lock"){
+      var me=GW.turn, them=gwOther(me), right=(GW.guessIx===GW.secret[them]);
+      GW.over=true;
+      var who=GW.cast[GW.secret[them]];
+      if(right){ FX.burst();
+        gwCurtain("Got them","<b>"+esc(GW.names[me])+"</b> guessed <b>"+esc(who.n)+"</b> and was right.","Play again",function(){ gwRestart(); });
+      } else {
+        gwCurtain("Not them","<b>"+esc(GW.names[me])+"</b> guessed wrong. "+esc(GW.names[them])+" was <b>"+esc(who.n)+"</b> all along.","Play again",function(){ gwRestart(); });
+      }
+      return;
+    }
+    if(a==="peek"){
+      var ix=GW.secret[GW.turn]; if(ix<0) return;
+      var c=GW.cast[ix], back=GW.sub;
+      gwCurtain("You are","<div class=\"gwpeek\">"+gwFace(c)+"<div class=\"nm\">"+esc(c.n)+"</div></div>Cover the screen before you hand it on.","Hide it",function(){ GW.sub=back; gwPaint(); });
+    }
+  }
+  var GW_FIELDS=[
+    {k:"skin",  lbl:"Skin",   sw:GW_SKIN, vals:[0,1,2]},
+    {k:"hair",  lbl:"Hair",   sw:["#23201f","#7a4a26","#e8c25a","#c4502a","#e8e4dd",null], vals:["black","brown","blonde","red","white","none"]},
+    {k:"style", lbl:"Length", vals:["short","long"], names:["Short","Long"]},
+    {k:"eyes",  lbl:"Eyes",   sw:["#5a3a1e","#3a6fc4","#3f8a4f"], vals:["brown","blue","green"]},
+    {k:"sex",   lbl:"Reads",  vals:["f","m"], names:["She","He"]},
+    {k:"hat",   lbl:"Hat",    vals:[0,1], names:["No","Yes"]},
+    {k:"glasses",lbl:"Glasses",vals:[0,1], names:["No","Yes"]},
+    {k:"beard", lbl:"Beard",  vals:[0,1], names:["No","Yes"]},
+    {k:"earrings",lbl:"Earrings",vals:[0,1],names:["No","Yes"]},
+    {k:"smile", lbl:"Mouth",  vals:[0,1], names:["Straight","Smiling"]},
+    {k:"bignose",lbl:"Nose",  vals:[0,1], names:["Small","Big"]}];
+  function gwFaceSheet(startIx){
+    var ppl=state.people.slice();
+    if(!ppl.length){ toast("Add some people first."); setTab("house"); return; }
+    var ix=Math.max(0,Math.min(startIx||0,ppl.length-1));
+    var o=occ(), hats=gwHat((o&&o.theme)||"halloween");
+    openSheet(function(sheet){
+      function cur(){ var pn=ppl[ix];
+        if(!pn.gwFace || typeof pn.gwFace!=="object") pn.gwFace=gwSeeded(pn);
+        return pn; }
+      function paint(){
+        var pn=cur(), v=pn.gwFace, prev={};
+        for(var kk in v) prev[kk]=v[kk];
+        prev.hatC=hats[0]; prev.hatB=hats[1];
+        var rows=GW_FIELDS.map(function(f){
+          var opts=f.vals.map(function(val,vi){
+            var on=(v[f.k]===val);
+            if(f.sw){ var col=f.sw[vi];
+              return '<button class="gwopt gwsw" data-gwf="'+f.k+'" data-gwv="'+vi+'" aria-pressed="'+on+'" title="'+esc(String(val))+'" style="background:'+(col||"transparent")+';'+(col?"":"color:var(--bone-dim);width:auto;border-radius:999px;padding:5px 10px")+'">'+(col?"":"None")+'</button>'; }
+            return '<button class="gwopt" data-gwf="'+f.k+'" data-gwv="'+vi+'" aria-pressed="'+on+'">'+esc(f.names?f.names[vi]:String(val))+'</button>';
+          }).join("");
+          return '<div class="gwrow"><div class="k">'+esc(f.lbl)+'</div><div class="opts">'+opts+'</div></div>';
+        }).join("");
+        sheet.innerHTML='<h3>Family faces</h3><div class="meta" style="font-size:13px;margin:-4px 0 8px">Make each face look like them. Saved for next time.</div>'
+          +'<div class="gwed">'+gwFace(prev)+'<div class="who">'+esc(pn.name)+'</div></div>'
+          +rows
+          +'<div class="two" style="margin-top:12px"><button class="btn" id="gwf-prev"'+(ix<=0?" disabled":"")+'>Back</button><button class="btn" id="gwf-next"'+(ix>=ppl.length-1?" disabled":"")+'>Next person</button></div>'
+          +'<div class="two" style="margin-top:8px"><button class="btn ghost" id="gwf-rand">Shuffle this face</button><button class="btn primary" id="gwf-done">Done</button></div>'
+          +'<div class="foot" style="text-align:center;margin-top:8px">'+(ix+1)+' of '+ppl.length+'</div>';
+        sheet.querySelectorAll("[data-gwf]").forEach(function(b){
+          b.addEventListener("click",function(){
+            var f=null, key=b.getAttribute("data-gwf");
+            GW_FIELDS.forEach(function(x){ if(x.k===key) f=x; });
+            if(!f) return;
+            v[key]=f.vals[+b.getAttribute("data-gwv")];
+            if(key==="hair" && v.hair==="none") v.style="short";
+            save(); paint();
+          });
+        });
+        sheet.querySelector("#gwf-prev").addEventListener("click",function(){ if(ix>0){ ix--; paint(); } });
+        sheet.querySelector("#gwf-next").addEventListener("click",function(){ if(ix<ppl.length-1){ ix++; paint(); } });
+        sheet.querySelector("#gwf-rand").addEventListener("click",function(){
+          pn.gwFace=gwSeeded({id:uid(),name:pn.name}); save(); paint(); });
+        sheet.querySelector("#gwf-done").addEventListener("click",function(){ save(); closeSheet(); toast("Faces saved."); });
+      }
+      paint();
+    });
+  }
+  function gwRestart(){ var m=GW?GW.mode:"themed"; gwClose(); gwOpen(m); }
   function renderGames(){ drawBingo(); }
 
   /* ---------- Print ---------- */
@@ -1264,7 +1636,7 @@
         ? 'On iPhone: open Gather on its own, tap Share, then Add to Home Screen. Safari can clear a website\'s saved data after about a week away, but a home-screen app keeps its own. That copy has separate storage on iPhone, so start there, or move what you entered with Save backup and Restore.'
         : 'In Chrome: open Gather on its own, tap the menu, then Add to Home screen. It opens like an app and keeps the same data you already entered.';
       sheet.innerHTML='<div class="about"><h3>Gather</h3>'
-        +'<p>Plan any holiday or party from one phone: your people, the gifts and budget, a Secret Santa draw, who brings what, and a few party games. Four themes, and every occasion keeps its own lists.</p>'
+        +'<p>Plan any holiday or party from one phone: your people, the gifts and budget, a Secret Santa draw, who brings what, and four party games including a two-player guessing game you can play with your own family. Six themes, and every occasion keeps its own lists.</p>'
         +'<div class="k">Where your stuff lives</div><p>Only on this device. No account, no cloud, nothing sent anywhere. Save a backup file from the Hub whenever you like.</p>'
         +'<div class="k">Keep it on your home screen</div><p>'+home+'</p>'
         +(framed?'<a class="btn block" href="./" target="_blank" rel="noopener" style="margin-bottom:10px">Open Gather on its own</a>':'')
@@ -1331,6 +1703,12 @@
     if(t.closest("[data-secret-redraw]")){ doDraw(); return; }
     if(t.closest("[data-secret-clear]")){ var o7=occ(); if(o7){ o7.secret.assignments=null; o7.secret.revealed={}; o7.secret.banked=false; } save(); renderSecret(); return; }
     if((m=t.closest("[data-reveal]"))){ revealSheet(m.getAttribute("data-reveal")); return; }
+    if(t.closest("[data-gwfaces]")){ gwFaceSheet(0); return; }
+    if((m=t.closest("[data-gw]"))){ gwOpen(m.getAttribute("data-gw")); return; }
+    if((m=t.closest("[data-gwc]"))){ gwTap(+m.getAttribute("data-gwc")); return; }
+    if((m=t.closest("[data-gwa]"))){ gwAct(m.getAttribute("data-gwa")); return; }
+    if(t.closest("#gwQuit")){ gwClose(); return; }
+    if(t.closest("#gwPeek")){ gwAct("peek"); return; }
     if(t.closest("[data-bingo-new]")){ newBingo(); return; }
     if(t.closest("[data-bingo-print]")){ printBingo(); return; }
     if((m=t.closest("[data-cell]"))){ var i=+m.getAttribute("data-cell"); if(bingoState && bingoState.cells[i]!=="FREE"){ bingoState.daub[i]=!bingoState.daub[i]; drawBingo(); } return; }
