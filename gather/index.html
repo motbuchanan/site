@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="halloween">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#160d1f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Gather">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<title>Gather</title>
+<style>
+  :root{
+    --bg:#160d1f; --bg2:#241033; --panel:#1f1430; --panel2:#2a1b3d; --line:#3a2a4d;
+    --bone:#f3e7cf; --bone-dim:#b9a98c; --primary:#ff7518; --primary-ink:#20120a;
+    --accent:#38c9a0; --amber:#ffb44d; --danger:#d64b3f; --radius:16px;
+    --glow:rgba(255,117,24,.35);
+    --display:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    --ui:'Archivo',system-ui,-apple-system,sans-serif;
+    --mb-ink:#ebedef; --mb-soft:#c2c9d1; --mb-dim:#7d8794;
+    --mb-teal:#4cf0e0; --mb-orange:#f59847;
+    --mb-glass:rgba(14,18,23,.62); --mb-line:rgba(255,255,255,.12);
+    --mb-ui:'Archivo',system-ui,-apple-system,sans-serif;
+    --mb-mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  }
+  [data-theme="thanksgiving"]{
+    --bg:#1b1410; --bg2:#2c1d12; --panel:#241a12; --panel2:#31241a; --line:#463424;
+    --bone:#f4e9d6; --bone-dim:#bda986; --primary:#c8622a; --primary-ink:#1c1008;
+    --accent:#8a9a3a; --amber:#e0a13a; --danger:#b23b2e; --glow:rgba(200,98,42,.32);
+  }
+  [data-theme="birthday"]{
+    --bg:#160f22; --bg2:#221641; --panel:#1e1633; --panel2:#2a2048; --line:#3b2f5e;
+    --bone:#f6efff; --bone-dim:#b6a9cf; --primary:#ff5da2; --primary-ink:#2a0a1a;
+    --accent:#43c6ff; --amber:#ffd24a; --danger:#e0466a; --glow:rgba(255,93,162,.30);
+  }
+  [data-theme="winter"]{
+    --bg:#0c1622; --bg2:#12263a; --panel:#122132; --panel2:#1a3047; --line:#264056;
+    --bone:#eaf4ff; --bone-dim:#9db6cf; --primary:#4aa3ff; --primary-ink:#06121f;
+    --accent:#57d6c4; --amber:#ffd98a; --danger:#e0596a; --glow:rgba(74,163,255,.30);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%;overflow-x:clip}
+  body{
+    font-family:var(--ui); color:var(--bone);
+    background:
+      radial-gradient(120% 70% at 50% -10%, var(--bg2), transparent 60%),
+      radial-gradient(90% 60% at 100% 0%, color-mix(in srgb, var(--primary) 14%, transparent), transparent 55%),
+      var(--bg);
+    background-attachment:fixed;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:112px;
+  }
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+  .wrap{max-width:640px;margin:0 auto;padding:0 16px;position:relative;z-index:2}
+  #fx{position:fixed;inset:0;z-index:0;pointer-events:none}
+  .fog{position:fixed;z-index:0;pointer-events:none;filter:blur(46px);opacity:.5;border-radius:50%}
+  .fog.a{width:120vw;height:44vh;left:-30vw;bottom:-16vh;background:radial-gradient(closest-side, color-mix(in srgb,var(--primary) 12%, transparent), transparent);animation:fogA 26s ease-in-out infinite alternate}
+  .fog.b{width:100vw;height:36vh;right:-30vw;bottom:-10vh;background:radial-gradient(closest-side, color-mix(in srgb,var(--accent) 9%, transparent), transparent);animation:fogB 34s ease-in-out infinite alternate}
+  @keyframes fogA{from{transform:translateX(-4vw)}to{transform:translateX(7vw)}}
+  @keyframes fogB{from{transform:translateX(5vw)}to{transform:translateX(-6vw)}}
+  header{position:sticky;top:0;z-index:30;padding:12px 0 8px;
+    background:linear-gradient(var(--bg), color-mix(in srgb,var(--bg) 82%, transparent));
+    backdrop-filter:blur(8px);}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .brand{display:flex;align-items:center;gap:9px;min-width:0}
+  .mark{flex:none;animation:flick 3.4s ease-in-out infinite}
+  @keyframes flick{0%,100%{filter:drop-shadow(0 0 6px var(--glow))}42%{filter:drop-shadow(0 0 13px var(--glow))}58%{filter:drop-shadow(0 0 4px var(--glow))}}
+  .brandtext{min-width:0}
+  .brand{cursor:pointer}
+  .brandtext h1{font-family:var(--mb-ui);font-weight:800;font-size:22px;letter-spacing:-.02em;margin:0;line-height:1}
+  .brandtext .sub{font:600 10.5px var(--mb-mono);color:var(--bone-dim);letter-spacing:.08em;text-transform:uppercase;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:52vw}
+
+
+  .occasion{margin-top:10px;display:flex;gap:8px;align-items:center;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+  .occasion::-webkit-scrollbar{display:none}
+  .chip{flex:none;border:1px solid var(--line);background:var(--panel);color:var(--bone-dim);
+    padding:7px 13px;border-radius:999px;font-size:13px;font-weight:600;cursor:pointer;display:flex;gap:6px;align-items:center;max-width:60vw}
+  .chip span.nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .chip[aria-pressed="true"]{color:var(--primary-ink);background:var(--primary);border-color:var(--primary)}
+  .chip.new{border-style:dashed;color:var(--bone)}
+  main{padding-top:14px}
+  .panel{display:none;animation:fade .25s ease;padding-bottom:12px}
+  .panel.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .eyebrow{font:700 10.5px var(--mb-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--primary);margin-bottom:4px}
+  .phead{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin:2px 0 12px}
+  .phead h2{font-family:var(--display);font-size:28px;margin:0;font-weight:700;letter-spacing:.3px;text-shadow:0 0 22px var(--glow)}
+  .phead p{margin:4px 0 0;color:var(--bone-dim);font-size:13px}
+  .phead .actions{display:flex;gap:8px;align-items:center;flex:none}
+  .card{background:linear-gradient(var(--panel),var(--panel2));border:1px solid var(--line);
+    border-radius:var(--radius);padding:14px;margin-bottom:12px;box-shadow:0 10px 26px rgba(0,0,0,.28)}
+  .row{display:flex;gap:12px;align-items:center}
+  .avatar{width:46px;height:46px;flex:none;border-radius:50%;display:grid;place-items:center;font-size:24px;
+    background:color-mix(in srgb,var(--primary) 20%, var(--panel));border:1px solid var(--line)}
+  .grow{flex:1;min-width:0}
+  .name{font-weight:700;font-size:16px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .tag{font:700 9.5px var(--mb-mono);letter-spacing:.08em;text-transform:uppercase;padding:3px 7px;border-radius:6px;
+    background:color-mix(in srgb,var(--accent) 22%, transparent);color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 40%,transparent)}
+  .tag.guest{background:color-mix(in srgb,var(--amber) 20%, transparent);color:var(--amber);border-color:color-mix(in srgb,var(--amber) 40%,transparent)}
+  .meta{color:var(--bone-dim);font-size:12.5px;margin-top:5px;display:flex;gap:6px;flex-wrap:wrap}
+  .pill{background:var(--bg2);border:1px solid var(--line);border-radius:999px;padding:2px 9px;font-size:11.5px}
+  .pill.warn{color:var(--danger);border-color:color-mix(in srgb,var(--danger) 50%,transparent)}
+  .pill.good{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 50%,transparent)}
+  .banner{margin:0 0 12px;border:1px dashed var(--primary);background:color-mix(in srgb,var(--primary) 12%,var(--panel));border-radius:14px;padding:12px}
+  .banner .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .count{position:relative;text-align:center;padding:22px 14px 18px;overflow:hidden;cursor:pointer}
+  .count .n{font-family:var(--display);font-size:64px;font-weight:700;line-height:1;text-shadow:0 0 34px var(--glow)}
+  .count .l{font:600 11px var(--mb-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--bone-dim);margin-top:7px}
+  .count .d{font-size:13px;color:var(--bone-dim);margin-top:3px}
+  .count .occname{font-family:var(--display);font-size:20px;margin-top:8px}
+  .hubgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .hubcard{background:linear-gradient(var(--panel),var(--panel2));border:1px solid var(--line);border-radius:14px;padding:12px;cursor:pointer;text-align:left;min-width:0;overflow-wrap:anywhere;color:var(--bone)}
+  .hubcard .t{font:600 10.5px var(--mb-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--bone-dim);display:flex;justify-content:space-between;align-items:center}
+  .hubcard .v{font-family:var(--display);font-size:21px;font-weight:700;margin-top:6px}
+  .hubcard .s{font-size:12px;color:var(--bone-dim);margin-top:3px;min-height:15px}
+  .minibar{height:6px;border-radius:999px;background:var(--bg2);overflow:hidden;border:1px solid var(--line);margin-top:8px}
+  .minibar > span{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--primary))}
+  .minibar.over > span{background:var(--danger)}
+  button{font-family:inherit}
+  .btn{border:1px solid var(--line);background:var(--panel2);color:var(--bone);
+    padding:12px 16px;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;display:inline-flex;gap:8px;align-items:center;justify-content:center;text-decoration:none}
+  .btn:active{transform:scale(.98)}
+  .btn.primary{background:var(--primary);color:var(--primary-ink);border-color:var(--primary);box-shadow:0 4px 22px var(--glow)}
+  .btn.ghost{background:transparent}
+  .btn.block{width:100%}
+  .btn.sm{padding:8px 12px;font-size:13px;border-radius:10px}
+  .btn.danger{color:var(--danger);border-color:color-mix(in srgb,var(--danger) 50%,transparent);background:transparent}
+  .iconbtn{border:1px solid var(--line);background:var(--panel2);color:var(--bone-dim);width:36px;height:36px;border-radius:10px;font-size:16px;cursor:pointer;display:grid;place-items:center;flex:none}
+  .addbar{margin:6px 0 10px;display:flex;flex-direction:column;gap:8px}
+  .two{display:flex;gap:10px}.two>*{flex:1;min-width:0}
+  .empty{text-align:center;padding:34px 18px;color:var(--bone-dim)}
+  .empty .big{font-size:44px;filter:saturate(.9)}
+  .empty h3{font-family:var(--display);color:var(--bone);font-size:20px;margin:10px 0 4px}
+  .empty p{margin:0 0 16px}
+  .stat{display:flex;gap:10px;margin-bottom:12px}
+  .stat .box{flex:1;background:linear-gradient(var(--panel),var(--panel2));border:1px solid var(--line);border-radius:14px;padding:11px 12px;text-align:center;min-width:0}
+  .stat .n{font-family:var(--display);font-size:22px;font-weight:700}
+  .stat .l{font:600 10px var(--mb-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--bone-dim);margin-top:3px}
+  .bar{height:9px;border-radius:999px;background:var(--bg2);overflow:hidden;border:1px solid var(--line);margin:4px 0 2px}
+  .bar > span{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--primary))}
+  .over > span{background:var(--danger)}
+  .statuses{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
+  .status{font-size:12px;font-weight:700;padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:var(--bg2);color:var(--bone-dim);cursor:pointer}
+  .status[aria-pressed="true"]{color:var(--primary-ink);background:var(--primary);border-color:var(--primary)}
+  .scrim{position:fixed;inset:0;background:rgba(6,3,10,.66);backdrop-filter:blur(3px);z-index:50;display:none;align-items:flex-end;justify-content:center}
+  .scrim.open{display:flex}
+  .sheet{width:100%;max-width:640px;max-height:92vh;overflow:auto;background:linear-gradient(var(--panel),var(--bg));
+    border:1px solid var(--line);border-bottom:none;border-radius:22px 22px 0 0;padding:16px 16px 26px;
+    box-shadow:0 -20px 60px rgba(0,0,0,.5);animation:up .28s cubic-bezier(.2,.8,.2,1)}
+  @keyframes up{from{transform:translateY(20px);opacity:.6}to{transform:none;opacity:1}}
+  .sheet h3{font-family:var(--display);font-size:22px;margin:2px 0 14px}
+  label.f{display:block;font:600 10.5px var(--mb-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--bone-dim);margin:14px 0 6px}
+  input,select,textarea{width:100%;font-family:inherit;font-size:16px;color:var(--bone);background:var(--bg2);
+    border:1px solid var(--line);border-radius:11px;padding:11px 12px}
+  textarea{min-height:64px;resize:vertical}
+  .emojigrid{display:flex;gap:7px;flex-wrap:wrap}
+  .emojigrid button{width:42px;height:42px;font-size:22px;border-radius:11px;border:1px solid var(--line);background:var(--bg2);cursor:pointer}
+  .emojigrid button[aria-pressed="true"]{border-color:var(--primary);background:color-mix(in srgb,var(--primary) 22%,transparent)}
+  .themegrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .themegrid button{padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--bg2);color:var(--bone);font-weight:700;cursor:pointer;text-align:left}
+  .themegrid button[aria-pressed="true"]{border-color:var(--primary);background:color-mix(in srgb,var(--primary) 22%,transparent)}
+  .toggle{display:flex;border:1px solid var(--line);border-radius:11px;overflow:hidden}
+  .toggle button{flex:1;padding:11px;background:var(--bg2);color:var(--bone-dim);border:none;font-weight:700;cursor:pointer;font-size:14px}
+  .toggle button[aria-pressed="true"]{background:var(--primary);color:var(--primary-ink)}
+  .wishrow{display:flex;gap:8px;align-items:center;margin-top:8px}
+  .wishrow input{flex:1}
+  .wishlist-item{display:flex;gap:9px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line)}
+  .wishlist-item.done > span.wtext{text-decoration:line-through;color:var(--bone-dim)}
+  .wishlist-item .wtext{flex:1;min-width:0;overflow-wrap:anywhere}
+  .check{width:22px;height:22px;border-radius:6px;border:1px solid var(--line);background:var(--bg2);display:grid;place-items:center;cursor:pointer;flex:none}
+  .hist{padding:7px 0;border-bottom:1px dashed var(--line);font-size:13.5px;display:flex;justify-content:space-between;gap:10px}
+  .hist .y{color:var(--bone-dim);font-size:12px;white-space:nowrap}
+  .sheetbtns{display:flex;gap:10px;margin-top:20px}
+  .sheetbtns .btn{flex:1}
+  .picklist{display:flex;flex-direction:column;gap:8px}
+  .pickrow{display:flex;gap:11px;align-items:center;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;cursor:pointer}
+  .pickrow[aria-pressed="true"]{border-color:var(--primary)}
+  .pickrow .check{pointer-events:none}
+  .exrow{display:flex;gap:8px;align-items:center;font-size:13px;background:var(--bg2);border:1px solid var(--line);border-radius:999px;padding:6px 6px 6px 12px;margin:6px 6px 0 0}
+  .exwrap{display:flex;flex-wrap:wrap}
+  .reveal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .reveal-name{padding:16px 12px;border-radius:14px;border:1px solid var(--line);background:linear-gradient(var(--panel),var(--panel2));
+    font-weight:700;font-size:15px;cursor:pointer;text-align:center;position:relative;color:var(--bone);min-width:0;overflow-wrap:anywhere}
+  .reveal-name.done{opacity:.5}
+  .reveal-name.done::after{content:"✓ seen";position:absolute;top:6px;right:8px;font-size:10px;color:var(--accent);font-weight:800}
+  .holdpad{width:100%;border-radius:16px;padding:18px;font-size:16px;font-weight:800;color:var(--bone);
+    background:linear-gradient(var(--panel2),var(--panel));position:relative;overflow:hidden;cursor:pointer;
+    user-select:none;-webkit-user-select:none;touch-action:none;border:1px solid var(--line)}
+  .holdpad .fill{position:absolute;inset:0;background:linear-gradient(90deg,color-mix(in srgb,var(--primary) 55%,transparent),var(--primary));width:0%;transition:width .06s linear}
+  .holdpad .lbl{position:relative;z-index:1;text-shadow:0 1px 6px rgba(0,0,0,.5)}
+  .revealname{font-family:var(--display);font-size:36px;margin-top:4px;text-shadow:0 0 28px var(--glow);animation:pop .5s cubic-bezier(.2,1.4,.4,1);overflow-wrap:anywhere}
+  @keyframes pop{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
+  .cat{font-family:var(--display);font-size:15px;color:var(--amber);margin:16px 0 8px;letter-spacing:.5px;display:flex;align-items:center;gap:8px}
+  .cat::after{content:"";flex:1;height:1px;background:var(--line)}
+  .bingo{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:6px}
+  .bingo .cell{aspect-ratio:1;border:1px solid var(--line);border-radius:10px;background:var(--panel2);
+    display:grid;place-items:center;text-align:center;font-size:clamp(9px,2.9vw,11.5px);font-weight:600;padding:3px;cursor:pointer;line-height:1.12;color:var(--bone);
+    min-width:0;overflow-wrap:anywhere;hyphens:auto;overflow:hidden}
+  .bingo .cell.free{background:color-mix(in srgb,var(--primary) 26%,var(--panel));color:var(--bone)}
+  .bingo .cell.daub{background:var(--primary);color:var(--primary-ink);border-color:var(--primary)}
+  .fortune{margin-top:12px;text-align:center;min-height:64px;font-family:var(--display);font-size:20px;line-height:1.35;padding:14px;
+    border:1px dashed var(--line);border-radius:14px;background:var(--bg2)}
+  .wyr{margin-top:12px;border:1px dashed var(--line);border-radius:14px;background:var(--bg2);padding:14px;text-align:center}
+  .wyr .q{font-family:var(--display);font-size:19px;line-height:1.35}
+  .wyr .or{font-size:11px;letter-spacing:2px;color:var(--primary);text-transform:uppercase;margin:8px 0;font-weight:800}
+  nav{position:fixed;bottom:0;left:0;right:0;z-index:40;background:linear-gradient(color-mix(in srgb,var(--bg) 40%,transparent),var(--bg) 40%);
+    backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:8px 4px calc(8px + env(safe-area-inset-bottom))}
+  .navinner{max-width:640px;margin:0 auto;display:flex;justify-content:space-between}
+  .navbtn{flex:1;background:none;border:none;color:var(--bone-dim);font-size:10px;font-weight:700;letter-spacing:.2px;
+    display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 1px;cursor:pointer;min-width:0}
+  .navbtn .ic{font-size:20px;line-height:1}
+  .navbtn[aria-pressed="true"]{color:var(--primary)}
+  .foot{text-align:center;color:var(--bone-dim);font-size:11.5px;margin:26px 0 8px;letter-spacing:.3px}
+  .toast{position:fixed;left:50%;bottom:108px;transform:translateX(-50%) translateY(20px);opacity:0;
+    background:var(--panel);border:1px solid var(--line);color:var(--bone);padding:11px 16px;border-radius:12px;
+    font-size:13px;z-index:60;transition:.25s;box-shadow:0 12px 30px rgba(0,0,0,.4);max-width:90vw;text-align:center;pointer-events:none}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .hidden-input{display:none}
+  .mb-ver{position:fixed;right:10px;bottom:calc(76px + env(safe-area-inset-bottom));z-index:900;font:600 10px var(--mb-mono);letter-spacing:.04em;color:var(--mb-teal);background:var(--mb-glass);border:1px solid rgba(76,240,224,.25);border-radius:999px;padding:4px 9px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);cursor:pointer;user-select:none;opacity:.85}
+  .scrim.open ~ .mb-ver{display:none}
+  .risk{margin:0 0 12px;border:1px solid var(--danger);background:color-mix(in srgb,var(--danger) 16%,var(--panel));border-radius:14px;padding:12px}
+  .risk .name{color:var(--bone)}
+  .risk .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .about p{margin:0 0 10px;color:var(--bone);font-size:14.5px;line-height:1.5}
+  .about .k{font:600 10.5px var(--mb-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--bone-dim);margin:14px 0 6px}
+  .about .size{font:600 12px var(--mb-mono);color:var(--mb-teal)}
+  .linkbtn{background:none;border:none;color:var(--bone-dim);font:inherit;text-decoration:underline;cursor:pointer;padding:0}
+  #printsheet{display:none}
+  @media print{
+    body.printing > *:not(#printsheet){display:none !important}
+    body.printing{background:#fff !important;padding:0}
+    body.printing #printsheet{display:block;color:#000;font-family:Georgia,serif;padding:24px}
+    #printsheet h1{font-size:22px;margin:0 0 2px}
+    #printsheet .psub{font-size:12px;color:#333;margin:0 0 16px;letter-spacing:1px;text-transform:uppercase}
+    #printsheet table{width:100%;border-collapse:collapse;margin-bottom:18px}
+    #printsheet th,#printsheet td{border:1px solid #000;padding:7px 9px;font-size:12.5px;text-align:left;vertical-align:top}
+    #printsheet th{background:#eee;font-size:11px;letter-spacing:.8px;text-transform:uppercase}
+    #printsheet .pcat{font-size:14px;font-weight:700;margin:14px 0 6px}
+    #printsheet .pbingo{display:grid;grid-template-columns:repeat(5,1fr);gap:0;border:2px solid #000;margin-top:8px}
+    #printsheet .pbingo div{border:1px solid #000;aspect-ratio:1;display:grid;place-items:center;text-align:center;font-size:13px;padding:4px;font-weight:600;min-width:0;overflow-wrap:anywhere;hyphens:auto}
+    #printsheet .pbingo .pfree{background:#eee}
+    #printsheet .pnote{font-size:11px;color:#444;margin-top:10px}
+  }
+  @media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important} #fx,.fog{display:none !important}}
+</style>
+</head>
+<body>
+<canvas id="fx" aria-hidden="true"></canvas>
+<div class="fog a" aria-hidden="true"></div>
+<div class="fog b" aria-hidden="true"></div>
+
+<header>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand" id="brand" role="button" tabindex="0" aria-label="About Gather">
+        <span class="mark" id="mark"></span>
+        <div class="brandtext">
+          <h1>Gather</h1>
+          <div class="sub" id="occLabel">Halloween 2026</div>
+        </div>
+      </div>
+    </div>
+    <div class="occasion" id="occasion"></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div id="riskBanner"></div>
+
+  <!-- HUB -->
+  <section class="panel" id="panel-hub">
+    <div id="hubBody"></div>
+    <div class="card">
+      <div class="name">🗝️ Your data, yours to keep</div>
+      <div class="meta" style="margin-bottom:10px">Everything lives on this device. Save a backup anytime, restore it anywhere.</div>
+      <div class="two">
+        <button class="btn sm" data-backup>Save backup</button>
+        <button class="btn sm" data-restore>Restore</button>
+      </div>
+      <div class="two" style="margin-top:8px" id="dangerRow"></div>
+      <input type="file" id="restoreFile" class="hidden-input" accept=".json,application/json">
+    </div>
+    <div id="pastBox"></div>
+  </section>
+
+  <!-- HOUSEHOLD -->
+  <section class="panel" id="panel-house">
+    <div class="phead"><div><div class="eyebrow" id="houseEyebrow"></div><h2 id="houseTitle">Household</h2><p>Everyone you plan around, in one place.</p></div>
+      <div class="actions"><button class="btn sm primary" data-add-person>+ Add</button></div></div>
+    <div id="peopleList"></div>
+    <div id="houseActions"></div>
+    <input type="file" id="vcardFile" class="hidden-input" accept=".vcf,text/vcard,text/x-vcard">
+  </section>
+
+  <!-- TREATS + BUDGET -->
+  <section class="panel" id="panel-treats">
+    <div class="phead"><div><div class="eyebrow" id="treatsEyebrow"></div><h2 id="treatsTitle">Treats</h2><p>What you're giving, and what it costs.</p></div>
+      <div class="actions"><button class="btn sm primary" data-add-treat>+ Add</button><button class="iconbtn" data-print-gifts title="Print list">🖨</button></div></div>
+    <div id="budgetBox"></div>
+    <div id="treatsList"></div>
+    <div id="treatsActions"></div>
+  </section>
+
+  <!-- SECRET -->
+  <section class="panel" id="panel-secret">
+    <div class="phead"><div><div class="eyebrow" id="secretEyebrow"></div><h2 id="secretTitle">Secret Ghoul</h2><p>Draw names. Nobody repeats last year.</p></div></div>
+    <div id="secretBody"></div>
+  </section>
+
+  <!-- POTLUCK -->
+  <section class="panel" id="panel-potluck">
+    <div class="phead"><div><div class="eyebrow" id="potluckEyebrow"></div><h2 id="potluckTitle">The Cauldron</h2><p>Who's bringing what. No two of the same.</p></div>
+      <div class="actions"><button class="btn sm primary" data-add-dish>+ Add</button><button class="iconbtn" data-print-potluck title="Print sheet">🖨</button></div></div>
+    <div id="potluckList"></div>
+    <div id="potluckActions"></div>
+  </section>
+
+  <!-- GAMES -->
+  <section class="panel" id="panel-games">
+    <div class="phead"><div><div class="eyebrow" id="gamesEyebrow"></div><h2>Party games</h2><p>Ready to play or print, right now.</p></div></div>
+    <div class="card">
+      <div class="row" style="justify-content:space-between">
+        <div><div class="name" id="bingoTitle">🎃 Spooky Bingo</div><div class="meta">Tap to daub. Print a fresh card per player.</div></div>
+      </div>
+      <div class="bingo" id="bingo"></div>
+      <div class="two" style="margin-top:12px">
+        <button class="btn" data-bingo-new>New card</button>
+        <button class="btn" data-bingo-print>Print card</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="name" id="fortuneTitle">🔮 Fortune teller</div>
+      <div class="meta">Pass it round. Tap for your fate.</div>
+      <div class="fortune" id="fortune">Tap below to summon a fortune…</div>
+      <button class="btn block" style="margin-top:12px" data-fortune>Summon a fortune</button>
+    </div>
+    <div class="card">
+      <div class="name">⚖️ Would you rather…</div>
+      <div class="meta">Go round the table. Defend your answer.</div>
+      <div class="wyr"><div class="q" id="wyrA">Tap for the first question</div><div class="or">or</div><div class="q" id="wyrB">…</div></div>
+      <button class="btn block" style="margin-top:12px" data-wyr>Next question</button>
+    </div>
+  </section>
+
+  <div class="foot">Everything stays on this device. No account, no cloud, no ads. <button class="linkbtn" data-about>About Gather</button></div>
+</main>
+
+<nav><div class="navinner" id="nav">
+  <button class="navbtn" data-tab="hub"><span class="ic" id="navHubIc">🕯️</span><span id="navHub">Haunt</span></button>
+  <button class="navbtn" data-tab="house"><span class="ic">🏚️</span><span id="navHouse">House</span></button>
+  <button class="navbtn" data-tab="treats"><span class="ic">🍬</span><span id="navTreats">Treats</span></button>
+  <button class="navbtn" data-tab="secret"><span class="ic">🎲</span><span id="navSecret">Secret</span></button>
+  <button class="navbtn" data-tab="potluck"><span class="ic">🍲</span><span id="navPotluck">Cauldron</span></button>
+  <button class="navbtn" data-tab="games"><span class="ic">👻</span><span>Games</span></button>
+</div></nav>
+
+<div class="scrim" id="scrim"><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast"></div>
+<button class="mb-ver" id="mbVer" type="button">v0.5.1 · Sep 26</button>
+<div id="printsheet"></div>
+
+<script>
+"use strict";
+(function(){
+  var VERSION = "v0.5.1 · Sep 26";
+  var KEY = "gather.v1";
+  var THEMES = {
+    halloween:{ label:"Halloween", emoji:"🎃", date:"2026-10-31",
+      terms:{ eyebrow:"All Hallows' Eve", hub:"The Haunt", navHub:"Haunt", hubIc:"🕯️",
+        house:"Household", treats:"Treats", treat:"treat", secret:"Secret Ghoul", navSecret:"Ghoul",
+        potluck:"The Cauldron", navPotluck:"Cauldron", bingo:"Spooky Bingo", fortuneName:"Fortune teller",
+        countLabel:"nights until the haunt", greeting:"The veil is thinning." },
+      empty:{ house:"No ghouls in the house yet." },
+      bingo:["Ghost","Witch","Pumpkin","Bat","Spider","Candy","Skeleton","Vampire","Zombie","Mummy","Cauldron","Broom","Black Cat","Full Moon","Cobweb","Potion","Goblin","Werewolf","Tombstone","Owl","Fangs","Lantern","Raven","Coffin","Spell","Bones","Slime","Shadow","Grave","Boo","Fright","Haunt","Trick","Scream","Creep","Cape"],
+      fortunes:["A black cat crosses your path and drops a full-size candy bar.","You will be the last one brave enough to check the basement.","Beware: the doorbell rings, but no one is there. Only more candy.","Your costume will be mistaken for someone famous. You are not.","A ghost approves of your snack choices tonight.","The pumpkin you carved is judging you. Kindly.","You'll find the good candy at the bottom of the bowl.","Something wicked this way comes. It's just Grandma in a cloak.","The creaky stair knows your name. Step over it tonight.","Your candy trade will be legendary. Hold out for the chocolate."],
+      wyr:[["Live in a haunted mansion (rent-free)","Live in a normal house with one friendly ghost roommate"],["Only eat candy corn for a month","Never eat chocolate again"],["Be able to talk to black cats","Be able to see ghosts (they're mostly boring)"],["Wear a costume every day for a year","Never wear a costume again"],["Carve 100 pumpkins in one night","Hand out candy to 1,000 trick-or-treaters"],["Have a broom that flies (walking speed)","Have a cauldron that makes any soup"],["Spend a night in a graveyard","Spend a night in an abandoned mall"],["Turn into a werewolf on full moons","Turn into a vampire but only at brunch"],["Know every scary movie ending in advance","Never be jump-scared again"],["Have cobwebs that clean themselves","Have a doorbell that plays your theme song"],["Trick","Treat, but you must share half"],["Own a talking skeleton (bad jokes only)","Own a silent, judgmental raven"]] },
+    thanksgiving:{ label:"Thanksgiving", emoji:"🦃", date:"2026-11-26",
+      terms:{ eyebrow:"Turkey Day", hub:"The Hearth", navHub:"Hearth", hubIc:"🔥",
+        house:"The Table", treats:"Gifts", treat:"gift", secret:"Secret Gifter", navSecret:"Gifter",
+        potluck:"The Spread", navPotluck:"Spread", bingo:"Harvest Bingo", fortuneName:"Wishbone wisdom",
+        countLabel:"days until the feast", greeting:"The table is being set." },
+      empty:{ house:"No one at the table yet." },
+      bingo:["Turkey","Pie","Gravy","Stuffing","Corn","Leaves","Football","Nap","Cranberry","Yams","Rolls","Family","Pilgrim","Harvest","Feast","Thanks","Pumpkin","Cider","Wishbone","Seconds","Leftovers","Parade","Cornucopia","Squash","Butter","Casserole","Toast","Grateful","Apron","Oven","Platter","Carving","Biscuit","Maple","Acorn","Hearth"],
+      fortunes:["You will go back for thirds. No regrets.","The wishbone is yours this year.","You'll be trusted with the gravy. Handle it well.","A nap of legendary quality awaits after the meal.","Someone will ask for your recipe. Guard it.","You get the last roll.","Peace at the table lasts the whole meal this year.","You will win the argument by simply passing the pie.","Your seat has the best view of the dessert table. Use it.","Leftovers will taste even better tomorrow. Science agrees."],
+      wyr:[["Only eat stuffing forever","Only eat mashed potatoes forever"],["Cook the whole feast alone","Do all the dishes alone"],["Sit at the kids' table for life","Give the toast every single year"],["Pumpkin pie for every dessert","Never have pie again"],["A turkey that cooks itself","A table that sets itself"],["Eat dinner at noon","Eat dinner at 9pm"],["Watch only the parade","Watch only the football"],["Gravy on everything","Cranberry sauce on everything"],["Host every year","Travel every year"],["One giant meal","Grazing all day long"],["Tell everyone what you're thankful for (honestly)","Hear what everyone is thankful for about you"],["Leftover sandwich for a week","Fresh feast but no leftovers ever"]] },
+    birthday:{ label:"Birthday", emoji:"🎂", date:null,
+      terms:{ eyebrow:"The Big Day", hub:"Party HQ", navHub:"Party", hubIc:"🎉",
+        house:"Guests", treats:"Gifts", treat:"gift", secret:"Secret Gifter", navSecret:"Gifter",
+        potluck:"The Spread", navPotluck:"Spread", bingo:"Party Bingo", fortuneName:"Birthday oracle",
+        countLabel:"days until the big day", greeting:"Someone's getting older. Gracefully." },
+      empty:{ house:"No guests on the list yet." },
+      bingo:["Cake","Balloon","Candle","Wish","Present","Confetti","Party Hat","Streamer","Sprinkles","Card","Song","Surprise","Piñata","Frosting","Gift Bag","Sparkler","Cheers","Games","Dance","Photo","Slice","Bow","Ribbon","Guest","Wrapping","Wishlist","Toast","Crown","Milestone","Memory","Laughter","Invite","Banner","Favors","Punch","Playlist"],
+      fortunes:["Your wish comes true, but not the way you expect.","You get the corner piece with the most frosting.","The best gift is saved for last.","You will win every party game tonight.","Someone secretly loves your present most of all.","The song will be sung slightly off-key, with great love.","You blow out every candle in one breath.","This year is your year. The cake says so.","A photo from tonight becomes a favorite for years.","The playlist lands perfectly. Take the credit."],
+      wyr:[["A surprise party every year","Never a surprise again"],["Cake for breakfast all week","Ice cream for dinner all week"],["Unwrap gifts in front of everyone","Open them all alone at midnight"],["Your age in candles (always)","One candle but it never blows out first try"],["A piñata full of your favorite candy","A gift bag you can't peek into for a week"],["Everyone sings loudly and badly","No song at all"],["One huge gift","Ten small mystery gifts"],["Birthday on a weekend forever","Birthday off work/school forever"],["A party with everyone you know","Dinner with your five favorites"],["Relive your best birthday","Fast-forward to your next one"],["Balloons that never pop","Streamers that hang themselves"],["Frosting only","Cake only"]] },
+    winter:{ label:"Winter Holiday", emoji:"❄️", date:"2026-12-25",
+      terms:{ eyebrow:"The Long Night", hub:"The Hearth", navHub:"Hearth", hubIc:"🕯️",
+        house:"The List", treats:"Gifts", treat:"gift", secret:"Secret Santa", navSecret:"Santa",
+        potluck:"The Feast", navPotluck:"Feast", bingo:"Snowfall Bingo", fortuneName:"Snow globe says",
+        countLabel:"sleeps until the morning", greeting:"The lights are going up." },
+      empty:{ house:"No one on the list yet." },
+      bingo:["Snowflake","Tree","Gift","Snowman","Star","Candle","Lights","Cocoa","Sleigh","Bells","Mistletoe","Ornament","Stocking","Cookies","Carol","Wreath","Reindeer","Scarf","Fireplace","Gingerbread","Snowball","Frost","Gift Bow","Mitten","Icicle","Eggnog","Ribbon","Chimney","Tinsel","Garland","Sled","Pinecone","Holly","Angel","North Star","Snow Day"],
+      fortunes:["You'll get exactly what's on your list. Every bit of it.","First tracks in fresh snow are yours tomorrow.","The cocoa is best the moment you stop reading this.","You will win the ugly-sweater contest without trying.","A gift you gave becomes someone's favorite thing.","Snow day. Trust the fortune.","The last cookie has your name on it.","Warmth finds you, wherever you are this season.","Your wrapping will be too beautiful to open. They'll open it anyway.","The twinkle lights untangle themselves this year. Believe."],
+      wyr:[["Snow every day of December","One perfect snow day you choose"],["Wrap 100 gifts","Untangle 100 strings of lights"],["Cocoa that never goes cold","Cookies that never run out"],["Sing one carol at every door","Wear jingle bells all month"],["Open one gift early","Save them all and open twice as slowly"],["A real tree that never sheds","A fake tree that smells real"],["Build the world's best snowman","Win every snowball fight"],["Fireplace but no TV","TV fireplace but real cocoa"],["Give perfect gifts, get socks","Get perfect gifts, give socks"],["Sled to work/school all winter","Ice skate everywhere indoors"],["It's the morning forever","It's the night before forever"],["Gingerbread house you can't eat","Ugly cookies that taste incredible"]] }
+  };
+  var STATUS = [["idea","Idea"],["got","Got it"],["ready","Ready"],["given","Given"]];
+  var CATS = ["Mains","Sides","Desserts","Drinks","Supplies"];
+  var NEUTRAL = ["🧑","👩","👨","👧","👦","🧒","👵","👴","🧔","👩‍🦰","👱‍♀️","🧑‍🦱","🐶","🐱"];
+  var THEME_EXTRA = {
+    halloween:{ faces:["🎃","👻","🦇","🕷️","💀","🧙","🐈‍⬛","🦉","🧛","🧟","🍬","🌙"], extraLabel:"Costume idea", extraPh:"Ghostbuster", extraIcon:"🎭", favLabel:"Favorite candy", favPh:"Reese's", favIcon:"🍬" },
+    thanksgiving:{ faces:["🦃","🍂","🥧","🌽","🍁","🍽️","🍗","🌻","🧑‍🍳","🍎"], extraLabel:"Famous for bringing", extraPh:"Her pecan pie", extraIcon:"🥧", favLabel:"Favorite treat", favPh:"Pumpkin pie", favIcon:"🥧" },
+    birthday:{ faces:["🎂","🎈","🎁","🎉","⭐","🥳","🍰","🎊","👑","🦄"], extraLabel:"Party job", extraPh:"Cake cutter", extraIcon:"🎉", favLabel:"Favorite treat", favPh:"Funfetti", favIcon:"🍰" },
+    winter:{ faces:["❄️","🎄","🎁","⛄","✨","🕯️","🦌","🎅","🍪","🧦","🧣"], extraLabel:"Holiday tradition", extraPh:"Reads the story", extraIcon:"🕯️", favLabel:"Favorite treat", favPh:"Peppermint bark", favIcon:"🍪" }
+  };
+
+  /* ---------- Storage (guarded, versioned, forward-migrating) ---------- */
+  var mem = null;
+  function uid(){ return Math.random().toString(36).slice(2,9); }
+  function newOcc(theme, name, date){
+    return { id:uid(), name:name, theme:theme, date:date||null, archived:false, treats:[], overallBudget:0, potluck:[],
+      secret:{participants:[],exclusions:[],assignments:null,revealed:{},relaxed:false,banked:false}, created:Date.now() };
+  }
+  function yearOf(date){ return date? String(date).slice(0,4) : String(new Date().getFullYear()); }
+  function fresh(){
+    var o=newOcc("halloween","Halloween 2026",THEMES.halloween.date);
+    return { v:3, tab:"hub", people:[], occasions:[o], currentId:o.id, drawHistory:[] };
+  }
+  function moveCostumes(s){
+    var target=null; s.occasions.forEach(function(o){ if(!target && !o.archived && o.theme==="halloween") target=o; });
+    if(!target){ var act=s.occasions.filter(function(o){return !o.archived;}); target=act[0]||s.occasions[0]; }
+    s.people.forEach(function(p){ if(p.costume){ if(target){ if(!target.extras)target.extras={}; if(!target.extras[p.id]) target.extras[p.id]=p.costume; } delete p.costume; } });
+  }
+  function fixPerson(p){ if(!p.wishlist)p.wishlist=[]; if(!p.history)p.history=[]; if(!p.emoji)p.emoji="🧑"; if(!p.kind)p.kind="house"; return p; }
+  function fixOcc(o){
+    if(!o.treats)o.treats=[]; if(!o.potluck)o.potluck=[]; if(typeof o.overallBudget!=="number")o.overallBudget=Number(o.overallBudget)||0;
+    if(!o.secret)o.secret={participants:[],exclusions:[],assignments:null,revealed:{},relaxed:false,banked:false};
+    var s=o.secret; if(!s.participants)s.participants=[]; if(!s.exclusions)s.exclusions=[]; if(!s.revealed)s.revealed={};
+    if(!o.theme||!THEMES[o.theme])o.theme="halloween"; if(!o.faces)o.faces={}; if(!o.extras)o.extras={}; if(!o.name)o.name=THEMES[o.theme].label; if(!o.id)o.id=uid();
+    return o;
+  }
+  function migrate(s){
+    if(!s || typeof s!=="object") return fresh();
+    if(s.v===3){
+      if(!s.people)s.people=[]; s.people.forEach(fixPerson);
+      if(!s.occasions||!s.occasions.length){ var o0=newOcc("halloween","Halloween 2026",THEMES.halloween.date); s.occasions=[o0]; s.currentId=o0.id; }
+      s.occasions.forEach(fixOcc);
+      if(!s.drawHistory)s.drawHistory=[];
+      moveCostumes(s);
+      if(!s.tab)s.tab="hub";
+      return s;
+    }
+    // v1 / v2 -> v3: wrap the single dataset into one occasion
+    var theme=(s.theme&&THEMES[s.theme])? s.theme : "halloween"; var th=THEMES[theme];
+    var date=(s.occDates&&s.occDates[theme])||th.date||null;
+    var yr=yearOf(date);
+    var o=newOcc(theme, th.label+" "+yr, date);
+    o.treats=s.treats||[]; o.potluck=s.potluck||[]; o.overallBudget=Number(s.overallBudget)||0;
+    var sec=s.secret||{};
+    o.secret={participants:sec.participants||[],exclusions:sec.exclusions||[],assignments:sec.assignments||null,revealed:sec.revealed||{},relaxed:!!sec.relaxed,banked:false};
+    var hist=(sec.history||[]).map(function(h){ return {theme:theme,occasion:o.name,year:String(h.year||yr),pairs:h.pairs||{}}; });
+    var people=(s.people||[]).map(fixPerson);
+    var out={ v:3, tab:"hub", people:people, occasions:[o], currentId:o.id, drawHistory:hist }; moveCostumes(out); return out;
+  }
+  function load(){
+    try{ var raw=localStorage.getItem(KEY); if(raw){ return migrate(JSON.parse(raw)); } }catch(e){}
+    if(mem) return mem;
+    return fresh();
+  }
+  function save(){ mem=state; try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+  var state = load();
+
+  /* ---------- Occasion accessors ---------- */
+  function activeOccs(){ return state.occasions.filter(function(o){return !o.archived;}); }
+  function occById(id){ for(var i=0;i<state.occasions.length;i++){ if(state.occasions[i].id===id) return state.occasions[i]; } return null; }
+  function occ(){
+    var o=occById(state.currentId);
+    if(o && !o.archived) return o;
+    var a=activeOccs(); if(a.length){ state.currentId=a[0].id; return a[0]; }
+    return null;
+  }
+  function T(){ var o=occ(); return THEMES[(o&&o.theme)||"halloween"]; }
+  function term(k){ return T().terms[k]; }
+
+  /* ---------- Utils ---------- */
+  function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];}); }
+  function $(id){ return document.getElementById(id); }
+  function money(n){ n=Number(n)||0; return "$"+n.toFixed(n%1?2:0); }
+  function personById(id){ for(var i=0;i<state.people.length;i++){ if(state.people[i].id===id) return state.people[i]; } return null; }
+  function face(p){ if(!p) return "🧑"; var o=occ(); if(o&&o.faces&&o.faces[p.id]) return o.faces[p.id]; return p.emoji||"🧑"; }
+  function TX(){ var o=occ(); return THEME_EXTRA[(o&&o.theme)||"halloween"]; }
+  function toast(msg){ var t=$("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(t._t); t._t=setTimeout(function(){t.classList.remove("show");},2200); }
+  function isoToDate(iso){ if(!iso) return null; var p=String(iso).split("-"); if(p.length<3) return null; return new Date(+p[0], +p[1]-1, +p[2]); }
+  function daysUntil(d){ if(!d) return null; var now=new Date(); var a=new Date(now.getFullYear(),now.getMonth(),now.getDate()); return Math.round((d-a)/86400000); }
+  var MONTHS={jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
+  function parseBirthday(str){
+    if(!str) return null;
+    var m=String(str).toLowerCase().match(/([a-z]{3,})\.?\s+(\d{1,2})/);
+    var mo=null, day=null;
+    if(m && MONTHS[m[1].slice(0,3)]!=null){ mo=MONTHS[m[1].slice(0,3)]; day=+m[2]; }
+    else{ m=String(str).match(/^(\d{1,2})[\/\-](\d{1,2})/); if(m){ mo=+m[1]-1; day=+m[2]; } }
+    if(mo==null||!day||day>31||mo<0||mo>11) return null;
+    var now=new Date(); var y=now.getFullYear();
+    var d=new Date(y,mo,day);
+    var today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+    if(d<today) d=new Date(y+1,mo,day);
+    return d;
+  }
+  function isHosted(){ return location.protocol==="https:"||location.protocol==="http:"; }
+  function isFramed(){ try{ return window.self!==window.top; }catch(e){ return true; } }
+  function isIOS(){ return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1); }
+  var storageOK=(function(){ try{ var k="gather.probe"; localStorage.setItem(k,"1"); var ok=localStorage.getItem(k)==="1"; localStorage.removeItem(k); return ok; }catch(e){ return false; } })();
+  function storageRisk(){ return !storageOK || !isHosted(); }
+
+  /* ---------- Atmosphere ---------- */
+  var FX=(function(){
+    var canvas=$("fx"), ctx=null, parts=[], bursts=[], running=false, W=0, H=0, dpr=1;
+    var reduced=window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var CONF={
+      halloween:{ glyphs:["🦇"], glyphChance:.12, dot:"255,150,60", dir:-1, sway:.4, sizes:[2,4] },
+      thanksgiving:{ glyphs:["🍂","🍁"], glyphChance:.55, dot:"224,161,58", dir:1, sway:1.2, sizes:[2,3] },
+      birthday:{ glyphs:["🎈"], glyphChance:.18, dot:"255,210,74", dir:-1, sway:.6, sizes:[2,4] },
+      winter:{ glyphs:["❄"], glyphChance:.5, dot:"210,230,255", dir:1, sway:.9, sizes:[1.5,3] }
+    };
+    function theme(){ var o=occ(); return (o&&o.theme)||"halloween"; }
+    function resize(){ if(!canvas) return; dpr=Math.min(window.devicePixelRatio||1,1.5); W=window.innerWidth; H=window.innerHeight; canvas.width=W*dpr; canvas.height=H*dpr; canvas.style.width=W+"px"; canvas.style.height=H+"px"; if(ctx) ctx.setTransform(dpr,0,0,dpr,0,0); }
+    function make(c,y){ var g=Math.random()<c.glyphChance; return { g:g, ch:g? c.glyphs[Math.floor(Math.random()*c.glyphs.length)]:null, x:Math.random()*W, y:(y!=null? y:(c.dir>0? -20:H+20)), vy:(.18+Math.random()*.4)*c.dir*(g?.7:1), ph:Math.random()*6.28, sw:c.sway*(.5+Math.random()*.8), r:c.sizes[0]+Math.random()*(c.sizes[1]-c.sizes[0]), fs:13+Math.random()*8, o:.25+Math.random()*.5, tw:Math.random()*6.28 }; }
+    function seed(){ var c=CONF[theme()]||CONF.halloween; var n=Math.max(10,Math.min(22,Math.round(W/34))); parts=[]; for(var i=0;i<n;i++) parts.push(make(c,Math.random()*H)); }
+    function tick(){
+      if(!running) return;
+      ctx.clearRect(0,0,W,H);
+      var c=CONF[theme()]||CONF.halloween; var t=Date.now()/1000;
+      for(var i=0;i<parts.length;i++){
+        var p=parts[i]; p.y+=p.vy; p.x+=Math.sin(t+p.ph)*p.sw*.3;
+        if(c.dir>0 && p.y>H+24){ parts[i]=make(c); parts[i].y=-16; }
+        if(c.dir<0 && p.y<-24){ parts[i]=make(c); parts[i].y=H+16; }
+        ctx.globalAlpha=Math.max(0,Math.min(1,p.o*(0.7+0.3*Math.sin(t*2+p.tw))));
+        if(p.g){ ctx.font=p.fs+"px serif"; ctx.fillText(p.ch,p.x,p.y); }
+        else{ ctx.fillStyle="rgba("+c.dot+",1)"; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,6.283); ctx.fill(); }
+      }
+      for(var b=bursts.length-1;b>=0;b--){
+        var q=bursts[b]; q.vy+=.05; q.x+=q.vx; q.y+=q.vy; q.life-=.016; q.rot+=q.vr;
+        if(q.life<=0){ bursts.splice(b,1); continue; }
+        ctx.globalAlpha=Math.max(0,q.life); ctx.save(); ctx.translate(q.x,q.y); ctx.rotate(q.rot); ctx.fillStyle=q.col; ctx.fillRect(-3,-2,6,4); ctx.restore();
+      }
+      ctx.globalAlpha=1; requestAnimationFrame(tick);
+    }
+    function start(){ if(reduced||!canvas) return; if(!ctx){ ctx=canvas.getContext("2d"); resize(); } seed(); if(!running){ running=true; requestAnimationFrame(tick); } }
+    function burst(){
+      if(reduced||!ctx) return;
+      var cs=getComputedStyle(document.documentElement);
+      var cols=[cs.getPropertyValue("--primary").trim()||"#ff7518", cs.getPropertyValue("--accent").trim()||"#38c9a0", cs.getPropertyValue("--amber").trim()||"#ffb44d"];
+      for(var i=0;i<70;i++){ var a=Math.random()*6.283, s=2+Math.random()*4; bursts.push({x:W/2,y:H*.36,vx:Math.cos(a)*s,vy:Math.sin(a)*s-2,vr:(Math.random()-.5)*.4,rot:Math.random()*6.28,life:1.4+Math.random()*.5,col:cols[i%cols.length]}); }
+    }
+    window.addEventListener("resize",function(){ resize(); seed(); });
+    document.addEventListener("visibilitychange",function(){ if(document.hidden){ running=false; } else if(!reduced && ctx){ running=true; requestAnimationFrame(tick); } });
+    return {start:start, reseed:function(){ if(ctx) seed(); }, burst:burst};
+  })();
+
+  /* ---------- Theme / header ---------- */
+  function applyTheme(){
+    var o=occ(); var th=T();
+    document.documentElement.setAttribute("data-theme", (o&&o.theme)||"halloween");
+    $("occLabel").textContent = o? o.name : "No occasion yet";
+    $("occasion").innerHTML = activeOccs().map(function(x){
+      return '<button class="chip" data-occ-set="'+x.id+'" aria-pressed="'+(o&&x.id===o.id)+'">'+THEMES[x.theme].emoji+' <span class="nm">'+esc(x.name)+'</span></button>';
+    }).join("") + '<button class="chip new" data-occ-new>+ New</button>';
+    var act=$("occasion").querySelector('[aria-pressed="true"]'); if(act && act.scrollIntoView){ try{ act.scrollIntoView({inline:"nearest",block:"nearest"}); }catch(e){} }
+    $("houseTitle").textContent = th.terms.house;
+    $("houseEyebrow").textContent = th.terms.eyebrow;
+    $("treatsTitle").textContent = th.terms.treats;
+    $("treatsEyebrow").textContent = th.terms.eyebrow;
+    $("navTreats").textContent = th.terms.treats;
+    $("navHouse").textContent = th.terms.house.split(" ").pop();
+    $("secretTitle").textContent = th.terms.secret;
+    $("secretEyebrow").textContent = th.terms.eyebrow;
+    $("navSecret").textContent = th.terms.navSecret;
+    $("potluckTitle").textContent = th.terms.potluck;
+    $("potluckEyebrow").textContent = th.terms.eyebrow;
+    $("navPotluck").textContent = th.terms.navPotluck;
+    $("gamesEyebrow").textContent = th.terms.eyebrow;
+    $("navHub").textContent = th.terms.navHub;
+    $("navHubIc").textContent = th.terms.hubIc;
+    $("bingoTitle").textContent = th.emoji+" "+th.terms.bingo;
+    $("fortuneTitle").textContent = "🔮 "+th.terms.fortuneName;
+    $("mark").innerHTML = markSVG((o&&o.theme)||"halloween");
+    var meta=document.querySelector('meta[name="theme-color"]');
+    if(meta){ meta.setAttribute("content", getComputedStyle(document.documentElement).getPropertyValue("--bg").trim()||"#160d1f"); }
+    renderRisk();
+    FX.start(); FX.reseed();
+  }
+  function markSVG(theme){
+    var primary=({halloween:"#ff7518",thanksgiving:"#c8622a",birthday:"#ff5da2",winter:"#4aa3ff"})[theme]||"#ff7518";
+    var amber=({halloween:"#ffb44d",thanksgiving:"#e0a13a",birthday:"#ffd24a",winter:"#ffd98a"})[theme]||"#ffb44d";
+    return '<svg width="34" height="34" viewBox="0 0 34 34" fill="none" aria-hidden="true">'
+      + '<circle cx="17" cy="17" r="16" fill="'+primary+'" opacity="0.16"/>'
+      + '<path d="M17 5c4 0 6 3 6 6 0 2-1 3-1 5 3 1 5 4 5 7a10 10 0 0 1-20 0c0-3 2-6 5-7 0-2-1-3-1-5 0-3 2-6 6-6z" fill="'+primary+'"/>'
+      + '<circle cx="13.5" cy="18" r="1.6" fill="#20120a"/><circle cx="20.5" cy="18" r="1.6" fill="#20120a"/>'
+      + '<path d="M13 23c1.4 1.4 6.6 1.4 8 0" stroke="#20120a" stroke-width="1.6" stroke-linecap="round"/>'
+      + '<circle cx="17" cy="8" r="2.4" fill="'+amber+'"/></svg>';
+  }
+  function renderRisk(){
+    var b=$("riskBanner"); if(!b) return;
+    if(!storageRisk()){ b.innerHTML=""; return; }
+    b.innerHTML='<div class="risk"><div class="name">This copy may not keep what you type</div><div class="meta">'
+      +(storageOK? 'You opened Gather from a downloaded file, and phones often wipe what a file saves. Open it from motbuchanan.com/gather instead, or save a backup often.' : 'This browser is blocking saved data, so everything here disappears when you close it. Save a backup before you leave.')
+      +'</div><div class="btns"><button class="btn sm" data-backup>Save backup</button><a class="btn sm ghost" href="https://motbuchanan.com/gather/" target="_blank" rel="noopener">Open the web copy</a></div></div>';
+  }
+
+  /* ---------- Navigation ---------- */
+  function setTab(tab){
+    state.tab=tab; save();
+    document.querySelectorAll(".panel").forEach(function(p){ p.classList.remove("active"); });
+    var el=$("panel-"+tab); if(el) el.classList.add("active");
+    document.querySelectorAll(".navbtn").forEach(function(b){ b.setAttribute("aria-pressed", b.getAttribute("data-tab")===tab); });
+    if(tab==="hub") renderHub();
+    if(tab==="house") renderPeople();
+    if(tab==="treats") renderTreats();
+    if(tab==="secret") renderSecret();
+    if(tab==="potluck") renderPotluck();
+    if(tab==="games") renderGames();
+    window.scrollTo(0,0);
+  }
+  function noOccHTML(){ return '<div class="empty"><div class="big">🗓️</div><h3>No occasion yet.</h3><p>Every gift list, potluck, and draw lives inside an occasion.</p><button class="btn primary" data-occ-new>+ New occasion</button></div>'; }
+
+  /* ---------- Occasions ---------- */
+  function occasionSheet(o){
+    var isNew=!o;
+    var base=occ();
+    var draft = o? JSON.parse(JSON.stringify(o)) : { id:uid(), name:"", theme:(base&&base.theme)||"halloween", date:"" };
+    if(isNew){ draft.date = THEMES[draft.theme].date || ""; draft.name = THEMES[draft.theme].label+" "+yearOf(draft.date||null); }
+    openSheet(function(sheet){
+      sheet.innerHTML='<h3>'+(isNew?"New occasion":"Edit occasion")+'</h3>'
+        +'<label class="f">Theme</label><div class="themegrid" id="o-theme">'+Object.keys(THEMES).map(function(k){ return '<button data-th="'+k+'" aria-pressed="'+(k===draft.theme)+'">'+THEMES[k].emoji+' '+THEMES[k].label+'</button>'; }).join("")+'</div>'
+        +'<label class="f">Name</label><input id="o-name" value="'+esc(draft.name)+'" placeholder="e.g. Halloween 2026, Ruby\'s 10th">'
+        +'<label class="f">Date</label><input type="date" id="o-date" value="'+esc(draft.date||"")+'">'
+        +'<div class="sheetbtns">'+(isNew?"":'<button class="btn danger" id="o-arch">Archive</button>')+'<button class="btn primary" id="o-save">'+(isNew?"Create":"Save")+'</button></div>'
+        +(isNew?"":'<button class="btn ghost block" id="o-del" style="margin-top:8px;color:var(--danger)">Delete this occasion</button>');
+      sheet.querySelector("#o-theme").addEventListener("click",function(ev){
+        var b=ev.target.closest("button"); if(!b) return;
+        var prevLabel=THEMES[draft.theme].label;
+        draft.theme=b.getAttribute("data-th");
+        this.querySelectorAll("button").forEach(function(x){ x.setAttribute("aria-pressed", x===b); });
+        var nameEl=sheet.querySelector("#o-name"), dateEl=sheet.querySelector("#o-date");
+        if(isNew || nameEl.value.indexOf(prevLabel)===0){ dateEl.value=THEMES[draft.theme].date||dateEl.value||""; nameEl.value=THEMES[draft.theme].label+" "+yearOf(dateEl.value||null); }
+      });
+      sheet.querySelector("#o-save").addEventListener("click",function(){
+        draft.name=sheet.querySelector("#o-name").value.trim(); draft.date=sheet.querySelector("#o-date").value||null;
+        if(!draft.name){ toast("Give it a name."); return; }
+        if(isNew){ var n=newOcc(draft.theme,draft.name,draft.date); state.occasions.push(n); state.currentId=n.id; }
+        else{ var ex=occById(draft.id); if(ex){ ex.name=draft.name; ex.theme=draft.theme; ex.date=draft.date; } }
+        save(); closeSheet(); bingoState=null; applyTheme(); setTab("hub");
+        toast(isNew? draft.name+" created." : "Saved.");
+      });
+      var arch=sheet.querySelector("#o-arch"); if(arch) arch.addEventListener("click",function(){ closeSheet(); confirmSheet("Archive "+draft.name+"?","Gifts marked Given get remembered on each person, this draw is banked so next year avoids repeats, and it moves to Past occasions. You can reopen it anytime.","Archive",function(){ archiveOccasion(draft.id); }); });
+      var del=sheet.querySelector("#o-del"); if(del) del.addEventListener("click",function(){ closeSheet(); confirmSheet("Delete "+draft.name+"?","Its gifts, potluck, and draw are gone for good. People are kept.","Delete",function(){ deleteOccasion(draft.id); },true); });
+    });
+  }
+  function stampMemory(o){
+    var yr=yearOf(o.date);
+    o.treats.forEach(function(t){
+      if(t.status!=="given" || t.memoried) return;
+      var p=personById(t.personId); if(!p) return;
+      if(!p.history) p.history=[];
+      p.history.push({year:yr, occasion:o.name, item:t.item, cost:Number(t.cost)||0});
+      t.memoried=true;
+    });
+  }
+  function bankDraw(o){
+    var s=o.secret; if(!s.assignments || s.banked) return;
+    state.drawHistory.push({theme:o.theme, occasion:o.name, year:yearOf(o.date), pairs:s.assignments});
+    var mine=state.drawHistory.filter(function(h){return h.theme===o.theme;});
+    if(mine.length>8){ var drop=mine[0]; state.drawHistory=state.drawHistory.filter(function(h){return h!==drop;}); }
+    s.banked=true;
+  }
+  function archiveOccasion(id){
+    var o=occById(id); if(!o) return;
+    stampMemory(o); bankDraw(o); o.archived=true;
+    if(state.currentId===id){ var a=activeOccs(); state.currentId=a.length? a[0].id : null; }
+    save(); bingoState=null; applyTheme(); setTab("hub"); toast(o.name+" archived.");
+    if(!activeOccs().length){ occasionSheet(null); }
+  }
+  function deleteOccasion(id){
+    state.occasions=state.occasions.filter(function(o){return o.id!==id;});
+    if(state.currentId===id){ var a=activeOccs(); state.currentId=a.length? a[0].id:null; }
+    save(); bingoState=null; applyTheme(); setTab("hub"); toast("Deleted.");
+  }
+  function reopenOccasion(id){ var o=occById(id); if(!o) return; o.archived=false; state.currentId=id; save(); applyTheme(); setTab("hub"); toast(o.name+" reopened."); }
+
+  /* ---------- Hub ---------- */
+  function renderHub(){
+    var o=occ(); var hb=$("hubBody");
+    if(!o){ hb.innerHTML=noOccHTML(); renderDanger(); renderPast(); return; }
+    var th=T();
+    var d=isoToDate(o.date); var days=daysUntil(d);
+    var cHtml='<div class="eyebrow">'+esc(th.terms.eyebrow)+'</div>';
+    if(days==null){ cHtml+='<div class="n">?</div><div class="l">no date set</div>'; }
+    else if(days===0){ cHtml+='<div class="n">Tonight</div><div class="l">it\'s happening</div>'; }
+    else if(days<0){ cHtml+='<div class="n">Done ✓</div><div class="l">that was a good one</div>'; }
+    else { cHtml+='<div class="n">'+days+'</div><div class="l">'+esc(th.terms.countLabel)+'</div>'; }
+    cHtml+='<div class="occname">'+esc(o.name)+'</div>'+(d?'<div class="d">'+esc(d.toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"}))+'</div>':"")+'<div class="d" style="opacity:.8">'+esc(days==null?"Tap to set the date":(days<0?"Tap to archive or set next year":th.terms.greeting))+'</div>';
+    var planned=0,got=0; o.treats.forEach(function(t){var c=Number(t.cost)||0;planned+=c;if(t.status!=="idea")got+=c;});
+    var bud=Number(o.overallBudget)||0; var pct=bud>0?Math.min(100,Math.round(planned/bud*100)):0; var over=bud>0&&planned>bud;
+    var s=o.secret; var drawn=!!s.assignments; var seen=0,total=0;
+    if(drawn){ s.participants.forEach(function(id){ if(personById(id)){ total++; if(s.revealed[id])seen++; } }); }
+    var open=o.potluck.filter(function(x){return !x.assignedTo;}).length;
+    var nb=null; state.people.forEach(function(p){ var bd=parseBirthday(p.birthday); if(bd && (!nb || bd<nb.d)) nb={d:bd,p:p}; });
+    hb.innerHTML='<div class="card count" data-occ-edit="'+o.id+'">'+cHtml+'</div>'
+      +'<div class="hubgrid">'
+      +'<button class="hubcard" data-tab-go="house"><div class="t">'+esc(th.terms.house)+' <span>→</span></div><div class="v">'+state.people.length+'</div><div class="s">'+(state.people.length?'people on the roster':'add your people')+'</div></button>'
+      +'<button class="hubcard" data-tab-go="treats"><div class="t">'+esc(th.terms.treats)+' <span>→</span></div><div class="v">'+money(got)+(bud?' <span style="font-size:13px;color:var(--bone-dim)">/ '+money(bud)+'</span>':"")+'</div><div class="s">'+money(planned)+' planned</div>'+(bud?'<div class="minibar'+(over?" over":"")+'"><span style="width:'+pct+'%"></span></div>':"")+'</button>'
+      +'<button class="hubcard" data-tab-go="secret"><div class="t">'+esc(th.terms.secret)+' <span>→</span></div><div class="v">'+(drawn?(seen+"/"+total):"Not yet")+'</div><div class="s">'+(drawn?(seen===total?"everyone has seen theirs":"revealed so far"):"tap to draw names")+'</div></button>'
+      +'<button class="hubcard" data-tab-go="potluck"><div class="t">'+esc(th.terms.potluck)+' <span>→</span></div><div class="v">'+o.potluck.length+'</div><div class="s">'+(open?open+" still need someone":(o.potluck.length?"all covered":"nothing listed yet"))+'</div></button>'
+      +(nb?'<button class="hubcard" data-tab-go="house" style="grid-column:1/-1"><div class="t">Next birthday <span>→</span></div><div class="v">'+esc(face(nb.p)+" "+nb.p.name)+'</div><div class="s">'+nb.d.toLocaleDateString(undefined,{month:"long",day:"numeric"})+' · '+daysUntil(nb.d)+' days out</div></button>':"")
+      +'</div>';
+    renderDanger(); renderPast();
+  }
+  function hasSample(){
+    if(state.people.some(function(p){return p.sample;})) return true;
+    return state.occasions.some(function(o){ return o.treats.some(function(t){return t.sample;}) || o.potluck.some(function(d){return d.sample;}); });
+  }
+  function renderDanger(){
+    var r=$("dangerRow");
+    r.innerHTML=(hasSample()?'<button class="btn sm ghost" data-clear-sample>Clear sample data</button>':"")+'<button class="btn sm danger" data-erase>Start fresh</button>';
+  }
+  function renderPast(){
+    var past=state.occasions.filter(function(o){return o.archived;});
+    var pb=$("pastBox");
+    if(!past.length){ pb.innerHTML=""; return; }
+    pb.innerHTML='<div class="card"><div class="name">📦 Past occasions</div><div class="meta" style="margin-bottom:6px">Kept for memory. Reopen any of them.</div>'
+      +past.map(function(o){ return '<div class="hist"><span>'+THEMES[o.theme].emoji+' '+esc(o.name)+'</span><span class="y">'+esc(o.date||"")+' <button class="btn sm ghost" data-occ-reopen="'+o.id+'">Reopen</button></span></div>'; }).join("")+'</div>';
+  }
+
+  /* ---------- Household ---------- */
+  function renderHouseActions(){
+    var a=$("houseActions"); if(!a) return;
+    if(!state.people.length){ a.innerHTML='<div class="addbar"><button class="btn block" data-vcard>Import from contacts (.vcf)</button></div>'; return; }
+    a.innerHTML='<div class="addbar"><button class="btn primary block" data-add-person>+ Add person</button><div class="two"><button class="btn" data-vcard>Import contacts</button><button class="btn" data-ask-wishes>✍️ Ask for wishes</button></div></div>';
+  }
+  function renderPeople(){
+    var c=$("peopleList"); var o=occ(); var tx=TX();
+    if(!state.people.length){
+      c.innerHTML='<div class="empty"><div class="big">'+T().emoji+'</div><h3>'+esc(T().empty.house)+'</h3><p>Add each person once. Sizes, '+esc(term("treats").toLowerCase())+', wishlist: it all hangs off them.</p><button class="btn primary" data-add-person>+ Add your first</button> <button class="btn ghost" data-sample>Load a sample household</button></div>';
+      renderHouseActions(); return;
+    }
+    c.innerHTML=state.people.map(function(p){
+      var chips=[];
+      if(p.birthday) chips.push('<span class="pill">🎂 '+esc(p.birthday)+'</span>');
+      if(p.favorites) chips.push('<span class="pill">'+tx.favIcon+' '+esc(p.favorites)+'</span>');
+      var extra=o&&o.extras&&o.extras[p.id]; if(extra) chips.push('<span class="pill">'+tx.extraIcon+' '+esc(extra)+'</span>');
+      if(p.allergies) chips.push('<span class="pill warn">⚠ '+esc(p.allergies)+'</span>');
+      if(p.budget) chips.push('<span class="pill good">'+money(p.budget)+' budget</span>');
+      if(p.wishlist&&p.wishlist.length) chips.push('<span class="pill">📝 '+p.wishlist.length+' wish'+(p.wishlist.length>1?"es":"")+'</span>');
+      if(p.history&&p.history.length) chips.push('<span class="pill">🎁 '+p.history.length+' past</span>');
+      return '<div class="card"><div class="row" data-edit-person="'+p.id+'" style="cursor:pointer">'
+        +'<div class="avatar">'+esc(face(p))+'</div>'
+        +'<div class="grow"><div class="name">'+esc(p.name||"Unnamed")+' <span class="tag'+(p.kind==="guest"?" guest":"")+'">'+(p.kind==="guest"?"Guest":"House")+'</span></div>'
+        +'<div class="meta">'+(chips.join("") || '<span class="pill">Tap to add details</span>')+'</div></div>'
+        +'<span class="iconbtn">✎</span></div></div>';
+    }).join("");
+    renderHouseActions();
+  }
+
+  function personSheet(p){
+    var isNew=!p; var o=occ(); var tx=TX();
+    p = p || fixPerson({ id:uid(), name:"", emoji:"🧑", kind:"house", birthday:"", shirt:"", shoe:"", dietary:"", allergies:"", favorites:"", notes:"", budget:0, wishlist:[], history:[] });
+    var draft=JSON.parse(JSON.stringify(p));
+    var draftFace=(o&&o.faces&&o.faces[p.id])||null;
+    var draftExtra=(o&&o.extras&&o.extras[p.id])||"";
+    openSheet(function(sheet){
+      sheet.innerHTML='<h3>'+(isNew?"Add person":"Edit person")+'</h3>'
+        +'<label class="f">Name</label><input id="f-name" value="'+esc(draft.name)+'" placeholder="e.g. Ruby">'
+        +'<label class="f">Their face</label><div class="emojigrid" id="f-emoji"></div>'
+        +(o?'<label class="f">Dressed up for '+esc(o.name)+'</label><div class="emojigrid" id="f-face"></div><div class="meta" style="margin-top:5px">Only shows in this occasion. Their regular face stays.</div>':"")
+        +'<label class="f">Who are they</label><div class="toggle" id="f-kind"><button data-k="house" aria-pressed="'+(draft.kind==="house")+'">In the house</button><button data-k="guest" aria-pressed="'+(draft.kind==="guest")+'">Guest / extended</button></div>'
+        +'<div class="two"><div><label class="f">Birthday</label><input id="f-bd" value="'+esc(draft.birthday)+'" placeholder="Oct 12"></div><div><label class="f">'+esc(term("treat"))+' budget</label><input id="f-budget" inputmode="decimal" value="'+(draft.budget||"")+'" placeholder="30"></div></div>'
+        +'<div class="two"><div><label class="f">'+esc(tx.favLabel)+'</label><input id="f-fav" value="'+esc(draft.favorites)+'" placeholder="'+esc(tx.favPh)+'"></div>'
+        +(o?'<div><label class="f">'+esc(tx.extraLabel)+'</label><input id="f-extra" value="'+esc(draftExtra)+'" placeholder="'+esc(tx.extraPh)+'"></div>':'<div></div>')+'</div>'
+        +'<div class="two"><div><label class="f">Shirt size</label><input id="f-shirt" value="'+esc(draft.shirt||"")+'" placeholder="M"></div><div><label class="f">Shoe size</label><input id="f-shoe" value="'+esc(draft.shoe||"")+'" placeholder="10"></div></div>'
+        +'<div class="two"><div><label class="f">Dietary</label><input id="f-diet" value="'+esc(draft.dietary||"")+'" placeholder="Vegetarian"></div><div><label class="f">Allergies</label><input id="f-all" value="'+esc(draft.allergies||"")+'" placeholder="Peanuts"></div></div>'
+        +'<label class="f">Wishlist</label><div id="f-wish"></div>'
+        +'<div class="wishrow"><input id="f-wishin" placeholder="Add a wish…"><button class="btn sm" id="f-wishadd">Add</button></div>'
+        +(draft.history&&draft.history.length? '<label class="f">Gift history</label><div>'+draft.history.slice().reverse().map(function(h){ return '<div class="hist"><span>'+esc(h.item)+'</span><span class="y">'+esc(h.year)+' · '+esc(h.occasion)+(h.cost?' · '+money(h.cost):"")+'</span></div>'; }).join("")+'</div>':"")
+        +'<label class="f">Notes</label><textarea id="f-notes" placeholder="Anything else worth remembering">'+esc(draft.notes||"")+'</textarea>'
+        +'<div class="sheetbtns">'+(isNew?"":'<button class="btn danger" id="f-del">Delete</button>')+'<button class="btn primary" id="f-save">Save</button></div>';
+      function drawFaces(){
+        var base = NEUTRAL.indexOf(draft.emoji)>=0 ? NEUTRAL : [draft.emoji].concat(NEUTRAL);
+        sheet.querySelector("#f-emoji").innerHTML=base.map(function(e){ return '<button data-e="'+e+'" aria-pressed="'+(!draftFace && e===draft.emoji)+'">'+e+'</button>'; }).join("");
+        var fg=sheet.querySelector("#f-face"); if(fg) fg.innerHTML=tx.faces.map(function(e){ return '<button data-x="'+e+'" aria-pressed="'+(e===draftFace)+'">'+e+'</button>'; }).join("");
+      }
+      drawFaces();
+      sheet.querySelector("#f-emoji").addEventListener("click",function(ev){ var b=ev.target.closest("button"); if(!b)return; draft.emoji=b.getAttribute("data-e"); draftFace=null; drawFaces(); });
+      var fg=sheet.querySelector("#f-face"); if(fg) fg.addEventListener("click",function(ev){ var b=ev.target.closest("button"); if(!b)return; var v=b.getAttribute("data-x"); draftFace=(draftFace===v)?null:v; drawFaces(); });
+      sheet.querySelector("#f-kind").addEventListener("click",function(ev){ var b=ev.target.closest("button"); if(!b)return; draft.kind=b.getAttribute("data-k"); this.querySelectorAll("button").forEach(function(x){x.setAttribute("aria-pressed", x===b);}); });
+      function drawWish(){
+        var w=sheet.querySelector("#f-wish");
+        w.innerHTML=draft.wishlist.map(function(it,i){
+          return '<div class="wishlist-item'+(it.done?" done":"")+'"><span class="check" data-wt="'+i+'">'+(it.done?"✓":"")+'</span><span class="wtext">'+esc(it.text)+'</span>'
+            +'<button class="iconbtn" title="Add to '+esc(term("treats"))+'" data-wg="'+i+'">🎁</button><button class="iconbtn" data-wd="'+i+'">✕</button></div>';
+        }).join("") || '<div class="meta">Nothing yet.</div>';
+      }
+      drawWish();
+      sheet.querySelector("#f-wish").addEventListener("click",function(ev){
+        var t=ev.target.closest("[data-wt]"), d=ev.target.closest("[data-wd]"), g=ev.target.closest("[data-wg]");
+        if(t){ var i=+t.getAttribute("data-wt"); draft.wishlist[i].done=!draft.wishlist[i].done; drawWish(); }
+        if(d){ draft.wishlist.splice(+d.getAttribute("data-wd"),1); drawWish(); }
+        if(g){
+          if(!o){ toast("Create an occasion first."); return; }
+          var it=draft.wishlist[+g.getAttribute("data-wg")];
+          if(o.treats.some(function(x){return x.personId===draft.id && String(x.item).toLowerCase()===it.text.toLowerCase();})){ toast("Already on the "+term("treats")+" list."); return; }
+          o.treats.push({id:uid(),personId:draft.id,item:it.text,cost:0,status:"idea",notes:"From their wishlist"});
+          save(); toast("Added to "+term("treats")+": "+it.text);
+        }
+      });
+      function addWish(){ var inp=sheet.querySelector("#f-wishin"); var v=inp.value.trim(); if(!v)return; draft.wishlist.push({text:v,done:false}); inp.value=""; drawWish(); inp.focus(); }
+      sheet.querySelector("#f-wishadd").addEventListener("click",addWish);
+      sheet.querySelector("#f-wishin").addEventListener("keydown",function(e){ if(e.key==="Enter"){e.preventDefault();addWish();} });
+      sheet.querySelector("#f-save").addEventListener("click",function(){
+        draft.name=sheet.querySelector("#f-name").value.trim();
+        draft.birthday=sheet.querySelector("#f-bd").value.trim();
+        draft.budget=parseFloat(sheet.querySelector("#f-budget").value)||0;
+        draft.favorites=sheet.querySelector("#f-fav").value.trim();
+        draft.shirt=sheet.querySelector("#f-shirt").value.trim();
+        draft.shoe=sheet.querySelector("#f-shoe").value.trim();
+        draft.dietary=sheet.querySelector("#f-diet").value.trim();
+        draft.allergies=sheet.querySelector("#f-all").value.trim();
+        draft.notes=sheet.querySelector("#f-notes").value.trim();
+        if(!draft.name){ toast("Give them a name first."); return; }
+        var pending=sheet.querySelector("#f-wishin").value.trim(); if(pending){ draft.wishlist.push({text:pending,done:false}); }
+        if(isNew){ state.people.push(draft); } else { for(var i=0;i<state.people.length;i++){ if(state.people[i].id===draft.id) state.people[i]=draft; } }
+        if(o){
+          if(!o.faces)o.faces={}; if(!o.extras)o.extras={};
+          if(draftFace) o.faces[draft.id]=draftFace; else delete o.faces[draft.id];
+          var exEl=sheet.querySelector("#f-extra"); var exV=exEl?exEl.value.trim():"";
+          if(exV) o.extras[draft.id]=exV; else delete o.extras[draft.id];
+        }
+        save(); closeSheet(); renderPeople(); toast(draft.name+" saved.");
+      });
+      var del=sheet.querySelector("#f-del");
+      if(del) del.addEventListener("click",function(){
+        closeSheet();
+        confirmSheet("Remove "+draft.name+"?","Their gifts, dishes, and draw spots in every occasion go too.","Remove",function(){ removePerson(draft.id); toast("Removed."); },true);
+      });
+    });
+  }
+  function removePerson(id){
+    state.people=state.people.filter(function(x){return x.id!==id;});
+    state.occasions.forEach(function(o){
+      o.treats=o.treats.filter(function(t){return t.personId!==id;});
+      if(o.faces) delete o.faces[id]; if(o.extras) delete o.extras[id];
+      o.potluck.forEach(function(d){ if(d.assignedTo===id) d.assignedTo=null; });
+      var s=o.secret;
+      s.participants=s.participants.filter(function(x){return x!==id;});
+      s.exclusions=s.exclusions.filter(function(pr){return pr[0]!==id && pr[1]!==id;});
+      if(s.assignments && (s.assignments[id] || Object.keys(s.assignments).some(function(g){return s.assignments[g]===id;}))){ s.assignments=null; s.revealed={}; }
+    });
+    save(); renderPeople();
+  }
+
+  /* ---------- Ask-for-wishes (self-serve) ---------- */
+  function askWishesSheet(){
+    if(!state.people.length){ toast("Add someone first."); return; }
+    openSheet(function(sheet){
+      sheet.innerHTML='<h3>Who\'s adding wishes?</h3><div class="meta" style="margin-bottom:10px">Pick them, then hand the phone over. They\'ll only see their own list.</div><div class="picklist">'
+        +state.people.map(function(p){ return '<div class="pickrow" data-ask="'+p.id+'"><div class="avatar" style="width:34px;height:34px;font-size:18px">'+esc(face(p))+'</div><div class="grow"><b>'+esc(p.name)+'</b></div><span style="color:var(--bone-dim)">→</span></div>'; }).join("")+'</div>';
+      sheet.addEventListener("click",function(ev){ var r=ev.target.closest("[data-ask]"); if(r){ wishKiosk(r.getAttribute("data-ask")); } });
+    });
+  }
+  function wishKiosk(id){
+    var p=personById(id); if(!p) return;
+    var stage="hand";
+    openSheet(function(sheet){
+      function paint(){
+        if(stage==="hand"){
+          sheetLock=true;
+          sheet.innerHTML='<h3 style="text-align:center">Hand the phone to</h3><div style="text-align:center;font-family:var(--display);font-size:34px;margin:2px 0 14px">'+esc(face(p)+" "+p.name)+'</div>'
+            +'<button class="btn primary block" id="k-go">I\'m '+esc(p.name)+', let me add wishes</button><button class="btn ghost block" id="k-back" style="margin-top:8px">Back</button>';
+          sheet.querySelector("#k-go").addEventListener("click",function(){ stage="edit"; paint(); });
+          sheet.querySelector("#k-back").addEventListener("click",function(){ sheetLock=false; closeSheet(); });
+          return;
+        }
+        if(stage==="edit"){
+          sheet.innerHTML='<h3>'+esc(face(p)+" "+p.name)+'\'s wishlist</h3><div class="meta" style="margin-bottom:8px">Add anything you\'d love. Big or small.</div><div id="k-list"></div>'
+            +'<div class="wishrow"><input id="k-in" placeholder="I\'d love…"><button class="btn sm" id="k-add">Add</button></div>'
+            +'<button class="btn primary block" id="k-done" style="margin-top:18px">Done, hand it back</button>';
+          function draw(){ var l=sheet.querySelector("#k-list"); l.innerHTML=p.wishlist.map(function(it,i){ return '<div class="wishlist-item"><span class="wtext">'+esc(it.text)+'</span><button class="iconbtn" data-kd="'+i+'">✕</button></div>'; }).join("") || '<div class="meta">Nothing yet.</div>'; }
+          draw();
+          sheet.querySelector("#k-list").addEventListener("click",function(ev){ var d=ev.target.closest("[data-kd]"); if(d){ p.wishlist.splice(+d.getAttribute("data-kd"),1); save(); draw(); } });
+          function add(){ var inp=sheet.querySelector("#k-in"); var v=inp.value.trim(); if(!v) return; p.wishlist.push({text:v,done:false}); save(); inp.value=""; draw(); inp.focus(); }
+          sheet.querySelector("#k-add").addEventListener("click",add);
+          sheet.querySelector("#k-in").addEventListener("keydown",function(e){ if(e.key==="Enter"){ e.preventDefault(); add(); } });
+          sheet.querySelector("#k-done").addEventListener("click",function(){ var pend=sheet.querySelector("#k-in").value.trim(); if(pend){ p.wishlist.push({text:pend,done:false}); save(); } stage="thanks"; paint(); });
+          setTimeout(function(){ var i=sheet.querySelector("#k-in"); if(i) i.focus(); },50);
+          return;
+        }
+        sheet.innerHTML='<div style="text-align:center;padding:16px 0"><div style="font-size:44px">'+esc(T().emoji)+'</div><h3 style="margin-top:8px">Thanks, '+esc(p.name)+'!</h3><div class="meta" style="justify-content:center">Hand the phone back now.</div>'
+          +'<button class="btn primary block" id="k-close" style="margin-top:18px">Close</button></div>';
+        sheet.querySelector("#k-close").addEventListener("click",function(){ sheetLock=false; closeSheet(); renderPeople(); toast(p.wishlist.length+" wish"+(p.wishlist.length===1?"":"es")+" on "+p.name+"\'s list."); });
+      }
+      paint();
+    });
+  }
+
+  /* ---------- vCard import ---------- */
+  function importVcards(text){
+    var blocks=text.split(/BEGIN:VCARD/i).slice(1); var added=0;
+    blocks.forEach(function(b){
+      b=b.replace(/\r?\n[ \t]/g,"");
+      var lines=b.split(/\r?\n/); var name="", bday="";
+      lines.forEach(function(ln){
+        var m=ln.match(/^FN[^:]*:(.+)$/i); if(m && !name) name=m[1].trim();
+        var n2=ln.match(/^N[^:]*:([^;]*);([^;]*)/i); if(n2 && !name){ name=(n2[2]+" "+n2[1]).trim(); }
+        var bd=ln.match(/^BDAY[^:]*:(\d{4})-?(\d{2})-?(\d{2})/i);
+        if(bd){ var mn=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][+bd[2]-1]; if(mn) bday=mn+" "+(+bd[3]); }
+      });
+      if(!name) return;
+      if(state.people.some(function(p){return p.name.toLowerCase()===name.toLowerCase();})) return;
+      state.people.push(fixPerson({id:uid(),name:name,emoji:"🧑",kind:"guest",birthday:bday,notes:"Imported from contacts",budget:0,wishlist:[],history:[]}));
+      added++;
+    });
+    save(); renderPeople();
+    toast(added? ("Imported "+added+" "+(added===1?"person":"people")+".") : "No new people found in that file.");
+  }
+
+  /* ---------- Sample ---------- */
+  function loadSample(){
+    var o=occ(); if(!o){ var n=newOcc("halloween","Halloween 2026",THEMES.halloween.date); state.occasions.push(n); state.currentId=n.id; o=n; }
+    var s=[
+      {id:uid(),sample:true,name:"Ruby",emoji:"👧",kind:"house",birthday:"Oct 12",favorites:"Sour Patch",shirt:"S",shoe:"4",dietary:"",allergies:"",notes:"",budget:30,wishlist:[{text:"Light-up broom",done:false},{text:"Spell book journal",done:false}],history:[{year:"2025",occasion:"Halloween 2025",item:"Glow wand",cost:12}]},
+      {id:uid(),sample:true,name:"Theo",emoji:"👦",kind:"house",birthday:"Mar 3",favorites:"Kit Kat",shirt:"M",shoe:"9",dietary:"",allergies:"Peanuts",notes:"",budget:40,wishlist:[{text:"Fog machine",done:false}],history:[{year:"2025",occasion:"Halloween 2025",item:"Skeleton gloves",cost:9}]},
+      {id:uid(),sample:true,name:"Mom",emoji:"👩",kind:"house",birthday:"Jul 20",favorites:"Dark chocolate",shirt:"M",shoe:"8",dietary:"Vegetarian",allergies:"",notes:"Runs the whole show.",budget:0,wishlist:[],history:[]},
+      {id:uid(),sample:true,name:"Dad",emoji:"👨",kind:"house",birthday:"Sep 30",favorites:"Twizzlers",shirt:"L",shoe:"11",dietary:"",allergies:"",notes:"",budget:40,wishlist:[{text:"Cape upgrade",done:false}],history:[]},
+      {id:uid(),sample:true,name:"Grandma Jo",emoji:"👵",kind:"guest",birthday:"Dec 2",favorites:"Werther's",shirt:"L",shoe:"7",dietary:"Low sugar",allergies:"Shellfish",notes:"Bringing the cider.",budget:30,wishlist:[{text:"Cozy shawl",done:false}],history:[]}
+    ];
+    state.people=s.concat(state.people);
+    o.faces=o.faces||{}; o.extras=o.extras||{};
+    if(o.theme==="halloween"){
+      o.faces[s[0].id]="🧙"; o.faces[s[1].id]="🧟"; o.faces[s[2].id]="🐈‍⬛"; o.faces[s[3].id]="🧛";
+      o.extras[s[0].id]="Witch"; o.extras[s[1].id]="Zombie"; o.extras[s[2].id]="Black cat"; o.extras[s[3].id]="Count Dracula (again)";
+    }
+    o.overallBudget=o.overallBudget||140;
+    o.treats=o.treats.concat([
+      {id:uid(),sample:true,personId:s[0].id,item:"Light-up broom",cost:24,status:"got",notes:""},
+      {id:uid(),sample:true,personId:s[1].id,item:"Fog machine (mini)",cost:35,status:"idea",notes:""},
+      {id:uid(),sample:true,personId:s[3].id,item:"Velvet cape",cost:32,status:"ready",notes:""},
+      {id:uid(),sample:true,personId:s[4].id,item:"Cozy shawl",cost:28,status:"ready",notes:""}
+    ]);
+    o.potluck=o.potluck.concat([
+      {id:uid(),sample:true,item:"Chili",cat:"Mains",assignedTo:s[2].id,count:1,notes:""},
+      {id:uid(),sample:true,item:"Caramel apples",cat:"Desserts",assignedTo:s[0].id,count:12,notes:""},
+      {id:uid(),sample:true,item:"Apple cider",cat:"Drinks",assignedTo:s[4].id,count:2,notes:"Warm"},
+      {id:uid(),sample:true,item:"Monster cookies",cat:"Desserts",assignedTo:null,count:24,notes:"Nut-free please"}
+    ]);
+    save(); toast("Sample household loaded.");
+  }
+  function clearSample(){
+    var ids={}; state.people.forEach(function(p){ if(p.sample) ids[p.id]=true; });
+    state.people=state.people.filter(function(p){return !p.sample;});
+    state.occasions.forEach(function(o){
+      o.treats=o.treats.filter(function(t){return !t.sample && !ids[t.personId];});
+      Object.keys(ids).forEach(function(id){ if(o.faces) delete o.faces[id]; if(o.extras) delete o.extras[id]; });
+      o.potluck=o.potluck.filter(function(d){return !d.sample;});
+      o.potluck.forEach(function(d){ if(ids[d.assignedTo]) d.assignedTo=null; });
+      var s=o.secret;
+      s.participants=s.participants.filter(function(x){return !ids[x];});
+      s.exclusions=s.exclusions.filter(function(pr){return !ids[pr[0]] && !ids[pr[1]];});
+      if(s.assignments && Object.keys(s.assignments).some(function(g){return ids[g]||ids[s.assignments[g]];})){ s.assignments=null; s.revealed={}; }
+    });
+    save(); applyTheme(); setTab(state.tab); toast("Sample data cleared.");
+  }
+  function eraseAll(){
+    state=fresh(); save(); bingoState=null; applyTheme(); setTab("hub"); toast("Fresh start.");
+  }
+
+  /* ---------- Treats + budget ---------- */
+  function renderTreats(){
+    var o=occ(); if(!o){ $("budgetBox").innerHTML=""; $("treatsList").innerHTML=noOccHTML(); $("treatsActions").innerHTML=""; return; }
+    var planned=0,got=0; o.treats.forEach(function(t){ var c=Number(t.cost)||0; planned+=c; if(t.status!=="idea") got+=c; });
+    var bud=Number(o.overallBudget)||0; var pct=bud>0?Math.min(100,Math.round(planned/bud*100)):0; var over=bud>0&&planned>bud;
+    $("budgetBox").innerHTML='<div class="card"><div class="row" style="justify-content:space-between;margin-bottom:8px"><div class="name">Budget · <span style="font-weight:500;color:var(--bone-dim)">'+esc(o.name)+'</span></div><button class="btn sm" data-set-budget>'+(bud?money(bud):"Set budget")+'</button></div>'
+      +'<div class="bar'+(over?" over":"")+'"><span style="width:'+pct+'%"></span></div>'
+      +'<div class="stat" style="margin-top:10px;margin-bottom:0"><div class="box"><div class="n">'+money(planned)+'</div><div class="l">Planned</div></div><div class="box"><div class="n">'+money(got)+'</div><div class="l">Bought</div></div>'
+      +'<div class="box"><div class="n" style="color:'+(over?"var(--danger)":"var(--accent)")+'">'+money(Math.max(0,bud-planned))+'</div><div class="l">'+(over?"Over by "+money(planned-bud).replace("$",""):"Left")+'</div></div></div></div>';
+    var c=$("treatsList");
+    $("treatsActions").innerHTML = o.treats.length? '<div class="addbar"><button class="btn primary block" data-add-treat>+ Add a '+esc(term("treat"))+'</button></div>' : "";
+    if(!o.treats.length){ c.innerHTML='<div class="empty"><div class="big">🍬</div><h3>No '+esc(term("treats").toLowerCase())+' planned yet.</h3><p>Add what you\'re giving each person and track the spend. Wishes can jump straight here too.</p><button class="btn primary" data-add-treat>+ Add a '+esc(term("treat"))+'</button></div>'; return; }
+    var groups={}, order=[];
+    o.treats.forEach(function(t){ if(!groups[t.personId]){groups[t.personId]=[];order.push(t.personId);} groups[t.personId].push(t); });
+    c.innerHTML=order.map(function(pid){
+      var p=personById(pid); var items=groups[pid];
+      var sub=items.reduce(function(a,t){return a+(Number(t.cost)||0);},0);
+      var pb=p&&p.budget? Number(p.budget):0;
+      var pbChip=pb? '<span class="pill'+(sub>pb?" warn":" good")+'">'+money(sub)+' of '+money(pb)+'</span>' : '<span class="name" style="font-size:15px">'+money(sub)+'</span>';
+      var last=(p&&p.history&&p.history.length)? p.history[p.history.length-1] : null;
+      return '<div class="card"><div class="row" style="margin-bottom:6px"><div class="avatar" style="width:38px;height:38px;font-size:20px">'+esc(p?face(p):"🎁")+'</div><div class="grow"><div class="name">'+esc(p?p.name:"(removed)")+'</div>'+(last?'<div class="meta">Last time: '+esc(last.item)+' ('+esc(last.year)+')</div>':"")+'</div>'+pbChip+'</div>'
+        +items.map(function(t){
+          return '<div style="border-top:1px solid var(--line);padding-top:10px;margin-top:10px"><div class="row" style="justify-content:space-between"><div class="grow" data-edit-treat="'+t.id+'" style="cursor:pointer"><b>'+esc(t.item||"Untitled")+'</b> <span class="meta" style="display:inline">'+money(t.cost)+'</span></div><button class="iconbtn" data-edit-treat="'+t.id+'">✎</button></div>'
+            +'<div class="statuses">'+STATUS.map(function(s){return '<button class="status" data-treat-status="'+t.id+'|'+s[0]+'" aria-pressed="'+(t.status===s[0])+'">'+s[1]+'</button>';}).join("")+'</div></div>';
+        }).join("")+'</div>';
+    }).join("");
+  }
+  function treatSheet(t){
+    var o=occ(); if(!o){ toast("Create an occasion first."); setTab("hub"); return; }
+    var isNew=!t;
+    if(!state.people.length){ toast("Add someone to the household first."); setTab("house"); return; }
+    t = t || { id:uid(), personId:state.people[0].id, item:"", cost:"", status:"idea", notes:"" };
+    var draft=JSON.parse(JSON.stringify(t));
+    openSheet(function(sheet){
+      sheet.innerHTML='<h3>'+(isNew?"Add a "+esc(term("treat")):"Edit "+esc(term("treat")))+'</h3>'
+        +'<label class="f">For</label><select id="t-person">'+state.people.map(function(p){return '<option value="'+p.id+'"'+(p.id===draft.personId?" selected":"")+'>'+esc(face(p)+" "+p.name)+'</option>';}).join("")+'</select>'
+        +'<label class="f">What is it</label><input id="t-item" value="'+esc(draft.item)+'" placeholder="e.g. Light-up broom">'
+        +'<label class="f">Cost</label><input id="t-cost" inputmode="decimal" value="'+esc(draft.cost)+'" placeholder="0">'
+        +'<label class="f">Notes</label><textarea id="t-notes" placeholder="Where to buy, size, etc.">'+esc(draft.notes)+'</textarea>'
+        +'<div class="sheetbtns">'+(isNew?"":'<button class="btn danger" id="t-del">Delete</button>')+'<button class="btn primary" id="t-save">Save</button></div>';
+      sheet.querySelector("#t-save").addEventListener("click",function(){
+        draft.personId=sheet.querySelector("#t-person").value; draft.item=sheet.querySelector("#t-item").value.trim();
+        draft.cost=parseFloat(sheet.querySelector("#t-cost").value)||0; draft.notes=sheet.querySelector("#t-notes").value.trim();
+        if(!draft.item){ toast("What's the gift?"); return; }
+        if(isNew){ o.treats.push(draft); } else { for(var i=0;i<o.treats.length;i++){ if(o.treats[i].id===draft.id) o.treats[i]=draft; } }
+        save(); closeSheet(); renderTreats();
+      });
+      var del=sheet.querySelector("#t-del"); if(del) del.addEventListener("click",function(){ o.treats=o.treats.filter(function(x){return x.id!==draft.id;}); save(); closeSheet(); renderTreats(); });
+    });
+  }
+  function budgetSheet(){
+    var o=occ(); if(!o) return;
+    openSheet(function(sheet){
+      sheet.innerHTML='<h3>Budget for '+esc(o.name)+'</h3><label class="f">What you want to spend in total</label><input id="b-val" inputmode="decimal" value="'+(o.overallBudget||"")+'" placeholder="120"><div class="sheetbtns"><button class="btn primary" id="b-save">Save</button></div>';
+      sheet.querySelector("#b-save").addEventListener("click",function(){ o.overallBudget=parseFloat(sheet.querySelector("#b-val").value)||0; save(); closeSheet(); renderTreats(); });
+    });
+  }
+
+  /* ---------- Secret gifting (no-repeat solver) ---------- */
+  function drawSecret(ids, exclusionPairs, historyPairs){
+    function key(a,b){ return a+">"+b; }
+    function attempt(useHistory){
+      for(var tries=0; tries<4000; tries++){
+        var receivers=ids.slice();
+        for(var i=receivers.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var tmp=receivers[i];receivers[i]=receivers[j];receivers[j]=tmp; }
+        var used={}, map={}, ok=true;
+        for(var g=0; g<ids.length; g++){
+          var giver=ids[g], picked=null;
+          for(var r=0; r<receivers.length; r++){
+            var rec=receivers[r];
+            if(used[rec]) continue;
+            if(rec===giver) continue;
+            var ex=false;
+            for(var e=0;e<exclusionPairs.length;e++){ var pr=exclusionPairs[e]; if((pr[0]===giver&&pr[1]===rec)||(pr[1]===giver&&pr[0]===rec)){ex=true;break;} }
+            if(ex) continue;
+            if(useHistory && historyPairs[key(giver,rec)]) continue;
+            picked=rec; break;
+          }
+          if(picked===null){ ok=false; break; }
+          used[picked]=true; map[giver]=picked;
+        }
+        if(ok) return map;
+      }
+      return null;
+    }
+    var m=attempt(true);
+    if(m) return {ok:true, map:m, relaxed:false};
+    m=attempt(false);
+    if(m) return {ok:true, map:m, relaxed:true};
+    return {ok:false};
+  }
+  function renderSecret(){
+    var b=$("secretBody"); var o=occ(); if(!o){ b.innerHTML=noOccHTML(); return; }
+    var s=o.secret; var house=state.people;
+    if(house.length<3){ b.innerHTML='<div class="empty"><div class="big">🎲</div><h3>Add at least three people.</h3><p>'+esc(term("secret"))+' needs a few names to draw from.</p><button class="btn primary" data-tab-go="house">Go to '+esc(term("house"))+'</button></div>'; return; }
+    var pastCount=state.drawHistory.filter(function(h){return h.theme===o.theme;}).length;
+    if(s.assignments){
+      var everyone=s.participants.filter(function(id){return personById(id);});
+      var allSeen=everyone.length>0 && everyone.every(function(id){return s.revealed[id];});
+      b.innerHTML='<div class="card"><div class="name">Pass the phone 👉</div><div class="meta">Each person taps their own name. A hold-to-light keeps wandering eyes out.</div><div class="reveal-grid" style="margin-top:12px">'
+        +everyone.map(function(id){ var p=personById(id); return '<button class="reveal-name'+(s.revealed[id]?" done":"")+'" data-reveal="'+id+'">'+esc(face(p)+" "+p.name)+'</button>'; }).join("")+'</div></div>'
+        +(allSeen?'<div class="card" style="text-align:center"><div class="name" style="justify-content:center">Everyone\'s seen their match 🎉</div><div class="meta" style="justify-content:center">The secret is sealed. See you at the exchange.</div></div>':"")
+        +'<div class="two"><button class="btn" data-secret-redraw>Draw again</button><button class="btn danger" data-secret-clear>Clear draw</button></div>'
+        +(s.relaxed?'<div class="foot" style="color:var(--amber)">Heads up: too many repeats to avoid this year, so some past pairs came back.</div>':'<div class="foot">No pair from a past '+esc(T().label)+' was repeated.'+(pastCount?"":" (No past draws yet, so this one sets the baseline.)")+'</div>');
+      return;
+    }
+    var chosen=s.participants;
+    b.innerHTML='<div class="card"><div class="name">Who\'s playing?</div><div class="meta">Tap to include. Usually the whole house.</div><div class="picklist" style="margin-top:10px">'
+      +house.map(function(p){ var on=chosen.indexOf(p.id)>=0; return '<div class="pickrow" data-pick="'+p.id+'" aria-pressed="'+on+'"><span class="check">'+(on?"✓":"")+'</span><div class="avatar" style="width:34px;height:34px;font-size:18px">'+esc(face(p))+'</div><div class="grow"><b>'+esc(p.name)+'</b></div></div>'; }).join("")+'</div>'
+      +'<button class="btn sm ghost" data-pick-all style="margin-top:10px">'+(chosen.length===house.length?"Clear all":"Select everyone")+'</button></div>'
+      +'<div class="card"><div class="name">Keep apart</div><div class="meta">Couples or anyone who shouldn\'t draw each other.</div><div class="exwrap">'
+      +s.exclusions.map(function(pr,i){ var a=personById(pr[0]),c=personById(pr[1]); if(!a||!c)return""; return '<span class="exrow">'+esc(a.name)+' ✕ '+esc(c.name)+' <button class="iconbtn" data-exdel="'+i+'">✕</button></span>'; }).join("")+'</div>'
+      +'<button class="btn sm" data-exadd style="margin-top:10px">+ Add a pair</button></div>'
+      +(pastCount?'<div class="foot">'+pastCount+' past '+esc(T().label)+' draw'+(pastCount>1?"s":"")+' remembered, so those pairs will be avoided.</div>':"")
+      +'<div class="addbar"><button class="btn primary block" data-secret-draw>Draw '+esc(term("secret"))+'</button></div>';
+  }
+  function exclusionSheet(){
+    var o=occ(); if(!o) return; var people=state.people;
+    openSheet(function(sheet){
+      sheet.innerHTML='<h3>Keep two apart</h3><label class="f">Person A</label><select id="ex-a">'+people.map(function(p){return '<option value="'+p.id+'">'+esc(face(p)+" "+p.name)+'</option>';}).join("")+'</select>'
+        +'<label class="f">Person B</label><select id="ex-b">'+people.map(function(p,i){return '<option value="'+p.id+'"'+(i===1?" selected":"")+'>'+esc(face(p)+" "+p.name)+'</option>';}).join("")+'</select>'
+        +'<div class="sheetbtns"><button class="btn primary" id="ex-save">Add pair</button></div>';
+      sheet.querySelector("#ex-save").addEventListener("click",function(){ var a=sheet.querySelector("#ex-a").value, bb=sheet.querySelector("#ex-b").value; if(a===bb){ toast("Pick two different people."); return; } o.secret.exclusions.push([a,bb]); save(); closeSheet(); renderSecret(); });
+    });
+  }
+  function doDraw(){
+    var o=occ(); if(!o) return; var s=o.secret;
+    var ids=s.participants.filter(function(id){return personById(id);});
+    if(ids.length<3){ toast("Pick at least three players."); return; }
+    var hist={}; state.drawHistory.forEach(function(h){ if(h.theme!==o.theme) return; Object.keys(h.pairs).forEach(function(g){ hist[g+">"+h.pairs[g]]=true; }); });
+    var res=drawSecret(ids, s.exclusions, hist);
+    if(!res.ok){ toast("Couldn't satisfy those rules. Remove an exclusion and retry."); return; }
+    s.assignments=res.map; s.relaxed=res.relaxed; s.revealed={}; s.banked=false;
+    save(); renderSecret();
+    toast(res.relaxed? "Drawn (some repeats were unavoidable).":"Drawn.");
+  }
+  function revealSheet(id){
+    var o=occ(); if(!o) return; var s=o.secret; var giver=personById(id); if(!giver||!s.assignments) return;
+    var rec=personById(s.assignments[id]); var stage="confirm"; var holdTimer=null, holdP=0;
+    openSheet(function(sheet){
+      function cleanup(){ if(holdTimer){ clearInterval(holdTimer); holdTimer=null; } }
+      function paint(){
+        cleanup();
+        if(stage==="confirm"){
+          sheet.innerHTML='<h3 style="text-align:center">Hand the phone to</h3><div style="text-align:center;font-family:var(--display);font-size:34px;margin:2px 0 4px">'+esc(face(giver)+" "+giver.name)+'</div><div style="text-align:center;color:var(--bone-dim);font-size:13px;margin-bottom:16px">Only they should tap continue.</div>'
+            +'<button class="btn primary block" id="rv-cont">I\'m '+esc(giver.name)+', continue</button><button class="btn ghost block" id="rv-back" style="margin-top:8px">Back</button>';
+          sheet.querySelector("#rv-cont").addEventListener("click",function(){ stage="hold"; paint(); });
+          sheet.querySelector("#rv-back").addEventListener("click",function(){ closeSheet(); });
+          return;
+        }
+        if(stage==="hold"){
+          sheet.innerHTML='<h3 style="text-align:center">'+esc(giver.name)+'</h3><div style="text-align:center;color:var(--bone-dim);font-size:13px;margin:-8px 0 10px">This screen is just for you</div><div style="display:grid;place-items:center;padding:6px 0 14px">'+lanternSVG(false)+'</div>'
+            +'<button class="holdpad" id="rv-hold"><span class="fill" id="rv-fill"></span><span class="lbl">Press and hold to light the lantern 🔥</span></button><div class="foot">Hold it down. Letting go snuffs it out.</div>';
+          var pad=sheet.querySelector("#rv-hold"), fill=sheet.querySelector("#rv-fill");
+          pad.addEventListener("contextmenu",function(e){ e.preventDefault(); });
+          function down(e){ e.preventDefault(); if(holdTimer) return; holdTimer=setInterval(function(){ holdP+=4; fill.style.width=Math.min(100,holdP)+"%"; if(holdP>=100){ cleanup(); stage="lit"; FX.burst(); paint(); } },50); }
+          function up(){ cleanup(); holdP=0; if(fill)fill.style.width="0%"; }
+          pad.addEventListener("pointerdown",down); pad.addEventListener("pointerup",up); pad.addEventListener("pointerleave",up); pad.addEventListener("pointercancel",up);
+          return;
+        }
+        sheet.innerHTML='<h3 style="text-align:center">'+esc(giver.name)+'</h3><div style="display:grid;place-items:center;padding:8px 0 4px">'+lanternSVG(true)+'</div><div style="text-align:center;padding:2px 8px 6px">'
+          +'<div style="color:var(--bone-dim);font-size:13px;letter-spacing:1px;text-transform:uppercase">You give a '+esc(term("treat"))+' to</div><div class="revealname">'+esc(rec?face(rec)+" "+rec.name:"someone")+'</div>'
+          +(rec&&rec.wishlist&&rec.wishlist.length?'<div class="meta" style="justify-content:center;margin-top:10px">Wishes: '+rec.wishlist.map(function(w){return esc(w.text);}).join(" · ")+'</div>':"")
+          +(rec&&rec.favorites?'<div class="meta" style="justify-content:center">Loves: '+esc(rec.favorites)+'</div>':"")
+          +(rec&&(rec.shirt||rec.shoe)?'<div class="meta" style="justify-content:center">Sizes: '+esc([rec.shirt?("shirt "+rec.shirt):"",rec.shoe?("shoe "+rec.shoe):""].filter(Boolean).join(" · "))+'</div>':"")
+          +'<button class="btn primary block" id="rv-done" style="margin-top:18px">Got it, hide and pass on</button></div>';
+        sheet.querySelector("#rv-done").addEventListener("click",function(){
+          s.revealed[id]=true; save(); closeSheet(); renderSecret();
+          var everyone=s.participants.filter(function(x){return personById(x);});
+          if(everyone.length && everyone.every(function(x){return s.revealed[x];})){ FX.burst(); toast("That's everyone. The secret is sealed. 🤫"); }
+        });
+      }
+      paint();
+    });
+  }
+  function lanternSVG(lit){
+    var o=occ(); var th=(o&&o.theme)||"halloween";
+    if(th==="halloween"){
+      var body=lit?"#ff7518":"#5a4636", glow=lit?"#ffd24a":"#3a2c22", eye=lit?"#3a1c06":"#160d0a";
+      return '<svg width="150" height="150" viewBox="0 0 150 150" aria-hidden="true">'+(lit?'<circle cx="75" cy="80" r="66" fill="#ff7518" opacity="0.18"/>':"")
+        +'<path d="M75 20 q5 8 0 16" stroke="#3a2c22" stroke-width="5" fill="none" stroke-linecap="round"/><ellipse cx="75" cy="88" rx="54" ry="48" fill="'+body+'"/><ellipse cx="48" cy="88" rx="12" ry="46" fill="'+body+'" opacity="0.85"/><ellipse cx="102" cy="88" rx="12" ry="46" fill="'+body+'" opacity="0.85"/>'
+        +'<polygon points="56,74 68,74 62,86" fill="'+eye+'"/><polygon points="94,74 82,74 88,86" fill="'+eye+'"/><polygon points="66,64 60,58 74,60 88,58 82,64" fill="'+eye+'"/>'
+        +'<path d="M50 104 q6 -8 12 0 q6 8 12 0 q6 -8 12 0 q6 8 12 0" stroke="'+eye+'" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="75" cy="92" r="10" fill="'+glow+'" opacity="'+(lit?"0.9":"0.4")+'"/></svg>';
+    }
+    /* every other theme: a plain lantern, frame and glow in the theme's own colors */
+    var C={thanksgiving:["#c8622a","#e0a13a"],birthday:["#ff5da2","#ffd24a"],winter:["#4aa3ff","#ffd98a"]}[th]||["#4cf0e0","#ffd24a"];
+    var frame=lit?C[0]:"#4a4a55", flame=lit?C[1]:"#3a3a44", core=lit?"#fff4d0":"#55555f";
+    return '<svg width="150" height="150" viewBox="0 0 96 96" aria-hidden="true">'
+      +(lit?'<defs><radialGradient id="lglow" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="'+C[1]+'" stop-opacity="0.75"/><stop offset="0.45" stop-color="'+C[1]+'" stop-opacity="0.22"/><stop offset="1" stop-color="'+C[1]+'" stop-opacity="0"/></radialGradient></defs><circle cx="48" cy="54" r="44" fill="url(#lglow)"/>':"")
+      +'<path d="M40 22a8 8 0 0 1 16 0" fill="none" stroke="'+frame+'" stroke-width="3" stroke-linecap="round"/>'
+      +'<path d="M34 27h28l-3 6H37z" fill="'+frame+'"/>'
+      +'<path d="M37 33h22l3 34H34z" fill="'+flame+'" fill-opacity="0.14" stroke="'+frame+'" stroke-width="3" stroke-linejoin="round"/>'
+      +'<line x1="48" y1="33" x2="48" y2="67" stroke="'+frame+'" stroke-width="1.6" stroke-opacity="0.55"/>'
+      +'<path d="M31 67h34l-2 7H33z" fill="'+frame+'"/>'
+      +'<path d="M48 41c5 6 5.8 10.5 0 15.5c-5.8-5-5-9.5 0-15.5z" fill="'+flame+'"/>'
+      +'<path d="M48 47c2.2 2.8 2.4 5 0 7c-2.4-2-2.2-4.2 0-7z" fill="'+core+'"/></svg>';
+  }
+
+
+  /* ---------- Potluck ---------- */
+  function renderPotluck(){
+    var c=$("potluckList"); var o=occ(); if(!o){ c.innerHTML=noOccHTML(); $("potluckActions").innerHTML=""; return; }
+    $("potluckActions").innerHTML = o.potluck.length? '<div class="addbar"><button class="btn primary block" data-add-dish>+ Add a dish</button></div>' : "";
+    if(!o.potluck.length){ c.innerHTML='<div class="empty"><div class="big">🍲</div><h3>Nothing on the table yet.</h3><p>List what\'s needed and who\'s bringing it. Duplicates get flagged.</p><button class="btn primary" data-add-dish>+ Add a dish</button></div>'; return; }
+    var counts={}; o.potluck.forEach(function(d){ var k=(d.item||"").trim().toLowerCase(); if(k) counts[k]=(counts[k]||0)+1; });
+    var html="";
+    CATS.forEach(function(cat){
+      var items=o.potluck.filter(function(d){return d.cat===cat;}); if(!items.length) return;
+      html+='<div class="cat">'+cat+'</div>'+items.map(function(d){
+        var p=d.assignedTo?personById(d.assignedTo):null; var dup=counts[(d.item||"").trim().toLowerCase()]>1;
+        var diet=(p&&(p.dietary||p.allergies))?'<span class="pill warn">'+esc([p.dietary,p.allergies].filter(Boolean).join(" · "))+'</span>':"";
+        return '<div class="card"><div class="row"><div class="grow" data-edit-dish="'+d.id+'" style="cursor:pointer"><div class="name">'+esc(d.item||"Untitled")+(d.count>1?' <span class="pill">×'+d.count+'</span>':"")+(dup?' <span class="pill warn">duplicate</span>':"")+'</div>'
+          +'<div class="meta">'+(p?'<span class="pill">'+esc(face(p)+" "+p.name)+'</span>':'<span class="pill" style="color:var(--amber);border-color:var(--amber)">Open, needs someone</span>')+diet+(d.notes?'<span class="pill">'+esc(d.notes)+'</span>':"")+'</div></div><button class="iconbtn" data-edit-dish="'+d.id+'">✎</button></div></div>';
+      }).join("");
+    });
+    c.innerHTML=html;
+  }
+  function dishSheet(d){
+    var o=occ(); if(!o){ toast("Create an occasion first."); setTab("hub"); return; }
+    var isNew=!d; d=d||{ id:uid(), item:"", cat:"Mains", assignedTo:null, count:1, notes:"" };
+    var draft=JSON.parse(JSON.stringify(d));
+    openSheet(function(sheet){
+      sheet.innerHTML='<h3>'+(isNew?"Add a dish":"Edit dish")+'</h3><label class="f">Dish or item</label><input id="d-item" value="'+esc(draft.item)+'" placeholder="e.g. Chili">'
+        +'<div class="two"><div><label class="f">Category</label><select id="d-cat">'+CATS.map(function(k){return '<option'+(k===draft.cat?" selected":"")+'>'+k+'</option>';}).join("")+'</select></div><div><label class="f">How many</label><input id="d-count" inputmode="numeric" value="'+(draft.count||1)+'"></div></div>'
+        +'<label class="f">Who\'s bringing it</label><select id="d-person"><option value="">Open, anyone</option>'+state.people.map(function(p){return '<option value="'+p.id+'"'+(p.id===draft.assignedTo?" selected":"")+'>'+esc(face(p)+" "+p.name)+'</option>';}).join("")+'</select>'
+        +'<label class="f">Notes</label><input id="d-notes" value="'+esc(draft.notes)+'" placeholder="Warm / nut-free / needs oven">'
+        +'<div class="sheetbtns">'+(isNew?"":'<button class="btn danger" id="d-del">Delete</button>')+'<button class="btn primary" id="d-save">Save</button></div>';
+      sheet.querySelector("#d-save").addEventListener("click",function(){
+        draft.item=sheet.querySelector("#d-item").value.trim(); draft.cat=sheet.querySelector("#d-cat").value; draft.count=parseInt(sheet.querySelector("#d-count").value,10)||1;
+        draft.assignedTo=sheet.querySelector("#d-person").value||null; draft.notes=sheet.querySelector("#d-notes").value.trim();
+        if(!draft.item){ toast("Name the dish."); return; }
+        if(isNew){ o.potluck.push(draft); } else { for(var i=0;i<o.potluck.length;i++){ if(o.potluck[i].id===draft.id) o.potluck[i]=draft; } }
+        save(); closeSheet(); renderPotluck();
+      });
+      var del=sheet.querySelector("#d-del"); if(del) del.addEventListener("click",function(){ o.potluck=o.potluck.filter(function(x){return x.id!==draft.id;}); save(); closeSheet(); renderPotluck(); });
+    });
+  }
+
+  /* ---------- Games ---------- */
+  var bingoState=null;
+  function newBingo(){ var pool=T().bingo.slice(); for(var i=pool.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=pool[i];pool[i]=pool[j];pool[j]=t; } var cells=pool.slice(0,24); cells.splice(12,0,"FREE"); bingoState={cells:cells,daub:{12:true}}; drawBingo(); }
+  function drawBingo(){ if(!bingoState){ newBingo(); return; } $("bingo").innerHTML=bingoState.cells.map(function(c,i){ var free=c==="FREE"; return '<div class="cell'+(free?" free":"")+(bingoState.daub[i]&&!free?" daub":"")+'" data-cell="'+i+'">'+esc(free?"★ FREE":c)+'</div>'; }).join(""); }
+  var wyrIdx=-1;
+  function nextWyr(){ var deck=T().wyr; wyrIdx=(wyrIdx+1+Math.floor(Math.random()*(deck.length-1)))%deck.length; var q=deck[wyrIdx]; $("wyrA").textContent=q[0]; $("wyrB").textContent=q[1]; }
+  function renderGames(){ drawBingo(); }
+
+  /* ---------- Print ---------- */
+  function printIt(html){ var ps=$("printsheet"); ps.innerHTML=html; document.body.classList.add("printing"); function done(){ document.body.classList.remove("printing"); ps.innerHTML=""; window.removeEventListener("afterprint",done); } window.addEventListener("afterprint",done); setTimeout(function(){ window.print(); },50); }
+  function printPotluck(){
+    var o=occ(); if(!o||!o.potluck.length){ toast("Nothing to print yet."); return; } var th=T();
+    var html='<h1>'+esc(th.terms.potluck)+': who brings what</h1><p class="psub">'+esc(o.name)+' · made with Gather</p>';
+    CATS.forEach(function(cat){ var items=o.potluck.filter(function(d){return d.cat===cat;}); if(!items.length) return;
+      html+='<div class="pcat">'+cat+'</div><table><tr><th style="width:34%">Dish</th><th style="width:8%">Qty</th><th style="width:26%">Who</th><th>Notes</th></tr>';
+      items.forEach(function(d){ var p=d.assignedTo?personById(d.assignedTo):null; var diet=p?[p.dietary,p.allergies].filter(Boolean).join(", "):""; html+='<tr><td>'+esc(d.item)+'</td><td>'+(d.count||1)+'</td><td>'+(p?esc(p.name):"________________")+'</td><td>'+esc([d.notes,diet].filter(Boolean).join(" · "))+'</td></tr>'; });
+      html+='</table>'; });
+    html+='<p class="pnote">Open lines are up for grabs. Write your name in.</p>'; printIt(html);
+  }
+  function printGifts(){
+    var o=occ(); if(!o||!o.treats.length){ toast("Nothing to print yet."); return; } var th=T();
+    var html='<h1>'+esc(th.terms.treats)+' list</h1><p class="psub">'+esc(o.name)+' · made with Gather</p>';
+    var groups={}, order=[]; o.treats.forEach(function(t){ if(!groups[t.personId]){groups[t.personId]=[];order.push(t.personId);} groups[t.personId].push(t); });
+    html+='<table><tr><th style="width:22%">For</th><th>Item</th><th style="width:12%">Cost</th><th style="width:14%">Status</th></tr>'; var total=0;
+    order.forEach(function(pid){ var p=personById(pid); groups[pid].forEach(function(t,i){ total+=Number(t.cost)||0; var st=""; STATUS.forEach(function(s){ if(s[0]===t.status) st=s[1]; }); html+='<tr><td>'+(i===0?esc(p?p.name:""):"")+'</td><td>'+esc(t.item)+'</td><td>'+money(t.cost)+'</td><td>☐ '+esc(st)+'</td></tr>'; }); });
+    html+='<tr><td></td><td style="text-align:right"><b>Total</b></td><td><b>'+money(total)+'</b></td><td></td></tr></table>'; printIt(html);
+  }
+  function printBingo(){ newBingo(); var th=T(); var o=occ(); var html='<h1>'+esc(th.terms.bingo)+'</h1><p class="psub">'+esc(o?o.name:th.label)+' · made with Gather</p><div class="pbingo">'; bingoState.cells.forEach(function(c){ html+='<div class="'+(c==="FREE"?"pfree":"")+'">'+esc(c==="FREE"?"★ FREE":c)+'</div>'; }); html+='</div><p class="pnote">Print a fresh card for each player. Every card is a new shuffle.</p>'; printIt(html); }
+
+  /* ---------- Backup / restore ---------- */
+  function doBackup(){
+    try{ var blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"}); var a=document.createElement("a"); var d=new Date();
+      var stamp=d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0");
+      a.href=URL.createObjectURL(blob); a.download="gather-backup-"+stamp+".json"; document.body.appendChild(a); a.click();
+      setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); },400); toast("Backup saved to your downloads.");
+    }catch(e){ toast("Couldn't create the backup file."); }
+  }
+  function doRestore(file){
+    var r=new FileReader();
+    r.onload=function(){ try{ var s=JSON.parse(r.result); if(!s||typeof s!=="object"||!("people" in s)) throw new Error("shape"); state=migrate(s); save(); bingoState=null; applyTheme(); setTab("hub"); toast("Restored. Welcome back."); }catch(e){ toast("That file doesn't look like a Gather backup."); } };
+    r.readAsText(file);
+  }
+
+  /* ---------- About (first open, then from the brand or the footer) ---------- */
+  var SEEN_KEY="gather.seenAbout";
+  function aboutSheet(first){
+    openSheet(function(sheet){
+      var framed=isFramed(), ios=isIOS();
+      var home = ios
+        ? 'On iPhone: open Gather on its own, tap Share, then Add to Home Screen. Safari can clear a website\'s saved data after about a week away, but a home-screen app keeps its own. That copy has separate storage on iPhone, so start there, or move what you entered with Save backup and Restore.'
+        : 'In Chrome: open Gather on its own, tap the menu, then Add to Home screen. It opens like an app and keeps the same data you already entered.';
+      sheet.innerHTML='<div class="about"><h3>Gather</h3>'
+        +'<p>Plan any holiday or party from one phone: your people, the gifts and budget, a Secret Santa draw, who brings what, and a few party games. Four themes, and every occasion keeps its own lists.</p>'
+        +'<div class="k">Where your stuff lives</div><p>Only on this device. No account, no cloud, nothing sent anywhere. Save a backup file from the Hub whenever you like.</p>'
+        +'<div class="k">Keep it on your home screen</div><p>'+home+'</p>'
+        +(framed?'<a class="btn block" href="./" target="_blank" rel="noopener" style="margin-bottom:10px">Open Gather on its own</a>':'')
+        +'<div class="k">How big is it</div><p>The whole app is one file: <span class="size" id="aboutSize">measuring</span>.</p>'
+        +'<div class="sheetbtns">'+(first && !state.people.length
+            ? '<button class="btn" id="ab-mine">Start my own</button><button class="btn primary" id="ab-sample">Load a sample family</button>'
+            : '<button class="btn primary" id="ab-close">Close</button>')+'</div></div>';
+      var mine=sheet.querySelector("#ab-mine"), smp=sheet.querySelector("#ab-sample"), cl=sheet.querySelector("#ab-close");
+      if(mine) mine.addEventListener("click",function(){ closeSheet(); setTab("house"); });
+      if(smp) smp.addEventListener("click",function(){ closeSheet(); loadSample(); applyTheme(); setTab("hub"); });
+      if(cl) cl.addEventListener("click",closeSheet);
+      measureSelf();
+    });
+    try{ localStorage.setItem(SEEN_KEY,"1"); }catch(e){}
+  }
+  function measureSelf(){
+    var el=$("aboutSize"); if(!el) return;
+    if(!isHosted()){ el.textContent="one HTML file"; return; }
+    try{
+      fetch(location.href.split("#")[0].split("?")[0],{cache:"no-store"}).then(function(r){ return r.blob(); }).then(function(b){
+        var e2=$("aboutSize"); if(e2) e2.textContent=Math.round(b.size/1024)+" KB";
+      }).catch(function(){ var e3=$("aboutSize"); if(e3) e3.textContent="one HTML file"; });
+    }catch(e){ el.textContent="one HTML file"; }
+  }
+
+  /* ---------- Sheet plumbing ---------- */
+  var sheetLock=false;
+  function openSheet(build){ var scrim=$("scrim"), sheet=$("sheet"); build(sheet); scrim.classList.add("open"); document.body.style.overflow="hidden"; }
+  function closeSheet(){ if(sheetLock) return; $("scrim").classList.remove("open"); document.body.style.overflow=""; }
+  $("scrim").addEventListener("click",function(e){ if(e.target===this) closeSheet(); });
+  function confirmSheet(title, body, yesLabel, onYes, danger){
+    openSheet(function(sheet){
+      sheet.innerHTML='<h3>'+esc(title)+'</h3><div class="meta" style="font-size:14px;margin-bottom:6px">'+esc(body)+'</div><div class="sheetbtns"><button class="btn ghost" id="c-no">Cancel</button><button class="btn '+(danger?"danger":"primary")+'" id="c-yes">'+esc(yesLabel)+'</button></div>';
+      sheet.querySelector("#c-no").addEventListener("click",closeSheet);
+      sheet.querySelector("#c-yes").addEventListener("click",function(){ closeSheet(); onYes(); });
+    });
+  }
+
+  /* ---------- Global event delegation ---------- */
+  document.addEventListener("click",function(e){
+    var t=e.target, m;
+    if((m=t.closest("[data-tab]"))){ setTab(m.getAttribute("data-tab")); return; }
+    if((m=t.closest("[data-tab-go]"))){ setTab(m.getAttribute("data-tab-go")); return; }
+    if((m=t.closest("[data-occ-set]"))){ state.currentId=m.getAttribute("data-occ-set"); save(); bingoState=null; applyTheme(); setTab(state.tab); return; }
+    if(t.closest("[data-occ-new]")){ occasionSheet(null); return; }
+    if((m=t.closest("[data-occ-edit]"))){ occasionSheet(occById(m.getAttribute("data-occ-edit"))); return; }
+    if((m=t.closest("[data-occ-reopen]"))){ reopenOccasion(m.getAttribute("data-occ-reopen")); return; }
+    if(t.closest("[data-add-person]")){ personSheet(null); return; }
+    if(t.closest("[data-sample]")){ loadSample(); renderPeople(); return; }
+    if((m=t.closest("[data-edit-person]"))){ personSheet(personById(m.getAttribute("data-edit-person"))); return; }
+    if(t.closest("[data-vcard]")){ $("vcardFile").click(); return; }
+    if(t.closest("[data-ask-wishes]")){ askWishesSheet(); return; }
+    if(t.closest("[data-add-treat]")){ treatSheet(null); return; }
+    if((m=t.closest("[data-edit-treat]"))){ var o1=occ(); var tt=null,id=m.getAttribute("data-edit-treat"); if(o1) o1.treats.forEach(function(x){if(x.id===id)tt=x;}); treatSheet(tt); return; }
+    if((m=t.closest("[data-treat-status]"))){ var o2=occ(); var parts=m.getAttribute("data-treat-status").split("|"); if(o2) o2.treats.forEach(function(x){if(x.id===parts[0])x.status=parts[1];}); save(); renderTreats(); return; }
+    if(t.closest("[data-set-budget]")){ budgetSheet(); return; }
+    if(t.closest("[data-add-dish]")){ dishSheet(null); return; }
+    if((m=t.closest("[data-edit-dish]"))){ var o3=occ(); var dd=null,did=m.getAttribute("data-edit-dish"); if(o3) o3.potluck.forEach(function(x){if(x.id===did)dd=x;}); dishSheet(dd); return; }
+    if((m=t.closest("[data-pick]"))){ var o4=occ(); if(!o4) return; var pid=m.getAttribute("data-pick"); var arr=o4.secret.participants; var ix=arr.indexOf(pid); if(ix>=0)arr.splice(ix,1); else arr.push(pid); save(); renderSecret(); return; }
+    if(t.closest("[data-pick-all]")){ var o5=occ(); if(!o5) return; if(o5.secret.participants.length===state.people.length){o5.secret.participants=[];}else{o5.secret.participants=state.people.map(function(p){return p.id;});} save(); renderSecret(); return; }
+    if(t.closest("[data-exadd]")){ exclusionSheet(); return; }
+    if((m=t.closest("[data-exdel]"))){ var o6=occ(); if(o6) o6.secret.exclusions.splice(+m.getAttribute("data-exdel"),1); save(); renderSecret(); return; }
+    if(t.closest("[data-secret-draw]")){ doDraw(); return; }
+    if(t.closest("[data-secret-redraw]")){ doDraw(); return; }
+    if(t.closest("[data-secret-clear]")){ var o7=occ(); if(o7){ o7.secret.assignments=null; o7.secret.revealed={}; o7.secret.banked=false; } save(); renderSecret(); return; }
+    if((m=t.closest("[data-reveal]"))){ revealSheet(m.getAttribute("data-reveal")); return; }
+    if(t.closest("[data-bingo-new]")){ newBingo(); return; }
+    if(t.closest("[data-bingo-print]")){ printBingo(); return; }
+    if((m=t.closest("[data-cell]"))){ var i=+m.getAttribute("data-cell"); if(bingoState && bingoState.cells[i]!=="FREE"){ bingoState.daub[i]=!bingoState.daub[i]; drawBingo(); } return; }
+    if(t.closest("[data-fortune]")){ var f=T().fortunes; $("fortune").textContent=f[Math.floor(Math.random()*f.length)]; return; }
+    if(t.closest("[data-wyr]")){ nextWyr(); return; }
+    if(t.closest("[data-print-potluck]")){ printPotluck(); return; }
+    if(t.closest("[data-print-gifts]")){ printGifts(); return; }
+    if(t.closest("[data-backup]")){ doBackup(); return; }
+    if(t.closest("[data-restore]")){ $("restoreFile").click(); return; }
+    if(t.closest("[data-clear-sample]")){ confirmSheet("Clear the sample data?","Removes the sample family and their sample gifts and dishes. Anything you added yourself stays.","Clear sample",function(){ clearSample(); }); return; }
+    if(t.closest("[data-erase]")){ confirmSheet("Start completely fresh?","Erases every person, occasion, gift, dish, and draw on this device. Save a backup first if you might want any of it back.","Erase everything",function(){ eraseAll(); },true); return; }
+    if(t.closest("[data-about]")){ aboutSheet(); return; }
+  });
+  $("vcardFile").addEventListener("change",function(){ var f=this.files&&this.files[0]; if(!f) return; var r=new FileReader(); r.onload=function(){ importVcards(String(r.result||"")); }; r.readAsText(f); this.value=""; });
+  $("restoreFile").addEventListener("change",function(){ var f=this.files&&this.files[0]; if(!f) return; doRestore(f); this.value=""; });
+
+  /* ---------- Version badge ---------- */
+  $("mbVer").textContent=VERSION;
+  $("mbVer").addEventListener("click",function(){ toast(VERSION.split(" ")[0]+" loaded"); });
+  $("brand").addEventListener("click",function(){ aboutSheet(false); });
+  $("brand").addEventListener("keydown",function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); aboutSheet(false); } });
+
+  /* ---------- Boot ---------- */
+  applyTheme();
+  setTab(state.tab||"hub");
+  var seen=false; try{ seen=localStorage.getItem(SEEN_KEY)==="1"; }catch(e){}
+  if(!seen) aboutSheet(true);
+  if(location.protocol==="https:" && "serviceWorker" in navigator){ try{ navigator.serviceWorker.register("sw.js"); }catch(e){} }
+})();
+</script>
+</body>
+</html>
