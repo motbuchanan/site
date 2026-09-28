@@ -7,7 +7,7 @@
 
 import { Input, BlobSource, ALL_FORMATS, CanvasSink } from './mediabunny.js';
 import { readMedia } from './state.js';
-import { drawTextsAt } from './text.js';
+import { drawTextsAt, ensureFonts } from './text.js';
 import { drawTransitionAt } from './transitions.js';
 
 export function draftSize(canvas, maxEdge = 720) {
@@ -30,6 +30,9 @@ export class Preview {
     this._dirty = false;
     this.hitBoxes = [];   // text hit boxes from the last paint (canvas px)
     this.tlUs = 0;
+    // once bundled fonts (Creepster) load, repaint so a spooky title stops
+    // showing in the fallback font.
+    ensureFonts().then(() => this.repaintOverlay());
   }
 
   sizeToProject(project) {

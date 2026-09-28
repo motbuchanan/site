@@ -6,7 +6,7 @@
 import { checkCapability } from './media.js';
 import { initUI, showCapabilityFail, toast } from './ui.js';
 
-const VERSION = 'v0.22 \u00b7 Sep 28';
+const VERSION = 'v0.23 \u00b7 Sep 28';
 
 async function registerSW() {
   if (!('serviceWorker' in navigator)) return;

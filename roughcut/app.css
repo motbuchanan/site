@@ -1,4 +1,11 @@
 /* app.css · RoughCut identity (L15) */
+@font-face {
+  font-family: 'Creepster';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('creepster.woff2') format('woff2');
+}
 :root {
   --bg: #0b1a20;
   --panel: #10242c;

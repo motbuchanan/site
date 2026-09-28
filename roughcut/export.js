@@ -18,7 +18,7 @@ import {
 } from './mediabunny.js';
 import { readMedia, usToS, US } from './state.js';
 import { mainTrack, clipDurUs, normalize } from './timeline.js';
-import { drawTextsAt } from './text.js';
+import { drawTextsAt, ensureFonts } from './text.js';
 import { drawTransitionAt } from './transitions.js';
 import { renderTimelineAudio } from './audio.js';
 
@@ -103,6 +103,10 @@ export function exportProject(project, opts = {}) {
       }
     }
     onProgress(0.12);
+
+    // Make sure bundled display fonts (e.g. Creepster) are loaded before any text
+    // is drawn, or the export would fall back to a system font.
+    await ensureFonts();
 
     // Video: walk clips in timeline order, decoding each clip's frames in ONE
     // sequential pass (canvasesAtTimestamps) instead of a precise seek per output
