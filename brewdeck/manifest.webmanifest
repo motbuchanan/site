@@ -1,0 +1,16 @@
+{
+  "name": "The Brew Deck",
+  "short_name": "Brew Deck",
+  "description": "A craft brewing training system: style guides, brew-day decision sims, and a leveled path from first batch to designing your own recipes.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f0b08",
+  "theme_color": "#0f0b08",
+  "icons": [
+    { "src": "./icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
