@@ -13,7 +13,7 @@
 <meta name="apple-mobile-web-app-title" content="Side Boss">
 <meta name="description" content="Level up your side hustle. A free game for makers and small side hustles.">
 <style>
-:root{--bg:#101119;--bg2:#0b0c12;--panel:#1b1d29;--panel2:#161826;--line:#31344a;--ink:#eef0f7;--muted:#8a8fa8;--gold:#f0c24a;--golddeep:#c8963a;--rose:#ff4d6d;--teal:#33d6c4;--ok:#5bd97f}
+:root{--bg:#101119;--bg2:#0b0c12;--panel:#1b1d29;--panel2:#161826;--line:#31344a;--ink:#eef0f7;--muted:#8a8fa8;--gold:#ff8a2b;--golddeep:#e0611a;--rose:#ff5d73;--teal:#23cdba;--ok:#5bd97f}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{margin:0;background:radial-gradient(140% 90% at 50% -10%,#191b28,#0b0c12 72%);background-attachment:fixed;color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.45;padding-bottom:calc(104px + env(safe-area-inset-bottom));min-height:100vh}
@@ -28,7 +28,7 @@ header h1 span{color:var(--gold)}
 header .ver{margin-left:auto;border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--muted);font-family:ui-monospace,Menlo,monospace;font-size:10.5px;cursor:pointer;white-space:nowrap}
 /* character sheet */
 .sheet{margin-top:8px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(158deg,#1d2030,#12131d);padding:16px 15px;display:flex;gap:14px;align-items:center;box-shadow:0 10px 26px rgba(0,0,0,.4)}
-.ava{width:60px;height:60px;flex:0 0 auto;border-radius:14px;border:1px solid var(--line);background:#0e0f18;display:flex;align-items:center;justify-content:center}
+.ava{width:60px;height:60px;flex:0 0 auto;border-radius:14px;border:1px solid var(--line);background:linear-gradient(135deg,#ff8a2b,#12a294 92%);display:flex;align-items:center;justify-content:center}
 .ava svg{width:38px;height:38px}
 .sheet .who{flex:1;min-width:0}
 .hname{font-size:19px;font-weight:700;line-height:1.1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -112,7 +112,7 @@ header .ver{margin-left:auto;border:1px solid var(--line);border-radius:999px;pa
 .boss .loot{margin-top:9px;font-size:13px;color:#d7dae8}
 .boss .loot b{color:var(--gold)}
 .bprog{height:8px;border-radius:5px;background:#0c0d15;border:1px solid var(--line);margin-top:10px;overflow:hidden}
-.bprog i{display:block;height:100%;background:linear-gradient(90deg,#c8963a,#f0c24a)}
+.bprog i{display:block;height:100%;background:linear-gradient(90deg,#e0611a,#ff8a2b)}
 .bpt{font-size:11px;color:var(--muted);margin-top:6px}
 /* shows */
 .lcard select{flex:1;min-width:0;background:#0e0f18;border:1px solid var(--line);border-radius:10px;color:var(--ink);font-size:15px;padding:11px 12px}
@@ -133,6 +133,38 @@ header .ver{margin-left:auto;border:1px solid var(--line);border-radius:999px;pa
 #installBar .im{flex:1;min-width:0;font-size:13px;color:#e6dfce}
 #installBar .mini{flex:0 0 auto}
 #installBar .ix{flex:0 0 auto;background:transparent;border:0;color:var(--muted);font-size:18px;line-height:1;padding:2px 4px}
+/* v0.8 additions */
+.tiles.six{grid-template-columns:repeat(3,1fr);gap:8px}
+.tiles.six .tile{padding:10px 10px}
+.tiles.six .tile b{font-size:17px}
+.tiles.six .tile .lab{font-size:9px}
+.hint{flex:1;font-size:11.5px;color:var(--muted);align-self:center;line-height:1.3}
+.field .sm{flex:0 0 96px}
+.brow{display:flex;justify-content:space-between;font-size:13px;padding:7px 0;border-top:1px solid var(--line)}
+.brow.first{border-top:0}
+.brow span{color:var(--muted)}
+.brow b{font-family:ui-monospace,Menlo,monospace}
+.verd,.stat{display:inline-block;margin-top:9px;margin-right:6px;font-size:9px;letter-spacing:.14em;text-transform:uppercase;border-radius:999px;padding:2px 8px;border:1px solid var(--line)}
+.verd.re{color:var(--ok);border-color:#2c5b3a}
+.verd.thin{color:var(--gold);border-color:#5a4a20}
+.verd.skip{color:var(--rose);border-color:#5b2c36}
+.stat{color:var(--teal);background:transparent;cursor:pointer}
+.kit{margin-top:2px}
+.krow{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
+.krow.first{border-top:0}
+.krow input[type=checkbox]{width:19px;height:19px;accent-color:#f59847;flex:0 0 auto}
+.krow .kt{flex:1;font-size:14px}
+.krow .kt.on{color:var(--muted);text-decoration:line-through}
+.krow .kx{background:transparent;border:0;color:var(--muted);font-size:16px;padding:2px 4px}
+.kadd{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.kadd input{flex:1;min-width:120px}
+.olink{margin-top:28px;background:transparent;border:0;color:var(--muted);font-size:12.5px;text-decoration:underline}
+#backup .card{border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:16px;text-align:left;max-width:460px;width:100%}
+#backup .card h3{margin:0 0 6px;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+#backup .card p{margin:0 0 10px;font-size:13.5px;color:#d7dae8;line-height:1.5}
+#backup textarea{width:100%;min-height:104px;background:#0e0f18;border:1px solid var(--line);border-radius:11px;color:var(--ink);font-size:12px;padding:11px 12px;font-family:ui-monospace,Menlo,monospace;resize:vertical;margin-top:8px}
+.bkrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.bkrow .btn{display:inline-block;font-size:14px;padding:10px 16px}
 /* bottom nav */
 .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:50;display:none;background:rgba(12,13,20,.94);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-top:1px solid var(--line);padding:6px 10px calc(6px + env(safe-area-inset-bottom))}
 .tabbar .tb{flex:1;background:transparent;border:0;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0;font-size:11px;letter-spacing:.04em;border-radius:12px}
@@ -185,10 +217,11 @@ header .ver{margin-left:auto;border:1px solid var(--line);border-radius:999px;pa
 <body>
 
 <div class="ov on" id="opening"><div class="in">
-  <svg class="crown" viewBox="0 0 120 96" aria-hidden="true"><defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd876"/><stop offset="1" stop-color="#c8963a"/></linearGradient></defs><path d="M14 74 L8 30 L36 52 L60 14 L84 52 L112 30 L106 74 Z" fill="url(#cg)" stroke="#7c5a1e" stroke-width="2" stroke-linejoin="round"/><rect x="14" y="74" width="92" height="14" rx="3" fill="#e0ad3f" stroke="#7c5a1e" stroke-width="2"/><circle cx="60" cy="40" r="7" fill="#ff4d6d" stroke="#7c1f30" stroke-width="1.5"/><circle cx="24" cy="58" r="4.5" fill="#33d6c4" stroke="#155e57" stroke-width="1.2"/><circle cx="96" cy="58" r="4.5" fill="#33d6c4" stroke="#155e57" stroke-width="1.2"/></svg>
+  <svg class="crown" viewBox="0 0 120 96" aria-hidden="true"><defs><linearGradient id="cg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffc46b"/><stop offset="1" stop-color="#e0611a"/></linearGradient></defs><path d="M14 74 L8 30 L36 52 L60 14 L84 52 L112 30 L106 74 Z" fill="url(#cg)" stroke="#8a3f12" stroke-width="2" stroke-linejoin="round"/><rect x="14" y="74" width="92" height="14" rx="3" fill="#e07a25" stroke="#8a3f12" stroke-width="2"/><circle cx="60" cy="40" r="7" fill="#23cdba" stroke="#0d5a52" stroke-width="1.5"/><circle cx="24" cy="58" r="4.5" fill="#23cdba" stroke="#155e57" stroke-width="1.2"/><circle cx="96" cy="58" r="4.5" fill="#23cdba" stroke="#155e57" stroke-width="1.2"/></svg>
   <div class="wm">Side<br><span class="lo">Boss</span></div>
   <div class="tag">Level up your <b>side hustle</b>.</div>
   <div class="start" id="pressStart">Press start</div>
+  <button class="olink" id="openRestore">Restore a backup</button>
 </div></div>
 
 <div class="ov" id="setup"><div class="in">
@@ -212,24 +245,24 @@ header .ver{margin-left:auto;border:1px solid var(--line);border-radius:999px;pa
 </div></div>
 
 <div class="ov" id="guide"><div class="in">
-  <svg width="46" height="37" viewBox="0 0 120 96" aria-hidden="true" style="margin-bottom:6px"><path d="M14 74 L8 30 L36 52 L60 14 L84 52 L112 30 L106 74 Z" fill="#f0c24a" stroke="#7c5a1e" stroke-width="3" stroke-linejoin="round"/><rect x="14" y="74" width="92" height="14" rx="3" fill="#e0ad3f"/></svg>
+  <svg width="46" height="37" viewBox="0 0 120 96" aria-hidden="true" style="margin-bottom:6px"><path d="M14 74 L8 30 L36 52 L60 14 L84 52 L112 30 L106 74 Z" fill="#ff8a2b" stroke="#8a3f12" stroke-width="3" stroke-linejoin="round"/><rect x="14" y="74" width="92" height="14" rx="3" fill="#e07a25"/></svg>
   <h2 style="font-size:22px;margin:0 0 16px">How Side Boss works</h2>
   <div class="card">
     <h3>It is your hustle, as a game</h3><p>Every real move you make to grow your side hustle is a quest. Do it, mark it done, earn XP, level up. That is the whole thing.</p>
     <h3>The Board</h3><p>Plan your week here. The board shows the moves that matter right now. Tap done when you have actually done one. No busywork, no fake tasks.</p>
-    <h3>The Ledger</h3><p>Log every sale and every cost. See your revenue, your profit, and your growth over the last six weeks. Logging your first sale finishes a quest on its own.</p>
+    <h3>The Ledger</h3><p>Log every sale and every cost. See revenue, expenses, item costs, profit, margin, and your growth over the last six weeks. Add what a sale cost you to make for true profit, and tag costs by category to see where the money went. Booth fees and travel are counted from Shows automatically. Logging your first sale finishes a quest on its own.</p>
     <h3>Boss battles</h3><p>The big milestones are boss fights: your first sale, a hundred-dollar day, a thousand in the door, surviving the busy season. You do not grind them, you earn them by running the hustle. Beat one for a pile of XP and a piece of loot.</p>
-    <h3>Shows, if you sell in person</h3><p>Sell at markets or fairs? The Shows tab tracks each one: booth fee against what you sold there, so you can see which shows are worth your weekend. Turn it on any time from the Board with "Sell at markets?"</p>
+    <h3>Shows, if you sell in person</h3><p>Sell at markets or fairs? The Shows tab tracks each one: booth fee and travel against what you sold there, with a verdict (rebook, thin margin, or skip). Track application deadlines and status, and keep a reusable booth kit checklist. Turn it on any time from the Board with "Sell at markets?"</p>
     <h3>Level up and unlock seasons</h3><p>XP raises your level and your five skills. Five seasons, timed to how a hustle grows: Getting Ready, First Sales, Find Your People, Busy Season, Level Up. Clear one to open the next.</p>
-    <h3>It saves on this device</h3><p>Your progress lives on this phone. Add it to your home screen so it is one tap away.</p>
+    <h3>It saves on this device</h3><p>Your progress lives on this phone. Add it to your home screen so it is one tap away. Use Backup on the Board to save a file you can restore on any phone or tablet.</p>
   </div>
   <button class="btn" id="guideClose" style="margin-top:20px">Got it</button>
 </div></div>
 
 <div class="ov" id="verCard"><div class="in">
-  <svg width="44" height="35" viewBox="0 0 120 96" aria-hidden="true" style="margin-bottom:8px"><path d="M14 74 L8 30 L36 52 L60 14 L84 52 L112 30 L106 74 Z" fill="#f0c24a" stroke="#7c5a1e" stroke-width="3" stroke-linejoin="round"/><rect x="14" y="74" width="92" height="14" rx="3" fill="#e0ad3f"/><circle cx="60" cy="40" r="6" fill="#ff4d6d"/></svg>
+  <svg width="44" height="35" viewBox="0 0 120 96" aria-hidden="true" style="margin-bottom:8px"><path d="M14 74 L8 30 L36 52 L60 14 L84 52 L112 30 L106 74 Z" fill="#ff8a2b" stroke="#8a3f12" stroke-width="3" stroke-linejoin="round"/><rect x="14" y="74" width="92" height="14" rx="3" fill="#e07a25"/><circle cx="60" cy="40" r="6" fill="#23cdba"/></svg>
   <h2 style="font-size:22px;margin:0">Side Boss</h2>
-  <div class="vcver" id="vcVer">v0.6</div>
+  <div class="vcver" id="vcVer">v0.8</div>
   <div class="vcrows">
     <div class="vcrow"><span>Today</span><b id="vcToday"></b></div>
     <div class="vcrow"><span>Last updated</span><b id="vcLast"></b></div>
@@ -240,10 +273,23 @@ header .ver{margin-left:auto;border:1px solid var(--line);border-radius:999px;pa
   <button class="btn ghost" id="vcClose" style="margin-top:12px">Close</button>
 </div></div>
 
+<div class="ov" id="backup"><div class="in">
+  <h2 style="font-size:22px;margin:0 0 14px">Backup and restore</h2>
+  <div class="card">
+    <h3>Save a backup</h3><p>Everything on this device in one small file. Save it to your phone, tablet, or a cloud drive. Do it after a good week.</p>
+    <div class="bkrow"><button class="btn" id="bkExport">Save backup file</button><button class="btn ghost" id="bkCopy">Copy as text</button></div>
+    <h3 style="margin-top:18px">Restore</h3><p>Pick a backup file, or paste backup text below. Restoring replaces what is on this device.</p>
+    <div class="bkrow"><label class="btn ghost" for="bkFile" style="cursor:pointer">Choose backup file</label><input id="bkFile" type="file" accept=".json,application/json" style="display:none"></div>
+    <textarea id="bkText" placeholder="Or paste backup text here"></textarea>
+    <div class="bkrow"><button class="btn" id="bkRestore">Restore from text</button></div>
+  </div>
+  <button class="btn ghost" id="bkClose" style="margin-top:16px">Close</button>
+</div></div>
+
 <header>
-  <svg class="mk" viewBox="0 0 120 96" aria-hidden="true"><path d="M14 74 L8 30 L36 52 L60 14 L84 52 L112 30 L106 74 Z" fill="#f0c24a" stroke="#7c5a1e" stroke-width="3" stroke-linejoin="round"/><rect x="14" y="74" width="92" height="14" rx="3" fill="#e0ad3f" stroke="#7c5a1e" stroke-width="3"/><circle cx="60" cy="40" r="7" fill="#ff4d6d"/></svg>
+  <svg class="mk" viewBox="0 0 120 96" aria-hidden="true"><path d="M14 74 L8 30 L36 52 L60 14 L84 52 L112 30 L106 74 Z" fill="#ff8a2b" stroke="#8a3f12" stroke-width="3" stroke-linejoin="round"/><rect x="14" y="74" width="92" height="14" rx="3" fill="#e07a25" stroke="#8a3f12" stroke-width="3"/><circle cx="60" cy="40" r="7" fill="#23cdba"/></svg>
   <h1>Side<span>Boss</span></h1>
-  <span class="ver" id="verBadge">v0.6 &middot; Sep 27 2026</span>
+  <span class="ver" id="verBadge">v0.8 &middot; Sep 29 2026</span>
 </header>
 
 <div class="wrap" id="app" style="display:none">
@@ -256,7 +302,7 @@ header .ver{margin-left:auto;border:1px solid var(--line);border-radius:999px;pa
 
   <div id="boardView">
     <div class="sheet">
-      <div class="ava"><svg viewBox="0 0 120 96" aria-hidden="true"><path d="M14 74 L8 30 L36 52 L60 14 L84 52 L112 30 L106 74 Z" fill="#f0c24a" stroke="#7c5a1e" stroke-width="3" stroke-linejoin="round"/><rect x="14" y="74" width="92" height="14" rx="3" fill="#e0ad3f" stroke="#7c5a1e" stroke-width="3"/><circle cx="60" cy="40" r="7" fill="#ff4d6d"/></svg></div>
+      <div class="ava"><svg viewBox="0 0 120 96" aria-hidden="true"><path d="M14 74 L8 30 L36 52 L60 14 L84 52 L112 30 L106 74 Z" fill="#fff7ec" stroke="rgba(0,0,0,.16)" stroke-width="2" stroke-linejoin="round"/><rect x="14" y="74" width="92" height="14" rx="3" fill="#fff7ec"/><circle cx="60" cy="40" r="7" fill="#ef6a16"/><circle cx="24" cy="58" r="4.5" fill="#12988a"/><circle cx="96" cy="58" r="4.5" fill="#12988a"/></svg></div>
       <div class="who">
         <div class="hname" id="hName">Your Hustle</div>
         <div class="htitle" id="hTitle">Level 1 &middot; Rookie</div>
@@ -281,6 +327,7 @@ header .ver{margin-left:auto;border:1px solid var(--line);border-radius:999px;pa
 
     <div class="foot">
       <button id="guideBtn">How it works</button>
+      <button id="backupBtn">Backup</button>
       <button id="eventsOn" style="display:none">Sell at markets?</button>
       <button id="resetBtn">Reset</button>
     </div>
@@ -300,8 +347,10 @@ header .ver{margin-left:auto;border:1px solid var(--line);border-radius:999px;pa
     <div class="lcard">
       <div class="lh">Add a show</div>
       <div class="field f0"><input id="shName" placeholder="Show name, e.g. Holiday Market"></div>
-      <div class="field"><input id="shDate" type="date"><input id="shFee" class="amt" type="number" inputmode="decimal" min="0" step="1" placeholder="Fee $"></div>
-      <div class="field"><input id="shCity" placeholder="City or venue (optional)"><button class="mini go2" id="shAdd">Add</button></div>
+      <div class="field"><input id="shDate" type="date"><input id="shFee" class="amt" type="number" inputmode="decimal" min="0" step="1" placeholder="Fee"></div>
+      <div class="field"><input id="shCity" placeholder="City or venue (optional)"><input id="shTravel" class="amt" type="number" inputmode="decimal" min="0" step="1" placeholder="Travel"></div>
+      <div class="field"><input id="shDue" type="date"><select id="shStatus" style="flex:0 0 118px"><option value="planning">Planning</option><option value="applied">Applied</option><option value="booked">Booked</option><option value="done">Done</option></select><button class="mini go2" id="shAdd">Add</button></div>
+      <div class="hint" style="margin-top:8px">Second date is the application deadline, if the show is juried. Tap a show's status later to update it.</div>
     </div>
 
     <div class="lcard" id="boothLogCard" style="display:none">
@@ -310,17 +359,30 @@ header .ver{margin-left:auto;border:1px solid var(--line);border-radius:999px;pa
       <div class="field"><input id="bsWhat" placeholder="Sold what? (optional)"><input id="bsAmt" class="amt" type="number" inputmode="decimal" min="0" step="0.01" placeholder="$"><button class="mini go2" id="bsAdd">Sale</button></div>
     </div>
 
+    <div class="lcard">
+      <div class="lh">Booth kit checklist</div>
+      <div class="kit" id="kitlist"></div>
+      <div class="kadd"><input id="kitNew" placeholder="Add an item"><button class="mini" id="kitAdd">Add</button><button class="mini" id="kitReset">Reset for next show</button></div>
+    </div>
+
     <div id="showlist"></div>
     <div class="foot"><button id="guideBtn4">How it works</button><button id="eventsOff">Turn off booth tools</button></div>
   </div>
 
   <div id="ledgerView" style="display:none">
     <div class="h3" style="margin-top:14px">Ledger</div>
-    <div class="tiles">
+    <div class="tiles six">
       <div class="tile"><span class="lab">Revenue</span><b id="tRev">$0</b></div>
-      <div class="tile"><span class="lab">Costs</span><b id="tCost">$0</b></div>
+      <div class="tile"><span class="lab">Expenses</span><b id="tCost">$0</b></div>
+      <div class="tile"><span class="lab">Item cost</span><b id="tCogs">$0</b></div>
       <div class="tile"><span class="lab">Profit</span><b id="tProfit">$0</b></div>
+      <div class="tile"><span class="lab">Margin</span><b id="tMargin">0%</b></div>
       <div class="tile"><span class="lab">Sales</span><b id="tCount">0</b></div>
+    </div>
+
+    <div class="lcard">
+      <div class="lh">Where the money went</div>
+      <div id="breakdown"></div>
     </div>
 
     <div class="lcard">
@@ -338,7 +400,9 @@ header .ver{margin-left:auto;border:1px solid var(--line);border-radius:999px;pa
     <div class="lcard">
       <div class="lh">Log it</div>
       <div class="field f0"><input id="saleWhat" placeholder="Sold what? e.g. 2 candles"><input id="saleAmt" class="amt" type="number" inputmode="decimal" min="0" step="0.01" placeholder="$"><button class="mini go2" id="saleAdd">Sale</button></div>
+      <div class="field"><input id="saleQty" class="sm" type="number" inputmode="numeric" min="1" step="1" placeholder="Qty"><input id="saleCogs" class="sm" type="number" inputmode="decimal" min="0" step="0.01" placeholder="Cost to make"><span class="hint">Optional. What those items cost you to make, total.</span></div>
       <div class="field"><input id="costWhat" placeholder="Spent on? e.g. wax + wicks"><input id="costAmt" class="amt" type="number" inputmode="decimal" min="0" step="0.01" placeholder="$"><button class="mini cost" id="costAdd">Cost</button></div>
+      <div class="field"><select id="costCat"><option value="materials">Materials</option><option value="tools">Tools</option><option value="shipping">Shipping</option><option value="fees">Fees and apps</option><option value="marketing">Marketing</option><option value="other">Other</option></select><span class="hint">Booth fees and travel are counted from Shows.</span></div>
     </div>
 
     <div class="lcard">
@@ -348,6 +412,7 @@ header .ver{margin-left:auto;border:1px solid var(--line);border-radius:999px;pa
 
     <div class="foot">
       <button id="guideBtn2">How it works</button>
+      <button id="backupBtn2">Backup</button>
     </div>
   </div>
 
@@ -366,8 +431,8 @@ header .ver{margin-left:auto;border:1px solid var(--line);border-radius:999px;pa
 "use strict";
 var $=function(id){return document.getElementById(id);};
 var KEY="sideboss-v1";
-var VER="0.6", BUILD_DATE="2026-09-27";
-var BUILD="Side Boss v"+VER+" · Sep 27 2026";
+var VER="0.8", BUILD_DATE="2026-09-29";
+var BUILD="Side Boss v"+VER+" · Sep 29 2026";
 
 function todayISO(){ try{ var m=location.search.match(/[?&]today=(\d{4}-\d{2}-\d{2})/); if(m) return m[1]; }catch(e){} return new Date().toISOString().slice(0,10); }
 
@@ -440,9 +505,9 @@ var BOSSES=[
 ];
 
 /* ---------- state ---------- */
-function fresh(){ return {v:5, opened:false, setup:{}, setupDone:false, xp:0, skillxp:{maker:0,merchant:0,herald:0,steward:0,scout:0}, done:{}, season:1, sales:[], costs:[], goalAmt:0, bosses:{}, artifacts:{}, shows:[], events:false, tab:"board"}; }
+function fresh(){ return {v:8, opened:false, setup:{}, setupDone:false, xp:0, skillxp:{maker:0,merchant:0,herald:0,steward:0,scout:0}, done:{}, season:1, sales:[], costs:[], goalAmt:0, bosses:{}, artifacts:{}, shows:[], events:false, kit:[], kitSeeded:false, tab:"board"}; }
 var S=fresh();
-try{ var raw=localStorage.getItem(KEY); if(raw){ S=Object.assign(fresh(), JSON.parse(raw)); if(!S.skillxp) S.skillxp={maker:0,merchant:0,herald:0,steward:0,scout:0}; if(!S.sales) S.sales=[]; if(!S.costs) S.costs=[]; if(!S.bosses) S.bosses={}; if(!S.artifacts) S.artifacts={}; if(!S.shows) S.shows=[]; if(typeof S.events!=="boolean") S.events=isEventWhere((S.setup||{}).where); } }catch(e){}
+try{ var raw=localStorage.getItem(KEY); if(raw){ S=Object.assign(fresh(), JSON.parse(raw)); if(!S.skillxp) S.skillxp={maker:0,merchant:0,herald:0,steward:0,scout:0}; if(!S.sales) S.sales=[]; if(!S.costs) S.costs=[]; if(!S.bosses) S.bosses={}; if(!S.artifacts) S.artifacts={}; if(!S.shows) S.shows=[]; if(!Array.isArray(S.kit)) S.kit=[]; if(typeof S.events!=="boolean") S.events=isEventWhere((S.setup||{}).where); } }catch(e){}
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
 function isEventWhere(w){ return !!w && (w.indexOf("In person")===0 || w.indexOf("A mix")===0); }
 function eventsOn(){ return !!S.events; }
@@ -457,6 +522,15 @@ function seasonComplete(n){ var qs=seasonQuests(n); return qs.length>0 && qs.eve
 function currentSeason(){ var s=1; for(var i=1;i<=5;i++){ if(i===1||seasonComplete(i-1)) s=i; } return s; }
 function revenue(){ var t=0; S.sales.forEach(function(x){t+=(+x.amt||0);}); return t; }
 function costTotal(){ var t=0; S.costs.forEach(function(x){t+=(+x.amt||0);}); return t; }
+function cogs(){ var t=0; S.sales.forEach(function(x){t+=(+x.cogs||0);}); return t; }
+function showCosts(){ if(!eventsOn()) return 0; var t=0; S.shows.forEach(function(x){t+=(+x.fee||0)+(+x.travel||0);}); return t; }
+function expensesAll(){ return costTotal()+showCosts(); }
+function profit(){ return revenue()-cogs()-expensesAll(); }
+var CATS={materials:"Materials",tools:"Tools",shipping:"Shipping",fees:"Fees and apps",marketing:"Marketing",other:"Other"};
+var STATS=["planning","applied","booked","done"], STATN={planning:"Planning",applied:"Applied",booked:"Booked",done:"Done"};
+function verdict(sh){ var sales=eventSales(sh.id), net=sales-(+sh.fee||0)-(+sh.travel||0); if(sales<=0) return null; if(net>=100) return {k:"re",t:"Rebook"}; if(net>0) return {k:"thin",t:"Thin margin"}; return {k:"skip",t:"Skip next time"}; }
+var KIT_DEFAULT=["Table","Tablecloth","Display stands","Signage and price tags","Cash box and change","Card reader","Bags and wrap","Tape, scissors, zip ties","Business cards","Water and snacks","Chair","Weights or clips for wind"];
+function seedKit(){ if(!S.kitSeeded){ S.kit=KIT_DEFAULT.map(function(t){return {t:t,on:false};}); S.kitSeeded=true; save(); } }
 function bestDay(){ var m={},mx=0; S.sales.forEach(function(x){ var d=x.date||todayISO(); m[d]=(m[d]||0)+(+x.amt||0); }); for(var k in m) if(m[k]>mx) mx=m[k]; return mx; }
 function bossMet(id){
   switch(id){
@@ -464,10 +538,10 @@ function bossMet(id){
     case "btax":    return S.costs.length>=8;
     case "b100day": return bestDay()>=100;
     case "bdry":    return !!S.done.repeat;
-    case "bbooth":  for(var i=0;i<S.shows.length;i++){ var sh=S.shows[i]; if((+sh.fee||0)>0 && eventSales(sh.id)>(+sh.fee||0)) return true; } return false;
+    case "bbooth":  for(var i=0;i<S.shows.length;i++){ var sh=S.shows[i]; if((+sh.fee||0)>0 && eventSales(sh.id)>((+sh.fee||0)+(+sh.travel||0))) return true; } return false;
     case "bbusy":   return seasonComplete(4);
     case "bgrand":  return revenue()>=1000;
-    case "breck":   return seasonComplete(5) && (revenue()-costTotal())>0;
+    case "breck":   return seasonComplete(5) && profit()>0;
   }
   return false;
 }
@@ -595,28 +669,36 @@ function weekly(){
   S.sales.forEach(function(x){ var d=new Date((x.date||todayISO())+"T12:00:00"); for(var i=0;i<weeks.length;i++){ var st=weeks[i].start, en=new Date(st); en.setDate(st.getDate()+7); if(d>=st&&d<en){ weeks[i].total+=(+x.amt||0); break; } } });
   return weeks;
 }
+function renderKit(){
+  seedKit();
+  var h=""; S.kit.forEach(function(k,i){ h+='<div class="krow'+(i===0?" first":"")+'"><input type="checkbox" data-kit="'+i+'"'+(k.on?" checked":"")+'><span class="kt'+(k.on?" on":"")+'">'+esc(k.t)+'</span><button class="kx" data-kdel="'+i+'" aria-label="Remove">\u00d7</button></div>'; });
+  if(!S.kit.length) h='<div class="emptyline">Add the things you pack for a show.</div>';
+  $("kitlist").innerHTML=h;
+}
 function renderShows(){
   if(!eventsOn()) return;
   var shows=S.shows.slice().sort(function(a,b){ return (a.date||"").localeCompare(b.date||""); });
   var today=todayISO();
-  // booth-log selector
   var log=$("boothLogCard");
-  if(shows.length){ log.style.display="block"; var opt=shows.map(function(s){ return '<option value="'+s.id+'">'+esc(s.name)+(s.date?(" · "+s.date):"")+'</option>'; }).join(""); $("bsShow").innerHTML=opt; }
+  if(shows.length){ log.style.display="block"; var opt=shows.map(function(s){ return '<option value="'+s.id+'">'+esc(s.name)+(s.date?(" \u00b7 "+s.date):"")+'</option>'; }).join(""); $("bsShow").innerHTML=opt; }
   else { log.style.display="none"; }
   var up=shows.filter(function(s){ return !s.date || s.date>=today; });
   var past=shows.filter(function(s){ return s.date && s.date<today; }).reverse();
   function card(s, isPast){
-    var sales=eventSales(s.id), fee=(+s.fee||0), net=sales-fee;
-    var h='<div class="show'+(isPast?" past":"")+'"><button class="sx" data-shdel="'+s.id+'" aria-label="Remove">×</button>'
+    var sales=eventSales(s.id), fee=(+s.fee||0), travel=(+s.travel||0), net=sales-fee-travel, v=verdict(s), st=s.status||"planning";
+    var h='<div class="show'+(isPast?" past":"")+'"><button class="sx" data-shdel="'+s.id+'" aria-label="Remove">\u00d7</button>'
       +'<div class="sn">'+esc(s.name)+'</div>'
-      +'<div class="sd">'+(s.date?esc(s.date):"No date set")+(s.city?(" · "+esc(s.city)):"")+'</div>'
+      +'<div class="sd">'+(s.date?esc(s.date):"No date set")+(s.city?(" \u00b7 "+esc(s.city)):"")+(s.due?(" \u00b7 apply by "+esc(s.due)):"")+'</div>'
       +'<div class="srow">'
       +(fee>0?'<span><span class="k">Fee</span> <b>'+money(fee)+'</b></span>':'')
+      +(travel>0?'<span><span class="k">Travel</span> <b>'+money(travel)+'</b></span>':'')
       +'<span><span class="k">Sales</span> <b>'+money(sales)+'</b></span>'
-      +(fee>0?'<span><span class="k">Net</span> <b class="net '+(net>=0?"pos":"neg")+'">'+money(net)+'</b></span>':'')
+      +((fee>0||travel>0)?'<span><span class="k">Net</span> <b class="net '+(net>=0?"pos":"neg")+'">'+money(net)+'</b></span>':'')
+      +'</div>'
+      +'<button class="stat" data-shstat="'+s.id+'">'+(STATN[st]||"Planning")+'</button>'
+      +(v?'<span class="verd '+v.k+'">'+v.t+'</span>':'')
+      +((fee>0 && sales>fee+travel)?'<span class="badge">Beat the fee</span>':'')
       +'</div>';
-    if(fee>0 && sales>fee) h+='<span class="badge">Beat the fee</span>';
-    h+='</div>';
     return h;
   }
   var html="";
@@ -624,20 +706,31 @@ function renderShows(){
   if(past.length){ html+='<div class="subh">Past</div>'; past.forEach(function(s){ html+=card(s,true); }); }
   if(!shows.length) html='<div class="emptyline" style="margin-top:12px">No shows yet. Add your first market or fair above.</div>';
   $("showlist").innerHTML=html;
+  renderKit();
 }
 function renderLedger(){
-  var rev=revenue(), cost=costTotal(), profit=rev-cost;
+  var rev=revenue(), exp=expensesAll(), cg=cogs(), pr=profit(), mg=rev>0?Math.round(pr/rev*100):0;
   $("tRev").textContent=money(rev);
-  $("tCost").textContent=money(cost);
-  $("tProfit").textContent=money(profit);
-  $("tProfit").style.color = profit<0 ? "#ff4d6d" : (profit>0?"#5bd97f":"#eef0f7");
+  $("tCost").textContent=money(exp);
+  $("tCogs").textContent=money(cg);
+  $("tProfit").textContent=money(pr);
+  $("tProfit").style.color = pr<0 ? "#ff5d73" : (pr>0?"#5bd97f":"#eef0f7");
+  $("tMargin").textContent=(rev>0?mg:0)+"%";
+  $("tMargin").style.color = (rev>0&&mg<0) ? "#ff5d73" : "#eef0f7";
   $("tCount").textContent=String(S.sales.length);
+  /* breakdown */
+  var by={}; S.costs.forEach(function(c){ var k=c.cat||"other"; by[k]=(by[k]||0)+(+c.amt||0); });
+  var rows=[]; Object.keys(CATS).forEach(function(k){ if(by[k]) rows.push([CATS[k],by[k]]); });
+  var sc=showCosts(); if(sc>0) rows.push(["Show fees and travel",sc]);
+  if(cg>0) rows.push(["Item costs on sales",cg]);
+  var bh=""; rows.forEach(function(r,i){ bh+='<div class="brow'+(i===0?" first":"")+'"><span>'+esc(r[0])+'</span><b>'+money(r[1])+'</b></div>'; });
+  $("breakdown").innerHTML = bh || '<div class="emptyline">Log a cost, add an item cost to a sale, or book a show to see the breakdown.</div>';
   /* goal */
   if(document.activeElement!==$("goalInp")) $("goalInp").value = S.goalAmt>0 ? String(S.goalAmt) : "";
   if(S.goalAmt>0){
     var gp=Math.max(0,Math.min(100,Math.round(rev/S.goalAmt*100)));
     $("goalWrap").style.display="block"; $("goalFill").style.width=gp+"%";
-    $("goalTxt").textContent=money(rev)+" of "+money(S.goalAmt)+" · "+gp+"%"+(gp>=100?", goal hit":"");
+    $("goalTxt").textContent=money(rev)+" of "+money(S.goalAmt)+" \u00b7 "+gp+"%"+(gp>=100?", goal hit":"");
   } else { $("goalWrap").style.display="none"; $("goalTxt").textContent="Set a revenue target and watch the bar fill as you log sales."; }
   /* chart */
   var wk=weekly(), max=0; wk.forEach(function(w){ if(w.total>max) max=w.total; });
@@ -650,10 +743,12 @@ function renderLedger(){
   else {
     var eh=""; all.slice(0,14).forEach(function(row,idx){
       var x=row.e, isSale=row.t==="sale";
+      var detail = isSale ? (((x.qty&&x.qty>1)?(x.qty+" items"):"")+((x.qty&&x.qty>1&&x.cogs>0)?", ":"")+(x.cogs>0?("cost "+money(x.cogs)):"")) : (CATS[x.cat||"other"]||"Other");
+      var meta = esc(x.date||"") + (detail?(" \u00b7 "+esc(detail)):"") + (x.evname?(" \u00b7 "+esc(x.evname)):"");
       eh+='<div class="ent'+(idx===0?" first":"")+'"><span class="ei '+(isSale?"s":"c")+'"></span>'
-        +'<div class="ew"><div class="wt">'+esc(x.what||(isSale?"Sale":"Cost"))+'</div><div class="ed">'+esc(x.date||"")+'</div></div>'
-        +'<span class="ea '+(isSale?"s":"c")+'">'+(isSale?"+":"−")+money(+x.amt||0).replace(/^-/,"")+'</span>'
-        +'<button class="ex" data-del="'+row.t+':'+x.id+'" aria-label="Remove">×</button></div>';
+        +'<div class="ew"><div class="wt">'+esc(x.what||(isSale?"Sale":"Cost"))+'</div><div class="ed">'+meta+'</div></div>'
+        +'<span class="ea '+(isSale?"s":"c")+'">'+(isSale?"+":"\u2212")+money(+x.amt||0).replace(/^-/,"")+'</span>'
+        +'<button class="ex" data-del="'+row.t+':'+x.id+'" aria-label="Remove">\u00d7</button></div>';
     });
     $("entries").innerHTML=eh;
   }
@@ -675,21 +770,24 @@ function uid(){ return String(Date.now())+"-"+Math.random().toString(36).slice(2
 function addSale(){
   var amt=parseFloat($("saleAmt").value); if(!(amt>0)){ toast("Enter a sale amount"); return; }
   var what=($("saleWhat").value||"").trim()||"Sale";
+  var qty=parseInt($("saleQty").value,10); if(!(qty>0)) qty=1;
+  var cg=parseFloat($("saleCogs").value); if(!(cg>=0)) cg=0;
   var first=S.sales.length===0;
-  S.sales.push({id:uid(), what:what, amt:Math.round(amt*100)/100, date:todayISO(), ts:Date.now()}); save();
-  $("saleWhat").value=""; $("saleAmt").value="";
+  S.sales.push({id:uid(), what:what, amt:Math.round(amt*100)/100, qty:qty, cogs:Math.round(cg*100)/100, date:todayISO(), ts:Date.now()}); save();
+  $("saleWhat").value=""; $("saleAmt").value=""; $("saleQty").value=""; $("saleCogs").value="";
   if(first && !S.done.firstsale){ completeQuest("firstsale"); }
-  else { award(15, "merchant", "Sale logged", money(amt)+" · "+what, "Money in. That is the sound of a boss at work."); }
+  else { award(15, "merchant", "Sale logged", money(amt)+" \u00b7 "+what, "Money in. That is the sound of a boss at work."); }
   checkBosses(false);
 }
 function addCost(){
   var amt=parseFloat($("costAmt").value); if(!(amt>0)){ toast("Enter a cost amount"); return; }
   var what=($("costWhat").value||"").trim()||"Cost";
+  var cat=$("costCat").value||"other"; if(!CATS[cat]) cat="other";
   var first=S.costs.length===0;
-  S.costs.push({id:uid(), what:what, amt:Math.round(amt*100)/100, date:todayISO(), ts:Date.now()}); save();
+  S.costs.push({id:uid(), what:what, amt:Math.round(amt*100)/100, cat:cat, date:todayISO(), ts:Date.now()}); save();
   $("costWhat").value=""; $("costAmt").value="";
   if(first && !S.done.expense){ completeQuest("expense"); }
-  else { award(8, "steward", "Cost logged", money(amt)+" · "+what, "Track every dollar out. Future you at tax time says thanks."); }
+  else { award(8, "steward", "Cost logged", money(amt)+" \u00b7 "+what, "Track every dollar out. Future you at tax time says thanks."); }
   checkBosses(false);
 }
 function setGoal(){
@@ -709,11 +807,14 @@ function addShow(){
   var date=($("shDate").value||"").trim();
   var city=($("shCity").value||"").trim();
   var fee=parseFloat($("shFee").value); if(!(fee>=0)) fee=0;
+  var travel=parseFloat($("shTravel").value); if(!(travel>=0)) travel=0;
+  var due=($("shDue").value||"").trim();
+  var status=$("shStatus").value||"planning"; if(STATS.indexOf(status)<0) status="planning";
   var first=S.shows.length===0;
-  S.shows.push({id:uid(), name:name, date:date, city:city, fee:Math.round(fee*100)/100}); save();
-  $("shName").value=""; $("shDate").value=""; $("shCity").value=""; $("shFee").value="";
+  S.shows.push({id:uid(), name:name, date:date, city:city, fee:Math.round(fee*100)/100, travel:Math.round(travel*100)/100, due:due, status:status}); save();
+  $("shName").value=""; $("shDate").value=""; $("shCity").value=""; $("shFee").value=""; $("shTravel").value=""; $("shDue").value=""; $("shStatus").value="planning";
   if(first && eventsOn() && !S.done.evscout){ completeQuest("evscout"); }
-  else { renderShows(); toast("Show added"); }
+  else { renderShows(); renderLedger(); toast("Show added"); }
   checkBosses(false);
 }
 function logBoothSale(){
@@ -731,8 +832,50 @@ function logBoothSale(){
 }
 function delShow(id){
   for(var i=0;i<S.shows.length;i++){ if(S.shows[i].id===id){ S.shows.splice(i,1); break; } }
-  save(); renderShows();
+  save(); renderShows(); renderLedger();
 }
+function cycleStatus(id){ for(var i=0;i<S.shows.length;i++){ var sh=S.shows[i]; if(sh.id===id){ var cur=STATS.indexOf(sh.status||"planning"); sh.status=STATS[(cur+1)%STATS.length]; save(); renderShows(); return; } } }
+/* ---------- booth kit ---------- */
+function kitToggle(i,on){ if(!S.kit[i]) return; S.kit[i].on=!!on; save(); renderKit(); if(S.kit.length && S.kit.every(function(k){return k.on;}) && eventsOn() && !S.done.evkit){ completeQuest("evkit"); } }
+function kitAdd(){ var v=($("kitNew").value||"").trim(); if(!v){ toast("Type an item first"); return; } S.kit.push({t:v,on:false}); $("kitNew").value=""; save(); renderKit(); }
+function kitDel(i){ S.kit.splice(i,1); save(); renderKit(); }
+function kitReset(){ S.kit.forEach(function(k){k.on=false;}); save(); renderKit(); toast("Kit reset for the next show"); }
+/* ---------- backup + restore ---------- */
+function backupJSON(){ return JSON.stringify({app:"sideboss", v:VER, exported:new Date().toISOString(), state:S}); }
+function downloadBlob(blob,name){ var a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(function(){ try{ URL.revokeObjectURL(a.href); }catch(e){} a.remove(); },1500); toast("Backup saved"); }
+function exportBackup(){
+  var txt=backupJSON(), name="sideboss-backup-"+todayISO()+".json";
+  try{
+    var blob=new Blob([txt],{type:"application/json"}), file=null;
+    try{ file=new File([blob],name,{type:"application/json"}); }catch(e){}
+    if(file && navigator.share && navigator.canShare && navigator.canShare({files:[file]})){
+      navigator.share({files:[file],title:"Side Boss backup"}).then(function(){ toast("Backup shared"); }).catch(function(){ downloadBlob(blob,name); });
+      return;
+    }
+    downloadBlob(blob,name);
+  }catch(e){ $("bkText").value=txt; toast("Could not save a file. Copy the text below instead."); }
+}
+function copyBackup(){
+  var txt=backupJSON();
+  function fallback(){ $("bkText").value=txt; try{ $("bkText").select(); }catch(e){} toast("Backup text is in the box. Select all and copy."); }
+  try{ if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(function(){ toast("Backup copied"); }, fallback); } else fallback(); }catch(e){ fallback(); }
+}
+function restoreFromObj(obj){
+  var st = (obj && obj.app==="sideboss" && obj.state) ? obj.state : ((obj && typeof obj.setupDone!=="undefined") ? obj : null);
+  if(!st){ toast("That is not a Side Boss backup"); return; }
+  if(!confirm("Restore this backup? It replaces everything on this device.")) return;
+  S=Object.assign(fresh(), st);
+  if(!S.skillxp) S.skillxp={maker:0,merchant:0,herald:0,steward:0,scout:0};
+  ["sales","costs","shows","kit"].forEach(function(k){ if(!Array.isArray(S[k])) S[k]=[]; });
+  if(!S.bosses) S.bosses={}; if(!S.artifacts) S.artifacts={}; if(!S.done) S.done={};
+  if(typeof S.events!=="boolean") S.events=isEventWhere((S.setup||{}).where);
+  save(); $("backup").classList.remove("on"); $("bkText").value="";
+  checkBosses(true);
+  if(S.setupDone){ $("opening").classList.remove("on"); $("setup").classList.remove("on"); render(); }
+  toast("Restored");
+}
+function restoreFromText(){ var txt=($("bkText").value||"").trim(); if(!txt){ toast("Paste backup text first"); return; } try{ restoreFromObj(JSON.parse(txt)); }catch(e){ toast("Could not read that backup"); } }
+(function(){ var f=$("bkFile"); if(!f) return; f.addEventListener("change", function(){ var file=f.files&&f.files[0]; if(!file) return; var r=new FileReader(); r.onload=function(){ try{ restoreFromObj(JSON.parse(String(r.result))); }catch(e){ toast("Could not read that file"); } f.value=""; }; r.readAsText(file); }); })();
 
 /* ---------- setup ---------- */
 var SETUP=[
@@ -769,6 +912,17 @@ function setupNext(){
 /* ---------- events ---------- */
 document.addEventListener("click", function(e){
   var t=e.target;
+  if(t.closest("#openRestore")){ $("backup").classList.add("on"); return; }
+  if(t.closest("#backupBtn")||t.closest("#backupBtn2")){ $("backup").classList.add("on"); return; }
+  if(t.closest("#bkClose")){ $("backup").classList.remove("on"); return; }
+  if(t.closest("#bkExport")){ exportBackup(); return; }
+  if(t.closest("#bkCopy")){ copyBackup(); return; }
+  if(t.closest("#bkRestore")){ restoreFromText(); return; }
+  if(t.closest("#kitAdd")){ kitAdd(); return; }
+  if(t.closest("#kitReset")){ kitReset(); return; }
+  var kc=t.closest("[data-kit]"); if(kc){ kitToggle(parseInt(kc.getAttribute("data-kit"),10), kc.checked); return; }
+  var kd=t.closest("[data-kdel]"); if(kd){ kitDel(parseInt(kd.getAttribute("data-kdel"),10)); return; }
+  var ss=t.closest("[data-shstat]"); if(ss){ cycleStatus(ss.getAttribute("data-shstat")); return; }
   if(t.closest("#pressStart")||t.closest("#opening")){ if(!$("opening").classList.contains("on")) return; S.opened=true; save(); $("opening").classList.remove("on"); if(S.setupDone){ render(); } else { setI=0; setVal=S.setup||{}; $("setup").classList.add("on"); showSetup(); } return; }
   if(t.closest("#setBack")){ if(setI>0){ setI--; showSetup(); } return; }
   if(t.closest("#setNext")){ setupNext(); return; }

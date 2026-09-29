@@ -1,5 +1,5 @@
 /* Side Boss service worker */
-var CACHE="sideboss-v0.6";
+var CACHE="sideboss-v0.8";
 var ASSETS=["./","./index.html","./manifest.webmanifest","./version.json","./icon-192.png","./icon-512.png","./icon-512-maskable.png","./apple-touch-icon.png"];
 self.addEventListener("install", function(e){
   self.skipWaiting();
