@@ -274,8 +274,12 @@ main { flex: 1 1 auto; position: relative; overflow: hidden; }
 .cs-val { color: var(--text); font-size: 12px; font-variant-numeric: tabular-nums; flex: 0 0 auto; min-width: 56px; text-align: right; }
 .tlbtn.grow { flex: 1 1 auto; }
 .cs-row.hidden { display: none; }
-.cs-trans-row #cs-trans-dur { flex: 0 0 auto; min-width: 52px; font-size: 13px; font-weight: 600; }
+.cs-trans-row #cs-trans-dur, .cs-trans-row #cs-trans-dir { flex: 0 0 auto; min-width: 48px; font-size: 13px; font-weight: 600; padding: 0 8px; }
 .cs-trans-row #cs-trans-dur:disabled { opacity: .4; }
+/* the cut-type strip scrolls sideways so it can hold every transition on a phone */
+.seg.scroll { flex: 1 1 auto; min-width: 0; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.seg.scroll::-webkit-scrollbar { display: none; }
+.seg.scroll button { flex: 0 0 auto; padding: 0 11px; }
 
 /* ---- pull audio sheet (v0.9, AudioPull folded in) ---- */
 .pull-sheet { display: flex; flex-direction: column; gap: 8px; padding: 8px 10px 10px; border-top: 1px solid var(--line); background: var(--panel-2); }
