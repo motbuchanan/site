@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="build" content="v0.8.2 · Oct 4">
+<meta name="build" content="v0.9 · Oct 4">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#07090c">
 <meta name="description" content="Pocket Shark: a 3D pool table with real ball physics, full camera control, and a shark that shows you the best shot.">
@@ -275,6 +275,13 @@ body.play #vtoast{bottom:calc(94px + env(safe-area-inset-bottom))}
 #se #vtoast.show {opacity:1}
 @media (min-width:700px){#se .word {font-size:38px}
 #se .intro .big {font-size:44px}}
+#se #lv {width:100%;display:block;max-height:56vh;object-fit:cover;background:#000}
+#se .liverow {display:flex;align-items:center;gap:10px;border:1px solid rgba(76,240,224,.35);background:rgba(76,240,224,.07);border-radius:12px;padding:9px 11px;margin-top:10px}
+#se .livetxt {flex:1;font:500 12.5px/1.4 var(--mb-ui);color:var(--mb-soft)}
+#se .livebadge {display:inline-flex;align-items:center;gap:6px;font:700 10px var(--mb-mono);letter-spacing:.1em;text-transform:uppercase;color:#06110f;background:var(--mb-teal);border-radius:999px;padding:4px 9px;white-space:nowrap}
+#se .livebadge i {width:7px;height:7px;border-radius:50%;background:#06110f;animation:lvpulse 1.1s ease-in-out infinite}
+@keyframes lvpulse {0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.7)}}
+#se .golive {color:var(--mb-teal)!important;border-color:rgba(76,240,224,.5)!important;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -346,7 +353,7 @@ body.play #vtoast{bottom:calc(94px + env(safe-area-inset-bottom))}
       <b>THREE</b><span>It finds the balls. Fix any it got wrong with a tap.</span>
       <b>FOUR</b><span>It plays every shot forward on a copy of your table and ranks what goes.</span>
     </div>
-    <button class="primary" id="btnCam" type="button">Take a photo</button>
+    <button class="primary" id="btnCam" type="button">Open the camera</button>
     <div class="rowb"><button class="ghost" id="btnPick" type="button">Pick a saved photo</button><button class="ghost" id="btnDemo" type="button">Try the demo table</button></div>
     <div class="warn hide" id="ctxWarn">The camera and photo picker only work on the live site (https). Opened from a download or a preview, use the demo table.</div>
     <div class="note">Photos never leave your phone. Everything runs on it. Tap Back to game any time to return to the table.</div>
@@ -355,11 +362,11 @@ body.play #vtoast{bottom:calc(94px + env(safe-area-inset-bottom))}
   </div>
 
   <div id="work" class="hide">
-    <div id="stage"><canvas id="cv"></canvas><div id="busy" class="hide">Reading the table</div></div>
+    <div id="stage"><video id="lv" class="hide" autoplay playsinline muted></video><canvas id="cv"></canvas><div id="busy" class="hide">Reading the table</div></div>
     <div class="panel" id="panel"></div>
   </div>
 </div></div>
-<button class="mb-ver" id="mbVer" type="button">v0.8.2 · Oct 4</button>
+<button class="mb-ver" id="mbVer" type="button">v0.9 · Oct 4</button>
 <div id="vtoast"></div>
 
 <script>
@@ -2267,6 +2274,7 @@ function openEyes() {
   setTimeout(function () { try { window.dispatchEvent(new Event('resize')); } catch (e) {} }, 30);
 }
 function closeEyes() {
+  if (window.__PS && window.__PS.stopCam) { try { window.__PS.stopCam(); } catch (e) {} }   // release the camera when leaving scan mode
   $('se').classList.add('hide'); $('menu').classList.remove('hide');
   if (window.__RH) window.__RH.frozen = false;
 }
@@ -2806,7 +2814,7 @@ var GUIDE = [
   ['Spin', 'Tap the cue-ball button for spin. Hit above center (follow) and the cue rolls forward after contact. Below center (draw) pulls it back. Left or right (english) curves it off the rails. Center ball is the safe default.'],
   ['Camera', 'The View button cycles three cameras: behind the cue, straight down on the table, and a free camera you can orbit. Pinch to zoom, drag with two fingers to pan.'],
   ['The shark', 'Stuck? Tap Shark. It plays every shot forward and ranks them by how likely they go in. Tap a shot to line it up, then pull the power bar to the white mark it sets. It also picks the spin for good position.'],
-  ['Shark Eyes', 'Playing on a real table? Open Shark Eyes from the menu, photograph the table, drop four dots on the corners, and it shows you your best shots on your own photo. Everything runs on your phone.'],
+  ['Shark Eyes', 'Playing on a real table? Open Shark Eyes, point the camera at the table and freeze the frame, drop four dots on the corners, and it shows your best shots on the real table. Tap Go live and prop the phone up: the shots keep updating as balls move. Everything runs on your phone.'],
   ['Make it yours', 'Settings has table feel (fast cloth, club, or bar box), four rooms to play in, cloth colors, and sound. Your picks are remembered.']
 ];
 function howTo(firstRun) {
@@ -3182,7 +3190,8 @@ var SIZES = { '7': [1.981, 0.991, '7 ft bar table'], '8': [2.235, 1.118, '8 ft']
 var TYPES = ['cue', 'solid', 'stripe', 'eight'];
 var TCOL = { cue: '#ffffff', solid: '#f59847', stripe: '#4cf0e0', eight: '#b9a8ff' };
 var S = { step: 0, src: null, sctx: null, w: 0, h: 0, corners: null, size: '8', swap: false, userSwap: null, pose: null, T: null,
-  balls: [], mine: 'solid', sigma: 0.8, results: null, safety: false, sel: 0, st: null, drag: null, loupe: null, demo: false, note: '' };
+  balls: [], mine: 'solid', sigma: 0.8, results: null, safety: false, sel: 0, st: null, drag: null, loupe: null, demo: false, note: '',
+  camOn: false, stream: null, liveSrc: false, liveOn: false, liveBusy: false, liveTimer: 0 };
 var cv = $('cv'), ctx = cv.getContext('2d');
 
 /* ---------- small linear algebra ---------- */
@@ -3264,7 +3273,7 @@ function loadFile(file) {
   var url = URL.createObjectURL(file), im = new Image();
   im.onload = function () {
     setSource(im, im.naturalWidth, im.naturalHeight); URL.revokeObjectURL(url);
-    S.demo = false; S.corners = autoCorners() || defaultCorners();
+    S.demo = false; S.liveSrc = false; S.corners = autoCorners() || defaultCorners();
     go(1);
   };
   im.onerror = function () { alert('That file would not open as a photo.'); };
@@ -3724,8 +3733,8 @@ function drawHit() {
 
 /* ---------- steps ---------- */
 function setSteps() {
-  var els = $('steps').children;
-  for (var i = 0; i < els.length; i++) { els[i].classList.toggle('on', i === S.step); els[i].classList.toggle('done', i < S.step); }
+  var els = $('steps').children, st = S.step === 4 ? 0 : S.step;   // 4 = live viewfinder, shown as the Photo step
+  for (var i = 0; i < els.length; i++) { els[i].classList.toggle('on', i === st); els[i].classList.toggle('done', i < st); }
 }
 function pillsHTML(key, opts, cur) {
   var h = '<div class="pills" data-k="' + key + '">';
@@ -3741,10 +3750,18 @@ function bindPills(fn) {
   });
 }
 function go(step) {
+  if (step !== 3) liveStop();
   S.step = step; setSteps(); S.loupe = null;
   $('intro').classList.toggle('hide', step !== 0); $('work').classList.toggle('hide', step === 0);
+  lv.classList.toggle('hide', step !== 4); cv.classList.toggle('hide', step === 4);
   var p = $('panel');
-  if (step === 0) return;
+  if (step === 0) { camStop(); S.liveSrc = false; return; }
+  if (step === 4) {
+    p.innerHTML = '<h2>Line up the table</h2><p>Get the whole cloth in frame, standing at a corner with the phone held high. Tap Freeze when it looks right.</p>' +
+      '<button class="primary" id="bFreeze" type="button">Freeze this frame</button><div class="rowb"><button class="ghost" id="bBack" type="button">Cancel</button></div>';
+    $('bFreeze').onclick = freeze; $('bBack').onclick = function () { go(0); };
+    return;
+  }
   if (step === 1) {
     updatePose(); sizeCanvas();
     p.innerHTML = '<h2>Mark the cloth</h2><p>Drag each dot onto a corner of the playing surface, right where two cushions would meet. The orange rings should land on the six pockets.</p>' +
@@ -3793,12 +3810,18 @@ function renderShots() {
     });
     h += '<div id="detail"><canvas id="hitCv"></canvas><p id="detailTxt"></p></div><canvas id="mapCv"></canvas>';
   }
-  h += '<div class="note">Ball positions come from one photo, so treat the line as a guide, not a laser. The ranking and the hit (full, half, thin) are the useful part.</div>' +
+  if (S.liveSrc) {
+    h += S.liveOn
+      ? '<div class="liverow"><span class="livebadge"><i></i>Live</span><span class="livetxt">Reading the table as it changes. Keep the phone where it is.</span><button class="ghost" id="bLive" type="button">Freeze</button></div>'
+      : '<div class="liverow"><span class="livetxt">Prop the phone where it is and the shots will update as balls move.</span><button class="ghost golive" id="bLive" type="button">Go live</button></div>';
+  }
+  h += '<div class="note">' + (S.liveOn ? 'Live re-reads the balls on its own every second or so. Freeze to fix any by hand. Your group and skill settings stay.' : 'Ball positions come from one photo, so treat the line as a guide, not a laser. The ranking and the hit (full, half, thin) are the useful part.') + '</div>' +
     '<div class="rowb"><button class="ghost" id="bBack" type="button">Fix the balls</button><button class="ghost" id="bNew" type="button">New photo</button></div>';
   p.innerHTML = h;
   var rows = p.querySelectorAll('.srow');
   for (var i = 0; i < rows.length; i++) rows[i].onclick = function () { S.sel = +this.getAttribute('data-i'); renderShots(); draw(); };
-  $('bBack').onclick = function () { go(2); }; $('bNew').onclick = function () { go(0); };
+  $('bBack').onclick = function () { liveStop(); go(2); }; $('bNew').onclick = function () { go(0); };
+  var bl = $('bLive'); if (bl) bl.onclick = function () { if (S.liveOn) { liveStop(); renderShots(); } else liveStart(); };
   if (rs.length) {
     var r = rs[S.sel], f = ballByid(r.first), side = r.side > 0 ? 'right' : 'left', full = 1 - Math.sin(r.cut || 0) > 0.93;
     var t = r.type === 'kick' ? 'Send the cue ball into the rail first, along the white line. ' : '';
@@ -3897,21 +3920,75 @@ function drawDemo() {
     sh.addColorStop(0, 'rgba(255,255,255,.5)'); sh.addColorStop(0.18, 'rgba(255,255,255,0)'); sh.addColorStop(0.19, 'rgba(0,0,0,0)'); sh.addColorStop(1, 'rgba(0,0,0,.42)');
     g.fillStyle = sh; g.fillRect(q[0] - r, q[1] - r, 2 * r, 2 * r); g.restore();
   });
-  setSource(c, w, h); S.demo = true; S.size = '8';
+  setSource(c, w, h); S.demo = true; S.liveSrc = false; S.size = '8';
   S.corners = rect(L, W).map(function (p) { var q = proj(P, p[0], p[1], 0); return [q[0], q[1]]; });
   go(1);
 }
 
+/* ---------- live camera: an in-app viewfinder, tap to freeze, and a locked live mode ---------- */
+var lv = $('lv'), lastFrame = null, diffCv = document.createElement('canvas'), diffCtx = diffCv.getContext('2d', { willReadFrequently: true });
+diffCv.width = 32; diffCv.height = 18;
+function camStart(cb) {
+  if (S.camOn) { cb(true); return; }
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { cb(false); return; }
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: false })
+    .then(function (st) { S.stream = st; lv.srcObject = st; S.camOn = true; var p = lv.play(); if (p && p.catch) p.catch(function () {}); cb(true); })
+    .catch(function () { cb(false); });
+}
+function camStop() { liveStop(); if (S.stream) { try { S.stream.getTracks().forEach(function (t) { t.stop(); }); } catch (e) {} } S.stream = null; S.camOn = false; try { lv.srcObject = null; } catch (e) {} }
+function openViewfinder() {
+  camStart(function (ok) {
+    if (!ok) { $('fCam').click(); return; }     // no in-page camera here: fall back to the phone's camera app
+    go(4);
+  });
+}
+function freeze() {
+  if (!S.camOn || !lv.videoWidth) return;
+  var c = document.createElement('canvas'); c.width = lv.videoWidth; c.height = lv.videoHeight;
+  c.getContext('2d').drawImage(lv, 0, 0);
+  setSource(c, c.width, c.height); S.demo = false; S.liveSrc = true; lastFrame = null;
+  S.corners = autoCorners() || defaultCorners();
+  go(1);                                        // the stream stays open so Go live can pick it up later
+}
+// did the picture change enough to be worth re-reading? (tiny grayscale diff against the last processed frame)
+function frameChanged() {
+  diffCtx.drawImage(S.src, 0, 0, 32, 18);
+  var d = diffCtx.getImageData(0, 0, 32, 18).data, cur = new Float32Array(32 * 18), i, sum = 0;
+  for (i = 0; i < cur.length; i++) cur[i] = (d[i * 4] + d[i * 4 + 1] + d[i * 4 + 2]) / 3;
+  if (lastFrame) { for (i = 0; i < cur.length; i++) sum += Math.abs(cur[i] - lastFrame[i]); sum /= cur.length; }
+  else sum = 1e9;
+  lastFrame = cur;
+  return sum > 3.5;
+}
+function liveStart() {
+  if (S.step !== 3 || !S.liveSrc) return;
+  camStart(function (ok) {
+    if (!ok) return;
+    S.liveOn = true; S.liveBusy = false; lastFrame = null; renderShots(); liveTick();
+  });
+}
+function liveStop() { if (!S.liveOn) return; S.liveOn = false; clearTimeout(S.liveTimer); }
+function liveTick() {
+  if (!S.liveOn) return;
+  if (S.liveBusy || !lv.videoWidth) { S.liveTimer = setTimeout(liveTick, 150); return; }
+  S.sctx.drawImage(lv, 0, 0, S.w, S.h);         // pull the live frame into the locked source; corners and pose stay valid
+  if (!frameChanged()) { draw(); S.liveTimer = setTimeout(liveTick, 400); return; }
+  S.liveBusy = true;
+  S.balls = detect(); tidyBalls();
+  if (!S.balls.some(function (b) { return b.type === 'cue'; })) { S.results = []; S.liveBusy = false; draw(); renderShots(); S.liveTimer = setTimeout(liveTick, 700); return; }
+  runShark(function () { S.liveBusy = false; if (!S.liveOn) return; draw(); renderShots(); S.liveTimer = setTimeout(liveTick, 500); });
+}
+
 /* ---------- boot ---------- */
-$('btnCam').onclick = function () { $('fCam').click(); };
+$('btnCam').onclick = openViewfinder;
 $('btnPick').onclick = function () { $('fPick').click(); };
 $('fCam').onchange = function () { loadFile(this.files[0]); this.value = ''; };
 $('fPick').onchange = function () { loadFile(this.files[0]); this.value = ''; };
 $('btnDemo').onclick = drawDemo;
 if (!/^https:/.test(location.protocol) && location.hostname !== 'localhost') $('ctxWarn').classList.remove('hide');
 setSteps();
-window.__PS = { S: S, go: go, reset: function () { go(0); }, proj: proj, unproj: unproj, makePose: makePose, detect: detect, updatePose: updatePose, tidyBalls: tidyBalls, autoCorners: autoCorners, setSource: setSource, DEMO: DEMO, draw: draw,
-  loadCanvas: function (c) { setSource(c, c.width, c.height); S.demo = false; S.corners = autoCorners() || defaultCorners(); go(1); } };
+window.__PS = { S: S, go: go, reset: function () { go(0); }, stopCam: camStop, freeze: freeze, liveStart: liveStart, liveStop: liveStop, openViewfinder: openViewfinder, proj: proj, unproj: unproj, makePose: makePose, detect: detect, updatePose: updatePose, tidyBalls: tidyBalls, autoCorners: autoCorners, setSource: setSource, DEMO: DEMO, draw: draw,
+  loadCanvas: function (c) { setSource(c, c.width, c.height); S.demo = false; S.liveSrc = false; S.corners = autoCorners() || defaultCorners(); go(1); } };
 })();
 
 </script>
