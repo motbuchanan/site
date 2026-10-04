@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07090c">
+<title>Pocket Shark — how it was built</title>
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="description" content="Pocket Shark: a 3D pool table with real ball physics, a shark that shows you the best shot, Shark Eyes for real tables, and a story-mode hustle. How it is built, the house players, and the rooms.">
+<meta property="og:title" content="Pocket Shark — how it was built">
+<meta property="og:description" content="Real ball physics, a shark that reads the table, and a story-mode hustle up the ladder. The build log.">
+<meta property="og:image" content="https://motbuchanan.com/pocketshark/icon-512.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://motbuchanan.com/pocketshark/icon-512.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#ebedef;--soft:#c2c9d1;--dim:#8b96a3;--teal:#4cf0e0;--orange:#f59847;
+  --line:#222a33;--card:#131a22;--bg:#07090c;
+  --sys:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,system-ui,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
+  --disp:'Archivo',var(--sys)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--sys);line-height:1.6;-webkit-font-smoothing:antialiased;min-height:100svh}
+#glow{position:fixed;inset:0;z-index:-1;pointer-events:none;background:
+  radial-gradient(120% 60% at 80% -10%, rgba(76,240,224,.14), transparent 55%),
+  radial-gradient(60vmax 90vmax at -10% 60%, rgba(245,152,71,.07), transparent 60%),var(--bg)}
+.wrap{max-width:900px;margin:0 auto;padding:0 20px}
+a{color:var(--teal)}
+.mono{font-family:var(--mono)}
+.hero{text-align:center;padding:56px 20px 38px}
+.icon{width:132px;height:132px;border-radius:30px;display:block;margin:0 auto 22px;box-shadow:0 14px 48px rgba(0,0,0,.6),0 0 0 1px var(--line)}
+.hero h1{font-family:var(--disp);font-weight:800;font-size:44px;letter-spacing:-.02em;margin-bottom:10px}
+.hero h1 em{font-style:normal;color:var(--teal)}
+.hero .tag{font-size:18px;color:var(--soft);max-width:580px;margin:0 auto}
+.hero .sub{font-family:var(--mono);font-size:13px;color:var(--dim);margin-top:10px;letter-spacing:.02em}
+.cta{display:inline-block;margin-top:24px;background:var(--teal);color:#06110f;font-family:var(--disp);font-weight:800;font-size:16px;text-decoration:none;padding:14px 28px;border-radius:12px}
+.cta:hover{filter:brightness(1.07)}
+.badge{display:inline-block;margin-top:16px;font-family:var(--mono);font-size:12px;color:var(--dim);border:1px solid var(--line);border-radius:20px;padding:5px 12px}
+section{padding:34px 0;border-top:1px solid var(--line)}
+h2{font-family:var(--mono);font-weight:600;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--teal);margin-bottom:16px}
+p{margin:0 0 14px;color:#cfd6dd}
+p .k{color:var(--orange)}
+.lead{font-size:18px;color:var(--ink)}
+.two{display:grid;grid-template-columns:1fr;gap:12px 22px}
+@media(min-width:620px){.two{grid-template-columns:1fr 1fr}}
+.feat{border:1px solid var(--line);border-radius:12px;padding:16px 18px;background:var(--card)}
+.feat h3{font-family:var(--disp);font-weight:700;font-size:16px;margin:0 0 6px;color:#fff}
+.feat p{font-size:14px;color:var(--dim);margin:0}
+/* cast */
+.cast{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+@media(min-width:620px){.cast{grid-template-columns:repeat(3,1fr)}}
+.face{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;text-align:center}
+.face img{width:100%;aspect-ratio:1/1;object-fit:cover;object-position:center 18%;display:block;background:#000}
+.face .fn{font-family:var(--disp);font-weight:700;font-size:15px;color:#fff;margin:9px 10px 0}
+.face .ft{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin:3px 10px 1px}
+.face .fl{font-family:var(--mono);font-size:11px;color:var(--teal);margin:2px 10px 11px}
+/* galleries */
+.gal{display:grid;grid-template-columns:1fr;gap:20px}
+@media(min-width:620px){.gal{grid-template-columns:1fr 1fr}}
+figure{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+figure img{width:100%;display:block;background:#000}
+figcaption{padding:12px 15px 15px}
+figcaption .v{font-family:var(--mono);font-weight:600;font-size:12px;letter-spacing:.06em;color:var(--teal)}
+figcaption .d{font-size:14px;color:var(--dim);margin-top:3px}
+.shots{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+@media(min-width:720px){.shots{grid-template-columns:repeat(4,1fr)}}
+.shots figure img{aspect-ratio:430/760;object-fit:cover;object-position:top}
+.shots figcaption{padding:10px 12px 13px}
+.shots .v{font-size:11px}
+.shots .d{font-size:12.5px}
+/* timeline */
+.tl{list-style:none;border-left:2px solid var(--line);margin-left:6px}
+.tl li{position:relative;padding:0 0 16px 20px}
+.tl li:before{content:"";position:absolute;left:-7px;top:7px;width:10px;height:10px;border-radius:50%;background:var(--orange)}
+.tl li.now:before{background:var(--teal);box-shadow:0 0 0 4px rgba(76,240,224,.18)}
+.tl .v{font-family:var(--mono);font-weight:600;color:var(--ink)}
+.tl .d{color:var(--dim);font-size:14px}
+.kvs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+@media(min-width:620px){.kvs{grid-template-columns:repeat(4,1fr)}}
+.kvs div{border:1px solid var(--line);border-radius:12px;padding:13px;background:var(--card)}
+.kvs b{display:block;font-family:var(--disp);font-weight:800;font-size:20px;color:#fff}
+.kvs span{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+footer{padding:34px 20px 64px;text-align:center;color:var(--dim);font-size:13px;border-top:1px solid var(--line)}
+footer a{color:var(--soft)}
+</style>
+</head>
+<body>
+<div id="glow"></div>
+
+<header class="hero">
+  <img class="icon" src="icon-512.png" alt="Pocket Shark icon: a teal camera aperture">
+  <h1>Pocket <em>Shark</em></h1>
+  <p class="tag">A pool table you can walk around, with a shark on your shoulder that reads the whole table and shows you the shot.</p>
+  <p class="sub">real ball physics &middot; one page &middot; built on a phone</p>
+  <a class="cta" href="index.html">&#9654;&nbsp; rack them up</a>
+  <div class="badge">in active development &middot; updated Oct 3, 2026</div>
+</header>
+
+<main class="wrap">
+
+<section>
+  <h2>What it is</h2>
+  <p class="lead">Pocket Shark is a full 3D pool game, 8-ball, 9-ball and a practice table, with a physics model honest enough that the balls slide, roll, take english, throw each other off line, and rattle in the jaws.</p>
+  <p>Three things make it more than another pool app. A <span class="k">shark</span> that does not guess: it plays every candidate shot forward on a copy of the table and ranks them by how likely they drop and where the cue ball ends up. <span class="k">Shark Eyes</span>, which does the same thing on a photo of a real table you are standing at. And a <span class="k">story mode</span> that stakes a bankroll against six house players and lets you fix up the basement with what you win.</p>
+  <p>The whole thing is a single HTML page with one dependency, three.js. No account, no network after it loads, installable to your home screen.</p>
+</section>
+
+<section>
+  <h2>How it is built</h2>
+  <div class="two">
+    <div class="feat"><h3>A real table, 500 steps a second</h3><p>A hand-written physics engine: sliding and rolling friction, follow, draw and side english, ball-to-ball throw, cushion rebound and pocket jaws, stepped with exact time-of-impact so nothing tunnels.</p></div>
+    <div class="feat"><h3>The shark actually solves it</h3><p>For every ball and pocket it tries direct shots, banks, kicks and combos, measures how much aiming error each one forgives, and ranks by make-probability and resulting position. No lookup tables.</p></div>
+    <div class="feat"><h3>Shark Eyes reads a photo</h3><p>Photograph a real table, drop four dots on the corners, and a homography plus camera solve lifts the layout off the image so the same shark can rank your shots, drawn back on your own photo. It all runs on the phone.</p></div>
+    <div class="feat"><h3>Four rooms, one engine</h3><p>The basement, the rail bar, the pool hall and the arena are each built from scratch, their own lights, props and baked reflections, and swapped live without a reload.</p></div>
+    <div class="feat"><h3>Story mode with real stakes</h3><p>A bankroll, a buy-in at every table, and a six-rung ladder from Dot on the bar box to Silas in the arena. Winnings fix up the basement you practice in, light, floor, then the whole room.</p></div>
+    <div class="feat"><h3>One page you can install</h3><p>Everything is inlined into a single file, with a web manifest, a service worker and an icon set, so it installs to the home screen and launches offline like a native app.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>The house</h2>
+  <p>Six players, one per level, each with their own way of missing and their own story. Beat one and the next sits down.</p>
+  <div class="cast">
+    <div class="face"><img src="face-dot.jpg" alt="Dot Pruitt"><div class="fn">Dot Pruitt</div><div class="ft">Tuesday league</div><div class="fl">Level 1</div></div>
+    <div class="face"><img src="face-benny.jpg" alt="Benny Okafor"><div class="fn">Benny Okafor</div><div class="ft">Banks everything</div><div class="fl">Level 2</div></div>
+    <div class="face"><img src="face-mari.jpg" alt="Marisol Vega"><div class="fn">Marisol Vega</div><div class="ft">Shoots fast</div><div class="fl">Level 3</div></div>
+    <div class="face"><img src="face-hank.jpg" alt="Hank Dobrowski"><div class="fn">Hank Dobrowski</div><div class="ft">Center ball only</div><div class="fl">Level 4</div></div>
+    <div class="face"><img src="face-ruth.jpg" alt="Ruth Castellanos"><div class="fn">Ruth Castellanos</div><div class="ft">Three balls ahead</div><div class="fl">Level 5</div></div>
+    <div class="face"><img src="face-silas.jpg" alt="Silas Crane"><div class="fn">Silas Crane</div><div class="ft">House shark</div><div class="fl">Level 6</div></div>
+  </div>
+</section>
+
+<section>
+  <h2>The rooms you climb through</h2>
+  <div class="gal">
+    <figure><img src="room-basement.jpg" alt="The Basement"><figcaption><div class="v">HOME &middot; THE BASEMENT</div><div class="d">Where you practice, one bare light over a cheap table. Fix it up with what you win.</div></figcaption></figure>
+    <figure><img src="room-dive.jpg" alt="The Rail Bar"><figcaption><div class="v">LEVELS 1&ndash;2 &middot; THE RAIL BAR</div><div class="d">A dollar a game on a worn bar box, neon on the walls, a jukebox in the corner.</div></figcaption></figure>
+    <figure><img src="room-hall.jpg" alt="Corner Pocket Billiards"><figcaption><div class="v">LEVELS 3&ndash;4 &middot; THE HALL</div><div class="d">A real room now, rows of tables under green-shaded pendants. People are watching.</div></figcaption></figure>
+    <figure><img src="room-arena.jpg" alt="The Championship"><figcaption><div class="v">LEVELS 5&ndash;6 &middot; THE ARENA</div><div class="d">One table in a dark hall, a truss of spotlights straight down, the lights on you.</div></figcaption></figure>
+  </div>
+</section>
+
+<section>
+  <h2>Inside the build</h2>
+  <div class="shots">
+    <figure><img src="dev-table.jpg" alt="Gameplay, free camera"><figcaption><div class="v">THE TABLE</div><div class="d">Walk the camera anywhere. The guides show the cue path and the object line.</div></figcaption></figure>
+    <figure><img src="dev-shark.jpg" alt="The shark panel"><figcaption><div class="v">THE SHARK</div><div class="d">Off the break it knows nothing drops, and calls the safe instead.</div></figcaption></figure>
+    <figure><img src="dev-eyes.jpg" alt="Shark Eyes on a photo"><figcaption><div class="v">SHARK EYES</div><div class="d">Your best two on a real table, with the aim and the pace spelled out.</div></figcaption></figure>
+    <figure><img src="dev-ladder.jpg" alt="The story ladder"><figcaption><div class="v">THE LADDER</div><div class="d">Your bankroll, the basement, and six players to climb past.</div></figcaption></figure>
+  </div>
+</section>
+
+<section>
+  <h2>Version history</h2>
+  <ul class="tl">
+    <li class="now"><span class="v">v0.8</span> <span class="d">&mdash; story mode and the bankroll, six house players with portraits, basement upgrades, installable PWA, this build log</span></li>
+    <li><span class="v">v0.7</span> <span class="d">&mdash; the teaching layer: a first-run walkthrough, a how-to-play deck, and five drills</span></li>
+    <li><span class="v">v0.6</span> <span class="d">&mdash; folded the game and the scanner into one file; became Pocket Shark</span></li>
+    <li><span class="v">v0.5</span> <span class="d">&mdash; Shark Eyes: photograph a real table and get your shots back on the photo</span></li>
+    <li><span class="v">v0.4</span> <span class="d">&mdash; four rooms with their own lights, props and reflections; the aperture table</span></li>
+    <li><span class="v">v0.2&ndash;0.3</span> <span class="d">&mdash; the weight pass: hop, gravity, rolling sound, shake, table-feel presets</span></li>
+    <li><span class="v">v0.1</span> <span class="d">&mdash; the physics engine and the shark; 8-ball and 9-ball</span></li>
+  </ul>
+  <div class="kvs">
+    <div><b>1</b><span>HTML file</span></div>
+    <div><b>three.js</b><span>only dependency</span></div>
+    <div><b>500/s</b><span>physics steps</span></div>
+    <div><b>6</b><span>house players</span></div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p class="mono">Pocket Shark &middot; built by Mot Buchanan</p>
+  <p>It develops live. Come back and it will have changed.</p>
+  <p style="margin-top:10px"><a href="index.html">&#9654; rack them up</a></p>
+</footer>
+
+</body>
+</html>
