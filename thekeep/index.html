@@ -82,7 +82,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
    <img src="05-predation.jpg" alt="a kill" loading="lazy">
    <img src="04-water.jpg" alt="the lake" loading="lazy">
   </div>
-  <p class="fsize">The whole world is one HTML file. Right now: <b id="fsize">~86 KB</b>. Smaller than a single phone photo.</p>
+  <p class="fsize">The whole world is one HTML file. Right now: <b id="fsize">~91 KB</b>. Smaller than a single phone photo.</p>
   <p><b>Why I built it.</b> I build things on a phone by asking AI the right questions, the way I would direct a camera. I saw a clip of a tiny 3D world made of nothing but text and wanted to see if I could grow one that was actually alive, and keep growing it in the open instead of ever calling it done.</p>
   <p><b>What I learned.</b> How far you can get with almost nothing. One idea, a ray walking a height map, turned into characters, with a small world of animals living on top. Every version taught me one concrete thing: how to make a wall read as solid, how to keep the wolves from starving the world empty, how to make a forest look like real woods.</p>
   <p style="color:var(--mb-dim);font-size:13px"><b style="color:var(--mb-soft)">Walk:</b> drag the left half of the screen. <b style="color:var(--mb-soft)">Look:</b> drag the right half. Wade into the water to swim. Tap ☰ menu for a new world and the dials.</p>
@@ -105,8 +105,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
 <script>
 (function(){
 'use strict';
-const VERSION='The Keep v0.7.12 · Sep 21 2026';
+const VERSION='The Keep v0.7.13 · Oct 4 2026';
 const CHANGELOG=[
+ ['v0.7.13 · Oct 4 2026','The keep is a real keep now. Four thick walls with a walkable rampart you reach by a stair, four corner towers, a gatehouse, and rooms built into the walls you can step inside. At its center a tall round donjon with an external stair that spirals up to a lookout room, where you stand and see out over the whole forest. The old hollow inner box is gone. (Day and night is next.)'],
  ['v0.7.12 · Sep 21 2026','Shared site chrome. The menu, cards, buttons, seed and dial inputs, HUD readouts and the version badge now use the same type, colors and shapes as every other app on motbuchanan.com. The world render is untouched.'],
  ['v0.7.11 · Sep 21 2026','New "about this build" card, App Store style: what it is, how it works (it is all just text characters), why I built it, what I learned, and shots from its development. It shows once on your first visit, then lives in the menu. It also shows the live size of this file, which updates itself on every release, because the surprising part is how small it is.'],
  ['v0.7.10 · Sep 21 2026','Trees got real girth. Crown width now varies about six to one from tree to tree, and wide crowns can be tall too, so a stand mixes thin spires, fat firs, squat bushes and broad canopies instead of same-width cones. The app has its own icon now, and the menu has a dev log link to the new project page: the story, how it is built, and a shot from every version.'],
@@ -184,26 +185,66 @@ function merlonRun(axis,p,a,b,zBase,doorA,doorB){
     WALLS.push({axis:axis, p:p, a:m0, b:m1, h:0, z0Abs:zBase, z1Abs:zTop, doorA:0, doorB:-1});
   }
 }
+// absolute-z wall segment (for structures that sit on top of raised st[] masses)
+function absWall(axis,p,a,b,z0,z1,gapA,gapB){
+  WALLS.push({axis:axis, p:p, a:a, b:b, h:0, z0Abs:z0, z1Abs:z1, doorA:(gapB>gapA?gapA:0), doorB:(gapB>gapA?gapB:-1)});
+}
+// keep geometry (shared by the plane builder and the st[] mass stamper)
+const KEEP={ H:18, IN:14, CURH:11, GATE:3.2, DONH:24, DONR:5.2, SPR:7.3, LR:3.4, TOWH:13 };
 function buildWalls(){
   WALLS.length=0;
   if(!DIALS.keep) return;
-  const cx=FORT.x, cy=FORT.y, H=FORT.half, B=(FORT.padH!=null?FORT.padH:WATER+6);
-  const curH=11, gateA=cx-2.5, gateB=cx+2.5;
-  // outer curtain: four brick planes, ground-level south gate cut through
+  const cx=FORT.x, cy=FORT.y, H=KEEP.H, B=(FORT.padH!=null?FORT.padH:WATER+6);
+  const curH=KEEP.CURH, gateA=cx-KEEP.GATE, gateB=cx+KEEP.GATE;
+  // outer curtain face (crisp plane), south gate cut through; st[] fills the thickness + walkable top
   boxWalls(cx-H, cy-H, cx+H, cy+H, curH, 's', gateA, gateB, false);
-  // crenellated parapet along all four runs (gate opening left clear on the south run)
   const zc=B+curH;
-  merlonRun('y', cy+H, cx-H, cx+H, zc, gateA, gateB); // south (gate)
+  merlonRun('y', cy+H, cx-H, cx+H, zc, gateA, gateB); // south parapet (gate gap)
   merlonRun('y', cy-H, cx-H, cx+H, zc, 0, -1);        // north
   merlonRun('x', cx-H, cy-H, cy+H, zc, 0, -1);        // west
   merlonRun('x', cx+H, cy-H, cy+H, zc, 0, -1);        // east
-  // four corner towers, taller than the curtain
-  tower(cx-H, cy-H, 2.6, 15); tower(cx+H, cy-H, 2.6, 15);
-  tower(cx-H, cy+H, 2.6, 15); tower(cx+H, cy+H, 2.6, 15);
-  // gatehouse towers flanking the south door
-  tower(cx-5, cy+H, 2.2, 13); tower(cx+5, cy+H, 2.2, 13);
-  // inner keep: a tall roofed hall with its own south door
-  boxWalls(cx-6, cy-6, cx+6, cy+6, 20, 's', cx-1.6, cx+1.6, true);
+  // four corner towers: crisp faces + a crenellated cap (solid mass is in st[])
+  const cns=[[cx-H,cy-H],[cx+H,cy-H],[cx-H,cy+H],[cx+H,cy+H]];
+  for(let i=0;i<4;i++){ const tx=cns[i][0], ty=cns[i][1]; tower(tx,ty,3,KEEP.TOWH);
+    const zt=B+KEEP.TOWH;
+    merlonRun('y',ty-3,tx-3,tx+3,zt,0,-1); merlonRun('y',ty+3,tx-3,tx+3,zt,0,-1);
+    merlonRun('x',tx-3,ty-3,ty+3,zt,0,-1); merlonRun('x',tx+3,ty-3,ty+3,zt,0,-1); }
+  // gatehouse towers flanking the south gate
+  tower(cx-5, cy+H, 2.4, 13); tower(cx+5, cy+H, 2.4, 13);
+  // --- central donjon lookout room, sitting on the 24-high round shaft (shaft mass is in st[]) ---
+  const LR=KEEP.LR, z0=B+KEEP.DONH, z1=z0+3;
+  absWall('y', cy+LR, cx-LR, cx+LR, z0, z1, cx-1.2, cx+1.2); // south window
+  absWall('y', cy-LR, cx-LR, cx+LR, z0, z1, cx-1.7, cx+1.7); // north: wider, where the stair lands
+  absWall('x', cx-LR, cy-LR, cy+LR, z0, z1, cy-1.2, cy+1.2); // west window
+  absWall('x', cx+LR, cy-LR, cy+LR, z0, z1, cy-1.2, cy+1.2); // east window
+  WALLS.push({axis:'roof', x0:cx-LR, x1:cx+LR, y0:cy-LR, y1:cy+LR, zAbs:z1}); // lookout roof
+  // --- rooms inside the walls (enclosed, enterable, on the flat courtyard) ---
+  boxWalls(cx-13, cy-13, cx-6, cy-6.5, 6, 's', cx-10.5, cx-8.5, true); // great hall (NW), door south
+  boxWalls(cx-13, cy+6.5, cx-7, cy+13, 5, 'e', cy+8.5, cy+10.5, true); // guard room (SW), door east
+}
+// stamp the solid, WALKABLE masses into W.st: curtain thickness + rampart, corner towers,
+// the donjon shaft, the external spiral stair up it, and the rampart stair.
+function stampKeepMass(){
+  if(!DIALS.keep) return;
+  const st=W.st, cx=FORT.x, cy=FORT.y;
+  const IN=KEEP.IN, OUT=KEEP.H, CURH=KEEP.CURH, DONH=KEEP.DONH, DONR=KEEP.DONR, SPR=KEEP.SPR, TWO_PI=Math.PI*2;
+  for(let y=cy-27;y<=cy+27;y++)for(let x=cx-27;x<=cx+27;x++){
+    if(x<2||y<2||x>N-3||y>N-3) continue;
+    const dx=x-cx, dy=y-cy, ax=Math.abs(dx), ay=Math.abs(dy), cheb=Math.max(ax,ay), r=Math.hypot(dx,dy);
+    let s=0;
+    // outer curtain ring: solid wall thickness with a flat walkable top (rampart); south gate left open
+    if(cheb>=IN && cheb<=OUT){ const gate=(dy>0 && ay>=ax && ax<KEEP.GATE); if(!gate) s=Math.max(s,CURH); }
+    // corner towers (solid, a touch taller, reachable from the rampart)
+    for(let i=0;i<4;i++){ const ox=(i&1?OUT:-OUT), oy=(i&2?OUT:-OUT);
+      if(Math.max(Math.abs(dx-ox),Math.abs(dy-oy))<=3) s=Math.max(s,KEEP.TOWH); }
+    // central donjon shaft (round, solid, 24 high); its flat top is the lookout floor + balcony
+    if(r<=DONR) s=Math.max(s,DONH);
+    // external spiral stair: a 2-wide ring hugging the shaft, rising one full turn (west seam)
+    else if(r<=SPR){ const f=(Math.atan2(dy,dx)+Math.PI)/TWO_PI; s=Math.max(s,DONH*f); }
+    // rampart stair: ramp against the inner east wall, rising north->south up to the wall-walk
+    if(x>=cx+12 && x<=cx+14 && y>=cy-10 && y<=cy+10){ const f=(y-(cy-10))/20; s=Math.max(s,CURH*f); }
+    if(s>0){ const i=y*N+x; st[i]=Math.max(st[i],s); }
+  }
 }
 function allWallHits(px,py,dx,dy){
   const hits=[];
@@ -280,8 +321,9 @@ function genWorld(seed){
       const d=Math.max(Math.abs(x-FORT.x),Math.abs(y-FORT.y));
       const k=1-sm(24,42,d);
       h[y*N+x]+=(ph-h[y*N+x])*k;
-      if(d<=22) h[y*N+x]=ph; // perfectly flat pad under the walls
+      if(d<=24) h[y*N+x]=ph; // perfectly flat pad under the walls
     }
+    stampKeepMass();
     buildWalls();
   }
   // clouds + ground detail
