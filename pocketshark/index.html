@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="build" content="v0.8.1 · Oct 4">
+<meta name="build" content="v0.8.2 · Oct 4">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#07090c">
 <meta name="description" content="Pocket Shark: a 3D pool table with real ball physics, full camera control, and a shark that shows you the best shot.">
@@ -32,6 +32,7 @@ html,body{margin:0;height:100%;background:#07090c;color:var(--mb-ink);font-famil
 button{font-family:inherit;color:inherit;cursor:pointer}
 #gl{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
 .hide{display:none!important}
+[hidden]{display:none!important}
 .mono{font-family:var(--mb-mono);text-transform:uppercase;letter-spacing:.08em;font-size:10px}
 
 /* ---- HUD ---- */
@@ -208,6 +209,13 @@ body.play #vtoast{bottom:calc(94px + env(safe-area-inset-bottom))}
 .purse{font:800 40px var(--mb-ui);letter-spacing:-.03em;margin:2px 0 4px}
 .purse.up{color:var(--mb-teal)}
 .purse.down{color:var(--mb-orange)}
+.instl{flex:1;color:var(--mb-teal)!important;border-color:rgba(76,240,224,.4)!important}
+/* ---- opponent bio sheet ---- */
+.bioTop{display:flex;gap:13px;align-items:center;margin-bottom:4px}
+.bioFace{flex:0 0 68px;width:68px;height:68px;font-size:22px}
+.bioName h2{margin:0;font-size:22px}
+.bioMeta{font:600 11px var(--mb-mono);letter-spacing:.04em;text-transform:uppercase;color:var(--mb-dim);margin-top:4px}
+.bioMeta b{color:var(--mb-teal);font-weight:600}
 /* ---- Shark Eyes overlay (the scan-a-real-table mode, same app) ---- */
 #se{position:fixed;inset:0;z-index:1000;overflow-y:auto;-webkit-overflow-scrolling:touch;background:radial-gradient(120% 60% at 80% -10%,#0d2a2c 0%,#07090c 60%)}
 #eyesBack{position:fixed;left:10px;top:calc(8px + var(--sat));z-index:1002;display:inline-flex;align-items:center;gap:6px;background:var(--mb-glass);color:var(--mb-teal);border:1px solid rgba(76,240,224,.4);border-radius:10px;font:700 12px var(--mb-mono);text-transform:uppercase;letter-spacing:.06em;padding:8px 13px;backdrop-filter:blur(8px)}
@@ -315,6 +323,7 @@ body.play #vtoast{bottom:calc(94px + env(safe-area-inset-bottom))}
       <div id="oppInfo"></div>
     </div>
     <button class="primary" id="btnStart" type="button">Rack them up</button>
+    <div class="rowb" id="installRow" hidden><button class="ghost instl" id="btnInstall" type="button">Install Pocket Shark</button></div>
     <div class="rowb"><button class="ghost" id="btnHow" type="button">How to play</button><button class="ghost" id="btnDrills" type="button">Drills</button></div>
     <div class="rowb"><button class="ghost" id="btnSettings" type="button">Settings</button><button class="ghost" id="btnAbout" type="button">About</button><button class="ghost xlink" id="btnEyes" type="button">Shark Eyes</button></div>
   </div>
@@ -350,7 +359,7 @@ body.play #vtoast{bottom:calc(94px + env(safe-area-inset-bottom))}
     <div class="panel" id="panel"></div>
   </div>
 </div></div>
-<button class="mb-ver" id="mbVer" type="button">v0.8.1 · Oct 4</button>
+<button class="mb-ver" id="mbVer" type="button">v0.8.2 · Oct 4</button>
 <div id="vtoast"></div>
 
 <script>
@@ -1390,17 +1399,29 @@ function drawLogo(g, ox, oy, k, color, apertureOnly) {
 
 var CHARS = [
   { id: 'dot', name: 'Dot Pruitt', ini: 'DP', lvl: 1, tag: 'Tuesday league', col: '#f59847', err: 1.3, vn: 0.14,
-    story: 'Drove a school bus for 31 years. Plays with whatever cue is leaning on the wall and never chalks it.' },
+    story: 'Drove a school bus for 31 years. Plays with whatever cue is leaning on the wall and never chalks it.',
+    bio: 'Retired after 31 years driving the Route 9 school bus. Every Tuesday she holds down the back table at the Rail Bar with the seniors league, and she brings a spare cube of chalk to loan out, never to use.',
+    play: 'Soft, patient, and wildly up and down. She leaves the cue ball wherever it happens to stop and misses the easy ones about as often as she makes them. Stay calm and wait her out.' },
   { id: 'benny', name: 'Benny Okafor', ini: 'BO', lvl: 2, tag: 'Banks everything', col: '#e8c84a', err: 0.9, vn: 0.11, banks: true,
-    story: 'Goes two rails with the straight shot wide open. Says the cushions owe him money.' },
+    story: 'Goes two rails with the straight shot wide open. Says the cushions owe him money.',
+    bio: 'Mid-twenties, runs delivery routes all day and shoots half the night. He came up on a slate table with one dead cushion, so he quit trusting the straight shot and fell in love with the bank.',
+    play: 'Banks when he does not have to and goes two rails when one would do. Flashy and streaky. Hand him a tricky leave and he will overthink it into a miss.' },
   { id: 'mari', name: 'Marisol Vega', ini: 'MV', lvl: 3, tag: 'Shoots fast', col: '#ef6f8f', err: 0.6, vn: 0.08, quick: true,
-    story: 'Learned on her uncle\'s bar box with a warped house cue. Down on the shot before you finish your sentence.' },
+    story: 'Learned on her uncle\'s bar box with a warped house cue. Down on the shot before you finish your sentence.',
+    bio: 'Early twenties, pulls nursing shifts and unwinds on her uncle\'s old bar box in the back of his garage. She is down on the shot before you have finished racking.',
+    play: 'Quick, confident, almost no pause over the ball. Her speed is the weapon and the leak both. Push her into a cluster and she will fire before she sees the trap.' },
   { id: 'hank', name: 'Hank Dobrowski', ini: 'HD', lvl: 4, tag: 'Center ball only', col: '#8fb4ff', err: 0.38, vn: 0.06, noSpin: true,
-    story: 'Third-shift machinist. Leveled this table himself and does not believe in english.' },
+    story: 'Third-shift machinist. Leveled this table himself and does not believe in english.',
+    bio: 'Third-shift machinist who leveled this table himself with a feeler gauge and a grudge. He does not believe in english, and he will tell you why if you give him the opening.',
+    play: 'Pure center ball, dead straight, and deadly from distance. No spin means his position game is limited. Leave him an angle that only english can solve and he is stuck.' },
   { id: 'ruth', name: 'Ruth Castellanos', ini: 'RC', lvl: 5, tag: 'Three balls ahead', col: '#b9f08a', err: 0.22, vn: 0.04,
-    story: 'Never raises her voice. Already knows where the cue ball stops three shots from now.' },
+    story: 'Never raises her voice. Already knows where the cue ball stops three shots from now.',
+    bio: 'Forties, soft-spoken, never lifts her cue off the table more than she has to. She coaches the junior night at the hall and already knows where the cue ball stops three shots from now.',
+    play: 'Plays position three balls ahead and almost never sells out. Patient and clinical. There is no cheap win here, you earn every ball you get.' },
   { id: 'silas', name: 'Silas Crane', ini: 'SC', lvl: 6, tag: 'House shark', col: '#4cf0e0', err: 0.1, vn: 0.025,
-    story: 'Nobody here has seen him miss the 8 since 2011, and they have been watching.' }
+    story: 'Nobody here has seen him miss the 8 since 2011, and they have been watching.',
+    bio: 'Around sixty, silver hair, his own cue in a worn leather case. Nobody at the hall has seen him miss the 8 since 2011, and they have been watching closely the whole time.',
+    play: 'Flawless safeties, ruthless position, no tell and no mercy. He waits for your one mistake and runs the rest out. Beat him and the house is yours.' }
 ];
 function charById(id) { for (var i = 0; i < CHARS.length; i++) if (CHARS[i].id === id) return CHARS[i]; return null; }
 
@@ -2909,6 +2930,48 @@ function drillList() {
   $('dlClose').onclick = closeModal;
 }
 
+function syncMenu() {
+  var ms = $('modes').querySelectorAll('.pill'), os = $('opps').querySelectorAll('.opp'), q;
+  for (q = 0; q < ms.length; q++) ms[q].classList.toggle('on', ms[q].getAttribute('data-m') === CFG.mode);
+  for (q = 0; q < os.length; q++) os[q].classList.toggle('on', os[q].getAttribute('data-o') === CFG.opp);
+  $('oppWrap').classList.toggle('hide', CFG.mode === 'practice');
+  var ch = charById(CFG.opp);
+  $('oppInfo').innerHTML = ch ? '<small>' + ch.tag + ' &middot; tap to read</small><p>' + ch.story + '</p>' : '<small>No house player</small><p>Hand the phone over after each turn. Fouls and ball in hand are still called.</p>';
+  $('btnStart').textContent = CFG.mode === 'practice' ? 'Open the practice table' : 'Rack them up';
+  var sb = $('scBank'); if (sb) sb.textContent = money(STORY.bank);
+}
+// tap an opponent to read their bio and play style, then play them
+function openBio(id) {
+  var c = charById(id); if (!c) { CFG.opp = id; saveCfg(); syncMenu(); return; }
+  CFG.opp = id; saveCfg(); syncMenu();
+  var first = c.name.split(' ')[0], mode = CFG.mode === 'practice' ? '8ball' : CFG.mode, L = ladderOf(id), done = STORY.beat[id];
+  openModal('<div class="bioTop"><span class="ava bioFace" data-face="' + c.id + '" style="background:' + c.col + '">' + c.ini + '</span>' +
+      '<div class="bioName"><h2>' + c.name + '</h2><div class="bioMeta"><b>Level ' + c.lvl + '</b> &middot; ' + c.tag + (done ? ' &middot; <span style="color:var(--mb-teal)">beaten</span>' : '') + '</div></div></div>' +
+    '<div class="lab">Background</div><p>' + c.bio + '</p>' +
+    '<div class="lab">How they play</div><p>' + c.play + '</p>' +
+    (L ? '<div class="kv"><span>Plays at</span><b>' + VENUES[L.venue].name + '</b></div><div class="kv"><span>Story buy-in / purse</span><b>' + money(L.buy) + ' / ' + money(L.purse) + '</b></div>' : '') +
+    '<button class="primary" id="bioPlay" type="button">Play ' + first + '</button>' +
+    '<div class="rowb"><button class="ghost" id="bioClose" type="button">Back</button></div>');
+  applyFaces();
+  $('bioPlay').onclick = function () { closeModal(); startGame(mode, id); };
+  $('bioClose').onclick = closeModal;
+}
+/* ---------- install to home screen (PWA) ---------- */
+var deferredPrompt = null, isStandalone = false, isiOS = /iphone|ipad|ipod/i.test(navigator.userAgent || '');
+try { isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true; } catch (e) {}
+function installable() { return !isStandalone && (!!deferredPrompt || isiOS); }
+function refreshInstall() { var r = $('installRow'); if (r) r.hidden = !installable(); }
+window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); deferredPrompt = e; refreshInstall(); });
+window.addEventListener('appinstalled', function () { deferredPrompt = null; isStandalone = true; refreshInstall(); });
+function doInstall() {
+  if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt.userChoice.then(function () { deferredPrompt = null; refreshInstall(); }); return; }
+  if (isiOS) { openModal('<div class="mono" style="color:var(--mb-orange)">Install</div><h2>Add to your home screen</h2>' +
+    '<p>In Safari, tap the Share button at the bottom of the screen, then choose <b>Add to Home Screen</b>. Pocket Shark opens full screen like a real app and works offline.</p>' +
+    '<button class="primary" id="mDone" type="button">Got it</button>'); $('mDone').onclick = closeModal; return; }
+  openModal('<div class="mono" style="color:var(--mb-orange)">Install</div><h2>Add to your home screen</h2>' +
+    '<p>Open your browser menu and choose <b>Install app</b> or <b>Add to Home screen</b>. It opens full screen and works offline.</p>' +
+    '<button class="primary" id="mDone" type="button">Got it</button>'); $('mDone').onclick = closeModal;
+}
 function buildMenu() {
   var h = '<button class="opp" data-o="pass" type="button"><span class="ava" style="background:#ebedef">2P</span><span><b>Pass and play</b><span class="lv">Two people, one phone</span></span></button>';
   for (var i = 0; i < CHARS.length; i++) {
@@ -2917,18 +2980,8 @@ function buildMenu() {
   }
   $('opps').innerHTML = h;
   applyFaces();
-  function mark() {
-    var ms = $('modes').querySelectorAll('.pill'), os = $('opps').querySelectorAll('.opp'), q;
-    for (q = 0; q < ms.length; q++) ms[q].classList.toggle('on', ms[q].getAttribute('data-m') === CFG.mode);
-    for (q = 0; q < os.length; q++) os[q].classList.toggle('on', os[q].getAttribute('data-o') === CFG.opp);
-    $('oppWrap').classList.toggle('hide', CFG.mode === 'practice');
-    var ch = charById(CFG.opp);
-    $('oppInfo').innerHTML = ch ? '<small>' + ch.tag + '</small><p>' + ch.story + '</p>' : '<small>No house player</small><p>Hand the phone over after each turn. Fouls and ball in hand are still called.</p>';
-    $('btnStart').textContent = CFG.mode === 'practice' ? 'Open the practice table' : 'Rack them up';
-    var sb = $('scBank'); if (sb) sb.textContent = money(STORY.bank);
-  }
-  $('modes').addEventListener('click', function (e) { var b = e.target.closest('.pill'); if (!b) return; CFG.mode = b.getAttribute('data-m'); saveCfg(); mark(); });
-  $('opps').addEventListener('click', function (e) { var b = e.target.closest('.opp'); if (!b) return; CFG.opp = b.getAttribute('data-o'); saveCfg(); mark(); });
+  $('modes').addEventListener('click', function (e) { var b = e.target.closest('.pill'); if (!b) return; CFG.mode = b.getAttribute('data-m'); saveCfg(); syncMenu(); });
+  $('opps').addEventListener('click', function (e) { var b = e.target.closest('.opp'); if (!b) return; var id = b.getAttribute('data-o'); if (id === 'pass') { CFG.opp = id; saveCfg(); syncMenu(); } else openBio(id); });
   $('btnStart').onclick = function () { startGame(CFG.mode, CFG.opp); };
   var bst = $('btnStory'); if (bst) bst.onclick = function () { openStory(); };
   $('btnSettings').onclick = function () { settings(null); };
@@ -2937,7 +2990,9 @@ function buildMenu() {
   var eb = $('eyesBack'); if (eb) eb.onclick = closeEyes;
   var bh = $('btnHow'); if (bh) bh.onclick = function () { howTo(false); };
   var bd = $('btnDrills'); if (bd) bd.onclick = drillList;
-  mark();
+  var bin = $('btnInstall'); if (bin) bin.onclick = doInstall;
+  refreshInstall();
+  syncMenu();
 }
 buildMenu();
 try { if (!store.get('seenIntro', 0)) setTimeout(function () { if (G.phase === 'menu') howTo(true); }, 500); } catch (e) {}
@@ -3111,7 +3166,7 @@ requestAnimationFrame(frame);
 window.__RH = { G: G, cam: cam, T: T, startGame: startGame, pToV: pToV, vToP: vToP, toScreen: toScreen, CFG: CFG,
   advance: function (sec) { var n = Math.round(sec * 60); for (var i = 0; i < n; i++) update(1 / 60); camApply(0, true); renderer.render(scene, camera); },
   setView: function (m) { while (cam.mode !== m) cycleView(); }, chars: CHARS, kick: function () { beginTurn(true); }, setLook: function (v) { CFG.cloth = v; setCloth(v); }, setRoom: setRoom, venues: VENUES, hopH: hopH, feels: FEELS,
-  story: STORY, openStory: openStory, challenge: challenge, ladder: LADDER, saveStory: saveStory, gameOver: gameOver,
+  story: STORY, openStory: openStory, challenge: challenge, ladder: LADDER, saveStory: saveStory, gameOver: gameOver, openBio: openBio, installable: installable,
   photo: function (yaw, pitch, dist, x, z) { window.__RH.frozen = true; cam.mode = 'free'; cam.free.yaw = yaw; cam.free.pitch = pitch; cam.free.dist = dist; cam.free.x = x || 0; cam.free.z = z || 0; update(0.001); hideGuides(); camApply(0, true); cue.visible = false; renderer.render(scene, camera); } };
 })();
 
