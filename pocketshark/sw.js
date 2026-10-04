@@ -1,5 +1,5 @@
 /* Pocket Shark service worker: cache the app shell for offline launch, network-first on the page so updates land. */
-var CACHE = 'pocketshark-v0.9.1';
+var CACHE = 'pocketshark-v1.0.1';
 var ASSETS = ['./', './index.html', './manifest.webmanifest',
   './icon-192.png', './icon-512.png', './icon-maskable-512.png', './apple-touch-icon.png',
   './face-dot.jpg', './face-benny.jpg', './face-mari.jpg', './face-hank.jpg', './face-ruth.jpg', './face-silas.jpg',

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="build" content="v0.9.1 · Oct 4">
+<meta name="build" content="v1.0.1 · Oct 4">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#07090c">
 <meta name="description" content="Pocket Shark: a 3D pool table with real ball physics, full camera control, and a shark that shows you the best shot.">
@@ -210,12 +210,33 @@ body.play #vtoast{bottom:calc(94px + env(safe-area-inset-bottom))}
 .purse.up{color:var(--mb-teal)}
 .purse.down{color:var(--mb-orange)}
 .instl{flex:1;color:var(--mb-teal)!important;border-color:rgba(76,240,224,.4)!important}
+.guide{border:1px solid var(--mb-line);border-radius:12px;margin-top:8px;background:rgba(16,21,28,.82)}
+.guide summary{cursor:pointer;list-style:none;font:700 14px var(--mb-ui);padding:11px 13px;display:flex;align-items:center;gap:8px}
+.guide summary::-webkit-details-marker{display:none}
+.guide summary:before{content:"";width:7px;height:7px;border-right:2px solid var(--mb-dim);border-bottom:2px solid var(--mb-dim);transform:rotate(-45deg);transition:transform .15s;flex:0 0 auto}
+.guide[open] summary:before{transform:rotate(45deg)}
+.guide[open]{border-color:rgba(76,240,224,.4)}
+.guide ol{margin:0;padding:0 14px 10px 30px;font:500 13.5px/1.5 var(--mb-ui);color:var(--mb-soft)}
+.guide li{margin:4px 0}
+.guide li b{color:var(--mb-ink)}
+.gnote{margin:0;padding:0 14px 12px;font:500 12.5px/1.45 var(--mb-ui);color:var(--mb-dim)}
+.you{font:700 9px var(--mb-mono);letter-spacing:.1em;text-transform:uppercase;color:#06110f;background:var(--mb-teal);border-radius:999px;padding:3px 8px;margin-left:auto}
 /* ---- opponent bio sheet ---- */
 .bioTop{display:flex;gap:13px;align-items:center;margin-bottom:4px}
 .bioFace{flex:0 0 68px;width:68px;height:68px;font-size:22px}
 .bioName h2{margin:0;font-size:22px}
 .bioMeta{font:600 11px var(--mb-mono);letter-spacing:.04em;text-transform:uppercase;color:var(--mb-dim);margin-top:4px}
 .bioMeta b{color:var(--mb-teal);font-weight:600}
+
+/* ---- story voice, arc, locker ---- */
+.quote{display:flex;gap:10px;align-items:flex-start;background:rgba(255,255,255,.04);border:1px solid var(--mb-line);border-left:3px solid var(--mb-teal);border-radius:12px;padding:10px 12px;margin:8px 0 6px}
+.quote .qava{flex:0 0 36px;width:36px;height:36px;font-size:12px}
+.quote p{margin:0;font:500 14px/1.45 var(--mb-ui);color:var(--mb-ink);font-style:italic}
+.arc{font:500 13.5px/1.5 var(--mb-ui);color:var(--mb-soft);border-top:1px solid var(--mb-line);padding-top:10px;margin:10px 0 2px}
+.awardRow{display:flex;gap:10px;align-items:center;background:rgba(76,240,224,.08);border:1px solid rgba(76,240,224,.4);border-radius:12px;padding:9px 11px;margin:8px 0 2px;font:600 13px var(--mb-ui);color:var(--mb-teal)}
+.cueSwatch{flex:0 0 46px;width:46px;height:12px;border-radius:6px;border:1px solid rgba(255,255,255,.18);box-shadow:inset 0 -2px 3px rgba(0,0,0,.35)}
+.ladRow .cueSwatch{flex-basis:54px;width:54px}
+.cueRow{margin-top:8px}
 /* ---- Shark Eyes overlay (the scan-a-real-table mode, same app) ---- */
 #se{position:fixed;inset:0;z-index:1000;overflow-y:auto;-webkit-overflow-scrolling:touch;background:radial-gradient(120% 60% at 80% -10%,#0d2a2c 0%,#07090c 60%)}
 #eyesBack{position:fixed;left:10px;top:calc(8px + var(--sat));z-index:1002;display:inline-flex;align-items:center;gap:6px;background:var(--mb-glass);color:var(--mb-teal);border:1px solid rgba(76,240,224,.4);border-radius:10px;font:700 12px var(--mb-mono);text-transform:uppercase;letter-spacing:.06em;padding:8px 13px;backdrop-filter:blur(8px)}
@@ -317,7 +338,7 @@ body.play #vtoast{bottom:calc(94px + env(safe-area-inset-bottom))}
   </div>
   <div class="mgap"></div>
   <div class="mbody">
-    <button class="storyCta" id="btnStory" type="button"><span class="sc-l"><b>Story mode</b><small>Hustle up the ladder</small></span><span class="sc-bank" id="scBank"></span></button>
+    <button class="storyCta" id="btnStory" type="button"><span class="sc-l"><b>Story mode</b><small id="scSub">Hustle up the ladder</small></span><span class="sc-bank" id="scBank"></span></button>
     <div class="orline"><span>or a quick game</span></div>
     <div class="pills" id="modes">
       <button class="pill on" data-m="8ball" type="button">8-Ball</button>
@@ -366,7 +387,7 @@ body.play #vtoast{bottom:calc(94px + env(safe-area-inset-bottom))}
     <div class="panel" id="panel"></div>
   </div>
 </div></div>
-<button class="mb-ver" id="mbVer" type="button">v0.9.1 · Oct 4</button>
+<button class="mb-ver" id="mbVer" type="button">v1.0.1 · Oct 4</button>
 <div id="vtoast"></div>
 
 <script>
@@ -1460,12 +1481,64 @@ var UPGR = [
   { name: 'Finish the room', cost: 150, note: 'Haul out the boxes and the water heater for good.' }
 ];
 var STORY = (function () {
-  var d = { bank: 20, beat: {}, up: 0 }, s = store.get('story', null);
-  if (s && typeof s === 'object') { if (typeof s.bank === 'number') d.bank = s.bank; if (s.beat && typeof s.beat === 'object') d.beat = s.beat; if (typeof s.up === 'number') d.up = s.up; }
+  var d = { bank: 20, beat: {}, up: 0, played: {}, cue: 'house', cues: { house: true }, champ: false }, s = store.get('story', null);
+  if (s && typeof s === 'object') {
+    if (typeof s.bank === 'number') d.bank = s.bank; if (s.beat && typeof s.beat === 'object') d.beat = s.beat; if (typeof s.up === 'number') d.up = s.up;
+    if (s.played && typeof s.played === 'object') d.played = s.played; if (typeof s.cue === 'string') d.cue = s.cue;
+    if (s.cues && typeof s.cues === 'object') d.cues = s.cues; if (s.champ) d.champ = true;
+  }
+  d.cues.house = true;
   return d;
 })();
 function saveStory() { store.set('story', STORY); }
 function money(n) { return '$' + Math.round(n); }
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+/* what the house says: before a match (first meeting or rematch), and after (they won / you won) */
+var LINES = {
+  dot:   { meet: ['You the new one? Grab a cue off the wall, honey. They are all crooked, pick the one you like.', 'Tuesday league rules. No crying, no quarters on the rail, and I break first because I am old.'],
+           rematch: ['Back again. I have been practicing. That is a lie, but I have been here.', 'Rack them. I have got forty minutes before my show comes on.'],
+           win: ['Well, look at that. Tuesday league, baby.', 'Thirty-one years of parallel parking a bus. You think I cannot aim?'],
+           lose: ['Good. Now go find Benny at the other end. That boy needs humbling.', 'Fine, fine. Take it. Benny is down there banking everything in sight. Go get him.'] },
+  benny: { meet: ['Straight in is for people with no imagination. Watch this.', 'Rail Bar rules: if it can go two rails, it goes two rails.'],
+           rematch: ['Rematch? Cushions are still on my side, I checked.', 'You again. Cool. I have a new bank I want to try on you.'],
+           win: ['Two rails! I TOLD you they owe me.', 'That is the bank. That is the whole bank. Thank you.'],
+           lose: ['Okay, okay. Marisol is up at Corner Pocket. Do not blink, she shoots before you finish talking.', 'Fine. You are better than the cushions tonight. Go see Marisol at the hall. Bring coffee, she is coming off a shift.'] },
+  mari:  { meet: ['I shoot fast. Keep up or do not, I am not waiting for you.', 'Rack it. I have a shift at six and I would like to win before then.'],
+           rematch: ['You again. Good. Faster this time.', 'Back for more? Rack it, I have three minutes of patience left.'],
+           win: ['Done. That was like four minutes. Benny said you were good.', 'Too slow. Next.'],
+           lose: ['Fine. You are quick enough. Hank is at the far table. He will talk your ear off about english.', 'Okay. Hank is in the back, leveling the table again. Do not mention spin.'] },
+  hank:  { meet: ['No spin. Center ball. That is pool. The rest is decoration.', 'I leveled this table with a feeler gauge. Respect it.'],
+           rematch: ['Still putting english on it? Your funeral.', 'Again. Center ball this time, and maybe you learn something.'],
+           win: ['Center ball. Every time. Write it down.', 'See? No spin, no excuses. Table is level, you were not.'],
+           lose: ['Hm. Ruth runs the back room. She does not lose to anybody I have seen.', 'Fine. You get one thing right. Ruth is in the back. She will take the rest.'] },
+  ruth:  { meet: ['Take your time. I already know how this ends, but I would like to watch you try.', 'Sit down. Three balls ahead. That is all it is.'],
+           rematch: ['Again? Good. Patience is the whole game.', 'Back. You left me two balls last time. We will fix that.'],
+           win: ['That is what three balls ahead looks like.', 'You were playing one shot. I was playing the next three.'],
+           lose: ['Well played. There is a man at the Championship who has not lost since 2011. Go introduce yourself.', 'Good. Now you are ready for Silas. Nobody is, but you are closer than most.'] },
+  silas: { meet: ['They told me about you. Sit down. Let us see if they were right.', 'Ruth sent you. Then you can play. Rack them.'],
+           rematch: ['You keep coming back. I respect that. It will not help.', 'Again. Fine. The house does not mind taking your money twice.'],
+           win: ['Same as 2011. Nothing personal.', 'You had one chance. You are not the first to miss it.'],
+           lose: ['That is the first time since 2011. The house is yours. Try not to lose it.', 'Still yours. For now.'] }
+};
+/* the thread between rungs, shown the first time you beat each player */
+var ARC = {
+  dot: 'Dot slides a folded twenty across the rail and nods toward the far end of the bar, where a kid in a courier jacket is banking the 3 off two rails for no reason at all.',
+  benny: 'Benny shakes your hand and tells you the real games are up the street at Corner Pocket Billiards. Ask for Marisol, he says. And do not blink.',
+  mari: 'Marisol taps her cue twice on the floor, the hall sign of respect, and points to the back table. A big man in a work shirt is leveling it. Again.',
+  hank: 'Hank does not shake hands. He just says one word, Ruth, and goes back to his gauge. The back room is quieter than the rest of the hall.',
+  ruth: 'Ruth writes a name and an address on a napkin. The Championship. Friday. He will know you are coming, she says.',
+  silas: 'The arena goes quiet. Silas sets his cue in its case, closes the latches, and leaves it on the table. It is yours, he says. Try not to lose it.'
+};
+/* cues you earn: colors for shaft, joint ring, forearm, wrap and butt */
+var CUES = [
+  { id: 'house', name: 'House cue', cost: 0, need: null, note: 'Off the wall. Slightly warped, completely honest.', shaft: 0xdcb37c, joint: 0xc7a24a, fore: 0x2a1410, wrap: 0x15171a, butt: 0x2a1410 },
+  { id: 'railbar', name: 'Rail Bar special', cost: 80, need: 'dot', note: 'Dark walnut with an orange linen wrap. Dot swears it is lucky.', shaft: 0xe2c48f, joint: 0xc7a24a, fore: 0x3b1f12, wrap: 0xf59847, butt: 0x3b1f12 },
+  { id: 'corner', name: 'Corner Pocket custom', cost: 180, need: 'mari', note: 'Black with teal rings. Built for speed, like its first owner.', shaft: 0xf0dcb0, joint: 0x4cf0e0, fore: 0x0d0f12, wrap: 0x1c2a2c, butt: 0x0d0f12 },
+  { id: 'aperture', name: 'The Aperture', cost: 300, need: 'hank', note: 'Teal shaft, orange butt. The house brand.', shaft: 0x1f7f7a, joint: 0xf59847, fore: 0x0b3d49, wrap: 0x07090c, butt: 0xf59847 },
+  { id: 'silas', name: 'Silas Crane\'s cue', cost: 0, need: 'silas', award: true, note: 'Ebony and silver. He left it on the table.', shaft: 0xf3e6c8, joint: 0xd8dde2, fore: 0x0a0a0c, wrap: 0x9aa3ad, butt: 0x0a0a0c }
+];
+function cueById(id) { for (var i = 0; i < CUES.length; i++) if (CUES[i].id === id) return CUES[i]; return CUES[0]; }
 
 /* ---------- audio (silent until a shot is played) ---------- */
 var AC = null, master = null, nbuf = null, rum = null;
@@ -1994,17 +2067,24 @@ function buildBalls() {
 }
 
 /* ---------- cue stick ---------- */
-var cue = new THREE.Group(), CUE_LEN = 1.47;
+var cue = new THREE.Group(), CUE_LEN = 1.47, cueMats = {};
 function buildCue() {
-  function part(pts, mat) { var g = new THREE.LatheGeometry(pts.map(function (p) { return new THREE.Vector2(p[0], p[1]); }), 20); var m = new THREE.Mesh(g, mat); m.castShadow = true; cue.add(m); }
+  function part(pts, mat) { var g = new THREE.LatheGeometry(pts.map(function (p) { return new THREE.Vector2(p[0], p[1]); }), 20); var m = new THREE.Mesh(g, mat); m.castShadow = true; cue.add(m); return mat; }
   part([[0, 0], [0.0058, 0.0008], [0.0062, 0.007]], new THREE.MeshStandardMaterial({ color: 0x3f6f9c, roughness: 0.95 }));
   part([[0.0062, 0.007], [0.0064, 0.03]], new THREE.MeshStandardMaterial({ color: 0xf1ece0, roughness: 0.4 }));
-  part([[0.0064, 0.03], [0.0105, 0.74]], new THREE.MeshPhysicalMaterial({ color: 0xdcb37c, roughness: 0.4, clearcoat: 0.5 }));
-  part([[0.0105, 0.74], [0.0108, 0.75]], new THREE.MeshStandardMaterial({ color: 0xc7a24a, roughness: 0.3, metalness: 0.9 }));
-  part([[0.0108, 0.75], [0.0128, 1.08]], new THREE.MeshPhysicalMaterial({ color: 0x2a1410, roughness: 0.35, clearcoat: 0.8 }));
-  part([[0.0128, 1.08], [0.0140, 1.36]], new THREE.MeshStandardMaterial({ color: 0x15171a, roughness: 0.95 }));
-  part([[0.0140, 1.36], [0.0146, 1.455], [0.0135, CUE_LEN], [0, CUE_LEN]], new THREE.MeshPhysicalMaterial({ color: 0x2a1410, roughness: 0.35, clearcoat: 0.8 }));
+  cueMats.shaft = part([[0.0064, 0.03], [0.0105, 0.74]], new THREE.MeshPhysicalMaterial({ color: 0xdcb37c, roughness: 0.4, clearcoat: 0.5 }));
+  cueMats.joint = part([[0.0105, 0.74], [0.0108, 0.75]], new THREE.MeshStandardMaterial({ color: 0xc7a24a, roughness: 0.3, metalness: 0.9 }));
+  cueMats.fore = part([[0.0108, 0.75], [0.0128, 1.08]], new THREE.MeshPhysicalMaterial({ color: 0x2a1410, roughness: 0.35, clearcoat: 0.8 }));
+  cueMats.wrap = part([[0.0128, 1.08], [0.0140, 1.36]], new THREE.MeshStandardMaterial({ color: 0x15171a, roughness: 0.95 }));
+  cueMats.butt = part([[0.0140, 1.36], [0.0146, 1.455], [0.0135, CUE_LEN], [0, CUE_LEN]], new THREE.MeshPhysicalMaterial({ color: 0x2a1410, roughness: 0.35, clearcoat: 0.8 }));
   cue.visible = false; scene.add(cue);
+  applyCue(STORY.cue);
+}
+function applyCue(id) {
+  var c = cueById(id); if (!cueMats.shaft) return;
+  ['shaft', 'joint', 'fore', 'wrap', 'butt'].forEach(function (k) { cueMats[k].color.setHex(c[k]); });
+  cueMats.joint.metalness = c.id === 'aperture' ? 0.3 : 0.9;
+  STORY.cue = c.id;
 }
 
 /* ---------- guide ribbons ---------- */
@@ -2196,42 +2276,81 @@ function gameOver(out) {
 
 /* ---------- story: settle a match, challenge an opponent, the ladder screen ---------- */
 function storyResult(out) {
-  var won = out.winner === 0, L = ladderOf(G.story.oppId), ch = charById(G.story.oppId), st = G.stats[0];
-  var head, big, sub;
+  var won = out.winner === 0, id = G.story.oppId, L = ladderOf(id), ch = charById(id), st = G.stats[0], ln = LINES[id] || {};
+  var head, big, sub, say = '', beat = '', award = '';
   if (won) {
     STORY.bank += G.story.purse;
-    var firstTime = !STORY.beat[G.story.oppId];
-    STORY.beat[G.story.oppId] = true; saveStory();
+    var firstTime = !STORY.beat[id];
+    STORY.beat[id] = true;
     var net = G.story.purse - G.story.buy;
     head = 'You take the table'; big = '+' + money(G.story.purse);
     sub = 'Bankroll ' + money(STORY.bank) + ' &middot; ' + (net >= 0 ? 'up ' + money(net) : 'down ' + money(-net)) + ' on the match.';
-    if (G.story.oppId === 'silas' && firstTime) { head = 'House shark'; sub = 'You beat Silas Crane, and nobody here has seen that since 2011. ' + sub; }
-    else if (firstTime) { var nx = nextOpp(G.story.oppId); if (nx) sub += ' ' + charById(nx.id).name + ' will give you a game now.'; }
+    if (id === 'silas') { say = firstTime ? ln.lose[0] : ln.lose[1]; } else if (ln.lose) say = pick(ln.lose);
+    if (firstTime && ARC[id]) beat = ARC[id];
+    if (id === 'silas' && firstTime) { head = 'House shark'; STORY.champ = true; STORY.cues.silas = true; applyCue('silas'); award = 'Silas Crane\'s cue is yours. It is on you now.'; }
+    saveStory();
   } else {
     head = (ch ? ch.name : 'They') + ' win'; big = '-' + money(G.story.buy);
-    sub = 'Down to ' + money(STORY.bank) + '. The buy-in is gone, but the table is always here.'; saveStory();
+    sub = 'Down to ' + money(STORY.bank) + '. The buy-in is gone, but the table is always here.';
+    if (ln.win) say = pick(ln.win);
+    saveStory();
   }
   var html = '<div class="mono" style="color:' + (won ? 'var(--mb-teal)' : 'var(--mb-orange)') + '">' + (ch ? ch.name + ' &middot; Level ' + ch.lvl : 'Match') + '</div>' +
     '<div class="big" style="color:' + (won ? 'var(--mb-teal)' : 'var(--mb-ink)') + '">' + head + '</div>' +
-    '<div class="purse ' + (won ? 'up' : 'down') + '">' + big + '</div><p>' + sub + '</p>' +
+    '<div class="purse ' + (won ? 'up' : 'down') + '">' + big + '</div>' +
+    (say ? '<div class="quote"><span class="ava qava" data-face="' + ch.id + '" style="background:' + ch.col + '">' + ch.ini + '</span><p>' + say + '</p></div>' : '') +
+    '<p>' + sub + '</p>' +
+    (beat ? '<p class="arc">' + beat + '</p>' : '') +
+    (award ? '<div class="awardRow"><span class="cueSwatch" style="' + swatchStyle(cueById('silas')) + '"></span><span>' + award + '</span></div>' : '') +
     '<div class="stats"><div><b>' + st.shots + '</b><span>Shots</span></div><div><b>' + st.pots + '</b><span>Balls made</span></div><div><b>' + st.best + '</b><span>Best run</span></div></div>';
   html += STORY.bank >= G.story.buy ? '<button class="primary" id="mAgain" type="button">Rematch &middot; ' + money(G.story.buy) + '</button>' : '';
   html += '<div class="rowb"><button class="ghost" id="mRoom" type="button">Back to the ladder</button></div>';
-  openModal(html);
-  if ($('mAgain')) $('mAgain').onclick = function () { challenge(G.story.oppId, true); };
+  openModal(html); applyFaces();
+  if ($('mAgain')) $('mAgain').onclick = function () { challenge(id, true); };
   $('mRoom').onclick = function () { closeModal(); openStory(); };
+}
+function swatchStyle(c) {
+  function hx(n) { return '#' + ('000000' + n.toString(16)).slice(-6); }
+  return 'background:linear-gradient(90deg,' + hx(c.shaft) + ' 0 48%,' + hx(c.joint) + ' 48% 51%,' + hx(c.fore) + ' 51% 70%,' + hx(c.wrap) + ' 70% 90%,' + hx(c.butt) + ' 90% 100%)';
+}
+/* the locker: buy and equip cues with what you have won */
+function openLocker(note) {
+  var h = '<div class="mono" style="color:var(--mb-orange)">Your cues</div><h2>The locker</h2>' +
+    (note ? '<p class="staked">' + note + '</p>' : '<p>Cues you have earned. Buy them with your bankroll (' + money(STORY.bank) + '), equip the one you like.</p>');
+  for (var i = 0; i < CUES.length; i++) {
+    var c = CUES[i], own = !!STORY.cues[c.id], eq = STORY.cue === c.id, gated = c.need && !STORY.beat[c.need], can = !gated && !c.award && STORY.bank >= c.cost;
+    var st = eq ? '<span class="st done">Equipped</span>' : own ? '<span class="st">Equip</span>' : c.award ? '<span class="st lock">Beat ' + charById(c.need).name.split(' ')[0] + '</span>'
+      : gated ? '<span class="st lock">Beat ' + charById(c.need).name.split(' ')[0] + '</span>' : '<span class="st' + (can ? '' : ' lock') + '">' + money(c.cost) + '</span>';
+    h += '<button class="ladRow' + (gated || (c.award && !own) ? ' off' : '') + '" data-c="' + c.id + '" type="button">' +
+      '<span class="cueSwatch" style="' + swatchStyle(c) + '"></span><span class="ltx"><b>' + c.name + '</b><span>' + c.note + '</span></span>' + st + '</button>';
+  }
+  h += '<button class="primary" id="lkBack" type="button" style="margin-top:14px">Back to the ladder</button>';
+  openModal(h);
+  var rows = $('modalCard').querySelectorAll('.ladRow');
+  for (var j = 0; j < rows.length; j++) rows[j].onclick = function () {
+    var c = cueById(this.getAttribute('data-c'));
+    if (STORY.cues[c.id]) { applyCue(c.id); saveStory(); openLocker(c.name + ' in hand.'); return; }
+    if (c.award) { openLocker('Beat ' + charById(c.need).name + ' and it is yours.'); return; }
+    if (c.need && !STORY.beat[c.need]) { openLocker('Beat ' + charById(c.need).name + ' first.'); return; }
+    if (STORY.bank < c.cost) { openLocker('You need ' + money(c.cost) + ' for that one.'); return; }
+    STORY.bank -= c.cost; STORY.cues[c.id] = true; applyCue(c.id); saveStory(); openLocker(c.name + ' bought and in hand.');
+  };
+  $('lkBack').onclick = function () { closeModal(); openStory(); };
 }
 function challenge(id, skip) {
   var L = ladderOf(id), ch = charById(id); if (!L || !ch) return;
   if (STORY.bank < L.buy) { openStory('You need ' + money(L.buy) + ' to sit down with ' + ch.name.split(' ')[0] + '.'); return; }
-  function go() { STORY.bank -= L.buy; saveStory(); closeModal(); buildRoom(L.venue); startGame('8ball', id, { oppId: id, buy: L.buy, purse: L.purse, venue: L.venue }); }
+  function go() { STORY.bank -= L.buy; STORY.played[id] = (STORY.played[id] || 0) + 1; saveStory(); closeModal(); buildRoom(L.venue); startGame('8ball', id, { oppId: id, buy: L.buy, purse: L.purse, venue: L.venue }); }
   if (skip) { go(); return; }
-  openModal('<div class="mono" style="color:var(--mb-orange)">' + VENUES[L.venue].name + '</div><h2>' + ch.name + '</h2><p>' + ch.story + '</p>' +
+  var ln = LINES[id], say = ln ? pick((STORY.played[id] || 0) ? ln.rematch : ln.meet) : '';
+  openModal('<div class="mono" style="color:var(--mb-orange)">' + VENUES[L.venue].name + '</div><h2>' + ch.name + '</h2>' +
+    (say ? '<div class="quote"><span class="ava qava" data-face="' + ch.id + '" style="background:' + ch.col + '">' + ch.ini + '</span><p>' + say + '</p></div>' : '<p>' + ch.story + '</p>') +
     '<div class="kv"><span>Buy-in</span><b>' + money(L.buy) + '</b></div>' +
     '<div class="kv"><span>Winner takes</span><b>' + money(L.purse) + '</b></div>' +
     '<div class="kv"><span>Your bankroll</span><b>' + money(STORY.bank) + '</b></div>' +
     '<button class="primary" id="cGo" type="button">Put up ' + money(L.buy) + '</button>' +
     '<div class="rowb"><button class="ghost" id="cBack" type="button">Not yet</button></div>');
+  applyFaces();
   $('cGo').onclick = go; $('cBack').onclick = function () { openStory(); };
 }
 function doUpgrade() {
@@ -2243,13 +2362,15 @@ function openStory(note) {
   var minBuy = 1e9, i; for (i = 0; i < LADDER.length; i++) if (storyAvail(LADDER[i].id)) minBuy = Math.min(minBuy, LADDER[i].buy);
   var staked = false; if (STORY.bank < minBuy) { STORY.bank = minBuy; saveStory(); staked = true; }
   var up = STORY.up | 0, nextUp = UPGR[up];
-  var h = '<div class="storyTop"><div><div class="mono" style="color:var(--mb-orange)">Story</div><h2 style="margin:0">Up the ladder</h2></div><div class="bank"><b>' + money(STORY.bank) + '</b><span>bankroll</span></div></div>';
+  var h = '<div class="storyTop"><div><div class="mono" style="color:var(--mb-orange)">Story</div><h2 style="margin:0">' + (STORY.champ ? 'House shark' : 'Up the ladder') + '</h2></div><div class="bank"><b>' + money(STORY.bank) + '</b><span>bankroll</span></div></div>';
   if (note) h += '<p class="staked">' + note + '</p>';
   else if (staked) h += '<p class="staked">The regulars spot you a rack. Win it back.</p>';
   h += '<div class="venueCard" style="background-image:url(room-basement.jpg)"><div class="vc"><small>Your practice room</small><b>The Basement</b><span class="up">' +
     (nextUp ? 'Next: ' + nextUp.name + ' &middot; ' + money(nextUp.cost) : 'Fully finished') + '</span></div></div>';
   h += '<div class="rowb"><button class="ghost" id="stPractice" type="button">Practice free</button>' +
     (nextUp ? '<button class="ghost" id="stUp" type="button"' + (STORY.bank < nextUp.cost ? ' disabled' : '') + '>Upgrade &middot; ' + money(nextUp.cost) + '</button>' : '') + '</div>';
+  var eqc = cueById(STORY.cue);
+  h += '<button class="ladRow cueRow" id="stCues" type="button"><span class="cueSwatch" style="' + swatchStyle(eqc) + '"></span><span class="ltx"><b>' + eqc.name + '</b><span>Your cue &middot; tap for the locker</span></span><span class="st">Cues</span></button>';
   h += '<div class="lab">The ladder</div>';
   for (i = 0; i < LADDER.length; i++) {
     var L = LADDER[i], c = charById(L.id), av = storyAvail(L.id), done = !!STORY.beat[L.id];
@@ -2262,10 +2383,11 @@ function openStory(note) {
   openModal(h);
   applyFaces();
   var rows = $('modalCard').querySelectorAll('.ladRow');
-  for (var j = 0; j < rows.length; j++) rows[j].onclick = function () { var id = this.getAttribute('data-o'); if (storyAvail(id)) challenge(id); };
+  for (var j = 0; j < rows.length; j++) rows[j].onclick = function () { var id = this.getAttribute('data-o'); if (id && storyAvail(id)) challenge(id); };
   if ($('stUp')) $('stUp').onclick = doUpgrade;
+  $('stCues').onclick = function () { openLocker(); };
   $('stPractice').onclick = function () { closeModal(); buildRoom('basement'); startGame('practice', null); };
-  $('stBack').onclick = function () { closeModal(); buildRoom(CFG.room); };
+  $('stBack').onclick = function () { closeModal(); buildRoom(CFG.room); try { syncMenu(); } catch (e) {} };
 }
 function openEyes() {
   if (window.__RH) window.__RH.frozen = true;      // stop the 3D loop while the scan mode is up
@@ -2282,6 +2404,7 @@ function toMenu() {
   G.drill = null;
   G.phase = 'menu'; G.paused = false; setRumble(0, 0); $('hud').classList.add('hide'); $('modal').classList.add('hide'); $('menu').classList.remove('hide');
   document.body.classList.remove('play'); hideGuides(); clearTags(); cue.visible = false;
+  try { syncMenu(); } catch (e) {}
 }
 
 /* ---------- CPU ---------- */
@@ -2947,6 +3070,7 @@ function syncMenu() {
   $('oppInfo').innerHTML = ch ? '<small>' + ch.tag + ' &middot; tap to read</small><p>' + ch.story + '</p>' : '<small>No house player</small><p>Hand the phone over after each turn. Fouls and ball in hand are still called.</p>';
   $('btnStart').textContent = CFG.mode === 'practice' ? 'Open the practice table' : 'Rack them up';
   var sb = $('scBank'); if (sb) sb.textContent = money(STORY.bank);
+  var ss = $('scSub'); if (ss) ss.textContent = STORY.champ ? 'House shark. Defend it.' : 'Hustle up the ladder';
 }
 // tap an opponent to read their bio and play style, then play them
 function openBio(id) {
@@ -2964,21 +3088,49 @@ function openBio(id) {
   $('bioPlay').onclick = function () { closeModal(); startGame(mode, id); };
   $('bioClose').onclick = closeModal;
 }
-/* ---------- install to home screen (PWA) ---------- */
-var deferredPrompt = null, isStandalone = false, isiOS = /iphone|ipad|ipod/i.test(navigator.userAgent || '');
+/* ---------- install to home screen (PWA): a guide for every system, plus the native prompt where the browser offers one ---------- */
+var deferredPrompt = null, isStandalone = false, UA = navigator.userAgent || '';
 try { isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true; } catch (e) {}
-function installable() { return !isStandalone && (!!deferredPrompt || isiOS); }
-function refreshInstall() { var r = $('installRow'); if (r) r.hidden = !installable(); }
-window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); deferredPrompt = e; refreshInstall(); });
-window.addEventListener('appinstalled', function () { deferredPrompt = null; isStandalone = true; refreshInstall(); });
+var inFrame = false; try { inFrame = window.top !== window.self; } catch (e) { inFrame = true; }
+function platform() {
+  var iPadOS = /macintosh/i.test(UA) && navigator.maxTouchPoints > 1;
+  var ios = /iphone|ipad|ipod/i.test(UA) || iPadOS, android = /android/i.test(UA);
+  var samsung = /samsungbrowser/i.test(UA), firefox = /firefox|fxios/i.test(UA), edge = /edg\//i.test(UA);
+  var chrome = /chrome|crios|chromium|brave/i.test(UA) && !edge, safari = /safari/i.test(UA) && !/chrome|crios|chromium|android/i.test(UA);
+  if (ios) return 'ios';
+  if (android) return samsung ? 'samsung' : firefox ? 'andfox' : 'android';
+  if (/macintosh/i.test(UA)) return safari ? 'macsafari' : firefox ? 'deskfox' : 'desktop';
+  if (firefox) return 'deskfox';
+  return 'desktop';
+}
+var INSTALL_GUIDE = [
+  { id: 'android', title: 'Android: Chrome, Brave or Edge', steps: ['Open Pocket Shark in Chrome from the direct link (not inside the site).', 'Tap the three-dot menu at the top right.', 'Tap <b>Add to Home screen</b> (some versions say <b>Install app</b>).', 'Tap <b>Install</b>, then <b>Add</b>.'], note: 'A bar reading "Add Pocket Shark to Home screen" may also pop up at the bottom; tapping that does the same thing.' },
+  { id: 'samsung', title: 'Android: Samsung Internet', steps: ['Open the direct link in Samsung Internet.', 'Tap the three-line menu at the bottom right.', 'Tap <b>Add page to</b>, then <b>Home screen</b>. If a small download-style icon shows in the address bar, that installs it too.', 'Tap <b>Add</b>.'] },
+  { id: 'andfox', title: 'Android: Firefox', steps: ['Open the direct link in Firefox.', 'Tap the three-dot menu.', 'Tap <b>Install</b> (older versions say <b>Add to Home screen</b>).'] },
+  { id: 'ios', title: 'iPhone and iPad', steps: ['Open the direct link in Safari.', 'Tap the <b>Share</b> button: the square with an arrow pointing up, at the bottom of the screen on iPhone, top right on iPad.', 'Scroll the sheet down and tap <b>Add to Home Screen</b>.', 'Tap <b>Add</b> at the top right.'], note: 'Chrome on iPhone works the same way: Share, then Add to Home Screen. The icon lands on your home screen and opens full screen.' },
+  { id: 'macsafari', title: 'Mac: Safari', steps: ['Open the direct link in Safari (macOS Sonoma or newer).', 'In the menu bar choose <b>File</b>, then <b>Add to Dock</b>. The Share button in the toolbar has the same option.', 'Click <b>Add</b>. It opens from the Dock as its own window.'] },
+  { id: 'desktop', title: 'Mac, Windows or Linux: Chrome, Edge or Brave', steps: ['Open the direct link.', 'Click the small <b>install</b> icon at the right end of the address bar (a monitor with an arrow, or a plus in a circle).', 'No icon? Chrome: menu, <b>Cast, save and share</b>, <b>Install page as app</b>. Edge: menu, <b>Apps</b>, <b>Install this site as an app</b>.', 'Click <b>Install</b>. It gets its own window and a spot in your app list or Start menu.'] },
+  { id: 'deskfox', title: 'Firefox on a computer', steps: ['Firefox on desktop does not install web apps.', 'Bookmark the direct link, or open it in Chrome or Edge to install it as an app.'] }
+];
+function refreshInstall() { var r = $('installRow'); if (r) r.hidden = isStandalone; }
+window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); deferredPrompt = e; });
+window.addEventListener('appinstalled', function () { deferredPrompt = null; isStandalone = true; refreshInstall(); try { closeModal(); } catch (e) {} });
 function doInstall() {
-  if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt.userChoice.then(function () { deferredPrompt = null; refreshInstall(); }); return; }
-  if (isiOS) { openModal('<div class="mono" style="color:var(--mb-orange)">Install</div><h2>Add to your home screen</h2>' +
-    '<p>In Safari, tap the Share button at the bottom of the screen, then choose <b>Add to Home Screen</b>. Pocket Shark opens full screen like a real app and works offline.</p>' +
-    '<button class="primary" id="mDone" type="button">Got it</button>'); $('mDone').onclick = closeModal; return; }
-  openModal('<div class="mono" style="color:var(--mb-orange)">Install</div><h2>Add to your home screen</h2>' +
-    '<p>Open your browser menu and choose <b>Install app</b> or <b>Add to Home screen</b>. It opens full screen and works offline.</p>' +
-    '<button class="primary" id="mDone" type="button">Got it</button>'); $('mDone').onclick = closeModal;
+  var me = platform(), h = '<div class="mono" style="color:var(--mb-orange)">Install</div><h2>Put it on your home screen</h2>' +
+    '<p>Installed, Pocket Shark opens full screen like a real app, keeps your story and settings, and works with no connection.</p>';
+  if (inFrame) h += '<div class="liverow"><span class="livetxt">You are inside the site right now. Browsers only offer install on the app\'s own page, so open the direct link first.</span><button class="ghost golive" id="instOpen" type="button">Open the link</button></div>';
+  if (deferredPrompt && !inFrame) h += '<button class="primary" id="instNow" type="button">Install now</button><div class="lab">Or by hand</div>';
+  INSTALL_GUIDE.forEach(function (g) {
+    var open = g.id === me;
+    h += '<details class="guide"' + (open ? ' open' : '') + '><summary>' + g.title + (open ? ' <span class="you">this device</span>' : '') + '</summary><ol>';
+    g.steps.forEach(function (s) { h += '<li>' + s + '</li>'; });
+    h += '</ol>' + (g.note ? '<p class="gnote">' + g.note + '</p>' : '') + '</details>';
+  });
+  h += '<button class="primary" id="mDone" type="button" style="margin-top:14px">Done</button>';
+  openModal(h);
+  $('mDone').onclick = closeModal;
+  var io = $('instOpen'); if (io) io.onclick = function () { try { window.open(location.href.split('?')[0].split('#')[0], '_blank', 'noopener'); } catch (e) {} };
+  var inow = $('instNow'); if (inow) inow.onclick = function () { if (!deferredPrompt) return; deferredPrompt.prompt(); deferredPrompt.userChoice.then(function () { deferredPrompt = null; }); };
 }
 function buildMenu() {
   var h = '<button class="opp" data-o="pass" type="button"><span class="ava" style="background:#ebedef">2P</span><span><b>Pass and play</b><span class="lv">Two people, one phone</span></span></button>';
@@ -3174,7 +3326,7 @@ requestAnimationFrame(frame);
 window.__RH = { G: G, cam: cam, T: T, startGame: startGame, pToV: pToV, vToP: vToP, toScreen: toScreen, CFG: CFG,
   advance: function (sec) { var n = Math.round(sec * 60); for (var i = 0; i < n; i++) update(1 / 60); camApply(0, true); renderer.render(scene, camera); },
   setView: function (m) { while (cam.mode !== m) cycleView(); }, chars: CHARS, kick: function () { beginTurn(true); }, setLook: function (v) { CFG.cloth = v; setCloth(v); }, setRoom: setRoom, venues: VENUES, hopH: hopH, feels: FEELS,
-  story: STORY, openStory: openStory, challenge: challenge, ladder: LADDER, saveStory: saveStory, gameOver: gameOver, openBio: openBio, installable: installable,
+  story: STORY, openStory: openStory, challenge: challenge, ladder: LADDER, saveStory: saveStory, gameOver: gameOver, openBio: openBio, platform: platform, doInstall: doInstall, cues: CUES, applyCue: applyCue, openLocker: openLocker, lines: LINES, arc: ARC, cueMats: cueMats,
   photo: function (yaw, pitch, dist, x, z) { window.__RH.frozen = true; cam.mode = 'free'; cam.free.yaw = yaw; cam.free.pitch = pitch; cam.free.dist = dist; cam.free.x = x || 0; cam.free.z = z || 0; update(0.001); hideGuides(); camApply(0, true); cue.visible = false; renderer.render(scene, camera); } };
 })();
 
