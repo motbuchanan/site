@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="build" content="v1.0.1 · Oct 4">
+<meta name="build" content="v1.2 · Oct 7">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#07090c">
 <meta name="description" content="Pocket Shark: a 3D pool table with real ball physics, full camera control, and a shark that shows you the best shot.">
@@ -122,6 +122,7 @@ button{font-family:inherit;color:inherit;cursor:pointer}
 .scrim.mid .sheet{padding:16px}
 h1.word{font:800 min(54px,12vw)/0.9 var(--mb-ui);white-space:nowrap;letter-spacing:-.045em;margin:0;text-transform:uppercase}
 h1.word em{font-style:normal;color:var(--mb-teal)}
+h1.word .wm{display:block;width:min(62%,250px);height:auto;margin:2px 0 4px -6px}
 .eyebrow{font:600 10px var(--mb-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--mb-soft);margin:10px 0 18px}
 .eyebrow b{color:var(--mb-orange);font-weight:600}
 h2{font:800 22px var(--mb-ui);letter-spacing:-.02em;margin:0 0 4px}
@@ -163,6 +164,7 @@ body.play #vtoast{bottom:calc(94px + env(safe-area-inset-bottom))}
 @media (orientation:landscape) and (max-height:520px){
   #power{top:calc(70px + var(--sat));bottom:calc(70px + var(--sab))}
   h1.word{font-size:40px}
+  h1.word .wm{width:190px}
   .sheet.menu{display:grid;grid-template-columns:1fr minmax(320px,44%);grid-template-rows:auto 1fr;max-width:none;padding:0;overflow:hidden}
   .mhead{grid-column:1;grid-row:1;padding:calc(14px + var(--sat)) 18px 0}
   .mgap{grid-column:1;grid-row:2;min-height:0}
@@ -237,6 +239,24 @@ body.play #vtoast{bottom:calc(94px + env(safe-area-inset-bottom))}
 .cueSwatch{flex:0 0 46px;width:46px;height:12px;border-radius:6px;border:1px solid rgba(255,255,255,.18);box-shadow:inset 0 -2px 3px rgba(0,0,0,.35)}
 .ladRow .cueSwatch{flex-basis:54px;width:54px}
 .cueRow{margin-top:8px}
+/* ---- achievement toast ---- */
+#achToast{position:fixed;left:50%;top:calc(14px + var(--sat));transform:translate(-50%,-16px);z-index:1200;display:flex;align-items:center;gap:10px;max-width:88vw;background:var(--panel);border:1px solid rgba(76,240,224,.5);border-radius:14px;padding:9px 14px 9px 11px;box-shadow:0 8px 30px rgba(0,0,0,.6);opacity:0;transition:opacity .3s,transform .3s cubic-bezier(.2,1.4,.4,1);pointer-events:none}
+#achToast.show{opacity:1;transform:translate(-50%,0)}
+#achToast .achIcon{flex:0 0 34px;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--mb-teal);color:#06110f;font-size:18px}
+#achToast small{display:block;font:700 8.5px var(--mb-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--mb-orange)}
+#achToast b{display:block;font:800 15px var(--mb-ui);letter-spacing:-.01em;margin-top:1px}
+/* ---- record screen ---- */
+.recg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:10px 0 2px}
+.recg div{border:1px solid var(--mb-line);border-radius:12px;padding:10px 6px;text-align:center}
+.recg b{display:block;font:800 19px var(--mb-ui);letter-spacing:-.02em}
+.recg span{font:600 8px var(--mb-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mb-dim)}
+.achg{display:grid;grid-template-columns:1fr;gap:6px}
+.achb{display:flex;gap:10px;align-items:center;border:1px solid var(--mb-line);border-radius:12px;padding:8px 11px;opacity:.55}
+.achb.on{opacity:1;border-color:rgba(76,240,224,.35)}
+.achm{flex:0 0 26px;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:15px;background:var(--mb-glass);color:var(--mb-dim)}
+.achb.on .achm{background:var(--mb-teal);color:#06110f}
+.achb b{display:block;font:700 13.5px var(--mb-ui)}
+.achb span{display:block;font:500 11.5px/1.35 var(--mb-ui);color:var(--mb-dim);margin-top:1px}
 /* ---- Shark Eyes overlay (the scan-a-real-table mode, same app) ---- */
 #se{position:fixed;inset:0;z-index:1000;overflow-y:auto;-webkit-overflow-scrolling:touch;background:radial-gradient(120% 60% at 80% -10%,#0d2a2c 0%,#07090c 60%)}
 #eyesBack{position:fixed;left:10px;top:calc(8px + var(--sat));z-index:1002;display:inline-flex;align-items:center;gap:6px;background:var(--mb-glass);color:var(--mb-teal);border:1px solid rgba(76,240,224,.4);border-radius:10px;font:700 12px var(--mb-mono);text-transform:uppercase;letter-spacing:.06em;padding:8px 13px;backdrop-filter:blur(8px)}
@@ -333,7 +353,7 @@ body.play #vtoast{bottom:calc(94px + env(safe-area-inset-bottom))}
 
 <div id="menu" class="scrim"><div class="sheet menu">
   <div class="mhead">
-    <h1 class="word">Pocket <em>Shark</em></h1>
+    <h1 class="word" aria-label="Pocket Shark"><svg class="wm" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="-142.9 61.0 1019.1 360.3"><defs><clipPath id="psm1"><rect x="-2000.0" y="-2000.0" width="6000.0" height="2322.1"/></clipPath><clipPath id="psm2"><rect x="-2000.0" y="331.1" width="6000.0" height="4000.0"/></clipPath></defs><path fill="#f2f4f6" d="M4.1 190.0 22.3 86.8H90.1Q99.3 86.8 106.0 90.4Q112.6 94.1 116.4 100.7Q120.1 107.3 120.1 116.0Q120.1 125.0 117.1 132.6Q114.2 140.2 108.9 145.8Q103.6 151.4 96.6 154.6Q89.6 157.7 81.2 157.7H44.4L38.8 190.0ZM48.9 133.0H73.4Q77.6 133.0 80.3 131.3Q83.1 129.6 84.5 126.6Q86.0 123.6 86.0 119.6Q86.0 115.7 83.6 113.7Q81.3 111.7 76.5 111.7H52.6ZM179.3 191.8Q162.0 191.8 149.7 186.9Q137.4 182.0 130.9 172.5Q124.5 163.0 124.5 149.2Q124.5 142.6 126.2 136.5Q128.0 130.4 131.1 125.2Q135.6 111.9 144.0 103.0Q152.5 94.1 164.9 89.5Q177.3 85.0 193.8 85.0Q211.3 85.0 223.6 89.9Q235.8 94.8 242.3 104.3Q248.7 113.9 248.7 127.9Q248.7 134.5 247.0 140.6Q245.2 146.7 242.0 151.8Q237.5 164.9 228.9 173.8Q220.4 182.8 208.0 187.3Q195.5 191.8 179.3 191.8ZM181.6 166.6Q187.7 166.6 192.7 164.9Q197.8 163.1 201.6 159.8Q205.5 156.5 208.0 151.9Q210.5 147.3 211.4 141.9Q212.0 138.5 212.4 136.3Q212.7 134.1 212.9 132.7Q213.0 131.4 213.1 130.6Q213.2 129.8 213.2 129.1Q213.2 123.3 210.7 119.0Q208.2 114.8 203.4 112.4Q198.6 110.1 191.5 110.1Q185.5 110.1 180.4 111.8Q175.4 113.6 171.6 116.9Q167.8 120.2 165.3 124.7Q162.8 129.3 161.9 134.7Q161.3 138.2 160.9 140.4Q160.6 142.6 160.4 144.0Q160.2 145.3 160.2 146.1Q160.1 146.9 160.1 147.6Q160.1 153.3 162.5 157.6Q165.0 161.9 169.8 164.3Q174.6 166.6 181.6 166.6ZM312.5 191.8Q286.2 191.8 273.0 181.4Q259.9 171.0 259.9 150.8Q259.9 143.3 261.7 136.7Q263.5 130.1 266.8 124.5Q271.2 111.5 279.3 102.7Q287.4 93.9 299.2 89.4Q311.1 85.0 326.2 85.0Q341.6 85.0 352.8 89.2Q364.1 93.4 370.2 101.4Q376.3 109.3 376.3 120.7Q376.3 122.7 376.1 124.8Q375.9 127.0 375.5 129.2H342.1Q342.4 128.1 342.4 127.0Q342.5 126.0 342.5 125.1Q342.5 120.5 340.4 117.2Q338.3 113.8 334.3 112.0Q330.3 110.1 324.5 110.1Q318.4 110.1 313.7 111.9Q309.0 113.8 305.7 117.1Q302.4 120.4 300.4 124.9Q298.3 129.4 297.3 134.7Q296.7 138.3 296.3 140.6Q295.9 143.0 295.7 144.4Q295.5 145.9 295.5 146.8Q295.4 147.7 295.4 148.5Q295.4 153.8 297.3 157.9Q299.3 162.0 303.4 164.3Q307.6 166.6 314.1 166.6Q321.5 166.6 326.8 164.4Q332.2 162.1 335.5 158.0Q338.9 153.8 339.9 148.1H372.2Q369.9 161.6 362.3 171.4Q354.7 181.2 342.1 186.5Q329.6 191.8 312.5 191.8ZM382.7 190.0 400.9 86.8H435.6L427.9 130.0L476.5 86.8H520.7L472.6 129.4L503.4 190.0H463.6L445.1 150.9L421.0 170.0L417.4 190.0ZM516.9 190.0 535.1 86.8H632.8L628.4 111.9H565.5L563.0 125.8H617.0L612.8 149.7H558.8L556.1 164.8H620.1L615.7 190.0ZM663.9 190.0 677.3 113.9H639.5L644.2 86.8H754.6L749.8 113.9H712.0L698.6 190.0Z"/><g clip-path="url(#psm1)"><path fill="#f2f4f6" d="M72.7 397.2Q58.2 397.2 45.9 395.6Q33.5 393.9 24.3 390.0Q15.2 386.2 10.0 379.3Q4.9 372.3 4.9 361.9Q4.9 359.3 5.1 356.2Q5.4 353.1 6.2 350.7H48.3Q47.6 352.1 47.5 353.5Q47.3 354.9 47.3 356.1Q47.3 360.6 50.1 363.0Q53.0 365.5 58.2 366.4Q63.4 367.2 70.0 367.2Q73.5 367.2 77.6 366.9Q81.7 366.6 85.4 365.7Q89.2 364.8 91.5 362.9Q93.9 360.9 93.9 357.5Q93.9 354.4 90.6 352.4Q87.2 350.5 81.6 349.3Q75.9 348.0 68.9 346.8Q61.9 345.7 54.6 344.1Q47.3 342.4 40.3 340.0Q33.4 337.5 27.8 333.7Q22.2 329.8 18.9 323.9Q15.6 318.0 15.6 309.6Q15.6 296.5 21.5 287.4Q27.4 278.4 37.3 272.7Q47.2 267.1 59.5 264.5Q71.8 262.0 84.7 262.0Q97.5 262.0 108.6 263.9Q119.7 265.9 127.9 270.0Q136.2 274.1 140.9 280.5Q145.5 286.9 145.5 295.8Q145.5 297.4 145.3 299.3Q145.1 301.2 144.6 304.5H102.8Q103.0 303.3 103.0 302.7Q103.0 302.0 103.0 301.4Q103.0 296.8 98.9 293.6Q94.8 290.5 85.2 290.5Q77.5 290.5 72.4 291.8Q67.2 293.2 64.7 295.4Q62.2 297.5 62.2 300.0Q62.2 302.7 64.6 304.4Q66.9 306.1 71.0 307.4Q75.2 308.7 80.6 309.6Q86.0 310.6 92.1 311.6Q100.2 313.1 108.8 315.2Q117.3 317.4 124.6 321.2Q131.8 325.0 136.3 331.2Q140.7 337.4 140.7 346.8Q140.7 359.7 135.2 369.2Q129.7 378.7 120.2 385.0Q110.7 391.2 98.5 394.2Q86.2 397.2 72.7 397.2ZM154.5 395.0 177.6 264.2H221.6L213.2 311.4H268.8L277.2 264.2H321.1L298.0 395.0H254.1L262.7 345.8H207.1L198.5 395.0ZM487.3 395.0 510.3 264.2H602.1Q615.7 264.2 624.5 268.9Q633.4 273.6 637.7 281.3Q642.1 289.1 642.1 298.7Q642.1 310.2 638.5 319.3Q634.9 328.4 628.3 334.9Q621.7 341.5 612.5 345.6L629.3 395.0H581.0L568.7 352.3H538.8L531.3 395.0ZM544.2 321.8H580.6Q584.4 321.8 588.1 319.8Q591.7 317.8 594.1 314.2Q596.4 310.6 596.4 305.7Q596.4 300.7 593.7 297.9Q590.9 295.1 586.4 295.1H548.8ZM647.5 395.0 670.6 264.2H714.6L704.9 319.0L766.4 264.2H822.3L761.5 318.3L800.4 395.0H750.1L726.7 345.5L696.1 369.7L691.5 395.0Z"/></g><g clip-path="url(#psm2)"><g transform="translate(26 0)"><path fill="#4cf0e0" d="M72.7 397.2Q58.2 397.2 45.9 395.6Q33.5 393.9 24.3 390.0Q15.2 386.2 10.0 379.3Q4.9 372.3 4.9 361.9Q4.9 359.3 5.1 356.2Q5.4 353.1 6.2 350.7H48.3Q47.6 352.1 47.5 353.5Q47.3 354.9 47.3 356.1Q47.3 360.6 50.1 363.0Q53.0 365.5 58.2 366.4Q63.4 367.2 70.0 367.2Q73.5 367.2 77.6 366.9Q81.7 366.6 85.4 365.7Q89.2 364.8 91.5 362.9Q93.9 360.9 93.9 357.5Q93.9 354.4 90.6 352.4Q87.2 350.5 81.6 349.3Q75.9 348.0 68.9 346.8Q61.9 345.7 54.6 344.1Q47.3 342.4 40.3 340.0Q33.4 337.5 27.8 333.7Q22.2 329.8 18.9 323.9Q15.6 318.0 15.6 309.6Q15.6 296.5 21.5 287.4Q27.4 278.4 37.3 272.7Q47.2 267.1 59.5 264.5Q71.8 262.0 84.7 262.0Q97.5 262.0 108.6 263.9Q119.7 265.9 127.9 270.0Q136.2 274.1 140.9 280.5Q145.5 286.9 145.5 295.8Q145.5 297.4 145.3 299.3Q145.1 301.2 144.6 304.5H102.8Q103.0 303.3 103.0 302.7Q103.0 302.0 103.0 301.4Q103.0 296.8 98.9 293.6Q94.8 290.5 85.2 290.5Q77.5 290.5 72.4 291.8Q67.2 293.2 64.7 295.4Q62.2 297.5 62.2 300.0Q62.2 302.7 64.6 304.4Q66.9 306.1 71.0 307.4Q75.2 308.7 80.6 309.6Q86.0 310.6 92.1 311.6Q100.2 313.1 108.8 315.2Q117.3 317.4 124.6 321.2Q131.8 325.0 136.3 331.2Q140.7 337.4 140.7 346.8Q140.7 359.7 135.2 369.2Q129.7 378.7 120.2 385.0Q110.7 391.2 98.5 394.2Q86.2 397.2 72.7 397.2ZM154.5 395.0 177.6 264.2H221.6L213.2 311.4H268.8L277.2 264.2H321.1L298.0 395.0H254.1L262.7 345.8H207.1L198.5 395.0ZM487.3 395.0 510.3 264.2H602.1Q615.7 264.2 624.5 268.9Q633.4 273.6 637.7 281.3Q642.1 289.1 642.1 298.7Q642.1 310.2 638.5 319.3Q634.9 328.4 628.3 334.9Q621.7 341.5 612.5 345.6L629.3 395.0H581.0L568.7 352.3H538.8L531.3 395.0ZM544.2 321.8H580.6Q584.4 321.8 588.1 319.8Q591.7 317.8 594.1 314.2Q596.4 310.6 596.4 305.7Q596.4 300.7 593.7 297.9Q590.9 295.1 586.4 295.1H548.8ZM647.5 395.0 670.6 264.2H714.6L704.9 319.0L766.4 264.2H822.3L761.5 318.3L800.4 395.0H750.1L726.7 345.5L696.1 369.7L691.5 395.0ZM313.8 395.0 390.8 264.2H440.8L471.5 395.0H425.9L422.6 377.0H369.4L359.9 395.0ZM385.7 346.4H417.0L413.4 325.1Q413.0 322.5 412.6 319.6Q412.2 316.6 411.7 313.4Q411.2 310.2 410.8 307.0Q410.3 303.8 409.9 300.8H408.9Q407.1 304.6 405.0 308.8Q402.8 313.1 400.7 317.2Q398.6 321.4 396.8 325.1Z"/></g></g><g clip-path="url(#psm1)"><path fill="#4cf0e0" d="M312.9,328.6 C353.6,280.5 390.7,251.8 475.9,225.1 C446.3,273.2 461.1,301.9 501.8,328.6 Z"/></g><path d="M-115.1,326.6 H-19.1" stroke="#f59847" stroke-width="7.6" stroke-linecap="round"/></svg></h1>
     <div class="eyebrow">Real ball physics <b>/</b> your camera <b>/</b> a shark on your shoulder</div>
   </div>
   <div class="mgap"></div>
@@ -352,7 +372,7 @@ body.play #vtoast{bottom:calc(94px + env(safe-area-inset-bottom))}
     </div>
     <button class="primary" id="btnStart" type="button">Rack them up</button>
     <div class="rowb" id="installRow" hidden><button class="ghost instl" id="btnInstall" type="button">Install Pocket Shark</button></div>
-    <div class="rowb"><button class="ghost" id="btnHow" type="button">How to play</button><button class="ghost" id="btnDrills" type="button">Drills</button></div>
+    <div class="rowb"><button class="ghost" id="btnHow" type="button">How to play</button><button class="ghost" id="btnDrills" type="button">Drills</button><button class="ghost" id="btnRecord" type="button">Record</button></div>
     <div class="rowb"><button class="ghost" id="btnSettings" type="button">Settings</button><button class="ghost" id="btnAbout" type="button">About</button><button class="ghost xlink" id="btnEyes" type="button">Shark Eyes</button></div>
   </div>
 </div></div>
@@ -387,8 +407,9 @@ body.play #vtoast{bottom:calc(94px + env(safe-area-inset-bottom))}
     <div class="panel" id="panel"></div>
   </div>
 </div></div>
-<button class="mb-ver" id="mbVer" type="button">v1.0.1 · Oct 4</button>
+<button class="mb-ver" id="mbVer" type="button">v1.2 · Oct 7</button>
 <div id="vtoast"></div>
+<div id="achToast"></div>
 
 <script>
 void 0,
@@ -1539,6 +1560,82 @@ var CUES = [
   { id: 'silas', name: 'Silas Crane\'s cue', cost: 0, need: 'silas', award: true, note: 'Ebony and silver. He left it on the table.', shaft: 0xf3e6c8, joint: 0xd8dde2, fore: 0x0a0a0c, wrap: 0x9aa3ad, butt: 0x0a0a0c }
 ];
 function cueById(id) { for (var i = 0; i < CUES.length; i++) if (CUES[i].id === id) return CUES[i]; return CUES[0]; }
+function cueCount() { var n = 0; for (var k in STORY.cues) if (STORY.cues[k]) n++; return n; }
+
+/* ---------- career record + achievements (persistent, offline, nothing to buy) ---------- */
+var CAREER = (function () {
+  var d = { games: 0, wins: 0, losses: 0, pots: 0, shots: 0, bestRun: 0, bestBreak: 0, streak: 0, bestStreak: 0,
+    win8: 0, win9: 0, noSpinWins: 0, snap9: 0, brokeEver: 0, drills: {}, ach: {} };
+  var s = store.get('career', null);
+  if (s && typeof s === 'object') for (var k in d) if (k in s) d[k] = s[k];
+  if (!d.drills || typeof d.drills !== 'object') d.drills = {};
+  if (!d.ach || typeof d.ach !== 'object') d.ach = {};
+  return d;
+})();
+function saveCareer() { store.set('career', CAREER); }
+function drillCount() { var n = 0; for (var k in CAREER.drills) if (CAREER.drills[k]) n++; return n; }
+function beatCount() { var n = 0; for (var i = 0; i < LADDER.length; i++) if (STORY.beat[LADDER[i].id]) n++; return n; }
+function winPct() { return CAREER.games ? Math.round(100 * CAREER.wins / Math.max(1, CAREER.wins + CAREER.losses)) : 0; }
+
+var ACH = [
+  { id: 'first', name: 'Rack broken', desc: 'Win your first match.', test: function (c) { return c.wins >= 1; } },
+  { id: 'ten', name: 'Regular', desc: 'Play ten matches.', test: function (c) { return c.games >= 10; } },
+  { id: 'heater', name: 'On a heater', desc: 'Win three matches in a row.', test: function (c) { return c.bestStreak >= 3; } },
+  { id: 'century', name: 'Century', desc: 'Pot a hundred balls.', test: function (c) { return c.pots >= 100; } },
+  { id: 'marksman', name: 'Marksman', desc: 'Pot five hundred balls.', test: function (c) { return c.pots >= 500; } },
+  { id: 'run5', name: 'Table runner', desc: 'Make five in a row in one visit.', test: function (c) { return c.bestRun >= 5; } },
+  { id: 'run7', name: 'Clean visit', desc: 'Make seven in a row in one visit.', test: function (c) { return c.bestRun >= 7; } },
+  { id: 'break', name: 'Break artist', desc: 'Pot a ball on the break.', test: function (c) { return c.brokeEver >= 1; } },
+  { id: 'snap9', name: 'Nine on the snap', desc: 'Sink the 9 on the break.', test: function (c) { return c.snap9 >= 1; } },
+  { id: 'both', name: 'Both ways', desc: 'Win at 8-ball and at 9-ball.', test: function (c) { return c.win8 >= 1 && c.win9 >= 1; } },
+  { id: 'purist', name: 'Center ball only', desc: 'Win a match with no spin at all. Hank approves.', test: function (c) { return c.noSpinWins >= 1; } },
+  { id: 'drills', name: 'Drilled', desc: 'Complete all five drills.', test: function (c) { return drillCount() >= 5; } },
+  { id: 'dot', name: 'Out of the basement', desc: 'Beat Dot Pruitt.', test: function () { return !!STORY.beat.dot; } },
+  { id: 'half', name: 'Halfway up', desc: 'Beat Hank Dobrowski.', test: function () { return !!STORY.beat.hank; } },
+  { id: 'champ', name: 'House shark', desc: 'Beat Silas Crane.', test: function () { return !!STORY.champ; } },
+  { id: 'cues', name: 'Cue collector', desc: 'Own three cues.', test: function () { return cueCount() >= 3; } },
+  { id: 'finish', name: 'Finished basement', desc: 'Fully fix up the practice room.', test: function () { return (STORY.up | 0) >= 3; } },
+  { id: 'rich', name: 'Deep pockets', desc: 'Reach a $500 bankroll.', test: function () { return STORY.bank >= 500; } }
+];
+function achById(id) { for (var i = 0; i < ACH.length; i++) if (ACH[i].id === id) return ACH[i]; return null; }
+function checkAch() {
+  var got = [];
+  for (var i = 0; i < ACH.length; i++) { var a = ACH[i]; if (!CAREER.ach[a.id] && a.test(CAREER)) { CAREER.ach[a.id] = Date.now(); got.push(a); } }
+  if (got.length) { saveCareer(); showAch(got); }
+  return got;
+}
+var achQ = [], achBusy = false;
+function showAch(list) {
+  for (var i = 0; i < list.length; i++) achQ.push(list[i]);
+  if (!achBusy) nextAch();
+}
+function nextAch() {
+  var el = $('achToast'); if (!el) { achQ = []; return; }
+  if (!achQ.length) { achBusy = false; return; }
+  achBusy = true; var a = achQ.shift();
+  el.innerHTML = '<span class="achIcon">★</span><span><small>Achievement unlocked</small><b>' + a.name + '</b></span>';
+  el.classList.add('show');
+  try { if (navigator.vibrate) navigator.vibrate(18); } catch (e) {}
+  setTimeout(function () { el.classList.remove('show'); setTimeout(nextAch, 350); }, 2100);
+}
+function recordGame(out) {
+  var st = G.stats[0], c = CAREER;
+  c.games++; c.pots += st.pots; c.shots += st.shots;
+  if (st.best > c.bestRun) c.bestRun = st.best;
+  if (G.bestBreakShot > c.bestBreak) c.bestBreak = G.bestBreakShot;
+  if (G.breakPots > 0) c.brokeEver = 1;
+  if (G.snap9) c.snap9++;
+  var vsCpu = G.players.length > 1 && !G.players[1].human;
+  if (vsCpu || G.story) {
+    if (out.winner === 0) {
+      c.wins++; c.streak++; if (c.streak > c.bestStreak) c.bestStreak = c.streak;
+      if (G.mode === '8ball') c.win8++; else if (G.mode === '9ball') c.win9++;
+      if (!G.usedSpin) c.noSpinWins++;
+    } else { c.losses++; c.streak = 0; }
+  }
+  saveCareer();
+  checkAch();
+}
 
 /* ---------- audio (silent until a shot is played) ---------- */
 var AC = null, master = null, nbuf = null, rum = null;
@@ -2186,6 +2283,7 @@ function startGame(mode, oppId, story) {
   if (oppId === 'pass' && mode !== 'practice') { G.players[0].name = 'Player 1'; G.players[0].ini = 'P1'; }
   G.stats = [{ shots: 0, pots: 0, best: 0, fouls: 0 }, { shots: 0, pots: 0, best: 0, fouls: 0 }];
   G.run = 0; G.drops = []; hopH.fill(0); hopV.fill(0); shake = 0; G.spinA = 0; G.spinB = 0; G.power = 0; G.sharkOn = false; G.shark = null; G.suggestP = -1;
+  G.usedSpin = false; G.breakPots = 0; G.bestBreakShot = 0; G.snap9 = false;
   for (var i = 0; i < 16; i++) { balls[i].userData.dropping = false; balls[i].scale.setScalar(1); }
   syncBalls(true);
   G.paused = false;
@@ -2229,6 +2327,7 @@ function doStrike() {
   var p = G.strike.p;
   PE.beginShot(G.s); G.s.rec = []; G.recIdx = 0;
   PE.strike(G.s, G.phi, pToV(p), G.spinA, G.spinB, 0);
+  if (Math.abs(G.spinA) > 0.02 || Math.abs(G.spinB) > 0.02) G.usedSpin = true;
   sfx.cue(p);
   if (p > 0.62) { hopV[0] = Math.max(hopV[0], (p - 0.6) * 1.9); shake = Math.min(1, shake + (p - 0.6) * 1.4); }
   if (navigator.vibrate && p > 0.5) { try { navigator.vibrate(12); } catch (e) {} }
@@ -2240,11 +2339,12 @@ function hideGuides() { rbAim.hide(); rbCue.hide(); rbObj.hide(); ghost.visible 
 
 function endShot() {
   if (G.drill) return resolveDrill();
-  var me = G.g.turn, was8 = G.g.groups, s = G.s;
+  var me = G.g.turn, was8 = G.g.groups, s = G.s, wasBreak = G.g.breakShot;
   s.rec = null;
   var out = PE.applyShot(G.g, s, T);
   var st = G.stats[me]; st.shots++;
   var made = out.pots.filter(function (b) { return b !== 0; }).length;
+  if (me === 0 && wasBreak) { G.breakPots += made; if (made > G.bestBreakShot) G.bestBreakShot = made; if (G.mode === '9ball' && out.pots.indexOf(9) >= 0) G.snap9 = true; }
   if (out.foul) { st.fouls++; G.run = 0; } else if (made) { st.pots += made; G.run += made; if (G.run > st.best) st.best = G.run; }
   if (out.turnOver) G.run = 0;
   syncBalls(false);
@@ -2261,6 +2361,7 @@ function endShot() {
 
 function gameOver(out) {
   G.phase = 'over'; updateHUD();
+  if (G.mode !== 'practice') recordGame(out);
   if (G.story) return storyResult(out);
   var w = out.winner, name = G.players[w] ? G.players[w].name : '';
   var mine = G.players.length > 1 && !G.players[1].human;
@@ -2295,6 +2396,7 @@ function storyResult(out) {
     if (ln.win) say = pick(ln.win);
     saveStory();
   }
+  checkAch();
   var html = '<div class="mono" style="color:' + (won ? 'var(--mb-teal)' : 'var(--mb-orange)') + '">' + (ch ? ch.name + ' &middot; Level ' + ch.lvl : 'Match') + '</div>' +
     '<div class="big" style="color:' + (won ? 'var(--mb-teal)' : 'var(--mb-ink)') + '">' + head + '</div>' +
     '<div class="purse ' + (won ? 'up' : 'down') + '">' + big + '</div>' +
@@ -2333,9 +2435,28 @@ function openLocker(note) {
     if (c.award) { openLocker('Beat ' + charById(c.need).name + ' and it is yours.'); return; }
     if (c.need && !STORY.beat[c.need]) { openLocker('Beat ' + charById(c.need).name + ' first.'); return; }
     if (STORY.bank < c.cost) { openLocker('You need ' + money(c.cost) + ' for that one.'); return; }
-    STORY.bank -= c.cost; STORY.cues[c.id] = true; applyCue(c.id); saveStory(); openLocker(c.name + ' bought and in hand.');
+    STORY.bank -= c.cost; STORY.cues[c.id] = true; applyCue(c.id); saveStory(); checkAch(); openLocker(c.name + ' bought and in hand.');
   };
   $('lkBack').onclick = function () { closeModal(); openStory(); };
+}
+/* career record + achievements screen */
+function openRecord() {
+  var c = CAREER, unlocked = 0;
+  for (var i = 0; i < ACH.length; i++) if (c.ach[ACH[i].id]) unlocked++;
+  var stat = function (b, s) { return '<div><b>' + b + '</b><span>' + s + '</span></div>'; };
+  var h = '<div class="mono" style="color:var(--mb-orange)">Record</div><h2>Your game</h2>' +
+    '<div class="recg">' +
+      stat(c.games, 'Played') + stat(c.wins, 'Won') + stat(winPct() + '%', 'Win rate') +
+      stat(c.pots, 'Balls potted') + stat(c.bestRun, 'Best run') + stat(c.bestBreak, 'Best break') +
+      stat(c.bestStreak, 'Best streak') + stat(money(STORY.bank), 'Bankroll') + stat(beatCount() + '/6', 'House beaten') +
+    '</div>' +
+    '<div class="lab">Achievements &middot; ' + unlocked + ' of ' + ACH.length + '</div><div class="achg">';
+  for (i = 0; i < ACH.length; i++) {
+    var a = ACH[i], on = !!c.ach[a.id];
+    h += '<div class="achb' + (on ? ' on' : '') + '"><span class="achm">' + (on ? '★' : '☆') + '</span><div><b>' + a.name + '</b><span>' + (on ? a.desc : 'Locked') + '</span></div></div>';
+  }
+  h += '</div><button class="primary" id="recDone" type="button" style="margin-top:14px">Done</button>';
+  openModal(h); $('recDone').onclick = closeModal;
 }
 function challenge(id, skip) {
   var L = ladderOf(id), ch = charById(id); if (!L || !ch) return;
@@ -2355,7 +2476,7 @@ function challenge(id, skip) {
 }
 function doUpgrade() {
   var u = UPGR[STORY.up | 0]; if (!u || STORY.bank < u.cost) return;
-  STORY.bank -= u.cost; STORY.up = (STORY.up | 0) + 1; saveStory(); buildRoom('basement'); openStory(u.name + ' done.');
+  STORY.bank -= u.cost; STORY.up = (STORY.up | 0) + 1; saveStory(); buildRoom('basement'); checkAch(); openStory(u.name + ' done.');
 }
 function openStory(note) {
   G.paused = false; buildRoom('basement');
@@ -3032,7 +3153,7 @@ function resolveDrill() {
   var madeBall = pots.indexOf(g.target) >= 0, ok = madeBall && !scratch;
   if (ok && g.type === 'pos') { var dz = Math.hypot(s.x[0] - g.zone[0], s.y[0] - g.zone[1]); ok = dz <= g.zone[2]; }
   var title, msg;
-  if (ok) { title = 'Made it'; msg = g.type === 'pos' ? 'Ball down and the cue is where you wanted it.' : 'Clean pot.'; sfx.pocket(); }
+  if (ok) { title = 'Made it'; msg = g.type === 'pos' ? 'Ball down and the cue is where you wanted it.' : 'Clean pot.'; sfx.pocket(); CAREER.drills[G.drill.i] = 1; saveCareer(); checkAch(); }
   else if (scratch) { title = 'Scratch'; msg = 'The cue ball went in. Try a little less, or center ball.'; }
   else if (!madeBall) { title = 'Not yet'; msg = 'The ball stayed up. ' + spec.teach; }
   else { title = 'Close'; msg = 'Ball down, but the cue ball did not reach the ring. Adjust your spin or pace.'; }
@@ -3150,6 +3271,7 @@ function buildMenu() {
   var eb = $('eyesBack'); if (eb) eb.onclick = closeEyes;
   var bh = $('btnHow'); if (bh) bh.onclick = function () { howTo(false); };
   var bd = $('btnDrills'); if (bd) bd.onclick = drillList;
+  var br = $('btnRecord'); if (br) br.onclick = openRecord;
   var bin = $('btnInstall'); if (bin) bin.onclick = doInstall;
   refreshInstall();
   syncMenu();
@@ -3326,7 +3448,7 @@ requestAnimationFrame(frame);
 window.__RH = { G: G, cam: cam, T: T, startGame: startGame, pToV: pToV, vToP: vToP, toScreen: toScreen, CFG: CFG,
   advance: function (sec) { var n = Math.round(sec * 60); for (var i = 0; i < n; i++) update(1 / 60); camApply(0, true); renderer.render(scene, camera); },
   setView: function (m) { while (cam.mode !== m) cycleView(); }, chars: CHARS, kick: function () { beginTurn(true); }, setLook: function (v) { CFG.cloth = v; setCloth(v); }, setRoom: setRoom, venues: VENUES, hopH: hopH, feels: FEELS,
-  story: STORY, openStory: openStory, challenge: challenge, ladder: LADDER, saveStory: saveStory, gameOver: gameOver, openBio: openBio, platform: platform, doInstall: doInstall, cues: CUES, applyCue: applyCue, openLocker: openLocker, lines: LINES, arc: ARC, cueMats: cueMats,
+  story: STORY, openStory: openStory, challenge: challenge, ladder: LADDER, saveStory: saveStory, gameOver: gameOver, openBio: openBio, platform: platform, doInstall: doInstall, career: CAREER, ach: ACH, openRecord: openRecord, checkAch: checkAch, recordGame: recordGame, cues: CUES, applyCue: applyCue, openLocker: openLocker, lines: LINES, arc: ARC, cueMats: cueMats,
   photo: function (yaw, pitch, dist, x, z) { window.__RH.frozen = true; cam.mode = 'free'; cam.free.yaw = yaw; cam.free.pitch = pitch; cam.free.dist = dist; cam.free.x = x || 0; cam.free.z = z || 0; update(0.001); hideGuides(); camApply(0, true); cue.visible = false; renderer.render(scene, camera); } };
 })();
 
