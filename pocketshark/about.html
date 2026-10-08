@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#07090c">
-<title>Pocket Shark — how it was built</title>
+<title>Pocket Shark: how it was built</title>
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="description" content="Pocket Shark: a 3D pool table with real ball physics, a shark that shows you the best shot, Shark Eyes for real tables, and a story-mode hustle. How it is built, the house players, and the rooms.">
-<meta property="og:title" content="Pocket Shark — how it was built">
+<meta property="og:title" content="Pocket Shark: how it was built">
 <meta property="og:description" content="Real ball physics, a shark that reads the table, and a story-mode hustle up the ladder. The build log.">
 <meta property="og:image" content="https://motbuchanan.com/pocketshark/icon-512.png">
 <meta property="og:type" content="website">
@@ -93,12 +93,12 @@ footer a{color:var(--soft)}
 <div id="glow"></div>
 
 <header class="hero">
-  <img class="icon" src="icon-512.png" alt="Pocket Shark icon: a teal camera aperture">
+  <img class="icon" src="icon-512.png" alt="Pocket Shark icon: a shark fin cutting through green felt past an 8-ball and cue ball">
   <h1>Pocket <em>Shark</em></h1>
   <p class="tag">A pool table you can walk around, with a shark on your shoulder that reads the whole table and shows you the shot.</p>
   <p class="sub">real ball physics &middot; one page &middot; built on a phone</p>
   <a class="cta" href="index.html">&#9654;&nbsp; rack them up</a>
-  <div class="badge">in active development &middot; updated Oct 3, 2026</div>
+  <div class="badge">in active development &middot; updated Oct 7, 2026</div>
 </header>
 
 <main class="wrap">
@@ -106,7 +106,7 @@ footer a{color:var(--soft)}
 <section>
   <h2>What it is</h2>
   <p class="lead">Pocket Shark is a full 3D pool game, 8-ball, 9-ball and a practice table, with a physics model honest enough that the balls slide, roll, take english, throw each other off line, and rattle in the jaws.</p>
-  <p>Three things make it more than another pool app. A <span class="k">shark</span> that does not guess: it plays every candidate shot forward on a copy of the table and ranks them by how likely they drop and where the cue ball ends up. <span class="k">Shark Eyes</span>, which does the same thing on a photo of a real table you are standing at. And a <span class="k">story mode</span> that stakes a bankroll against six house players and lets you fix up the basement with what you win.</p>
+  <p>Three things make it more than another pool app. A <span class="k">shark</span> that does not guess: it plays every candidate shot forward on a copy of the table and ranks them by how likely they drop and where the cue ball ends up. <span class="k">Shark Eyes</span>, which does the same thing on a real table you are standing at, from a photo or straight through the live camera. And a <span class="k">story mode</span> that stakes a bankroll against six house players and lets you fix up the basement with what you win.</p>
   <p>The whole thing is a single HTML page with one dependency, three.js. No account, no network after it loads, installable to your home screen.</p>
 </section>
 
@@ -115,7 +115,7 @@ footer a{color:var(--soft)}
   <div class="two">
     <div class="feat"><h3>A real table, 500 steps a second</h3><p>A hand-written physics engine: sliding and rolling friction, follow, draw and side english, ball-to-ball throw, cushion rebound and pocket jaws, stepped with exact time-of-impact so nothing tunnels.</p></div>
     <div class="feat"><h3>The shark actually solves it</h3><p>For every ball and pocket it tries direct shots, banks, kicks and combos, measures how much aiming error each one forgives, and ranks by make-probability and resulting position. No lookup tables.</p></div>
-    <div class="feat"><h3>Shark Eyes reads a photo</h3><p>Photograph a real table, drop four dots on the corners, and a homography plus camera solve lifts the layout off the image so the same shark can rank your shots, drawn back on your own photo. It all runs on the phone.</p></div>
+    <div class="feat"><h3>Shark Eyes reads a real table</h3><p>Point the live camera at a table, or load a photo, drop four dots on the corners, and a homography plus camera solve lifts the layout off the image so the same shark can rank your shots, drawn back on your own view. It all runs on the phone.</p></div>
     <div class="feat"><h3>Four rooms, one engine</h3><p>The basement, the rail bar, the pool hall and the arena are each built from scratch, their own lights, props and baked reflections, and swapped live without a reload.</p></div>
     <div class="feat"><h3>Story mode with real stakes</h3><p>A bankroll, a buy-in at every table, and a six-rung ladder from Dot on the bar box to Silas in the arena. Winnings fix up the basement you practice in, light, floor, then the whole room.</p></div>
     <div class="feat"><h3>One page you can install</h3><p>Everything is inlined into a single file, with a web manifest, a service worker and an icon set, so it installs to the home screen and launches offline like a native app.</p></div>
@@ -158,7 +158,11 @@ footer a{color:var(--soft)}
 <section>
   <h2>Version history</h2>
   <ul class="tl">
-    <li class="now"><span class="v">v0.8</span> <span class="d">&mdash; story mode and the bankroll, six house players with portraits, basement upgrades, installable PWA, this build log</span></li>
+    <li class="now"><span class="v">v1.2</span> <span class="d">&mdash; the Fin Stack wordmark on the menu</span></li>
+    <li><span class="v">v1.1</span> <span class="d">&mdash; eighteen achievements and a career-stats record screen</span></li>
+    <li><span class="v">v1.0</span> <span class="d">&mdash; deeper story, five unlockable cues, tappable opponent bios</span></li>
+    <li><span class="v">v0.9</span> <span class="d">&mdash; Shark Eyes gains a live-camera viewfinder, not just a photo</span></li>
+    <li><span class="v">v0.8</span> <span class="d">&mdash; story mode and the bankroll, six house players with portraits, basement upgrades, installable PWA, this build log</span></li>
     <li><span class="v">v0.7</span> <span class="d">&mdash; the teaching layer: a first-run walkthrough, a how-to-play deck, and five drills</span></li>
     <li><span class="v">v0.6</span> <span class="d">&mdash; folded the game and the scanner into one file; became Pocket Shark</span></li>
     <li><span class="v">v0.5</span> <span class="d">&mdash; Shark Eyes: photograph a real table and get your shots back on the photo</span></li>
