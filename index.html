@@ -45,8 +45,19 @@ body{background:#0a0d11;font-family:'Archivo',system-ui,sans-serif;color:var(--i
 @media(min-width:620px){.island{display:block;position:absolute;top:11px;left:50%;transform:translateX(-50%);width:116px;height:31px;background:#000;border-radius:17px;z-index:4;box-shadow:inset 0 0 0 1px rgba(255,255,255,.04)}}
 @media(min-width:620px){
   body{padding:36px 0}
-  .device{width:392px;height:768px;border-radius:44px;border:9px solid #171a1f;
+  .device{width:392px;height:768px;border-radius:44px;border:9px solid #171a1f;flex:none;
+    transform:scale(var(--k,1));transform-origin:50% 50%;
     box-shadow:0 40px 90px rgba(0,0,0,.65), 0 0 0 1.5px #2b3138, -18px 22px 60px rgba(0,0,0,.45)}
+}
+/* v7.48 desktop fit: --k (phone scale), --gap (space under the phone) and --gapk (gap / k) are set by fitPhone() so the whole phone always fits the window */
+/* inside the framed desktop phone the screen is always 750px tall, so sizes that follow the window height are pinned to their full values there (the scale above does the shrinking) */
+@media(min-width:620px){
+  .device .app{max-width:74px}
+  .device .w1{font-size:16.5px;margin-top:5px}
+  .device .w2{font-size:12.5px}
+  .device .grid{margin-top:16px}
+  .device .page{gap:10px 8px}
+  .device .tagline{margin-top:9px}
 }
 /* wallpaper inside the phone = the same studio, closer */
 .wall{position:absolute;inset:0;z-index:0;background:
@@ -265,7 +276,7 @@ html.nocc .app .nm::before{display:none}
 #sheet{position:fixed;left:0;right:0;bottom:0;z-index:61;max-height:calc(100% - 44px);background:#10151c;color:var(--ink);border-radius:26px 26px 0 0;
   transform:translateY(105%);transition:transform .36s cubic-bezier(.2,.85,.2,1);display:flex;flex-direction:column;font-family:var(--sys);
   box-shadow:0 -20px 60px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.08);touch-action:pan-y}
-@media(min-width:620px){#sheet{left:50%;transform:translate(-50%,105%);width:392px;border-radius:26px 26px 0 0;bottom:36px;max-height:700px}
+@media(min-width:620px){#sheet{left:50%;transform:translate(-50%,calc(105% + var(--gapk,36px)));width:392px;border-radius:26px 26px 0 0;bottom:var(--gap,36px);max-height:700px;scale:var(--k,1);transform-origin:0 100%}
   #sheet.on{transform:translate(-50%,0)!important}}
 #sheet.on{transform:translateY(0)}
 #sheet.drag{transition:none}
@@ -324,6 +335,8 @@ html.nocc .app .nm::before{display:none}
 #fscrim.on{opacity:1;pointer-events:auto}
 #fpop{position:fixed;left:50%;top:50%;transform:translate(-50%,-46%) scale(.94);z-index:39;width:min(88vw,360px);opacity:0;pointer-events:none;transition:opacity .3s,transform .34s cubic-bezier(.2,.85,.2,1);text-align:center}
 #fpop.on{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+@media(min-width:620px){#fpop{scale:var(--k,1);transform:translate(calc(-50% / var(--k,1)),calc(-46% / var(--k,1))) scale(.94)}
+  #fpop.on{transform:translate(calc(-50% / var(--k,1)),calc(-50% / var(--k,1))) scale(1)}}
 .fpt{font:800 24px var(--sys);letter-spacing:-.02em;margin-bottom:16px;color:var(--ink);text-shadow:0 2px 12px rgba(0,0,0,.6)}
 .fpg{background:rgba(30,36,46,.5);border:1px solid rgba(255,255,255,.1);border-radius:32px;padding:20px 12px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px 6px;justify-items:center}
 .fpg .app{max-width:min(72px,19vw)}
@@ -478,7 +491,7 @@ html.nocc .app .nm::before{display:none}
         </svg></span>
       </button>
     </div>
-    <div class="tagline">made on a phone like this one &middot; v7.47 &middot; Oct 4</div>
+    <div class="tagline">made on a phone like this one &middot; v7.48 &middot; Oct 9</div>
   </div>
 </div>
 
@@ -529,7 +542,7 @@ html.nocc .app .nm::before{display:none}
     <div class="setsec">MOT-1</div>
     <div class="setgroup">
       <div class="setrow tap" data-go="about"><span class="si"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M5 21c0-4 3-7 7-7s7 3 7 7"/></svg></span><span class="st">About this phone</span><span class="chev">&rsaquo;</span></div>
-      <div class="setrow tap" data-go="update"><span class="si"><svg viewBox="0 0 24 24"><path d="M12 4v10M7 11l5 5 5-5M5 20h14"/></svg></span><span class="st">Software Update</span><span class="sv" id="updBadge">v7.47</span><span class="chev">&rsaquo;</span></div>
+      <div class="setrow tap" data-go="update"><span class="si"><svg viewBox="0 0 24 24"><path d="M12 4v10M7 11l5 5 5-5M5 20h14"/></svg></span><span class="st">Software Update</span><span class="sv" id="updBadge">v7.48</span><span class="chev">&rsaquo;</span></div>
     </div>
     <div class="setsec">Make it yours</div>
     <div class="setgroup">
@@ -577,7 +590,7 @@ html.nocc .app .nm::before{display:none}
   <!-- SOFTWARE UPDATE -->
   <div class="setpage" data-page="update">
     <div class="sethdr"><button class="bk setback">&larr; Settings</button><h2>Software Update</h2></div>
-    <div class="bigver"><div class="num" id="verNum2">v7.47</div></div>
+    <div class="bigver"><div class="num" id="verNum2">v7.48</div></div>
     <div class="uptodate">This phone is up to date.</div>
     <div class="setsec">Recently shipped</div>
     <div class="setgroup" id="changelog"></div>
@@ -641,6 +654,13 @@ html.nocc .app .nm::before{display:none}
 <div class="toast2" id="toast2"></div>
 
 <script>
+/* v7.48: on a laptop or desktop the phone is 768px tall. If the window is shorter than that, shrink the whole phone to fit instead of clipping it. */
+(function(){var R=document.documentElement;
+  function fitPhone(){var k=1,g=36,h=window.innerHeight||768;
+    if(window.innerWidth>=620){k=Math.min(1,Math.max(.4,(h-32)/768));g=Math.max(0,(h-768*k)/2);}
+    R.style.setProperty('--k',k.toFixed(4));R.style.setProperty('--gap',g.toFixed(1)+'px');R.style.setProperty('--gapk',(g/k+8).toFixed(1)+'px');}
+  fitPhone();window.addEventListener('resize',fitPhone);window.addEventListener('orientationchange',fitPhone);
+})();
 (function(){
 function tick(){var d=new Date(),h=d.getHours()%12||12,m=('0'+d.getMinutes()).slice(-2);
   document.getElementById('clock').textContent=h+':'+m;}
@@ -817,7 +837,7 @@ var dvReset=document.getElementById('dvReset');
 if(dvReset)dvReset.addEventListener('click',function(){t2('Wiping everything...');setTimeout(function(){t2('...just kidding. Nothing was deleted.');},1600);});
 
 /* ---- changelog from build log data (short, static mirror) ---- */
-var CHANGES=[['v7.47','RoughCut card updated to the current build: transitions, animated text in real fonts, and audio that works on iPhone too'],['v7.46','Card copy pass: the why, how and learned stories on 22 cards rewritten from my own notes'],['v7.45','The Brew Deck joins the phone, a homebrew training system with live recipe math'],['v7.44','RoughCut joins the phone, up front on the home screen'],['v7.43','Side Boss joins the phone, in the Tools folder'],['v7.42','Gather gets its own icon'],['v7.41','Gather joins the phone, in the Tools folder'],['v7.40','New settings icon that matches the dock'],['v7.39','Home screen: the eight I want you to see first, set the way I want them'],['v7.38','Home settles: eight apps up top, the four folders as the bottom row'],['v7.37','Spectra joins the phone, and the tools move into a Tools folder'],['v7.36','The Bloom card gets its first screenshots'],['v7.35','Home screen tidy: all four folders sit on the bottom row now'],['v7.34','Bloom joins the phone, and Pigment, Nazca and Bloom group into a Make folder'],['v7.33','Haunt Inc. joins the phone; Star Stuff moves into the games folder'],['v7.32','Calmer home screen: the tilt is gone, the grid still flows'],['v7.31','A new home screen: folders, a living grid behind the icons, and it tilts'],['v7.30','Measure Up joins the phone'],['v7.29','One look across every app: shared type, buttons and version badges'],['v7.28','App cards: tap any icon for the story, screenshots and file size'],['v7.27','Nazca, the drawing app'],['v7.16','The Upcard, SHARP and HARP'],['v7.15','Camera icon, designed by me in the icon studio'],['v7.11','My real aperture mark, from the source file'],['v7.9','Settings, Camera, themes, and things to find'],['v7.8','Lock screen'],['v7.7','Home screen reordered'],['v7.6','Findable by search engines'],['v7.5','Fresh taglines']];
+var CHANGES=[['v7.48','On a laptop the phone now shrinks to fit the window, so nothing gets cut off at the top or bottom'],['v7.47','RoughCut card updated to the current build: transitions, animated text in real fonts, and audio that works on iPhone too'],['v7.46','Card copy pass: the why, how and learned stories on 22 cards rewritten from my own notes'],['v7.45','The Brew Deck joins the phone, a homebrew training system with live recipe math'],['v7.44','RoughCut joins the phone, up front on the home screen'],['v7.43','Side Boss joins the phone, in the Tools folder'],['v7.42','Gather gets its own icon'],['v7.41','Gather joins the phone, in the Tools folder'],['v7.40','New settings icon that matches the dock'],['v7.39','Home screen: the eight I want you to see first, set the way I want them'],['v7.38','Home settles: eight apps up top, the four folders as the bottom row'],['v7.37','Spectra joins the phone, and the tools move into a Tools folder'],['v7.36','The Bloom card gets its first screenshots'],['v7.35','Home screen tidy: all four folders sit on the bottom row now'],['v7.34','Bloom joins the phone, and Pigment, Nazca and Bloom group into a Make folder'],['v7.33','Haunt Inc. joins the phone; Star Stuff moves into the games folder'],['v7.32','Calmer home screen: the tilt is gone, the grid still flows'],['v7.31','A new home screen: folders, a living grid behind the icons, and it tilts'],['v7.30','Measure Up joins the phone'],['v7.29','One look across every app: shared type, buttons and version badges'],['v7.28','App cards: tap any icon for the story, screenshots and file size'],['v7.27','Nazca, the drawing app'],['v7.16','The Upcard, SHARP and HARP'],['v7.15','Camera icon, designed by me in the icon studio'],['v7.11','My real aperture mark, from the source file'],['v7.9','Settings, Camera, themes, and things to find'],['v7.8','Lock screen'],['v7.7','Home screen reordered'],['v7.6','Findable by search engines'],['v7.5','Fresh taglines']];
 var cl=document.getElementById('changelog');
 if(cl)CHANGES.forEach(function(x){var r=document.createElement('div');r.className='setrow';r.innerHTML='<span class="st">'+x[1]+'</span><span class="sv">'+x[0]+'</span>';cl.appendChild(r);});
 
