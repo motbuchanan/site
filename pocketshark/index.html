@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="build" content="v1.2 · Oct 7">
+<meta name="build" content="v1.3 · Oct 10">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#07090c">
 <meta name="description" content="Pocket Shark: a 3D pool table with real ball physics, full camera control, and a shark that shows you the best shot.">
@@ -130,6 +130,10 @@ h2{font:800 22px var(--mb-ui);letter-spacing:-.02em;margin:0 0 4px}
 .pills{display:flex;gap:6px;flex-wrap:wrap}
 .pill{background:var(--mb-glass);color:var(--mb-ink);border:1px solid var(--mb-line);border-radius:999px;font:700 13px var(--mb-ui);padding:9px 15px}
 .pill.on{background:var(--mb-teal);color:#06110f;border-color:transparent}
+.pills.stakes{gap:8px}
+.stakePill{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 6px;text-align:center}
+.stakePill small{font:600 11px var(--mb-mono);opacity:.7}
+.stakePill.lock{opacity:.4}
 #opps{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .opp{display:flex;gap:9px;align-items:center;text-align:left;background:rgba(16,21,28,.82);border:1px solid var(--mb-line);border-radius:13px;padding:7px 9px;min-width:0}
 .opp.on{border-color:var(--mb-teal);background:rgba(10,34,33,.92)}
@@ -407,7 +411,7 @@ body.play #vtoast{bottom:calc(94px + env(safe-area-inset-bottom))}
     <div class="panel" id="panel"></div>
   </div>
 </div></div>
-<button class="mb-ver" id="mbVer" type="button">v1.2 · Oct 7</button>
+<button class="mb-ver" id="mbVer" type="button">v1.3 · Oct 10</button>
 <div id="vtoast"></div>
 <div id="achToast"></div>
 
@@ -1447,30 +1451,46 @@ function drawLogo(g, ox, oy, k, color, apertureOnly) {
 }
 
 var CHARS = [
-  { id: 'dot', name: 'Dot Pruitt', ini: 'DP', lvl: 1, tag: 'Tuesday league', col: '#f59847', err: 1.3, vn: 0.14,
+  { id: 'dot', name: 'Dot Pruitt', ini: 'DP', lvl: 1, tag: 'Tuesday league', col: '#f59847', err: 1.3, vn: 0.15,
     story: 'Drove a school bus for 31 years. Plays with whatever cue is leaning on the wall and never chalks it.',
     bio: 'Retired after 31 years driving the Route 9 school bus. Every Tuesday she holds down the back table at the Rail Bar with the seniors league, and she brings a spare cube of chalk to loan out, never to use.',
     play: 'Soft, patient, and wildly up and down. She leaves the cue ball wherever it happens to stop and misses the easy ones about as often as she makes them. Stay calm and wait her out.' },
-  { id: 'benny', name: 'Benny Okafor', ini: 'BO', lvl: 2, tag: 'Banks everything', col: '#e8c84a', err: 0.9, vn: 0.11, banks: true,
+  { id: 'benny', name: 'Benny Okafor', ini: 'BO', lvl: 2, tag: 'Banks everything', col: '#e8c84a', err: 1.0, vn: 0.12, banks: true,
     story: 'Goes two rails with the straight shot wide open. Says the cushions owe him money.',
     bio: 'Mid-twenties, runs delivery routes all day and shoots half the night. He came up on a slate table with one dead cushion, so he quit trusting the straight shot and fell in love with the bank.',
     play: 'Banks when he does not have to and goes two rails when one would do. Flashy and streaky. Hand him a tricky leave and he will overthink it into a miss.' },
-  { id: 'mari', name: 'Marisol Vega', ini: 'MV', lvl: 3, tag: 'Shoots fast', col: '#ef6f8f', err: 0.6, vn: 0.08, quick: true,
+  { id: 'mari', name: 'Marisol Vega', ini: 'MV', lvl: 5, tag: 'Shoots fast', col: '#ef6f8f', err: 0.5, vn: 0.08, quick: true,
     story: 'Learned on her uncle\'s bar box with a warped house cue. Down on the shot before you finish your sentence.',
     bio: 'Early twenties, pulls nursing shifts and unwinds on her uncle\'s old bar box in the back of his garage. She is down on the shot before you have finished racking.',
     play: 'Quick, confident, almost no pause over the ball. Her speed is the weapon and the leak both. Push her into a cluster and she will fire before she sees the trap.' },
-  { id: 'hank', name: 'Hank Dobrowski', ini: 'HD', lvl: 4, tag: 'Center ball only', col: '#8fb4ff', err: 0.38, vn: 0.06, noSpin: true,
+  { id: 'hank', name: 'Hank Dobrowski', ini: 'HD', lvl: 6, tag: 'Center ball only', col: '#8fb4ff', err: 0.38, vn: 0.06, noSpin: true,
     story: 'Third-shift machinist. Leveled this table himself and does not believe in english.',
     bio: 'Third-shift machinist who leveled this table himself with a feeler gauge and a grudge. He does not believe in english, and he will tell you why if you give him the opening.',
     play: 'Pure center ball, dead straight, and deadly from distance. No spin means his position game is limited. Leave him an angle that only english can solve and he is stuck.' },
-  { id: 'ruth', name: 'Ruth Castellanos', ini: 'RC', lvl: 5, tag: 'Three balls ahead', col: '#b9f08a', err: 0.22, vn: 0.04,
+  { id: 'ruth', name: 'Ruth Castellanos', ini: 'RC', lvl: 9, tag: 'Three balls ahead', col: '#b9f08a', err: 0.16, vn: 0.035,
     story: 'Never raises her voice. Already knows where the cue ball stops three shots from now.',
     bio: 'Forties, soft-spoken, never lifts her cue off the table more than she has to. She coaches the junior night at the hall and already knows where the cue ball stops three shots from now.',
     play: 'Plays position three balls ahead and almost never sells out. Patient and clinical. There is no cheap win here, you earn every ball you get.' },
-  { id: 'silas', name: 'Silas Crane', ini: 'SC', lvl: 6, tag: 'House shark', col: '#4cf0e0', err: 0.1, vn: 0.025,
+  { id: 'silas', name: 'Silas Crane', ini: 'SC', lvl: 10, tag: 'House shark', col: '#4cf0e0', err: 0.1, vn: 0.025,
     story: 'Nobody here has seen him miss the 8 since 2011, and they have been watching.',
     bio: 'Around sixty, silver hair, his own cue in a worn leather case. Nobody at the hall has seen him miss the 8 since 2011, and they have been watching closely the whole time.',
-    play: 'Flawless safeties, ruthless position, no tell and no mercy. He waits for your one mistake and runs the rest out. Beat him and the house is yours.' }
+    play: 'Flawless safeties, ruthless position, no tell and no mercy. He waits for your one mistake and runs the rest out. Beat him and the house is yours.' },
+  { id: 'charlie', name: 'Charlie Boyd', ini: 'CB', lvl: 3, tag: 'Rolls in junk', col: '#f0b35a', err: 0.8, vn: 0.17,
+    story: 'Runs the fish fry at the Legion. Fires everything hard and the table keeps bailing her out.',
+    bio: 'Sixties, works the Friday fish fry at Legion Post 9 and shoots the back table every night after close. She hits everything a little too hard and the rolls keep going her way, which drives the regulars crazy.',
+    play: 'Big speed, no fear, and a horseshoe where most people keep their luck. She slops in as many as she makes clean, so the junk falls for her on the break and the clusters. Give her nothing easy and the luck runs out.' },
+  { id: 'dontae', name: 'Dontae Fields', ini: 'DF', lvl: 4, tag: 'Shows off', col: '#b48ef0',  err: 0.62, vn: 0.12,
+    story: 'Learned every shot off trick-shot videos. Will try the hard one with the easy one sitting there.',
+    bio: 'Early twenties, learned the whole game off trick-shot clips on his phone and it shows, both ways. He can draw the cue ball three rails and then miss a hanger because the straight shot bores him.',
+    play: 'Flashy, high risk, allergic to the simple shot. His speed control is real but his shot choice is not. Keep the table open and he will overplay a routine rack into a miss.' },
+  { id: 'yuki', name: 'Yuki Tanaka', ini: 'YT', lvl: 7, tag: 'Owns the cue ball', col: '#6fd0b0', err: 0.3, vn: 0.045,
+    story: 'Plays the Cue Club circuit. Spends more time on position drills than most people spend playing.',
+    bio: 'Thirties, a touring amateur who treats the Cue Club like a practice hall, two rails of shape worked out before the first ball drops. Quiet, precise, and almost never out of line.',
+    play: 'A position machine. She rarely takes a hard shot because she never leaves herself one. Force her off her pattern, make her move the cue ball a long way, and the cracks show.' },
+  { id: 'vince', name: 'Vince Marchetti', ini: 'VM', lvl: 8, tag: 'Plays your wallet', col: '#e06a5a', err: 0.22, vn: 0.035,
+    story: 'Runs the money games at the Cue Club. Reads the room before he reads the table.',
+    bio: 'Late fifties, the Cue Club\'s resident money player, a leather case and a lot of patience. He sizes up your bankroll and your nerve before he picks up his cue, and he has taken more rent money than anybody wants to admit.',
+    play: 'All business. Tight safeties, no wasted motion, and he presses when he smells you flinch. There is no slop in his game, so you beat him straight up or not at all.' }
 ];
 function charById(id) { for (var i = 0; i < CHARS.length; i++) if (CHARS[i].id === id) return CHARS[i]; return null; }
 
@@ -1486,27 +1506,34 @@ function applyFaces() { for (var i = 0; i < CHARS.length; i++) applyFace(CHARS[i
 
 /* ---------- story mode: a bankroll, buy-ins, the six-rung ladder, and a basement you fix up ---------- */
 var LADDER = [
-  { id: 'dot',   buy: 10,  purse: 25,  venue: 'dive'  },
-  { id: 'benny', buy: 20,  purse: 55,  venue: 'dive'  },
-  { id: 'mari',  buy: 40,  purse: 110, venue: 'hall'  },
-  { id: 'hank',  buy: 75,  purse: 190, venue: 'hall'  },
-  { id: 'ruth',  buy: 150, purse: 380, venue: 'arena' },
-  { id: 'silas', buy: 300, purse: 760, venue: 'arena' }
+  { id: 'dot',     buy: 10,  purse: 25,   venue: 'dive'   },
+  { id: 'benny',   buy: 20,  purse: 55,   venue: 'dive'   },
+  { id: 'charlie', buy: 35,  purse: 90,   venue: 'legion' },
+  { id: 'dontae',  buy: 60,  purse: 150,  venue: 'legion' },
+  { id: 'mari',    buy: 95,  purse: 240,  venue: 'hall'   },
+  { id: 'hank',    buy: 150, purse: 370,  venue: 'hall'   },
+  { id: 'yuki',    buy: 230, purse: 560,  venue: 'club'   },
+  { id: 'vince',   buy: 340, purse: 820,  venue: 'club'   },
+  { id: 'ruth',    buy: 500, purse: 1180, venue: 'arena'  },
+  { id: 'silas',   buy: 750, purse: 1750, venue: 'arena'  }
 ];
 function ladderOf(id) { for (var i = 0; i < LADDER.length; i++) if (LADDER[i].id === id) return LADDER[i]; return null; }
 function nextOpp(id) { for (var i = 0; i < LADDER.length - 1; i++) if (LADDER[i].id === id) return LADDER[i + 1]; return null; }
 function storyAvail(id) { var i = 0; for (; i < LADDER.length; i++) if (LADDER[i].id === id) break; return i === 0 || !!STORY.beat[LADDER[i - 1].id]; }
+function effChar(ch, edge) { if (!ch || !edge) return ch; var k = Math.min(6, edge | 0), e = {}; for (var p in ch) e[p] = ch[p]; e.err = Math.max(0.07, ch.err * Math.pow(0.88, k)); e.vn = Math.max(0.02, ch.vn * Math.pow(0.9, k)); e.lvl = Math.min(10, ch.lvl + Math.min(3, k)); e.edge = k; return e; }
+function matchStake(base, k, mult) { return Math.max(1, Math.round(base * mult * (1 + 0.6 * k))); }
 var UPGR = [
   { name: 'A better light', cost: 50,  note: 'Swap the bare shop bulb for a real hanging lamp.' },
   { name: 'A real floor',   cost: 90,  note: 'Carpet over the concrete, trim on the walls.' },
   { name: 'Finish the room', cost: 150, note: 'Haul out the boxes and the water heater for good.' }
 ];
 var STORY = (function () {
-  var d = { bank: 20, beat: {}, up: 0, played: {}, cue: 'house', cues: { house: true }, champ: false }, s = store.get('story', null);
+  var d = { bank: 20, beat: {}, up: 0, played: {}, wins: {}, cue: 'house', cues: { house: true }, champ: false }, s = store.get('story', null);
   if (s && typeof s === 'object') {
     if (typeof s.bank === 'number') d.bank = s.bank; if (s.beat && typeof s.beat === 'object') d.beat = s.beat; if (typeof s.up === 'number') d.up = s.up;
     if (s.played && typeof s.played === 'object') d.played = s.played; if (typeof s.cue === 'string') d.cue = s.cue;
     if (s.cues && typeof s.cues === 'object') d.cues = s.cues; if (s.champ) d.champ = true;
+    if (s.wins && typeof s.wins === 'object') d.wins = s.wins;
   }
   d.cues.house = true;
   return d;
@@ -1524,7 +1551,7 @@ var LINES = {
   benny: { meet: ['Straight in is for people with no imagination. Watch this.', 'Rail Bar rules: if it can go two rails, it goes two rails.'],
            rematch: ['Rematch? Cushions are still on my side, I checked.', 'You again. Cool. I have a new bank I want to try on you.'],
            win: ['Two rails! I TOLD you they owe me.', 'That is the bank. That is the whole bank. Thank you.'],
-           lose: ['Okay, okay. Marisol is up at Corner Pocket. Do not blink, she shoots before you finish talking.', 'Fine. You are better than the cushions tonight. Go see Marisol at the hall. Bring coffee, she is coming off a shift.'] },
+           lose: ['Okay, okay. Take the Legion up the road. Ask for Charlie at the back table, she is loud and she gets lucky.', 'Fine. You beat the cushions tonight. Charlie runs the back room at the Legion. Good luck, the rolls love her.'] },
   mari:  { meet: ['I shoot fast. Keep up or do not, I am not waiting for you.', 'Rack it. I have a shift at six and I would like to win before then.'],
            rematch: ['You again. Good. Faster this time.', 'Back for more? Rack it, I have three minutes of patience left.'],
            win: ['Done. That was like four minutes. Benny said you were good.', 'Too slow. Next.'],
@@ -1532,11 +1559,27 @@ var LINES = {
   hank:  { meet: ['No spin. Center ball. That is pool. The rest is decoration.', 'I leveled this table with a feeler gauge. Respect it.'],
            rematch: ['Still putting english on it? Your funeral.', 'Again. Center ball this time, and maybe you learn something.'],
            win: ['Center ball. Every time. Write it down.', 'See? No spin, no excuses. Table is level, you were not.'],
-           lose: ['Hm. Ruth runs the back room. She does not lose to anybody I have seen.', 'Fine. You get one thing right. Ruth is in the back. She will take the rest.'] },
+           lose: ['Hm. You want a real room, try the Cue Club across town. Ask for Yuki. She does not miss shape.', 'Fine. You get one thing right. The Cue Club is where the money is. Yuki first. Then it gets worse.'] },
   ruth:  { meet: ['Take your time. I already know how this ends, but I would like to watch you try.', 'Sit down. Three balls ahead. That is all it is.'],
            rematch: ['Again? Good. Patience is the whole game.', 'Back. You left me two balls last time. We will fix that.'],
            win: ['That is what three balls ahead looks like.', 'You were playing one shot. I was playing the next three.'],
            lose: ['Well played. There is a man at the Championship who has not lost since 2011. Go introduce yourself.', 'Good. Now you are ready for Silas. Nobody is, but you are closer than most.'] },
+  charlie: { meet: ['Oh, a new face. Rack em up, hon, I am on a heater.', 'Fish fry money is burning a hole. Break first, I insist.'],
+           rematch: ['You again. The table still likes me, just so you know.', 'Back? Good. I feel another lucky one coming on.'],
+           win: ['See that roll? The Legion loves me.', 'I did not even aim that one. Do not tell anybody.'],
+           lose: ['Alright, alright. Dontae is over there filming himself. Go humble the kid.', 'Luck ran out. Dontae is up next, he will try the hard one every time. Let him.'] },
+  dontae: { meet: ['Watch this. No, really, watch the whole thing.', 'I do not play easy. Easy is boring. Rack it.'],
+           rematch: ['Round two. I have a new one I been practicing.', 'Back for the show? Say less.'],
+           win: ['Three rails for position. You saw it.', 'Too clean. The clip is going up tonight.'],
+           lose: ['Man. Okay. Marisol at Corner Pocket is the real deal. She shoots before you breathe.', 'Fine, you got the fundamentals. Go see Marisol at the hall. She is faster than me and she does not miss.'] },
+  yuki: { meet: ['Cue Club rules. We play clean and we play for real. Rack.', 'I will leave you nothing. Nothing personal.'],
+           rematch: ['Again. Good. Your shape was sloppy last time.', 'Back. Let us see if you learned the cue ball.'],
+           win: ['Position. That is the whole game. You were chasing.', 'I never left myself a hard shot. That is why.'],
+           lose: ['Clean. You earned that. Vince runs the money games here. He plays your nerve, not the balls.', 'Good shape. Now Vince. He reads you before he racks. Keep your face still.'] },
+  vince: { meet: ['Let me see your money and your hands. Both tell me how you play.', 'Cue Club house rules. Slow, straight, expensive. Rack them.'],
+           rematch: ['Back with more to lose. I like that.', 'Again. The house always has time for your money.'],
+           win: ['You flinched on the eight. I watch for that.', 'No slop in my game. You brought some in yours.'],
+           lose: ['Well. The Championship is the last room, and Ruth is the gate. She is three balls ahead of both of us.', 'You held your nerve. Ruth at the Championship is next. Nobody plays further ahead than she does.'] },
   silas: { meet: ['They told me about you. Sit down. Let us see if they were right.', 'Ruth sent you. Then you can play. Rack them.'],
            rematch: ['You keep coming back. I respect that. It will not help.', 'Again. Fine. The house does not mind taking your money twice.'],
            win: ['Same as 2011. Nothing personal.', 'You had one chance. You are not the first to miss it.'],
@@ -1545,9 +1588,13 @@ var LINES = {
 /* the thread between rungs, shown the first time you beat each player */
 var ARC = {
   dot: 'Dot slides a folded twenty across the rail and nods toward the far end of the bar, where a kid in a courier jacket is banking the 3 off two rails for no reason at all.',
-  benny: 'Benny shakes your hand and tells you the real games are up the street at Corner Pocket Billiards. Ask for Marisol, he says. And do not blink.',
+  benny: 'Benny shakes your hand and tells you the real games are up the road at the Legion, Post 9. Ask for Charlie at the back table, he says, and do not let the rolls rattle you.',
+  charlie: 'Charlie cackles, pockets your money, and jerks a thumb at a kid in the corner filming a four-rail bank into an empty pocket. That is Dontae, she says. All highlight, no scoreboard.',
+  dontae: 'Dontae daps you up, says the clip is going online anyway, and tells you the real speed is at Corner Pocket Billiards. Ask for Marisol, he says. Do not try to talk to her mid-rack.',
   mari: 'Marisol taps her cue twice on the floor, the hall sign of respect, and points to the back table. A big man in a work shirt is leveling it. Again.',
-  hank: 'Hank does not shake hands. He just says one word, Ruth, and goes back to his gauge. The back room is quieter than the rest of the hall.',
+  hank: 'Hank does not shake hands. He slides a Cue Club matchbook across the rail and says one word, Yuki, then goes back to his gauge.',
+  yuki: 'Yuki racks her own cue with a soft click and nods toward a man by the window with a leather case and a stack of bills. Vince, she says. He will not play the table until he has played you.',
+  vince: 'Vince counts your money twice, hands it back, and writes an address on the back of a card. The Championship. Ruth holds the door. Beat her and you get the man nobody beats.',
   ruth: 'Ruth writes a name and an address on a napkin. The Championship. Friday. He will know you are coming, she says.',
   silas: 'The arena goes quiet. Silas sets his cue in its case, closes the latches, and leaves it on the table. It is yours, he says. Try not to lose it.'
 };
@@ -1557,6 +1604,8 @@ var CUES = [
   { id: 'railbar', name: 'Rail Bar special', cost: 80, need: 'dot', note: 'Dark walnut with an orange linen wrap. Dot swears it is lucky.', shaft: 0xe2c48f, joint: 0xc7a24a, fore: 0x3b1f12, wrap: 0xf59847, butt: 0x3b1f12 },
   { id: 'corner', name: 'Corner Pocket custom', cost: 180, need: 'mari', note: 'Black with teal rings. Built for speed, like its first owner.', shaft: 0xf0dcb0, joint: 0x4cf0e0, fore: 0x0d0f12, wrap: 0x1c2a2c, butt: 0x0d0f12 },
   { id: 'aperture', name: 'The Aperture', cost: 300, need: 'hank', note: 'Teal shaft, orange butt. The house brand.', shaft: 0x1f7f7a, joint: 0xf59847, fore: 0x0b3d49, wrap: 0x07090c, butt: 0xf59847 },
+  { id: 'legion', name: 'Legion house cue', cost: 130, need: 'dontae', note: 'Maple and faded red, a little nicked. Charlie says it is the lucky one. It is not.', shaft: 0xe6c79a, joint: 0xb08a3a, fore: 0x6a2420, wrap: 0xf0b35a, butt: 0x6a2420 },
+  { id: 'club', name: 'Cue Club cue', cost: 260, need: 'vince', note: 'Deep green forearm, brass rings. The members\' room standard.', shaft: 0xf0dcb0, joint: 0xd8b24a, fore: 0x12301f, wrap: 0x6fd0b0, butt: 0x12301f },
   { id: 'silas', name: 'Silas Crane\'s cue', cost: 0, need: 'silas', award: true, note: 'Ebony and silver. He left it on the table.', shaft: 0xf3e6c8, joint: 0xd8dde2, fore: 0x0a0a0c, wrap: 0x9aa3ad, butt: 0x0a0a0c }
 ];
 function cueById(id) { for (var i = 0; i < CUES.length; i++) if (CUES[i].id === id) return CUES[i]; return CUES[0]; }
@@ -1565,7 +1614,7 @@ function cueCount() { var n = 0; for (var k in STORY.cues) if (STORY.cues[k]) n+
 /* ---------- career record + achievements (persistent, offline, nothing to buy) ---------- */
 var CAREER = (function () {
   var d = { games: 0, wins: 0, losses: 0, pots: 0, shots: 0, bestRun: 0, bestBreak: 0, streak: 0, bestStreak: 0,
-    win8: 0, win9: 0, noSpinWins: 0, snap9: 0, brokeEver: 0, drills: {}, ach: {} };
+    win8: 0, win9: 0, noSpinWins: 0, snap9: 0, brokeEver: 0, holdBestStreak: 0, holdBestTake: 0, doubles: 0, drills: {}, ach: {} };
   var s = store.get('career', null);
   if (s && typeof s === 'object') for (var k in d) if (k in s) d[k] = s[k];
   if (!d.drills || typeof d.drills !== 'object') d.drills = {};
@@ -1595,7 +1644,10 @@ var ACH = [
   { id: 'champ', name: 'House shark', desc: 'Beat Silas Crane.', test: function () { return !!STORY.champ; } },
   { id: 'cues', name: 'Cue collector', desc: 'Own three cues.', test: function () { return cueCount() >= 3; } },
   { id: 'finish', name: 'Finished basement', desc: 'Fully fix up the practice room.', test: function () { return (STORY.up | 0) >= 3; } },
-  { id: 'rich', name: 'Deep pockets', desc: 'Reach a $500 bankroll.', test: function () { return STORY.bank >= 500; } }
+  { id: 'rich', name: 'Deep pockets', desc: 'Reach a $500 bankroll.', test: function () { return STORY.bank >= 500; } },
+  { id: 'climb', name: 'The long climb', desc: 'Beat all ten of the house.', test: function () { return beatCount() >= LADDER.length; } },
+  { id: 'press', name: 'Pressed it', desc: 'Win a double or nothing.', test: function (c) { return (c.doubles | 0) >= 1; } },
+  { id: 'hold5', name: 'Holding the house', desc: 'Hold the house five challengers deep.', test: function (c) { return (c.holdBestStreak | 0) >= 5; } }
 ];
 function achById(id) { for (var i = 0; i < ACH.length; i++) if (ACH[i].id === id) return ACH[i]; return null; }
 function checkAch() {
@@ -1893,6 +1945,18 @@ var VENUES = {
     amb: [0xfff0dc, 0x0c0f14, 0.2], fill: [0xffe2b8, 0.55, 0xffe2b8, 0.55], spot: [0xffeccd, 12.5],
     lamp: 'bar3', sign: 'neon', props: 'dive',
     env: { ceil: [5, 4.4, 3.6], w1: [0.5, 0.36, 0.24], w2: [0.15, 0.7, 0.66], w3: [0.5, 0.36, 0.24] } },
+  legion: { name: 'The Legion Hall', order: 1.5, sub: 'Post 9 back room',
+    floor: ['carpet', '#3a2320', '#1a0f0e'], wall: 0x2a2420, wain: ['#241a14', '#0e0a07'], back: 'panel',
+    fog: [0x0a0806, 7, 20], bg: 0x0a0806,
+    amb: [0xfff2d8, 0x0e0c10, 0.3], fill: [0xffe7c2, 0.5, 0xd8e0ff, 0.4], spot: [0xfff2dc, 12.5],
+    lamp: 'pendant', sign: 'plaque', props: 'dive',
+    env: { ceil: [3.6, 3.6, 3.8], w1: [0.26, 0.22, 0.17], w2: [0.3, 0.4, 0.3], w3: [0.26, 0.22, 0.17] } },
+  club: { name: 'The Cue Club', order: 2.5, sub: 'Members only',
+    floor: ['carpet', '#13241c', '#0a130e'], wall: 0x13231b, wain: ['#0e1a14', '#060d09'], back: 'panel',
+    fog: [0x070f0b, 8, 22], bg: 0x070f0b,
+    amb: [0xe6fff0, 0x0a140e, 0.32], fill: [0xcfeede, 0.55, 0xe8d8a0, 0.45], spot: [0xf2fff6, 13.5],
+    lamp: 'pendant', sign: 'plaque', props: 'hall',
+    env: { ceil: [4.4, 4.6, 4.4], w1: [0.14, 0.22, 0.18], w2: [0.3, 0.5, 0.4], w3: [0.14, 0.22, 0.18] } },
   hall: { name: 'Corner Pocket Billiards', order: 2, sub: 'A real room',
     floor: ['carpet', '#241a2a', '#14101c'], wall: 0x241f2b, wain: ['#1a1622', '#0b0910'], back: 'panel',
     fog: [0x0a0910, 8, 22], bg: 0x0a0910,
@@ -2276,7 +2340,7 @@ function startGame(mode, oppId, story) {
   var seed = (Date.now() % 100000) + 1;
   var ng = PE.newGame(mode, T, seed);
   G.s = ng.s; G.g = ng.g; G.tmp = G.s.clone(); G.mode = mode; G.story = story || null;
-  var ch = oppId === 'pass' ? null : charById(oppId);
+  var ch = oppId === 'pass' ? null : effChar(charById(oppId), story && story.edge);
   G.players = mode === 'practice' ? [{ name: 'Practice table', ini: 'P', human: true, col: '#4cf0e0' }]
     : [{ name: 'You', ini: 'YOU', human: true, col: '#4cf0e0' },
        ch ? { name: ch.name, ini: ch.ini, human: false, ch: ch, col: ch.col } : { name: 'Player 2', ini: 'P2', human: true, col: '#f59847' }];
@@ -2377,27 +2441,40 @@ function gameOver(out) {
 
 /* ---------- story: settle a match, challenge an opponent, the ladder screen ---------- */
 function storyResult(out) {
-  var won = out.winner === 0, id = G.story.oppId, L = ladderOf(id), ch = charById(id), st = G.stats[0], ln = LINES[id] || {};
+  var won = out.winner === 0, id = G.story.oppId, ch = charById(id), st = G.stats[0], ln = LINES[id] || {};
+  var dbl = !!G.story.dbl, hold = !!G.story.hold;
   var head, big, sub, say = '', beat = '', award = '';
   if (won) {
     STORY.bank += G.story.purse;
     var firstTime = !STORY.beat[id];
     STORY.beat[id] = true;
+    if (!dbl && !hold) STORY.wins[id] = (STORY.wins[id] || 0) + 1;
     var net = G.story.purse - G.story.buy;
-    head = 'You take the table'; big = '+' + money(G.story.purse);
+    head = dbl ? 'You pressed it' : hold ? 'Still standing' : 'You take the table';
+    big = '+' + money(G.story.purse);
     sub = 'Bankroll ' + money(STORY.bank) + ' &middot; ' + (net >= 0 ? 'up ' + money(net) : 'down ' + money(-net)) + ' on the match.';
     if (id === 'silas') { say = firstTime ? ln.lose[0] : ln.lose[1]; } else if (ln.lose) say = pick(ln.lose);
-    if (firstTime && ARC[id]) beat = ARC[id];
-    if (id === 'silas' && firstTime) { head = 'House shark'; STORY.champ = true; STORY.cues.silas = true; applyCue('silas'); award = 'Silas Crane\'s cue is yours. It is on you now.'; }
+    if (firstTime && !dbl && !hold && ARC[id]) beat = ARC[id];
+    if (id === 'silas' && firstTime && !dbl && !hold) { head = 'House shark'; STORY.champ = true; STORY.cues.silas = true; applyCue('silas'); award = 'Silas Crane\'s cue is yours. It is on you now.'; }
     saveStory();
   } else {
-    head = (ch ? ch.name : 'They') + ' win'; big = '-' + money(G.story.buy);
-    sub = 'Down to ' + money(STORY.bank) + '. The buy-in is gone, but the table is always here.';
+    head = dbl ? 'You lost the press' : hold ? (ch ? ch.name : 'They') + ' end the night' : (ch ? ch.name : 'They') + ' win';
+    big = '-' + money(G.story.buy);
+    sub = 'Down to ' + money(STORY.bank) + '. ' + (dbl ? 'The winnings are gone.' : hold ? 'The run is over.' : 'The buy-in is gone, but the table is always here.');
     if (ln.win) say = pick(ln.win);
     saveStory();
   }
+  if (dbl && won) { CAREER.doubles = (CAREER.doubles | 0) + 1; saveCareer(); }
+  if (hold) {
+    var hs = (G.story.holdStreak || 0) + (won ? 1 : 0);
+    var take = (G.story.holdTake || 0) + (won ? G.story.purse : 0);
+    if (hs > (CAREER.holdBestStreak | 0)) CAREER.holdBestStreak = hs;
+    if (take > (CAREER.holdBestTake | 0)) CAREER.holdBestTake = take;
+    saveCareer();
+    G.story.holdStreak = hs; G.story.holdTake = take;
+  }
   checkAch();
-  var html = '<div class="mono" style="color:' + (won ? 'var(--mb-teal)' : 'var(--mb-orange)') + '">' + (ch ? ch.name + ' &middot; Level ' + ch.lvl : 'Match') + '</div>' +
+  var html = '<div class="mono" style="color:' + (won ? 'var(--mb-teal)' : 'var(--mb-orange)') + '">' + (ch ? ch.name + ' &middot; Level ' + ch.lvl : 'Match') + (hold ? ' &middot; Hold ' + (G.story.holdStreak || 0) : '') + '</div>' +
     '<div class="big" style="color:' + (won ? 'var(--mb-teal)' : 'var(--mb-ink)') + '">' + head + '</div>' +
     '<div class="purse ' + (won ? 'up' : 'down') + '">' + big + '</div>' +
     (say ? '<div class="quote"><span class="ava qava" data-face="' + ch.id + '" style="background:' + ch.col + '">' + ch.ini + '</span><p>' + say + '</p></div>' : '') +
@@ -2405,11 +2482,39 @@ function storyResult(out) {
     (beat ? '<p class="arc">' + beat + '</p>' : '') +
     (award ? '<div class="awardRow"><span class="cueSwatch" style="' + swatchStyle(cueById('silas')) + '"></span><span>' + award + '</span></div>' : '') +
     '<div class="stats"><div><b>' + st.shots + '</b><span>Shots</span></div><div><b>' + st.pots + '</b><span>Balls made</span></div><div><b>' + st.best + '</b><span>Best run</span></div></div>';
-  html += STORY.bank >= G.story.buy ? '<button class="primary" id="mAgain" type="button">Rematch &middot; ' + money(G.story.buy) + '</button>' : '';
-  html += '<div class="rowb"><button class="ghost" id="mRoom" type="button">Back to the ladder</button></div>';
+  if (hold) {
+    if (won) html += '<button class="primary" id="mNext" type="button">Next challenger</button><div class="rowb"><button class="ghost" id="mCash" type="button">Cash out the night</button></div>';
+    else html += '<button class="primary" id="mRoom" type="button">Back to the ladder</button>';
+  } else if (dbl) {
+    if (won && STORY.bank >= G.story.purse) html += '<button class="primary" id="mDouble" type="button">Double again &middot; risk ' + money(G.story.purse) + '</button>';
+    html += '<div class="rowb"><button class="ghost" id="mRoom" type="button">' + (won ? 'Take it and go' : 'Back to the ladder') + '</button></div>';
+  } else if (won) {
+    if (STORY.bank >= G.story.purse) html += '<button class="primary" id="mDouble" type="button">Double or nothing &middot; risk ' + money(G.story.purse) + '</button>';
+    html += '<div class="rowb"><button class="ghost" id="mAgain" type="button">Rematch</button><button class="ghost" id="mRoom" type="button">The ladder</button></div>';
+  } else {
+    if (STORY.bank >= ladderOf(id).buy) html += '<button class="primary" id="mAgain" type="button">Rematch</button>';
+    html += '<div class="rowb"><button class="ghost" id="mRoom" type="button">Back to the ladder</button></div>';
+  }
   openModal(html); applyFaces();
-  if ($('mAgain')) $('mAgain').onclick = function () { challenge(id, true); };
-  $('mRoom').onclick = function () { closeModal(); openStory(); };
+  if ($('mAgain')) $('mAgain').onclick = function () { challenge(id); };
+  if ($('mDouble')) $('mDouble').onclick = function () { doubleOrNothing(id, G.story.purse, G.story.venue); };
+  if ($('mNext')) $('mNext').onclick = function () { holdHouse(G.story.holdStreak || 0, G.story.holdTake || 0); };
+  if ($('mCash')) $('mCash').onclick = function () { closeModal(); openStory('You cash out. Best run held: ' + (CAREER.holdBestStreak | 0) + ' deep.'); };
+  if ($('mRoom')) $('mRoom').onclick = function () { closeModal(); openStory(); };
+}
+function doubleOrNothing(id, wager, venue) {
+  if (STORY.bank < wager) { closeModal(); openStory('Not enough left to press it.'); return; }
+  STORY.bank -= wager; saveStory(); closeModal(); buildRoom(venue);
+  startGame('8ball', id, { oppId: id, buy: wager, purse: wager * 2, venue: venue, dbl: true, edge: (STORY.wins[id] || 0) });
+}
+function holdHouse(streak, take) {
+  streak = streak || 0; take = take || 0;
+  var opp = LADDER[Math.floor(Math.random() * LADDER.length)], id = opp.id, L = ladderOf(id);
+  var mult = 1 + streak * 0.5;
+  var buy = Math.max(10, Math.round(L.buy * 0.5 * mult)), purse = Math.max(20, Math.round(L.purse * 0.6 * mult));
+  if (STORY.bank < buy) { closeModal(); openStory('You need ' + money(buy) + ' for the next challenger. Win some back on the ladder.'); return; }
+  STORY.bank -= buy; saveStory(); closeModal(); buildRoom(L.venue);
+  startGame('8ball', id, { oppId: id, buy: buy, purse: purse, venue: L.venue, hold: true, holdStreak: streak, holdTake: take, edge: Math.min(6, 2 + streak) });
 }
 function swatchStyle(c) {
   function hx(n) { return '#' + ('000000' + n.toString(16)).slice(-6); }
@@ -2448,7 +2553,8 @@ function openRecord() {
     '<div class="recg">' +
       stat(c.games, 'Played') + stat(c.wins, 'Won') + stat(winPct() + '%', 'Win rate') +
       stat(c.pots, 'Balls potted') + stat(c.bestRun, 'Best run') + stat(c.bestBreak, 'Best break') +
-      stat(c.bestStreak, 'Best streak') + stat(money(STORY.bank), 'Bankroll') + stat(beatCount() + '/6', 'House beaten') +
+      stat(c.bestStreak, 'Best streak') + stat(money(STORY.bank), 'Bankroll') + stat(beatCount() + '/' + LADDER.length, 'House beaten') +
+      (STORY.champ ? stat(c.holdBestStreak | 0, 'Best hold') + stat(money(c.holdBestTake | 0), 'Best night') : '') +
     '</div>' +
     '<div class="lab">Achievements &middot; ' + unlocked + ' of ' + ACH.length + '</div><div class="achg">';
   for (i = 0; i < ACH.length; i++) {
@@ -2458,21 +2564,41 @@ function openRecord() {
   h += '</div><button class="primary" id="recDone" type="button" style="margin-top:14px">Done</button>';
   openModal(h); $('recDone').onclick = closeModal;
 }
+var STAKES = [['Light', 0.5], ['Standard', 1], ['High', 2]];
 function challenge(id, skip) {
   var L = ladderOf(id), ch = charById(id); if (!L || !ch) return;
-  if (STORY.bank < L.buy) { openStory('You need ' + money(L.buy) + ' to sit down with ' + ch.name.split(' ')[0] + '.'); return; }
-  function go() { STORY.bank -= L.buy; STORY.played[id] = (STORY.played[id] || 0) + 1; saveStory(); closeModal(); buildRoom(L.venue); startGame('8ball', id, { oppId: id, buy: L.buy, purse: L.purse, venue: L.venue }); }
+  var k = STORY.wins[id] || 0, mult = 1;
+  function buyFor(m) { return matchStake(L.buy, k, m); }
+  function purseFor(m) { return matchStake(L.purse, k, m); }
+  function go() {
+    var buy = buyFor(mult), purse = purseFor(mult);
+    if (STORY.bank < buy) { render(); return; }
+    STORY.bank -= buy; STORY.played[id] = (STORY.played[id] || 0) + 1; saveStory();
+    closeModal(); buildRoom(L.venue);
+    startGame('8ball', id, { oppId: id, buy: buy, purse: purse, venue: L.venue, edge: k });
+  }
   if (skip) { go(); return; }
-  var ln = LINES[id], say = ln ? pick((STORY.played[id] || 0) ? ln.rematch : ln.meet) : '';
-  openModal('<div class="mono" style="color:var(--mb-orange)">' + VENUES[L.venue].name + '</div><h2>' + ch.name + '</h2>' +
-    (say ? '<div class="quote"><span class="ava qava" data-face="' + ch.id + '" style="background:' + ch.col + '">' + ch.ini + '</span><p>' + say + '</p></div>' : '<p>' + ch.story + '</p>') +
-    '<div class="kv"><span>Buy-in</span><b>' + money(L.buy) + '</b></div>' +
-    '<div class="kv"><span>Winner takes</span><b>' + money(L.purse) + '</b></div>' +
-    '<div class="kv"><span>Your bankroll</span><b>' + money(STORY.bank) + '</b></div>' +
-    '<button class="primary" id="cGo" type="button">Put up ' + money(L.buy) + '</button>' +
-    '<div class="rowb"><button class="ghost" id="cBack" type="button">Not yet</button></div>');
-  applyFaces();
-  $('cGo').onclick = go; $('cBack').onclick = function () { openStory(); };
+  function render() {
+    var ln = LINES[id], say = ln ? pick((STORY.played[id] || 0) ? ln.rematch : ln.meet) : '';
+    var chips = '';
+    for (var i = 0; i < STAKES.length; i++) { var m = STAKES[i][1], can = STORY.bank >= buyFor(m); chips += '<button class="pill stakePill' + (m === mult ? ' on' : '') + (can ? '' : ' lock') + '" data-m="' + m + '" type="button">' + STAKES[i][0] + '<small>' + money(buyFor(m)) + '</small></button>'; }
+    var canGo = STORY.bank >= buyFor(mult);
+    openModal('<div class="mono" style="color:var(--mb-orange)">' + VENUES[L.venue].name + (k ? ' &middot; rematch ' + (k + 1) : '') + '</div><h2>' + ch.name + '</h2>' +
+      (say ? '<div class="quote"><span class="ava qava" data-face="' + ch.id + '" style="background:' + ch.col + '">' + ch.ini + '</span><p>' + say + '</p></div>' : '<p>' + ch.story + '</p>') +
+      (k ? '<p class="staked">' + ch.name.split(' ')[0] + ' has your number now. Sharper game, bigger money.</p>' : '') +
+      '<div class="lab">Name your stake</div><div class="pills stakes">' + chips + '</div>' +
+      '<div class="kv"><span>Buy-in</span><b>' + money(buyFor(mult)) + '</b></div>' +
+      '<div class="kv"><span>Winner takes</span><b>' + money(purseFor(mult)) + '</b></div>' +
+      '<div class="kv"><span>Your bankroll</span><b>' + money(STORY.bank) + '</b></div>' +
+      '<button class="primary" id="cGo" type="button"' + (canGo ? '' : ' disabled') + '>' + (canGo ? 'Put up ' + money(buyFor(mult)) : 'Not enough for this stake') + '</button>' +
+      '<div class="rowb"><button class="ghost" id="cBack" type="button">Not yet</button></div>');
+    applyFaces();
+    var ps = $('modalCard').querySelectorAll('.stakePill');
+    for (var j = 0; j < ps.length; j++) ps[j].onclick = function () { mult = parseFloat(this.getAttribute('data-m')); render(); };
+    $('cGo').onclick = function () { if (STORY.bank >= buyFor(mult)) go(); };
+    $('cBack').onclick = function () { openStory(); };
+  }
+  render();
 }
 function doUpgrade() {
   var u = UPGR[STORY.up | 0]; if (!u || STORY.bank < u.cost) return;
@@ -2500,11 +2626,13 @@ function openStory(note) {
       '<span class="ava" data-face="' + c.id + '" style="background:' + c.col + '">' + c.ini + '</span>' +
       '<span class="ltx"><b>' + c.name + '</b><span>' + VENUES[L.venue].name + ' &middot; Lvl ' + c.lvl + '</span></span>' + state + '</button>';
   }
-  h += '<button class="primary" id="stBack" type="button" style="margin-top:14px">Back to the door</button>';
+  if (STORY.champ) h += '<button class="primary" id="stHold" type="button" style="margin-top:12px">Hold the house &middot; endless</button>';
+  h += '<button class="' + (STORY.champ ? 'ghost' : 'primary') + '" id="stBack" type="button" style="margin-top:' + (STORY.champ ? '8px' : '14px') + '">Back to the door</button>';
   openModal(h);
   applyFaces();
   var rows = $('modalCard').querySelectorAll('.ladRow');
   for (var j = 0; j < rows.length; j++) rows[j].onclick = function () { var id = this.getAttribute('data-o'); if (id && storyAvail(id)) challenge(id); };
+  if ($('stHold')) $('stHold').onclick = function () { holdHouse(0, 0); };
   if ($('stUp')) $('stUp').onclick = doUpgrade;
   $('stCues').onclick = function () { openLocker(); };
   $('stPractice').onclick = function () { closeModal(); buildRoom('basement'); startGame('practice', null); };
