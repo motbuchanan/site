@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="build" content="v1.3 · Oct 10">
+<meta name="build" content="v1.3.1 · Oct 11">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#07090c">
 <meta name="description" content="Pocket Shark: a 3D pool table with real ball physics, full camera control, and a shark that shows you the best shot.">
@@ -411,7 +411,7 @@ body.play #vtoast{bottom:calc(94px + env(safe-area-inset-bottom))}
     <div class="panel" id="panel"></div>
   </div>
 </div></div>
-<button class="mb-ver" id="mbVer" type="button">v1.3 · Oct 10</button>
+<button class="mb-ver" id="mbVer" type="button">v1.3.1 · Oct 11</button>
 <div id="vtoast"></div>
 <div id="achToast"></div>
 
@@ -3383,8 +3383,9 @@ function doInstall() {
 }
 function buildMenu() {
   var h = '<button class="opp" data-o="pass" type="button"><span class="ava" style="background:#ebedef">2P</span><span><b>Pass and play</b><span class="lv">Two people, one phone</span></span></button>';
-  for (var i = 0; i < CHARS.length; i++) {
-    var c = CHARS[i];
+  var ranked = CHARS.slice().sort(function (a, b) { return a.lvl - b.lvl; });
+  for (var i = 0; i < ranked.length; i++) {
+    var c = ranked[i];
     h += '<button class="opp" data-o="' + c.id + '" type="button"><span class="ava" data-face="' + c.id + '" style="background:' + c.col + '">' + c.ini + '</span><span><b>' + c.name + '</b><span class="lv">Level ' + c.lvl + '</span></span></button>';
   }
   $('opps').innerHTML = h;
