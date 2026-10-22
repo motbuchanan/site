@@ -129,10 +129,10 @@ footer{color:#5b6272;font-size:12.5px;text-align:center;margin:30px 0 10px;line-
 </footer>
 </main>
 <div id="toast" role="status"></div>
-<button class="mb-ver" id="mbVer" type="button">v1.17 &middot; Sep 21</button>
+<button class="mb-ver" id="mbVer" type="button">v1.20 &middot; Oct 22</button>
 <script>
 "use strict";
-var VERSION = "v1.17 · Sep 21";
+var VERSION = "v1.20 · Oct 22";
 
 /* pure helpers (testable) */
 function countDone(state){
@@ -169,6 +169,15 @@ var ROWS = [
   { key:"hosting101_v1", img:"thumb-hosting", file:"hosting-basics.html", title:"Ship It",
     sub:"How a file on your phone becomes a web address: repos, index.html, root vs folder, and the content:// trap.",
     total:6, color:"#b7a4e3", unit:2 },
+  { key:"data101_v1", img:"thumb-data", file:"data-basics.html", title:"Where Data Lives",
+    sub:"The three places an app keeps data, why progress sticks to one device, and how a cloud database (Firebase) syncs it.",
+    total:6, color:"#45d4c4", unit:2 },
+  { key:"api101_v1", img:"thumb-api", file:"api-basics.html", title:"The Order Window",
+    sub:"What an API call is: verbs, URLs, status codes, reading JSON, keys and rate limits. You have been making them for months.",
+    total:6, color:"#ff9a6b", unit:2 },
+  { key:"shelf101_v1", img:"thumb-beside-phone", file:"shelf-dissected.html", title:"The Shelf Dissected",
+    sub:"The keystone. Your real Game Shelf taken apart: the hub, the four registrations, the service worker, the Firestore cabinet, and 282 commits of history.",
+    total:6, color:"#d9b35a", unit:2 },
 ];
 
 function initApp(){

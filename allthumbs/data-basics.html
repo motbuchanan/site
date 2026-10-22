@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14181d">
+<title>Where Data Lives: Storage</title>
+<style>
+  :root{
+    --canvas:#14181d; --panel:#1c2229; --card:#171c22; --line:#2c3540;
+    --ink:#e8ecf0; --soft:#97a3ae; --dim:#6b7682;
+    --green:#6fe08c; --amber:#f5b04c; --blue:#5aa7e8; --red:#e87a6d; --teal:#45d4c4; --trail:#c8a4f0;
+    --mono:ui-monospace,'SF Mono','Cascadia Mono','Roboto Mono',Consolas,Menlo,monospace;
+    --sans:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',sans-serif;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; background:var(--canvas); color:var(--ink);
+    font-family:var(--sans); font-size:17px; line-height:1.6;
+    padding-bottom:70px;
+  }
+  header{
+    padding:26px 20px 10px; max-width:760px; margin:0 auto;
+    display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+  }
+  .wordmark{font-family:var(--mono); font-size:12px; letter-spacing:.22em; color:var(--soft); text-transform:uppercase;}
+  h1{margin:6px 0 2px; font-size:30px; line-height:1.15; letter-spacing:-.01em;}
+  .subtitle{color:var(--soft); margin:0; font-size:15px;}
+  .vbadge{
+    font-family:var(--mono); font-size:11px; color:var(--soft);
+    border:1px solid var(--line); border-radius:999px; padding:5px 10px;
+    background:var(--panel); cursor:pointer; white-space:nowrap; margin-top:4px;
+  }
+  nav{
+    position:sticky; top:0; z-index:30; background:rgba(20,24,29,.92);
+    backdrop-filter:blur(8px); border-bottom:1px solid var(--line);
+    overflow-x:auto; -webkit-overflow-scrolling:touch;
+  }
+  .navrow{display:flex; gap:8px; padding:10px 16px; max-width:760px; margin:0 auto; width:max-content;}
+  .navchip{
+    font-family:var(--mono); font-size:12px; color:var(--soft);
+    border:1px solid var(--line); border-radius:999px; padding:7px 13px;
+    background:var(--card); text-decoration:none; white-space:nowrap;
+  }
+  .navchip:active{color:var(--ink); border-color:var(--amber);}
+  main{max-width:760px; margin:0 auto; padding:0 16px;}
+  section{
+    background:var(--panel); border:1px solid var(--line); border-radius:16px;
+    padding:22px 18px; margin:18px 0;
+  }
+  .eyebrow{
+    font-family:var(--mono); font-size:11px; letter-spacing:.2em; text-transform:uppercase;
+    color:var(--amber); margin:0 0 6px;
+  }
+  h2{margin:0 0 10px; font-size:23px; line-height:1.2;}
+  h3{margin:20px 0 8px; font-size:17px;}
+  p{margin:10px 0; color:var(--ink);}
+  .soft{color:var(--soft);}
+  .small{font-size:14px;}
+  code, .code{font-family:var(--mono); font-size:.92em; background:var(--card); border:1px solid var(--line); border-radius:6px; padding:1px 6px; color:var(--green);}
+  .note{
+    border-left:3px solid var(--amber); background:var(--card);
+    border-radius:0 10px 10px 0; padding:10px 14px; margin:14px 0; font-size:15px; color:var(--soft);
+  }
+  .btn{
+    display:inline-block; font-family:var(--mono); font-size:14px; color:var(--ink);
+    background:var(--card); border:1px solid var(--line); border-radius:10px;
+    padding:11px 16px; cursor:pointer; user-select:none;
+  }
+  .btn:active{border-color:var(--amber); transform:translateY(1px);}
+  .btn.primary{border-color:var(--amber); color:var(--amber);}
+  .mfill{margin-left:8px; flex:0 0 auto; font-size:11px; padding:3px 9px; border:1px solid var(--line); border-radius:999px; background:transparent; color:var(--amber); cursor:pointer;}
+  .mfill:active{border-color:var(--amber);}
+  .gym{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px; margin:14px 0;}
+  .gymstats{display:flex; gap:18px; font-size:12.5px; color:#9aa5b1; margin-bottom:10px; letter-spacing:.04em;}
+  .gymstats b{color:var(--green); font-size:15px; margin-left:4px;}
+  .gymtabs{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;}
+  .gtab{font-size:12px; padding:6px 11px; border-radius:999px; border:1px solid var(--line); background:transparent; color:inherit; cursor:pointer;}
+  .gtab.on{border-color:var(--amber); color:var(--amber); font-weight:700;}
+  .gymcard{border:1px dashed var(--line); border-radius:10px; padding:12px;}
+  .gymcard.active{border-style:solid; border-color:var(--amber);}
+  .gymcard.win{border-style:solid; border-color:var(--green);}
+  .ggoal{font-size:15px; line-height:1.5;}
+  .ggoal b{color:var(--amber);}
+  .gstep{font-size:12px; color:var(--green); margin-top:6px;}
+  .ghint{font-size:13.5px; color:var(--blue); margin-top:8px; display:none;}
+  .ghint.show{display:block;}
+  .gbtns{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;}
+  .tracktoggle{display:flex;gap:8px;margin:14px 0 10px;align-items:center;flex-wrap:wrap}
+  .tracktoggle .tlabel{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin-right:2px}
+  .ttab{font-family:var(--mono);font-size:12.5px;padding:7px 14px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--soft);cursor:pointer;}
+  .ttab.on.general{border-color:var(--blue);color:var(--blue);background:rgba(90,167,232,.1);font-weight:700;}
+  .ttab.on.trail{border-color:#c8a4f0;color:#c8a4f0;background:rgba(200,164,240,.12);font-weight:700;}
+  .trailbanner{font-family:var(--mono);font-size:11.5px;color:#c8a4f0;background:rgba(200,164,240,.08);border:1px solid rgba(200,164,240,.3);border-radius:8px;padding:7px 11px;margin:8px 0;display:none;}
+  .trailbanner.show{display:block;}
+  .gymcard.trailmode.active{border-color:#c8a4f0;}
+  .gymcard.trailmode.win{border-color:var(--green);}
+
+
+  /* hero */
+  .hero{display:flex; flex-direction:column; align-items:center; text-align:center; gap:10px;}
+  .hero svg{width:120px; height:auto;}
+  .hook{font-size:21px; font-weight:650; margin:4px 0 0;}
+  .flips{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; width:100%; margin-top:14px;}
+  .flip{
+    border:1px solid var(--line); border-radius:12px; background:var(--card);
+    padding:14px; text-align:left; cursor:pointer; min-height:104px; position:relative;
+  }
+  .flip .front{font-weight:650;}
+  .flip .tapcue{font-family:var(--mono); font-size:11px; color:var(--dim); margin-top:8px;}
+  .flip .back{display:none; font-size:14.5px; color:var(--soft);}
+  .flip.open .front,.flip.open .tapcue{display:none;}
+  .flip.open .back{display:block; animation:fadeup .35s ease;}
+  .flip.open{border-color:var(--green);}
+  @keyframes fadeup{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+
+  /* layer stack */
+  .stack{display:flex; flex-direction:column; gap:8px; margin:14px 0;}
+  .layer{
+    border:1px solid var(--line); border-radius:12px; background:var(--card);
+    padding:13px 14px; cursor:pointer; display:flex; align-items:center; gap:12px;
+    transition:border-color .25s, box-shadow .25s;
+  }
+  .layer .lname{font-weight:650;}
+  .layer .ltag{font-family:var(--mono); font-size:11px; color:var(--dim); margin-left:auto;}
+  .layer.active{border-color:var(--amber); box-shadow:0 0 0 1px var(--amber) inset;}
+  .layer.pulseglow{border-color:var(--green); box-shadow:0 0 14px rgba(111,224,140,.25);}
+  .layerinfo{
+    min-height:78px; border:1px dashed var(--line); border-radius:12px;
+    padding:12px 14px; color:var(--soft); font-size:15px; margin-top:10px;
+  }
+  .layerinfo b{color:var(--ink);}
+
+  /* comparison */
+  .acc{border:1px solid var(--line); border-radius:12px; background:var(--card); margin:10px 0; overflow:hidden;}
+  .acc>button{
+    all:unset; display:flex; width:100%; padding:14px; cursor:pointer;
+    font-weight:650; align-items:center; gap:10px; box-sizing:border-box;
+  }
+  .acc>button .plus{margin-left:auto; font-family:var(--mono); color:var(--dim);}
+  .acc .body{display:none; padding:0 14px 14px;}
+  .acc.open .body{display:block; animation:fadeup .3s ease;}
+  .acc.open>button .plus{color:var(--amber);}
+  .duel{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  @media(max-width:480px){.duel{grid-template-columns:1fr;}}
+  .duelcard{border-radius:10px; padding:11px 12px; font-size:14.5px; line-height:1.5;}
+  .duelcard .who{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; margin-bottom:5px;}
+  .win{background:rgba(90,167,232,.09); border:1px solid rgba(90,167,232,.35);}
+  .win .who{color:var(--blue);}
+  .lin{background:rgba(111,224,140,.08); border:1px solid rgba(111,224,140,.3);}
+  .lin .who{color:var(--green);}
+
+  /* distro hub */
+  .hubwrap{display:flex; justify-content:center; margin:16px 0 4px;}
+  .hubwrap svg{width:100%; max-width:420px; height:auto;}
+
+  /* tree explorer */
+  .xsplit{display:grid; grid-template-columns:1fr; gap:12px;}
+  .xtree{
+    font-family:var(--mono); font-size:14.5px; background:var(--card);
+    border:1px solid var(--line); border-radius:12px; padding:12px 10px;
+  }
+  .xtree ul{list-style:none; margin:0; padding-left:18px; border-left:1px solid var(--line);}
+  .xtree>ul{padding-left:4px; border-left:none;}
+  .xnode{
+    display:inline-flex; align-items:center; gap:7px; padding:6px 9px; margin:2px 0;
+    border-radius:8px; cursor:pointer; border:1px solid transparent;
+  }
+  .xnode:active{background:var(--panel);}
+  .xnode.dir{color:var(--amber);}
+  .xnode.file{color:var(--ink);}
+  .xnode.sel{border-color:var(--amber); background:var(--panel);}
+  .xkids.closed{display:none;}
+  .xinfo{
+    border:1px dashed var(--line); border-radius:12px; padding:12px 14px;
+    color:var(--soft); font-size:15px; min-height:74px;
+  }
+  .xinfo b{color:var(--ink);}
+  .pathduel{margin-top:14px;}
+
+  /* terminal */
+  .missions{display:flex; flex-direction:column; gap:7px; margin:12px 0;}
+  .mission{
+    display:flex; gap:10px; align-items:flex-start; font-size:14.5px;
+    border:1px solid var(--line); background:var(--card); border-radius:10px; padding:9px 12px;
+  }
+  .mission .mk{
+    font-family:var(--mono); flex:0 0 auto; width:22px; height:22px; border-radius:50%;
+    border:1px solid var(--line); color:var(--dim); display:flex; align-items:center; justify-content:center; font-size:12px;
+  }
+  .mission.done{border-color:rgba(111,224,140,.5);}
+  .mission.done .mk{border-color:var(--green); color:var(--green); background:rgba(111,224,140,.1);}
+  .mission.done .mtext{color:var(--soft); text-decoration:line-through; text-decoration-color:var(--dim);}
+  .mission code{padding:0 5px;}
+  .term{
+    background:#0d1114; border:1px solid var(--line); border-radius:12px;
+    overflow:hidden; margin:12px 0;
+  }
+  .termbar{
+    display:flex; align-items:center; gap:6px; padding:8px 12px;
+    border-bottom:1px solid var(--line); background:#11161b;
+  }
+  .dot{width:10px; height:10px; border-radius:50%; background:var(--line);}
+  .termbar .ttitle{font-family:var(--mono); font-size:11px; color:var(--dim); margin-left:6px;}
+  .termout{
+    font-family:var(--mono); font-size:14px; line-height:1.55; padding:12px;
+    height:230px; overflow-y:auto; white-space:pre-wrap; word-break:break-word;
+  }
+  .tl-cmd{color:var(--ink);}
+  .tl-out{color:var(--green);}
+  .tl-dir{color:var(--amber);}
+  .tl-err{color:var(--red);}
+  .tl-hint{color:var(--dim); font-style:italic;}
+  .termin{
+    display:flex; align-items:center; gap:8px; padding:10px 12px;
+    border-top:1px solid var(--line); background:#11161b;
+  }
+  .prompt{font-family:var(--mono); font-size:13px; color:var(--green); white-space:nowrap;}
+  .termin input{
+    flex:1; background:transparent; border:none; outline:none; color:var(--ink);
+    font-family:var(--mono); font-size:16px; min-width:0;
+  }
+  .runbtn{
+    font-family:var(--mono); font-size:13px; color:var(--green);
+    background:transparent; border:1px solid var(--line); border-radius:8px;
+    padding:8px 13px; cursor:pointer;
+  }
+  .chips{display:flex; flex-wrap:wrap; gap:7px; margin:10px 0 4px;}
+  .chip{
+    font-family:var(--mono); font-size:13px; color:var(--soft);
+    border:1px solid var(--line); border-radius:999px; background:var(--card);
+    padding:7px 12px; cursor:pointer;
+  }
+  .chip:active{color:var(--amber); border-color:var(--amber);}
+  .mirror{
+    border:1px solid var(--line); border-radius:12px; background:var(--card);
+    padding:12px 10px; font-family:var(--mono); font-size:14px; margin-top:12px;
+  }
+  .mirror .mtitle{font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--dim); margin:0 0 8px 4px;}
+  .mirror ul{list-style:none; margin:0; padding-left:18px; border-left:1px solid var(--line);}
+  .mirror>ul{padding-left:4px; border-left:none;}
+  .mnode{display:inline-block; padding:3px 8px; margin:1px 0; border-radius:7px; border:1px solid transparent;}
+  .mnode.dir{color:var(--amber);}
+  .mnode.file{color:var(--ink);}
+  .mnode.here{border-color:var(--green); color:var(--green);}
+  .mnode.grow{animation:grow .5s ease;}
+  @keyframes grow{from{opacity:0; transform:scale(.6);} to{opacity:1; transform:scale(1);}}
+
+  /* verdict */
+  .verd{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:14px 0;}
+  @media(max-width:520px){.verd{grid-template-columns:1fr;}}
+  .verdcard{border-radius:12px; padding:13px 14px; font-size:15px;}
+  .keep{background:rgba(111,224,140,.07); border:1px solid rgba(111,224,140,.3);}
+  .skip{background:rgba(232,122,109,.06); border:1px solid rgba(232,122,109,.3);}
+  .verdcard .vt{font-family:var(--mono); font-size:11px; letter-spacing:.16em; text-transform:uppercase; margin-bottom:7px;}
+  .keep .vt{color:var(--green);}
+  .skip .vt{color:var(--red);}
+  .verdcard ul{margin:0; padding-left:18px; color:var(--soft);}
+  .verdcard li{margin:5px 0;}
+  .cheat{
+    background:#0d1114; border:1px solid var(--line); border-radius:12px;
+    padding:14px; font-family:var(--mono); font-size:14px; line-height:1.9;
+  }
+  .cheat .c{color:var(--green);}
+  .cheat .d{color:var(--dim);}
+
+  /* quiz */
+  .q{border:1px solid var(--line); border-radius:12px; background:var(--card); padding:14px; margin:12px 0;}
+  .q .qt{font-weight:650; margin-bottom:10px;}
+  .opts{display:flex; flex-direction:column; gap:8px;}
+  .opt{
+    border:1px solid var(--line); border-radius:10px; padding:11px 13px;
+    cursor:pointer; font-size:15px; color:var(--soft);
+  }
+  .opt.right{border-color:var(--green); color:var(--green);}
+  .opt.wrong{border-color:var(--red); color:var(--red);}
+  .opt.lock{pointer-events:none;}
+  .score{font-family:var(--mono); color:var(--amber); font-size:15px; margin-top:10px; min-height:24px;}
+
+  footer{max-width:760px; margin:8px auto 30px; padding:0 20px; color:var(--dim); font-size:13px; text-align:center;}
+  #toast{
+    position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(80px);
+    background:var(--card); color:var(--ink); border:1px solid var(--amber);
+    border-radius:999px; padding:10px 18px; font-family:var(--mono); font-size:13px;
+    transition:transform .3s ease; z-index:99; pointer-events:none; max-width:88vw; text-align:center;
+  }
+  #toast.show{transform:translateX(-50%) translateY(0);}
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.001s !important; transition-duration:.001s !important;}
+    html{scroll-behavior:auto;}
+  }
+  .btn:focus-visible,.chip:focus-visible,.opt:focus-visible,.xnode:focus-visible,
+  .layer:focus-visible,.flip:focus-visible,.acc>button:focus-visible,.navchip:focus-visible{
+    outline:2px solid var(--amber); outline-offset:2px;
+  }
+</style>
+<style>
+  .simwrap{margin:14px 0;}
+  .repo{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin:10px 0;}
+  .repohead{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12.5px;color:var(--soft);margin-bottom:8px;}
+  .repohead .dot{width:9px;height:9px;border-radius:50%;background:var(--green);}
+  .filerow{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:13.5px;padding:6px 8px;border-radius:8px;}
+  .filerow:nth-child(odd){background:rgba(255,255,255,.02);}
+  .filerow .fi{color:var(--amber);}
+  .filerow .fp{color:var(--ink);}
+  .filerow.folder .fp{color:var(--blue);}
+  .filerow .badge{margin-left:auto;font-size:10.5px;color:var(--dim);}
+  .urlbar{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-family:var(--mono);font-size:13px;color:var(--soft);margin:10px 0;}
+  .urlbar .lock{color:var(--green);}
+  .urlbar .path{color:var(--ink);word-break:break-all;}
+  .browser{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:10px 0;background:#0e1216;}
+  .browserbar{background:var(--card);border-bottom:1px solid var(--line);padding:8px 12px;font-family:var(--mono);font-size:11.5px;color:var(--soft);display:flex;gap:6px;align-items:center;}
+  .browserbar .b{width:9px;height:9px;border-radius:50%;background:var(--line);}
+  .viewport{padding:20px 16px;min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+  .viewport.ok{color:var(--ink);}
+  .viewport.err{color:var(--red);}
+  .viewport .big{font-size:40px;margin-bottom:6px;}
+  .viewport h4{margin:4px 0;font-size:18px;}
+  .viewport .u{font-family:var(--mono);font-size:12px;color:var(--dim);word-break:break-all;margin-top:8px;}
+  .simbtns{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0;}
+  .picker{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;}
+  .chipbtn{font-family:var(--mono);font-size:12.5px;padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--soft);cursor:pointer;}
+  .chipbtn.on{border-color:var(--amber);color:var(--amber);}
+  /* big hero-spotlight mascot inside a section (light panel so glow/phone shadows vanish) */
+  .mascotspot{text-align:center;margin:6px 0 2px;}
+  .mascotspot img{height:230px;width:auto;filter:drop-shadow(0 10px 22px rgba(0,0,0,.5));}
+  /* tip boxes: mascot is BIG and pokes in at an angle, overlapping the card edge */
+  .tipbox{position:relative;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--amber);border-radius:0 12px 12px 0;padding:16px 16px 16px 118px;margin:22px 0;min-height:96px;}
+  .tipbox .poke{position:absolute;left:-14px;bottom:-8px;height:150px;width:auto;transform:rotate(-8deg);filter:drop-shadow(0 8px 16px rgba(0,0,0,.45));pointer-events:none;}
+  .tipbox.right{border-left:none;border-right:3px solid var(--amber);border-radius:12px 0 0 12px;padding:16px 118px 16px 16px;}
+  .tipbox.right .poke{left:auto;right:-14px;transform:rotate(8deg);}
+  .tipbox.big{padding-left:150px;min-height:130px;}
+  .tipbox.big .poke{height:200px;left:-22px;}
+  .tipbox .tt{font-weight:700;color:var(--amber);font-size:15px;}
+  .tipbox .tp{margin:4px 0 0;font-size:14.5px;color:var(--soft);line-height:1.55;}
+  .missions{margin:14px 0;}
+  .mission{display:flex;gap:10px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin:8px 0;}
+  .mission .mx{flex:0 0 auto;width:22px;height:22px;border-radius:50%;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--dim);margin-top:1px;}
+  .mission.done .mx{border-color:var(--green);color:var(--green);background:rgba(111,224,140,.12);}
+  .mission .mtext{font-size:14.5px;}
+  .mission .mtext b{color:var(--amber);}
+  .backhub{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:12px;color:var(--soft);border:1px solid var(--line);border-radius:999px;padding:7px 13px;background:var(--card);text-decoration:none;}
+  .backhub:active{border-color:var(--amber);color:var(--amber);}
+  .quizq{margin:16px 0;}
+  .quizq .q{font-weight:600;margin-bottom:8px;}
+  .quizopt{display:block;width:100%;text-align:left;font-size:14.5px;padding:11px 14px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;margin:6px 0;font-family:var(--sans);}
+  .quizopt.sel{border-color:var(--amber);}
+  .quizopt.right{border-color:var(--green);background:rgba(111,224,140,.1);}
+  .quizopt.wrong{border-color:var(--red);background:rgba(232,122,109,.1);}
+  .qresult{font-weight:700;margin-top:10px;}
+
+.phonerow{display:flex;gap:12px;justify-content:center;margin:14px 0;flex-wrap:wrap;}
+.phone{flex:1 1 140px;max-width:180px;border:2px solid var(--line);border-radius:18px;background:#0e1216;padding:10px 10px 14px;}
+.phone .pcap{font-family:var(--mono);font-size:11px;color:var(--dim);text-align:center;margin-bottom:8px;letter-spacing:.08em;}
+.phone .pscreen{min-height:92px;border-radius:10px;background:var(--card);border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:10px;}
+.phone .pscreen .big{font-size:30px;font-weight:700;color:var(--teal);line-height:1;}
+.phone .pscreen .lbl{font-family:var(--mono);font-size:10.5px;color:var(--dim);margin-top:6px;}
+.phone .pscreen.empty .big{color:var(--dim);}
+.phone .pbtns{display:flex;gap:6px;margin-top:8px;}
+.phone .pbtn{flex:1;font-family:var(--mono);font-size:11px;padding:7px 4px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--soft);cursor:pointer;text-align:center;}
+.phone .pbtn:active{border-color:var(--teal);color:var(--teal);}
+.cloudbox{text-align:center;margin:8px 0 2px;}
+.cloudbox .cloud{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;color:var(--soft);border:1px dashed var(--line);border-radius:999px;padding:7px 15px;background:var(--card);}
+.cloudbox .cloud .cval{color:var(--teal);font-weight:700;}
+.cloudbox.off .cloud{opacity:.4;}
+.storepick{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;justify-content:center;}
+.tierchip{font-family:var(--mono);font-size:12px;padding:8px 13px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--soft);cursor:pointer;}
+.tierchip.on{border-color:var(--teal);color:var(--teal);background:rgba(69,212,196,.1);font-weight:700;}
+.ttab.on.general{border-color:var(--teal) !important;color:var(--teal) !important;background:rgba(69,212,196,.1) !important;}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="wordmark">All Thumbs &middot; chapter 8</div>
+    <h1>Where Data Lives</h1>
+    <p class="subtitle">Why your progress is on this phone and nowhere else, and how to fix that.</p>
+  </div>
+  <button class="vbadge" id="vbadge" type="button">v0.1</button>
+</header>
+
+<nav>
+  <div class="navrow">
+    <a class="navchip" href="#idea">the idea</a>
+    <a class="navchip" href="#three">three places</a>
+    <a class="navchip" href="#wall">the wall you hit</a>
+    <a class="navchip" href="#cloud">the shared cabinet</a>
+    <a class="navchip" href="#sync">sync</a>
+    <a class="navchip" href="#missions">missions</a>
+    <a class="navchip" href="#gym">gym</a>
+    <a class="navchip" href="#quiz">quiz</a>
+  </div>
+</nav>
+
+<main>
+
+<section id="idea">
+  <p class="eyebrow">what data even is</p>
+  <h2>Data is just the stuff your app has to remember</h2>
+  <div class="mascotspot"><img src="thumb-data.png" alt="mascot holding a storage box"></div>
+  <p>A high score. A checklist someone ticked. Which level they reached. The toast message with their name in it. All of that is <b>data</b>: facts your app wants to still know next time it runs.</p>
+  <p>Here is the thing nobody tells you at the start. When your app remembers something, it remembers it <b>somewhere</b>, and that somewhere decides who else can ever see it. Pick the wrong somewhere and your kid opens the same game on his iPad to a blank slate, with none of the progress he had on your phone. That is not a bug. That is a storage choice you made without knowing you made it.</p>
+  <div class="note">This chapter is the one that explains the thing you have actually been fighting: progress that lives on one device and refuses to show up on another.</div>
+</section>
+
+<section id="three">
+  <p class="eyebrow">three places</p>
+  <h2>A web app can keep data in three places</h2>
+  <p>From most forgetful to most permanent:</p>
+  <p><b>1. In a variable (memory).</b> A number the page holds while it is open. Close the tab and it is gone, instantly and completely. Good for a score <i>during</i> one game. Useless the moment they leave.</p>
+  <p><b>2. In localStorage (this one browser).</b> The browser hands every site a little drawer it keeps between visits. Save the score there and it is still there tomorrow. But that drawer belongs to <b>this browser on this one device</b>. Another phone, another browser, even the same phone in a private tab, gets a different, empty drawer.</p>
+  <p><b>3. In a database (the cloud).</b> A cabinet that lives on someone else's always-on computer. Your app sends the data up and pulls it back down. Because it is not on any one device, every device that signs in sees the same thing.</p>
+  <p>Try all three below. Save a score on the left phone, then look at the right phone, which is a <b>different device</b>. Watch what crosses over and what does not.</p>
+
+  <div class="simwrap">
+    <div class="storepick" id="tierPick">
+      <button class="tierchip on" data-tier="mem" type="button">variable</button>
+      <button class="tierchip" data-tier="local" type="button">localStorage</button>
+      <button class="tierchip" data-tier="cloud" type="button">database</button>
+    </div>
+    <div class="cloudbox off" id="cloudBox"><div class="cloud">cloud cabinet: <span class="cval" id="cloudVal">empty</span></div></div>
+    <div class="phonerow">
+      <div class="phone">
+        <div class="pcap">your phone</div>
+        <div class="pscreen empty" id="scrA"><div class="big" id="valA">-</div><div class="lbl">high score</div></div>
+        <div class="pbtns">
+          <button class="pbtn" id="saveA" type="button">save 100</button>
+          <button class="pbtn" id="closeA" type="button">close app</button>
+        </div>
+      </div>
+      <div class="phone">
+        <div class="pcap">garrett's ipad</div>
+        <div class="pscreen empty" id="scrB"><div class="big" id="valB">-</div><div class="lbl">high score</div></div>
+        <div class="pbtns">
+          <button class="pbtn" id="openB" type="button">open app</button>
+        </div>
+      </div>
+    </div>
+    <div class="note" id="tierNote">Variable: the score lives in memory on your phone only. Close the app and it is gone. The iPad never sees it.</div>
+  </div>
+</section>
+
+<section id="wall">
+  <p class="eyebrow">the wall you hit</p>
+  <h2>localStorage is a drawer, not a shared cabinet</h2>
+  <p>localStorage feels like real saving, because it survives closing the app. That is why it fools everyone. It is perfect for a solo app: a drawing pad, a single-player game, a notes tool for yourself.</p>
+  <p>It hits a wall the instant two people, or two devices, need the same data. Your phone's drawer and the iPad's drawer are separate drawers in separate rooms. Nothing you save in one appears in the other. There is no secret link between them, because localStorage was never meant to leave the device.</p>
+  <div class="tipbox big">
+    <img class="poke" src="thumb-think.png" alt="">
+    <div class="tt">The question that tells you which to use</div>
+    <p class="tp">Ask: does anyone on another device need to see this? No, it is just for me on this phone, localStorage is fine and free. Yes, a family high score, a shared checklist, two players, you need the cloud. That one question saves you a rebuild.</p>
+  </div>
+</section>
+
+<section id="cloud">
+  <p class="eyebrow">the shared cabinet</p>
+  <h2>A database is just a drawer everyone can reach</h2>
+  <p>A <b>database</b> is storage that does not live on any player's device. It lives on a computer that stays on all the time (a server), reachable over the internet. Your app sends data up to it and asks for data back from it. Because every device talks to the <b>same</b> cabinet, they all see the same contents.</p>
+  <p><b>Firebase</b> is one of these, made by Google, with a free tier that is plenty for a family app. People say "Firebase" or "Firestore" the way they say "GitHub Pages" for hosting: a specific free service that does the general job. It hands your app two things: a place to store data (the cabinet) and a way to say who is who (sign-in), so the right person gets the right drawer inside it.</p>
+  <p>You do not have to run the server, patch it, or keep it awake. That is the whole point of a service like Firebase: the always-on computer is someone else's problem. You just send and receive.</p>
+  <div class="tipbox right">
+    <img class="poke" src="thumb-aha.png" alt="">
+    <div class="tt">Public config is not a password</div>
+    <p class="tp">A Firebase app carries a config block right in the page, and it looks like a secret. It is not. It only names which cabinet to talk to. What actually protects the data is the rules you set on the cabinet, deciding who may read and write. Lock the rules, not the config.</p>
+  </div>
+</section>
+
+<section id="sync">
+  <p class="eyebrow">sync</p>
+  <h2>Sync is both devices watching the same drawer</h2>
+  <p>Here is the magic that makes a cloud app feel alive. Each device does not just read the cabinet once. It <b>subscribes</b>: it asks the database to tell it the moment anything changes. So when your phone writes a new high score, the iPad is listening, and its screen updates on its own, within a second, with nobody refreshing anything.</p>
+  <p>That is a <b>live listener</b>. Your phone writes, the cabinet changes, every subscribed device hears about it and redraws. It is the difference between a photo and a video call. Flip the cloud on below and watch the save on one phone appear on the other by itself.</p>
+
+  <div class="simwrap">
+    <div class="storepick">
+      <button class="btn primary" id="syncSave" type="button">save 250 on your phone</button>
+      <button class="btn" id="syncReset" type="button">reset both</button>
+    </div>
+    <div class="cloudbox" id="syncCloud"><div class="cloud">cloud cabinet: <span class="cval" id="syncCloudVal">empty</span> &middot; <span id="syncListen">2 devices listening</span></div></div>
+    <div class="phonerow">
+      <div class="phone">
+        <div class="pcap">your phone</div>
+        <div class="pscreen empty" id="scrSA"><div class="big" id="valSA">-</div><div class="lbl">high score</div></div>
+      </div>
+      <div class="phone">
+        <div class="pcap">garrett's ipad</div>
+        <div class="pscreen empty" id="scrSB"><div class="big" id="valSB">-</div><div class="lbl">high score</div></div>
+      </div>
+    </div>
+    <div class="note">With a live listener, you save on one device and the other updates itself. No refresh, no re-open. That is what "synced" means.</div>
+  </div>
+</section>
+
+<section id="missions">
+  <p class="eyebrow">missions</p>
+  <h2>Prove it</h2>
+  <p>Six things to make happen using the sandboxes above. They tick off as you go.</p>
+  <div class="missions" id="missionList"></div>
+</section>
+
+<section id="gym">
+  <p class="eyebrow">the gym</p>
+  <h2>Practice: will the other device see it?</h2>
+  <p class="small soft">Randomized drills. You are shown where an app saves something, and you call whether a second device (or the same app after closing) will see that data. Hints cost nothing but pride; skipping resets your streak.</p>
+  <div class="tracktoggle">
+    <span class="tlabel">practice</span>
+    <button class="ttab general on" id="trackGeneral" type="button">General</button>
+    <button class="ttab trail" id="trackTrail" type="button">The Trail</button>
+  </div>
+  <div class="trailbanner" id="trailBanner">The Trail: real storage calls from Mot's builds, the content:// progress loss, the Game Shelf going to Firebase, the buzzer learning project.</div>
+  <div class="gym">
+    <div class="gymstats"><span>reps<b id="repN">0</b></span><span>streak<b id="strN">0</b></span><span>best<b id="bestN">0</b></span></div>
+    <div class="gymtabs" id="gymTabs"></div>
+    <div class="gymcard" id="gymCard">
+      <div class="ggoal" id="gGoal">Pick a level (or Surprise me) and tap <b>Start drill</b>.</div>
+      <div id="gymBoard"></div>
+      <div class="ghint" id="gHint"></div>
+      <div class="gbtns">
+        <button class="btn primary" id="gStart" type="button">Start drill</button>
+        <button class="btn" id="gAnswerYes" type="button" style="display:none">It syncs</button>
+        <button class="btn" id="gAnswerNo" type="button" style="display:none">It is stuck</button>
+        <button class="btn" id="gHintBtn" type="button" style="display:none">Hint</button>
+        <button class="btn" id="gSkip" type="button" style="display:none">Skip</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="quiz">
+  <p class="eyebrow">quiz</p>
+  <h2>Five questions</h2>
+  <div id="quizBox"></div>
+</section>
+
+<div style="text-align:center;margin:24px 0 8px;">
+  <a class="backhub" href="index.html">&larr; back to All Thumbs</a>
+</div>
+
+</main>
+<footer style="text-align:center;color:var(--dim);font-size:12px;padding:20px;">Where Data Lives &middot; a curiosity tool &middot; nothing here saves anywhere real</footer>
+<div id="toast" role="status"></div>
+</body>
+
+<script>
+"use strict";
+var VERSION = "v0.1 · Oct 21";
+var STORE_KEY = "data101_v1";
+
+/* ---------- guarded storage ---------- */
+var memStore = {};
+function loadState(){
+  try{ var raw = localStorage.getItem(STORE_KEY); if(raw) return JSON.parse(raw); }catch(e){}
+  return memStore[STORE_KEY] || { m:{}, quizBest:0, gym:{ reps:0, streak:0, best:0 } };
+}
+function saveState(s){
+  memStore[STORE_KEY] = s;
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(s)); }catch(e){}
+}
+function getState(){
+  var s = loadState();
+  if(!s.m) s.m = {};
+  if(!s.gym) s.gym = { reps:0, streak:0, best:0 };
+  if(typeof s.quizBest !== "number") s.quizBest = 0;
+  return s;
+}
+
+/* ---------- DATA ENGINE (pure, testable) ----------
+   Three storage tiers decide what survives and what crosses devices:
+     "mem"   - a variable: lost when the app closes, never leaves the device
+     "local" - localStorage: survives close, stays on THIS device/browser only
+     "cloud" - a database: survives everything, visible on every signed-in device
+   survivesClose(tier): does the value still exist after the app is closed and reopened?
+   visibleOnOtherDevice(tier): can a different device see it?
+   syncs(tier): shorthand the gym uses - does a second device see this write? (== cloud)
+*/
+function survivesClose(tier){ return tier === "local" || tier === "cloud"; }
+function visibleOnOtherDevice(tier){ return tier === "cloud"; }
+function syncs(tier){ return tier === "cloud"; }
+
+/* ---------- small DOM helpers ---------- */
+function $(id){ return document.getElementById(id); }
+function el(tag, cls, html){ var e=document.createElement(tag); if(cls)e.className=cls; if(html!=null)e.innerHTML=html; return e; }
+function toast(msg){ var t=$("toast"); if(!t)return; t.textContent=msg; t.className="show"; setTimeout(function(){t.className="";},1600); }
+
+/* ---------- three-places sandbox ---------- */
+var tier = "mem";
+var devA = null;   // value on your phone (what's showing)
+var devAStored = null; // value actually persisted for A given the tier
+var cloud = null;  // value in the cloud cabinet
+var TIER_NOTE = {
+  mem:   "Variable: the score lives in memory on your phone only. Close the app and it is gone. The iPad never sees it.",
+  local: "localStorage: the score survives closing the app on your phone. But it is this device's private drawer, so the iPad still sees nothing.",
+  cloud: "Database: the score goes up to a shared cabinet. Close and reopen, it is still there, and the iPad sees it too, because both talk to the same cabinet."
+};
+function renderThree(){
+  var sa=$("scrA"), va=$("valA"), sb=$("scrB"), vb=$("valB"), cb=$("cloudBox"), cv=$("cloudVal");
+  va.textContent = devA==null ? "-" : devA;
+  sa.className = "pscreen" + (devA==null?" empty":"");
+  vb.textContent = (cloud!=null && visibleOnOtherDevice(tier)) ? "-" : "-"; // B only fills when opened
+  // cloud box
+  if(tier==="cloud"){ cb.className="cloudbox"; cv.textContent = cloud==null?"empty":cloud; }
+  else { cb.className="cloudbox off"; cv.textContent = "not used"; }
+  $("tierNote").innerHTML = TIER_NOTE[tier];
+}
+function setTier(t){
+  tier=t; devA=null; devAStored=null; cloud=null;
+  var vb=$("valB"), sb=$("scrB"); if(vb){vb.textContent="-"; sb.className="pscreen empty";}
+  [].forEach.call(document.querySelectorAll("#tierPick .tierchip"),function(x){ x.classList.toggle("on", x.getAttribute("data-tier")===t); });
+  renderThree();
+}
+function saveOnA(){
+  devA = 100;
+  if(tier==="local") devAStored = 100;
+  if(tier==="cloud"){ devAStored = 100; cloud = 100; }
+  if(tier==="mem") devAStored = null;
+  renderThree();
+  markMission("save");
+  if(tier==="cloud") markMission("cloudsave");
+}
+function closeA(){
+  // reopen: A shows only what persisted for this tier
+  devA = survivesClose(tier) ? (tier==="cloud" ? cloud : devAStored) : null;
+  renderThree();
+  if(tier==="mem") markMission("memloss");
+}
+function openB(){
+  var vb=$("valB"), sb=$("scrB");
+  if(visibleOnOtherDevice(tier) && cloud!=null){ vb.textContent=cloud; sb.className="pscreen"; markMission("cross"); }
+  else { vb.textContent="-"; sb.className="pscreen empty"; toast("nothing here on this device"); }
+}
+function initThree(){
+  var pick=$("tierPick");
+  if(pick) pick.addEventListener("click",function(e){ var b=e.target.closest("[data-tier]"); if(b) setTier(b.getAttribute("data-tier")); });
+  if($("saveA")) $("saveA").addEventListener("click", saveOnA);
+  if($("closeA")) $("closeA").addEventListener("click", closeA);
+  if($("openB")) $("openB").addEventListener("click", openB);
+  renderThree();
+}
+
+/* ---------- sync sandbox ---------- */
+var syncCloud=null;
+function renderSync(){
+  var a=$("valSA"), sa=$("scrSA"), b=$("valSB"), sb=$("scrSB"), cv=$("syncCloudVal");
+  a.textContent = syncCloud==null?"-":syncCloud; sa.className="pscreen"+(syncCloud==null?" empty":"");
+  b.textContent = syncCloud==null?"-":syncCloud; sb.className="pscreen"+(syncCloud==null?" empty":"");
+  cv.textContent = syncCloud==null?"empty":syncCloud;
+}
+function initSync(){
+  if($("syncSave")) $("syncSave").addEventListener("click", function(){
+    // write on A -> cloud changes -> both listeners redraw (simulated with a tiny delay on B)
+    syncCloud = 250;
+    var a=$("valSA"), sa=$("scrSA"); a.textContent=250; sa.className="pscreen";
+    $("syncCloudVal").textContent=250;
+    setTimeout(function(){ var b=$("valSB"), sb=$("scrSB"); if(b){ b.textContent=250; sb.className="pscreen"; } markMission("sync"); }, 650);
+  });
+  if($("syncReset")) $("syncReset").addEventListener("click", function(){ syncCloud=null; renderSync(); });
+  renderSync();
+}
+
+/* ---------- missions ---------- */
+var MISSIONS = [
+  { id:"save",      text:"Save a score on your phone in any tier." },
+  { id:"memloss",   text:"With <b>variable</b> selected, close the app and watch the score vanish." },
+  { id:"cross",     text:"Get the score to show on the iPad (open it after a cloud save)." },
+  { id:"cloudsave", text:"Save once using the <b>database</b> tier." },
+  { id:"sync",      text:"In the sync sandbox, save on one phone and watch the other update itself." },
+  { id:"gym",       text:"Land one gym drill correct." }
+];
+function renderMissions(){
+  var box=$("missionList"); if(!box)return; var s=getState(); box.innerHTML="";
+  MISSIONS.forEach(function(m){
+    var done=!!s.m[m.id];
+    var row=el("div","mission"+(done?" done":""));
+    row.innerHTML = "<span class='mk'>"+(done?"✓":"")+"</span><span class='mtext'>"+m.text+"</span>";
+    box.appendChild(row);
+  });
+}
+function markMission(id){ var s=getState(); if(!s.m[id]){ s.m[id]=true; saveState(s); renderMissions(); toast("mission done"); } }
+
+/* ---------- GYM: will the other device see it? ---------- */
+function rn(list){ return list[Math.floor(Math.random()*list.length)]; }
+var G_THINGS = ["a high score","a saved checklist","the current level","a brush setting","a daily streak","a player name"];
+var G_APPS = ["a solo drawing app","a single-player game","a notes app","a family game","a two-player game","a shared tracker"];
+
+function makeDrill(level){
+  // level 0: variable -> does it survive closing? (no)
+  // level 1: localStorage -> does a second device see it? (no)
+  // level 2: cloud -> does a second device see it? (yes)
+  // level 3: mixed - pick a tier, ask the sync question
+  var thing = rn(G_THINGS);
+  var t, story, loads;
+  if(level===0){ t="mem";
+    story = "An app keeps <b>"+thing+"</b> in a <b>variable</b> only. The player closes the app and reopens it. Is the value still there?";
+    loads = survivesClose(t);
+  } else if(level===1){ t="local";
+    story = "An app saves <b>"+thing+"</b> in <b>localStorage</b> on a phone. The player opens the same app on a different tablet. Does the tablet see it?";
+    loads = visibleOnOtherDevice(t);
+  } else if(level===2){ t="cloud";
+    story = "An app writes <b>"+thing+"</b> to a <b>database</b> (Firebase). A second signed-in device opens the app. Does it see the value?";
+    loads = visibleOnOtherDevice(t);
+  } else {
+    t = rn(["mem","local","cloud"]);
+    var tierName = t==="mem"?"a variable":(t==="local"?"localStorage":"a database");
+    story = "An app stores <b>"+thing+"</b> in <b>"+tierName+"</b>. A second device needs to see it. Does it sync across?";
+    loads = syncs(t);
+  }
+  var hint = loads
+    ? "It is in the cloud cabinet, which every device shares, so a second device sees it."
+    : (t==="mem"
+        ? "A variable lives in memory and is wiped when the app closes. Nothing survives, let alone crosses devices."
+        : "localStorage is this device's private drawer. It survives closing, but never leaves the device, so a second device sees nothing.");
+  return { story:story, loads:loads, hint:hint };
+}
+
+/* ---------- TRAIL drills: real cases from Mot's builds ---------- */
+var TRAIL_CASES = [
+  { story:"The content:// problem. You open a Game Shelf game straight from Downloads to test it. Progress seems to reset every time. The score was saved to <b>localStorage</b>. Will it reliably persist and sync?",
+    loads:false, hint:"Opened from content:// it is barely even a normal page, localStorage can come back empty, and localStorage never crosses devices anyway. This is why testing from Downloads lies to you. Open the real https:// URL." },
+  { story:"Early Game Shelf. Every game saved high scores to <b>localStorage</b>. It worked great on your phone. Then the family tried it on other devices and everyone had their own separate scores. Does one device's score show on another?",
+    loads:false, hint:"localStorage is per-device. Each phone and tablet had its own private drawer. This is the exact wall that pushed the shelf toward Firebase." },
+  { story:"Game Shelf after the move to <b>Firebase</b>. A game writes a new high score to Firestore. Garrett beats it on his iPad. Does your phone see his new score?",
+    loads:true, hint:"Firestore is the shared cabinet with live listeners. His iPad writes, your phone is subscribed, your screen updates on its own. That is the whole reason you added Firebase." },
+  { story:"The buzzer learning project. Two phones join the same room. Phone one hits the buzzer, the state is written to <b>Firebase</b> with a live listener. Does phone two see it light up?",
+    loads:true, hint:"That project exists specifically to learn real-time sync: write to Firestore, both phones listen, both update within a second. Yes, it syncs." },
+  { story:"A solo drawing app you built for yourself. It saves your canvas to <b>localStorage</b>. You never open it anywhere but your own phone. Is localStorage the right call here?",
+    loads:false, hint:"Trick framing: nothing to sync, so the honest answer to 'does another device see it' is no, and that is fine. For a solo app, localStorage is correct, free, and needs no server. Not every app needs the cloud." },
+  { story:"A family checklist app. Everyone needs to see the same ticked boxes. You build it on <b>localStorage</b> first because it is easier. Will the family actually share one list?",
+    loads:false, hint:"No. Shared data across people means the cloud, full stop. localStorage would give each person their own private checklist. This is the question to ask before building, not after." },
+  { story:"Pigment, your color app for Garrett, saves his palettes to <b>localStorage</b> on his iPad, the only device he uses it on. Does that choice work for what it needs?",
+    loads:false, hint:"Again the honest sync answer is no (it will not appear elsewhere), but for a single-device personal app that is the right, simple choice. Cloud would be overkill." },
+  { story:"Mot OS, meant to be your personal dashboard across phone and laptop. You want the same data on both. Which answer do you need: does <b>localStorage</b> get it onto both devices?",
+    loads:false, hint:"No. Same person, two devices, still needs the cloud. localStorage on the phone never reaches the laptop. This is why Mot OS was flagged for a Firebase migration." }
+];
+function makeTrailDrill(){ return TRAIL_CASES[Math.floor(Math.random()*TRAIL_CASES.length)]; }
+
+var gym = { level:-1, drill:null, answered:false, track:"general" };
+var GYM_LEVELS = [ {lv:0,name:"survives close"}, {lv:1,name:"localStorage"}, {lv:2,name:"database"}, {lv:3,name:"mixed"} ];
+function gymStatsRender(){ var s=getState(); if($("repN"))$("repN").textContent=s.gym.reps||0; if($("strN"))$("strN").textContent=s.gym.streak||0; if($("bestN"))$("bestN").textContent=s.gym.best||0; }
+function renderGymTabs(){
+  var box=$("gymTabs"); if(!box)return; box.innerHTML="";
+  var all=el("button","gtab"+(gym.level===-1?" on":""),"Surprise me");
+  all.addEventListener("click",function(){ gym.level=-1; renderGymTabs(); }); box.appendChild(all);
+  GYM_LEVELS.forEach(function(L){ var t=el("button","gtab"+(gym.level===L.lv?" on":""),L.name); t.addEventListener("click",function(){ gym.level=L.lv; renderGymTabs(); }); box.appendChild(t); });
+}
+function gymStart(){
+  if(gym.track==="trail"){ gym.drill=makeTrailDrill(); }
+  else { var lv = gym.level===-1 ? Math.floor(Math.random()*4) : gym.level; gym.drill=makeDrill(lv); }
+  gym.answered=false;
+  var card=$("gymCard"); card.className="gymcard active"+(gym.track==="trail"?" trailmode":"");
+  $("gGoal").innerHTML="Will the other device see it?";
+  $("gymBoard").innerHTML="<div class='note' style='margin-top:10px'>"+gym.drill.story+"</div>";
+  $("gHint").className="ghint"; $("gHint").innerHTML="";
+  $("gStart").style.display="none"; $("gAnswerYes").style.display=""; $("gAnswerNo").style.display="";
+  $("gHintBtn").style.display=""; $("gSkip").style.display="";
+}
+function gymAnswer(saidYes){
+  if(gym.answered||!gym.drill)return; gym.answered=true;
+  var s=getState(); var correct=(saidYes===gym.drill.loads); var card=$("gymCard");
+  if(correct){
+    s.gym.reps=(s.gym.reps||0)+1; s.gym.streak=(s.gym.streak||0)+1;
+    if(s.gym.streak>(s.gym.best||0)) s.gym.best=s.gym.streak; saveState(s);
+    card.className="gymcard win"+(gym.track==="trail"?" trailmode":"");
+    $("gGoal").innerHTML="Correct. "+(gym.drill.loads?"It syncs.":"It is stuck on one device.");
+    markMission("gym");
+  } else {
+    s.gym.streak=0; saveState(s);
+    card.className="gymcard"+(gym.track==="trail"?" trailmode":"");
+    $("gGoal").innerHTML="Not quite. "+(gym.drill.loads?"It actually syncs.":"It is actually stuck on one device.");
+  }
+  $("gHint").className="ghint show"; $("gHint").innerHTML=gym.drill.hint; gymStatsRender();
+  $("gAnswerYes").style.display="none"; $("gAnswerNo").style.display="none";
+  $("gHintBtn").style.display="none"; $("gSkip").style.display="none";
+  $("gStart").style.display=""; $("gStart").textContent="Next drill";
+}
+function gymSkip(){
+  var s=getState(); s.gym.streak=0; saveState(s); gymStatsRender();
+  if(gym.drill){ $("gHint").className="ghint show"; $("gHint").innerHTML="Answer: "+(gym.drill.loads?"it syncs.":"stuck on one device.")+" "+gym.drill.hint; }
+  gym.answered=true;
+  $("gAnswerYes").style.display="none"; $("gAnswerNo").style.display="none";
+  $("gHintBtn").style.display="none"; $("gSkip").style.display="none";
+  $("gStart").style.display=""; $("gStart").textContent="Next drill";
+}
+function setTrack(t){
+  gym.track=t;
+  var g=$("trackGeneral"), tr=$("trackTrail"), tabs=$("gymTabs"), ban=$("trailBanner");
+  if(g)g.classList.toggle("on",t==="general"); if(tr)tr.classList.toggle("on",t==="trail");
+  if(tabs)tabs.style.display=(t==="trail")?"none":""; if(ban)ban.className="trailbanner"+(t==="trail"?" show":"");
+  var card=$("gymCard"); if(card)card.className="gymcard";
+  if($("gGoal"))$("gGoal").innerHTML=(t==="trail")?"Real cases from the build. Tap <b>Start drill</b>.":"Pick a level (or Surprise me) and tap <b>Start drill</b>.";
+  if($("gymBoard"))$("gymBoard").innerHTML="";
+  if($("gHint")){$("gHint").className="ghint"; $("gHint").innerHTML="";}
+  ["gAnswerYes","gAnswerNo","gHintBtn","gSkip"].forEach(function(id){ if($(id))$(id).style.display="none"; });
+  if($("gStart")){$("gStart").style.display=""; $("gStart").textContent="Start drill";}
+}
+function initGym(){
+  renderGymTabs(); gymStatsRender();
+  if($("trackGeneral"))$("trackGeneral").addEventListener("click",function(){setTrack("general");});
+  if($("trackTrail"))$("trackTrail").addEventListener("click",function(){setTrack("trail");});
+  if($("gStart"))$("gStart").addEventListener("click",gymStart);
+  if($("gAnswerYes"))$("gAnswerYes").addEventListener("click",function(){gymAnswer(true);});
+  if($("gAnswerNo"))$("gAnswerNo").addEventListener("click",function(){gymAnswer(false);});
+  if($("gHintBtn"))$("gHintBtn").addEventListener("click",function(){ if(gym.drill){$("gHint").className="ghint show"; $("gHint").innerHTML=gym.drill.hint;} });
+  if($("gSkip"))$("gSkip").addEventListener("click",gymSkip);
+}
+
+/* ---------- quiz ---------- */
+var QUIZ = [
+  { q:"Your app keeps a score in a plain variable. The player closes the tab. What happens to the score?",
+    opts:["It is saved for next time","It is gone, variables live only while the page is open","It moves to the cloud","It goes to localStorage automatically"], a:1 },
+  { q:"localStorage saves data where?",
+    opts:["On a shared server everyone reaches","In this one browser on this one device","On Garrett's iPad too","Inside the Firebase cabinet"], a:1 },
+  { q:"You want a family high score every device can see. Which storage do you need?",
+    opts:["A variable","localStorage","A database in the cloud, like Firebase","None, it happens automatically"], a:2 },
+  { q:"What makes a second device update on its own when the first one saves?",
+    opts:["A faster phone","A live listener subscribed to the database","Refreshing the page over and over","A bigger localStorage drawer"], a:1 },
+  { q:"The Firebase config block sits right in your page. Is it the thing protecting your data?",
+    opts:["Yes, hide it like a password","No, it just names the cabinet, the security rules protect the data","Yes, without it anyone edits your data","It is only for styling"], a:1 }
+];
+var quizAnswered={};
+function renderQuiz(){
+  var box=$("quizBox"); if(!box)return; box.innerHTML="";
+  QUIZ.forEach(function(item,qi){
+    var wrap=el("div","quizq"); wrap.appendChild(el("div","q",(qi+1)+". "+item.q));
+    item.opts.forEach(function(opt,oi){
+      var b=el("button","quizopt",opt);
+      b.addEventListener("click",function(){
+        if(quizAnswered[qi]!=null)return; quizAnswered[qi]=oi;
+        var kids=wrap.querySelectorAll(".quizopt"); kids[item.a].classList.add("right");
+        if(oi!==item.a)b.classList.add("wrong");
+        var got=0,ans=0; for(var k in quizAnswered){ans++; if(quizAnswered[k]===QUIZ[k].a)got++;}
+        if(ans===QUIZ.length){ var s=getState(); if(got>(s.quizBest||0)){s.quizBest=got; saveState(s);}
+          box.appendChild(el("div","qresult","You got "+got+" / "+QUIZ.length+(got===QUIZ.length?", perfect.":"."))); }
+      });
+      wrap.appendChild(b);
+    });
+    box.appendChild(wrap);
+  });
+}
+
+/* ---------- badge + boot ---------- */
+function initBadge(){ var b=$("vbadge"); if(!b)return; b.textContent=VERSION.split(" ")[0]; b.addEventListener("click",function(){ toast("Where Data Lives · "+VERSION); }); }
+function initApp(){ initBadge(); initThree(); initSync(); renderMissions(); initGym(); renderQuiz(); }
+if(typeof window!=="undefined" && typeof document!=="undefined"){
+  if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",initApp); } else { initApp(); }
+}
+if(typeof module!=="undefined" && module.exports){
+  module.exports = { survivesClose:survivesClose, visibleOnOtherDevice:visibleOnOtherDevice, syncs:syncs, makeDrill:makeDrill, makeTrailDrill:makeTrailDrill };
+}
+</script>
+
+</html>

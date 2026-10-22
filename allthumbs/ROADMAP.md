@@ -1,5 +1,39 @@
 # All Thumbs — course roadmap and state
 
+## v1.20 (Oct 22 2026) - Chapter 10: The Shelf Dissected (KEYSTONE). Tier 2 complete.
+
+- NEW chapter: shelf-dissected.html (storage key shelf101_v1, brass accent #d9b35a, thumb-beside-phone hero, cool + nice poke-ins). The keystone: Mot's real Game Shelf taken apart. NOT a simulator: every number, file name and bug is read from the live motbuchanan/gameshelf repo (cloned with history on Oct 22) and AUDIT-2026-07.md. Facts baked in: 84 HTML pages, 282 commits (Jun 9 to Oct 21; 114/40/29/48/51 per month), 47 GAME_KEYS, sw cache gameshelf-v70 with 135 precached files, Firestore project buchanan-gameshelf, 4 onSnapshot listeners, GN.room (create/join/pushState/start/watch) live in Trouble, zero GN.room calls in Connect 4 yet.
+- Sections: what it is (stat tiles) / anatomy (6 tappable parts, each mapped to the chapter that taught it) / adding a game (the four interlocking registrations as a checklist simulator: tick what you did, ship, read the silent bugs; engine registerGame(flags) maps each miss to its real failure) / the service worker (network-first, precache, the cache-name bump as deploy ritual) / the cabinet (gamenight.js, GAME_KEYS, the v34 orphan-record push-back bug walked step by step, GN.room) / timeline (commits-per-month bars + 7 real milestones). 6 missions, "ships clean or silent bug?" gym with 4 general levels, 8 Trail cases straight from the audit (arcade GAME_KEYS, Scrabble NAMES, chess shelf_tv vs gn_tv, network-first single-file edits, the v7-v16 deploy burst, the 67-ref link audit, Connect 4 room gap, deterministic labels), 5-question quiz.
+- Hub bumped to v1.20: "The Shelf Dissected" row added, 10 chapters. Visible badge + VERSION var both updated.
+- Deploy zip carries all three unshipped chapters (data, api, shelf) + hub + roadmap, since v1.18/v1.19 had not landed when this was built.
+- Validated: 0 em/en dashes, 0 Jekyll tokens, node --check, acorn, 12 engine unit tests, 21-assertion jsdom smoke.
+
+TIER 2 COMPLETE (ch8 data, ch9 API, ch10 keystone). Tier 3 next, Mot's pick: CI/CD and GitHub Actions (the validation gates as a workflow he owns), or the AI image/video strand (the mascot pipeline as the worked example), or the Firebase/backend chapter via the buzzer project.
+
+
+## v1.19 (Oct 22 2026) - Chapter 9: The Order Window (APIs)
+
+- NEW chapter: api-basics.html "The Order Window" (storage key api101_v1, coral accent #ff9a6b, thumb-api mascot; tip + oops poke-ins). Second Tier 2 chapter. Teaches what an API call is (the walk-up order window on someone else's computer, same move as Chapter 2 but asking for data instead of a page), the four-part shape (verb / URL / body / response), status codes by first digit (2xx worked, 4xx your order was wrong, 5xx the kitchen is broken), reading JSON by following label paths, API keys (a key in a page is readable, money-spending keys live server-side) and rate limits (429). Ties back to Chapter 8: Firebase config = which window, security rules = who is allowed.
+- Engine (pure, module-exported): a tiny fake server callApi(verb,url,body) with two windows, whoseFault(status), dig(obj,path). Two sandboxes: build-and-send an order (watch the round trip, see 200/201/403/404) and a JSON label-path explorer that highlights the line and prints the answer.path code. 6 missions, a "whose side is the problem on?" gym with 4 general levels, 5-question quiz.
+- Two-track practice: General (coral) + The Trail (purple, 8 real cases): the office weather screens going blank on 503 vs 401, a Firebase 403 permission-denied write, the Garrett's Buddy key scare (scan came back clean), polling too fast into 429, a stale link 404 after the course.html rename, a Firestore incident during the buzzer project, and the 200-but-undefined wrong-label-path bug.
+- Hub bumped to v1.19: "The Order Window" row added in Unit 2 (9 chapters). Visible badge and VERSION var both updated.
+- NOTE: Chapter 8 (v1.18) had not been uploaded yet when this was built, so this deploy zip carries BOTH data-basics.html and api-basics.html plus the hub.
+- Validated: 0 em/en dashes, 0 Jekyll tokens, node --check, acorn, 13 engine unit tests, 21-assertion jsdom smoke.
+
+STILL TO DO Tier 2: Chapter 10 (The Shelf Dissected, keystone). Tier 3 planned: CI/CD and GitHub Actions, the AI image/video strand.
+
+
+## v1.18 (Oct 21 2026) - Chapter 8: Where Data Lives (Tier 2 begins)
+
+- NEW chapter: data-basics.html "Where Data Lives" (storage key data101_v1, teal accent #45d4c4, thumb-data mascot). First Tier 2 chapter. Teaches the three places a web app keeps data: a variable (memory, lost on close), localStorage (survives close but stuck on one device/browser), and a cloud database like Firebase (survives everything, syncs to every signed-in device). Then the wall that forces the jump (progress on your phone is not on Garrett's iPad), what Firebase is in plain terms (a shared cabinet on an always-on computer, config is not a password, security rules are), and sync via live listeners.
+- Interactive engine (pure, module-exported, testable): survivesClose / visibleOnOtherDevice / syncs across the three tiers. Two sandboxes: a two-phone three-tier store (save on your phone, see what crosses to the iPad per tier) and a live-sync demo (save on one phone, the other updates itself). 6 missions, a "will the other device see it?" gym with 4 general levels, 5-question quiz.
+- Two-track practice: General (teal, 4 levels) default + The Trail (purple, 8 real cases): the content:// progress-loss, early Game Shelf localStorage giving everyone separate scores, the Game Shelf move to Firebase, the buzzer learning project, and honest "localStorage is the right call" cases for solo apps (Pigment, a personal drawing app).
+- Hub bumped to v1.18: added the "Where Data Lives" spotlight row in Unit 2 (8 chapters now). Both the visible badge and the VERSION var updated so the deploy is verifiable against a stale cache.
+- Validated: 0 em/en dashes, 0 Jekyll tokens, node --check, acorn parse, 12 engine unit tests, 23-assertion jsdom smoke (all sandboxes, missions, track toggle, 25 trail drills, sync). Single-file chapter; thumb-data.png already lives in the repo.
+
+STILL TO DO Tier 2: Chapter 9 (what an API call is), Chapter 10 (The Shelf Dissected, keystone). Tier 3 planned: CI/CD and GitHub Actions, the AI image/video strand.
+
+
 ## v1.16 (Aug 26 2026) - chapter rebuild pass COMPLETE (all 6) + app icon
 
 - Ch5 python-basics.html v3.1: snake mascot; gold accent. Trail = tiny Python on real build data (version string, gameshelf_v1 storage key, USB cost math, measure app-name length, personalize a toast). All run through the teaching mini-interpreter (print/vars/concat/repeat/len; no str/list/if/for by design).

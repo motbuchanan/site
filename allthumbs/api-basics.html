@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14181d">
+<title>The Order Window: APIs</title>
+<style>
+  :root{
+    --canvas:#14181d; --panel:#1c2229; --card:#171c22; --line:#2c3540;
+    --ink:#e8ecf0; --soft:#97a3ae; --dim:#6b7682;
+    --green:#6fe08c; --amber:#f5b04c; --blue:#5aa7e8; --red:#e87a6d; --teal:#45d4c4; --trail:#c8a4f0; --api:#ff9a6b;
+    --mono:ui-monospace,'SF Mono','Cascadia Mono','Roboto Mono',Consolas,Menlo,monospace;
+    --sans:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',sans-serif;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; background:var(--canvas); color:var(--ink);
+    font-family:var(--sans); font-size:17px; line-height:1.6;
+    padding-bottom:70px;
+  }
+  header{
+    padding:26px 20px 10px; max-width:760px; margin:0 auto;
+    display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+  }
+  .wordmark{font-family:var(--mono); font-size:12px; letter-spacing:.22em; color:var(--soft); text-transform:uppercase;}
+  h1{margin:6px 0 2px; font-size:30px; line-height:1.15; letter-spacing:-.01em;}
+  .subtitle{color:var(--soft); margin:0; font-size:15px;}
+  .vbadge{
+    font-family:var(--mono); font-size:11px; color:var(--soft);
+    border:1px solid var(--line); border-radius:999px; padding:5px 10px;
+    background:var(--panel); cursor:pointer; white-space:nowrap; margin-top:4px;
+  }
+  nav{
+    position:sticky; top:0; z-index:30; background:rgba(20,24,29,.92);
+    backdrop-filter:blur(8px); border-bottom:1px solid var(--line);
+    overflow-x:auto; -webkit-overflow-scrolling:touch;
+  }
+  .navrow{display:flex; gap:8px; padding:10px 16px; max-width:760px; margin:0 auto; width:max-content;}
+  .navchip{
+    font-family:var(--mono); font-size:12px; color:var(--soft);
+    border:1px solid var(--line); border-radius:999px; padding:7px 13px;
+    background:var(--card); text-decoration:none; white-space:nowrap;
+  }
+  .navchip:active{color:var(--ink); border-color:var(--amber);}
+  main{max-width:760px; margin:0 auto; padding:0 16px;}
+  section{
+    background:var(--panel); border:1px solid var(--line); border-radius:16px;
+    padding:22px 18px; margin:18px 0;
+  }
+  .eyebrow{
+    font-family:var(--mono); font-size:11px; letter-spacing:.2em; text-transform:uppercase;
+    color:var(--amber); margin:0 0 6px;
+  }
+  h2{margin:0 0 10px; font-size:23px; line-height:1.2;}
+  h3{margin:20px 0 8px; font-size:17px;}
+  p{margin:10px 0; color:var(--ink);}
+  .soft{color:var(--soft);}
+  .small{font-size:14px;}
+  code, .code{font-family:var(--mono); font-size:.92em; background:var(--card); border:1px solid var(--line); border-radius:6px; padding:1px 6px; color:var(--green);}
+  .note{
+    border-left:3px solid var(--amber); background:var(--card);
+    border-radius:0 10px 10px 0; padding:10px 14px; margin:14px 0; font-size:15px; color:var(--soft);
+  }
+  .btn{
+    display:inline-block; font-family:var(--mono); font-size:14px; color:var(--ink);
+    background:var(--card); border:1px solid var(--line); border-radius:10px;
+    padding:11px 16px; cursor:pointer; user-select:none;
+  }
+  .btn:active{border-color:var(--amber); transform:translateY(1px);}
+  .btn.primary{border-color:var(--amber); color:var(--amber);}
+  .mfill{margin-left:8px; flex:0 0 auto; font-size:11px; padding:3px 9px; border:1px solid var(--line); border-radius:999px; background:transparent; color:var(--amber); cursor:pointer;}
+  .mfill:active{border-color:var(--amber);}
+  .gym{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px; margin:14px 0;}
+  .gymstats{display:flex; gap:18px; font-size:12.5px; color:#9aa5b1; margin-bottom:10px; letter-spacing:.04em;}
+  .gymstats b{color:var(--green); font-size:15px; margin-left:4px;}
+  .gymtabs{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;}
+  .gtab{font-size:12px; padding:6px 11px; border-radius:999px; border:1px solid var(--line); background:transparent; color:inherit; cursor:pointer;}
+  .gtab.on{border-color:var(--amber); color:var(--amber); font-weight:700;}
+  .gymcard{border:1px dashed var(--line); border-radius:10px; padding:12px;}
+  .gymcard.active{border-style:solid; border-color:var(--amber);}
+  .gymcard.win{border-style:solid; border-color:var(--green);}
+  .ggoal{font-size:15px; line-height:1.5;}
+  .ggoal b{color:var(--amber);}
+  .gstep{font-size:12px; color:var(--green); margin-top:6px;}
+  .ghint{font-size:13.5px; color:var(--blue); margin-top:8px; display:none;}
+  .ghint.show{display:block;}
+  .gbtns{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;}
+  .tracktoggle{display:flex;gap:8px;margin:14px 0 10px;align-items:center;flex-wrap:wrap}
+  .tracktoggle .tlabel{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin-right:2px}
+  .ttab{font-family:var(--mono);font-size:12.5px;padding:7px 14px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--soft);cursor:pointer;}
+  .ttab.on.general{border-color:var(--blue);color:var(--blue);background:rgba(90,167,232,.1);font-weight:700;}
+  .ttab.on.trail{border-color:#c8a4f0;color:#c8a4f0;background:rgba(200,164,240,.12);font-weight:700;}
+  .trailbanner{font-family:var(--mono);font-size:11.5px;color:#c8a4f0;background:rgba(200,164,240,.08);border:1px solid rgba(200,164,240,.3);border-radius:8px;padding:7px 11px;margin:8px 0;display:none;}
+  .trailbanner.show{display:block;}
+  .gymcard.trailmode.active{border-color:#c8a4f0;}
+  .gymcard.trailmode.win{border-color:var(--green);}
+
+
+  /* hero */
+  .hero{display:flex; flex-direction:column; align-items:center; text-align:center; gap:10px;}
+  .hero svg{width:120px; height:auto;}
+  .hook{font-size:21px; font-weight:650; margin:4px 0 0;}
+  .flips{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; width:100%; margin-top:14px;}
+  .flip{
+    border:1px solid var(--line); border-radius:12px; background:var(--card);
+    padding:14px; text-align:left; cursor:pointer; min-height:104px; position:relative;
+  }
+  .flip .front{font-weight:650;}
+  .flip .tapcue{font-family:var(--mono); font-size:11px; color:var(--dim); margin-top:8px;}
+  .flip .back{display:none; font-size:14.5px; color:var(--soft);}
+  .flip.open .front,.flip.open .tapcue{display:none;}
+  .flip.open .back{display:block; animation:fadeup .35s ease;}
+  .flip.open{border-color:var(--green);}
+  @keyframes fadeup{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+
+  /* layer stack */
+  .stack{display:flex; flex-direction:column; gap:8px; margin:14px 0;}
+  .layer{
+    border:1px solid var(--line); border-radius:12px; background:var(--card);
+    padding:13px 14px; cursor:pointer; display:flex; align-items:center; gap:12px;
+    transition:border-color .25s, box-shadow .25s;
+  }
+  .layer .lname{font-weight:650;}
+  .layer .ltag{font-family:var(--mono); font-size:11px; color:var(--dim); margin-left:auto;}
+  .layer.active{border-color:var(--amber); box-shadow:0 0 0 1px var(--amber) inset;}
+  .layer.pulseglow{border-color:var(--green); box-shadow:0 0 14px rgba(111,224,140,.25);}
+  .layerinfo{
+    min-height:78px; border:1px dashed var(--line); border-radius:12px;
+    padding:12px 14px; color:var(--soft); font-size:15px; margin-top:10px;
+  }
+  .layerinfo b{color:var(--ink);}
+
+  /* comparison */
+  .acc{border:1px solid var(--line); border-radius:12px; background:var(--card); margin:10px 0; overflow:hidden;}
+  .acc>button{
+    all:unset; display:flex; width:100%; padding:14px; cursor:pointer;
+    font-weight:650; align-items:center; gap:10px; box-sizing:border-box;
+  }
+  .acc>button .plus{margin-left:auto; font-family:var(--mono); color:var(--dim);}
+  .acc .body{display:none; padding:0 14px 14px;}
+  .acc.open .body{display:block; animation:fadeup .3s ease;}
+  .acc.open>button .plus{color:var(--amber);}
+  .duel{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  @media(max-width:480px){.duel{grid-template-columns:1fr;}}
+  .duelcard{border-radius:10px; padding:11px 12px; font-size:14.5px; line-height:1.5;}
+  .duelcard .who{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; margin-bottom:5px;}
+  .win{background:rgba(90,167,232,.09); border:1px solid rgba(90,167,232,.35);}
+  .win .who{color:var(--blue);}
+  .lin{background:rgba(111,224,140,.08); border:1px solid rgba(111,224,140,.3);}
+  .lin .who{color:var(--green);}
+
+  /* distro hub */
+  .hubwrap{display:flex; justify-content:center; margin:16px 0 4px;}
+  .hubwrap svg{width:100%; max-width:420px; height:auto;}
+
+  /* tree explorer */
+  .xsplit{display:grid; grid-template-columns:1fr; gap:12px;}
+  .xtree{
+    font-family:var(--mono); font-size:14.5px; background:var(--card);
+    border:1px solid var(--line); border-radius:12px; padding:12px 10px;
+  }
+  .xtree ul{list-style:none; margin:0; padding-left:18px; border-left:1px solid var(--line);}
+  .xtree>ul{padding-left:4px; border-left:none;}
+  .xnode{
+    display:inline-flex; align-items:center; gap:7px; padding:6px 9px; margin:2px 0;
+    border-radius:8px; cursor:pointer; border:1px solid transparent;
+  }
+  .xnode:active{background:var(--panel);}
+  .xnode.dir{color:var(--amber);}
+  .xnode.file{color:var(--ink);}
+  .xnode.sel{border-color:var(--amber); background:var(--panel);}
+  .xkids.closed{display:none;}
+  .xinfo{
+    border:1px dashed var(--line); border-radius:12px; padding:12px 14px;
+    color:var(--soft); font-size:15px; min-height:74px;
+  }
+  .xinfo b{color:var(--ink);}
+  .pathduel{margin-top:14px;}
+
+  /* terminal */
+  .missions{display:flex; flex-direction:column; gap:7px; margin:12px 0;}
+  .mission{
+    display:flex; gap:10px; align-items:flex-start; font-size:14.5px;
+    border:1px solid var(--line); background:var(--card); border-radius:10px; padding:9px 12px;
+  }
+  .mission .mk{
+    font-family:var(--mono); flex:0 0 auto; width:22px; height:22px; border-radius:50%;
+    border:1px solid var(--line); color:var(--dim); display:flex; align-items:center; justify-content:center; font-size:12px;
+  }
+  .mission.done{border-color:rgba(111,224,140,.5);}
+  .mission.done .mk{border-color:var(--green); color:var(--green); background:rgba(111,224,140,.1);}
+  .mission.done .mtext{color:var(--soft); text-decoration:line-through; text-decoration-color:var(--dim);}
+  .mission code{padding:0 5px;}
+  .term{
+    background:#0d1114; border:1px solid var(--line); border-radius:12px;
+    overflow:hidden; margin:12px 0;
+  }
+  .termbar{
+    display:flex; align-items:center; gap:6px; padding:8px 12px;
+    border-bottom:1px solid var(--line); background:#11161b;
+  }
+  .dot{width:10px; height:10px; border-radius:50%; background:var(--line);}
+  .termbar .ttitle{font-family:var(--mono); font-size:11px; color:var(--dim); margin-left:6px;}
+  .termout{
+    font-family:var(--mono); font-size:14px; line-height:1.55; padding:12px;
+    height:230px; overflow-y:auto; white-space:pre-wrap; word-break:break-word;
+  }
+  .tl-cmd{color:var(--ink);}
+  .tl-out{color:var(--green);}
+  .tl-dir{color:var(--amber);}
+  .tl-err{color:var(--red);}
+  .tl-hint{color:var(--dim); font-style:italic;}
+  .termin{
+    display:flex; align-items:center; gap:8px; padding:10px 12px;
+    border-top:1px solid var(--line); background:#11161b;
+  }
+  .prompt{font-family:var(--mono); font-size:13px; color:var(--green); white-space:nowrap;}
+  .termin input{
+    flex:1; background:transparent; border:none; outline:none; color:var(--ink);
+    font-family:var(--mono); font-size:16px; min-width:0;
+  }
+  .runbtn{
+    font-family:var(--mono); font-size:13px; color:var(--green);
+    background:transparent; border:1px solid var(--line); border-radius:8px;
+    padding:8px 13px; cursor:pointer;
+  }
+  .chips{display:flex; flex-wrap:wrap; gap:7px; margin:10px 0 4px;}
+  .chip{
+    font-family:var(--mono); font-size:13px; color:var(--soft);
+    border:1px solid var(--line); border-radius:999px; background:var(--card);
+    padding:7px 12px; cursor:pointer;
+  }
+  .chip:active{color:var(--amber); border-color:var(--amber);}
+  .mirror{
+    border:1px solid var(--line); border-radius:12px; background:var(--card);
+    padding:12px 10px; font-family:var(--mono); font-size:14px; margin-top:12px;
+  }
+  .mirror .mtitle{font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--dim); margin:0 0 8px 4px;}
+  .mirror ul{list-style:none; margin:0; padding-left:18px; border-left:1px solid var(--line);}
+  .mirror>ul{padding-left:4px; border-left:none;}
+  .mnode{display:inline-block; padding:3px 8px; margin:1px 0; border-radius:7px; border:1px solid transparent;}
+  .mnode.dir{color:var(--amber);}
+  .mnode.file{color:var(--ink);}
+  .mnode.here{border-color:var(--green); color:var(--green);}
+  .mnode.grow{animation:grow .5s ease;}
+  @keyframes grow{from{opacity:0; transform:scale(.6);} to{opacity:1; transform:scale(1);}}
+
+  /* verdict */
+  .verd{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:14px 0;}
+  @media(max-width:520px){.verd{grid-template-columns:1fr;}}
+  .verdcard{border-radius:12px; padding:13px 14px; font-size:15px;}
+  .keep{background:rgba(111,224,140,.07); border:1px solid rgba(111,224,140,.3);}
+  .skip{background:rgba(232,122,109,.06); border:1px solid rgba(232,122,109,.3);}
+  .verdcard .vt{font-family:var(--mono); font-size:11px; letter-spacing:.16em; text-transform:uppercase; margin-bottom:7px;}
+  .keep .vt{color:var(--green);}
+  .skip .vt{color:var(--red);}
+  .verdcard ul{margin:0; padding-left:18px; color:var(--soft);}
+  .verdcard li{margin:5px 0;}
+  .cheat{
+    background:#0d1114; border:1px solid var(--line); border-radius:12px;
+    padding:14px; font-family:var(--mono); font-size:14px; line-height:1.9;
+  }
+  .cheat .c{color:var(--green);}
+  .cheat .d{color:var(--dim);}
+
+  /* quiz */
+  .q{border:1px solid var(--line); border-radius:12px; background:var(--card); padding:14px; margin:12px 0;}
+  .q .qt{font-weight:650; margin-bottom:10px;}
+  .opts{display:flex; flex-direction:column; gap:8px;}
+  .opt{
+    border:1px solid var(--line); border-radius:10px; padding:11px 13px;
+    cursor:pointer; font-size:15px; color:var(--soft);
+  }
+  .opt.right{border-color:var(--green); color:var(--green);}
+  .opt.wrong{border-color:var(--red); color:var(--red);}
+  .opt.lock{pointer-events:none;}
+  .score{font-family:var(--mono); color:var(--amber); font-size:15px; margin-top:10px; min-height:24px;}
+
+  footer{max-width:760px; margin:8px auto 30px; padding:0 20px; color:var(--dim); font-size:13px; text-align:center;}
+  #toast{
+    position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(80px);
+    background:var(--card); color:var(--ink); border:1px solid var(--amber);
+    border-radius:999px; padding:10px 18px; font-family:var(--mono); font-size:13px;
+    transition:transform .3s ease; z-index:99; pointer-events:none; max-width:88vw; text-align:center;
+  }
+  #toast.show{transform:translateX(-50%) translateY(0);}
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.001s !important; transition-duration:.001s !important;}
+    html{scroll-behavior:auto;}
+  }
+  .btn:focus-visible,.chip:focus-visible,.opt:focus-visible,.xnode:focus-visible,
+  .layer:focus-visible,.flip:focus-visible,.acc>button:focus-visible,.navchip:focus-visible{
+    outline:2px solid var(--amber); outline-offset:2px;
+  }
+</style>
+<style>
+  .simwrap{margin:14px 0;}
+  .repo{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin:10px 0;}
+  .repohead{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12.5px;color:var(--soft);margin-bottom:8px;}
+  .repohead .dot{width:9px;height:9px;border-radius:50%;background:var(--green);}
+  .filerow{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:13.5px;padding:6px 8px;border-radius:8px;}
+  .filerow:nth-child(odd){background:rgba(255,255,255,.02);}
+  .filerow .fi{color:var(--amber);}
+  .filerow .fp{color:var(--ink);}
+  .filerow.folder .fp{color:var(--blue);}
+  .filerow .badge{margin-left:auto;font-size:10.5px;color:var(--dim);}
+  .urlbar{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-family:var(--mono);font-size:13px;color:var(--soft);margin:10px 0;}
+  .urlbar .lock{color:var(--green);}
+  .urlbar .path{color:var(--ink);word-break:break-all;}
+  .browser{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:10px 0;background:#0e1216;}
+  .browserbar{background:var(--card);border-bottom:1px solid var(--line);padding:8px 12px;font-family:var(--mono);font-size:11.5px;color:var(--soft);display:flex;gap:6px;align-items:center;}
+  .browserbar .b{width:9px;height:9px;border-radius:50%;background:var(--line);}
+  .viewport{padding:20px 16px;min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+  .viewport.ok{color:var(--ink);}
+  .viewport.err{color:var(--red);}
+  .viewport .big{font-size:40px;margin-bottom:6px;}
+  .viewport h4{margin:4px 0;font-size:18px;}
+  .viewport .u{font-family:var(--mono);font-size:12px;color:var(--dim);word-break:break-all;margin-top:8px;}
+  .simbtns{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0;}
+  .picker{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;}
+  .chipbtn{font-family:var(--mono);font-size:12.5px;padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--soft);cursor:pointer;}
+  .chipbtn.on{border-color:var(--amber);color:var(--amber);}
+  /* big hero-spotlight mascot inside a section (light panel so glow/phone shadows vanish) */
+  .mascotspot{text-align:center;margin:6px 0 2px;}
+  .mascotspot img{height:230px;width:auto;filter:drop-shadow(0 10px 22px rgba(0,0,0,.5));}
+  /* tip boxes: mascot is BIG and pokes in at an angle, overlapping the card edge */
+  .tipbox{position:relative;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--amber);border-radius:0 12px 12px 0;padding:16px 16px 16px 118px;margin:22px 0;min-height:96px;}
+  .tipbox .poke{position:absolute;left:-14px;bottom:-8px;height:150px;width:auto;transform:rotate(-8deg);filter:drop-shadow(0 8px 16px rgba(0,0,0,.45));pointer-events:none;}
+  .tipbox.right{border-left:none;border-right:3px solid var(--amber);border-radius:12px 0 0 12px;padding:16px 118px 16px 16px;}
+  .tipbox.right .poke{left:auto;right:-14px;transform:rotate(8deg);}
+  .tipbox.big{padding-left:150px;min-height:130px;}
+  .tipbox.big .poke{height:200px;left:-22px;}
+  .tipbox .tt{font-weight:700;color:var(--amber);font-size:15px;}
+  .tipbox .tp{margin:4px 0 0;font-size:14.5px;color:var(--soft);line-height:1.55;}
+  .missions{margin:14px 0;}
+  .mission{display:flex;gap:10px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin:8px 0;}
+  .mission .mx{flex:0 0 auto;width:22px;height:22px;border-radius:50%;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--dim);margin-top:1px;}
+  .mission.done .mx{border-color:var(--green);color:var(--green);background:rgba(111,224,140,.12);}
+  .mission .mtext{font-size:14.5px;}
+  .mission .mtext b{color:var(--amber);}
+  .backhub{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:12px;color:var(--soft);border:1px solid var(--line);border-radius:999px;padding:7px 13px;background:var(--card);text-decoration:none;}
+  .backhub:active{border-color:var(--amber);color:var(--amber);}
+  .quizq{margin:16px 0;}
+  .quizq .q{font-weight:600;margin-bottom:8px;}
+  .quizopt{display:block;width:100%;text-align:left;font-size:14.5px;padding:11px 14px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;margin:6px 0;font-family:var(--sans);}
+  .quizopt.sel{border-color:var(--amber);}
+  .quizopt.right{border-color:var(--green);background:rgba(111,224,140,.1);}
+  .quizopt.wrong{border-color:var(--red);background:rgba(232,122,109,.1);}
+  .qresult{font-weight:700;margin-top:10px;}
+
+.phonerow{display:flex;gap:12px;justify-content:center;margin:14px 0;flex-wrap:wrap;}
+.phone{flex:1 1 140px;max-width:180px;border:2px solid var(--line);border-radius:18px;background:#0e1216;padding:10px 10px 14px;}
+.phone .pcap{font-family:var(--mono);font-size:11px;color:var(--dim);text-align:center;margin-bottom:8px;letter-spacing:.08em;}
+.phone .pscreen{min-height:92px;border-radius:10px;background:var(--card);border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:10px;}
+.phone .pscreen .big{font-size:30px;font-weight:700;color:var(--teal);line-height:1;}
+.phone .pscreen .lbl{font-family:var(--mono);font-size:10.5px;color:var(--dim);margin-top:6px;}
+.phone .pscreen.empty .big{color:var(--dim);}
+.phone .pbtns{display:flex;gap:6px;margin-top:8px;}
+.phone .pbtn{flex:1;font-family:var(--mono);font-size:11px;padding:7px 4px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--soft);cursor:pointer;text-align:center;}
+.phone .pbtn:active{border-color:var(--teal);color:var(--teal);}
+.cloudbox{text-align:center;margin:8px 0 2px;}
+.cloudbox .cloud{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;color:var(--soft);border:1px dashed var(--line);border-radius:999px;padding:7px 15px;background:var(--card);}
+.cloudbox .cloud .cval{color:var(--teal);font-weight:700;}
+.cloudbox.off .cloud{opacity:.4;}
+.storepick{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;justify-content:center;}
+.tierchip{font-family:var(--mono);font-size:12px;padding:8px 13px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--soft);cursor:pointer;}
+.tierchip.on{border-color:var(--api);color:var(--api);background:rgba(255,154,107,.12);font-weight:700;}
+.ttab.on.general{border-color:var(--api) !important;color:var(--api) !important;background:rgba(255,154,107,.12) !important;}
+
+.wire{display:flex;flex-direction:column;gap:8px;margin:14px 0;}
+.wirerow{display:flex;align-items:center;gap:10px;}
+.wbox{flex:1;border:1px solid var(--line);border-radius:12px;background:var(--card);padding:10px 12px;min-height:58px;}
+.wbox .wcap{font-family:var(--mono);font-size:10.5px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;}
+.wbox .wbody{font-family:var(--mono);font-size:12.5px;color:var(--ink);margin-top:4px;word-break:break-word;white-space:pre-wrap;}
+.wbox.you{border-color:rgba(255,154,107,.5);}
+.wbox.srv{border-color:rgba(90,167,232,.5);}
+.arrow{font-family:var(--mono);font-size:12px;color:var(--dim);text-align:center;padding:2px 0;}
+.arrow.live{color:var(--api);}
+.status{display:inline-block;font-family:var(--mono);font-size:12px;padding:3px 9px;border-radius:999px;border:1px solid var(--line);}
+.status.s2{border-color:var(--green);color:var(--green);}
+.status.s4{border-color:var(--red);color:var(--red);}
+.status.s5{border-color:var(--amber);color:var(--amber);}
+.reqline{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0;}
+.verb{font-family:var(--mono);font-size:12px;padding:5px 10px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--soft);cursor:pointer;}
+.verb.on{border-color:var(--api);color:var(--api);font-weight:700;}
+.urlin{flex:1;min-width:160px;font-family:var(--mono);font-size:12.5px;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);}
+.jsonv{font-family:var(--mono);font-size:12.5px;line-height:1.5;}
+.jsonv .k{color:var(--blue);} .jsonv .s{color:var(--green);} .jsonv .n{color:var(--amber);}
+.jsonv .hl{background:rgba(255,154,107,.18);border-radius:4px;padding:0 3px;}
+.picker2{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="wordmark">All Thumbs &middot; chapter 9</div>
+    <h1>The Order Window</h1>
+    <p class="subtitle">What an API call actually is. You have been making them for months.</p>
+  </div>
+  <button class="vbadge" id="vbadge" type="button">v0.1</button>
+</header>
+
+<nav>
+  <div class="navrow">
+    <a class="navchip" href="#idea">the idea</a>
+    <a class="navchip" href="#shape">the shape</a>
+    <a class="navchip" href="#status">status codes</a>
+    <a class="navchip" href="#json">reading the answer</a>
+    <a class="navchip" href="#keys">keys and limits</a>
+    <a class="navchip" href="#missions">missions</a>
+    <a class="navchip" href="#gym">gym</a>
+    <a class="navchip" href="#quiz">quiz</a>
+  </div>
+</nav>
+
+<main>
+
+<section id="idea">
+  <p class="eyebrow">what an api is</p>
+  <h2>An API is an order window on someone else's computer</h2>
+  <div class="mascotspot"><img src="thumb-api.png" alt="mascot holding an order ticket"></div>
+  <p>Chapter 2 showed you a browser asking a server for a page: you type an address, the server sends back HTML, the browser paints it. An <b>API call</b> is the same move with one difference: instead of asking for a <i>page</i> to look at, your code asks for <i>data</i> to use. A weather number. A list of games. A save confirmation. The server answers with plain data, no page around it, and your app decides what to do with it.</p>
+  <p>Think of a restaurant with a walk-up window. You do not go in the kitchen. You hand over an order in the format the window expects, you get a ticket number, and a minute later something comes back. The window is the API: a fixed, public way to ask the kitchen for things without touching the kitchen. <b>API</b> stands for Application Programming Interface, which is a stiff way of saying "the agreed-upon order window."</p>
+  <div class="note">You have been using these the whole time. Every Firebase save, every weather slide on the office screens, every time an app checks something on another server: an order went through a window and an answer came back.</div>
+</section>
+
+<section id="shape">
+  <p class="eyebrow">the shape</p>
+  <h2>Every call has the same four parts</h2>
+  <p>A <b>verb</b> (what kind of order: GET to fetch, POST to send something new, PUT to replace, DELETE to remove). A <b>URL</b> (which window, and which thing at that window). Sometimes a <b>body</b> (the actual order details, for POST and PUT). And then the server's <b>response</b>: a status code plus the data.</p>
+  <p>Build one below. Pick a verb, pick a window, send it, and watch the whole round trip.</p>
+
+  <div class="simwrap">
+    <div class="reqline" id="verbPick">
+      <button class="verb on" data-verb="GET" type="button">GET</button>
+      <button class="verb" data-verb="POST" type="button">POST</button>
+      <button class="verb" data-verb="DELETE" type="button">DELETE</button>
+    </div>
+    <div class="picker2" id="urlPick">
+      <button class="tierchip on" data-url="/weather/akron" type="button">/weather/akron</button>
+      <button class="tierchip" data-url="/scores/gameshelf" type="button">/scores/gameshelf</button>
+      <button class="tierchip" data-url="/scores/nope" type="button">/scores/nope</button>
+    </div>
+    <div class="wire">
+      <div class="wbox you"><div class="wcap">your app sends</div><div class="wbody" id="reqBody">GET /weather/akron</div></div>
+      <div class="arrow" id="arrowDown">&darr; across the internet &darr;</div>
+      <div class="wbox srv"><div class="wcap">the window answers</div><div class="wbody" id="resBody"><span class="soft">tap send</span></div></div>
+    </div>
+    <div class="simbtns">
+      <button class="btn primary" id="sendBtn" type="button">Send the order</button>
+    </div>
+  </div>
+
+  <div class="tipbox big">
+    <img class="poke" src="thumb-tip.png" alt="">
+    <div class="tt">GET is reading, POST is writing</div>
+    <p class="tp">The verb tells the window what kind of visit this is. GET means "just show me," it changes nothing and you can repeat it safely. POST means "here is something new, keep it." That is why a page refresh after a POST can warn you about resubmitting: the browser knows a second POST might make a second order.</p>
+  </div>
+</section>
+
+<section id="status">
+  <p class="eyebrow">status codes</p>
+  <h2>The first thing back is a number that tells you how it went</h2>
+  <p>Before any data, the server sends a three-digit <b>status code</b>. You already know one of them. The first digit is the whole story:</p>
+  <p><span class="status s2">2xx</span> &nbsp;worked. <code>200</code> OK, <code>201</code> created.</p>
+  <p><span class="status s4">4xx</span> &nbsp;your order was wrong. <code>404</code> nothing at that address, <code>401</code> you are not signed in, <code>403</code> signed in but not allowed, <code>429</code> you are asking too fast.</p>
+  <p><span class="status s5">5xx</span> &nbsp;the kitchen is broken. <code>500</code> the server crashed on your order, <code>503</code> it is down. Not your fault; wait and retry.</p>
+  <p>The habit that saves you hours: <b>read the number before you read anything else.</b> A 4xx means fix your request. A 5xx means fix nothing, wait. A 2xx with weird data means the call worked and the problem is in how you handled the answer.</p>
+  <div class="tipbox right">
+    <img class="poke" src="thumb-oops.png" alt="">
+    <div class="tt">The one that looks like your bug but is not</div>
+    <p class="tp">A 503 or a 500 at 2am is the service having a bad night. The weather screens going blank at the offices is almost always this: the weather window is down, not your slide code. Build the slide to show the last good answer when the new one fails, and the blank disappears.</p>
+  </div>
+</section>
+
+<section id="json">
+  <p class="eyebrow">reading the answer</p>
+  <h2>The data comes back as JSON, which is just labeled boxes</h2>
+  <p>APIs almost always answer in <b>JSON</b>: text shaped like <code>{"label": value}</code>. Curly braces hold a set of labeled things, square brackets hold a list, quotes mark text, bare numbers are numbers. It looks scary in a wall but it is only ever those four shapes nested.</p>
+  <p>Your code pulls out what it needs by following the labels: <code>answer.temp</code> gets the temperature, <code>answer.scores[0].name</code> gets the first player's name. Tap a label below and watch the path light up.</p>
+
+  <div class="simwrap">
+    <div class="picker2" id="pathPick">
+      <button class="tierchip on" data-path="city" type="button">city</button>
+      <button class="tierchip" data-path="temp" type="button">temp</button>
+      <button class="tierchip" data-path="sky" type="button">sky</button>
+      <button class="tierchip" data-path="scores.0.name" type="button">first player</button>
+      <button class="tierchip" data-path="scores.1.pts" type="button">second score</button>
+    </div>
+    <div class="wbox srv"><div class="wcap">the answer</div><div class="wbody jsonv" id="jsonView"></div></div>
+    <div class="note" id="pathNote"></div>
+  </div>
+</section>
+
+<section id="keys">
+  <p class="eyebrow">keys and limits</p>
+  <h2>Most windows want to know who is ordering</h2>
+  <p>A public window (a free weather feed) takes anyone's order. Most others hand you an <b>API key</b>: a long string that says "this order is from Mot's app." You send it with every call. It is how the service counts your usage, bills you if there is a bill, and shuts you off if you misbehave.</p>
+  <p>Two things the key teaches you. First, <b>a key in a page is a key anyone can read.</b> View-source shows it. For a free, read-only weather key that is fine. For a key that can spend money or write data, it belongs on a server you control, never in the HTML. Second, windows have <b>rate limits</b>: ask 1000 times a minute and you get <code>429</code> until you slow down. The weather screens poll every few minutes, not every second, for exactly this reason.</p>
+  <div class="note">This connects straight back to Chapter 8. The Firebase config in your page is the "which window" part. The security rules on the cabinet are the "who is allowed" part. Same split: address is public, permission is enforced server-side.</div>
+</section>
+
+<section id="missions">
+  <p class="eyebrow">missions</p>
+  <h2>Prove it</h2>
+  <p>Six things to make happen using the sandboxes above. They tick off as you go.</p>
+  <div class="missions" id="missionList"></div>
+</section>
+
+<section id="gym">
+  <p class="eyebrow">the gym</p>
+  <h2>Practice: read the status, call the fix</h2>
+  <p class="small soft">Randomized drills. You are shown a call and what came back, and you call whether the problem is on your side (fix the request) or theirs (wait and retry). Hints cost nothing but pride; skipping resets your streak.</p>
+  <div class="tracktoggle">
+    <span class="tlabel">practice</span>
+    <button class="ttab general on" id="trackGeneral" type="button">General</button>
+    <button class="ttab trail" id="trackTrail" type="button">The Trail</button>
+  </div>
+  <div class="trailbanner" id="trailBanner">The Trail: real calls from Mot's builds, the office weather screens, Firebase writes, the Garrett's Buddy key scare.</div>
+  <div class="gym">
+    <div class="gymstats"><span>reps<b id="repN">0</b></span><span>streak<b id="strN">0</b></span><span>best<b id="bestN">0</b></span></div>
+    <div class="gymtabs" id="gymTabs"></div>
+    <div class="gymcard" id="gymCard">
+      <div class="ggoal" id="gGoal">Pick a level (or Surprise me) and tap <b>Start drill</b>.</div>
+      <div id="gymBoard"></div>
+      <div class="ghint" id="gHint"></div>
+      <div class="gbtns">
+        <button class="btn primary" id="gStart" type="button">Start drill</button>
+        <button class="btn" id="gAnswerYes" type="button" style="display:none">My side, fix the request</button>
+        <button class="btn" id="gAnswerNo" type="button" style="display:none">Their side, wait</button>
+        <button class="btn" id="gHintBtn" type="button" style="display:none">Hint</button>
+        <button class="btn" id="gSkip" type="button" style="display:none">Skip</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="quiz">
+  <p class="eyebrow">quiz</p>
+  <h2>Five questions</h2>
+  <div id="quizBox"></div>
+</section>
+
+<div style="text-align:center;margin:24px 0 8px;">
+  <a class="backhub" href="index.html">&larr; back to All Thumbs</a>
+</div>
+
+</main>
+<footer style="text-align:center;color:var(--dim);font-size:12px;padding:20px;">The Order Window &middot; a curiosity tool &middot; nothing here calls anywhere real</footer>
+<div id="toast" role="status"></div>
+</body>
+
+<script>
+"use strict";
+var VERSION = "v0.1 · Oct 22";
+var STORE_KEY = "api101_v1";
+
+/* ---------- guarded storage ---------- */
+var memStore = {};
+function loadState(){
+  try{ var raw = localStorage.getItem(STORE_KEY); if(raw) return JSON.parse(raw); }catch(e){}
+  return memStore[STORE_KEY] || { m:{}, quizBest:0, gym:{ reps:0, streak:0, best:0 } };
+}
+function saveState(s){ memStore[STORE_KEY]=s; try{ localStorage.setItem(STORE_KEY, JSON.stringify(s)); }catch(e){} }
+function getState(){ var s=loadState(); if(!s.m)s.m={}; if(!s.gym)s.gym={reps:0,streak:0,best:0}; if(typeof s.quizBest!=="number")s.quizBest=0; return s; }
+
+/* ---------- API ENGINE (pure, testable) ----------
+   A tiny fake server with two windows. callApi(verb, url, body) returns {status, data}.
+   /weather/akron      GET -> 200 weather object
+   /scores/gameshelf   GET -> 200 list; POST -> 201 created; DELETE -> 403 not allowed
+   anything else       -> 404
+   whoseFault(status): "mine" for 4xx (fix the request), "theirs" for 5xx (wait), "none" for 2xx
+*/
+var WEATHER = { city:"Akron", temp:61, sky:"overcast", scores:[{name:"Garrett",pts:4200},{name:"Mot",pts:3150}] };
+var SCORES = [ {name:"Garrett",pts:4200}, {name:"Mot",pts:3150} ];
+function callApi(verb, url, body){
+  verb = String(verb||"GET").toUpperCase(); url = String(url||"");
+  if(url === "/weather/akron"){
+    if(verb === "GET") return { status:200, data:{ city:"Akron", temp:61, sky:"overcast" } };
+    return { status:405, data:{ error:"method not allowed" } };
+  }
+  if(url === "/scores/gameshelf"){
+    if(verb === "GET") return { status:200, data:{ scores:SCORES } };
+    if(verb === "POST") return { status:201, data:{ saved:true, entry: body || {name:"you",pts:0} } };
+    if(verb === "DELETE") return { status:403, data:{ error:"not allowed: scores are read-only here" } };
+    return { status:405, data:{ error:"method not allowed" } };
+  }
+  return { status:404, data:{ error:"nothing at " + url } };
+}
+function whoseFault(status){
+  var d = Math.floor(status/100);
+  if(d === 2) return "none";
+  if(d === 4) return "mine";
+  if(d === 5) return "theirs";
+  return "none";
+}
+/* follow a dotted path through an object: "scores.0.name" */
+function dig(obj, path){
+  var parts = String(path).split(".");
+  var cur = obj;
+  for(var i=0;i<parts.length;i++){ if(cur==null) return undefined; cur = cur[parts[i]]; }
+  return cur;
+}
+
+/* ---------- DOM helpers ---------- */
+function $(id){ return document.getElementById(id); }
+function el(tag,cls,html){ var e=document.createElement(tag); if(cls)e.className=cls; if(html!=null)e.innerHTML=html; return e; }
+function toast(msg){ var t=$("toast"); if(!t)return; t.textContent=msg; t.className="show"; setTimeout(function(){t.className="";},1600); }
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+/* ---------- shape sandbox ---------- */
+var verb="GET", url="/weather/akron";
+function renderReq(){
+  var b = $("reqBody"); if(!b) return;
+  var line = verb + " " + url;
+  if(verb==="POST") line += '\n{"name":"you","pts":99}';
+  b.textContent = line;
+}
+function sendOrder(){
+  var body = verb==="POST" ? {name:"you",pts:99} : null;
+  var res = callApi(verb, url, body);
+  var cls = "s"+Math.floor(res.status/100);
+  var r = $("resBody");
+  r.innerHTML = "<span class='status "+cls+"'>"+res.status+"</span>\n" + esc(JSON.stringify(res.data, null, 1));
+  var a=$("arrowDown"); if(a){ a.className="arrow live"; setTimeout(function(){a.className="arrow";},700); }
+  markMission("send");
+  if(res.status===200 && verb==="GET") markMission("get200");
+  if(res.status===201) markMission("post201");
+  if(res.status===404) markMission("see404");
+  if(res.status===403) markMission("see403");
+}
+function initShape(){
+  var vp=$("verbPick"); if(vp) vp.addEventListener("click",function(e){ var b=e.target.closest("[data-verb]"); if(!b)return; verb=b.getAttribute("data-verb"); [].forEach.call(vp.querySelectorAll(".verb"),function(x){x.classList.toggle("on",x===b);}); renderReq(); });
+  var up=$("urlPick"); if(up) up.addEventListener("click",function(e){ var b=e.target.closest("[data-url]"); if(!b)return; url=b.getAttribute("data-url"); [].forEach.call(up.querySelectorAll(".tierchip"),function(x){x.classList.toggle("on",x===b);}); renderReq(); });
+  if($("sendBtn")) $("sendBtn").addEventListener("click", sendOrder);
+  renderReq();
+}
+
+/* ---------- json path sandbox ---------- */
+function renderJson(path){
+  var v=$("jsonView"); if(!v) return;
+  var lines = [
+    ['{', ''],
+    ['  <span class="k">"city"</span>: <span class="s">"Akron"</span>,', 'city'],
+    ['  <span class="k">"temp"</span>: <span class="n">61</span>,', 'temp'],
+    ['  <span class="k">"sky"</span>: <span class="s">"overcast"</span>,', 'sky'],
+    ['  <span class="k">"scores"</span>: [', ''],
+    ['    { <span class="k">"name"</span>: <span class="s">"Garrett"</span>, <span class="k">"pts"</span>: <span class="n">4200</span> },', 'scores.0.name'],
+    ['    { <span class="k">"name"</span>: <span class="s">"Mot"</span>, <span class="k">"pts"</span>: <span class="n">3150</span> }', 'scores.1.pts'],
+    ['  ]', ''],
+    ['}', '']
+  ];
+  v.innerHTML = lines.map(function(l){ return (l[1]===path) ? '<span class="hl">'+l[0]+'</span>' : l[0]; }).join("\n");
+  var val = dig(WEATHER, path);
+  var code = "answer." + path.replace(/\.(\d+)/g, "[$1]").replace(/\.(\w+)/g, ".$1");
+  $("pathNote").innerHTML = "<code>" + code + "</code> gives you <b>" + esc(JSON.stringify(val)) + "</b>";
+}
+function initJson(){
+  var pp=$("pathPick"); if(pp) pp.addEventListener("click",function(e){ var b=e.target.closest("[data-path]"); if(!b)return; [].forEach.call(pp.querySelectorAll(".tierchip"),function(x){x.classList.toggle("on",x===b);}); renderJson(b.getAttribute("data-path")); markMission("dig"); });
+  renderJson("city");
+}
+
+/* ---------- missions ---------- */
+var MISSIONS = [
+  { id:"send",    text:"Send any order and get an answer back." },
+  { id:"get200",  text:"GET the weather and get a <b>200</b>." },
+  { id:"post201", text:"POST a score and get a <b>201 created</b>." },
+  { id:"see404",  text:"Order from a window that does not exist and read the <b>404</b>." },
+  { id:"see403",  text:"Try to DELETE the scores and get told <b>403</b>." },
+  { id:"dig",     text:"Follow a label path into the JSON answer." }
+];
+function renderMissions(){ var box=$("missionList"); if(!box)return; var s=getState(); box.innerHTML=""; MISSIONS.forEach(function(m){ var done=!!s.m[m.id]; var row=el("div","mission"+(done?" done":"")); row.innerHTML="<span class='mk'>"+(done?"✓":"")+"</span><span class='mtext'>"+m.text+"</span>"; box.appendChild(row); }); }
+function markMission(id){ var s=getState(); if(!s.m[id]){ s.m[id]=true; saveState(s); renderMissions(); toast("mission done"); } }
+
+/* ---------- GYM: whose side is the problem on? ----------
+   answer true  = "my side, fix the request" (4xx)
+   answer false = "their side, wait and retry" (5xx)
+*/
+function rn(list){ return list[Math.floor(Math.random()*list.length)]; }
+var G_WINDOWS = ["/weather/akron","/scores/gameshelf","/users/me","/games/list","/photos/upload"];
+var CODES_MINE = [ [404,"nothing at that address, check the URL spelling"], [401,"not signed in, send the key or log in first"], [403,"signed in but not allowed to do that here"], [400,"the body is malformed, the window could not read your order"], [429,"too many calls too fast, slow down and back off"] ];
+var CODES_THEIRS = [ [500,"the server crashed handling it, nothing you sent caused that"], [502,"a server in the middle got a bad answer from the kitchen"], [503,"the service is down or overloaded, come back in a minute"], [504,"the kitchen took too long, timed out"] ];
+function makeDrill(level){
+  var w = rn(G_WINDOWS), verbs=["GET","POST","PUT","DELETE"], v=rn(verbs);
+  var mine, pick;
+  if(level===0){ mine=true; pick=rn(CODES_MINE.slice(0,1)); }           // 404 only
+  else if(level===1){ mine=true; pick=rn(CODES_MINE); }                 // all 4xx
+  else if(level===2){ mine=false; pick=rn(CODES_THEIRS); }              // all 5xx
+  else { mine = Math.random()<0.5; pick = mine ? rn(CODES_MINE) : rn(CODES_THEIRS); }
+  var story = "Your app sends <b>"+v+" "+w+"</b>. Back comes <b>"+pick[0]+"</b>. Whose side is the problem on?";
+  var hint = pick[0]+" is a "+(mine?"4xx: your order was wrong. ":"5xx: the kitchen is broken. ")+pick[1]+".";
+  return { story:story, loads:mine, hint:hint };
+}
+
+/* ---------- TRAIL drills: real calls from Mot's builds ---------- */
+var TRAIL_CASES = [
+  { story:"The office weather screens. The slide calls the weather window every few minutes. One morning every office shows a blank slide and the call is returning <b>503</b>. Whose side?",
+    loads:false, hint:"503 is the weather service being down. Your slide code is fine. The real fix was making the slide keep showing the last good forecast when a fresh call fails." },
+  { story:"Same weather screens, different morning. Blank slide again, but this time the call returns <b>401</b>. Whose side?",
+    loads:true, hint:"401 means the window did not accept who you are: the API key expired or got rotated. Fix the request by sending a valid key. The weather service is up." },
+  { story:"Game Shelf saves a high score to Firebase. The write comes back <b>403 permission denied</b>. Whose side?",
+    loads:true, hint:"403 from Firebase means the security rules on the cabinet said no. Your request is the thing to fix: either the user is not signed in the way the rules expect, or the rules are stricter than the write. Firebase is up." },
+  { story:"Garrett's Buddy. You worried the Anthropic key had leaked into the public repo. Scanning showed the app keeps the key only in localStorage on the device and never commits it. Is a key sitting in a public page a problem on your side to fix?",
+    loads:true, hint:"Yes, a readable key that can spend money is a request-side problem, which is why the app was built to keep it off the server and out of the repo. That scan came back clean, but the instinct was right." },
+  { story:"A PWA you built polls a free API once per second to feel live. After a minute every call returns <b>429</b>. Whose side?",
+    loads:true, hint:"429 is the window telling you to slow down. Rate limit. Your side: poll every 30 seconds or every few minutes, like the weather screens do." },
+  { story:"You rename a Game Shelf file from <code>course.html</code> to <code>index.html</code>, but an old link in another app still fetches <code>course.html</code>. The fetch returns <b>404</b>. Whose side?",
+    loads:true, hint:"404 means nothing at that address. Your side: the request points at a name that no longer exists. Update the link. Same rule as Chapter 7, just as a data call instead of a page." },
+  { story:"The buzzer learning project writes to Firestore and two phones listen. Mid-session every write starts failing with <b>500</b> and the Firebase status page shows an incident. Whose side?",
+    loads:false, hint:"500 plus a posted incident is their side. Nothing to fix in your code. Wait it out, and build the buzzer so a failed write retries instead of silently dropping." },
+  { story:"A weather call comes back <b>200</b> but the slide shows <code>undefined</code> for the temperature. The JSON has <code>main.temp</code>, your code reads <code>answer.temp</code>. Whose side?",
+    loads:true, hint:"The call worked (200). The bug is in how you read the answer: wrong label path. Your side, fix the dig: answer.main.temp. This is the Chapter 9 version of the most common bug there is." }
+];
+function makeTrailDrill(){ return TRAIL_CASES[Math.floor(Math.random()*TRAIL_CASES.length)]; }
+
+var gym = { level:-1, drill:null, answered:false, track:"general" };
+var GYM_LEVELS = [ {lv:0,name:"404 basics"}, {lv:1,name:"4xx: your side"}, {lv:2,name:"5xx: their side"}, {lv:3,name:"mixed"} ];
+function gymStatsRender(){ var s=getState(); if($("repN"))$("repN").textContent=s.gym.reps||0; if($("strN"))$("strN").textContent=s.gym.streak||0; if($("bestN"))$("bestN").textContent=s.gym.best||0; }
+function renderGymTabs(){ var box=$("gymTabs"); if(!box)return; box.innerHTML=""; var all=el("button","gtab"+(gym.level===-1?" on":""),"Surprise me"); all.addEventListener("click",function(){gym.level=-1;renderGymTabs();}); box.appendChild(all); GYM_LEVELS.forEach(function(L){ var t=el("button","gtab"+(gym.level===L.lv?" on":""),L.name); t.addEventListener("click",function(){gym.level=L.lv;renderGymTabs();}); box.appendChild(t); }); }
+function gymStart(){
+  if(gym.track==="trail"){ gym.drill=makeTrailDrill(); } else { var lv=gym.level===-1?Math.floor(Math.random()*4):gym.level; gym.drill=makeDrill(lv); }
+  gym.answered=false;
+  var card=$("gymCard"); card.className="gymcard active"+(gym.track==="trail"?" trailmode":"");
+  $("gGoal").innerHTML="Whose side is the problem on?";
+  $("gymBoard").innerHTML="<div class='note' style='margin-top:10px'>"+gym.drill.story+"</div>";
+  $("gHint").className="ghint"; $("gHint").innerHTML="";
+  $("gStart").style.display="none"; $("gAnswerYes").style.display=""; $("gAnswerNo").style.display="";
+  $("gHintBtn").style.display=""; $("gSkip").style.display="";
+}
+function gymAnswer(saidMine){
+  if(gym.answered||!gym.drill)return; gym.answered=true;
+  var s=getState(); var correct=(saidMine===gym.drill.loads); var card=$("gymCard");
+  if(correct){ s.gym.reps=(s.gym.reps||0)+1; s.gym.streak=(s.gym.streak||0)+1; if(s.gym.streak>(s.gym.best||0))s.gym.best=s.gym.streak; saveState(s);
+    card.className="gymcard win"+(gym.track==="trail"?" trailmode":""); $("gGoal").innerHTML="Correct. "+(gym.drill.loads?"Your side, fix the request.":"Their side, wait and retry."); markMission("gym"); }
+  else { s.gym.streak=0; saveState(s); card.className="gymcard"+(gym.track==="trail"?" trailmode":""); $("gGoal").innerHTML="Not quite. "+(gym.drill.loads?"It is actually your side.":"It is actually their side."); }
+  $("gHint").className="ghint show"; $("gHint").innerHTML=gym.drill.hint; gymStatsRender();
+  $("gAnswerYes").style.display="none"; $("gAnswerNo").style.display="none"; $("gHintBtn").style.display="none"; $("gSkip").style.display="none";
+  $("gStart").style.display=""; $("gStart").textContent="Next drill";
+}
+function gymSkip(){ var s=getState(); s.gym.streak=0; saveState(s); gymStatsRender(); if(gym.drill){ $("gHint").className="ghint show"; $("gHint").innerHTML="Answer: "+(gym.drill.loads?"your side.":"their side.")+" "+gym.drill.hint; } gym.answered=true; $("gAnswerYes").style.display="none"; $("gAnswerNo").style.display="none"; $("gHintBtn").style.display="none"; $("gSkip").style.display="none"; $("gStart").style.display=""; $("gStart").textContent="Next drill"; }
+function setTrack(t){ gym.track=t; var g=$("trackGeneral"),tr=$("trackTrail"),tabs=$("gymTabs"),ban=$("trailBanner"); if(g)g.classList.toggle("on",t==="general"); if(tr)tr.classList.toggle("on",t==="trail"); if(tabs)tabs.style.display=(t==="trail")?"none":""; if(ban)ban.className="trailbanner"+(t==="trail"?" show":""); var card=$("gymCard"); if(card)card.className="gymcard"; if($("gGoal"))$("gGoal").innerHTML=(t==="trail")?"Real calls from the build. Tap <b>Start drill</b>.":"Pick a level (or Surprise me) and tap <b>Start drill</b>."; if($("gymBoard"))$("gymBoard").innerHTML=""; if($("gHint")){$("gHint").className="ghint";$("gHint").innerHTML="";} ["gAnswerYes","gAnswerNo","gHintBtn","gSkip"].forEach(function(id){if($(id))$(id).style.display="none";}); if($("gStart")){$("gStart").style.display="";$("gStart").textContent="Start drill";} }
+function initGym(){ renderGymTabs(); gymStatsRender(); if($("trackGeneral"))$("trackGeneral").addEventListener("click",function(){setTrack("general");}); if($("trackTrail"))$("trackTrail").addEventListener("click",function(){setTrack("trail");}); if($("gStart"))$("gStart").addEventListener("click",gymStart); if($("gAnswerYes"))$("gAnswerYes").addEventListener("click",function(){gymAnswer(true);}); if($("gAnswerNo"))$("gAnswerNo").addEventListener("click",function(){gymAnswer(false);}); if($("gHintBtn"))$("gHintBtn").addEventListener("click",function(){ if(gym.drill){$("gHint").className="ghint show";$("gHint").innerHTML=gym.drill.hint;} }); if($("gSkip"))$("gSkip").addEventListener("click",gymSkip); }
+
+/* ---------- quiz ---------- */
+var QUIZ = [
+  { q:"What is the difference between loading a web page and making an API call?",
+    opts:["There is none","A page comes back as HTML to look at, an API call comes back as data for your code to use","API calls only work on phones","Pages use the internet, API calls do not"], a:1 },
+  { q:"Which verb means \"just show me, change nothing\"?",
+    opts:["POST","DELETE","GET","PUT"], a:2 },
+  { q:"A call returns 503. What should your code do?",
+    opts:["Fix the URL","Wait and retry, the service is down","Send the API key","Switch to POST"], a:1 },
+  { q:"The answer is {\"main\":{\"temp\":61}}. Which gets you 61?",
+    opts:["answer.temp","answer.main.temp","answer[61]","answer.temp.main"], a:1 },
+  { q:"Where should a key that can spend money live?",
+    opts:["In the HTML, it is fine","In a comment so it is hidden","On a server you control, never in the page","In the page title"], a:2 }
+];
+var quizAnswered={};
+function renderQuiz(){ var box=$("quizBox"); if(!box)return; box.innerHTML=""; QUIZ.forEach(function(item,qi){ var wrap=el("div","quizq"); wrap.appendChild(el("div","q",(qi+1)+". "+item.q)); item.opts.forEach(function(opt,oi){ var b=el("button","quizopt",opt); b.addEventListener("click",function(){ if(quizAnswered[qi]!=null)return; quizAnswered[qi]=oi; var kids=wrap.querySelectorAll(".quizopt"); kids[item.a].classList.add("right"); if(oi!==item.a)b.classList.add("wrong"); var got=0,ans=0; for(var k in quizAnswered){ans++; if(quizAnswered[k]===QUIZ[k].a)got++;} if(ans===QUIZ.length){ var s=getState(); if(got>(s.quizBest||0)){s.quizBest=got;saveState(s);} box.appendChild(el("div","qresult","You got "+got+" / "+QUIZ.length+(got===QUIZ.length?", perfect.":"."))); } }); wrap.appendChild(b); }); box.appendChild(wrap); }); }
+
+/* ---------- badge + boot ---------- */
+function initBadge(){ var b=$("vbadge"); if(!b)return; b.textContent=VERSION.split(" ")[0]; b.addEventListener("click",function(){ toast("The Order Window · "+VERSION); }); }
+function initApp(){ initBadge(); initShape(); initJson(); renderMissions(); initGym(); renderQuiz(); }
+if(typeof window!=="undefined" && typeof document!=="undefined"){ if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",initApp); } else { initApp(); } }
+if(typeof module!=="undefined" && module.exports){ module.exports = { callApi:callApi, whoseFault:whoseFault, dig:dig, makeDrill:makeDrill, makeTrailDrill:makeTrailDrill }; }
+</script>
+
+</html>

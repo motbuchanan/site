@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14181d">
+<title>The Shelf Dissected</title>
+<style>
+  :root{
+    --canvas:#14181d; --panel:#1c2229; --card:#171c22; --line:#2c3540;
+    --ink:#e8ecf0; --soft:#97a3ae; --dim:#6b7682;
+    --green:#6fe08c; --amber:#f5b04c; --blue:#5aa7e8; --red:#e87a6d; --teal:#45d4c4; --trail:#c8a4f0; --api:#ff9a6b; --brass:#d9b35a;
+    --mono:ui-monospace,'SF Mono','Cascadia Mono','Roboto Mono',Consolas,Menlo,monospace;
+    --sans:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',sans-serif;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; background:var(--canvas); color:var(--ink);
+    font-family:var(--sans); font-size:17px; line-height:1.6;
+    padding-bottom:70px;
+  }
+  header{
+    padding:26px 20px 10px; max-width:760px; margin:0 auto;
+    display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+  }
+  .wordmark{font-family:var(--mono); font-size:12px; letter-spacing:.22em; color:var(--soft); text-transform:uppercase;}
+  h1{margin:6px 0 2px; font-size:30px; line-height:1.15; letter-spacing:-.01em;}
+  .subtitle{color:var(--soft); margin:0; font-size:15px;}
+  .vbadge{
+    font-family:var(--mono); font-size:11px; color:var(--soft);
+    border:1px solid var(--line); border-radius:999px; padding:5px 10px;
+    background:var(--panel); cursor:pointer; white-space:nowrap; margin-top:4px;
+  }
+  nav{
+    position:sticky; top:0; z-index:30; background:rgba(20,24,29,.92);
+    backdrop-filter:blur(8px); border-bottom:1px solid var(--line);
+    overflow-x:auto; -webkit-overflow-scrolling:touch;
+  }
+  .navrow{display:flex; gap:8px; padding:10px 16px; max-width:760px; margin:0 auto; width:max-content;}
+  .navchip{
+    font-family:var(--mono); font-size:12px; color:var(--soft);
+    border:1px solid var(--line); border-radius:999px; padding:7px 13px;
+    background:var(--card); text-decoration:none; white-space:nowrap;
+  }
+  .navchip:active{color:var(--ink); border-color:var(--amber);}
+  main{max-width:760px; margin:0 auto; padding:0 16px;}
+  section{
+    background:var(--panel); border:1px solid var(--line); border-radius:16px;
+    padding:22px 18px; margin:18px 0;
+  }
+  .eyebrow{
+    font-family:var(--mono); font-size:11px; letter-spacing:.2em; text-transform:uppercase;
+    color:var(--amber); margin:0 0 6px;
+  }
+  h2{margin:0 0 10px; font-size:23px; line-height:1.2;}
+  h3{margin:20px 0 8px; font-size:17px;}
+  p{margin:10px 0; color:var(--ink);}
+  .soft{color:var(--soft);}
+  .small{font-size:14px;}
+  code, .code{font-family:var(--mono); font-size:.92em; background:var(--card); border:1px solid var(--line); border-radius:6px; padding:1px 6px; color:var(--green);}
+  .note{
+    border-left:3px solid var(--amber); background:var(--card);
+    border-radius:0 10px 10px 0; padding:10px 14px; margin:14px 0; font-size:15px; color:var(--soft);
+  }
+  .btn{
+    display:inline-block; font-family:var(--mono); font-size:14px; color:var(--ink);
+    background:var(--card); border:1px solid var(--line); border-radius:10px;
+    padding:11px 16px; cursor:pointer; user-select:none;
+  }
+  .btn:active{border-color:var(--amber); transform:translateY(1px);}
+  .btn.primary{border-color:var(--amber); color:var(--amber);}
+  .mfill{margin-left:8px; flex:0 0 auto; font-size:11px; padding:3px 9px; border:1px solid var(--line); border-radius:999px; background:transparent; color:var(--amber); cursor:pointer;}
+  .mfill:active{border-color:var(--amber);}
+  .gym{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px; margin:14px 0;}
+  .gymstats{display:flex; gap:18px; font-size:12.5px; color:#9aa5b1; margin-bottom:10px; letter-spacing:.04em;}
+  .gymstats b{color:var(--green); font-size:15px; margin-left:4px;}
+  .gymtabs{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;}
+  .gtab{font-size:12px; padding:6px 11px; border-radius:999px; border:1px solid var(--line); background:transparent; color:inherit; cursor:pointer;}
+  .gtab.on{border-color:var(--amber); color:var(--amber); font-weight:700;}
+  .gymcard{border:1px dashed var(--line); border-radius:10px; padding:12px;}
+  .gymcard.active{border-style:solid; border-color:var(--amber);}
+  .gymcard.win{border-style:solid; border-color:var(--green);}
+  .ggoal{font-size:15px; line-height:1.5;}
+  .ggoal b{color:var(--amber);}
+  .gstep{font-size:12px; color:var(--green); margin-top:6px;}
+  .ghint{font-size:13.5px; color:var(--blue); margin-top:8px; display:none;}
+  .ghint.show{display:block;}
+  .gbtns{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;}
+  .tracktoggle{display:flex;gap:8px;margin:14px 0 10px;align-items:center;flex-wrap:wrap}
+  .tracktoggle .tlabel{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin-right:2px}
+  .ttab{font-family:var(--mono);font-size:12.5px;padding:7px 14px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--soft);cursor:pointer;}
+  .ttab.on.general{border-color:var(--blue);color:var(--blue);background:rgba(90,167,232,.1);font-weight:700;}
+  .ttab.on.trail{border-color:#c8a4f0;color:#c8a4f0;background:rgba(200,164,240,.12);font-weight:700;}
+  .trailbanner{font-family:var(--mono);font-size:11.5px;color:#c8a4f0;background:rgba(200,164,240,.08);border:1px solid rgba(200,164,240,.3);border-radius:8px;padding:7px 11px;margin:8px 0;display:none;}
+  .trailbanner.show{display:block;}
+  .gymcard.trailmode.active{border-color:#c8a4f0;}
+  .gymcard.trailmode.win{border-color:var(--green);}
+
+
+  /* hero */
+  .hero{display:flex; flex-direction:column; align-items:center; text-align:center; gap:10px;}
+  .hero svg{width:120px; height:auto;}
+  .hook{font-size:21px; font-weight:650; margin:4px 0 0;}
+  .flips{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; width:100%; margin-top:14px;}
+  .flip{
+    border:1px solid var(--line); border-radius:12px; background:var(--card);
+    padding:14px; text-align:left; cursor:pointer; min-height:104px; position:relative;
+  }
+  .flip .front{font-weight:650;}
+  .flip .tapcue{font-family:var(--mono); font-size:11px; color:var(--dim); margin-top:8px;}
+  .flip .back{display:none; font-size:14.5px; color:var(--soft);}
+  .flip.open .front,.flip.open .tapcue{display:none;}
+  .flip.open .back{display:block; animation:fadeup .35s ease;}
+  .flip.open{border-color:var(--green);}
+  @keyframes fadeup{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+
+  /* layer stack */
+  .stack{display:flex; flex-direction:column; gap:8px; margin:14px 0;}
+  .layer{
+    border:1px solid var(--line); border-radius:12px; background:var(--card);
+    padding:13px 14px; cursor:pointer; display:flex; align-items:center; gap:12px;
+    transition:border-color .25s, box-shadow .25s;
+  }
+  .layer .lname{font-weight:650;}
+  .layer .ltag{font-family:var(--mono); font-size:11px; color:var(--dim); margin-left:auto;}
+  .layer.active{border-color:var(--amber); box-shadow:0 0 0 1px var(--amber) inset;}
+  .layer.pulseglow{border-color:var(--green); box-shadow:0 0 14px rgba(111,224,140,.25);}
+  .layerinfo{
+    min-height:78px; border:1px dashed var(--line); border-radius:12px;
+    padding:12px 14px; color:var(--soft); font-size:15px; margin-top:10px;
+  }
+  .layerinfo b{color:var(--ink);}
+
+  /* comparison */
+  .acc{border:1px solid var(--line); border-radius:12px; background:var(--card); margin:10px 0; overflow:hidden;}
+  .acc>button{
+    all:unset; display:flex; width:100%; padding:14px; cursor:pointer;
+    font-weight:650; align-items:center; gap:10px; box-sizing:border-box;
+  }
+  .acc>button .plus{margin-left:auto; font-family:var(--mono); color:var(--dim);}
+  .acc .body{display:none; padding:0 14px 14px;}
+  .acc.open .body{display:block; animation:fadeup .3s ease;}
+  .acc.open>button .plus{color:var(--amber);}
+  .duel{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  @media(max-width:480px){.duel{grid-template-columns:1fr;}}
+  .duelcard{border-radius:10px; padding:11px 12px; font-size:14.5px; line-height:1.5;}
+  .duelcard .who{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; margin-bottom:5px;}
+  .win{background:rgba(90,167,232,.09); border:1px solid rgba(90,167,232,.35);}
+  .win .who{color:var(--blue);}
+  .lin{background:rgba(111,224,140,.08); border:1px solid rgba(111,224,140,.3);}
+  .lin .who{color:var(--green);}
+
+  /* distro hub */
+  .hubwrap{display:flex; justify-content:center; margin:16px 0 4px;}
+  .hubwrap svg{width:100%; max-width:420px; height:auto;}
+
+  /* tree explorer */
+  .xsplit{display:grid; grid-template-columns:1fr; gap:12px;}
+  .xtree{
+    font-family:var(--mono); font-size:14.5px; background:var(--card);
+    border:1px solid var(--line); border-radius:12px; padding:12px 10px;
+  }
+  .xtree ul{list-style:none; margin:0; padding-left:18px; border-left:1px solid var(--line);}
+  .xtree>ul{padding-left:4px; border-left:none;}
+  .xnode{
+    display:inline-flex; align-items:center; gap:7px; padding:6px 9px; margin:2px 0;
+    border-radius:8px; cursor:pointer; border:1px solid transparent;
+  }
+  .xnode:active{background:var(--panel);}
+  .xnode.dir{color:var(--amber);}
+  .xnode.file{color:var(--ink);}
+  .xnode.sel{border-color:var(--amber); background:var(--panel);}
+  .xkids.closed{display:none;}
+  .xinfo{
+    border:1px dashed var(--line); border-radius:12px; padding:12px 14px;
+    color:var(--soft); font-size:15px; min-height:74px;
+  }
+  .xinfo b{color:var(--ink);}
+  .pathduel{margin-top:14px;}
+
+  /* terminal */
+  .missions{display:flex; flex-direction:column; gap:7px; margin:12px 0;}
+  .mission{
+    display:flex; gap:10px; align-items:flex-start; font-size:14.5px;
+    border:1px solid var(--line); background:var(--card); border-radius:10px; padding:9px 12px;
+  }
+  .mission .mk{
+    font-family:var(--mono); flex:0 0 auto; width:22px; height:22px; border-radius:50%;
+    border:1px solid var(--line); color:var(--dim); display:flex; align-items:center; justify-content:center; font-size:12px;
+  }
+  .mission.done{border-color:rgba(111,224,140,.5);}
+  .mission.done .mk{border-color:var(--green); color:var(--green); background:rgba(111,224,140,.1);}
+  .mission.done .mtext{color:var(--soft); text-decoration:line-through; text-decoration-color:var(--dim);}
+  .mission code{padding:0 5px;}
+  .term{
+    background:#0d1114; border:1px solid var(--line); border-radius:12px;
+    overflow:hidden; margin:12px 0;
+  }
+  .termbar{
+    display:flex; align-items:center; gap:6px; padding:8px 12px;
+    border-bottom:1px solid var(--line); background:#11161b;
+  }
+  .dot{width:10px; height:10px; border-radius:50%; background:var(--line);}
+  .termbar .ttitle{font-family:var(--mono); font-size:11px; color:var(--dim); margin-left:6px;}
+  .termout{
+    font-family:var(--mono); font-size:14px; line-height:1.55; padding:12px;
+    height:230px; overflow-y:auto; white-space:pre-wrap; word-break:break-word;
+  }
+  .tl-cmd{color:var(--ink);}
+  .tl-out{color:var(--green);}
+  .tl-dir{color:var(--amber);}
+  .tl-err{color:var(--red);}
+  .tl-hint{color:var(--dim); font-style:italic;}
+  .termin{
+    display:flex; align-items:center; gap:8px; padding:10px 12px;
+    border-top:1px solid var(--line); background:#11161b;
+  }
+  .prompt{font-family:var(--mono); font-size:13px; color:var(--green); white-space:nowrap;}
+  .termin input{
+    flex:1; background:transparent; border:none; outline:none; color:var(--ink);
+    font-family:var(--mono); font-size:16px; min-width:0;
+  }
+  .runbtn{
+    font-family:var(--mono); font-size:13px; color:var(--green);
+    background:transparent; border:1px solid var(--line); border-radius:8px;
+    padding:8px 13px; cursor:pointer;
+  }
+  .chips{display:flex; flex-wrap:wrap; gap:7px; margin:10px 0 4px;}
+  .chip{
+    font-family:var(--mono); font-size:13px; color:var(--soft);
+    border:1px solid var(--line); border-radius:999px; background:var(--card);
+    padding:7px 12px; cursor:pointer;
+  }
+  .chip:active{color:var(--amber); border-color:var(--amber);}
+  .mirror{
+    border:1px solid var(--line); border-radius:12px; background:var(--card);
+    padding:12px 10px; font-family:var(--mono); font-size:14px; margin-top:12px;
+  }
+  .mirror .mtitle{font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--dim); margin:0 0 8px 4px;}
+  .mirror ul{list-style:none; margin:0; padding-left:18px; border-left:1px solid var(--line);}
+  .mirror>ul{padding-left:4px; border-left:none;}
+  .mnode{display:inline-block; padding:3px 8px; margin:1px 0; border-radius:7px; border:1px solid transparent;}
+  .mnode.dir{color:var(--amber);}
+  .mnode.file{color:var(--ink);}
+  .mnode.here{border-color:var(--green); color:var(--green);}
+  .mnode.grow{animation:grow .5s ease;}
+  @keyframes grow{from{opacity:0; transform:scale(.6);} to{opacity:1; transform:scale(1);}}
+
+  /* verdict */
+  .verd{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:14px 0;}
+  @media(max-width:520px){.verd{grid-template-columns:1fr;}}
+  .verdcard{border-radius:12px; padding:13px 14px; font-size:15px;}
+  .keep{background:rgba(111,224,140,.07); border:1px solid rgba(111,224,140,.3);}
+  .skip{background:rgba(232,122,109,.06); border:1px solid rgba(232,122,109,.3);}
+  .verdcard .vt{font-family:var(--mono); font-size:11px; letter-spacing:.16em; text-transform:uppercase; margin-bottom:7px;}
+  .keep .vt{color:var(--green);}
+  .skip .vt{color:var(--red);}
+  .verdcard ul{margin:0; padding-left:18px; color:var(--soft);}
+  .verdcard li{margin:5px 0;}
+  .cheat{
+    background:#0d1114; border:1px solid var(--line); border-radius:12px;
+    padding:14px; font-family:var(--mono); font-size:14px; line-height:1.9;
+  }
+  .cheat .c{color:var(--green);}
+  .cheat .d{color:var(--dim);}
+
+  /* quiz */
+  .q{border:1px solid var(--line); border-radius:12px; background:var(--card); padding:14px; margin:12px 0;}
+  .q .qt{font-weight:650; margin-bottom:10px;}
+  .opts{display:flex; flex-direction:column; gap:8px;}
+  .opt{
+    border:1px solid var(--line); border-radius:10px; padding:11px 13px;
+    cursor:pointer; font-size:15px; color:var(--soft);
+  }
+  .opt.right{border-color:var(--green); color:var(--green);}
+  .opt.wrong{border-color:var(--red); color:var(--red);}
+  .opt.lock{pointer-events:none;}
+  .score{font-family:var(--mono); color:var(--amber); font-size:15px; margin-top:10px; min-height:24px;}
+
+  footer{max-width:760px; margin:8px auto 30px; padding:0 20px; color:var(--dim); font-size:13px; text-align:center;}
+  #toast{
+    position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(80px);
+    background:var(--card); color:var(--ink); border:1px solid var(--amber);
+    border-radius:999px; padding:10px 18px; font-family:var(--mono); font-size:13px;
+    transition:transform .3s ease; z-index:99; pointer-events:none; max-width:88vw; text-align:center;
+  }
+  #toast.show{transform:translateX(-50%) translateY(0);}
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.001s !important; transition-duration:.001s !important;}
+    html{scroll-behavior:auto;}
+  }
+  .btn:focus-visible,.chip:focus-visible,.opt:focus-visible,.xnode:focus-visible,
+  .layer:focus-visible,.flip:focus-visible,.acc>button:focus-visible,.navchip:focus-visible{
+    outline:2px solid var(--amber); outline-offset:2px;
+  }
+</style>
+<style>
+  .simwrap{margin:14px 0;}
+  .repo{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin:10px 0;}
+  .repohead{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12.5px;color:var(--soft);margin-bottom:8px;}
+  .repohead .dot{width:9px;height:9px;border-radius:50%;background:var(--green);}
+  .filerow{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:13.5px;padding:6px 8px;border-radius:8px;}
+  .filerow:nth-child(odd){background:rgba(255,255,255,.02);}
+  .filerow .fi{color:var(--amber);}
+  .filerow .fp{color:var(--ink);}
+  .filerow.folder .fp{color:var(--blue);}
+  .filerow .badge{margin-left:auto;font-size:10.5px;color:var(--dim);}
+  .urlbar{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-family:var(--mono);font-size:13px;color:var(--soft);margin:10px 0;}
+  .urlbar .lock{color:var(--green);}
+  .urlbar .path{color:var(--ink);word-break:break-all;}
+  .browser{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:10px 0;background:#0e1216;}
+  .browserbar{background:var(--card);border-bottom:1px solid var(--line);padding:8px 12px;font-family:var(--mono);font-size:11.5px;color:var(--soft);display:flex;gap:6px;align-items:center;}
+  .browserbar .b{width:9px;height:9px;border-radius:50%;background:var(--line);}
+  .viewport{padding:20px 16px;min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+  .viewport.ok{color:var(--ink);}
+  .viewport.err{color:var(--red);}
+  .viewport .big{font-size:40px;margin-bottom:6px;}
+  .viewport h4{margin:4px 0;font-size:18px;}
+  .viewport .u{font-family:var(--mono);font-size:12px;color:var(--dim);word-break:break-all;margin-top:8px;}
+  .simbtns{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0;}
+  .picker{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;}
+  .chipbtn{font-family:var(--mono);font-size:12.5px;padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--soft);cursor:pointer;}
+  .chipbtn.on{border-color:var(--amber);color:var(--amber);}
+  /* big hero-spotlight mascot inside a section (light panel so glow/phone shadows vanish) */
+  .mascotspot{text-align:center;margin:6px 0 2px;}
+  .mascotspot img{height:230px;width:auto;filter:drop-shadow(0 10px 22px rgba(0,0,0,.5));}
+  /* tip boxes: mascot is BIG and pokes in at an angle, overlapping the card edge */
+  .tipbox{position:relative;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--amber);border-radius:0 12px 12px 0;padding:16px 16px 16px 118px;margin:22px 0;min-height:96px;}
+  .tipbox .poke{position:absolute;left:-14px;bottom:-8px;height:150px;width:auto;transform:rotate(-8deg);filter:drop-shadow(0 8px 16px rgba(0,0,0,.45));pointer-events:none;}
+  .tipbox.right{border-left:none;border-right:3px solid var(--amber);border-radius:12px 0 0 12px;padding:16px 118px 16px 16px;}
+  .tipbox.right .poke{left:auto;right:-14px;transform:rotate(8deg);}
+  .tipbox.big{padding-left:150px;min-height:130px;}
+  .tipbox.big .poke{height:200px;left:-22px;}
+  .tipbox .tt{font-weight:700;color:var(--amber);font-size:15px;}
+  .tipbox .tp{margin:4px 0 0;font-size:14.5px;color:var(--soft);line-height:1.55;}
+  .missions{margin:14px 0;}
+  .mission{display:flex;gap:10px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin:8px 0;}
+  .mission .mx{flex:0 0 auto;width:22px;height:22px;border-radius:50%;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--dim);margin-top:1px;}
+  .mission.done .mx{border-color:var(--green);color:var(--green);background:rgba(111,224,140,.12);}
+  .mission .mtext{font-size:14.5px;}
+  .mission .mtext b{color:var(--amber);}
+  .backhub{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:12px;color:var(--soft);border:1px solid var(--line);border-radius:999px;padding:7px 13px;background:var(--card);text-decoration:none;}
+  .backhub:active{border-color:var(--amber);color:var(--amber);}
+  .quizq{margin:16px 0;}
+  .quizq .q{font-weight:600;margin-bottom:8px;}
+  .quizopt{display:block;width:100%;text-align:left;font-size:14.5px;padding:11px 14px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;margin:6px 0;font-family:var(--sans);}
+  .quizopt.sel{border-color:var(--amber);}
+  .quizopt.right{border-color:var(--green);background:rgba(111,224,140,.1);}
+  .quizopt.wrong{border-color:var(--red);background:rgba(232,122,109,.1);}
+  .qresult{font-weight:700;margin-top:10px;}
+
+.phonerow{display:flex;gap:12px;justify-content:center;margin:14px 0;flex-wrap:wrap;}
+.phone{flex:1 1 140px;max-width:180px;border:2px solid var(--line);border-radius:18px;background:#0e1216;padding:10px 10px 14px;}
+.phone .pcap{font-family:var(--mono);font-size:11px;color:var(--dim);text-align:center;margin-bottom:8px;letter-spacing:.08em;}
+.phone .pscreen{min-height:92px;border-radius:10px;background:var(--card);border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:10px;}
+.phone .pscreen .big{font-size:30px;font-weight:700;color:var(--teal);line-height:1;}
+.phone .pscreen .lbl{font-family:var(--mono);font-size:10.5px;color:var(--dim);margin-top:6px;}
+.phone .pscreen.empty .big{color:var(--dim);}
+.phone .pbtns{display:flex;gap:6px;margin-top:8px;}
+.phone .pbtn{flex:1;font-family:var(--mono);font-size:11px;padding:7px 4px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--soft);cursor:pointer;text-align:center;}
+.phone .pbtn:active{border-color:var(--teal);color:var(--teal);}
+.cloudbox{text-align:center;margin:8px 0 2px;}
+.cloudbox .cloud{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;color:var(--soft);border:1px dashed var(--line);border-radius:999px;padding:7px 15px;background:var(--card);}
+.cloudbox .cloud .cval{color:var(--teal);font-weight:700;}
+.cloudbox.off .cloud{opacity:.4;}
+.storepick{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;justify-content:center;}
+.tierchip{font-family:var(--mono);font-size:12px;padding:8px 13px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--soft);cursor:pointer;}
+.tierchip.on{border-color:var(--brass);color:var(--brass);background:rgba(217,179,90,.12);font-weight:700;}
+.ttab.on.general{border-color:var(--brass) !important;color:var(--brass) !important;background:rgba(217,179,90,.12) !important;}
+
+.wire{display:flex;flex-direction:column;gap:8px;margin:14px 0;}
+.wirerow{display:flex;align-items:center;gap:10px;}
+.wbox{flex:1;border:1px solid var(--line);border-radius:12px;background:var(--card);padding:10px 12px;min-height:58px;}
+.wbox .wcap{font-family:var(--mono);font-size:10.5px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;}
+.wbox .wbody{font-family:var(--mono);font-size:12.5px;color:var(--ink);margin-top:4px;word-break:break-word;white-space:pre-wrap;}
+.wbox.you{border-color:rgba(255,154,107,.5);}
+.wbox.srv{border-color:rgba(90,167,232,.5);}
+.arrow{font-family:var(--mono);font-size:12px;color:var(--dim);text-align:center;padding:2px 0;}
+.arrow.live{color:var(--api);}
+.status{display:inline-block;font-family:var(--mono);font-size:12px;padding:3px 9px;border-radius:999px;border:1px solid var(--line);}
+.status.s2{border-color:var(--green);color:var(--green);}
+.status.s4{border-color:var(--red);color:var(--red);}
+.status.s5{border-color:var(--amber);color:var(--amber);}
+.reqline{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0;}
+.verb{font-family:var(--mono);font-size:12px;padding:5px 10px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--soft);cursor:pointer;}
+.verb.on{border-color:var(--api);color:var(--api);font-weight:700;}
+.urlin{flex:1;min-width:160px;font-family:var(--mono);font-size:12.5px;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);}
+.jsonv{font-family:var(--mono);font-size:12.5px;line-height:1.5;}
+.jsonv .k{color:var(--blue);} .jsonv .s{color:var(--green);} .jsonv .n{color:var(--amber);}
+.jsonv .hl{background:rgba(255,154,107,.18);border-radius:4px;padding:0 3px;}
+.picker2{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;}
+
+.anat{display:flex;flex-direction:column;gap:8px;margin:14px 0;}
+.part{border:1px solid var(--line);border-radius:12px;background:var(--card);padding:12px 14px;cursor:pointer;display:flex;align-items:center;gap:12px;}
+.part .pn{font-family:var(--mono);font-size:12.5px;color:var(--brass);min-width:118px;}
+.part .pd{font-size:14px;color:var(--soft);flex:1;}
+.part .pc{font-family:var(--mono);font-size:10.5px;color:var(--dim);}
+.part.on{border-color:var(--brass);box-shadow:0 0 0 1px var(--brass) inset;}
+.part.on .pd{color:var(--ink);}
+.partdetail{border-left:3px solid var(--brass);background:var(--card);border-radius:0 10px 10px 0;padding:12px 14px;margin:10px 0;font-size:14.5px;color:var(--soft);line-height:1.55;}
+.partdetail b{color:var(--ink);} .partdetail code{color:var(--green);}
+.checks{display:flex;flex-direction:column;gap:7px;margin:12px 0;}
+.chk{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;background:var(--card);padding:10px 12px;cursor:pointer;}
+.chk .box{width:22px;height:22px;border-radius:6px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:13px;color:var(--green);flex:0 0 auto;}
+.chk.on{border-color:var(--brass);} .chk.on .box{border-color:var(--green);background:rgba(111,224,140,.12);}
+.chk .ct{font-size:14px;} .chk .ct code{padding:0 5px;}
+.verdict{border-radius:12px;padding:12px 14px;margin:10px 0;font-size:14.5px;line-height:1.55;border:1px solid var(--line);background:var(--card);}
+.verdict.ok{border-color:var(--green);} .verdict.bad{border-color:var(--red);}
+.verdict .vt{font-weight:700;margin-bottom:4px;} .verdict.ok .vt{color:var(--green);} .verdict.bad .vt{color:var(--red);}
+.verdict ul{margin:6px 0 0;padding-left:18px;color:var(--soft);}
+.tl{margin:14px 0;}
+.tlrow{display:flex;align-items:center;gap:10px;margin:6px 0;}
+.tlrow .tlm{font-family:var(--mono);font-size:12px;color:var(--dim);width:58px;flex:0 0 auto;}
+.tlrow .tlbar{height:18px;border-radius:6px;background:linear-gradient(90deg,var(--brass),#a8832f);min-width:4px;}
+.tlrow .tln{font-family:var(--mono);font-size:12px;color:var(--soft);}
+.stones{display:flex;flex-direction:column;gap:6px;margin:12px 0;}
+.stone{display:flex;gap:10px;font-size:14px;border-left:2px solid var(--line);padding:4px 0 4px 12px;}
+.stone .sd{font-family:var(--mono);font-size:11.5px;color:var(--brass);width:76px;flex:0 0 auto;}
+.stone .st{color:var(--soft);} .stone .st b{color:var(--ink);}
+.bigstat{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin:12px 0;}
+.stat{border:1px solid var(--line);border-radius:12px;background:var(--card);padding:12px;text-align:center;}
+.stat .sn{font-size:26px;font-weight:700;color:var(--brass);line-height:1.1;}
+.stat .sl{font-family:var(--mono);font-size:10.5px;color:var(--dim);margin-top:4px;letter-spacing:.06em;text-transform:uppercase;}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="wordmark">All Thumbs &middot; chapter 10 &middot; keystone</div>
+    <h1>The Shelf Dissected</h1>
+    <p class="subtitle">Your actual Game Shelf, taken apart. Every chapter so far was a piece of this.</p>
+  </div>
+  <button class="vbadge" id="vbadge" type="button">v0.1</button>
+</header>
+
+<nav>
+  <div class="navrow">
+    <a class="navchip" href="#idea">what it is</a>
+    <a class="navchip" href="#anatomy">anatomy</a>
+    <a class="navchip" href="#register">adding a game</a>
+    <a class="navchip" href="#sw">the service worker</a>
+    <a class="navchip" href="#sync">the cabinet</a>
+    <a class="navchip" href="#timeline">timeline</a>
+    <a class="navchip" href="#missions">missions</a>
+    <a class="navchip" href="#gym">gym</a>
+    <a class="navchip" href="#quiz">quiz</a>
+  </div>
+</nav>
+
+<main>
+
+<section id="idea">
+  <p class="eyebrow">what it is</p>
+  <h2>"A series of HTML files" was the right answer. Here is the rest of it.</h2>
+  <div class="mascotspot"><img src="thumb-beside-phone.png" alt="mascot beside a phone"></div>
+  <p>When this course started you described the Game Shelf as "a series of HTML files" and said you did not really know what it was beyond that. That description was correct. It just stops early. Pulled fresh from the repo today, the shelf is:</p>
+  <div class="bigstat">
+    <div class="stat"><div class="sn" id="stHtml">84</div><div class="sl">html pages</div></div>
+    <div class="stat"><div class="sn" id="stCommits">282</div><div class="sl">commits</div></div>
+    <div class="stat"><div class="sn" id="stKeys">47</div><div class="sl">record keys</div></div>
+    <div class="stat"><div class="sn" id="stCache">v70</div><div class="sl">cache version</div></div>
+  </div>
+  <p>One hub page, 84 game and tool pages, four shared scripts that every page loads, a service worker that makes the whole thing work offline, and a Firestore cabinet named <code>buchanan-gameshelf</code> that six people's devices all talk to. Everything you learned in Chapters 1 through 9 is in this one project. This chapter walks the real code and points at where each lesson lives.</p>
+  <div class="note">Nothing in this chapter is a simulation. The numbers, file names, and bugs are read from the live <code>motbuchanan/gameshelf</code> repo and its July audit.</div>
+</section>
+
+<section id="anatomy">
+  <p class="eyebrow">anatomy</p>
+  <h2>Six parts. Tap each one.</h2>
+  <p>Every page on the shelf is its own single-file app (Chapter 3). What makes them a <i>shelf</i> instead of 84 strangers is the shared layer underneath. Tap a part to see what it does and which chapter taught it.</p>
+  <div class="anat" id="anat"></div>
+  <div class="partdetail" id="partDetail"></div>
+</section>
+
+<section id="register">
+  <p class="eyebrow">adding a game</p>
+  <h2>A new game has to be registered in four places, or it breaks quietly</h2>
+  <p>This is the single most important thing in the chapter, and it is the thing that bit you in July. A game is not "on the shelf" when its HTML file is uploaded. It is on the shelf when four separate lists know about it. Miss one and nothing errors. The shelf just quietly does the wrong thing, sometimes weeks later.</p>
+  <p>Pretend you just finished <code>puffkart.html</code>. Tick what you remembered to do, then read the verdict.</p>
+  <div class="simwrap">
+    <div class="checks" id="regChecks"></div>
+    <div class="simbtns"><button class="btn primary" id="regShip" type="button">Ship it</button><button class="btn" id="regReset" type="button">Reset</button></div>
+    <div id="regVerdict"></div>
+  </div>
+  <div class="tipbox big">
+    <img class="poke" src="thumb-cool.png" alt="">
+    <div class="tt">Why four lists and not one</div>
+    <p class="tp">Each list is read by a different part of the system at a different moment: the hub when it draws tiles, the service worker when it seeds offline copies, the sync layer when it resets the cabinet, the badge system when it hands out achievements. None of them read each other. That is normal in software and it is exactly why a checklist beats memory. Chapter 6 taught you commits; this is why a commit should touch all four files at once.</p>
+  </div>
+</section>
+
+<section id="sw">
+  <p class="eyebrow">the service worker</p>
+  <h2>Why the shelf plays with no signal, and why the badge number matters</h2>
+  <p><code>sw.js</code> is a small script the browser installs beside your site and keeps running between visits (Chapter 7 mentioned it as the thing that will not run from <code>content://</code>). The shelf's worker is <b>network-first</b>: when you are online every request goes to the real server, so an upload shows up on a plain refresh. As responses fly past, it quietly saves copies. Offline, it serves those copies, so Garrett can play in the car.</p>
+  <p>It also <b>precaches</b> a list of core files on install, <span id="stPre">135</span> of them today, so the first offline visit already has the hub, the shared scripts, and the main games. That list lives in a constant called <code>CORE</code>, and the cache itself is named <code>gameshelf-v70</code>.</p>
+  <p>That name is your deploy ritual. Bumping it to <code>v71</code> tells every device "throw out the old copies, seed fresh ones." Forget the bump after changing the precache list and devices keep serving stale files. This is the same stale-cache lesson from Chapter 2 and the badge rule from this course, running inside your own app.</p>
+  <div class="tipbox right">
+    <img class="poke" src="thumb-nice.png" alt="">
+    <div class="tt">From v1 to v70 in four months</div>
+    <p class="tp">The cache name has been bumped roughly 70 times since June 12. Each bump is a real deploy you made from a phone. The timeline section has the full run.</p>
+  </div>
+</section>
+
+<section id="sync">
+  <p class="eyebrow">the cabinet</p>
+  <h2>gamenight.js is the cabinet door, and here is the bug that hid in it</h2>
+  <p><code>gamenight.js</code> (132 KB, the biggest shared script) holds the Firestore config, the sign-in, and the sync. Chapter 8 called a database "a shared cabinet." Here it is for real: every finished game writes a record under a key like <code>chess_games</code> or <code>c4_games</code>, and a collection-wide <b>live listener</b> (<code>onSnapshot</code>, Chapter 8's "subscribe") pushes every change to every device.</p>
+  <p>There is a list called <code>GAME_KEYS</code> naming every record key, 47 today. It is the fourth registration from the checklist above, and in July eight arcade games were missing from it. Day to day, nothing looked wrong. Then someone did a household reset:</p>
+  <div class="partdetail"><b>The v34 bug, step by step.</b> Reset walks <code>GAME_KEYS</code> and deletes each key's records from the cabinet. The eight unlisted keys were skipped, so their records stayed alive in Firestore. The live listener saw the collection change, read the surviving records, and pushed them back down onto every device. The reset undid itself. No error, no crash, just scores that would not go away. The fix was one edit: add the eight keys. The lesson is bigger than the fix.</div>
+  <p>The same file holds <code>GN.room</code>: create, join, pushState, start, watch. That is a full cross-device multiplayer layer, proven in production by Trouble, built on the same listener idea. Two phones watching one room document is two phones watching one drawer (Chapter 8), with turns as the data.</p>
+</section>
+
+<section id="timeline">
+  <p class="eyebrow">timeline</p>
+  <h2>Four and a half months, 282 commits, from a phone</h2>
+  <p>Commits per month, read from the repo history. June is the build-out. July is the audit and fix bundle. The autumn climb is games for Garrett, the settled-shelf redesign, and the music trainers finishing.</p>
+  <div class="tl" id="tl"></div>
+  <div class="stones" id="stones"></div>
+</section>
+
+<section id="missions">
+  <p class="eyebrow">missions</p>
+  <h2>Prove it</h2>
+  <p>Six things to make happen using the sections above. They tick off as you go.</p>
+  <div class="missions" id="missionList"></div>
+</section>
+
+<section id="gym">
+  <p class="eyebrow">the gym</p>
+  <h2>Practice: ships clean, or silent bug?</h2>
+  <p class="small soft">Randomized drills. You are shown what someone did when adding or changing a shelf game, and you call whether it ships clean or carries a silent bug. Hints cost nothing but pride; skipping resets your streak.</p>
+  <div class="tracktoggle">
+    <span class="tlabel">practice</span>
+    <button class="ttab general on" id="trackGeneral" type="button">General</button>
+    <button class="ttab trail" id="trackTrail" type="button">The Trail</button>
+  </div>
+  <div class="trailbanner" id="trailBanner">The Trail: the actual shelf bugs from the July audit and since, the arcade records, Scrabble badges, chess TV mode, the unbumped cache.</div>
+  <div class="gym">
+    <div class="gymstats"><span>reps<b id="repN">0</b></span><span>streak<b id="strN">0</b></span><span>best<b id="bestN">0</b></span></div>
+    <div class="gymtabs" id="gymTabs"></div>
+    <div class="gymcard" id="gymCard">
+      <div class="ggoal" id="gGoal">Pick a level (or Surprise me) and tap <b>Start drill</b>.</div>
+      <div id="gymBoard"></div>
+      <div class="ghint" id="gHint"></div>
+      <div class="gbtns">
+        <button class="btn primary" id="gStart" type="button">Start drill</button>
+        <button class="btn" id="gAnswerYes" type="button" style="display:none">Ships clean</button>
+        <button class="btn" id="gAnswerNo" type="button" style="display:none">Silent bug</button>
+        <button class="btn" id="gHintBtn" type="button" style="display:none">Hint</button>
+        <button class="btn" id="gSkip" type="button" style="display:none">Skip</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="quiz">
+  <p class="eyebrow">quiz</p>
+  <h2>Five questions</h2>
+  <div id="quizBox"></div>
+</section>
+
+<div style="text-align:center;margin:24px 0 8px;">
+  <a class="backhub" href="index.html">&larr; back to All Thumbs</a>
+</div>
+
+</main>
+<footer style="text-align:center;color:var(--dim);font-size:12px;padding:20px;">The Shelf Dissected &middot; read from the real repo &middot; nothing here edits it</footer>
+<div id="toast" role="status"></div>
+</body>
+
+<script>
+"use strict";
+var VERSION = "v0.1 · Oct 22";
+var STORE_KEY = "shelf101_v1";
+
+/* ---------- guarded storage ---------- */
+var memStore = {};
+function loadState(){ try{ var raw=localStorage.getItem(STORE_KEY); if(raw) return JSON.parse(raw); }catch(e){} return memStore[STORE_KEY] || { m:{}, quizBest:0, gym:{reps:0,streak:0,best:0} }; }
+function saveState(s){ memStore[STORE_KEY]=s; try{ localStorage.setItem(STORE_KEY, JSON.stringify(s)); }catch(e){} }
+function getState(){ var s=loadState(); if(!s.m)s.m={}; if(!s.gym)s.gym={reps:0,streak:0,best:0}; if(typeof s.quizBest!=="number")s.quizBest=0; return s; }
+
+/* ---------- FACTS read from motbuchanan/gameshelf on Oct 22 2026 ---------- */
+var FACTS = {
+  html:84, commits:282, keys:47, cache:"v70", precache:135, project:"buchanan-gameshelf",
+  months:[["Jun",114],["Jul",40],["Aug",29],["Sep",48],["Oct",51]],
+  stones:[
+    ["Jun 9","<b>Initial commit.</b> index-30.html renamed to index.html the same day. The shelf is born already at v30 of something."],
+    ["Jun 12","<b>sw.js arrives</b>, network-first from day one. Cache name gameshelf-v1. By Jun 14 it is v16: a dozen deploys in two days."],
+    ["Jun 27","Seven cache bumps in one day (v25 to v31). The build-out month: 114 commits in June alone."],
+    ["Jul 2","<b>The v34 audit.</b> Eight arcade keys missing from GAME_KEYS, Scrabble invisible to achievements, chess reading the wrong TV-mode key. Fix bundle shipped. AUDIT-2026-07.md written as the durable record."],
+    ["Jul 16","v41 to v51 in two days. Music trainers (SHARP, HARP) land and are later declared done."],
+    ["Sep","Settled-shelf redesign: physical planks, time-of-day lighting, deterministic handwriting labels. 48 commits."],
+    ["Oct 18","<b>v70 to v72</b> in one day. Bloodstream, STICK, the Kirby collection: the Garrett autumn. 282 commits total at this writing."]
+  ]
+};
+
+/* ---------- SHELF ENGINE (pure, testable) ----------
+   registerGame(flags) -> { clean:boolean, problems:[...] }
+   flags: { tile, precache, gamekey, badges } booleans for the four registrations.
+   Each missing registration maps to the real silent failure it causes.
+*/
+var REG = [
+  { id:"tile",     file:"index.html TOYS",      label:"Add a tile entry to <code>index.html</code> (name, href, inline SVG art)",
+    miss:"Not on the shelf at all. The file is live at its URL but no tile points to it, so nobody finds it." },
+  { id:"precache", file:"sw.js CORE + CACHE",   label:"Add it to the <code>sw.js</code> precache list and bump the cache name",
+    miss:"Works online, missing offline. First offline visit has no copy, and without the bump old devices never re-seed." },
+  { id:"gamekey",  file:"gamenight.js GAME_KEYS", label:"Add its record key to <code>GAME_KEYS</code> in <code>gamenight.js</code>",
+    miss:"Records sync day to day, but a household reset skips this key, the live listener pushes the surviving records back, and the reset undoes itself (the v34 arcade bug)." },
+  { id:"badges",   file:"achievements.js NAMES", label:"Add its name to <code>NAMES</code> in <code>achievements.js</code>",
+    miss:"Plays fine, earns nothing. No badge ladder, so wins never count toward achievements (the Scrabble bug)." }
+];
+function registerGame(flags){
+  flags = flags || {};
+  var problems = [];
+  for(var i=0;i<REG.length;i++){ if(!flags[REG[i].id]) problems.push({ id:REG[i].id, file:REG[i].file, why:REG[i].miss }); }
+  return { clean: problems.length===0, problems: problems };
+}
+/* did the cache name get bumped when the precache list changed? */
+function cacheOk(listChanged, bumped){ return !listChanged || !!bumped; }
+
+/* ---------- DOM helpers ---------- */
+function $(id){ return document.getElementById(id); }
+function el(tag,cls,html){ var e=document.createElement(tag); if(cls)e.className=cls; if(html!=null)e.innerHTML=html; return e; }
+function toast(msg){ var t=$("toast"); if(!t)return; t.textContent=msg; t.className="show"; setTimeout(function(){t.className="";},1600); }
+
+/* ---------- anatomy ---------- */
+var PARTS = [
+  { n:"index.html", d:"The hub. One page that draws every tile from a list called TOYS.", c:"ch3, ch7",
+    long:"<b>233 KB, the front door.</b> It holds a list named <code>TOYS</code>: one entry per game with a name, an href, a record key, and the tile art as inline SVG. The hub loops that list and draws the shelf. 61 of the 84 pages are linked from it today (the rest are tools, specs, and pages games open themselves). Chapter 7 is why it is named index.html; Chapter 3 is how a JS list becomes tiles on screen." },
+  { n:"a game page", d:"84 of them. Each one a complete single-file app.", c:"ch3, ch5",
+    long:"<b>chess.html, trouble.html, bloodstream.html, harmonica.html...</b> Every one is the single-file pattern from Chapter 3: HTML skeleton, CSS dress, JS engine, all in one upload. They do not know about each other. They only know the hub and the four shared scripts. That independence is why you can ship one game without touching the rest, and why one game can break without taking the shelf down." },
+  { n:"gamenight.js", d:"132 KB. Firestore config, sign-in, record sync, multiplayer rooms.", c:"ch8, ch9",
+    long:"<b>The cabinet door.</b> Chapter 8's database and Chapter 9's order window, in one file every page loads. It carries the Firebase config (project <code>buchanan-gameshelf</code>), the list of 47 record keys, four <code>onSnapshot</code> live listeners, and <code>GN.room</code> for cross-device turns. When a game ends it calls one function here, and that function talks to Firestore so every device sees the result." },
+  { n:"sw.js", d:"The service worker. Network-first, precaches 135 files, cache named gameshelf-v70.", c:"ch2, ch7",
+    long:"<b>4 KB that makes the shelf work in the car.</b> Installed by the browser, it answers requests from the network when it can and from its saved copies when it cannot. The cache name is the deploy ritual: bump it and every device re-seeds. Chapter 2's stale-cache lesson and this course's badge rule are the same idea this file enforces." },
+  { n:"achievements.js", d:"74 named games and the badge ladder for each.", c:"ch5",
+    long:"<b>NAMES</b> maps each game key to a display name; the badge logic hands out ladders from there. If a game is missing from NAMES it earns nothing, silently. Scrabble was missing until the July audit. Pure data plus a little logic, the Chapter 5 shape." },
+  { n:"Firestore", d:"The cloud cabinet. Six people's devices read and write one shared store.", c:"ch8",
+    long:"<b>Not in the repo at all.</b> It lives on Google's servers. The repo only holds the address (the config) and the rules for talking to it. Chapter 8's whole point: the data that has to be the same on your phone and Garrett's iPad cannot live in either one, so it lives here. Every record, every multiplayer room, every reset goes through it." }
+];
+function initAnatomy(){
+  var box=$("anat"); if(!box) return;
+  PARTS.forEach(function(p,i){
+    var row=el("div","part"+(i===0?" on":""));
+    row.innerHTML="<span class='pn'>"+p.n+"</span><span class='pd'>"+p.d+"</span><span class='pc'>"+p.c+"</span>";
+    row.addEventListener("click",function(){ [].forEach.call(box.children,function(x){x.classList.remove("on");}); row.classList.add("on"); $("partDetail").innerHTML=p.long; markMission("anat"); });
+    box.appendChild(row);
+  });
+  $("partDetail").innerHTML=PARTS[0].long;
+}
+
+/* ---------- registration checklist ---------- */
+var regFlags={ tile:false, precache:false, gamekey:false, badges:false };
+function renderChecks(){
+  var box=$("regChecks"); if(!box) return; box.innerHTML="";
+  REG.forEach(function(r){
+    var row=el("div","chk"+(regFlags[r.id]?" on":""));
+    row.innerHTML="<span class='box'>"+(regFlags[r.id]?"✓":"")+"</span><span class='ct'>"+r.label+"</span>";
+    row.addEventListener("click",function(){ regFlags[r.id]=!regFlags[r.id]; renderChecks(); });
+    box.appendChild(row);
+  });
+}
+function shipGame(){
+  var res=registerGame(regFlags); var v=$("regVerdict");
+  if(res.clean){ v.innerHTML="<div class='verdict ok'><div class='vt'>Ships clean.</div>All four lists know about puffkart. It is on the shelf, works offline, resets properly, and earns badges.</div>"; markMission("shipclean"); }
+  else {
+    var li=res.problems.map(function(p){ return "<li><b>"+p.file+"</b>: "+p.why+"</li>"; }).join("");
+    v.innerHTML="<div class='verdict bad'><div class='vt'>Uploads fine. "+res.problems.length+" silent bug"+(res.problems.length>1?"s":"")+".</div>Nothing errors. Here is what quietly goes wrong:<ul>"+li+"</ul></div>";
+    markMission("seebug");
+    if(res.problems.some(function(p){return p.id==="gamekey";})) markMission("v34");
+  }
+}
+function initRegister(){
+  renderChecks();
+  if($("regShip")) $("regShip").addEventListener("click", shipGame);
+  if($("regReset")) $("regReset").addEventListener("click", function(){ regFlags={tile:false,precache:false,gamekey:false,badges:false}; renderChecks(); $("regVerdict").innerHTML=""; });
+}
+
+/* ---------- timeline ---------- */
+function initTimeline(){
+  var tl=$("tl"); if(!tl) return;
+  var max=Math.max.apply(null, FACTS.months.map(function(m){return m[1];}));
+  FACTS.months.forEach(function(m){
+    var row=el("div","tlrow");
+    row.innerHTML="<span class='tlm'>"+m[0]+"</span><div class='tlbar' style='width:"+Math.round(m[1]/max*100)+"%'></div><span class='tln'>"+m[1]+"</span>";
+    tl.appendChild(row);
+  });
+  var st=$("stones"); FACTS.stones.forEach(function(s){ var r=el("div","stone"); r.innerHTML="<span class='sd'>"+s[0]+"</span><span class='st'>"+s[1]+"</span>"; st.appendChild(r); });
+  ["stHtml","stCommits","stKeys","stCache","stPre"].forEach(function(id){ if(!$(id)) return; });
+  $("stHtml").textContent=FACTS.html; $("stCommits").textContent=FACTS.commits; $("stKeys").textContent=FACTS.keys; $("stCache").textContent=FACTS.cache; if($("stPre")) $("stPre").textContent=FACTS.precache;
+  var seen=false; var obs=function(){ if(seen) return; var r=tl.getBoundingClientRect(); if(r.top < (window.innerHeight||800)){ seen=true; markMission("timeline"); } };
+  window.addEventListener("scroll", obs); setTimeout(obs, 50);
+}
+
+/* ---------- missions ---------- */
+var MISSIONS = [
+  { id:"anat",      text:"Tap through at least one part of the anatomy." },
+  { id:"seebug",    text:"Ship puffkart with something missing and read the silent bug." },
+  { id:"v34",       text:"Ship it without the <b>GAME_KEYS</b> entry and see the v34 reset bug explained." },
+  { id:"shipclean", text:"Tick all four registrations and ship clean." },
+  { id:"timeline",  text:"Scroll the timeline into view." },
+  { id:"gym",       text:"Land one gym drill correct." }
+];
+function renderMissions(){ var box=$("missionList"); if(!box)return; var s=getState(); box.innerHTML=""; MISSIONS.forEach(function(m){ var done=!!s.m[m.id]; var row=el("div","mission"+(done?" done":"")); row.innerHTML="<span class='mk'>"+(done?"✓":"")+"</span><span class='mtext'>"+m.text+"</span>"; box.appendChild(row); }); }
+function markMission(id){ var s=getState(); if(!s.m[id]){ s.m[id]=true; saveState(s); renderMissions(); toast("mission done"); } }
+
+/* ---------- GYM: ships clean, or silent bug? ----------
+   answer true = ships clean, false = silent bug
+*/
+function rn(list){ return list[Math.floor(Math.random()*list.length)]; }
+var G_GAMES=["Puff Kart","a new dice game","Bloodstream","a word puzzle","a drum trainer","a card game"];
+function makeDrill(level){
+  var g=rn(G_GAMES), story, clean, hint;
+  if(level===0){ // tile + precache only
+    var missTile = Math.random()<0.5;
+    if(missTile){ story="You upload <b>"+g+"</b>, add it to the sw.js precache and bump the cache, add its key and badge name. You forget the <b>index.html tile</b>."; clean=false; hint="No tile means no way onto the shelf. The page is live at its URL, invisible from the hub. Silent bug."; }
+    else { story="You upload <b>"+g+"</b> and add its tile, key, and badge name. You add it to the precache list but <b>do not bump the cache name</b>."; clean=false; hint="Precache list changed, cache name did not. Old devices keep their old seed and never pick up the new copy. Silent offline gap."; }
+  } else if(level===1){ // gamekey / badges
+    if(Math.random()<0.5){ story="<b>"+g+"</b> is tiled, precached, and bumped. You add its badge name. You skip adding its key to <b>GAME_KEYS</b>."; clean=false; hint="Day-to-day sync still works, so it looks fine. The first household reset skips this key and the listener pushes the records back. The v34 bug, exactly."; }
+    else { story="<b>"+g+"</b> is tiled, precached, bumped, and in GAME_KEYS. You skip <b>achievements.js NAMES</b>."; clean=false; hint="Plays fine, earns nothing. No badge ladder. The Scrabble bug."; }
+  } else if(level===2){ // clean cases
+    var variants=[
+      ["You add <b>"+g+"</b> to all four lists in one commit: tile, precache plus bump, GAME_KEYS, NAMES.", "All four registrations present. Ships clean."],
+      ["You fix a typo inside <b>"+g+"</b>'s own HTML. No shared list changed, no precache change. You upload just that file.", "Network-first means a plain refresh fetches the new file. No list changed, no bump needed. Ships clean."],
+      ["You rename <b>"+g+"</b>'s tile label text in index.html only, nothing else.", "Tile text is hub-only data. Nothing else reads it. Ships clean."]
+    ]; var v=rn(variants); story=v[0]; clean=true; hint=v[1];
+  } else { // mixed
+    var pool=[
+      ["You add <b>"+g+"</b> everywhere but forget <b>GAME_KEYS</b>.", false, "Missing GAME_KEYS: reset will undo itself later. Silent."],
+      ["You add <b>"+g+"</b> to all four lists and bump the cache.", true, "All four. Clean."],
+      ["You delete <b>"+g+"</b>'s file but leave its tile in index.html.", false, "Tile points at a file that is gone. Tapping it 404s. The hub does not check."],
+      ["You change the precache list and bump gameshelf-v70 to v71.", true, "List changed and the name bumped with it. Clean."],
+      ["You rename <b>"+g+"</b>.html but keep the old href in the tile.", false, "Same as Chapter 7: the address changed, the link did not. 404 from the hub."],
+      ["You add <b>"+g+"</b> with a record key, but spell it differently in GAME_KEYS than in the game.", false, "The listed key and the written key do not match, so the real key is effectively unlisted. v34 again, with a typo."]
+    ]; var p=rn(pool); story=p[0]; clean=p[1]; hint=p[2];
+  }
+  return { story:story, loads:clean, hint:hint };
+}
+
+/* ---------- TRAIL drills: the real shelf bugs ---------- */
+var TRAIL_CASES = [
+  { story:"July 2. Eight arcade games (snake, brickbreak, blocks, star defender, minesweeper, gem match, craps, liar's dice) record scores but are not in <b>GAME_KEYS</b>. Everyone's scores sync fine every day. Does the shelf ship clean?",
+    loads:false, hint:"It looked clean for weeks. Then a household reset skipped those eight keys, the onSnapshot listener pushed the surviving records back to every device, and the reset undid itself. Fix 2 of the v34 audit: eight keys added, list duplicate-checked." },
+  { story:"Scrabble is tiled, precached, and in GAME_KEYS, but its name is not in <b>achievements.js NAMES</b>. Clean?",
+    loads:false, hint:"Scrabble played fine and earned nothing. No badge ladder existed for it. Fix 3 of the audit: one line in achievements.js." },
+  { story:"The shelf writes <code>shelf_tv=\"1\"</code> to turn on TV mode. Chess reads <code>gn_tv===\"on\"</code> instead. Does TV mode work in chess?",
+    loads:false, hint:"Two parts of the system disagreed on the key name, so chess could never see TV mode. Fixed to read shelf_tv. Different bug, same shape: lists that do not read each other." },
+  { story:"You fix a bug inside trouble.html only, touch nothing else, and upload. The service worker is network-first. Clean?",
+    loads:true, hint:"Network-first means a plain refresh fetches the new trouble.html. No shared list changed, so no bump needed. This is exactly why the worker was written that way: day-to-day edits need nothing." },
+  { story:"June 14. You deploy a dozen times in two days and the cache name climbs v7 to v16. Each bump is a precache change. Clean?",
+    loads:true, hint:"Bumping on every precache change is the ritual working as designed. Each bump re-seeds every device. Noisy, correct." },
+  { story:"The audit checked every tile href in index.html against the files on disk: 67 refs, all resolve, zero orphan pages. Clean?",
+    loads:true, hint:"That is the registration check done by hand across the whole shelf. All four lists lined up for every game. Clean, and the reason AUDIT-2026-07.md exists." },
+  { story:"Trouble uses <code>GN.room</code> (create, join, pushState, start, watch) for two phones to play one game. Connect 4 does not use it yet. Is cross-device Connect 4 shipping?",
+    loads:false, hint:"Not a bug, a gap: Connect 4 is the designated first port of the room layer, but the file has zero GN.room calls today. Nothing silent, just not built." },
+  { story:"The settled-shelf redesign generated handwriting labels with Math.random, so labels rewrote on every sort. The fix hashes each label from its position. Clean after the fix?",
+    loads:true, hint:"Deterministic from position means the same label every time, every sort. The invariant was validated headlessly: 10 rows, 10 planks, 67 unique links, zero throws." }
+];
+function makeTrailDrill(){ return TRAIL_CASES[Math.floor(Math.random()*TRAIL_CASES.length)]; }
+
+var gym={ level:-1, drill:null, answered:false, track:"general" };
+var GYM_LEVELS=[ {lv:0,name:"tile and cache"}, {lv:1,name:"keys and badges"}, {lv:2,name:"clean ships"}, {lv:3,name:"mixed"} ];
+function gymStatsRender(){ var s=getState(); if($("repN"))$("repN").textContent=s.gym.reps||0; if($("strN"))$("strN").textContent=s.gym.streak||0; if($("bestN"))$("bestN").textContent=s.gym.best||0; }
+function renderGymTabs(){ var box=$("gymTabs"); if(!box)return; box.innerHTML=""; var all=el("button","gtab"+(gym.level===-1?" on":""),"Surprise me"); all.addEventListener("click",function(){gym.level=-1;renderGymTabs();}); box.appendChild(all); GYM_LEVELS.forEach(function(L){ var t=el("button","gtab"+(gym.level===L.lv?" on":""),L.name); t.addEventListener("click",function(){gym.level=L.lv;renderGymTabs();}); box.appendChild(t); }); }
+function gymStart(){ if(gym.track==="trail"){gym.drill=makeTrailDrill();} else {var lv=gym.level===-1?Math.floor(Math.random()*4):gym.level; gym.drill=makeDrill(lv);} gym.answered=false; var card=$("gymCard"); card.className="gymcard active"+(gym.track==="trail"?" trailmode":""); $("gGoal").innerHTML="Ships clean, or silent bug?"; $("gymBoard").innerHTML="<div class='note' style='margin-top:10px'>"+gym.drill.story+"</div>"; $("gHint").className="ghint"; $("gHint").innerHTML=""; $("gStart").style.display="none"; $("gAnswerYes").style.display=""; $("gAnswerNo").style.display=""; $("gHintBtn").style.display=""; $("gSkip").style.display=""; }
+function gymAnswer(saidClean){ if(gym.answered||!gym.drill)return; gym.answered=true; var s=getState(); var correct=(saidClean===gym.drill.loads); var card=$("gymCard"); if(correct){ s.gym.reps=(s.gym.reps||0)+1; s.gym.streak=(s.gym.streak||0)+1; if(s.gym.streak>(s.gym.best||0))s.gym.best=s.gym.streak; saveState(s); card.className="gymcard win"+(gym.track==="trail"?" trailmode":""); $("gGoal").innerHTML="Correct. "+(gym.drill.loads?"Ships clean.":"Silent bug."); markMission("gym"); } else { s.gym.streak=0; saveState(s); card.className="gymcard"+(gym.track==="trail"?" trailmode":""); $("gGoal").innerHTML="Not quite. "+(gym.drill.loads?"It actually ships clean.":"It actually carries a silent bug."); } $("gHint").className="ghint show"; $("gHint").innerHTML=gym.drill.hint; gymStatsRender(); $("gAnswerYes").style.display="none"; $("gAnswerNo").style.display="none"; $("gHintBtn").style.display="none"; $("gSkip").style.display="none"; $("gStart").style.display=""; $("gStart").textContent="Next drill"; }
+function gymSkip(){ var s=getState(); s.gym.streak=0; saveState(s); gymStatsRender(); if(gym.drill){ $("gHint").className="ghint show"; $("gHint").innerHTML="Answer: "+(gym.drill.loads?"ships clean.":"silent bug.")+" "+gym.drill.hint; } gym.answered=true; $("gAnswerYes").style.display="none"; $("gAnswerNo").style.display="none"; $("gHintBtn").style.display="none"; $("gSkip").style.display="none"; $("gStart").style.display=""; $("gStart").textContent="Next drill"; }
+function setTrack(t){ gym.track=t; var g=$("trackGeneral"),tr=$("trackTrail"),tabs=$("gymTabs"),ban=$("trailBanner"); if(g)g.classList.toggle("on",t==="general"); if(tr)tr.classList.toggle("on",t==="trail"); if(tabs)tabs.style.display=(t==="trail")?"none":""; if(ban)ban.className="trailbanner"+(t==="trail"?" show":""); var card=$("gymCard"); if(card)card.className="gymcard"; if($("gGoal"))$("gGoal").innerHTML=(t==="trail")?"The real shelf bugs. Tap <b>Start drill</b>.":"Pick a level (or Surprise me) and tap <b>Start drill</b>."; if($("gymBoard"))$("gymBoard").innerHTML=""; if($("gHint")){$("gHint").className="ghint";$("gHint").innerHTML="";} ["gAnswerYes","gAnswerNo","gHintBtn","gSkip"].forEach(function(id){if($(id))$(id).style.display="none";}); if($("gStart")){$("gStart").style.display="";$("gStart").textContent="Start drill";} }
+function initGym(){ renderGymTabs(); gymStatsRender(); if($("trackGeneral"))$("trackGeneral").addEventListener("click",function(){setTrack("general");}); if($("trackTrail"))$("trackTrail").addEventListener("click",function(){setTrack("trail");}); if($("gStart"))$("gStart").addEventListener("click",gymStart); if($("gAnswerYes"))$("gAnswerYes").addEventListener("click",function(){gymAnswer(true);}); if($("gAnswerNo"))$("gAnswerNo").addEventListener("click",function(){gymAnswer(false);}); if($("gHintBtn"))$("gHintBtn").addEventListener("click",function(){ if(gym.drill){$("gHint").className="ghint show";$("gHint").innerHTML=gym.drill.hint;} }); if($("gSkip"))$("gSkip").addEventListener("click",gymSkip); }
+
+/* ---------- quiz ---------- */
+var QUIZ = [
+  { q:"A new game's HTML file is uploaded to the repo. Is it on the shelf?", opts:["Yes, upload is enough","Only once index.html has a tile entry pointing at it","Only after Firebase approves it","Only on the next cache bump"], a:1 },
+  { q:"What does the cache name in sw.js (gameshelf-v70) actually do when you bump it?", opts:["Changes the shelf colors","Tells every device to throw out old saved copies and re-seed","Deletes Firestore records","Nothing, it is decorative"], a:1 },
+  { q:"Eight games were missing from GAME_KEYS. Daily sync still worked. What broke?", opts:["The games would not open","Household reset skipped them and the listener pushed records back","Badges doubled","The hub crashed"], a:1 },
+  { q:"Why does editing one game's own HTML need no cache bump?", opts:["Games are not cached","The worker is network-first, a refresh fetches the new file; bumps are for precache list changes","Git does it automatically","Firebase re-caches it"], a:1 },
+  { q:"Where does the shared data (records, rooms) actually live?", opts:["In index.html","In gamenight.js","In each device's localStorage","In Firestore, on Google's servers; the repo only holds the address and rules"], a:3 }
+];
+var quizAnswered={};
+function renderQuiz(){ var box=$("quizBox"); if(!box)return; box.innerHTML=""; QUIZ.forEach(function(item,qi){ var wrap=el("div","quizq"); wrap.appendChild(el("div","q",(qi+1)+". "+item.q)); item.opts.forEach(function(opt,oi){ var b=el("button","quizopt",opt); b.addEventListener("click",function(){ if(quizAnswered[qi]!=null)return; quizAnswered[qi]=oi; var kids=wrap.querySelectorAll(".quizopt"); kids[item.a].classList.add("right"); if(oi!==item.a)b.classList.add("wrong"); var got=0,ans=0; for(var k in quizAnswered){ans++; if(quizAnswered[k]===QUIZ[k].a)got++;} if(ans===QUIZ.length){ var s=getState(); if(got>(s.quizBest||0)){s.quizBest=got;saveState(s);} box.appendChild(el("div","qresult","You got "+got+" / "+QUIZ.length+(got===QUIZ.length?", perfect.":"."))); } }); wrap.appendChild(b); }); box.appendChild(wrap); }); }
+
+/* ---------- badge + boot ---------- */
+function initBadge(){ var b=$("vbadge"); if(!b)return; b.textContent=VERSION.split(" ")[0]; b.addEventListener("click",function(){ toast("The Shelf Dissected · "+VERSION); }); }
+function initApp(){ initBadge(); initAnatomy(); initRegister(); initTimeline(); renderMissions(); initGym(); renderQuiz(); }
+if(typeof window!=="undefined" && typeof document!=="undefined"){ if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",initApp); } else { initApp(); } }
+if(typeof module!=="undefined" && module.exports){ module.exports={ registerGame:registerGame, cacheOk:cacheOk, makeDrill:makeDrill, makeTrailDrill:makeTrailDrill, FACTS:FACTS, REG:REG }; }
+</script>
+
+</html>
