@@ -184,7 +184,7 @@ footer{color:#54617a;font-size:12.5px;text-align:center;margin:30px 0 10px;line-
       <h1>The Fast Idiot</h1>
       <p class="sub" style="font-size:18px">What a computer actually is: a very fast worker following a very dumb list.</p>
     </div>
-    <button id="vbadge" aria-label="version">v3.1</button>
+    <button id="vbadge" aria-label="version">v3.2</button>
   </div>
   <svg class="herosvg" viewBox="0 0 270 110" aria-hidden="true">
     <rect x="95" y="25" width="80" height="60" rx="10" fill="#1c2536" stroke="#45c8ff" stroke-width="2.5"/>
@@ -353,7 +353,7 @@ footer{color:#54617a;font-size:12.5px;text-align:center;margin:30px 0 10px;line-
 <div id="toast" role="status"></div>
 <script>
 "use strict";
-var VERSION = "v3.1 · Aug 26";
+var VERSION = "v3.2 · Oct 22";
 
 /* ============ ENGINE (DOM-free) ============ */
 /* Instructions: ["SET",r,n] ["ADD",r,n] ["SUB",r,n] ["ADDR",r,r2] ["SHOW",r] ["JUMPIF",r,line] ["HALT"] */
@@ -514,9 +514,7 @@ function initApp(){
   ];
   var pIdx = 0, mach = null, runTimer = null;
   function cloneProg(p){ return p.map(function(row){ return row.slice(); }); }
-  function insText(ins){
-    return ins.map(function(x, i){ return (i === 0 ? x : x); }).join(" ");
-  }
+
   function loadProgram(i){
     pIdx = i;
     clearInterval(runTimer); runTimer = null;

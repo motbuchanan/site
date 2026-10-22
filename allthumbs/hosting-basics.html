@@ -358,7 +358,7 @@
     <h1>Ship It</h1>
     <p class="subtitle">How a file on your phone becomes a web address anyone can open.</p>
   </div>
-  <button class="vbadge" id="vbadge" type="button">v0.6</button>
+  <button class="vbadge" id="vbadge" type="button">v0.7</button>
 </header>
 
 <nav>
@@ -543,7 +543,7 @@
 
 <script>
 "use strict";
-var VERSION = "v0.6 \u00B7 Aug 26";
+var VERSION = "v0.7 \u00B7 Oct 22";
 var STORE_KEY = "hosting101_v1";
 
 /* ---------- guarded storage ---------- */
@@ -622,7 +622,7 @@ function renderRepo(){
   var box = $("repoFiles"); if(!box) return;
   box.innerHTML = "";
   if(repoState.length === 0){
-    box.appendChild(el("div","filerow","<span class='soft' style='color:var(--dim)'>empty repo &mdash; add a file</span>"));
+    box.appendChild(el("div","filerow","<span class='soft' style='color:var(--dim)'>empty repo, add a file</span>"));
     return;
   }
   repoState.forEach(function(f){
@@ -646,8 +646,8 @@ function publishRepo(){
   // bare address note
   var bare = servePath(repoState, "");
   var b = el("div","note", bare.status === 200 ?
-    "The bare address <code>&hellip;/demo/</code> works too &mdash; it serves <code>index.html</code>." :
-    "Heads up: the bare address <code>&hellip;/demo/</code> would 404 &mdash; there's no <code>index.html</code> yet.");
+    "The bare address <code>&hellip;/demo/</code> works too, it serves <code>index.html</code>." :
+    "Heads up: the bare address <code>&hellip;/demo/</code> would 404, there's no <code>index.html</code> yet.");
   box.appendChild(b);
   markMission("publish");
 }
@@ -679,7 +679,7 @@ function initDoorSandbox(){
       markMission("door");
     } else {
       view.className = "viewport err";
-      view.innerHTML = "<span class='big'>&#10060;</span><h4>404 &mdash; not found</h4><div class='soft small'>no <code>index.html</code> at the front door</div><div class='u'>motbuchanan.github.io/demo/</div>";
+      view.innerHTML = "<span class='big'>&#10060;</span><h4>404, not found</h4><div class='soft small'>no <code>index.html</code> at the front door</div><div class='u'>motbuchanan.github.io/demo/</div>";
     }
   }
   if(withB) withB.addEventListener("click", function(){ show(true); });
@@ -732,7 +732,7 @@ function initTrapSandbox(){
       urlEl.textContent = "content://downloads/12/index.html";
       lockEl.innerHTML = "&#9888;&#65039;";
       view.className = "viewport err";
-      view.innerHTML = "<span class='big'>&#128533;</span><h4>Runs, but things break</h4><div class='soft small'>progress may not save, some images fail, no service worker &mdash; this is not the web</div>";
+      view.innerHTML = "<span class='big'>&#128533;</span><h4>Runs, but things break</h4><div class='soft small'>progress may not save, some images fail, no service worker, this is not the web</div>";
     }
   }
   if(picker) picker.addEventListener("click", function(e){
@@ -766,10 +766,6 @@ function renderMissions(){
 function markMission(id){
   var s = getState();
   if(!s.m[id]){ s.m[id] = true; saveState(s); renderMissions(); toast("mission done"); }
-}
-function countDone(st){
-  st = st || getState();
-  var n = 0; MISSIONS.forEach(function(m){ if(st.m && st.m[m.id]) n++; }); return n;
 }
 
 /* ---------- GYM: will this address load? ---------- */
@@ -956,9 +952,9 @@ var QUIZ = [
   { q:"You visit \u2026/demo/ with no file name. What does the host look for?",
     opts:["home.html","main.html","index.html","start.html"], a:2 },
   { q:"Your code says <code>img/logo.png</code> but the file is in the repo root. What happens?",
-    opts:["It loads fine","Broken image \u2014 404","It moves the file automatically","The page won't open at all"], a:1 },
+    opts:["It loads fine","Broken image, 404","It moves the file automatically","The page won't open at all"], a:1 },
   { q:"You open your file from Downloads and the address bar shows content:// . Progress isn't saving. Why?",
-    opts:["The file is corrupted","You need a new phone","That's local storage, not the web \u2014 open the https:// address","GitHub is down"], a:2 },
+    opts:["The file is corrupted","You need a new phone","That's local storage, not the web, open the https:// address","GitHub is down"], a:2 },
   { q:"Easiest way to get images onto GitHub Pages from a phone?",
     opts:["Upload a zip and it unpacks","Keep files flat in the repo root and point at them by bare name","Email them to GitHub","You can't host images"], a:1 }
 ];
@@ -983,7 +979,7 @@ function renderQuiz(){
         if(ans === QUIZ.length){
           var s = getState();
           if(got > (s.quizBest||0)){ s.quizBest = got; saveState(s); }
-          var tot = el("div","qresult","You got " + got + " / " + QUIZ.length + (got===QUIZ.length ? " \u2014 perfect." : "."));
+          var tot = el("div","qresult","You got " + got + " / " + QUIZ.length + (got===QUIZ.length ? ", perfect." : "."));
           box.appendChild(tot);
         }
       });

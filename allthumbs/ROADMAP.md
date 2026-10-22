@@ -1,5 +1,21 @@
 # All Thumbs — course roadmap and state
 
+## v1.21 (Oct 22 2026) - full audit of the live course after ch8-10 went up
+
+Pulled motbuchanan/site fresh and audited all 11 files (hub + 10 chapters) that are live at v1.20.
+Checked per file: em/en dashes in raw, escaped (\u2014) and entity (&mdash;) form; Jekyll tokens; unescaped </script in JS; every thumb-*.png referenced exists; every href resolves; duplicate ids; node --check + acorn on every script; jsdom boot with console-error capture; gym starts on General AND Trail with level tabs hidden on Trail; quiz completes and persists quizBest; hub row key matches each chapter's storage key; hub `total` matches each chapter's real mission/lesson count; hub integration test seeding every state shape (m / missions / lessons) and reading the rendered percentages; dead-function scan.
+
+Findings and fixes:
+- hosting-basics.html: 8 dashes hiding as &mdash; and \u2014 (the original gate only caught the raw character). Removed. Dead function countDone() removed. Bumped v0.6 -> v0.7.
+- computer-basics.html: dead function insText() removed. Bumped v3.1 -> v3.2.
+- linux-basics.html: primeSeen flagged by the scanner but it is a named self-invoking function, so it runs. Left alone.
+- index.html (hub): lede still said every gym has a "Your work" level (the pre-Trail name). Rewritten to describe General + The Trail. Chapters 8-10 were filed under "Unit 2 - Your toolbox"; added "Unit 3 - Under your own apps" and moved data/api/shelf there (3/4/3). Bumped v1.20 -> v1.21.
+- Everything else clean: all 10 chapters boot with zero console errors, all gyms run both tracks, all quizzes are 5 questions and persist, all hub totals match (5/6/6/6/4/7/6/6/6/6), all images and links resolve, zero dashes elsewhere, zero Jekyll tokens.
+- Site card (motbuchanan.com index.html, v7.51 -> v7.52): APPINFO allthumbs/ entry said "7 of 10 chapters built", listed 8 files, "the hub plus seven chapters", and the how-text named seven chapters. Updated to 10 of 10, 11 files (size stat is measured live from that list), "the hub plus ten chapters", how-text names all ten and the two gym tracks. shot-allthumbs-1.jpg re-rendered from the v1.21 hub at 480x1038 (old one showed v1.16). CHANGES log entry added.
+
+Hub rules confirmed in the audit: a chapter shows "complete" at quiz 4/5 or better (the day-one rule); progress reads state.m, state.missions or state.lessons, so all three generations of chapter state shape work.
+
+
 ## v1.20 (Oct 22 2026) - Chapter 10: The Shelf Dissected (KEYSTONE). Tier 2 complete.
 
 - NEW chapter: shelf-dissected.html (storage key shelf101_v1, brass accent #d9b35a, thumb-beside-phone hero, cool + nice poke-ins). The keystone: Mot's real Game Shelf taken apart. NOT a simulator: every number, file name and bug is read from the live motbuchanan/gameshelf repo (cloned with history on Oct 22) and AUDIT-2026-07.md. Facts baked in: 84 HTML pages, 282 commits (Jun 9 to Oct 21; 114/40/29/48/51 per month), 47 GAME_KEYS, sw cache gameshelf-v70 with 135 precached files, Firestore project buchanan-gameshelf, 4 onSnapshot listeners, GN.room (create/join/pushState/start/watch) live in Trouble, zero GN.room calls in Connect 4 yet.
