@@ -133,6 +133,8 @@ body.cb .key.hit{background:linear-gradient(160deg,#f0813f,#cf5f1e);color:#160a0
 body.cb .key.near{background:linear-gradient(160deg,#5aa4ea,#3577c2);color:#04101e}
 body.cb .ttile.hit{background:linear-gradient(160deg,#f0813f,#cf5f1e);color:#160a02;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 0 14px rgba(232,112,58,.5)}
 body.cb .ttile.near{background:linear-gradient(160deg,#5aa4ea,#3577c2);color:#04101e;box-shadow:inset 0 1px 0 rgba(255,255,255,.3)}
+@media (orientation:landscape) and (max-height:520px){.key{height:40px}#kb{gap:5px;padding-top:4px}#grid{width:min(86vw,340px,calc((100svh - 290px) / 1.25))}}
+.ver{display:block;margin:10px auto 0;text-align:center;font:600 11px ui-monospace,monospace;letter-spacing:.04em;color:var(--dim,#8a94a6);background:none;border:none;padding:8px 12px;min-height:32px}
 </style>
 </head>
 <body>
@@ -195,6 +197,7 @@ body.cb .ttile.near{background:linear-gradient(160deg,#5aa4ea,#3577c2);color:#04
     <button class="tog" id="tgCB" role="switch" aria-checked="false" aria-label="High Contrast"><span class="knob"></span></button>
   </div>
   <button class="btn ghost" id="bSetClose">Close</button>
+  <button class="ver" id="bVer" type="button"></button>
 </div></div>
 
 <div class="sheet" id="shStats"><div class="sbox">
@@ -214,11 +217,15 @@ body.cb .ttile.near{background:linear-gradient(160deg,#5aa4ea,#3577c2);color:#04
 <script>
 "use strict";
 var $=function(i){return document.getElementById(i);};
-var VERSION="v1.1";
+var VERSION="v1.2 \u00b7 Oct 23";
+/* safe storage: falls back to memory when the browser blocks saving (private mode) */
+var MEM={};
+function sget(k){try{var v=localStorage.getItem(k);if(v!=null)return v;}catch(e){}return (k in MEM)?MEM[k]:null;}
+function sset(k,v){MEM[k]=String(v);try{localStorage.setItem(k,String(v));}catch(e){}}
 
 /* ---------- settings state ---------- */
-function pref(k){try{return localStorage.getItem(k)==="1";}catch(e){return false;}}
-function setPref(k,v){try{localStorage.setItem(k,v?"1":"0");}catch(e){}}
+function pref(k){return sget(k)==="1";}
+function setPref(k,v){sset(k,v?"1":"0");}
 var CB=pref("fl_cb"), HARD=pref("fl_hard");
 function applyCB(){
   document.body.classList.toggle("cb",CB);
@@ -269,12 +276,12 @@ function todayKey(){
 /* ---------- stats ---------- */
 var SKEY="fiveletters_stats_v1", DKEY="fiveletters_daily_v1";
 function loadStats(){
-  try{return JSON.parse(localStorage.getItem(SKEY))||{played:0,won:0,streak:0,best:0,dist:[0,0,0,0,0,0]};}
+  try{return JSON.parse(sget(SKEY))||{played:0,won:0,streak:0,best:0,dist:[0,0,0,0,0,0]};}
   catch(e){return {played:0,won:0,streak:0,best:0,dist:[0,0,0,0,0,0]};}
 }
-function saveStats(s){try{localStorage.setItem(SKEY,JSON.stringify(s));}catch(e){}}
-function loadDaily(){try{return JSON.parse(localStorage.getItem(DKEY))||{};}catch(e){return {};}}
-function saveDaily(o){try{localStorage.setItem(DKEY,JSON.stringify(o));}catch(e){}}
+function saveStats(s){sset(SKEY,JSON.stringify(s));}
+function loadDaily(){try{return JSON.parse(sget(DKEY))||{};}catch(e){return {};}}
+function saveDaily(o){sset(DKEY,JSON.stringify(o));}
 
 /* ---------- board ---------- */
 function buildGrid(){
@@ -506,9 +513,10 @@ $("bHelp").onclick=function(){$("shHelp").classList.add("on");};
 $("bHelpClose").onclick=function(){$("shHelp").classList.remove("on");};
 $("bStats").onclick=openStats;
 $("bStatsClose").onclick=function(){$("shStats").classList.remove("on");};
-$("bTutClose").onclick=function(){$("shTut").classList.remove("on");try{localStorage.setItem("fl_tut_seen","1");}catch(e){}};
+$("bTutClose").onclick=function(){$("shTut").classList.remove("on");sset("fl_tut_seen","1");};
 $("bSet").onclick=function(){$("shSet").classList.add("on");};
 $("bSetClose").onclick=function(){$("shSet").classList.remove("on");};
+$("bVer").textContent=VERSION;$("bVer").onclick=function(){toast(VERSION+" loaded");};
 function drawTogs(){
   $("tgHard").classList.toggle("on",HARD); $("tgHard").setAttribute("aria-checked",HARD?"true":"false");
   $("tgCB").classList.toggle("on",CB); $("tgCB").setAttribute("aria-checked",CB?"true":"false");
@@ -548,7 +556,7 @@ window.addEventListener("keydown",function(e){
 newGame("daily");
 // first-run tutorial: show once, ever
 try{
-  if(!localStorage.getItem("fl_tut_seen")){
+  if(!sget("fl_tut_seen")){
     setTimeout(function(){$("shTut").classList.add("on");},450);
   }
 }catch(e){}

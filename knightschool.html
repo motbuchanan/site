@@ -66,6 +66,8 @@
   .sw{width:58px;height:42px;border-radius:9px;border:2px solid var(--mb-line);cursor:pointer;overflow:hidden;display:grid;grid-template-columns:1fr 1fr;padding:0;}
   .sw.cur{border-color:var(--mb-teal);box-shadow:0 0 0 2px rgba(76,240,224,.35);}
   .sw i{display:block;}
+  .sw.fin{width:auto;min-width:76px;display:flex;align-items:center;justify-content:center;}
+  button{-webkit-user-select:none;user-select:none;}
   /* ---- motion: piece slides + effects ---- */
   #frame{position:relative;}
   #flyLayer{position:absolute;inset:9px;pointer-events:none;overflow:hidden;border-radius:6px;z-index:5;}
@@ -170,7 +172,7 @@
   <button class="act ghost" id="backBtn" style="display:none;">&#8617; Takeback</button>
   <button class="act" id="learnBtn">Learn</button><button class="act ghost" id="themeBtn">Theme</button>
 </div>
-<button class="mb-ver" id="mbVer" type="button">v1.1 &middot; Sep 21</button><div id="mbToast" role="status"></div>
+<button class="mb-ver" id="mbVer" type="button">v1.2 &middot; Oct 23</button><div id="mbToast" role="status"></div>
 <div class="ov" id="learnOv"><h1>Learn chess</h1>
   <div style="max-height:56vh;overflow:auto;width:min(88vw,420px);" id="lsList"></div>
   <button class="act" id="lsClose">Close</button></div>
@@ -876,33 +878,35 @@ const PIECE_THEMES=[
  {id:"maple",pw1:"#ecd2a0",pw2:"#c8a468",pws:"#6a4a22",pb1:"#7a5230",pb2:"#46280f",pbs:"#1e0f04"},
  {id:"frost",pw1:"#f2f8fc",pw2:"#c2d4e2",pws:"#48637a",pb1:"#3c628c",pb2:"#1d3a5c",pbs:"#0c1a2c"},
  {id:"rose",pw1:"#f4dcd8",pw2:"#d8aaa2",pws:"#7a4a42",pb1:"#5c5662",pb2:"#332f3c",pbs:"#16141c"}];
-let themeB=localStorage.getItem("ks_theme_b")||"walnut";
-let themeP=localStorage.getItem("ks_theme_p")||"ivory";
+/* safe storage: falls back to memory when the browser blocks saving (private mode) */
+const LS=(function(){const mem={};return{get(k,d){try{const v=localStorage.getItem(k);if(v!=null)return v;}catch(e){}return k in mem?mem[k]:d;},set(k,v){mem[k]=String(v);try{localStorage.setItem(k,String(v));}catch(e){}}};})();
+let themeB=LS.get("ks_theme_b","walnut");
+let themeP=LS.get("ks_theme_p","ivory");
 /* ===== CLOSET FORK: board finishes ===== */
 const FINISHES=[{id:"clean",label:"Clean"},{id:"satin",label:"Satin"},{id:"wood",label:"Woodshop"}];
-let finishId=localStorage.getItem("ks_finish")||"satin";
+let finishId=LS.get("ks_finish","satin");
 function applyFinish(){const fr=document.getElementById("frame");
   fr.classList.remove("fin-satin","fin-wood");
   if(finishId==="satin")fr.classList.add("fin-satin");
   if(finishId==="wood")fr.classList.add("fin-wood");
-  localStorage.setItem("ks_finish",finishId);}
+  LS.set("ks_finish",finishId);}
 function applyTheme(){applyFinish();const b=BOARD_THEMES.find(t=>t.id===themeB)||BOARD_THEMES[0];
   const p=PIECE_THEMES.find(t=>t.id===themeP)||PIECE_THEMES[0];
   const r=document.documentElement.style;
   r.setProperty("--lt",b.lt);r.setProperty("--dk",b.dk);r.setProperty("--fr1",b.fr1);r.setProperty("--fr2",b.fr2);
   r.setProperty("--bg1",b.bg1);r.setProperty("--bg2",b.bg2);
   for(const k of["pw1","pw2","pws","pb1","pb2","pbs"])r.setProperty("--"+k,p[k]);
-  localStorage.setItem("ks_theme_b",themeB);localStorage.setItem("ks_theme_p",themeP);
+  LS.set("ks_theme_b",themeB);LS.set("ks_theme_p",themeP);
   if(st)render();}
 /* ---------- state ---------- */
 let P={w:{name:"White"},b:{name:"Black"}};
 let st=null,sel=-1,legalNow=[],lastMv=null,phase="over",GS=null;
-let botLevel=+(localStorage.getItem("ks_bot_level")||0),botBusy=false,botKey="";
-let thinkPref=localStorage.getItem("ks_think")||"normal";
+let botLevel=+(LS.get("ks_bot_level","0")||0),botBusy=false,botKey="";
+let thinkPref=LS.get("ks_think","normal");
 const THINK={quick:{msMult:0.45,depthBonus:0,label:"Quick"},normal:{msMult:1,depthBonus:0,label:"Normal"},patient:{msMult:2.2,depthBonus:1,label:"Patient"}};
 function thinkOpts(){return THINK[thinkPref]||THINK.normal;}
 let coach=false,hintShown=null,pendingPromo=null,lastHintMove=null;
-const TVMODE=localStorage.getItem("shelf_tv")==="1";
+const TVMODE=LS.get("shelf_tv","0")==="1";
 const boardEl=document.getElementById("board");
 const RM=window.matchMedia&&window.matchMedia("(prefers-reduced-motion:reduce)").matches;
 let flyLayer=null,noSlide=false,drag=null,suppressClick=false;
@@ -1385,19 +1389,19 @@ function lvLabel(){document.getElementById("botBtn").textContent="vs Computer: "
 function buildThinkRow(){const r=document.getElementById("thinkRow");r.innerHTML="";
   for(const key of ["quick","normal","patient"]){const b=document.createElement("button");
     b.textContent=THINK[key].label;if(key===thinkPref)b.classList.add("cur");
-    b.addEventListener("click",()=>{thinkPref=key;localStorage.setItem("ks_think",key);botKey="";buildThinkRow();lvLabel();});
+    b.addEventListener("click",()=>{thinkPref=key;LS.set("ks_think",key);botKey="";buildThinkRow();lvLabel();});
     r.appendChild(b);}}
 document.getElementById("botBtn").addEventListener("click",()=>{
   const g=document.getElementById("lvGrid");g.innerHTML="";
   for(let i=1;i<=10;i++){const b=document.createElement("button");
     b.textContent=i;if(i===botLevel)b.classList.add("cur");
-    b.addEventListener("click",()=>{botLevel=i;localStorage.setItem("ks_bot_level",i);botKey="";
+    b.addEventListener("click",()=>{botLevel=i;LS.set("ks_bot_level",i);botKey="";
       lvLabel();document.getElementById("lvOv").classList.remove("show");
       setMsg("Computer plays Black at level "+i+" ("+(THINK[thinkPref]||THINK.normal).label+" thinking time).");render();});
     g.appendChild(b);}
   buildThinkRow();
   document.getElementById("lvOv").classList.add("show");});
-document.getElementById("lvOff").addEventListener("click",()=>{botLevel=0;localStorage.setItem("ks_bot_level",0);
+document.getElementById("lvOff").addEventListener("click",()=>{botLevel=0;LS.set("ks_bot_level",0);
   lvLabel();document.getElementById("lvOv").classList.remove("show");setMsg("Two players at the board.");render();});
 /* ---------- theme picker ---------- */
 document.getElementById("themeBtn").addEventListener("click",()=>{
@@ -1409,7 +1413,7 @@ document.getElementById("themeBtn").addEventListener("click",()=>{
     sb.appendChild(b);}
   /* CLOSET FORK: finish swatches */
   const sf=document.getElementById("swF");if(sf){sf.innerHTML="";
-    for(const f of FINISHES){const b=document.createElement("button");b.className="sw"+(f.id===finishId?" cur":"");
+    for(const f of FINISHES){const b=document.createElement("button");b.className="sw fin"+(f.id===finishId?" cur":"");
       b.innerHTML='<span style="font-size:.72rem;padding:0 6px;">'+f.label+'</span>';
       b.addEventListener("click",()=>{finishId=f.id;applyFinish();
         sf.querySelectorAll(".sw").forEach(x=>x.classList.remove("cur"));b.classList.add("cur");});
@@ -1472,5 +1476,5 @@ window.GN&&GN.sync&&GN.sync();
 
 </script>
 <script>
-(function(){var t=document.getElementById("mbToast"),tm=0;document.getElementById("mbVer").onclick=function(){t.textContent="v1.1 loaded";t.classList.add("show");clearTimeout(tm);tm=setTimeout(function(){t.classList.remove("show");},1400);};})();
+(function(){var t=document.getElementById("mbToast"),tm=0;document.getElementById("mbVer").onclick=function(){t.textContent="v1.2 loaded";t.classList.add("show");clearTimeout(tm);tm=setTimeout(function(){t.classList.remove("show");},1400);};})();
 </script></body></html>
