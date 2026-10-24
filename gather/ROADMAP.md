@@ -6,11 +6,12 @@ Self-documenting record for the `gather/` folder app inside motbuchanan/site. Re
 A private, single-device family occasion planner: household profiles (the spine), gifts + budgets, a no-repeat Secret Santa with a pass-the-phone hold-to-light reveal, potluck sign-up, party games, countdown hub. Six themes (Halloween, Thanksgiving, Birthday, Winter Holiday, Easter, New Year's Eve), with moving-holiday dates computed rather than hardcoded. Every occasion is its own container sharing one household. Free on motbuchanan.com; opens in the site's app viewer (iframe) and also works on its own at motbuchanan.com/gather/.
 
 ## Current version
-- index.html: **v0.8 · Oct 23** (badge = `VERSION` const + .mb-ver pill)
-- sw.js CACHE: `gather-v0.8` (must match the badge every deploy)
+- index.html: **v0.8.1 · Oct 24** (badge = `VERSION` const + .mb-ver pill)
+- sw.js CACHE: `gather-v0.8.1` (must match the badge every deploy)
 - Storage keys: `gather.v1` (state, internal v:3), `gather.seenAbout` (first-open About shown)
 
 ## What shipped
+- v0.8.1 (Oct 24): fonts load from the site's shared fonts/ folder instead of Google; fonts added to the offline list.
 - v0.8 (Oct 23): break-test fixes. Version badge no longer covers the footer line, bigger About link, no text highlight on fast taps, Quit game on the Pass the phone screen, cache bumped so installed copies update.
 - v0.7 (Sep 27): Guess the ___, a two-player pass-the-phone deduction game. 24 procedurally drawn SVG faces from attribute vectors, themed cast names per occasion, family mode that puts your own roster on the board, and a face editor that saves each person's look to `person.gwFace`. All six bottom-nav icons now theme (they had been stuck on Halloween since v0.1).
 - v0.6 (Sep 27): Easter and New Year's Eve themes. Self-computing date engine: anonymous Gregorian algorithm for Easter, nth-weekday for Thanksgiving, `md:[month,day]` for fixed holidays. `defaultDate(theme)` returns the next upcoming occurrence, so no default ever goes stale.

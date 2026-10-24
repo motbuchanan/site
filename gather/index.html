@@ -8,8 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Gather">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="../fonts/fonts.css" rel="stylesheet">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" href="icon-192.png">
 <title>Gather</title>
@@ -418,7 +417,7 @@
 
 <div class="scrim" id="scrim"><div class="sheet" id="sheet"></div></div>
 <div class="toast" id="toast"></div>
-<button class="mb-ver" id="mbVer" type="button">v0.8 · Oct 23</button>
+<button class="mb-ver" id="mbVer" type="button">v0.8.1 · Oct 24</button>
 <div class="gwrap" id="gwrap">
   <div class="gwtop"><div class="r1"><div class="t" id="gwTitle">Guess the Guest</div><button class="gwx" id="gwPeek">Peek</button><button class="gwx" id="gwQuit">Quit</button></div><div class="gwmode" id="gwMode"></div></div>
   <div class="gwgrid" id="gwGrid"></div>
@@ -430,7 +429,7 @@
 <script>
 "use strict";
 (function(){
-  var VERSION = "v0.8 · Oct 23";
+  var VERSION = "v0.8.1 · Oct 24";
   var KEY = "gather.v1";
   var THEMES = {
     halloween:{ label:"Halloween", emoji:"🎃", md:[9,31],
