@@ -1,5 +1,7 @@
 # All Thumbs — course roadmap and state
 
+## v1.22 (Oct 24 2026) - fonts load from the site's shared fonts/ folder (../fonts/fonts.css) instead of Google. No content change.
+
 ## v1.21 (Oct 22 2026) - full audit of the live course after ch8-10 went up
 
 Pulled motbuchanan/site fresh and audited all 11 files (hub + 10 chapters) that are live at v1.20.

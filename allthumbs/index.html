@@ -8,8 +8,7 @@
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="../fonts/fonts.css" rel="stylesheet">
 
 <title>All Thumbs: build it on a phone</title>
 <meta name="description" content="Six small interactive explainers, one map: computer, internet, browser, Linux, Python, and Git, with live progress tracking.">
@@ -132,10 +131,10 @@ footer{color:#5b6272;font-size:12.5px;text-align:center;margin:30px 0 10px;line-
 </footer>
 </main>
 <div id="toast" role="status"></div>
-<button class="mb-ver" id="mbVer" type="button">v1.21 &middot; Oct 22</button>
+<button class="mb-ver" id="mbVer" type="button">v1.22 &middot; Oct 24</button>
 <script>
 "use strict";
-var VERSION = "v1.21 · Oct 22";
+var VERSION = "v1.22 · Oct 24";
 
 /* pure helpers (testable) */
 function countDone(state){
@@ -192,7 +191,7 @@ function initApp(){
     clearTimeout(toastT);
     toastT = setTimeout(function(){ el.classList.remove("show"); }, 1800);
   }
-  $("mbVer").addEventListener("click", function(){ toast("v1.17 loaded"); });
+  $("mbVer").addEventListener("click", function(){ toast("v1.22 loaded"); });
 
   function readState(key){
     try {
