@@ -1,1 +1,32 @@
+/* motbuchanan.com shared fonts · v1.0 · Oct 24 2026
+   Every app on the site loads its fonts from here, never from Google or any other server.
+   Link it from a page with the right relative path:
+     site root page:        <link rel="stylesheet" href="fonts/fonts.css">
+     page one folder down:  <link rel="stylesheet" href="../fonts/fonts.css">
+   Adding a font: drop its .woff2 in this folder, add an @font-face block below,
+   and add a line to README.md. Family names match the Google Fonts names exactly,
+   so existing CSS (font-family:'Archivo') keeps working unchanged. */
 
+/* Archivo: variable, any weight 100-900 */
+@font-face{font-family:'Archivo';font-style:normal;font-weight:100 900;font-display:swap;src:url(archivo.woff2) format('woff2');}
+
+/* JetBrains Mono: variable, any weight 100-800 */
+@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:100 800;font-display:swap;src:url(jetbrains-mono.woff2) format('woff2');}
+
+/* Space Grotesk: variable, any weight 300-700 */
+@font-face{font-family:'Space Grotesk';font-style:normal;font-weight:300 700;font-display:swap;src:url(space-grotesk.woff2) format('woff2');}
+
+/* Space Mono: 400 and 700 */
+@font-face{font-family:'Space Mono';font-style:normal;font-weight:400;font-display:swap;src:url(space-mono-400.woff2) format('woff2');}
+@font-face{font-family:'Space Mono';font-style:normal;font-weight:700;font-display:swap;src:url(space-mono-700.woff2) format('woff2');}
+
+/* Playfair Display: variable, any weight 400-900, plus italic */
+@font-face{font-family:'Playfair Display';font-style:normal;font-weight:400 900;font-display:swap;src:url(playfair-display.woff2) format('woff2');}
+@font-face{font-family:'Playfair Display';font-style:italic;font-weight:400 900;font-display:swap;src:url(playfair-display-italic.woff2) format('woff2');}
+
+/* DM Sans: variable, any weight 100-1000 */
+@font-face{font-family:'DM Sans';font-style:normal;font-weight:100 1000;font-display:swap;src:url(dm-sans.woff2) format('woff2');}
+
+/* DM Mono: 400 and 500 */
+@font-face{font-family:'DM Mono';font-style:normal;font-weight:400;font-display:swap;src:url(dm-mono-400.woff2) format('woff2');}
+@font-face{font-family:'DM Mono';font-style:normal;font-weight:500;font-display:swap;src:url(dm-mono-500.woff2) format('woff2');}
