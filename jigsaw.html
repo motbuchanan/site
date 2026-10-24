@@ -5,8 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#1b1a24">
 <title>Jigsaw · make a puzzle</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="fonts/fonts.css" rel="stylesheet">
 <style>
   :root{
     --bg:#1b1a24; --panel:#252433; --line:rgba(255,255,255,.14);
@@ -107,7 +106,7 @@
   <a href="index.html" id="gsShelfBtn" class="mb-home" aria-label="Back home" style="pointer-events:auto">&larr; home</a>
   <span id="wordmark">Jig<span>saw</span></span>
 </div>
-<button class="mb-ver" id="mbVer" type="button">v1.1 &middot; Sep 21</button><div id="mbToast" role="status"></div>
+<button class="mb-ver" id="mbVer" type="button">v1.2 &middot; Oct 24</button><div id="mbToast" role="status"></div>
 
 <main>
 
@@ -177,7 +176,7 @@
 <script>
 "use strict";
 var $=function(id){return document.getElementById(id);};
-var VERSION="v1.1 \u00b7 Sep 21";
+var VERSION="v1.2 \u00b7 Oct 24";
 $("mbVer").textContent=VERSION;
 
 /* ---------- tiny IndexedDB store ----------

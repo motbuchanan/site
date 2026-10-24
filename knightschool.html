@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
 <title>Knight School: learn and play chess</title><!-- CLOSET FORK: title -->
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="fonts/fonts.css" rel="stylesheet">
 <style>
   :root{--mb-ink:#ebedef; --mb-soft:#c2c9d1; --mb-dim:#7d8794;
     --mb-teal:#4cf0e0; --mb-orange:#f59847;
@@ -172,7 +171,7 @@
   <button class="act ghost" id="backBtn" style="display:none;">&#8617; Takeback</button>
   <button class="act" id="learnBtn">Learn</button><button class="act ghost" id="themeBtn">Theme</button>
 </div>
-<button class="mb-ver" id="mbVer" type="button">v1.2 &middot; Oct 23</button><div id="mbToast" role="status"></div>
+<button class="mb-ver" id="mbVer" type="button">v1.2.1 &middot; Oct 24</button><div id="mbToast" role="status"></div>
 <div class="ov" id="learnOv"><h1>Learn chess</h1>
   <div style="max-height:56vh;overflow:auto;width:min(88vw,420px);" id="lsList"></div>
   <button class="act" id="lsClose">Close</button></div>
@@ -1476,5 +1475,5 @@ window.GN&&GN.sync&&GN.sync();
 
 </script>
 <script>
-(function(){var t=document.getElementById("mbToast"),tm=0;document.getElementById("mbVer").onclick=function(){t.textContent="v1.2 loaded";t.classList.add("show");clearTimeout(tm);tm=setTimeout(function(){t.classList.remove("show");},1400);};})();
+(function(){var t=document.getElementById("mbToast"),tm=0;document.getElementById("mbVer").onclick=function(){t.textContent="v1.2.1 loaded";t.classList.add("show");clearTimeout(tm);tm=setTimeout(function(){t.classList.remove("show");},1400);};})();
 </script></body></html>

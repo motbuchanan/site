@@ -11,8 +11,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%23171a20'/><rect x='10' y='25' width='44' height='15' rx='4' fill='%23c7cdd6'/><g stroke='%23171a20' stroke-width='2'><line x1='19' y1='25' x2='19' y2='40'/><line x1='28' y1='25' x2='28' y2='40'/><line x1='37' y1='25' x2='37' y2='40'/><line x1='46' y1='25' x2='46' y2='40'/></g><rect x='10' y='22' width='44' height='4' rx='2' fill='%23ffda73'/></svg>">
 <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%23171a20'/><rect x='10' y='25' width='44' height='15' rx='4' fill='%23c7cdd6'/><g stroke='%23171a20' stroke-width='2'><line x1='19' y1='25' x2='19' y2='40'/><line x1='28' y1='25' x2='28' y2='40'/><line x1='37' y1='25' x2='37' y2='40'/><line x1='46' y1='25' x2='46' y2='40'/></g><rect x='10' y='22' width='44' height='4' rx='2' fill='%23ffda73'/></svg>">
 <title>HARP</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="fonts/fonts.css" rel="stylesheet">
 <style>
   :root{
     --bg:#12181f; --panel:#1a212b; --panel2:#222b36; --line:#2b323b;
@@ -1127,6 +1126,6 @@ const startLevel = gGet('harpLevel') || 'simple';
 setLevel(startLevel);
 if(!wizSeen && startLevel==='simple') startWizard();
 </script>
-<div class="verbadge" id="verbadge" onclick="(function(){var t=document.getElementById('verToast');if(!t){t=document.createElement('div');t.id='verToast';t.style.cssText='position:fixed;left:50%;bottom:20%;transform:translateX(-50%);background:#000d;color:#fff;padding:9px 15px;border-radius:18px;font:600 12px sans-serif;z-index:50';document.body.appendChild(t);}t.textContent='HARP v0.3';t.style.opacity='1';clearTimeout(window._vt);window._vt=setTimeout(function(){t.style.opacity='0';},1500);})()">v0.3</div>
+<div class="verbadge" id="verbadge" onclick="(function(){var t=document.getElementById('verToast');if(!t){t=document.createElement('div');t.id='verToast';t.style.cssText='position:fixed;left:50%;bottom:20%;transform:translateX(-50%);background:#000d;color:#fff;padding:9px 15px;border-radius:18px;font:600 12px sans-serif;z-index:50';document.body.appendChild(t);}t.textContent='HARP v0.3.1 · Oct 24';t.style.opacity='1';clearTimeout(window._vt);window._vt=setTimeout(function(){t.style.opacity='0';},1500);})()">v0.3.1 &middot; Oct 24</div>
 </body>
 </html>

@@ -5,8 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0e1420">
 <title>Five Letters</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+<link href="fonts/fonts.css" rel="stylesheet">
 <style>
 :root{
   --bg:#0e1420; --panel:#161d2b; --tile:#222a3a; --line:#333c50; --txt:#f2f4f8; --dim:#9aa6ba;
@@ -217,7 +216,7 @@ body.cb .ttile.near{background:linear-gradient(160deg,#5aa4ea,#3577c2);color:#04
 <script>
 "use strict";
 var $=function(i){return document.getElementById(i);};
-var VERSION="v1.2 \u00b7 Oct 23";
+var VERSION="v1.2.1 \u00b7 Oct 24";
 /* safe storage: falls back to memory when the browser blocks saving (private mode) */
 var MEM={};
 function sget(k){try{var v=localStorage.getItem(k);if(v!=null)return v;}catch(e){}return (k in MEM)?MEM[k]:null;}

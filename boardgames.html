@@ -4,9 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Board Games</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="fonts/fonts.css" rel="stylesheet">
 <style>
 :root{--ink:#ebedef;--soft:#b9c1ca;--teal:#4cf0e0;--orange:#f59847;--line:#2b323b;--mb-teal:#4cf0e0;--mb-glass:rgba(14,18,23,.62);--mb-mono:'JetBrains Mono',ui-monospace,Menlo,monospace}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -46,7 +44,7 @@ h1{text-align:center;font-size:clamp(24px,7vw,32px);font-weight:800;margin-top:6
 <body>
 <div id="glow"></div>
 <div id="bar"><a href="index.html" class="mb-home">&larr; home</a><span class="t">Board Games</span></div>
-<button class="mb-ver" id="mbVer" type="button">v1.1 &middot; Sep 21</button><div id="mbToast" role="status"></div>
+<button class="mb-ver" id="mbVer" type="button">v1.2 &middot; Oct 24</button><div id="mbToast" role="status"></div>
 
 
 <div class="wrap">
@@ -82,7 +80,7 @@ document.addEventListener('click',function(e){
 })();
 </script>
 <script>
-(function(){var t=document.getElementById("mbToast"),tm=0;document.getElementById("mbVer").onclick=function(){t.textContent="v1.1 loaded";t.classList.add("show");clearTimeout(tm);tm=setTimeout(function(){t.classList.remove("show");},1400);};})();
+(function(){var t=document.getElementById("mbToast"),tm=0;document.getElementById("mbVer").onclick=function(){t.textContent="v1.2 loaded";t.classList.add("show");clearTimeout(tm);tm=setTimeout(function(){t.classList.remove("show");},1400);};})();
 </script>
 </body>
 </html>

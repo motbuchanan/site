@@ -6,12 +6,17 @@ Self-documenting record of this repo. Fetch this file (raw) before any work and 
 The "This Phone" portfolio at motbuchanan.com: a phone-shaped home screen of single-file HTML apps, hosted on GitHub Pages from repo motbuchanan/site. Temporary front door that Mot now intends to keep (The Closet concept likely abandoned in favor of this).
 
 ## Current version
-- index.html footer: **v7.53 · Oct 23** (FOUR stamps must match: footer tagline, Settings updBadge, About verNum, Software Update verNum2. v7.52 shipped with two of them still on 7.51; fixed in v7.53)
+- index.html footer: **v7.54 · Oct 24** (FOUR stamps must match: footer tagline, Settings updBadge, About verNum, Software Update verNum2. v7.52 shipped with two of them still on 7.51; fixed in v7.53)
 - buildlog.html: log r13 · Oct 24 (badge v1.3). Caught up through v7.53. Dates for Side Boss and RoughCut joining (Sep 27), desktop fit (Oct 8) and Two Cans (Oct 20) are best estimates from version order.
 - og.png: real 1200x630 screenshot of the phone in the studio (Oct 18). Regenerate when the home screen changes a lot.
 - LAYOUT LAW (do not violate; Mot sets the exact picks): TOP 8 loose (rows 1-2), BOTTOM ROW = 4 folders. 12 tiles, one page. CURRENT (v7.44 to v7.50): row1 All Thumbs, The Keep, Nazca, Spectra; row2 Haunt Inc, Knight School, Reframe, RoughCut; row3 folders Learn (sharp, harp, measureup, brewdeck), Make (pigment, bloom), Tools (sideboss, liftsafe, triangle, gather), Play (pocketshark, shelf, brickbreak, upcard, sudoku, jigsaw, fiveletters, starstuff). Do NOT change which apps are featured or the folder order without an explicit instruction. NEXT LAYOUT MOVE (decided Oct 18, not built): a 2x2 flagship WIDGET in row 1 (see Open queue).
 - Deployed authoritative source = this repo. Every zip in Downloads is behind it.
 - NOTE: ROADMAP drifted again from v7.42 (Sep 26) to v7.49 (Oct 10). Re-synced Oct 18. Update with every upload.
+
+## Fonts (standing rule, Oct 24 2026)
+- Every page on this site loads fonts from fonts/fonts.css. Never Google Fonts or any other outside font server.
+- A new project can use a new font: add the .woff2 to fonts/, an @font-face block to fonts.css and a row to fonts/README.md first, then link fonts.css.
+- Apps with a service worker list ../fonts/fonts.css and the .woff2 files they use in their offline list.
 
 ## Testing
 - tools/break.py is the Break It tester (phone, iPad, storage blocked, landscape). The break-it skill pulls it from here. A Monthly Break Sweep scheduled task runs it on every app on the 1st and sends a ranked report. tools/BREAK-REPORT.md = the latest report, used to track what got fixed.
@@ -24,6 +29,7 @@ The "This Phone" portfolio at motbuchanan.com: a phone-shaped home screen of sin
 - RESUME: separate project (motbuchanan/resume). Never linked from this site. Never logged here.
 
 ## What shipped (newest first)
+- v7.54 (Oct 24): FONTS GO LOCAL. New fonts/ folder (fonts.css + 10 woff2 files + README + OFL license) and all 25 pages that used Google Fonts now link fonts/fonts.css (or ../fonts/fonts.css). Every touched app bumped to an Oct 24 badge (toast and SW cache in step); Brew Deck SW dropped its Google font cache and precaches the local fonts; Gather and Pocket Shark SWs precache them too. Sounds & Haptics switch shows a joke when turned off, and settings switches now remember OFF across reloads. Build Log caught up (r13). CHROME.md font snippet now points at fonts/.
 - v7.53 (Oct 23): first Break It sweep fixes. All four version stamps agree again; dead `var VER` line removed. Same upload round: Knight School v1.2 (works with storage blocked, Woodshop chip fixed), Five Letters v1.2 (landscape keyboard reachable, results kept with storage blocked, version shown in Settings), Gather v0.8, Pocket Shark v1.3.2 (offline cache now has all 10 portraits and 6 rooms, about page em dashes gone).
 - v7.52 (Oct 22): All Thumbs complete, all ten chapters; card, count and screenshot updated.
 - v7.51 (Oct ~20): Two Cans joins the phone, with a practice version on the phone.

@@ -4,8 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Sudoku</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="fonts/fonts.css" rel="stylesheet">
 <style>
   :root{--mb-ink:#ebedef; --mb-soft:#c2c9d1; --mb-dim:#7d8794;
     --mb-teal:#4cf0e0; --mb-orange:#f59847;
@@ -113,7 +112,7 @@
 </div>
 
 <div id="toast"></div>
-<button class="mb-ver" id="mbVer" type="button">v2.1 &middot; Sep 21</button>
+<button class="mb-ver" id="mbVer" type="button">v2.2 &middot; Oct 24</button>
 
 <div class="ov" id="overlay">
   <div class="big">&#127881;</div>
@@ -396,7 +395,7 @@ $("erase").addEventListener("click",eraseCell);
 $("undo").addEventListener("click",undo);
 $("hint").addEventListener("click",doHint);
 $("newp").addEventListener("click",function(){newPuzzle(mode==="daily"?dayRamp():mode);});
-$("mbVer").addEventListener("click",function(){toast("v2.1 loaded");});
+$("mbVer").addEventListener("click",function(){toast("v2.2 loaded");});
 $("ovBtn").addEventListener("click",function(){$("overlay").classList.remove("show");newPuzzle(mode==="daily"?"medium":mode);});
 
 document.addEventListener("keydown",function(e){

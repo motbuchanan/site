@@ -12,8 +12,9 @@ Every app on the site keeps its own CONTENT world (board colors, felt, space, pa
 ```
 Font link (add to <head> if missing):
 ```
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="fonts/fonts.css" rel="stylesheet">          (page at the site root)
+<link href="../fonts/fonts.css" rel="stylesheet">       (page one folder down)
+Never link Google Fonts or any outside font server. A new font goes into fonts/ first: see fonts/README.md.
 ```
 
 ## Rules

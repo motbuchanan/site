@@ -11,8 +11,7 @@
 <script>try{if(window.self!==window.top)document.documentElement.classList.add("embed");}catch(e){document.documentElement.classList.add("embed");}</script>
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon-192.png">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="fonts/fonts.css" rel="stylesheet">
 <title>LiftSafe - Powered Industrial Truck Training</title>
 <style>
 :root{
@@ -367,7 +366,7 @@ html.embed .topbar-inner{padding-left:96px}
     </div>
   </div>
   <div id="toast"></div>
-  <button class="mb-ver" id="mbVer" type="button" onclick="showVer()">v3.0.4 &middot; Sep 21</button>
+  <button class="mb-ver" id="mbVer" type="button" onclick="showVer()">v3.0.5 &middot; Oct 24</button>
 </div>
 
 <script>
@@ -1884,7 +1883,7 @@ function openSelect(){enterSection();renderSelect();var bb=document.getElementBy
 
 /* toast + version */
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('show');},2000);}
-function showVer(){toast('v3.0.4 loaded');}
+function showVer(){toast('v3.0.5 loaded');}
 
 /* boot */
 /* service worker registration removed for site embed (single-file, no sw.js at site root) */

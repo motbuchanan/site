@@ -6,10 +6,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0C0F14">
 <title>The Production Triangle</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="fonts/fonts.css" rel="stylesheet">
+
 <style>
   :root{
     --ink-0:#0C0F14; --ink-1:#11151C; --ink-2:#171D26; --ink-3:#1E2530;
@@ -471,13 +469,13 @@ html.embed .hero{padding-top:clamp(52px,8vh,84px)}
 <footer class="wrap">
   <p>Move the point, make the trade, on purpose.</p>
 </footer>
-<button class="mb-ver" id="mbVer" type="button">v10.1 &middot; Sep 21</button>
+<button class="mb-ver" id="mbVer" type="button">v10.2 &middot; Oct 24</button>
 <div class="toast" id="toast"></div>
 
 <script>
 (function(){
   "use strict";
-  var VERSION="v10.1 · Sep 21";
+  var VERSION="v10.2 · Oct 24";
   var reduce=matchMedia("(prefers-reduced-motion:reduce)").matches;
   function id(x){return document.getElementById(x);}
 
@@ -681,7 +679,7 @@ html.embed .hero{padding-top:clamp(52px,8vh,84px)}
 
   /* badge */
   var toast=id("toast"),tt=null;
-  id("mbVer").addEventListener("click",function(){toast.textContent="v10.1 loaded";toast.classList.add("show");clearTimeout(tt);tt=setTimeout(function(){toast.classList.remove("show");},1600);});
+  id("mbVer").addEventListener("click",function(){toast.textContent="v10.2 loaded";toast.classList.add("show");clearTimeout(tt);tt=setTimeout(function(){toast.classList.remove("show");},1600);});
 })();
 </script>
 </body>

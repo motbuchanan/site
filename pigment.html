@@ -7,8 +7,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>Pigment · color lab</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="fonts/fonts.css" rel="stylesheet">
 <style>
 :root{
   --mb-ink:#ebedef; --mb-soft:#c2c9d1; --mb-dim:#7d8794;
@@ -522,11 +521,11 @@ nav button.on .ic{background:rgba(76,240,224,.14)}
   <div id="obDots"><i class="on"></i><i></i><i></i><i></i></div>
 </div></div>
 
-<button class="mb-ver" id="mbVer" type="button">v1.5.1 &middot; Sep 21</button>
+<button class="mb-ver" id="mbVer" type="button">v1.5.2 &middot; Oct 24</button>
 <div id="toast"></div>
 <script>
 /* ============ PIGMENT · color lab ============ */
-var VERSION = "v1.5.1 · Sep 21";
+var VERSION = "v1.5.2 · Oct 24";
 try{if(window.self!==window.top){document.documentElement.classList.add("embed");}}catch(e){document.documentElement.classList.add("embed");}
 
 /* name | hex | source
@@ -1786,7 +1785,7 @@ $("importIn").onchange=function(e){
 };
 
 /* ============ boot ============ */
-$("mbVer").onclick=function(){toast("v1.5.1 loaded");};
+$("mbVer").onclick=function(){toast("v1.5.2 loaded");};
 $("mbVer").textContent=VERSION;
 $("dbCount").textContent=DB.length;
 $("search").placeholder="Search "+DB.length+" color names";
