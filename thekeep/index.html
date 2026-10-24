@@ -7,8 +7,7 @@
 <title>The Keep</title>
 <link rel="icon" type="image/png" href="the-keep-icon.png">
 <link rel="apple-touch-icon" href="the-keep-icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="../fonts/fonts.css" rel="stylesheet">
 <meta name="description" content="A living world drawn entirely as characters. A seed-generated snow globe you walk around inside, with birds, deer and a wolf pack living out real cycles. Built one improvement at a time.">
 <meta property="og:title" content="The Keep">
 <meta property="og:description" content="A whole world drawn as characters. Walk it, watch it. It grows one improvement at a time.">
@@ -63,7 +62,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
  </div>
  <div id="stick"><div id="knob"></div></div>
  <div id="fps"></div>
- <button class="mb-ver" id="mbVer" type="button">v0.7.12 &middot; Sep 21</button>
+ <button class="mb-ver" id="mbVer" type="button">v0.7.14 &middot; Oct 24</button>
  <div id="toast"></div>
  <div id="help" class="hidden"><div class="card">
   <h1>How to play</h1>
@@ -105,8 +104,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
 <script>
 (function(){
 'use strict';
-const VERSION='The Keep v0.7.13 · Oct 4 2026';
+const VERSION='The Keep v0.7.14 · Oct 24 2026';
 const CHANGELOG=[
+ ['v0.7.14 · Oct 24 2026','Fonts now load from this site instead of from Google, so nothing about your visit leaves for another server.'],
  ['v0.7.13 · Oct 4 2026','The keep is a real keep now. Four thick walls with a walkable rampart you reach by a stair, four corner towers, a gatehouse, and rooms built into the walls you can step inside. At its center a tall round donjon with an external stair that spirals up to a lookout room, where you stand and see out over the whole forest. The old hollow inner box is gone. (Day and night is next.)'],
  ['v0.7.12 · Sep 21 2026','Shared site chrome. The menu, cards, buttons, seed and dial inputs, HUD readouts and the version badge now use the same type, colors and shapes as every other app on motbuchanan.com. The world render is untouched.'],
  ['v0.7.11 · Sep 21 2026','New "about this build" card, App Store style: what it is, how it works (it is all just text characters), why I built it, what I learned, and shots from its development. It shows once on your first visit, then lives in the menu. It also shows the live size of this file, which updates itself on every release, because the surprising part is how small it is.'],
@@ -1343,7 +1343,7 @@ function boot(){
     img=new ImageData(new Uint8ClampedArray(FB.px32.buffer),C*cw,R*ch);
     buildGlyphs(cw,ch);
   }
-  $('mbVer').addEventListener('click',function(){ toast('v0.7.12 loaded · seed '+W.seed+' · '+RS.C+'x'+RS.R+(RS.letterbox?' · letterboxed':'')); });
+  $('mbVer').addEventListener('click',function(){ toast('v0.7.14 loaded · seed '+W.seed+' · '+RS.C+'x'+RS.R+(RS.letterbox?' · letterboxed':'')); });
   function openSeed(){
     const c=$('seedCard');
     c.innerHTML='<h1>World seed</h1><p>Type a number for that exact world, or roll a random one.</p><input id="seedIn" inputmode="numeric" value="'+W.seed+'" style="width:100%;padding:12px;font:600 16px var(--mb-mono);background:rgba(0,0,0,.5);color:var(--mb-ink);border:1px solid var(--mb-line);border-radius:13px;margin:6px 0"><div style="display:flex;gap:8px"><button class="btn go" id="seedUse" style="flex:1;margin-top:0">grow it</button><button class="btn go" id="seedRnd" style="flex:1;margin-top:0">random</button></div><button class="btn" id="seedClose" style="width:100%;margin-top:8px">cancel</button>';
