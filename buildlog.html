@@ -39,18 +39,29 @@ h1{font-family:'Archivo',sans-serif;font-weight:800;font-size:22px}
 <body>
 <div id="glow"></div>
 <div id="bar"><a href="index.html" class="mb-home">&larr; home</a><span class="t">Build Log</span></div>
-<button class="mb-ver" id="mbVer" type="button">v1.2 &middot; Sep 26</button><div id="mbToast" role="status"></div>
+<button class="mb-ver" id="mbVer" type="button">v1.3 &middot; Oct 24</button><div id="mbToast" role="status"></div>
 
 
 <div class="wrap">
   <h1>What shipped, when</h1>
   <div class="sub">Newest first. This list only grows.</div>
   <div class="log" id="log"></div>
-  <div class="foot">updated every time something ships &middot; log r12 &middot; Sep 26</div>
+  <div class="foot">updated every time something ships &middot; log r13 &middot; Oct 24</div>
 </div>
 
 <script>
 var LOG=[
+["Oct 23", "A tester that tries to break things", "I built a tester that tries to break every app here the way a thumb or a kid would: hundreds of random taps, the phone turned sideways, a browser that refuses to save. Its first sweep found two real problems. Knight School wouldn't draw a board in private browsing, and Five Letters hid half its keyboard when you turned the phone sideways. Both are fixed, along with smaller cleanups in Gather and Pocket Shark."],
+["Oct 22", "All Thumbs is finished", "All ten chapters of my build-it-on-a-phone course are up. The last one takes the real Game Shelf apart piece by piece, so you can see how a working app is put together."],
+["Oct 20", "Two Cans joins the phone", "A private line between two phones: texts, photos, voice notes, doodles and eight turn-based games. The copy here runs in practice mode, so you can pick a side and try all of it without an account."],
+["Oct 18", "Take it with you", "Every card now has three ways to take an app home: open it on its own, look at the code, or save the file. The lock screen also lets you in by itself after a few seconds."],
+["Oct 10", "The Game Shelf moves in", "Board Games and Card Games are now one wooden shelf: eleven board games and thirteen card games. Tap a box to play the computer or pass the phone."],
+["Oct 8", "Fits a laptop", "On a laptop the phone now shrinks to fit the window, so the top and bottom don't get cut off."],
+["Oct 4", "RoughCut gets transitions", "RoughCut's card now matches the current build: dip, crossfade, slide, wipe and zoom transitions, animated text in real fonts, and sound that works on iPhone too."],
+["Sep 29", "Every card, rewritten", "The why, the how and the what-I-learned on 22 cards, rewritten from my own notes."],
+["Sep 28", "The Brew Deck joins the phone", "A homebrew training system. Recipes do their strength, bitterness and color math live as you change the ingredients, and a brew day plays out as a series of decisions."],
+["Sep 27", "RoughCut joins the phone", "A real video editor that runs in your browser. Trim and reorder clips on a touch timeline, lay music and titles under them, and export the finished video with no watermark and no account."],
+["Sep 27", "Side Boss joins the phone", "A game that turns growing a side hustle into quests, levels and boss fights. Plan your week, log every sale and cost, and clear milestones like your first sale."],
 ["Oct 7","Pocket Shark racks up","A full 3D pool table you can walk around, with real ball physics and a shark on your shoulder that plays every shot forward and shows you the best one. Shark Eyes does the same thing on a real table, from a photo or straight through the camera. There is a story mode that stakes a bankroll against six house players and lets you fix up the basement you practice in, plus eighteen achievements and a career-stats screen. One HTML page, installable, offline. It lives in the Play folder."],
 ["Sep 26","Gather joins the phone","A holiday and party planner that lives on your phone and nowhere else. Add your people once, then plan the gifts and budget, draw names for a Secret Santa that never repeats last year, sort out who brings what, and play a few party games. Four themes: Halloween, Thanksgiving, birthdays and the winter holidays. It lives in the Tools folder."],
 ["Sep 22","The home screen settles","Eight apps up top for the ones I want you to see first, and the four folders (Play, Learn, Make, Tools) as the bottom row. Everything else lives in a folder. The top eight will change as I do."],
@@ -101,7 +112,7 @@ document.addEventListener('click',function(e){
 },true);
 </script>
 <script>
-(function(){var t=document.getElementById("mbToast"),tm=0;document.getElementById("mbVer").onclick=function(){t.textContent="v1.1 loaded";t.classList.add("show");clearTimeout(tm);tm=setTimeout(function(){t.classList.remove("show");},1400);};})();
+(function(){var t=document.getElementById("mbToast"),tm=0;document.getElementById("mbVer").onclick=function(){t.textContent=document.getElementById("mbVer").textContent.split(" ")[0]+" loaded";t.classList.add("show");clearTimeout(tm);tm=setTimeout(function(){t.classList.remove("show");},1400);};})();
 </script>
 </body>
 </html>
