@@ -1,9 +1,10 @@
 /* Pocket Shark service worker: cache the app shell for offline launch, network-first on the page so updates land. */
-var CACHE = 'pocketshark-v1.3.1';
+var CACHE = 'pocketshark-v1.3.2';
 var ASSETS = ['./', './index.html', './manifest.webmanifest',
   './icon-192.png', './icon-512.png', './icon-maskable-512.png', './apple-touch-icon.png',
   './face-dot.jpg', './face-benny.jpg', './face-mari.jpg', './face-hank.jpg', './face-ruth.jpg', './face-silas.jpg',
-  './room-basement.jpg', './room-dive.jpg', './room-hall.jpg', './room-arena.jpg'];
+  './face-charlie.jpg', './face-dontae.jpg', './face-yuki.jpg', './face-vince.jpg',
+  './room-basement.jpg', './room-dive.jpg', './room-hall.jpg', './room-arena.jpg', './room-club.jpg', './room-legion.jpg'];
 self.addEventListener('install', function (e) {
   self.skipWaiting();
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(ASSETS).catch(function () {}); }));

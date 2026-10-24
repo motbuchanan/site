@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="build" content="v1.3.1 · Oct 11">
+<meta name="build" content="v1.3.2 · Oct 23">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#07090c">
 <meta name="description" content="Pocket Shark: a 3D pool table with real ball physics, full camera control, and a shark that shows you the best shot.">
@@ -159,7 +159,7 @@ h2{font:800 22px var(--mb-ui);letter-spacing:-.02em;margin:0 0 4px}
 .stats b{display:block;font:800 20px var(--mb-ui)}
 .stats span{font:600 8px var(--mb-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mb-dim)}
 
-.mb-ver{position:fixed;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:900;font:600 10px var(--mb-mono);letter-spacing:.04em;color:var(--mb-teal);background:var(--mb-glass);border:1px solid rgba(76,240,224,.25);border-radius:999px;padding:4px 9px;backdrop-filter:blur(8px);cursor:pointer;user-select:none;opacity:.85}
+.mb-ver{min-height:32px;padding:6px 10px;position:fixed;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:900;font:600 10px var(--mb-mono);letter-spacing:.04em;color:var(--mb-teal);background:var(--mb-glass);border:1px solid rgba(76,240,224,.25);border-radius:999px;padding:4px 9px;backdrop-filter:blur(8px);cursor:pointer;user-select:none;opacity:.85}
 body.play .mb-ver{bottom:calc(64px + env(safe-area-inset-bottom))}
 #vtoast{position:fixed;right:10px;bottom:calc(40px + env(safe-area-inset-bottom));z-index:901;font:600 10px var(--mb-mono);color:#06110f;background:var(--mb-teal);border-radius:999px;padding:5px 10px;opacity:0;transition:opacity .25s;pointer-events:none}
 body.play #vtoast{bottom:calc(94px + env(safe-area-inset-bottom))}
@@ -411,7 +411,7 @@ body.play #vtoast{bottom:calc(94px + env(safe-area-inset-bottom))}
     <div class="panel" id="panel"></div>
   </div>
 </div></div>
-<button class="mb-ver" id="mbVer" type="button">v1.3.1 · Oct 11</button>
+<button class="mb-ver" id="mbVer" type="button">v1.3.2 · Oct 23</button>
 <div id="vtoast"></div>
 <div id="achToast"></div>
 
