@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0d1117">
-<title>The Keep — build log</title>
+<title>The Keep · build log</title>
 <link rel="icon" type="image/png" href="the-keep-icon.png">
 <link rel="apple-touch-icon" href="the-keep-icon.png">
 <meta name="description" content="The Keep: a living world drawn entirely as characters. The story, how it is built, and a shot from every version.">
-<meta property="og:title" content="The Keep — build log">
+<meta property="og:title" content="The Keep · build log">
 <meta property="og:description" content="A whole world drawn as characters. The story of how it is being built, one improvement at a time.">
 <meta property="og:image" content="https://motbuchanan.com/thekeep/the-keep-icon.png">
 <meta property="og:type" content="website">
@@ -94,9 +94,9 @@ footer a{color:var(--soft)}
   <div class="two">
     <div class="feat"><h3>One ray per column</h3><p>A heightfield raycaster walks the terrain, one ray for each column of the screen, and draws it as vertical spans of characters. That is the whole renderer.</p></div>
     <div class="feat"><h3>Water that reflects</h3><p>Every water column runs a second march to mirror what is above it, with a depth gradient and a foam line where you cross the surface.</p></div>
-    <div class="feat"><h3>A keep of flat planes</h3><p>The castle is built from brick planes the ray intersects directly, so the walls read as solid, crenellated stone instead of hollow columns.</p></div>
+    <div class="feat"><h3>A keep of planes and mass</h3><p>The castle faces are brick planes the ray intersects directly, so walls read as solid, crenellated stone. Under them, raised ground gives the walls their thickness and makes the rampart, stairs and lookout walkable.</p></div>
     <div class="feat"><h3>A world that lives</h3><p>Under the renderer, every creature is a tiny agent running steering rules and a state machine. Flocking, herding, and the hunt fall out of that, held in balance by soft floors and carrying caps.</p></div>
-    <div class="feat"><h3>Soft sun and shadow</h3><p>A blurred shadow map is sampled per character, so shade falls across the ground and the trees instead of snapping on and off in blocks.</p></div>
+    <div class="feat"><h3>A sun that moves</h3><p>The sun's place in the sky comes from the same formulas as a sunrise table, for Akron on today's date. A blurred shadow map, re-marched a few rows per frame as the sun moves, is sampled per character, so shade falls softly and swings round through the day.</p></div>
     <div class="feat"><h3>Same on any screen</h3><p>The vertical field of view is locked and the detail auto-sizes, so the world looks correct on a phone, a tablet, or a desktop, in any orientation.</p></div>
   </div>
 </section>
@@ -114,20 +114,27 @@ footer a{color:var(--soft)}
     <figure><img src="07-plane-keep.jpg" alt="The keep as a solid mass"><figcaption><div class="v">v0.7.7 · THE PLANE KEEP</div><div class="d">The castle rebuilt from flat brick planes: a solid, crenellated mass with a taller keep rising in the middle. No more hollow walls.</div></figcaption></figure>
     <figure><img src="08-crenellated-gate.jpg" alt="Approaching the gate"><figcaption><div class="v">v0.7.7 · THE GATE</div><div class="d">Crenellated curtain walls, corner towers, a gatehouse, and a gate cut at ground level. Walk in, then through the inner door.</div></figcaption></figure>
     <figure><img src="09-forest.jpg" alt="The keep among a varied forest"><figcaption><div class="v">v0.7.10 · A REAL FOREST</div><div class="d">Trees now vary in height, width, and shape, from thin spires to fat firs to broad low canopies, so a stand reads like real woods.</div></figcaption></figure>
+    <figure><img src="10-real-keep.jpg" alt="The donjon and its spiral stair seen from a corner tower" loading="lazy"><figcaption><div class="v">v0.7.13 to 0.7.15 · THE REAL KEEP</div><div class="d">From the top of a corner tower: the round donjon with its spiral stair, the courtyard, the walls, and the forest beyond. The walls got their thickness from raised ground, so you can climb to the rampart and up the stair to the lookout.</div></figcaption></figure>
+    <figure><img src="11-moonlit.jpg" alt="The keep at five in the morning under a full moon" loading="lazy"><figcaption><div class="v">v0.8.0 · DAY AND NIGHT</div><div class="d">Five in the morning. The sun crosses the sky on its real arc for Akron, Ohio, so the light and every shadow move through the day; at night a moon rises opposite the sunset and the world goes blue and moonlit, never black.</div></figcaption></figure>
   </div>
 </section>
 
 <section>
   <h2>Version history</h2>
   <ul class="tl">
-    <li><span class="v">v0.7.10</span> <span class="d">— tree girth variety, app icon, this build log</span></li>
-    <li><span class="v">v0.7.7–0.7.9</span> <span class="d">— the plane-built keep: crenellations, towers, gatehouse; portrait menu</span></li>
-    <li><span class="v">v0.7</span> <span class="d">— young that follow adults and age; the keeper's dials panel</span></li>
-    <li><span class="v">v0.6</span> <span class="d">— witnessable predation, soft per-pixel shadows, scattered landmarks</span></li>
-    <li><span class="v">v0.5</span> <span class="d">— swimming and the underwater view, three tree types, a solid keep</span></li>
-    <li><span class="v">v0.4</span> <span class="d">— the full food web, balanced; seed-driven paths</span></li>
-    <li><span class="v">v0.3</span> <span class="d">— first life: birds and rabbits; the seed box</span></li>
-    <li><span class="v">v0.1–0.2</span> <span class="d">— the raycaster, a 512×512 world, the first castle</span></li>
+    <li><span class="v">v0.8.0</span> <span class="d">day and night: the sun on its real arc over Akron, moving shadows, orange dusk, a moon and stars, a blue moonlit night; time and day-length dials; birds roost and wolves hunt after dark</span></li>
+    <li><span class="v">v0.7.15</span> <span class="d">stairs that feel safe: a ledge guard on every drop, a wider spiral with a handrail, steadier footing on stairs, corner towers open to the wall-walk; dials remembered on your device</span></li>
+    <li><span class="v">v0.7.14</span> <span class="d">fonts served from this site, nothing leaves for another server</span></li>
+    <li><span class="v">v0.7.13</span> <span class="d">a real keep: four thick walls with a rampart you climb, corner towers, a gatehouse, rooms in the walls, and a round donjon with a spiral stair up to a lookout</span></li>
+    <li><span class="v">v0.7.11–0.7.12</span> <span class="d">the "about this build" card with the live file size; shared site chrome</span></li>
+    <li><span class="v">v0.7.10</span> <span class="d">tree girth variety, app icon, this build log</span></li>
+    <li><span class="v">v0.7.7–0.7.9</span> <span class="d">the plane-built keep: crenellations, towers, gatehouse; portrait menu</span></li>
+    <li><span class="v">v0.7</span> <span class="d">young that follow adults and age; the keeper's dials panel</span></li>
+    <li><span class="v">v0.6</span> <span class="d">witnessable predation, soft per-pixel shadows, scattered landmarks</span></li>
+    <li><span class="v">v0.5</span> <span class="d">swimming and the underwater view, three tree types, a solid keep</span></li>
+    <li><span class="v">v0.4</span> <span class="d">the full food web, balanced; seed-driven paths</span></li>
+    <li><span class="v">v0.3</span> <span class="d">first life: birds and rabbits; the seed box</span></li>
+    <li><span class="v">v0.1–0.2</span> <span class="d">the raycaster, a 512×512 world, the first castle</span></li>
   </ul>
 </section>
 

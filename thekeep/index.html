@@ -27,11 +27,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
 #hud{position:absolute;inset:0;pointer-events:none}
 #bar{position:absolute;top:calc(6px + env(safe-area-inset-top));left:8px;right:8px;display:flex;align-items:flex-start;gap:6px;pointer-events:none;z-index:3}
 .mb-ver{position:fixed;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:900;font:600 10px var(--mb-mono);letter-spacing:.04em;color:var(--mb-teal);background:var(--mb-glass);border:1px solid rgba(76,240,224,.25);border-radius:999px;padding:4px 9px;backdrop-filter:blur(8px);cursor:pointer;user-select:none;opacity:.85;pointer-events:auto}
+.mb-ver::after{content:'';position:absolute;inset:-9px} /* bigger thumb target, same look */
 .bar-sp{flex:1 1 auto}
 .btns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;pointer-events:auto}
 .btn{font:700 14px var(--mb-ui);color:var(--mb-ink);background:var(--mb-glass);border:1px solid var(--mb-line);padding:11px 16px;border-radius:13px;pointer-events:auto;cursor:pointer;backdrop-filter:blur(8px)}
 #fps{position:absolute;bottom:calc(10px + env(safe-area-inset-bottom));left:10px;font:600 10px var(--mb-mono);letter-spacing:.04em;color:var(--mb-soft);background:var(--mb-glass);border:1px solid var(--mb-line);padding:4px 9px;border-radius:999px}
-#toast{position:absolute;left:50%;top:64px;transform:translateX(-50%);background:rgba(16,21,28,.92);border:1px solid var(--mb-line);color:var(--mb-ink);padding:9px 16px;border-radius:999px;font:600 11px var(--mb-mono);opacity:0;transition:opacity .25s;white-space:nowrap;z-index:950}
+#toast{position:absolute;left:50%;top:64px;transform:translateX(-50%);background:rgba(16,21,28,.92);border:1px solid var(--mb-line);color:var(--mb-ink);padding:9px 16px;border-radius:18px;font:600 11px var(--mb-mono);opacity:0;transition:opacity .25s;white-space:normal;text-align:center;max-width:calc(100vw - 32px);width:max-content;z-index:950}
 #help{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);pointer-events:auto}
 #help.hidden,#log.hidden,#seed.hidden,#dials.hidden,#menu.hidden,#about.hidden{display:none!important}
 .btn.menu{font:700 12px var(--mb-mono);letter-spacing:.04em;padding:9px 14px;border-radius:8px}
@@ -41,8 +42,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
 .card .fsize b{color:var(--mb-teal);font-family:var(--mb-mono)}
 .card{background:rgba(16,21,28,.92);border:1px solid var(--mb-line);border-radius:16px;padding:18px 20px;max-width:340px;font-size:14px;line-height:1.5;max-height:min(86vh,720px);overflow:auto;color:var(--mb-ink)}
 .dial-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:6px 0;font-size:13px}
-.dial-row label{flex:1}
-.dial-row input[type=range]{width:110px}
+.dial-row label{flex:1;display:flex;align-items:center;gap:8px;min-height:40px}
+.dial-row input[type=range]{flex:1 1 140px;min-width:140px;height:40px}
 .dial-row input[type=checkbox]{width:18px;height:18px}
 .dial-sec{margin-top:10px;padding-top:8px;border-top:1px solid var(--mb-line);font:600 10px var(--mb-mono);color:var(--mb-dim);letter-spacing:.08em;text-transform:uppercase}
 .card h1{font:800 20px var(--mb-ui);letter-spacing:-.02em;margin-bottom:8px}
@@ -62,7 +63,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
  </div>
  <div id="stick"><div id="knob"></div></div>
  <div id="fps"></div>
- <button class="mb-ver" id="mbVer" type="button">v0.7.14 &middot; Oct 24</button>
+ <button class="mb-ver" id="mbVer" type="button">v0.8.0 &middot; Oct 24</button>
  <div id="toast"></div>
  <div id="help" class="hidden"><div class="card">
   <h1>How to play</h1>
@@ -76,15 +77,17 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
   <p style="color:var(--mb-soft)">A whole world drawn as characters. A snow globe you walk around inside.</p>
   <p><b>It's all text.</b> Everything here, the hills, the water, the wolves, the keep, is drawn with the characters on your keyboard: @ # * = and dots. The screen is a grid of them. Each spot picks a character by how light or dark it should be and tints it a color, and as you move the whole grid gets re-typed dozens of times a second. No 3D engine, no photos. It's ASCII art you can walk around inside.</p>
   <div class="shots">
+   <img src="11-moonlit.jpg" alt="the keep by moonlight" loading="lazy">
+   <img src="10-real-keep.jpg" alt="the donjon and its spiral stair" loading="lazy">
    <img src="07-plane-keep.jpg" alt="the keep" loading="lazy">
    <img src="09-forest.jpg" alt="the forest" loading="lazy">
    <img src="05-predation.jpg" alt="a kill" loading="lazy">
    <img src="04-water.jpg" alt="the lake" loading="lazy">
   </div>
-  <p class="fsize">The whole world is one HTML file. Right now: <b id="fsize">~91 KB</b>. Smaller than a single phone photo.</p>
+  <p class="fsize">The whole world is one HTML file. Right now: <b id="fsize">~111 KB</b>. Smaller than a single phone photo.</p>
   <p><b>Why I built it.</b> I build things on a phone by asking AI the right questions, the way I would direct a camera. I saw a clip of a tiny 3D world made of nothing but text and wanted to see if I could grow one that was actually alive, and keep growing it in the open instead of ever calling it done.</p>
   <p><b>What I learned.</b> How far you can get with almost nothing. One idea, a ray walking a height map, turned into characters, with a small world of animals living on top. Every version taught me one concrete thing: how to make a wall read as solid, how to keep the wolves from starving the world empty, how to make a forest look like real woods.</p>
-  <p style="color:var(--mb-dim);font-size:13px"><b style="color:var(--mb-soft)">Walk:</b> drag the left half of the screen. <b style="color:var(--mb-soft)">Look:</b> drag the right half. Wade into the water to swim. Tap ☰ menu for a new world and the dials.</p>
+  <p style="color:var(--mb-dim);font-size:13px"><b style="color:var(--mb-soft)">Walk:</b> drag the left half of the screen. <b style="color:var(--mb-soft)">Look:</b> drag the right half. Wade into the water to swim. Tap ☰ menu for a new world, the dials, and the time of day.</p>
   <button class="btn go" id="aGo">walk the keep</button>
   <button class="btn" id="aFull" style="width:100%;margin-top:8px">see every version →</button>
  </div></div>
@@ -104,8 +107,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
 <script>
 (function(){
 'use strict';
-const VERSION='The Keep v0.7.14 · Oct 24 2026';
+const VERSION='The Keep v0.8.0 · Oct 24 2026';
+const VER_SHORT='v0.8.0 · Oct 24'; // what the badge shows; bump with VERSION
 const CHANGELOG=[
+ ['v0.8.0 · Oct 24 2026','Day and night. The sun now crosses the sky on its real arc for Akron, Ohio on today\'s date (the same formulas astronomers use for sunrise tables), so light comes from where the sun actually is: low and golden in the morning and evening, high at midday, with the shadows of every tree and wall swinging round as it moves. Dusk goes orange on the sun\'s side of the sky, then a moon rises opposite, stars come out, and the night is blue and moonlit, never black. Birds go to roost after dark and wolves hunt more at night. New sky dials in the menu: time of day (slide it and watch), and day length (paused, 3, 8 or 20 real minutes per day, or the real clock in Akron, Ohio, where the globe lives, so it matches the sky outside Mot\'s window). A small clock sits in the corner readout. Also: the picture only redraws four times a second while a card is open, to save your battery.'],
+ ['v0.7.15 · Oct 24 2026','Stairs feel right now. You cannot walk off an edge anymore: the rampart, the stairs, and the tower top all have a ledge guard, so a slip of the thumb never drops you. The spiral stair is wider with a low handrail along its outer edge, you walk a little slower on stairs for steadier footing, and if you drift toward the outside of the spiral it eases you back toward the middle. The corner towers are reachable from the wall-walk now, with doorways on their inner faces. Also: the dials and your seed are remembered on this device across reloads, the menu opens one card at a time (no more dead cards stacked behind each other), bigger thumb targets on the dial rows and the version badge, and typing a seed on a desktop no longer walks you around. Render fix: walls that stand on raised ground (the lookout room on top of the donjon) used to leave a strip of the screen unpainted beneath them, which showed as smeared streaks from the last frame when you were near the donjon. Painted properly now.'],
  ['v0.7.14 · Oct 24 2026','Fonts now load from this site instead of from Google, so nothing about your visit leaves for another server.'],
  ['v0.7.13 · Oct 4 2026','The keep is a real keep now. Four thick walls with a walkable rampart you reach by a stair, four corner towers, a gatehouse, and rooms built into the walls you can step inside. At its center a tall round donjon with an external stair that spirals up to a lookout room, where you stand and see out over the whole forest. The old hollow inner box is gone. (Day and night is next.)'],
  ['v0.7.12 · Sep 21 2026','Shared site chrome. The menu, cards, buttons, seed and dial inputs, HUD readouts and the version badge now use the same type, colors and shapes as every other app on motbuchanan.com. The world render is untouched.'],
@@ -147,7 +153,8 @@ const DIALS={
   seed:20260919,
   forest:1, water:1, keep:1, structures:1, predators:1,
   on:[1,1,1,1,1,1],
-  pop:[1,1,1,1,1,1]
+  pop:[1,1,1,1,1,1],
+  tod:14, dayMode:2   // time of day in hours, and the day-length mode (see DAYMODES)
 };
 function growOf(c){
   const s=CR_.sp[c];
@@ -164,7 +171,58 @@ function parentOf(c){
 
 // ---------------- world ----------------
 const N=512, WATER=8, EYE=1.7, CLOUDH=95;
-const SUN=(function(){ const az=-0.7, el=0.85; return {x:Math.cos(az)*Math.cos(el), y:Math.sin(az)*Math.cos(el), z:Math.sin(el)}; })();
+// ---------------- the sun, the moon and the clock ----------------
+// The sun is where it really is over Akron, Ohio for the world's date and time of day (the Astronomical
+// Almanac low-precision formulas, good to a fraction of a degree). SUN and MOON are unit vectors toward the
+// light in world axes (+x east, +y south, +z up); the arc moves them every frame.
+const SITE={lat:41.08, lon:-81.52, tz:'America/New_York'};
+const SUN={x:0.0,y:0.60,z:0.80};
+const MOON={x:0.0,y:-0.60,z:-0.80};
+const DAYMODES=[0,3,8,20,-1];   // real minutes per world day: 0 paused, -1 follows the real clock
+const DAY={ tod:14, mode:2, date:null, tzOff:-5, alt:0, az:0, moonAlt:-1, k:1, dusk:0, light:SUN, lightAlt:1, sunLight:true, shadowK:0.44, expo:1, tr:1, tg:1, tb:1 };
+function sunAltAz(d,lat,lon){
+  const n=d.getTime()/86400000+2440587.5-2451545.0;
+  const L=((280.460+0.9856474*n)%360+360)%360, g=(((357.528+0.9856003*n)%360+360)%360)*Math.PI/180;
+  const lam=(L+1.915*Math.sin(g)+0.020*Math.sin(2*g))*Math.PI/180;
+  const eps=(23.439-0.0000004*n)*Math.PI/180;
+  const ra=Math.atan2(Math.cos(eps)*Math.sin(lam),Math.cos(lam)), dec=Math.asin(Math.sin(eps)*Math.sin(lam));
+  const gmst=((18.697374558+24.06570982441908*n)%24+24)%24;
+  const ha=(gmst+lon/15)*15*Math.PI/180-ra, la=lat*Math.PI/180;
+  const xe=-Math.cos(dec)*Math.sin(ha), yn=Math.sin(dec)*Math.cos(la)-Math.cos(dec)*Math.cos(ha)*Math.sin(la), zu=Math.sin(dec)*Math.sin(la)+Math.cos(dec)*Math.cos(ha)*Math.cos(la);
+  return {alt:Math.asin(clamp(zu,-1,1)), az:Math.atan2(xe,yn)};
+}
+function tzOffsetHours(tz){ // Akron's offset from UTC right now (DST aware), so the dial reads Akron wall-clock time anywhere
+  try{ const now=new Date(); const f=new Intl.DateTimeFormat('en-US',{timeZone:tz,hour12:false,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+    const q={}; f.formatToParts(now).forEach(function(z){ q[z.type]=z.value; });
+    const asUTC=Date.UTC(+q.year,+q.month-1,+q.day,(+q.hour)%24,+q.minute); return Math.round((asUTC-now.getTime())/60000)/60; }catch(e){ return -5; }
+}
+function dayDate(){ // the instant for the world's civil date (today in Akron) at DAY.tod hours Akron time
+  const now=DAY.date||new Date(); const ak=new Date(now.getTime()+DAY.tzOff*3600000);
+  return new Date(Date.UTC(ak.getUTCFullYear(),ak.getUTCMonth(),ak.getUTCDate())+(DAY.tod-DAY.tzOff)*3600000);
+}
+function sunUpdate(){
+  const s=sunAltAz(dayDate(),SITE.lat,SITE.lon); DAY.alt=s.alt; DAY.az=s.az;
+  const ca=Math.cos(s.alt); SUN.x=ca*Math.sin(s.az); SUN.y=-ca*Math.cos(s.az); SUN.z=Math.sin(s.alt);
+  // the moon stands opposite the sun and rises as it sets (a full moon's geometry, every night)
+  const malt=-s.alt, maz=s.az+Math.PI, cm=Math.cos(malt); MOON.x=cm*Math.sin(maz); MOON.y=-cm*Math.cos(maz); MOON.z=Math.sin(malt); DAY.moonAlt=malt;
+  const ad=s.alt*180/Math.PI;
+  DAY.k=clamp((ad+6)/12,0,1);                // 0 at civil dusk .. 1 in full day
+  DAY.dusk=Math.max(0,1-Math.abs(ad)/9);     // the warm band while the sun crosses the horizon
+  if(DAY.k>=0.5){ DAY.light=SUN; DAY.sunLight=true; DAY.lightAlt=s.alt; DAY.shadowK=1-0.56*clamp(ad/12,0,1); }
+  else { DAY.light=MOON; DAY.sunLight=false; DAY.lightAlt=malt; DAY.shadowK=1-0.30*clamp(malt*180/Math.PI/12,0,1); }
+  // exposure and tint for everything that is not sky: bright and neutral by day, dim and blue by night, warm at dusk
+  const k=DAY.k, nd=1-k, du=DAY.dusk;
+  DAY.expo=0.54+0.46*k;   // the night floor keeps the glyphs readable: moonlit, never black
+  DAY.tr=DAY.expo*(1-0.22*nd)*(1+0.16*du); DAY.tg=DAY.expo*(1-0.10*nd)*(1+0.02*du); DAY.tb=DAY.expo*(1+0.22*nd)*(1-0.14*du);
+  skyUpdate();
+}
+function updateDay(dt){
+  const m=DAYMODES[DAY.mode]||0;
+  if(m<0){ const ak=new Date(Date.now()+DAY.tzOff*3600000); DAY.tod=ak.getUTCHours()+ak.getUTCMinutes()/60+ak.getUTCSeconds()/3600; }
+  else if(m>0){ DAY.tod=(DAY.tod+dt*24/(m*60))%24; }
+  sunUpdate();
+}
+function fmtTod(t){ const hh=Math.floor(t)%24, mm=Math.floor((t%1)*60); return ((hh%12)||12)+':'+(mm<10?'0':'')+mm+(hh>=12?' pm':' am'); }
 const FORT={x:200,y:210,half:18,padH:null};
 const WALLS=[];
 function boxWalls(x0,y0,x1,y1,h,doorFace,doorA,doorB,roof){
@@ -190,25 +248,36 @@ function absWall(axis,p,a,b,z0,z1,gapA,gapB){
   WALLS.push({axis:axis, p:p, a:a, b:b, h:0, z0Abs:z0, z1Abs:z1, doorA:(gapB>gapA?gapA:0), doorB:(gapB>gapA?gapB:-1)});
 }
 // keep geometry (shared by the plane builder and the st[] mass stamper)
-const KEEP={ H:18, IN:14, CURH:11, GATE:3.2, DONH:24, DONR:5.2, SPR:7.3, LR:3.4, TOWH:13 };
+const KEEP={ H:18, IN:14, CURH:11, GATE:3.2, DONH:24, DONR:5.2, SPR:8.0, LIP:0.7, LR:3.4, TOWH:12.5 };
 function buildWalls(){
   WALLS.length=0;
   if(!DIALS.keep) return;
   const cx=FORT.x, cy=FORT.y, H=KEEP.H, B=(FORT.padH!=null?FORT.padH:WATER+6);
   const curH=KEEP.CURH, gateA=cx-KEEP.GATE, gateB=cx+KEEP.GATE;
-  // outer curtain face (crisp plane), south gate cut through; st[] fills the thickness + walkable top
-  boxWalls(cx-H, cy-H, cx+H, cy+H, curH, 's', gateA, gateB, false);
+  // outer curtain faces (crisp planes), trimmed 3 at each end so they stop at the corner towers
+  // instead of running through them; south gate cut through; st[] fills the thickness + walkable top
+  const T=3;
+  WALLS.push({axis:'y', p:cy+H, a:cx-H+T, b:cx+H-T, h:curH, doorA:gateA, doorB:gateB}); // south (gate)
+  WALLS.push({axis:'y', p:cy-H, a:cx-H+T, b:cx+H-T, h:curH, doorA:0, doorB:-1});         // north
+  WALLS.push({axis:'x', p:cx-H, a:cy-H+T, b:cy+H-T, h:curH, doorA:0, doorB:-1});         // west
+  WALLS.push({axis:'x', p:cx+H, a:cy-H+T, b:cy+H-T, h:curH, doorA:0, doorB:-1});         // east
   const zc=B+curH;
-  merlonRun('y', cy+H, cx-H, cx+H, zc, gateA, gateB); // south parapet (gate gap)
-  merlonRun('y', cy-H, cx-H, cx+H, zc, 0, -1);        // north
-  merlonRun('x', cx-H, cy-H, cy+H, zc, 0, -1);        // west
-  merlonRun('x', cx+H, cy-H, cy+H, zc, 0, -1);        // east
-  // four corner towers: crisp faces + a crenellated cap (solid mass is in st[])
-  const cns=[[cx-H,cy-H],[cx+H,cy-H],[cx-H,cy+H],[cx+H,cy+H]];
-  for(let i=0;i<4;i++){ const tx=cns[i][0], ty=cns[i][1]; tower(tx,ty,3,KEEP.TOWH);
-    const zt=B+KEEP.TOWH;
-    merlonRun('y',ty-3,tx-3,tx+3,zt,0,-1); merlonRun('y',ty+3,tx-3,tx+3,zt,0,-1);
-    merlonRun('x',tx-3,ty-3,ty+3,zt,0,-1); merlonRun('x',tx+3,ty-3,ty+3,zt,0,-1); }
+  merlonRun('y', cy+H, cx-H+T, cx+H-T, zc, gateA, gateB); // south parapet (gate gap)
+  merlonRun('y', cy-H, cx-H+T, cx+H-T, zc, 0, -1);        // north
+  merlonRun('x', cx-H, cy-H+T, cy+H-T, zc, 0, -1);        // west
+  merlonRun('x', cx+H, cy-H+T, cy+H-T, zc, 0, -1);        // east
+  // four corner towers: crisp faces + a crenellated cap (solid mass is in st[]). The two faces that
+  // meet the rampart get a doorway, so the wall-walk runs through every tower as a continuous loop.
+  for(let i=0;i<4;i++){ const sx=(i&1?1:-1), sy=(i&2?1:-1); const tx=cx+sx*H, ty=cy+sy*H;
+    const x0=tx-T, x1=tx+T, y0=ty-T, y1=ty+T, xf=tx-sx*T, yf=ty-sy*T, h=KEEP.TOWH, zt=B+h;
+    const gyA=Math.min(ty,ty-sy*T)+0.4, gyB=Math.max(ty,ty-sy*T)-0.4; // doorway on the inner x-face
+    const gxA=Math.min(tx,tx-sx*T)+0.4, gxB=Math.max(tx,tx-sx*T)-0.4; // doorway on the inner y-face
+    WALLS.push({axis:'x', p:x0, a:y0, b:y1, h:h, doorA:(x0===xf?gyA:0), doorB:(x0===xf?gyB:-1)});
+    WALLS.push({axis:'x', p:x1, a:y0, b:y1, h:h, doorA:(x1===xf?gyA:0), doorB:(x1===xf?gyB:-1)});
+    WALLS.push({axis:'y', p:y0, a:x0, b:x1, h:h, doorA:(y0===yf?gxA:0), doorB:(y0===yf?gxB:-1)});
+    WALLS.push({axis:'y', p:y1, a:x0, b:x1, h:h, doorA:(y1===yf?gxA:0), doorB:(y1===yf?gxB:-1)});
+    merlonRun('x', x0, y0, y1, zt, (x0===xf?gyA:0), (x0===xf?gyB:-1)); merlonRun('x', x1, y0, y1, zt, (x1===xf?gyA:0), (x1===xf?gyB:-1));
+    merlonRun('y', y0, x0, x1, zt, (y0===yf?gxA:0), (y0===yf?gxB:-1)); merlonRun('y', y1, x0, x1, zt, (y1===yf?gxA:0), (y1===yf?gxB:-1)); }
   // gatehouse towers flanking the south gate
   tower(cx-5, cy+H, 2.4, 13); tower(cx+5, cy+H, 2.4, 13);
   // --- central donjon lookout room, sitting on the 24-high round shaft (shaft mass is in st[]) ---
@@ -219,8 +288,9 @@ function buildWalls(){
   absWall('x', cx+LR, cy-LR, cy+LR, z0, z1, cy-1.2, cy+1.2); // east window
   WALLS.push({axis:'roof', x0:cx-LR, x1:cx+LR, y0:cy-LR, y1:cy+LR, zAbs:z1}); // lookout roof
   // --- rooms inside the walls (enclosed, enterable, on the flat courtyard) ---
-  boxWalls(cx-13, cy-13, cx-6, cy-6.5, 6, 's', cx-10.5, cx-8.5, true); // great hall (NW), door south
-  boxWalls(cx-13, cy+6.5, cx-7, cy+13, 5, 'e', cy+8.5, cy+10.5, true); // guard room (SW), door east
+  // (their east walls stop short of the donjon so a walkway runs round the tower at ground level)
+  boxWalls(cx-13, cy-13, cx-8, cy-6.5, 6, 's', cx-11.5, cx-9.5, true); // great hall (NW), door south
+  boxWalls(cx-13, cy+6.5, cx-9, cy+13, 5, 'e', cy+8.5, cy+10.5, true); // guard room (SW), door east
 }
 // stamp the solid, WALKABLE masses into W.st: curtain thickness + rampart, corner towers,
 // the donjon shaft, the external spiral stair up it, and the rampart stair.
@@ -239,10 +309,12 @@ function stampKeepMass(){
       if(Math.max(Math.abs(dx-ox),Math.abs(dy-oy))<=3) s=Math.max(s,KEEP.TOWH); }
     // central donjon shaft (round, solid, 24 high); its flat top is the lookout floor + balcony
     if(r<=DONR) s=Math.max(s,DONH);
-    // external spiral stair: a 2-wide ring hugging the shaft, rising one full turn (west seam)
+    // external spiral stair: a ~3-wide ring hugging the shaft, rising one full turn (west seam)
     else if(r<=SPR){ const f=(Math.atan2(dy,dx)+Math.PI)/TWO_PI; s=Math.max(s,DONH*f); }
-    // rampart stair: ramp against the inner east wall, rising north->south up to the wall-walk
-    if(x>=cx+12 && x<=cx+14 && y>=cy-10 && y<=cy+10){ const f=(y-(cy-10))/20; s=Math.max(s,CURH*f); }
+    // low handrail lip along the stair's outer edge (you can see over it; the ledge guard stops any fall)
+    else if(r<=SPR+KEEP.LIP){ const f=(Math.atan2(dy,dx)+Math.PI)/TWO_PI; s=Math.max(s,DONH*f+1.0); }
+    // rampart stair: 3-wide ramp against the inner east wall, rising north->south, with a handrail lip on its open side
+    if(x>=cx+11 && x<=cx+14 && y>=cy-10 && y<=cy+10){ const f=(y-(cy-10))/20; s=Math.max(s,CURH*f+(x===cx+11?1.0:0)); }
     if(s>0){ const i=y*N+x; st[i]=Math.max(st[i],s); }
   }
 }
@@ -290,7 +362,7 @@ const W={
   h:new Float32Array(N*N), st:new Float32Array(N*N), tree:new Float32Array(N*N), gh:new Float32Array(N*N),
   cr:new Uint8Array(N*N), cg:new Uint8Array(N*N), cb:new Uint8Array(N*N),
   tr:new Uint8Array(N*N), tg:new Uint8Array(N*N), tb:new Uint8Array(N*N),
-  cloud:new Uint8Array(256*256), cloud2:new Uint8Array(256*256), detail:new Uint8Array(64*64), path:new Uint8Array(N*N), ttype:new Uint8Array(N*N), shad:new Float32Array(N*N), seed:1, shadowCells:0
+  cloud:new Uint8Array(256*256), cloud2:new Uint8Array(256*256), detail:new Uint8Array(64*64), path:new Uint8Array(N*N), ttype:new Uint8Array(N*N), shad:new Float32Array(N*N), shadRaw:new Float32Array(N*N), ar:new Uint8Array(N*N), ag:new Uint8Array(N*N), ab:new Uint8Array(N*N), seed:1, shadowCells:0
 };
 
 function genWorld(seed){
@@ -369,25 +441,13 @@ function genWorld(seed){
   carvePath(gate[0],gate[1], LAKE.x-LAKE.r+4, LAKE.y-6, seed+83, 1.6);
   carvePath(LAKE.x, LAKE.y+LAKE.r-4, 360,360, seed+85, 1.3);
   placeStructures(seed);
-  // lighting + colors
+  // base colors (albedo); the light itself is applied by shadeRows so the sun can move
   W.shadowCells=0;
   for(let y=0;y<N;y++)for(let x=0;x<N;x++){
     const i=y*N+x;
     const xl=x>0?x-1:x, xr=x<N-1?x+1:x, yu=y>0?y-1:y, yd=y<N-1?y+1:y;
-    let sx=(h[y*N+xr]-h[y*N+xl])*0.5, sy=(h[yd*N+x]-h[yu*N+x])*0.5;
+    const sx=(h[y*N+xr]-h[y*N+xl])*0.5, sy=(h[yd*N+x]-h[yu*N+x])*0.5;
     const slope=Math.sqrt(sx*sx+sy*sy);
-    if(st[i]>0){ sx=0; sy=0; }
-    const nl=1/Math.sqrt(sx*sx+sy*sy+1);
-    const diff=Math.max(0,(-sx*SUN.x-sy*SUN.y+1*SUN.z)*nl);
-    // shadow march toward the sun
-    let shadow=false;
-    { let cx=x+0.5, cy=y+0.5, cz=h[i]+st[i]+0.2;
-      for(let k=0;k<110;k++){ cx+=SUN.x*0.8; cy+=SUN.y*0.8; cz+=SUN.z*0.8;
-        const xi=cx|0, yi=cy|0; if(xi<0||yi<0||xi>=N||yi>=N) break;
-        const j=yi*N+xi; if(h[j]+st[j]+tree[j]>cz){ shadow=true; break; } }
-    }
-    W.shad[i]=shadow?0.44:1.0;
-    const L=0.42+0.70*diff;
     const hh=h[i], v=hash2(x,y,seed+55), w=fbm(x*0.05,y*0.05,seed+77,3);
     let r,g,b;
     if(st[i]>0){ const k=28*(v-0.5); r=158+k; g=152+k; b=140+k; }
@@ -396,16 +456,59 @@ function genWorld(seed){
     else if(slope>1.0||hh>44){ const k=32*(v-0.5); r=132+k; g=122+k; b=108+k; }
     else { const m=sm(0.50,0.74,w); const k=18*(v-0.5); r=78+(148-78)*m+k; g=150+(118-150)*m+k; b=42+(70-42)*m+k; }
     if(W.path[i]&&st[i]===0&&hh>WATER+0.3){ const pv=hash2(x,y,seed+66); r=158+22*(pv-0.5); g=132+16*(pv-0.5); b=92+12*(pv-0.5); }
-    W.cr[i]=clamp(r*L,0,255); W.cg[i]=clamp(g*L,0,255); W.cb[i]=clamp(b*L,0,255);
-    const tl=0.62+0.55*L;
+    W.ar[i]=clamp(r,0,255); W.ag[i]=clamp(g,0,255); W.ab[i]=clamp(b,0,255);
+  }
+  relightAll();
+}
+
+// ---------------- light on the land (runs again, in slices, as the sun moves) ----------------
+// shadeRows: for rows y0..y1-1, march a shadow ray toward the light, light the albedo by the slope, and color the trees.
+function shadeRows(y0,y1,lx,ly,lz,dark,cast,sunLike){
+  const h=W.h, st=W.st, tree=W.tree, raw=W.shadRaw, seed=W.seed;
+  const sx8=lx*0.8, sy8=ly*0.8, sz8=lz*0.8;
+  const amb=0.42, dk=0.70*(sunLike?1:0.70)*(0.75/Math.max(0.6,lz))*Math.min(1,lz/0.14);   // midday as bright as before; the directional light fades out over the last 8 degrees so the sun-to-moon switch never pops
+  for(let y=y0;y<y1;y++)for(let x=0;x<N;x++){
+    const i=y*N+x;
+    const xl=x>0?x-1:x, xr=x<N-1?x+1:x, yu=y>0?y-1:y, yd=y<N-1?y+1:y;
+    let sx=(h[y*N+xr]-h[y*N+xl])*0.5, sy=(h[yd*N+x]-h[yu*N+x])*0.5;
+    if(st[i]>0){ sx=0; sy=0; }
+    const nl=1/Math.sqrt(sx*sx+sy*sy+1);
+    const diff=Math.max(0,(-sx*lx-sy*ly+lz)*nl);
+    let shadow=false;
+    if(cast){ let cx=x+0.5, cy=y+0.5, cz=h[i]+st[i]+0.2;
+      for(let k=0;k<110;k++){ cx+=sx8; cy+=sy8; cz+=sz8;
+        const xi=cx|0, yi=cy|0; if(xi<0||yi<0||xi>=N||yi>=N) break;
+        const j=yi*N+xi; if(h[j]+st[j]+tree[j]>cz){ shadow=true; break; } } }
+    raw[i]=shadow?dark:1.0;
+    const L=amb+dk*diff;
+    W.cr[i]=clamp(W.ar[i]*L,0,255); W.cg[i]=clamp(W.ag[i]*L,0,255); W.cb[i]=clamp(W.ab[i]*L,0,255);
+    const v=hash2(x,y,seed+55), tl=0.62+0.55*L;
     const ttp=W.ttype[i]; const tgR=ttp===1?68:ttp===2?96:36, tgG=ttp===1?136:ttp===2?124:108, tgB=ttp===1?50:ttp===2?48:40;
     W.tr[i]=clamp((tgR+16*v)*tl,0,255); W.tg[i]=clamp((tgG+30*v)*tl,0,255); W.tb[i]=clamp((tgB+12*v)*tl,0,255);
   }
-  // soft shadows: 3x3 box blur of the cast-shadow map for a penumbra
-  { const src=W.shad, tmp=new Float32Array(N*N);
-    for(let y=1;y<N-1;y++)for(let x=1;x<N-1;x++){ const i=y*N+x;
-      tmp[i]=(src[i-N-1]+src[i-N]+src[i-N+1]+src[i-1]+src[i]+src[i+1]+src[i+N-1]+src[i+N]+src[i+N+1])/9; }
-    for(let i=0;i<N*N;i++) if(tmp[i]>0) W.shad[i]=tmp[i]; }
+}
+// blurRows: soft shadows, a 3x3 box blur of the raw map into W.shad for rows y0..y1-1 (raw rows y0-1..y1 must be done)
+function blurRows(y0,y1){
+  const src=W.shadRaw, dst=W.shad; if(y0<1)y0=1; if(y1>N-1)y1=N-1;
+  for(let y=y0;y<y1;y++)for(let x=1;x<N-1;x++){ const i=y*N+x;
+    dst[i]=(src[i-N-1]+src[i-N]+src[i-N+1]+src[i-1]+src[i]+src[i+1]+src[i+N-1]+src[i+N]+src[i+N+1])/9; }
+}
+function shadBorders(){ const src=W.shadRaw, dst=W.shad; for(let x=0;x<N;x++){ dst[x]=src[x]; dst[(N-1)*N+x]=src[(N-1)*N+x]; } for(let y=0;y<N;y++){ dst[y*N]=src[y*N]; dst[y*N+N-1]=src[y*N+N-1]; } }
+const RELIGHT={ row:N, lx:0, ly:0, lz:1, dark:0.44, cast:true, sunLike:true, passes:0 };
+function relightBegin(){ const L=DAY.light; RELIGHT.lx=L.x; RELIGHT.ly=L.y; RELIGHT.lz=L.z; RELIGHT.dark=DAY.shadowK; RELIGHT.cast=DAY.lightAlt>0.035; RELIGHT.sunLike=DAY.sunLight; RELIGHT.row=0; RELIGHT.passes++; }
+function relightAll(){ sunUpdate(); relightBegin(); shadeRows(0,N,RELIGHT.lx,RELIGHT.ly,RELIGHT.lz,RELIGHT.dark,RELIGHT.cast,RELIGHT.sunLike); blurRows(0,N); shadBorders(); RELIGHT.row=N; }
+// relightStep: a few rows per frame; a new pass starts when the light has moved about a degree and a half
+function relightStep(rows){
+  if(RELIGHT.row>=N){
+    const L=DAY.light; const dot=L.x*RELIGHT.lx+L.y*RELIGHT.ly+L.z*RELIGHT.lz;
+    if(dot>0.99966 && Math.abs(DAY.shadowK-RELIGHT.dark)<0.04 && (DAY.lightAlt>0.035)===RELIGHT.cast) return false;
+    relightBegin();
+  }
+  const y0=RELIGHT.row, y1=Math.min(N,y0+rows);
+  shadeRows(y0,y1,RELIGHT.lx,RELIGHT.ly,RELIGHT.lz,RELIGHT.dark,RELIGHT.cast,RELIGHT.sunLike);
+  blurRows(y0-1,y1-1);
+  if(y1>=N){ blurRows(N-2,N); shadBorders(); }
+  RELIGHT.row=y1; return true;
 }
 
 function carveRiver(x0,y0,dx0,dy0,len,s2){
@@ -464,7 +567,8 @@ function groundAt(x,y){ const xi=clamp(x|0,0,N-1), yi=clamp(y|0,0,N-1); return t
 
 // ---------------- renderer ----------------
 const FOGK=0.0032, MAXT=520, TREE_FAR=210, RC=0.92, RT=0.10;
-const FOG_R=172, FOG_G=196, FOG_B=222;
+let FOG_R=172, FOG_G=196, FOG_B=222;
+const SKYBIT=1<<30; // marks sky cells in FB.col so compose leaves them out of the day/night exposure
 const fogLUT=new Float32Array(MAXT*4+16);
 for(let i=0;i<fogLUT.length;i++) fogLUT[i]=1-Math.exp(-(i/4)*FOGK);
 const RS={C:0,R:0,cellW:0,cellH:0,K:0,tanHalf:0,offX:0,offY:0,letterbox:false};
@@ -487,30 +591,59 @@ function pack(r,g,b,f){
   r+=(FOG_R-r)*f; g+=(FOG_G-g)*f; b+=(FOG_B-b)*f;
   return ((r|0)<<16)|((g|0)<<8)|(b|0);
 }
+// the sky palette for the current sun: top and horizon colors, cloud light, sun disc; recomputed once per frame
+const SKY={tr:52,tg:104,tb:208, hr:172,hg:196,hb:222, cl:1, cr:255,cg:252,cb:250, sr:255,sg:250,sb:215, nd:0, du:0, hx:0, hy:1};
+function skyUpdate(){
+  const k=DAY.k, nd=1-k, du=DAY.dusk;
+  SKY.nd=nd; SKY.du=du;
+  SKY.tr=52+(7-52)*nd; SKY.tg=104+(11-104)*nd; SKY.tb=208+(32-208)*nd;
+  SKY.hr=172+(26-172)*nd; SKY.hg=196+(36-196)*nd; SKY.hb=222+(64-222)*nd;
+  // dusk: the top goes violet (the horizon warms per pixel, on the sun's side)
+  SKY.tr+=(92-SKY.tr)*du*0.45; SKY.tg+=(58-SKY.tg)*du*0.45; SKY.tb+=(126-SKY.tb)*du*0.35;
+  SKY.cl=0.18+0.82*k;                                   // cloud light
+  SKY.cr=255*(1+0.05*du); SKY.cg=252*(1-0.12*du); SKY.cb=250*(1-0.30*du);
+  SKY.sr=255; SKY.sg=250-80*du; SKY.sb=215-130*du;      // sun disc, orange at the horizon
+  const hl=Math.hypot(SUN.x,SUN.y)||1; SKY.hx=SUN.x/hl; SKY.hy=SUN.y/hl;
+  // fog meets the horizon; the world is tinted by compose afterwards, so the fog is stored pre-tint
+  FOG_R=clamp(SKY.hr/DAY.tr,0,255); FOG_G=clamp(SKY.hg/DAY.tg,0,255); FOG_B=clamp(SKY.hb/DAY.tb,0,255);
+}
+// a sky color divided by the day tint, for sky that reaches the screen through world cells (the lake's reflection)
+function preTint(c){ if(DAY.tr===1&&DAY.tg===1&&DAY.tb===1) return c; const r=Math.min(255,((c>>16)&255)/DAY.tr), g=Math.min(255,((c>>8)&255)/DAY.tg), b=Math.min(255,(c&255)/DAY.tb); return ((r|0)<<16)|((g|0)<<8)|(b|0); }
 function sky(dx,dy,sg,px,py,pz){
   const t=clamp(sg*1.6,0,1), tt=Math.sqrt(t);
-  let r=172+(52-172)*tt, g=196+(104-196)*tt, b=222+(208-222)*tt;
-  const len=Math.sqrt(dx*dx+dy*dy+sg*sg);
-  const d=(dx*SUN.x+dy*SUN.y+sg*SUN.z)/len;
-  if(d>0.9993) return (255<<16)|(250<<8)|215;
-  if(d>0.96){ const k=(d-0.96)/0.04; r+=70*k*k; g+=55*k*k; b+=10*k*k; }
+  const len=Math.sqrt(dx*dx+dy*dy+sg*sg), hl=Math.sqrt(dx*dx+dy*dy)||1e-6;
+  let hr=SKY.hr, hg=SKY.hg, hb=SKY.hb;
+  if(SKY.du>0){ const side=0.35+0.65*Math.max(0,(dx*SKY.hx+dy*SKY.hy)/hl); const w=SKY.du*side; hr+=(255-hr)*w*0.85; hg+=(150-hg)*w*0.75; hb+=(70-hb)*w*0.85; }
+  let r=hr+(SKY.tr-hr)*tt, g=hg+(SKY.tg-hg)*tt, b=hb+(SKY.tb-hb)*tt;
+  const nd=SKY.nd;
+  if(nd>0 && sg>0.02){ // stars, fixed to the sky, a faint twinkle
+    const sx=Math.floor(Math.atan2(dy,dx)*160), sy=Math.floor(Math.atan(sg/hl)*160); const hs=hash2(sx,sy,77);
+    if(hs>0.985){ const br=nd*(0.5+0.5*hash2(sx,sy,78))*(0.7+0.3*Math.sin(skyTime*2.5+hs*60)); r+=(232-r)*br; g+=(236-g)*br; b+=(255-b)*br; }
+  }
+  if(SUN.z>-0.03){ const d=(dx*SUN.x+dy*SUN.y+sg*SUN.z)/len;
+    if(d>0.9993) return (SKY.sr<<16)|((SKY.sg|0)<<8)|(SKY.sb|0);
+    if(d>0.96){ const k=(d-0.96)/0.04, gl=k*k*(1+SKY.du); r+=70*gl; g+=(55-30*SKY.du)*gl; b+=(10-10*SKY.du)*gl; } }
+  if(MOON.z>-0.03 && nd>0){ const d=(dx*MOON.x+dy*MOON.y+sg*MOON.z)/len;
+    if(d>0.9991) return ((226*(0.5+0.5*nd))<<16)|(((228*(0.5+0.5*nd))|0)<<8)|((214*(0.5+0.5*nd))|0);
+    if(d>0.975){ const k=(d-0.975)/0.025*nd; r+=40*k*k; g+=44*k*k; b+=60*k*k; } }
   if(sg>0.03){
+    const cl=SKY.cl, cR=SKY.cr*cl, cG=SKY.cg*cl, cB=SKY.cb*cl;
     const dist2=(CLOUDH+50-pz)/sg;
     const cx2=px+dx*dist2+skyTime*1.5, cy2=py+dy*dist2;
     const c2=W.cloud2[(((cx2*0.7)|0)&255)+((((cy2*0.7)|0)&255)<<8)]/255;
     const a2=sm(0.52,0.74,c2)*clamp(1-dist2/1400,0,1)*0.7;
-    if(a2>0){ const sh=0.88-0.2*sm(0.7,0.95,c2); r+=(240*sh-r)*a2; g+=(242*sh-g)*a2; b+=(248*sh-b)*a2; }
+    if(a2>0){ const sh=0.88-0.2*sm(0.7,0.95,c2); r+=(cR*0.94*sh-r)*a2; g+=(cG*0.96*sh-g)*a2; b+=(cB*0.99*sh-b)*a2; }
     const dist=(CLOUDH-pz)/sg;
     const cx=px+dx*dist+skyTime*3, cy=py+dy*dist;
     const c=W.cloud[(((cx*1.1)|0)&255)+((((cy*1.1)|0)&255)<<8)]/255;
     const a=sm(0.50,0.70,c)*clamp(1-dist/900,0,1);
-    if(a>0){ const sh=1-0.3*sm(0.64,0.92,c); r+=(255*sh-r)*a; g+=(252*sh-g)*a; b+=(250*sh-b)*a; }
+    if(a>0){ const sh=1-0.3*sm(0.64,0.92,c); r+=(cR*sh-r)*a; g+=(cG*sh-g)*a; b+=(cB*sh-b)*a; }
   }
   return (clamp(r,0,255)<<16)|(clamp(g,0,255)<<8)|clamp(b,0,255);
 }
 
 function renderFrame(px,py,pz,yaw,pitch){
-  const C=RS.C,R=RS.R,K=RS.K,tanH=RS.tanHalf;
+  const C=RS.C,R=RS.R,K=RS.K,tanH=RS.tanHalf; const LIT=DAY.light;
   simBin(px,py);
   const fb=FB.col;
   const h=W.h, st=W.st, tree=W.tree, gh=W.gh, cr=W.cr,cg=W.cg,cb=W.cb, tr=W.tr,tg=W.tg,tb=W.tb;
@@ -549,12 +682,14 @@ function renderFrame(px,py,pz,yaw,pitch){
         const z0=planeHit.w.z0Abs!=null?planeHit.w.z0Abs:terr(hx,hy), z1=planeHit.w.z1Abs!=null?planeHit.w.z1Abs:z0+planeHit.w.h;
         const rowT=Math.floor(horizon-(z1-pz)*K/tw);
         const rowB=Math.floor(horizon-(z0-pz)*K/tw);
-        const bot=ybuf<rowB?ybuf:rowB;
+        // a plane whose foot is above the painted watermark (a wall standing on a raised mass the march has not reached yet) is
+        // painted down to its own foot and leaves ybuf alone, so the rows under it still get the mass face, not a black gap
+        const gap=rowB<ybuf; const bot=gap?Math.min(rowB+1,R):ybuf;
         if(rowT<bot){
           const lo=rowT<0?0:rowT; const f=fogLUT[(tw*4)|0];
           const nxw=planeHit.w.axis==='y'?0:(dx<0?1:-1);
           const nyw=planeHit.w.axis==='x'?0:(dy<0?1:-1);
-          const lit=0.66+0.44*Math.max(0,nxw*SUN.x+nyw*SUN.y);
+          const lit=0.66+0.44*Math.max(0,nxw*LIT.x+nyw*LIT.y);
           const along=planeHit.w.axis==='y'?hx:hy;
           const tk=tw/K;
           for(let r=bot-1;r>=lo;r--){ if(flag[r]) continue;
@@ -565,7 +700,7 @@ function renderFrame(px,py,pz,yaw,pitch){
             const mort=(fzc<0.08||fab<0.06)?0.78:1;
             const bl=(0.90+0.12*hash2(bi,zi*3+1,7))*mort*lit;
             fb[r*C+i]=pack((wood?142:176)*bl,(wood?98:168)*bl,(wood?54:156)*bl,f); flag[r]=1; }
-          if(lo<ybuf) ybuf=lo;
+          if(!gap&&lo<ybuf) ybuf=lo;
         }
       }
       let ex=px+dx*t, ey=py+dy*t;
@@ -652,7 +787,7 @@ function renderFrame(px,py,pz,yaw,pitch){
           const lo=rowT<0?0:rowT; const f=fogLUT[(t*4)|0];
           if(sc>0&&(sc-prevSt>0.8||(prevSt<=0&&sc>0))){
             const nx=sideWasX?-stepX:0, ny=sideWasX?0:-stepY;
-            const lit=0.64+0.46*Math.max(0,nx*SUN.x+ny*SUN.y);
+            const lit=0.64+0.46*Math.max(0,nx*LIT.x+ny*LIT.y);
             const along=(sideWasX?ey:ex), tk=t/K;
             for(let r=ybuf-1;r>=lo;r--){ if(flag[r]) continue;
               const z=pz+(horizon-r)*tk;
@@ -693,12 +828,12 @@ function renderFrame(px,py,pz,yaw,pitch){
       const z0=planeHit.w.z0Abs!=null?planeHit.w.z0Abs:terr(hx,hy), z1=planeHit.w.z1Abs!=null?planeHit.w.z1Abs:z0+planeHit.w.h;
       const rowT=Math.floor(horizon-(z1-pz)*K/tw);
       const rowB=Math.floor(horizon-(z0-pz)*K/tw);
-      const bot=ybuf<rowB?ybuf:rowB;
+      const gap=rowB<ybuf; const bot=gap?Math.min(rowB+1,R):ybuf;
       if(rowT<bot){
         const lo=rowT<0?0:rowT; const f=fogLUT[(tw*4)|0];
         const nxw=planeHit.w.axis==='y'?0:(dx<0?1:-1);
         const nyw=planeHit.w.axis==='x'?0:(dy<0?1:-1);
-        const lit=0.66+0.44*Math.max(0,nxw*SUN.x+nyw*SUN.y);
+        const lit=0.66+0.44*Math.max(0,nxw*LIT.x+nyw*LIT.y);
         const along=planeHit.w.axis==='y'?hx:hy;
         const tk=tw/K;
         for(let r=bot-1;r>=lo;r--){ if(flag[r]) continue;
@@ -709,7 +844,7 @@ function renderFrame(px,py,pz,yaw,pitch){
           const mort=(fzc<0.08||fab<0.06)?0.78:1;
           const bl=(0.90+0.12*hash2(bi,zi*3+1,7))*mort*lit;
           fb[r*C+i]=pack((wood?142:176)*bl,(wood?98:168)*bl,(wood?54:156)*bl,f); flag[r]=1; }
-        if(lo<ybuf) ybuf=lo;
+        if(!gap&&lo<ybuf) ybuf=lo;
       }
     }
     // ---- roof planes (method C) ----
@@ -738,10 +873,10 @@ function renderFrame(px,py,pz,yaw,pitch){
       }
     }
     // ---- sky ----
-    for(let r=0;r<ybuf;r++){ if(!flag[r]) fb[r*C+i]=sky(dx,dy,(horizon-r)/K,px,py,pz); }
+    for(let r=0;r<ybuf;r++){ if(!flag[r]) fb[r*C+i]=sky(dx,dy,(horizon-r)/K,px,py,pz)|SKYBIT; }
     // ---- reflection march ----
     if(wCount>0){
-      for(let r=wMin;r<=wMax;r++){ mflag[r]=0; if(wflag[r]) mirror[r]=sky(dx,dy,(r-horizon)/K,px,py,pz); }
+      for(let r=wMin;r<=wMax;r++){ mflag[r]=0; if(wflag[r]) mirror[r]=preTint(sky(dx,dy,(r-horizon)/K,px,py,pz)); }
       mx=mx0; my=my0; sideX=sideX0; sideY=sideY0; let done=0; lodN=0;
       while(done<wCount){
         let tn,cx,cy;
@@ -816,14 +951,15 @@ function buildGlyphs(cw,ch){
 function compose(){
   const C=RS.C,R=RS.R,cw=RS.cellW,ch=RS.cellH,PW=C*cw;
   const px32=FB.px32, fb=FB.col, G=GLY.masks, nG=GLY.n;
-  const uw=UW;
+  const uw=UW, xr=DAY.tr, xg=DAY.tg, xb=DAY.tb, tint=(xr!==1||xg!==1||xb!==1);
   for(let j=0;j<R;j++){
     let utR=0,utG=0,utB=0,um=0;
     if(uw>0){ const sgl=1-j/R; utR=12+(46-12)*sgl; utG=46+(118-46)*sgl; utB=72+(150-72)*sgl; um=uw*0.6; }
     for(let i=0;i<C;i++){
       const c=fb[j*C+i]; let r=(c>>16)&255, g=(c>>8)&255, b=c&255;
       if(um>0){ r+=(utR-r)*um; g+=(utG-g)*um; b+=(utB-b)*um; }
-      const lum=(r*77+g*150+b*29)>>8;
+      const lum=(r*77+g*150+b*29)>>8;   // the glyph comes from the untinted light, so night keeps its texture
+      if(tint&&!(c&SKYBIT)){ r*=xr; g*=xg; b*=xb; if(r>255)r=255; if(g>255)g=255; if(b>255)b=255; }
       const mask=G[(lum*nG)>>8];
       const fg=(0xff000000|(b<<16)|(g<<8)|r)>>>0;
       const bg=(0xff000000|(((b*0.45)|0)<<16)|(((g*0.45)|0)<<8)|((r*0.45)|0))>>>0;
@@ -1058,6 +1194,7 @@ function tickBird(c,dt){
     const s=Math.hypot(vx,vy)||1e-4, mx=p.speed;
     if(s>mx){ vx=vx/s*mx; vy=vy/s*mx; } else if(s<mx*0.5){ vx=vx/s*mx*0.5; vy=vy/s*mx*0.5; }
     CR_.z[c]+=(Math.max(terr(x,y),WATER)+12-CR_.z[c])*Math.min(1,dt*1.5);
+    if(DAY.k<0.5 && CR_.tm[c]>3) CR_.tm[c]=3;   // dusk: head for the trees
     if(CR_.tm[c]<=0){ CR_.st[c]=1; CR_.tm[c]=8+Math.random()*12; }
   } else {
     const hx=CR_.ax[c]-x, hy=CR_.ay[c]-y, hd=Math.hypot(hx,hy)+1e-4;
@@ -1065,7 +1202,7 @@ function tickBird(c,dt){
     const ax=CR_.ax[c]|0, ay=CR_.ay[c]|0, ti=ay*N+ax;
     const rz=(W.tree[ti]>0? terr(ax,ay)+W.tree[ti]*0.78 : Math.max(terr(x,y),WATER)+1.6);
     CR_.z[c]+=(rz-CR_.z[c])*Math.min(1,dt*1.3);
-    if(CR_.tm[c]<=0){ CR_.st[c]=0; CR_.tm[c]=14+Math.random()*20; }
+    if(CR_.tm[c]<=0){ if(DAY.k<0.5){ CR_.tm[c]=6+Math.random()*8; } else { CR_.st[c]=0; CR_.tm[c]=14+Math.random()*20; } }   // roost through the night
   }
   integ(c,vx,vy,dt,false);
 }
@@ -1176,7 +1313,7 @@ function tickWolf(c,dt){
   else {
     // draw the pack to a fresh kill
     if(CR_.energy[c]<75 && CR_.tgt[c]<0){ const carc=nearestSp(x,y,34,SP.CARCASS); if(carc>=0){ CR_.tgt[c]=carc; CR_.st[c]=2; CR_.tm[c]=6; } }
-    if(CR_.st[c]===0 && CR_.energy[c]<62 && CR_.tgt[c]<0){
+    if(CR_.st[c]===0 && CR_.energy[c]<(DAY.k<0.5?72:62) && CR_.tgt[c]<0){   // wolves hunt sooner after dark
       let t=nearestSp(x,y,300,SP.RABBIT); let td=t>=0?((CR_.x[t]-x)*(CR_.x[t]-x)+(CR_.y[t]-y)*(CR_.y[t]-y)):1e9;
       let t2=nearestSp(x,y,300,SP.DEER); let td2=t2>=0?((CR_.x[t2]-x)*(CR_.x[t2]-x)+(CR_.y[t2]-y)*(CR_.y[t2]-y)):1e9;
       const pick=(td2<td)?t2:t; if(pick>=0){ CR_.tgt[c]=pick; CR_.st[c]=1; }
@@ -1296,13 +1433,29 @@ function updatePlayer(dt){
     if(nz<bedEye)nz=bedEye; if(nz>surfEye)nz=surfEye;
     P.z=nz; P.gz=P.z-EYE;
   } else {
-    const sp=6*run*dt;
+    // where am I in the keep? stairs get slower, steadier footing; every raised edge gets a ledge guard
+    const kdx=P.x-FORT.x, kdy=P.y-FORT.y, kr=Math.hypot(kdx,kdy);
+    const inKeep=!!DIALS.keep && Math.max(Math.abs(kdx),Math.abs(kdy))<KEEP.H;
+    const onSpiral=inKeep && kr>KEEP.DONR && kr<=KEEP.SPR;
+    const onStair=onSpiral || (inKeep && P.x>=FORT.x+11.5 && P.x<=FORT.x+14.5 && P.y>=FORT.y-10 && P.y<=FORT.y+10);
+    const sp=6*run*dt*(onStair?0.7:1);
     const nx=P.x+(fx*mf-fy*ms)*sp, ny=P.y+(fy*mf+fx*ms)*sp;
     const g0=Math.max(groundAt(P.x,P.y),WATER-0.6);
     const bvx=(fx*mf-fy*ms), bvy=(fy*mf+fx*ms), bl=Math.hypot(bvx,bvy)||1;
     const pbx=nx+bvx/bl*0.45, pby=ny+bvy/bl*0.45;
-    if(nx>1.5&&nx<N-2.5&&groundAt(nx,P.y)-g0<1.6&&groundAt(pbx,P.y)-g0<1.9&&!wallBlocked(nx,P.y)&&!wallBlocked(pbx,P.y)) P.x=nx;
-    if(ny>1.5&&ny<N-2.5&&groundAt(P.x,ny)-g0<1.6&&groundAt(P.x,pby)-g0<1.9&&!wallBlocked(P.x,ny)&&!wallBlocked(P.x,pby)) P.y=ny;
+    // ledge guard: a step UP is capped (as before) and now a step DOWN is too, so you cannot walk off
+    // the rampart, the stairs, or the tower top. Natural slopes never drop this much in one step.
+    const LEDGE=1.8;
+    const okX=nx>1.5&&nx<N-2.5&&groundAt(nx,P.y)-g0<1.6&&groundAt(pbx,P.y)-g0<1.9&&g0-groundAt(nx,P.y)<LEDGE&&g0-groundAt(pbx,P.y)<LEDGE&&!wallBlocked(nx,P.y)&&!wallBlocked(pbx,P.y);
+    if(okX) P.x=nx;
+    const okY=ny>1.5&&ny<N-2.5&&groundAt(P.x,ny)-g0<1.6&&groundAt(P.x,pby)-g0<1.9&&g0-groundAt(P.x,ny)<LEDGE&&g0-groundAt(P.x,pby)<LEDGE&&!wallBlocked(P.x,ny)&&!wallBlocked(P.x,pby);
+    if(okY) P.y=ny;
+    // on the spiral, if you drift toward the outer edge, ease back toward the middle of the stair
+    // (only while standing on the stamped stair itself, never across a step, so it can never lift
+    //  someone off courtyard ground beside the tower; and gentle enough to walk against)
+    if(onSpiral && kr>0.01 && W.st[(P.y|0)*N+(P.x|0)]>0){ const tr=(KEEP.DONR+KEEP.SPR)*0.5; if(kr>tr){ const k=Math.min(1,dt*1.5);
+      const sx=P.x+(kdx/kr)*(tr-kr)*k, sy=P.y+(kdy/kr)*(tr-kr)*k;
+      if(Math.abs(groundAt(sx,sy)-groundAt(P.x,P.y))<1.6 && !wallBlocked(sx,sy)){ P.x=sx; P.y=sy; } } }
     const g=Math.max(groundAt(P.x,P.y),WATER-0.6);
     P.gz+=(g-P.gz)*Math.min(1,dt*12);
     P.z=P.gz+EYE;
@@ -1343,20 +1496,40 @@ function boot(){
     img=new ImageData(new Uint8ClampedArray(FB.px32.buffer),C*cw,R*ch);
     buildGlyphs(cw,ch);
   }
-  $('mbVer').addEventListener('click',function(){ toast('v0.7.14 loaded · seed '+W.seed+' · '+RS.C+'x'+RS.R+(RS.letterbox?' · letterboxed':'')); });
+  $('mbVer').textContent=VER_SHORT;
+  $('mbVer').addEventListener('click',function(){ toast(VER_SHORT+' loaded · seed '+W.seed+' · '+RS.C+'x'+RS.R+(RS.letterbox?' · letterboxed':'')); });
+  // one card at a time: every opener closes the rest first, so nothing paints dead behind another card
+  const OVERLAYS=['help','about','menu','seed','log','dials'];
+  let skyHud=null;   // set by openDials: refreshes the sky dials' clock while the card is open
+  function closeAll(){ for(let i=0;i<OVERLAYS.length;i++) $(OVERLAYS[i]).classList.add('hidden'); }
+  // the dials remember both states across reloads (seed, species, predators, keep, landmarks, forest, water)
+  function saveDials(){ try{ localStorage.setItem('keep_dials',JSON.stringify(DIALS)); }catch(e){} }
+  function loadDials(){
+    try{
+      const d=JSON.parse(localStorage.getItem('keep_dials')||'null'); if(!d||typeof d!=='object') return;
+      const num=function(v,lo,hi,dflt){ v=parseFloat(v); return isFinite(v)?Math.min(hi,Math.max(lo,v)):dflt; };
+      DIALS.seed=(parseInt(d.seed,10)>>>0)||DIALS.seed;
+      DIALS.forest=num(d.forest,0.3,1.7,DIALS.forest); DIALS.water=num(d.water,0.3,1.7,DIALS.water);
+      DIALS.keep=d.keep?1:0; DIALS.structures=d.structures?1:0; DIALS.predators=d.predators?1:0;
+      for(let i=0;i<6;i++){ if(d.on&&d.on.length===6) DIALS.on[i]=d.on[i]?1:0; if(d.pop&&d.pop.length===6) DIALS.pop[i]=num(d.pop[i],0.25,2,DIALS.pop[i]); }
+      if(!DIALS.predators) DIALS.on[SP.WOLF]=0;
+      DIALS.tod=num(d.tod,0,24,DIALS.tod)%24; const dm=parseInt(d.dayMode,10); if(dm>=0&&dm<DAYMODES.length) DIALS.dayMode=dm;
+    }catch(e){}
+  }
   function openSeed(){
+    closeAll();
     const c=$('seedCard');
     c.innerHTML='<h1>World seed</h1><p>Type a number for that exact world, or roll a random one.</p><input id="seedIn" inputmode="numeric" value="'+W.seed+'" style="width:100%;padding:12px;font:600 16px var(--mb-mono);background:rgba(0,0,0,.5);color:var(--mb-ink);border:1px solid var(--mb-line);border-radius:13px;margin:6px 0"><div style="display:flex;gap:8px"><button class="btn go" id="seedUse" style="flex:1;margin-top:0">grow it</button><button class="btn go" id="seedRnd" style="flex:1;margin-top:0">random</button></div><button class="btn" id="seedClose" style="width:100%;margin-top:8px">cancel</button>';
     $('seed').classList.remove('hidden');
-    function apply(sv){ DIALS.seed=sv; genWorld(sv); populate(sv); spawn(); $('seed').classList.add('hidden'); toast('seed '+sv); }
+    function apply(sv){ DIALS.seed=sv; saveDials(); genWorld(sv); populate(sv); spawn(); $('seed').classList.add('hidden'); toast('seed '+sv); }
     $('seedUse').addEventListener('click',function(){ const v=parseInt($('seedIn').value,10); apply(isFinite(v)?(v>>>0):(Math.random()*1e9|0)); });
     $('seedRnd').addEventListener('click',function(){ apply(Math.random()*1e9|0); });
     $('seedClose').addEventListener('click',function(){ $('seed').classList.add('hidden'); });
   }
-  function openHelp(){ $('help').classList.remove('hidden'); }
+  function openHelp(){ closeAll(); $('help').classList.remove('hidden'); }
   function showSize(){ var el=$('fsize'); if(!el) return;
     try{ fetch(location.href,{cache:'no-store'}).then(function(r){return r.blob();}).then(function(b){ if(b&&b.size) el.textContent=(b.size/1024).toFixed(0)+' KB'; }).catch(function(){}); }catch(e){} }
-  function openAbout(){ $('about').classList.remove('hidden'); showSize(); }
+  function openAbout(){ closeAll(); $('about').classList.remove('hidden'); showSize(); }
   function readDialsFromCard(){
     const num=function(id,d){ const el=$(id); if(!el) return d; const v=parseFloat(el.value); return isFinite(v)?v:d; };
     const chk=function(id){ const el=$(id); return el?el.checked:true; };
@@ -1367,14 +1540,17 @@ function boot(){
     const pops=['pBird','pRabbit','pDeer','pSquirrel','pFish','pWolf'];
     for(let i=0;i<6;i++){ DIALS.on[i]=chk(ids[i])?1:0; DIALS.pop[i]=num(pops[i],1); }
     if(!DIALS.predators) DIALS.on[SP.WOLF]=0;
+    DIALS.tod=DAY.tod; DIALS.dayMode=DAY.mode;
+    saveDials();
   }
   function openDials(){
+    closeAll();
     const c=$('dialsCard');
     const row=function(id,label,on,pv){
       return '<div class="dial-row"><label><input type="checkbox" id="'+id+'"'+(on?' checked':'')+'> '+label+'</label>'+
         '<input id="p'+id.slice(1)+'" type="range" min="0.25" max="2" step="0.25" value="'+pv+'"></div>';
     };
-    c.innerHTML='<h1>Keeper dials</h1><p>Set the world, then drop in. Life sliders are starting numbers. Forest, water, and landmarks rebuild the ground.</p>'+
+    c.innerHTML='<h1>Keeper dials</h1><p>Set the world, then drop in. Life sliders are starting numbers. Forest, water, and landmarks rebuild the ground. Your settings are remembered on this device.</p>'+
       '<input id="dSeed" inputmode="numeric" value="'+DIALS.seed+'" style="width:100%;padding:10px;font:600 16px var(--mb-mono);background:rgba(0,0,0,.5);color:var(--mb-ink);border:1px solid var(--mb-line);border-radius:13px;margin:6px 0">'+
       '<div class="dial-sec">LIFE</div>'+
       row('dBird','birds',DIALS.on[0],DIALS.pop[0])+
@@ -1389,18 +1565,30 @@ function boot(){
       '<div class="dial-row"><label>water</label><input id="dWater" type="range" min="0.3" max="1.7" step="0.1" value="'+DIALS.water+'"></div>'+
       '<div class="dial-row"><label><input type="checkbox" id="dKeep"'+(DIALS.keep?' checked':'')+'> the keep</label></div>'+
       '<div class="dial-row"><label><input type="checkbox" id="dStruct"'+(DIALS.structures?' checked':'')+'> landmarks</label></div>'+
+      '<div class="dial-sec">SKY</div>'+
+      '<div class="dial-row"><label>time <b id="dTodV" style="font-family:var(--mb-mono);font-weight:600"></b></label><input id="dTod" type="range" min="0" max="23.75" step="0.25" value="'+(Math.round(DAY.tod*4)/4)+'"></div>'+
+      '<div class="dial-row"><label>day length <b id="dDayV" style="font-family:var(--mb-mono);font-weight:600"></b></label><input id="dDay" type="range" min="0" max="4" step="1" value="'+DIALS.dayMode+'"></div>'+
       '<button class="btn go" id="dGrow">grow this world</button>'+
       '<button class="btn" id="dLife" style="width:100%;margin-top:8px">restock life only</button>'+
       '<button class="btn" id="dClose" style="width:100%;margin-top:8px">cancel</button>';
     $('dials').classList.remove('hidden');
+    // the sky dials apply as you slide them (no regrow needed)
+    const DAYNAMES=['paused','3 min day','8 min day','20 min day','Akron clock'];
+    let held=false;
+    const showSky=function(){ $('dTodV').textContent=fmtTod(DAY.tod); $('dDayV').textContent=DAYNAMES[DAY.mode]||''; $('dTod').disabled=(DAYMODES[DAY.mode]<0); if(!held) $('dTod').value=Math.round(DAY.tod*4)/4; };
+    skyHud=showSky;   // frame() keeps the card's clock and slider in step with the running day
+    $('dTod').addEventListener('pointerdown',function(){ held=true; }); window.addEventListener('pointerup',function(){ held=false; }); window.addEventListener('pointercancel',function(){ held=false; });
+    $('dTod').addEventListener('input',function(){ const v=parseFloat($('dTod').value); if(isFinite(v)){ DAY.tod=v; DIALS.tod=v; sunUpdate(); saveDials(); showSky(); } });
+    $('dDay').addEventListener('input',function(){ const v=parseInt($('dDay').value,10); if(v>=0&&v<DAYMODES.length){ DAY.mode=v; DIALS.dayMode=v; updateDay(0); $('dTod').value=Math.round(DAY.tod*4)/4; saveDials(); showSky(); } });
+    showSky();
     $('dGrow').addEventListener('click',function(){ readDialsFromCard(); genWorld(DIALS.seed); populate(DIALS.seed); spawn(); $('dials').classList.add('hidden'); toast('world '+DIALS.seed); });
     $('dLife').addEventListener('click',function(){ readDialsFromCard(); populate(DIALS.seed); $('dials').classList.add('hidden'); toast('life restocked'); });
     $('dClose').addEventListener('click',function(){ $('dials').classList.add('hidden'); });
   }
-  function openLog(){ const c=$('logCard'); c.innerHTML='<h1>Changelog</h1>'+CHANGELOG.map(function(e){ return '<p><b>'+e[0]+'</b><br>'+e[1]+'</p>'; }).join('')+'<button class="btn go" id="bLogClose">close</button>'; $('log').classList.remove('hidden'); $('bLogClose').addEventListener('click',function(){ $('log').classList.add('hidden'); }); }
+  function openLog(){ closeAll(); const c=$('logCard'); c.innerHTML='<h1>Changelog</h1>'+CHANGELOG.map(function(e){ return '<p><b>'+e[0]+'</b><br>'+e[1]+'</p>'; }).join('')+'<button class="btn go" id="bLogClose">close</button>'; $('log').classList.remove('hidden'); $('bLogClose').addEventListener('click',function(){ $('log').classList.add('hidden'); }); }
   // top-right menu: one button that reaches everything, so nothing is off-screen in portrait
   const closeMenu=function(){ $('menu').classList.add('hidden'); };
-  $('bMenu').addEventListener('click',function(){ $('menu').classList.remove('hidden'); });
+  $('bMenu').addEventListener('click',function(){ closeAll(); $('menu').classList.remove('hidden'); });
   $('mClose').addEventListener('click',closeMenu);
   $('mSeed').addEventListener('click',function(){ closeMenu(); openSeed(); });
   $('mDials').addEventListener('click',function(){ closeMenu(); openDials(); });
@@ -1411,8 +1599,11 @@ function boot(){
   $('aGo').addEventListener('click',function(){ $('about').classList.add('hidden'); try{localStorage.setItem('keep_about_seen','1');}catch(e){} });
   $('aFull').addEventListener('click',function(){ location.href='keep-about.html'; });
   let rzT; window.addEventListener('resize',function(){ clearTimeout(rzT); rzT=setTimeout(setupGrid,200); });
-  window.addEventListener('keydown',function(e){ IN.keys[e.code]=true; if(e.code.indexOf('Arrow')===0) e.preventDefault(); });
-  window.addEventListener('keyup',function(e){ IN.keys[e.code]=false; });
+  // desktop keys: ignore typing in the seed boxes, and drop every held key when the window loses focus
+  const typing=function(e){ const t=e.target; return !!(t&&t.tagName&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA')); };
+  window.addEventListener('keydown',function(e){ if(typing(e)) return; IN.keys[e.code]=true; if(e.code.indexOf('Arrow')===0) e.preventDefault(); });
+  window.addEventListener('keyup',function(e){ if(typing(e)) return; IN.keys[e.code]=false; });
+  window.addEventListener('blur',function(){ IN.keys={}; });
   // pointer: touch left = walk, touch right = look, mouse = look
   const ptr={};
   const stick=$('stick'), knob=$('knob');
@@ -1433,34 +1624,42 @@ function boot(){
   function end(e){ const p=ptr[e.pointerId]; if(!p) return; if(p.role==='move'){ IN.f=0; IN.s=0; IN.run=false; stick.style.display='none'; } delete ptr[e.pointerId]; }
   canvas.addEventListener('pointerup',end); canvas.addEventListener('pointercancel',end);
   // go
-  DIALS.seed=20260919; genWorld(DIALS.seed); populate(DIALS.seed); spawn(); setupGrid();
+  DIALS.seed=20260919; loadDials(); DAY.tzOff=tzOffsetHours(SITE.tz); DAY.tod=DIALS.tod; DAY.mode=DIALS.dayMode; updateDay(0);
+  genWorld(DIALS.seed); populate(DIALS.seed); spawn(); setupGrid();
   // first visit ever: show the "about this build" card once, then it lives in the menu
   try{ if(!localStorage.getItem('keep_about_seen')) openAbout(); else showSize(); }catch(e){ openAbout(); }
-  let last=performance.now(), fAcc=0, fN=0, fT=0, acc=0, ecoAcc=0; const STEP=1/15, ECOSTEP=2.5;
+  let last=performance.now(), fAcc=0, fN=0, fT=0, acc=0, ecoAcc=0, slowAt=0, hudT=0, fpsTxt='';
+  const STEP=1/15, ECOSTEP=2.5;
+  const anyCard=function(){ for(let i=0;i<OVERLAYS.length;i++){ if(!$(OVERLAYS[i]).classList.contains('hidden')) return true; } return false; };
   function frame(now){
     requestAnimationFrame(frame);
     const dt=Math.min(0.05,(now-last)/1000); last=now; skyTime=now/1000;
+    updateDay(dt);
     updatePlayer(dt);
     acc+=dt; let guard=0; while(acc>=STEP&&guard++<4){ tick(STEP); acc-=STEP; }
     ecoAcc+=dt; if(ecoAcc>=ECOSTEP){ ecology(); ecoAcc-=ECOSTEP; }
+    relightStep(2);   // the sun moves: re-light two rows of the map per frame
+    const card=anyCard();
+    if(now-hudT>500){ hudT=now;   // the corner readout: twice a second, clock included, card open or not
+      if(fN>0&&fT>0){ const ms=fAcc/fN; fpsTxt=Math.round(fN/fT)+' fps · '+ms.toFixed(1)+' ms';
+        if(!card&&now-govT>4000){
+          if(ms>30 && qCell<1.9){ qCell=Math.min(1.9,qCell*1.2); govT=now; setupGrid(); }
+          else if(ms<9 && qCell>1.0){ qCell=Math.max(1.0,qCell/1.15); govT=now; setupGrid(); } }
+        fAcc=0; fN=0; fT=0; }
+      $('fps').textContent=fpsTxt+(fpsTxt?' · ':'')+CR_.n+' alive · '+fmtTod(DAY.tod);
+      if(skyHud&&!$('dials').classList.contains('hidden')) skyHud(); }
+    if(card){ if(now-slowAt<250) return; slowAt=now; }   // a card is open: redraw 4 times a second, save the battery
     const t0=performance.now();
     renderFrame(P.x,P.y,P.z,P.yaw,P.pitch);
     compose();
     if(RS.letterbox){ ctx.fillStyle='#000'; ctx.fillRect(0,0,canvas.width,canvas.height); ctx.putImageData(img,RS.offX,RS.offY); }
     else ctx.putImageData(img,0,0);
-    fAcc+=performance.now()-t0; fN++; fT+=dt;
-    if(fT>0.5){ const ms=fAcc/fN;
-      $('fps').textContent=Math.round(fN/fT)+' fps · '+ms.toFixed(1)+' ms · '+CR_.n+' alive';
-      if(now-govT>4000){
-        if(ms>30 && qCell<1.9){ qCell=Math.min(1.9,qCell*1.2); govT=now; setupGrid(); }
-        else if(ms<9 && qCell>1.0){ qCell=Math.max(1.0,qCell/1.15); govT=now; setupGrid(); }
-      }
-      fAcc=0; fN=0; fT=0; }
+    if(!card){ fAcc+=performance.now()-t0; fN++; fT+=dt; }   // frame stats only while really playing
   }
   requestAnimationFrame(frame);
 }
 
-if(IS_NODE){ module.exports={genWorld,allocGrid,buildGlyphs,renderFrame,compose,spawn,populate,tick,ecology,simBin,updatePlayer,W,RS,FB,P,IN,CR_,SP,SPP,MASKS,RESERVE,RAMP,N,WATER,EYE,terr,groundAt,DIALS,growOf,isAdult,addCreature,WALLS,buildWalls,nearestWall,allWallHits,wallBlocked,setSkyTime:function(t){skyTime=t;},setUW:function(v){UW=v;}}; }
+if(IS_NODE){ module.exports={genWorld,allocGrid,buildGlyphs,renderFrame,compose,spawn,populate,tick,ecology,simBin,updatePlayer,W,RS,FB,P,IN,CR_,SP,SPP,MASKS,RESERVE,RAMP,N,WATER,EYE,terr,groundAt,DIALS,growOf,isAdult,addCreature,WALLS,buildWalls,nearestWall,allWallHits,wallBlocked,setSkyTime:function(t){skyTime=t;},setUW:function(v){UW=v;},DAY,SUN,MOON,SKY,DAYMODES,sunAltAz,sunUpdate,updateDay,relightAll,relightStep,RELIGHT,dayDate,fmtTod,setTod:function(h){DAY.tod=h;sunUpdate();}}; }
 else boot();
 })();
 </script>
