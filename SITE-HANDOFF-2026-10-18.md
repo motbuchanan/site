@@ -1,7 +1,7 @@
 # motbuchanan.com: session handoff, Oct 18 2026 (ships v7.50)
 
 ## 1. What this is
-The "This Phone" portfolio at motbuchanan.com, repo motbuchanan/site (GitHub Pages, main, root). One index.html is the phone shell; 26 app tiles (8 loose + 4 folders), each with a card (APPINFO), launching local files or live external builds in an iframe. Audience: a stealth job search (no resume, no hire-me), his Yanke orbit via the business card, and makers who are welcome to copy anything. Authoritative files: the repo. ROADMAP.md in the repo is the running record and was re-synced this session.
+The "This Phone" portfolio at motbuchanan.com, repo motbuchanan/site (GitHub Pages, main, root). One index.html is the phone shell; 26 app tiles (8 loose + 4 folders), each with a card (APPINFO), launching local files or live external builds in an iframe. Audience: strangers who land here (no resume, no hire-me), people who get the domain from his business card, and makers who are welcome to copy anything. Authoritative files: the repo. ROADMAP.md in the repo is the running record and was re-synced this session.
 
 ## 2. Current state
 - Delivered: **v7.50 · Oct 18**, zip `showcase-phone-v7.50.zip` = index.html, og.png, ROADMAP.md, roughcut/index.html, this handoff, SITE-AUDIT-2026-10-18.md. Upload index.html, og.png, ROADMAP.md to root and roughcut/index.html over the old one. Nothing else changed.
@@ -15,14 +15,14 @@ The "This Phone" portfolio at motbuchanan.com, repo motbuchanan/site (GitHub Pag
 - A folder inherits NEW from any app inside it.
 - One canonical home per app (table in ROADMAP.md "Where each app really lives"). Brew Deck = brewdeck/ in this repo. RoughCut = standalone repo. Measure Up + Haunt Inc = gameshelf repo. Noodle = DecisionDeck/beatforge.html (not on the site yet).
 - Five taglines rewritten (apology/burnout lines out), two false ones made true, eight added. Mot owns the list; cut any he dislikes (LINES array, line ~920).
-- Still locked from before and respected here: no resume link, no job-hunt language, no Yanke work, no son's name, dock label-free, real wordmark verbatim, icon-tap opens the card, layout law (8 loose + 4 folders).
+- Still locked from before and respected here: no resume link, no hire-me language, no employer work, no family names, dock label-free, real wordmark verbatim, icon-tap opens the card, layout law (8 loose + 4 folders).
 - NOT changed, awaiting Mot: the lock-screen identity line and About paragraph order (method-first vs outcome-first; options in the audit), LinkedIn in About, the widget, loops, videos, desktop panel.
 
 ## 4. Open items (ordered)
 1. BLOCKING for the widget: Mot picks the widget app and records its loop (phone screen recording, trimmed in RoughCut, 720p, 5 to 8 s, muted, under 3 MB). Recommendation on file: Pocket Shark first. Then the widget build (W1 in ROADMAP).
 2. Mot picks the six loose apps that sit beside the widget.
 3. Loops for the rest of the cards (W2), replacing title-screen screenshots.
-4. His 3 to 5 own videos: confirm they are not Yanke-owned, then the Reel tile (W3).
+4. His 3 to 5 own videos: confirm they are his own and not work-owned, then the Reel tile (W3).
 5. Desktop: card-beside-phone + caption (W4).
 6. Housekeeping on GitHub (F1): delete stray root file `measureup`, the four orphan pages, the 26 leftover roughcut/ files.
 7. Cards (F2): Spectra and Haunt Inc screenshots; months for five `since` fields; mid-use shots for Knight School and Nazca.
@@ -53,8 +53,8 @@ The "This Phone" portfolio at motbuchanan.com, repo motbuchanan/site (GitHub Pag
 
 ## 7. People
 - Mot: owner, sole builder, final call on every design and copy decision.
-- Garrett (son): recipient of many apps; never named on the site.
-- Yanke Bionics: employer; nothing of theirs on the site; staff reach the domain via his business card.
+- His son: recipient of many apps; never named on the site.
+- Employer: nothing of theirs on the site; coworkers reach the domain via his business card.
 
 ## 8. Re-entry instructions
 1. Fetch raw index.html and ROADMAP.md from the repo; confirm the footer reads v7.50 · Oct 18 (if not, v7.50 was not uploaded; do not build on the older file).

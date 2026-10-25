@@ -1,14 +1,14 @@
 # motbuchanan.com: objective site audit
 
 Date: Sunday, October 18, 2026
-Source reviewed: repo motbuchanan/site at commit 83e1fc3 (Oct 11), index v7.49 Oct 10, rendered headless at phone (390x844) and laptop (1440x900) sizes, every card's copy read, plus a research round on comparable sites and on what hiring-side readers do with AI-built work.
+Source reviewed: repo motbuchanan/site at commit 83e1fc3 (Oct 11), index v7.49 Oct 10, rendered headless at phone (390x844) and laptop (1440x900) sizes, every card's copy read, plus a research round on comparable sites and on how strangers read AI-built work.
 
 ## 1. Bottom line
 
 1. The thing you are getting right is the thing most comparable sites fake: everything is real, measured, yours, and in your voice. Keep all of it.
 2. The site has a depth problem, not a category problem. 26 tiles get identical weight. A WebCodecs video editor and a Brick Breaker clone are the same 80px square. Your strongest technical piece (Pocket Shark) is inside a folder with its NEW badge hidden.
-3. Every door leads with the method ("by asking AI the right questions") and the outcome comes second. The hiring research says that ordering is the one framing strangers penalize, even at equal quality. The fix is a reorder, not a retreat.
-4. On a laptop, 70 percent of the screen is empty studio. Recruiters sit at laptops. The desktop experience is a small phone in the dark.
+3. Every door leads with the method ("by asking AI the right questions") and the outcome comes second. The research says that ordering is the one framing strangers penalize, even at equal quality. The fix is a reorder, not a retreat.
+4. On a laptop, 70 percent of the screen is empty studio. Plenty of visitors sit at laptops. The desktop experience is a small phone in the dark.
 5. A video producer's site contains zero video. Nothing moves except the grid backdrop and the taglines.
 6. Housekeeping has drifted again (About version 7.47 vs 7.49, ROADMAP three weeks behind, four orphan pages, a stale "31 KB" brag, a brown evening tint that breaks your own no-warm-background rule).
 
@@ -26,7 +26,7 @@ Source reviewed: repo motbuchanan/site at commit 83e1fc3 (Oct 11), index v7.49 O
 
 ## 3. What a stranger hits, in order
 
-Hiring-side readers scan in a known order: name and role, strongest project, problems you solve, your level of involvement, then hierarchy and a next step. Here is the walk.
+Strangers scan in a known order: name and role, strongest project, problems you solve, your level of involvement, then hierarchy and a next step. Here is the walk.
 
 1. Lock screen: name, yes. Role: "Designer and maker" is vague, and the line that follows is the method. Seven seconds spent on how, not on what or for whom.
 2. Home: 12 equal squares, a rotating joke, no signal about which of these matters. START HERE points at All Thumbs, a beginner course on computer basics whose own card opens with "I am no expert." For a learner that is right. For someone judging you, the first door you push them through is the least showcase-shaped thing you own.
@@ -55,10 +55,10 @@ Taglines: 34 of 39 are good. Five read as apology or burnout and the research sa
 Per-app previews: 5 to 8 second muted loops of each app in use, cut in RoughCut, autoplaying in the card gallery like App Store previews. That is proof of two skills at once, and the caption writes itself: "cut in the editor it previews." A 20-second site trailer is optional. This is also the "personal work" you said you miss: it is your real profession and it is absent from your own site.
 
 ### D. Source links
-Every card gets "see the code" pointing at the public file on GitHub (derived from data-game, one line of JS). External apps point at their repos. This makes the academy ethic real instead of stated, and public repos with real commit history are what hiring-side readers use to see how you worked. LinkedIn goes back into About. Neither is a job-hunt signal.
+Every card gets "see the code" pointing at the public file on GitHub (derived from data-game, one line of JS). External apps point at their repos. This makes the academy ethic real instead of stated, and public repos with real commit history are how strangers see how you worked. LinkedIn goes back into About.
 
 ### E. Desktop
-Cheap version: on wide screens, open the card as a panel beside the phone instead of over it, and add one line under the phone: "A real phone home screen. Every app on it is one I built. Click any icon." Better version: a quiet side column that only exists on desktop (name, one line, four flagships, say hi, LinkedIn, GitHub). Coworkers arrive on phones from your business card and never see it; recruiters arrive on laptops and get the seven-second path.
+Cheap version: on wide screens, open the card as a panel beside the phone instead of over it, and add one line under the phone: "A real phone home screen. Every app on it is one I built. Click any icon." Better version: a quiet side column that only exists on desktop (name, one line, four flagships, say hi, LinkedIn, GitHub). Phone visitors never see it; laptop visitors get the seven-second path.
 
 ### F. The ledger
 18 of 26 apps are inside folders. There is no place that lists everything. Settings > Storage already counts by category; make it list every app with its size (tap opens the card). That is the plain ledger from the September plan, inside the metaphor, zero new pages.
@@ -85,7 +85,7 @@ Where to spend build time if you want balance: not another small game. Finish th
 - Vibe-coded portfolio conventions (from a 20-site roundup): the site is live and is itself the evidence; distinct personal aesthetic (OS-style and "personal internet space" are the two common looks); a playground section for experiments; public repos; documented builds covering what broke and which decisions the AI could not make. You meet all of these except the playground (your lab/ folder is hidden) and the repo link (none on the site).
 - neal.fun, the reference "pile of toys" site: a grid of doors, each with a one-glance promise built on a single verb (scroll, draw, spend), information delivered through interaction not explanation, varied styles that read as one curator, restraint in copy. Your verb buttons are the same instinct. Your explanation stack is the opposite instinct.
 - "Built on a phone" is no longer unique. A founder shipped a life-admin app on Product Hunt built entirely on an Android phone with an AI agent. The angle still works, but alone it is not a moat. Your moat is range plus your own art plus real recipients plus the family origin story.
-- Hiring side: adding AI skills raised interview odds 8 to 15 points in a 1,725-recruiter experiment; disclosing machine authorship cut trust sharply in 13 experiments even at equal quality, while human help barely moved it. 65 percent of hiring managers say AI-enhanced applications make skills harder to verify, so they add rounds. Translation for this site: say what you did, give one checkable number per piece, put the tool at the end of the sentence, be ready to explain any build without it open.
+- How strangers read AI-built work: disclosing machine authorship cut trust sharply in 13 experiments even at equal quality, while human help barely moved it. Translation for this site: say what you did, give one checkable number per piece, put the tool at the end of the sentence, be ready to explain any build without it open.
 
 ## 7. Repo defects found (exact)
 
@@ -115,7 +115,7 @@ Recommended order: 1, then 2, then 3. Option 1 is the only one that changes the 
 
 ## 9. Open questions for you
 
-- Which app goes in the widget first: Pocket Shark (newest, deepest engineering) or RoughCut (a real product, strongest hiring signal)?
+- Which app goes in the widget first: Pocket Shark (newest, deepest engineering) or RoughCut (a real product, strongest proof-of-work signal)?
 - Which six stay loose beside it?
 - Does LinkedIn go back into About?
-- Is the quiet desktop side column acceptable under the stealth rule, or caption-only for now?
+- Is the quiet desktop side column acceptable, or caption-only for now?
