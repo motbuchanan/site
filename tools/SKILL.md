@@ -25,7 +25,7 @@ Write the script below to `break.py` (once per session), then:
 - Run it in the background for anything heavy; never chain sleeps.
 - Never kill it with `pkill -f break.py` (that pattern kills your own shell); use the background task stop.
 
-What it does: opens the app as Mot's Android phone (412x915, touch) with ~150 random taps, swipes, 4x button mashes and stray taps; rotates to landscape; reopens as Garrett's iPad (820x1180); reopens with localStorage/sessionStorage throwing (private mode). Logs uncaught errors with the exact action that caused them, console errors, 404s, the app navigating away, horizontal overflow, blank screens, tap targets under 32px, em dashes in visible text, version strings, external hosts contacted, and screenshots of each state. Output: `reports/<app>/report.json` + PNGs.
+What it does: opens the app as Mot's Android phone (412x915, touch) with ~150 random taps, swipes, 4x button mashes and stray taps; rotates to landscape; reopens as a kid's iPad (820x1180); reopens with localStorage/sessionStorage throwing (private mode). Logs uncaught errors with the exact action that caused them, console errors, 404s, the app navigating away, horizontal overflow, blank screens, tap targets under 32px, em dashes in visible text, version strings, external hosts contacted, and screenshots of each state. Output: `reports/<app>/report.json` + PNGs.
 
 ## Step 3: separate reviewer (required)
 Spawn a NEW agent (Agent tool, general-purpose) that has not seen the build. Give it the app source path, the report folder, and this brief:
