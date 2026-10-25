@@ -52,7 +52,7 @@ Nazca is Mot's infinite deep-zoom drawing app: kid-friendly fun brushes and pro 
 - Debug hook in the page: `window.nazca` (doc, view, settings, floodFill, stroke getter).
 
 ## People
-- Mot: owner, builds and tests on phone (360 CSS px wide). Garrett: primary kid user. No other stakeholders.
+- Mot: owner, builds and tests on phone (360 CSS px wide). His son: primary kid user. No other stakeholders.
 
 ## Re-entry instructions
 1. Fetch the live file: https://raw.githubusercontent.com/motbuchanan/site/main/nazca/index.html and read `VERSION` to confirm what is deployed.
