@@ -1,6 +1,6 @@
 # fonts/
 
-The site's shared font folder. Started Oct 24 2026.
+The site's shared font folder. Started Oct 24 2026. Game Shelf families added Oct 25 2026.
 
 ## The rule
 Every app on motbuchanan.com loads its fonts from this folder. Nothing loads fonts from Google Fonts or any other outside server, so the site's promise holds: nothing leaves your device.
@@ -14,13 +14,20 @@ Every app on motbuchanan.com loads its fonts from this folder. Nothing loads fon
 ## What's here
 | Family | File(s) | Weights | Used by |
 |---|---|---|---|
-| Archivo | archivo.woff2 | 100-900 (variable) | the site and most apps |
-| JetBrains Mono | jetbrains-mono.woff2 | 100-800 (variable) | the site and most apps |
+| Archivo | archivo.woff2 | 100-900 (variable) | the site and most apps, Game Shelf Noodle |
+| JetBrains Mono | jetbrains-mono.woff2 | 100-800 (variable) | the site and most apps, Game Shelf Noodle |
 | Space Grotesk | space-grotesk.woff2 | 300-700 (variable) | Production Triangle |
 | Space Mono | space-mono-400.woff2, space-mono-700.woff2 | 400, 700 | Production Triangle |
 | Playfair Display | playfair-display.woff2, playfair-display-italic.woff2 | 400-900 (variable), normal and italic | The Brew Deck |
 | DM Sans | dm-sans.woff2 | 100-1000 (variable) | The Brew Deck |
 | DM Mono | dm-mono-400.woff2, dm-mono-500.woff2 | 400, 500 | The Brew Deck |
+| Fredoka | fredoka.woff2 | 300-700 (variable) | Game Shelf Puff, Salon Dash, Dollhouse |
+| Nunito | nunito.woff2 | 200-1000 (variable) | Game Shelf Salon Dash, Dollhouse, Cozy Critter Garden |
+| Fraunces | fraunces.woff2 | 100-900 (variable, optical size 9-144) | Game Shelf home page, Cozy Critter Garden |
+| Cormorant Garamond | cormorant-garamond.woff2, cormorant-garamond-italic.woff2 | 300-700 (variable), normal and italic | Game Shelf The Orb |
+| Spline Sans Mono | spline-sans-mono.woff2 | 300-700 (variable) | Game Shelf The Orb |
+| Press Start 2P | press-start-2p.woff2 | 400 | Game Shelf Hex Empire |
+| Silkscreen | silkscreen-400.woff2, silkscreen-700.woff2 | 400, 700 | Game Shelf Hex Empire |
 
 Latin character set only (English and Western European). Characters outside it fall back to the phone's own fonts.
 
