@@ -430,7 +430,7 @@
         </div>
       </div>
       <div class="phone">
-        <div class="pcap">garrett's ipad</div>
+        <div class="pcap">your son's ipad</div>
         <div class="pscreen empty" id="scrB"><div class="big" id="valB">-</div><div class="lbl">high score</div></div>
         <div class="pbtns">
           <button class="pbtn" id="openB" type="button">open app</button>
@@ -484,7 +484,7 @@
         <div class="pscreen empty" id="scrSA"><div class="big" id="valSA">-</div><div class="lbl">high score</div></div>
       </div>
       <div class="phone">
-        <div class="pcap">garrett's ipad</div>
+        <div class="pcap">your son's ipad</div>
         <div class="pscreen empty" id="scrSB"><div class="big" id="valSB">-</div><div class="lbl">high score</div></div>
       </div>
     </div>
@@ -544,7 +544,7 @@
 
 <script>
 "use strict";
-var VERSION = "v0.1 · Oct 21";
+var VERSION = "v0.2 · Oct 25";
 var STORE_KEY = "data101_v1";
 
 /* ---------- guarded storage ---------- */
@@ -719,7 +719,7 @@ var TRAIL_CASES = [
     loads:false, hint:"Opened from content:// it is barely even a normal page, localStorage can come back empty, and localStorage never crosses devices anyway. This is why testing from Downloads lies to you. Open the real https:// URL." },
   { story:"Early Game Shelf. Every game saved high scores to <b>localStorage</b>. It worked great on your phone. Then the family tried it on other devices and everyone had their own separate scores. Does one device's score show on another?",
     loads:false, hint:"localStorage is per-device. Each phone and tablet had its own private drawer. This is the exact wall that pushed the shelf toward Firebase." },
-  { story:"Game Shelf after the move to <b>Firebase</b>. A game writes a new high score to Firestore. Garrett beats it on his iPad. Does your phone see his new score?",
+  { story:"Game Shelf after the move to <b>Firebase</b>. A game writes a new high score to Firestore. Your son beats it on his iPad. Does your phone see his new score?",
     loads:true, hint:"Firestore is the shared cabinet with live listeners. His iPad writes, your phone is subscribed, your screen updates on its own. That is the whole reason you added Firebase." },
   { story:"The buzzer learning project. Two phones join the same room. Phone one hits the buzzer, the state is written to <b>Firebase</b> with a live listener. Does phone two see it light up?",
     loads:true, hint:"That project exists specifically to learn real-time sync: write to Firestore, both phones listen, both update within a second. Yes, it syncs." },
@@ -727,7 +727,7 @@ var TRAIL_CASES = [
     loads:false, hint:"Trick framing: nothing to sync, so the honest answer to 'does another device see it' is no, and that is fine. For a solo app, localStorage is correct, free, and needs no server. Not every app needs the cloud." },
   { story:"A family checklist app. Everyone needs to see the same ticked boxes. You build it on <b>localStorage</b> first because it is easier. Will the family actually share one list?",
     loads:false, hint:"No. Shared data across people means the cloud, full stop. localStorage would give each person their own private checklist. This is the question to ask before building, not after." },
-  { story:"Pigment, your color app for Garrett, saves his palettes to <b>localStorage</b> on his iPad, the only device he uses it on. Does that choice work for what it needs?",
+  { story:"Pigment, the color app you built for your son, saves his palettes to <b>localStorage</b> on his iPad, the only device he uses it on. Does that choice work for what it needs?",
     loads:false, hint:"Again the honest sync answer is no (it will not appear elsewhere), but for a single-device personal app that is the right, simple choice. Cloud would be overkill." },
   { story:"Mot OS, meant to be your personal dashboard across phone and laptop. You want the same data on both. Which answer do you need: does <b>localStorage</b> get it onto both devices?",
     loads:false, hint:"No. Same person, two devices, still needs the cloud. localStorage on the phone never reaches the laptop. This is why Mot OS was flagged for a Firebase migration." }
@@ -809,7 +809,7 @@ var QUIZ = [
   { q:"Your app keeps a score in a plain variable. The player closes the tab. What happens to the score?",
     opts:["It is saved for next time","It is gone, variables live only while the page is open","It moves to the cloud","It goes to localStorage automatically"], a:1 },
   { q:"localStorage saves data where?",
-    opts:["On a shared server everyone reaches","In this one browser on this one device","On Garrett's iPad too","Inside the Firebase cabinet"], a:1 },
+    opts:["On a shared server everyone reaches","In this one browser on this one device","On your son's iPad too","Inside the Firebase cabinet"], a:1 },
   { q:"You want a family high score every device can see. Which storage do you need?",
     opts:["A variable","localStorage","A database in the cloud, like Firebase","None, it happens automatically"], a:2 },
   { q:"What makes a second device update on its own when the first one saves?",

@@ -1,4 +1,4 @@
-# All Thumbs — course roadmap and state
+# All Thumbs: course roadmap and state
 
 ## v1.22 (Oct 24 2026) - fonts load from the site's shared fonts/ folder (../fonts/fonts.css) instead of Google. No content change.
 
@@ -33,7 +33,7 @@ TIER 2 COMPLETE (ch8 data, ch9 API, ch10 keystone). Tier 3 next, Mot's pick: CI/
 
 - NEW chapter: api-basics.html "The Order Window" (storage key api101_v1, coral accent #ff9a6b, thumb-api mascot; tip + oops poke-ins). Second Tier 2 chapter. Teaches what an API call is (the walk-up order window on someone else's computer, same move as Chapter 2 but asking for data instead of a page), the four-part shape (verb / URL / body / response), status codes by first digit (2xx worked, 4xx your order was wrong, 5xx the kitchen is broken), reading JSON by following label paths, API keys (a key in a page is readable, money-spending keys live server-side) and rate limits (429). Ties back to Chapter 8: Firebase config = which window, security rules = who is allowed.
 - Engine (pure, module-exported): a tiny fake server callApi(verb,url,body) with two windows, whoseFault(status), dig(obj,path). Two sandboxes: build-and-send an order (watch the round trip, see 200/201/403/404) and a JSON label-path explorer that highlights the line and prints the answer.path code. 6 missions, a "whose side is the problem on?" gym with 4 general levels, 5-question quiz.
-- Two-track practice: General (coral) + The Trail (purple, 8 real cases): the office weather screens going blank on 503 vs 401, a Firebase 403 permission-denied write, the Garrett's Buddy key scare (scan came back clean), polling too fast into 429, a stale link 404 after the course.html rename, a Firestore incident during the buzzer project, and the 200-but-undefined wrong-label-path bug.
+- Two-track practice: General (coral) + The Trail (purple, 8 real cases): the office weather screens going blank on 503 vs 401, a Firebase 403 permission-denied write, the API key scare (scan came back clean), polling too fast into 429, a stale link 404 after the course.html rename, a Firestore incident during the buzzer project, and the 200-but-undefined wrong-label-path bug.
 - Hub bumped to v1.19: "The Order Window" row added in Unit 2 (9 chapters). Visible badge and VERSION var both updated.
 - NOTE: Chapter 8 (v1.18) had not been uploaded yet when this was built, so this deploy zip carries BOTH data-basics.html and api-basics.html plus the hub.
 - Validated: 0 em/en dashes, 0 Jekyll tokens, node --check, acorn, 13 engine unit tests, 21-assertion jsdom smoke.
@@ -43,7 +43,7 @@ STILL TO DO Tier 2: Chapter 10 (The Shelf Dissected, keystone). Tier 3 planned: 
 
 ## v1.18 (Oct 21 2026) - Chapter 8: Where Data Lives (Tier 2 begins)
 
-- NEW chapter: data-basics.html "Where Data Lives" (storage key data101_v1, teal accent #45d4c4, thumb-data mascot). First Tier 2 chapter. Teaches the three places a web app keeps data: a variable (memory, lost on close), localStorage (survives close but stuck on one device/browser), and a cloud database like Firebase (survives everything, syncs to every signed-in device). Then the wall that forces the jump (progress on your phone is not on Garrett's iPad), what Firebase is in plain terms (a shared cabinet on an always-on computer, config is not a password, security rules are), and sync via live listeners.
+- NEW chapter: data-basics.html "Where Data Lives" (storage key data101_v1, teal accent #45d4c4, thumb-data mascot). First Tier 2 chapter. Teaches the three places a web app keeps data: a variable (memory, lost on close), localStorage (survives close but stuck on one device/browser), and a cloud database like Firebase (survives everything, syncs to every signed-in device). Then the wall that forces the jump (progress on your phone is not on the kid's iPad), what Firebase is in plain terms (a shared cabinet on an always-on computer, config is not a password, security rules are), and sync via live listeners.
 - Interactive engine (pure, module-exported, testable): survivesClose / visibleOnOtherDevice / syncs across the three tiers. Two sandboxes: a two-phone three-tier store (save on your phone, see what crosses to the iPad per tier) and a live-sync demo (save on one phone, the other updates itself). 6 missions, a "will the other device see it?" gym with 4 general levels, 5-question quiz.
 - Two-track practice: General (teal, 4 levels) default + The Trail (purple, 8 real cases): the content:// progress-loss, early Game Shelf localStorage giving everyone separate scores, the Game Shelf move to Firebase, the buzzer learning project, and honest "localStorage is the right call" cases for solo apps (Pigment, a personal drawing app).
 - Hub bumped to v1.18: added the "Where Data Lives" spotlight row in Unit 2 (8 chapters now). Both the visible badge and the VERSION var updated so the deploy is verifiable against a stale cache.
@@ -141,7 +141,7 @@ Second goal: a shareable teaching piece on the website (motbuchanan.com shelf).
 
 This is, in effect, a working demonstration of a training-and-development method: take a goal, break it into what a person needs to know at each step, and build the interactive tool that gets them there, with practice tuned to how they will actually use it. The "Your work" gym level is the proof: same engine, drills reshaped to the real job.
 
-Framed to an organization, that is custom training plans for any path through the company (onboard a fabrication tech, ramp a clinician on a new scanner, get a comms hire up to speed), built as live practice tools rather than passive slides.
+Framed to an organization, that is custom training plans for any path through an organization (onboard a new hire, ramp someone on a new machine, get a new teammate up to speed), built as live practice tools rather than passive slides.
 
 Two honesty rails so the pitch stays defensible:
 - This is a demonstration of the method, not a finished L&D platform. No admin dashboard, no cross-user completion tracking, no content-authoring UI. A real engagement gets scoped separately.
@@ -155,7 +155,7 @@ Two honesty rails so the pitch stays defensible:
 - Aug 22: Public shelf identity pulls from The Reveal. See "Pull from The Reveal" below.
 - Aug 22: Tier 2 chapters get built next, in order, THEN the three Tier 3 branches. Confirmed.
 - Aug 22: Aesthetic direction: each section keeps its own theme (colors/fonts fit the concept); a cohesive layer holds it together, especially the hub as branches grow. A dedicated design pass happens later, done as pick-from-options, not decided unilaterally. DEFERRED, do not design-pass early.
-- Aug 23: PUBLIC NAME LOCKED = "All Thumbs." Dropped the magician/"Reveal" framing entirely. New angle: phone-first, self-taught building ("supposedly all thumbs, still built the whole thing on a phone"). "The Whole Machine" is retired as the hub name. The repo FOLDER stays `reveal` (renaming breaks the live GitHub Pages URL) — folder name and display name are deliberately separate. Live at https://motbuchanan.github.io/reveal/ . ENTRY FILE is index.html (renamed from course.html on Aug 23 so the bare /reveal/ URL resolves — Pages serves index.html by default; a root without one 404s). course.html no longer exists in the repo; delete it if it lingers.
+- Aug 23: PUBLIC NAME LOCKED = "All Thumbs." Dropped the magician/"Reveal" framing entirely. New angle: phone-first, self-taught building ("supposedly all thumbs, still built the whole thing on a phone"). "The Whole Machine" is retired as the hub name. The repo FOLDER stays `reveal` (renaming breaks the live GitHub Pages URL): folder name and display name are deliberately separate. Live at https://motbuchanan.github.io/reveal/ . ENTRY FILE is index.html (renamed from course.html on Aug 23 so the bare /reveal/ URL resolves: Pages serves index.html by default; a root without one 404s). course.html no longer exists in the repo; delete it if it lingers.
 - Nothing goes public yet. Keep developing.
 
 ### Open decisions (settle before the work they gate)
@@ -164,7 +164,7 @@ Two honesty rails so the pitch stays defensible:
 
 ---
 
-## Current state — what is built (all shipped, all validated)
+## Current state: what is built (all shipped, all validated)
 
 Seven single-file HTML apps, same origin, deploy together in one folder. The hub reads each app's progress key same-origin. Progress is per-device / per-browser.
 
@@ -214,14 +214,14 @@ Design rule to preserve: computer + internet field-call drills are the ONLY ones
 
 ## Roadmap
 
-### Tier 2 — build next, in this order
+### Tier 2: build next, in this order
 
-- Ch 7 — Hosting & GitHub Pages. Repos, the upload-from-phone flow, flat vs folder, the content:// persistence trap as a first-class lesson (open from Downloads = quarantined origin = storage dies). Gym: fix a broken deploy, spot why a file 404s, choose flat vs folder.
-- Ch 8 — Where data lives. localStorage -> files -> a real database, ending pointed at Firebase. Gym: pick the right storage for a scenario, debug a lost-save.
-- Ch 9 — What an API call is. Mot already makes them. Request/response, status, shape. Gym: read a request/response, predict the result.
-- Ch 10 — The Shelf Dissected. THE KEYSTONE. His actual Game Shelf taken apart and rebuilt: hub, game registrations, sw.js precache, Firebase sync, GitHub Pages deploy, the version timeline. This is the chapter that makes the course unmistakably his and carries the training-tool proof.
+- Ch 7: Hosting & GitHub Pages. Repos, the upload-from-phone flow, flat vs folder, the content:// persistence trap as a first-class lesson (open from Downloads = quarantined origin = storage dies). Gym: fix a broken deploy, spot why a file 404s, choose flat vs folder.
+- Ch 8: Where data lives. localStorage -> files -> a real database, ending pointed at Firebase. Gym: pick the right storage for a scenario, debug a lost-save.
+- Ch 9: What an API call is. Mot already makes them. Request/response, status, shape. Gym: read a request/response, predict the result.
+- Ch 10: The Shelf Dissected. THE KEYSTONE. His actual Game Shelf taken apart and rebuilt: hub, game registrations, sw.js precache, Firebase sync, GitHub Pages deploy, the version timeline. This is the chapter that makes the course unmistakably his and carries the training-tool proof.
 
-### Tier 3 — the three branches, after Tier 2
+### Tier 3: the three branches, after Tier 2
 
 - Firebase / backend. Turn the buzzer learning-project into the lesson. Mot's named next skill. Auth, Firestore, live listeners, cross-device state.
 - How AI models work. Prompts, context, what the model is actually doing. Includes a practical prompting/context gym (a Mot strength, so it teaches well).
@@ -269,7 +269,7 @@ DO NOT pull: the 18-chapter read-only structure, the passive quiz-only progressi
 - No em dashes anywhere, including app copy. No cream/warm-light backgrounds (the "default AI" tell). No uniform fade-up-on-scroll (also an AI tell).
 - Honest-interactive: never fake an effect. If the engine cannot show the real thing, change the metric to what is true. (This is why the two python drills got rewritten.)
 - Deploy: all seven files in ONE folder, same origin. Mot uploads from his phone via GitHub "Upload files" (never paste large file contents into the mobile editor, it truncates). Subfolders are OK for a self-contained app with relative paths and its own scoped sw.js; flat is the default.
-- Publishable copy: no personal or employer names in the public version. The "Your work" drills currently name real projects (puff-kart, gameshelf, etc.). Fine for Mot's private build; sanitize for any public release.
+- Publishable copy: no personal or employer names anywhere in the course. The "Your work" drills name real projects (puff-kart, gameshelf, etc.), which is fine; people's names are not. Chapters were scrubbed Oct 25 2026.
 
 ## Validation gate (run before every ship)
 

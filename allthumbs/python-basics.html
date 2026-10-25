@@ -527,7 +527,7 @@
 
 <script>
 "use strict";
-var VERSION = "v3.1 \u00B7 Aug 26";
+var VERSION = "v3.2 \u00B7 Oct 25";
 var STORE_KEY = "python101_v1";
 
 /* ---------- guarded storage ---------- */
@@ -1001,7 +1001,7 @@ function initApp(){
           fill:'app = "' + name + '"', sol:'app = "' + name + '"\nprint(len(app))' };
       } },
     { id:"z05", lv:4, make:function(){
-        var name = pickFrom(["Garrett","a tester","your coworker","the club"]);
+        var name = pickFrom(["the kid","a tester","your coworker","the club"]);
         return { goal:"<b>Personalize a toast message.</b> Store <b>who = \"" + name + "\"</b> and print exactly: <b>Saved for " + name + "!</b> (the kind of confirmation line your apps show)",
           expect:["Saved for " + name + "!"], needle:"who",
           hints:["Sandwich the variable between two quoted pieces with +.","<code>who = \"" + name + "\"</code> then <code>print(\"Saved for \" + who + \"!\")</code>"],

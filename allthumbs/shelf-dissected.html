@@ -493,7 +493,7 @@
 <section id="sw">
   <p class="eyebrow">the service worker</p>
   <h2>Why the shelf plays with no signal, and why the badge number matters</h2>
-  <p><code>sw.js</code> is a small script the browser installs beside your site and keeps running between visits (Chapter 7 mentioned it as the thing that will not run from <code>content://</code>). The shelf's worker is <b>network-first</b>: when you are online every request goes to the real server, so an upload shows up on a plain refresh. As responses fly past, it quietly saves copies. Offline, it serves those copies, so Garrett can play in the car.</p>
+  <p><code>sw.js</code> is a small script the browser installs beside your site and keeps running between visits (Chapter 7 mentioned it as the thing that will not run from <code>content://</code>). The shelf's worker is <b>network-first</b>: when you are online every request goes to the real server, so an upload shows up on a plain refresh. As responses fly past, it quietly saves copies. Offline, it serves those copies, so a kid can play in the car.</p>
   <p>It also <b>precaches</b> a list of core files on install, <span id="stPre">135</span> of them today, so the first offline visit already has the hub, the shared scripts, and the main games. That list lives in a constant called <code>CORE</code>, and the cache itself is named <code>gameshelf-v70</code>.</p>
   <p>That name is your deploy ritual. Bumping it to <code>v71</code> tells every device "throw out the old copies, seed fresh ones." Forget the bump after changing the precache list and devices keep serving stale files. This is the same stale-cache lesson from Chapter 2 and the badge rule from this course, running inside your own app.</p>
   <div class="tipbox right">
@@ -515,7 +515,7 @@
 <section id="timeline">
   <p class="eyebrow">timeline</p>
   <h2>Four and a half months, 282 commits, from a phone</h2>
-  <p>Commits per month, read from the repo history. June is the build-out. July is the audit and fix bundle. The autumn climb is games for Garrett, the settled-shelf redesign, and the music trainers finishing.</p>
+  <p>Commits per month, read from the repo history. June is the build-out. July is the audit and fix bundle. The autumn climb is games for the kid, the settled-shelf redesign, and the music trainers finishing.</p>
   <div class="tl" id="tl"></div>
   <div class="stones" id="stones"></div>
 </section>
@@ -572,7 +572,7 @@
 
 <script>
 "use strict";
-var VERSION = "v0.1 · Oct 22";
+var VERSION = "v0.2 · Oct 25";
 var STORE_KEY = "shelf101_v1";
 
 /* ---------- guarded storage ---------- */
@@ -592,7 +592,7 @@ var FACTS = {
     ["Jul 2","<b>The v34 audit.</b> Eight arcade keys missing from GAME_KEYS, Scrabble invisible to achievements, chess reading the wrong TV-mode key. Fix bundle shipped. AUDIT-2026-07.md written as the durable record."],
     ["Jul 16","v41 to v51 in two days. Music trainers (SHARP, HARP) land and are later declared done."],
     ["Sep","Settled-shelf redesign: physical planks, time-of-day lighting, deterministic handwriting labels. 48 commits."],
-    ["Oct 18","<b>v70 to v72</b> in one day. Bloodstream, STICK, the Kirby collection: the Garrett autumn. 282 commits total at this writing."]
+    ["Oct 18","<b>v70 to v72</b> in one day. Bloodstream, STICK, the Kirby collection: a whole autumn of games for the kid. 282 commits total at this writing."]
   ]
 };
 
@@ -638,7 +638,7 @@ var PARTS = [
   { n:"achievements.js", d:"74 named games and the badge ladder for each.", c:"ch5",
     long:"<b>NAMES</b> maps each game key to a display name; the badge logic hands out ladders from there. If a game is missing from NAMES it earns nothing, silently. Scrabble was missing until the July audit. Pure data plus a little logic, the Chapter 5 shape." },
   { n:"Firestore", d:"The cloud cabinet. Six people's devices read and write one shared store.", c:"ch8",
-    long:"<b>Not in the repo at all.</b> It lives on Google's servers. The repo only holds the address (the config) and the rules for talking to it. Chapter 8's whole point: the data that has to be the same on your phone and Garrett's iPad cannot live in either one, so it lives here. Every record, every multiplayer room, every reset goes through it." }
+    long:"<b>Not in the repo at all.</b> It lives on Google's servers. The repo only holds the address (the config) and the rules for talking to it. Chapter 8's whole point: the data that has to be the same on your phone and the kid's iPad cannot live in either one, so it lives here. Every record, every multiplayer room, every reset goes through it." }
 ];
 function initAnatomy(){
   var box=$("anat"); if(!box) return;

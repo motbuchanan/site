@@ -543,7 +543,7 @@
 
 <script>
 "use strict";
-var VERSION = "v0.7 \u00B7 Oct 22";
+var VERSION = "v0.8 \u00B7 Oct 25";
 var STORE_KEY = "hosting101_v1";
 
 /* ---------- guarded storage ---------- */
@@ -828,7 +828,7 @@ var TRAIL_CASES = [
     loads:false, hint:"No index.html at the root means the bare address has no front door. You fixed it by renaming course.html to index.html." },
   { story:"The rename fix. Hub is now <code>index.html</code> at the repo root. Someone visits <code>motbuchanan.github.io/reveal/</code>. Loads?",
     loads:true, hint:"index.html at the root IS the front door. The bare address serves it. This is why the hub is index.html, not hub.html." },
-  { story:"The content:// trap on Garrett's iPad. You opened the game shelf HTML straight from Downloads to test. Address bar shows <code>content://</code>. Does saved progress persist between opens?",
+  { story:"The content:// trap on your son's iPad. You opened the game shelf HTML straight from Downloads to test. Address bar shows <code>content://</code>. Does saved progress persist between opens?",
     loads:false, hint:"content:// is local storage, not the web. Progress may not persist and the service worker won't run. Open the https:// Pages URL to really test." },
   { story:"measureup/ inside the gameshelf repo. The game lives in a subfolder <code>measureup/</code> with its own index.html and all-relative paths. Someone visits <code>&hellip;/gameshelf/measureup/</code>. Loads?",
     loads:true, hint:"A subfolder with its own index.html serves at that subfolder's bare address. This is the folder-in-repo pattern you now use for self-contained apps." },

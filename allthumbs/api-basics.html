@@ -518,7 +518,7 @@
     <button class="ttab general on" id="trackGeneral" type="button">General</button>
     <button class="ttab trail" id="trackTrail" type="button">The Trail</button>
   </div>
-  <div class="trailbanner" id="trailBanner">The Trail: real calls from Mot's builds, the office weather screens, Firebase writes, the Garrett's Buddy key scare.</div>
+  <div class="trailbanner" id="trailBanner">The Trail: real calls from Mot's builds, the office weather screens, Firebase writes, the API key scare.</div>
   <div class="gym">
     <div class="gymstats"><span>reps<b id="repN">0</b></span><span>streak<b id="strN">0</b></span><span>best<b id="bestN">0</b></span></div>
     <div class="gymtabs" id="gymTabs"></div>
@@ -554,7 +554,7 @@
 
 <script>
 "use strict";
-var VERSION = "v0.1 · Oct 22";
+var VERSION = "v0.2 · Oct 25";
 var STORE_KEY = "api101_v1";
 
 /* ---------- guarded storage ---------- */
@@ -573,8 +573,8 @@ function getState(){ var s=loadState(); if(!s.m)s.m={}; if(!s.gym)s.gym={reps:0,
    anything else       -> 404
    whoseFault(status): "mine" for 4xx (fix the request), "theirs" for 5xx (wait), "none" for 2xx
 */
-var WEATHER = { city:"Akron", temp:61, sky:"overcast", scores:[{name:"Garrett",pts:4200},{name:"Mot",pts:3150}] };
-var SCORES = [ {name:"Garrett",pts:4200}, {name:"Mot",pts:3150} ];
+var WEATHER = { city:"Akron", temp:61, sky:"overcast", scores:[{name:"Kiddo",pts:4200},{name:"Mot",pts:3150}] };
+var SCORES = [ {name:"Kiddo",pts:4200}, {name:"Mot",pts:3150} ];
 function callApi(verb, url, body){
   verb = String(verb||"GET").toUpperCase(); url = String(url||"");
   if(url === "/weather/akron"){
@@ -647,7 +647,7 @@ function renderJson(path){
     ['  <span class="k">"temp"</span>: <span class="n">61</span>,', 'temp'],
     ['  <span class="k">"sky"</span>: <span class="s">"overcast"</span>,', 'sky'],
     ['  <span class="k">"scores"</span>: [', ''],
-    ['    { <span class="k">"name"</span>: <span class="s">"Garrett"</span>, <span class="k">"pts"</span>: <span class="n">4200</span> },', 'scores.0.name'],
+    ['    { <span class="k">"name"</span>: <span class="s">"Kiddo"</span>, <span class="k">"pts"</span>: <span class="n">4200</span> },', 'scores.0.name'],
     ['    { <span class="k">"name"</span>: <span class="s">"Mot"</span>, <span class="k">"pts"</span>: <span class="n">3150</span> }', 'scores.1.pts'],
     ['  ]', ''],
     ['}', '']
@@ -702,7 +702,7 @@ var TRAIL_CASES = [
     loads:true, hint:"401 means the window did not accept who you are: the API key expired or got rotated. Fix the request by sending a valid key. The weather service is up." },
   { story:"Game Shelf saves a high score to Firebase. The write comes back <b>403 permission denied</b>. Whose side?",
     loads:true, hint:"403 from Firebase means the security rules on the cabinet said no. Your request is the thing to fix: either the user is not signed in the way the rules expect, or the rules are stricter than the write. Firebase is up." },
-  { story:"Garrett's Buddy. You worried the Anthropic key had leaked into the public repo. Scanning showed the app keeps the key only in localStorage on the device and never commits it. Is a key sitting in a public page a problem on your side to fix?",
+  { story:"A chatbot toy you built. You worried the API key had leaked into the public repo. Scanning showed the app keeps the key only in localStorage on the device and never commits it. Is a key sitting in a public page a problem on your side to fix?",
     loads:true, hint:"Yes, a readable key that can spend money is a request-side problem, which is why the app was built to keep it off the server and out of the repo. That scan came back clean, but the instinct was right." },
   { story:"A PWA you built polls a free API once per second to feel live. After a minute every call returns <b>429</b>. Whose side?",
     loads:true, hint:"429 is the window telling you to slow down. Rate limit. Your side: poll every 30 seconds or every few minutes, like the weather screens do." },
