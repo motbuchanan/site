@@ -77,7 +77,7 @@ footer a{color:var(--soft)}
   <p class="tag">A whole world drawn as characters. A snow globe you walk around inside.</p>
   <p class="sub">an ASCII raycaster that grows one improvement at a time</p>
   <a class="cta" href="index.html">▶ &nbsp;walk the keep</a>
-  <div class="badge">in active development · updated Oct 24, 2026</div>
+  <div class="badge">in active development · updated Oct 25, 2026</div>
 </header>
 
 <main class="wrap">
@@ -94,7 +94,7 @@ footer a{color:var(--soft)}
   <div class="two">
     <div class="feat"><h3>One ray per column</h3><p>A heightfield raycaster walks the terrain, one ray for each column of the screen, and draws it as vertical spans of characters. That is the whole renderer.</p></div>
     <div class="feat"><h3>Water that reflects</h3><p>Every water column runs a second march to mirror what is above it, with a depth gradient and a foam line where you cross the surface.</p></div>
-    <div class="feat"><h3>A keep of planes and mass</h3><p>The castle faces are brick planes the ray intersects directly, so walls read as solid, crenellated stone. Under them, raised ground gives the walls their thickness and makes the rampart, stairs and lookout walkable.</p></div>
+    <div class="feat"><h3>A keep of planes and mass</h3><p>The castle faces are brick planes the ray intersects directly, so walls read as solid, crenellated stone. Under them, raised ground gives the walls their thickness and makes the rampart, stairs and lookout walkable. A second layer of stone can float above the ground, which is how the gate arch, the tunnel and the round room under the tower work.</p></div>
     <div class="feat"><h3>A world that lives</h3><p>Under the renderer, every creature is a tiny agent running steering rules and a state machine. Flocking, herding, and the hunt fall out of that, held in balance by soft floors and carrying caps.</p></div>
     <div class="feat"><h3>A sun that moves</h3><p>The sun's place in the sky comes from the same formulas as a sunrise table, for Akron on today's date. A blurred shadow map, re-marched a few rows per frame as the sun moves, is sampled per character, so shade falls softly and swings round through the day.</p></div>
     <div class="feat"><h3>Same on any screen</h3><p>The vertical field of view is locked and the detail auto-sizes, so the world looks correct on a phone, a tablet, or a desktop, in any orientation.</p></div>
@@ -105,7 +105,7 @@ footer a{color:var(--soft)}
   <h2>The story so far</h2>
   <p>Each of these is a real frame from the engine, one from about every version, in order. The whole thing began as a test level to prove one ray could walk a hill, and grew from there.</p>
   <div class="gal">
-    <figure><img src="01-first-engine.jpg" alt="Early engine: terrain and the gate"><figcaption><div class="v">v0.1–0.2 · THE ENGINE</div><div class="d">One ray per column walking a heightfield, water reflections, cone trees. The first proof it could work.</div></figcaption></figure>
+    <figure><img src="01-first-engine.jpg" alt="Early engine: terrain and the gate"><figcaption><div class="v">v0.1 to 0.2 · THE ENGINE</div><div class="d">One ray per column walking a heightfield, water reflections, cone trees. The first proof it could work.</div></figcaption></figure>
     <figure><img src="02-first-life.jpg" alt="Birds and rabbits"><figcaption><div class="v">v0.3 · FIRST LIFE</div><div class="d">Birds flock and roost, rabbits graze and bolt underground. The agent layer arrives, and seeds make worlds repeatable.</div></figcaption></figure>
     <figure><img src="03-food-web.jpg" alt="A wolf on the move"><figcaption><div class="v">v0.4 · THE FOOD WEB</div><div class="d">Deer herd, squirrels dart, fish school, and a wolf pack hunts. Prey breed, wolves starve when prey is scarce, and the whole system stays balanced.</div></figcaption></figure>
     <figure><img src="04-water.jpg" alt="The lake"><figcaption><div class="v">v0.5 · INTO THE WATER</div><div class="d">Wade in, dive, and walk the lakebed. Underwater the view goes murky blue-green. Three kinds of tree now stand in mixed groves.</div></figcaption></figure>
@@ -116,25 +116,27 @@ footer a{color:var(--soft)}
     <figure><img src="09-forest.jpg" alt="The keep among a varied forest"><figcaption><div class="v">v0.7.10 · A REAL FOREST</div><div class="d">Trees now vary in height, width, and shape, from thin spires to fat firs to broad low canopies, so a stand reads like real woods.</div></figcaption></figure>
     <figure><img src="10-real-keep.jpg" alt="The donjon and its spiral stair seen from a corner tower" loading="lazy"><figcaption><div class="v">v0.7.13 to 0.7.15 · THE REAL KEEP</div><div class="d">From the top of a corner tower: the round donjon with its spiral stair, the courtyard, the walls, and the forest beyond. The walls got their thickness from raised ground, so you can climb to the rampart and up the stair to the lookout.</div></figcaption></figure>
     <figure><img src="11-moonlit.jpg" alt="The keep at five in the morning under a full moon" loading="lazy"><figcaption><div class="v">v0.8.0 · DAY AND NIGHT</div><div class="d">Five in the morning. The sun crosses the sky on its real arc for Akron, Ohio, so the light and every shadow move through the day; at night a moon rises opposite the sunset and the world goes blue and moonlit, never black.</div></figcaption></figure>
+    <figure><img src="12-gate-at-night.jpg" alt="A brazier burning beside the gate arch at night, the gatekeeper beyond" loading="lazy"><figcaption><div class="v">v0.9.0 · SOLID STONE AND PEOPLE</div><div class="d">The keep is built of solid blocks now instead of thin sheets, and the gate is a real arch with the wall-walk carried over it. Beyond it the gatekeeper watches the road; after dark a brazier burns on each side and the keepers carry lanterns.</div></figcaption></figure>
   </div>
 </section>
 
 <section>
   <h2>Version history</h2>
   <ul class="tl">
+    <li><span class="v">v0.9.0</span> <span class="d">solid stone and people: every paper-thin wall sheet replaced by solid blocks; a stair you can climb hands-off; a second layer of stone lets floors float over open space, so the gate is a real arch with the wall-walk over it and the donjon has a ground-floor room; four keepers walk their rounds with lanterns at night, and braziers burn at the gate</span></li>
     <li><span class="v">v0.8.0</span> <span class="d">day and night: the sun on its real arc over Akron, moving shadows, orange dusk, a moon and stars, a blue moonlit night; time and day-length dials; birds roost and wolves hunt after dark</span></li>
     <li><span class="v">v0.7.15</span> <span class="d">stairs that feel safe: a ledge guard on every drop, a wider spiral with a handrail, steadier footing on stairs, corner towers open to the wall-walk; dials remembered on your device</span></li>
     <li><span class="v">v0.7.14</span> <span class="d">fonts served from this site, nothing leaves for another server</span></li>
     <li><span class="v">v0.7.13</span> <span class="d">a real keep: four thick walls with a rampart you climb, corner towers, a gatehouse, rooms in the walls, and a round donjon with a spiral stair up to a lookout</span></li>
-    <li><span class="v">v0.7.11–0.7.12</span> <span class="d">the "about this build" card with the live file size; shared site chrome</span></li>
+    <li><span class="v">v0.7.11 to 0.7.12</span> <span class="d">the "about this build" card with the live file size; shared site chrome</span></li>
     <li><span class="v">v0.7.10</span> <span class="d">tree girth variety, app icon, this build log</span></li>
-    <li><span class="v">v0.7.7–0.7.9</span> <span class="d">the plane-built keep: crenellations, towers, gatehouse; portrait menu</span></li>
+    <li><span class="v">v0.7.7 to 0.7.9</span> <span class="d">the plane-built keep: crenellations, towers, gatehouse; portrait menu</span></li>
     <li><span class="v">v0.7</span> <span class="d">young that follow adults and age; the keeper's dials panel</span></li>
     <li><span class="v">v0.6</span> <span class="d">witnessable predation, soft per-pixel shadows, scattered landmarks</span></li>
     <li><span class="v">v0.5</span> <span class="d">swimming and the underwater view, three tree types, a solid keep</span></li>
     <li><span class="v">v0.4</span> <span class="d">the full food web, balanced; seed-driven paths</span></li>
     <li><span class="v">v0.3</span> <span class="d">first life: birds and rabbits; the seed box</span></li>
-    <li><span class="v">v0.1–0.2</span> <span class="d">the raycaster, a 512×512 world, the first castle</span></li>
+    <li><span class="v">v0.1 to 0.2</span> <span class="d">the raycaster, a 512×512 world, the first castle</span></li>
   </ul>
 </section>
 
