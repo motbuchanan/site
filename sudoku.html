@@ -23,7 +23,7 @@
   #stats{margin-left:auto;display:flex;gap:12px;align-items:center;font:600 11px var(--mb-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mb-soft)}
   #timer{font-variant-numeric:tabular-nums}
   .mb-ver{position:fixed;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:900;font:600 10px var(--mb-mono);letter-spacing:.04em;color:var(--mb-teal);background:var(--mb-glass);border:1px solid rgba(76,240,224,.25);border-radius:999px;padding:4px 9px;backdrop-filter:blur(8px);cursor:pointer;user-select:none;opacity:.85}
-  #modes{display:flex;gap:6px;flex:0 0 auto;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none}
+  #modes{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;flex:0 0 auto;padding:2px 0 10px}
   #modes::-webkit-scrollbar{display:none}
   .mode{flex:0 0 auto;font:700 13px var(--mb-ui);cursor:pointer;border:1px solid var(--mb-line);background:var(--mb-glass);color:var(--mb-ink);
     border-radius:999px;padding:8px 14px;white-space:nowrap}
@@ -112,7 +112,7 @@
 </div>
 
 <div id="toast"></div>
-<button class="mb-ver" id="mbVer" type="button">v2.2 &middot; Oct 24</button>
+<button class="mb-ver" id="mbVer" type="button">v2.3 &middot; Oct 25</button>
 
 <div class="ov" id="overlay">
   <div class="big">&#127881;</div>
@@ -395,7 +395,7 @@ $("erase").addEventListener("click",eraseCell);
 $("undo").addEventListener("click",undo);
 $("hint").addEventListener("click",doHint);
 $("newp").addEventListener("click",function(){newPuzzle(mode==="daily"?dayRamp():mode);});
-$("mbVer").addEventListener("click",function(){toast("v2.2 loaded");});
+$("mbVer").addEventListener("click",function(){toast("v2.3 loaded");});
 $("ovBtn").addEventListener("click",function(){$("overlay").classList.remove("show");newPuzzle(mode==="daily"?"medium":mode);});
 
 document.addEventListener("keydown",function(e){
