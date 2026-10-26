@@ -1,5 +1,5 @@
 /* Pocket Shark service worker: cache the app shell for offline launch, network-first on the page so updates land. */
-var CACHE = 'pocketshark-v1.3.3';
+var CACHE = 'pocketshark-v1.3.4';
 var ASSETS = ['./', './index.html', './manifest.webmanifest',
   './icon-192.png', './icon-512.png', './icon-maskable-512.png', './apple-touch-icon.png',
   './face-dot.jpg', './face-benny.jpg', './face-mari.jpg', './face-hank.jpg', './face-ruth.jpg', './face-silas.jpg',
@@ -12,7 +12,7 @@ self.addEventListener('install', function (e) {
 });
 self.addEventListener('activate', function (e) {
   e.waitUntil(caches.keys().then(function (keys) {
-    return Promise.all(keys.map(function (k) { if (k !== CACHE) return caches.delete(k); }));
+    return Promise.all(keys.map(function (k) { if (k.indexOf('pocketshark-') === 0 && k !== CACHE) return caches.delete(k); }));
   }).then(function () { return self.clients.claim(); }));
 });
 self.addEventListener('fetch', function (e) {
