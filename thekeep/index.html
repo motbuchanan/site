@@ -63,7 +63,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
  </div>
  <div id="stick"><div id="knob"></div></div>
  <div id="fps"></div>
- <button class="mb-ver" id="mbVer" type="button">v0.10.1 &middot; Oct 26</button>
+ <button class="mb-ver" id="mbVer" type="button">v0.10.2 &middot; Oct 26</button>
  <div id="toast"></div>
  <div id="help" class="hidden"><div class="card">
   <h1>How to play</h1>
@@ -108,9 +108,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
 <script>
 (function(){
 'use strict';
-const VERSION='The Keep v0.10.1 · Oct 26 2026';
-const VER_SHORT='v0.10.1 · Oct 26'; // what the badge shows; bump with VERSION
+const VERSION='The Keep v0.10.2 · Oct 26 2026';
+const VER_SHORT='v0.10.2 · Oct 26'; // what the badge shows; bump with VERSION
 const CHANGELOG=[
+ ['v0.10.2 · Oct 26 2026','Solid walls again. Every stone block was being drawn with its face at its back edge instead of its front edge. Seen from below, that shaved the top off every wall face and turned the one-block battlements into thin slanted needles; seen from above, the top of a wall was drawn as more wall face, so walls had no thickness and looked like paper. Faces now stand where the stone starts, and the tops of walls, battlements and towers show as their own lit surface, so you can see how thick they are.'],
  ['v0.10.1 · Oct 26 2026','The stair up to the wall-walk now runs straight on to the south rampart instead of stopping short and making you turn a corner at the top, and its handrail can no longer be stood on. Walk toward it from the courtyard or from the wall-walk and it guides you up or down the middle, while you stay free to look around. Also fixed: at midday, bright sunlit sand on the beach could flash teal and navy, because the brightest colors overflowed and wrapped around.'],
  ['v0.10.0 · Oct 26 2026','The people of the keep. The four keepers are drawn three times sharper and each is someone you can tell apart: Bram, the bearded guard in blue with a spear; Tilda, the guard in red with a long fair braid; Old Wick, the gatekeeper in a green hood with a white beard and a staff; and Maud, the steward in a purple robe and white cap with a ring of keys. You see them from the front, the side or the back depending on which way they are walking, and they swing into a walk as they go. The sun lights the side of them it falls on, and they cast a small shadow at their feet. After dark their lanterns light their own faces and throw a warm pool of light on the ground around them, and the gate braziers light the ground too. Walk up to a keeper and they stop, turn to face you and say hello.'],
  ['v0.9.1 · Oct 25 2026','Stepping off the stair. Holding forward used to carry you up the spiral and then leave you facing the edge at the top. Now the stair hands you off: at the top it walks you in through the opening to the middle of the lookout and turns you to face it, and on the way down it carries you off the last step and turns you to face out into the courtyard. From the lookout, walk toward the opening and it starts you down the stair. The low steps at the foot now catch you too when you push straight along them, and you can still step off sideways.'],
@@ -936,20 +937,31 @@ function renderFrame(px,py,pz,yaw,pitch){
         const rowT=Math.floor(horizon-(hh-pz)*K/t);
         const sc=st[ci];
         if(sc===0&&t<52){ const dn=(W.detail[(((ex*1.7)|0)&63)|((((ey*1.7)|0)&63)<<6)]-128)*(1-t/52)*0.0022; colR*=1+dn; colG*=1+dn; colB*=1+dn*0.8; }
-        if(rowT<ybuf){
-          const lo=rowT<0?0:rowT; const f=fogLUT[(t*4)|0];
-          if(sc>0&&(sc-prevSt>0.8||(prevSt<=0&&sc>0)||pz<hh)){   // from below a top is never visible: what shows is a riser
-            const nx=sideWasX?-stepX:0, ny=sideWasX?0:-stepY;
+        // a stone step up is a solid block: its face stands at the NEAR edge of the cell (where the ray came in), and seen
+        // from above its top is a lit surface from the near edge to the far edge. (v0.9 to v0.10.1 drew the face at the far
+        // edge, which shaved the top off every face seen from below and turned one-cell battlements into thin slanted needles.)
+        const riser=sc>0&&(sc-prevSt>0.8||(prevSt<=0&&sc>0)||pz<hh);
+        const tE=tA<0.2?0.2:tA, rowA=riser?Math.floor(horizon-(hh-pz)*K/tE):rowT, rowTop=rowA<rowT?rowA:rowT;
+        if(rowTop<ybuf){
+          const lo=rowTop<0?0:rowTop; const f=fogLUT[(t*4)|0];
+          if(riser){
+            const nx=sA?-stepX:0, ny=sA?0:-stepY;
             const lit=0.64+0.46*Math.max(0,nx*LIT.x+ny*LIT.y);
-            const along=(sideWasX?ey:ex), tk=t/K;
-            for(let r=ybuf-1;r>=lo;r--){ if(flag[r]) continue;
+            const along=sA?(py+dy*tE):(px+dx*tE), tk=tE/K, fA=fogLUT[(tE*4)|0];
+            const faceLo=rowA<0?0:rowA;
+            for(let r=ybuf-1;r>=faceLo;r--){ if(flag[r]) continue;
               const z=pz+(horizon-r)*tk;
               const cz=z/0.72, zi=Math.floor(cz), fzc=cz-zi;
               const av=(along+(zi&1?0.55:0))/1.15, bi=Math.floor(av), fab=av-bi;
               const mort=(fzc<0.07||fab<0.05)?0.82:1;
               const bl=(0.92+0.10*hash2(bi,zi*3+1,7))*mort*lit;
               const edge=(r>=ybuf-2)?1.10:1;
-              fb[r*C+i]=pack(176*bl*edge*shc,168*bl*edge*shc,156*bl*edge*shc,f); }
+              fb[r*C+i]=pack(176*bl*edge*shc,168*bl*edge*shc,156*bl*edge*shc,fA); }
+            if(rowT<faceLo){   // seen from above: the block's top, with a bright lip along its front edge
+              const nn=0.94+0.14*hash2(cx,cy,5);
+              for(let r=(faceLo<ybuf?faceLo:ybuf)-1;r>=lo;r--){ if(flag[r]) continue;   // never below ybuf: those rows hold nearer stone
+                const edge=(r===faceLo-1)?1.18:1;
+                fb[r*C+i]=pack(206*nn*edge*shc,198*nn*edge*shc,182*nn*edge*shc,f); } }
           } else if(sc>0){
             const nn=0.94+0.14*hash2((ex*1.3)|0,(ey*1.3)|0,5);
             for(let r=ybuf-1;r>=lo;r--){ if(flag[r]) continue;
