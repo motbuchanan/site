@@ -63,7 +63,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
  </div>
  <div id="stick"><div id="knob"></div></div>
  <div id="fps"></div>
- <button class="mb-ver" id="mbVer" type="button">v0.9.1 &middot; Oct 25</button>
+ <button class="mb-ver" id="mbVer" type="button">v0.10.0 &middot; Oct 26</button>
  <div id="toast"></div>
  <div id="help" class="hidden"><div class="card">
   <h1>How to play</h1>
@@ -85,7 +85,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
    <img src="05-predation.jpg" alt="a kill" loading="lazy">
    <img src="04-water.jpg" alt="the lake" loading="lazy">
   </div>
-  <p class="fsize">The whole world is one HTML file. Right now: <b id="fsize">~124 KB</b>. Smaller than a single phone photo.</p>
+  <p class="fsize">The whole world is one HTML file. Right now: <b id="fsize">~140 KB</b>. Smaller than a single phone photo.</p>
   <p><b>Why I built it.</b> I build things on a phone by asking AI the right questions, the way I would direct a camera. I saw a clip of a tiny 3D world made of nothing but text and wanted to see if I could grow one that was actually alive, and keep growing it in the open instead of ever calling it done.</p>
   <p><b>What I learned.</b> How far you can get with almost nothing. One idea, a ray walking a height map, turned into characters, with a small world of animals living on top. Every version taught me one concrete thing: how to make a wall read as solid, how to keep the wolves from starving the world empty, how to make a forest look like real woods.</p>
   <p style="color:var(--mb-dim);font-size:13px"><b style="color:var(--mb-soft)">Walk:</b> drag the left half of the screen. <b style="color:var(--mb-soft)">Look:</b> drag the right half. Wade into the water to swim. Tap ☰ menu for a new world, the dials, and the time of day. Walk under the gate arch and find the door under the tower stair.</p>
@@ -108,9 +108,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
 <script>
 (function(){
 'use strict';
-const VERSION='The Keep v0.9.1 · Oct 25 2026';
-const VER_SHORT='v0.9.1 · Oct 25'; // what the badge shows; bump with VERSION
+const VERSION='The Keep v0.10.0 · Oct 26 2026';
+const VER_SHORT='v0.10.0 · Oct 26'; // what the badge shows; bump with VERSION
 const CHANGELOG=[
+ ['v0.10.0 · Oct 26 2026','The people of the keep. The four keepers are drawn three times sharper and each is someone you can tell apart: Bram, the bearded guard in blue with a spear; Tilda, the guard in red with a long fair braid; Old Wick, the gatekeeper in a green hood with a white beard and a staff; and Maud, the steward in a purple robe and white cap with a ring of keys. You see them from the front, the side or the back depending on which way they are walking, and they swing into a walk as they go. The sun lights the side of them it falls on, and they cast a small shadow at their feet. After dark their lanterns light their own faces and throw a warm pool of light on the ground around them, and the gate braziers light the ground too. Walk up to a keeper and they stop, turn to face you and say hello.'],
  ['v0.9.1 · Oct 25 2026','Stepping off the stair. Holding forward used to carry you up the spiral and then leave you facing the edge at the top. Now the stair hands you off: at the top it walks you in through the opening to the middle of the lookout and turns you to face it, and on the way down it carries you off the last step and turns you to face out into the courtyard. From the lookout, walk toward the opening and it starts you down the stair. The low steps at the foot now catch you too when you push straight along them, and you can still step off sideways.'],
  ['v0.9.0 · Oct 25 2026','The keep is solid stone now, it has people, and rooms you walk under. Every wall used to be a paper-thin sheet standing in front of the real stone, which is why the castle looked like cardboard next to the trees: the sheets are gone, and the battlements, gatehouse, towers and rooms are all built from solid blocks. The spiral stair has a flat landing at the bottom and the top, no rail to climb over at the foot, a wide opening onto the tower top, and a steering assist: on the stair, pushing forward follows the curve by itself and the view turns to face where you walk. The tower top is an open lookout ringed by battlements. The engine also learned a second layer of stone: a floor can float over open space, so the world can have arches, tunnels and ceilings for the first time. The south gate is a real arch, and the wall-walk runs right over it, so you can walk the whole rampart as one loop. The round donjon has a ground floor: a low tunnel under the spiral stair (east side) leads into a round stone room. The great hall and the guard room have thick walls, a stone lintel over the door and a real ceiling. Four keepers live here and walk their rounds: two guards circle the wall-walk in opposite directions, the gatekeeper walks from the guard room out through the arch to watch the road, and the steward goes from the great hall into the donjon and climbs the stair to the lookout. After dark they carry lanterns, and braziers burn on either side of the gate. New dial: people of the keep, on or off.'],
  ['v0.8.0 · Oct 24 2026','Day and night. The sun now crosses the sky on its real arc for Akron, Ohio on today\'s date (the same formulas astronomers use for sunrise tables), so light comes from where the sun actually is: low and golden in the morning and evening, high at midday, with the shadows of every tree and wall swinging round as it moves. Dusk goes orange on the sun\'s side of the sky, then a moon rises opposite, stars come out, and the night is blue and moonlit, never black. Birds go to roost after dark and wolves hunt more at night. New sky dials in the menu: time of day (slide it and watch), and day length (paused, 3, 8 or 20 real minutes per day, or the real clock in Akron, Ohio, where the globe lives, so it matches the sky outside Mot\'s window). A small clock sits in the corner readout. Also: the picture only redraws four times a second while a card is open, to save your battery.'],
@@ -595,7 +596,7 @@ function allocGrid(C,R,cw,ch){
   FB.col=new Int32Array(C*R);
   FB.px32=new Uint32Array(C*cw*R*ch);
   TMP.flag=new Uint8Array(R); TMP.wflag=new Uint8Array(R); TMP.mflag=new Uint8Array(R);
-  TMP.wdepth=new Float32Array(R); TMP.wt=new Float32Array(R); TMP.mirror=new Int32Array(R);
+  TMP.kflag=new Uint8Array(R); TMP.gm=new Float32Array(R); TMP.gw=new Float32Array(R); TMP.wdepth=new Float32Array(R); TMP.wt=new Float32Array(R); TMP.mirror=new Int32Array(R);
 }
 function pack(r,g,b,f){
   r+=(FOG_R-r)*f; g+=(FOG_G-g)*f; b+=(FOG_B-b)*f;
@@ -653,6 +654,80 @@ function sky(dx,dy,sg,px,py,pz){
 }
 
 const RF={z:new Float32Array(16),t0:new Float32Array(16),t1:new Float32Array(16),w:new Array(16)};
+// ---- people: drawn when the march reaches them, with light and shadow on and around them ----
+const KL={n:0, x:new Float32Array(16), y:new Float32Array(16), z:new Float32Array(16), kind:new Uint8Array(16), id:new Uint8Array(16),
+  view:new Uint8Array(16), frame:new Uint8Array(16), mir:new Uint8Array(16), amb:new Float32Array(16), lat:new Float32Array(16),
+  shs:new Float32Array(16), pool:new Float32Array(16), prad:new Float32Array(16), lx:new Float32Array(16), ly:new Float32Array(16), night:0};
+const KC={n:0, t:new Float32Array(48), k:new Uint8Array(48), ty:new Uint8Array(48), sd:new Float32Array(48), sg:new Float32Array(48)};
+const GE={n:0, r:new Int32Array(4096), m:new Float32Array(4096), w:new Float32Array(4096)};
+function keeperFrame(px,py,fx,fy,rx,ry){
+  KL.n=0; const L=DAY.light, night=clamp((0.6-DAY.k)/0.6,0,1); KL.night=night;
+  const R2=CDRAW*CDRAW;
+  for(let c=0;c<CR_.n&&KL.n<16;c++){ const sp=CR_.sp[c]; if(CR_.al[c]===0||(sp!==SP.KEEPER&&sp!==SP.FIRE)) continue;
+    const x=CR_.x[c], y=CR_.y[c], z=CR_.z[c], ex=x-px, ey=y-py; if(ex*ex+ey*ey>R2) continue;
+    const k=KL.n++; KL.x[k]=x; KL.y[k]=y; KL.z[k]=z;
+    if(sp===SP.FIRE){ KL.kind[k]=1; KL.pool[k]=night*1.1; KL.prad[k]=2.8; KL.shs[k]=0; continue; }
+    KL.kind[k]=0; const id=Math.min(3,CR_.ay[c]|0); KL.id[k]=id;
+    // which way is the keeper facing, seen from here: front, side (mirrored for left) or back
+    const hx=CR_.vx[c], hy=CR_.vy[c], hl=Math.hypot(hx,hy)||1, tl=Math.hypot(ex,ey)||1;
+    const dot=-(hx*ex+hy*ey)/(hl*tl), v=dot>0.42?0:(dot<-0.42?2:1);
+    KL.view[k]=v; KL.mir[k]=(v===1&&(hx*rx+hy*ry)<0)?1:0;
+    KL.frame[k]=CR_.st[c]===0?((CR_.tm[c]/0.34)|0)&3:0;
+    const ln=KMASK[id].lan[v][KL.frame[k]]; KL.lx[k]=ln[0]; KL.ly[k]=ln[1];
+    // sun and shade: in direct light the side toward the sun is brighter; in a shadow the keeper is dimmer
+    const ci=(y|0)*N+(x|0), top=W.su[ci]>0&&z>terr(x,y)+W.sb[ci]+0.2, sh=top?W.shadTop[ci]:W.shadRaw[ci];
+    const lit=sh>0.99&&DAY.lightAlt>0.035&&L.z>0;
+    KL.amb[k]=lit?(0.92-0.10*(L.x*fx+L.y*fy)):(0.56+0.36*sh);
+    KL.lat[k]=lit?0.16*(L.x*rx+L.y*ry):0;
+    KL.shs[k]=lit?0.48:0.26; KL.pool[k]=night*0.72; KL.prad[k]=1.8; }
+}
+function keeperSprite(i,j,horizon,pz,ybuf,K,C){
+  const k=KC.k[j], sd=KC.sd[j], sg=KC.sg[j], q=sg/SPP[SP.KEEPER].wsize; if(q<=-1||q>=1) return;
+  const fb=FB.col, flag=TMP.flag, kflag=TMP.kflag, M=KMASK[KL.id[k]], px_=M.views[KL.view[k]][KL.frame[k]];
+  const us=q*0.5+0.5, u=KL.mir[k]?1-us:us; let mx=(u*16)|0; if(mx<0)mx=0; if(mx>15)mx=15;
+  const z0=KL.z[k], H=SPP[SP.KEEPER].hsize, f2=fogLUT[(sd*4)|0];
+  const topF=horizon-(z0+H-pz)*K/sd, botF=horizon-(z0-pz)*K/sd, span=(botF-topF)||1;
+  let rT=Math.floor(topF), rB=Math.floor(botF); if(rT<0)rT=0; if(rB>ybuf-1)rB=ybuf-1;
+  const night=KL.night, amb=KL.amb[k], lat=KL.lat[k]*(2*us-1), xr=DAY.tr, xg=DAY.tg, xb=DAY.tb;
+  for(let r=rT;r<=rB;r++){ if(flag[r]) continue;
+    let my=(((r+0.5-topF)/span)*32)|0; if(my<0)my=0; if(my>31)my=31;
+    const pi=px_[my*16+mx]; if(pi===0) continue;
+    if(pi===9&&night>0.02){ const fl=0.86+0.14*Math.sin(skyTime*9+k*2.3+r);
+      fb[r*C+i]=pack(255*fl,214*fl,120*fl,f2*0.4)|SKYBIT; flag[r]=1; kflag[r]=1; continue; }
+    const cc=M.pal[pi]; const lt=pi===1?0.92:amb*(1+lat)*(0.96+0.08*(1-my/32));
+    let rr=cc[0]*lt, gg=cc[1]*lt, bb=cc[2]*lt;
+    let w=0; if(night>0.02){ const ax=mx-KL.lx[k], ay=my-KL.ly[k]; w=night*Math.max(0,1-Math.sqrt(ax*ax+ay*ay)/12)*1.1; }
+    if(w>0.03){ // lit by the keeper's own lantern: warm, and it survives the night exposure
+      rr=rr*xr+rr*w*1.0+18*w; gg=gg*xg+gg*w*0.74+8*w; bb=bb*xb+bb*w*0.40;
+      fb[r*C+i]=pack(rr>255?255:rr,gg>255?255:gg,bb>255?255:bb,f2)|SKYBIT; }
+    else fb[r*C+i]=pack(rr,gg,bb,f2);
+    flag[r]=1; kflag[r]=1; }
+}
+function keeperGround(i,j,horizon,pz,ybuf,K){
+  const k=KC.k[j], sd=KC.sd[j], sg=KC.sg[j], z0=KL.z[k]; if(pz<z0+0.08) return;
+  const flag=TMP.flag, shs=KL.shs[k], pool=KL.pool[k], Rs=0.5, Rd=0.34, Rp=KL.prad[k];
+  const ashs=Math.abs(sg)<Rs?shs:0, apool=(pool>0.02&&Math.abs(sg)<Rp)?pool:0; if(ashs===0&&apool===0) return;
+  const ext=apool>0?Rp:Rd, near=Math.max(0.3,sd-ext), far=sd+ext, hk=(pz-z0)*K; if(far<=near) return;
+  let r0=Math.ceil(horizon+hk/far), r1=Math.floor(horizon+hk/near); if(r0<0)r0=0; if(r1>ybuf-1)r1=ybuf-1;
+  const fade=sd<40?1:Math.max(0,1-(sd-40)/40);
+  for(let r=r0;r<=r1&&GE.n<4096;r++){ if(flag[r]) continue;
+    const tr_=hk/(r+0.5-horizon); let m=1, w=0;
+    if(ashs>0){ const e=(sg/Rs)*(sg/Rs)+((tr_-sd)/Rd)*((tr_-sd)/Rd); if(e<1) m=1-ashs*(1-e); }
+    if(apool>0){ const e=(sg*sg+(tr_-sd)*(tr_-sd))/(Rp*Rp); if(e<1) w=apool*(1-e)*(1-e)*fade; }
+    if(m<1||w>0.02){ GE.r[GE.n]=r; GE.m[GE.n]=m; GE.w[GE.n]=w; GE.n++; } }
+}
+function kcSwap(b){ const A=[KC.t,KC.k,KC.ty,KC.sd,KC.sg]; for(let n=0;n<5;n++){ const X=A[n], q=X[b]; X[b]=X[b-1]; X[b-1]=q; } }
+function applyGE(i,C){
+  const fb=FB.col, kflag=TMP.kflag, gm=TMP.gm, gw=TMP.gw, xr=DAY.tr, xg=DAY.tg, xb=DAY.tb;
+  for(let g=0;g<GE.n;g++){ const r=GE.r[g]; gm[r]=1; gw[r]=0; }
+  for(let g=0;g<GE.n;g++){ const r=GE.r[g]; gm[r]*=GE.m[g]; gw[r]+=GE.w[g]; }   // overlapping lights and shadows add up
+  for(let g=0;g<GE.n;g++){ const r=GE.r[g]; const m=gm[r]; if(m<0) continue; gm[r]=-1;   // each row written once
+    if(kflag[r]) continue; const c=fb[r*C+i]; if(c&SKYBIT) continue;
+    const w=gw[r]>1.25?1.25:gw[r]; let rr=((c>>16)&255)*m, gg=((c>>8)&255)*m, bb=(c&255)*m;
+    if(w>0.02){ const lu=(rr*0.3+gg*0.5+bb*0.2)*0.55+44; rr=rr*xr+lu*w; gg=gg*xg+lu*0.55*w; bb=bb*xb+lu*0.22*w;   // warm light: the same orange on grass, sand or stone
+      fb[r*C+i]=((rr>255?255:rr|0)<<16)|((gg>255?255:gg|0)<<8)|(bb>255?255:bb|0)|SKYBIT; }
+    else fb[r*C+i]=((rr|0)<<16)|((gg|0)<<8)|(bb|0); }
+}
 function renderFrame(px,py,pz,yaw,pitch){
   const C=RS.C,R=RS.R,K=RS.K,tanH=RS.tanHalf; const LIT=DAY.light;
   simBin(px,py);
@@ -663,12 +738,23 @@ function renderFrame(px,py,pz,yaw,pitch){
   const flag=TMP.flag, wflag=TMP.wflag, wdepth=TMP.wdepth, wt=TMP.wt, mirror=TMP.mirror, mflag=TMP.mflag;
   const pz2=2*WATER-pz;
   const uw=pz<WATER;   // eye below the surface: no reflective surface, see through to the bed
+  keeperFrame(px,py,fx,fy,rx,ry);
   for(let i=0;i<C;i++){
     const u=((i+0.5)/C-0.5)*2*tanH;
     const dx=fx+rx*u, dy=fy+ry*u;
     const dd=dx*dx+dy*dy, invLen=1/Math.sqrt(dd);
     flag.fill(0);
     let ybuf=R, wMin=R, wMax=-1, wCount=0;
+    // the people this ray passes near, as events in march order: ground light/shadow first, then the figure
+    KC.n=0; GE.n=0;
+    for(let k=0;k<KL.n;k++){ const wx=KL.x[k]-px, wy=KL.y[k]-py, sd=(wx*dx+wy*dy)/dd;
+      const reach=Math.max(0.5,KL.pool[k]>0.02?KL.prad[k]:0); if(sd<0.35-reach) continue;
+      const sg=(wx*dy-wy*dx)*invLen, asg=sg<0?-sg:sg;
+      if(asg<reach&&KC.n<47){ KC.t[KC.n]=Math.max(0.3,sd-reach); KC.k[KC.n]=k; KC.ty[KC.n]=0; KC.sd[KC.n]=sd; KC.sg[KC.n]=sg; KC.n++; }
+      if(KL.kind[k]===0&&sd>=0.35&&asg<0.5&&KC.n<47){ KC.t[KC.n]=sd; KC.k[KC.n]=k; KC.ty[KC.n]=1; KC.sd[KC.n]=sd; KC.sg[KC.n]=sg; KC.n++; } }
+    for(let a=1;a<KC.n;a++){ for(let b=a;b>0&&KC.t[b]<KC.t[b-1];b--) kcSwap(b); }
+    if(KC.n) TMP.kflag.fill(0);
+    let kNext=0;
     const stepX=dx<0?-1:1, stepY=dy<0?-1:1;
     const deltaX=Math.abs(1/dx), deltaY=Math.abs(1/dy);
     const mx0=Math.floor(px), my0=Math.floor(py);
@@ -695,6 +781,7 @@ function renderFrame(px,py,pz,yaw,pitch){
       if(sideX<sideY){ tn=sideX; sideX+=deltaX; cx=mx; cy=my; mx+=stepX; sideWasX=true; } else { tn=sideY; sideY+=deltaY; cx=mx; cy=my; my+=stepY; sideWasX=false; }
       if(tn>MAXT) break;
       if(cx<0||cx>=N-1||cy<0||cy>=N-1) break;
+      while(kNext<KC.n&&KC.t[kNext]<=tn){ if(KC.ty[kNext]===0) keeperGround(i,kNext,horizon,pz,ybuf,K); else keeperSprite(i,kNext,horizon,pz,ybuf,K,C); kNext++; }
       if(tn>140&&((++lodN)&(tn>300?3:1))) continue;
       const tA=tPrevC, sA=sPrevC; tPrevC=tn; sPrevC=sideWasX;
       const ci=cy*N+cx;
@@ -833,8 +920,6 @@ function renderFrame(px,py,pz,yaw,pitch){
             const cc=M.pal[pi]; const lt=0.82+0.18*(1-(r-rTc)/spn);
             if(pi===9&&spc>=SP.KEEPER&&DAY.k<0.6){ const fl=0.86+0.14*Math.sin(skyTime*(spc===SP.FIRE?17:9)+cj*2.3+r);
               fb[r*C+i]=pack(255*fl,(spc===SP.FIRE?170:214)*fl,(spc===SP.FIRE?70:120)*fl,f2*0.4)|SKYBIT; flag[r]=1; continue; }
-            if(pi===1&&spc===SP.KEEPER){ const v=CR_.ay[cj]|0; const k2=v===1?[66,74,92]:v===2?[110,64,52]:cc;
-              fb[r*C+i]=pack(k2[0]*lt,k2[1]*lt,k2[2]*lt,f2); flag[r]=1; continue; }
             fb[r*C+i]=pack(cc[0]*lt,cc[1]*lt,cc[2]*lt,f2); flag[r]=1; }
         }
       }
@@ -960,6 +1045,7 @@ function renderFrame(px,py,pz,yaw,pitch){
         wflag[r]=0;
       }
     }
+    if(GE.n) applyGE(i,C);
   }
   // water surface line: a bright foam waterline that sweeps across as you enter/leave the water
   { const sd=pz-WATER; if(sd>-3&&sd<3&&terr(px,py)<WATER+0.5){
@@ -1020,7 +1106,7 @@ const SPP=[
   { speed:3.6, turn:5.0, sight:6,  sep:0.9, wsize:0.70, hsize:0.42, r:88,g:138,b:162 },
   { speed:6.7, turn:4.4, sight:30, sep:2.2, wsize:1.18, hsize:1.22, r:96,g:92,b:88 },
   { speed:0, turn:0, sight:0, sep:0, wsize:1.20, hsize:0.52, r:110,g:70,b:46 },
-  { speed:1.5, turn:0, sight:0, sep:0, wsize:0.50, hsize:1.80, r:98,g:84,b:70 },
+  { speed:1.5, turn:0, sight:0, sep:0, wsize:0.50, hsize:2.00, r:98,g:84,b:70 },
   { speed:0, turn:0, sight:0, sep:0, wsize:0.42, hsize:1.15, r:80,g:72,b:64 }
 ];
 const CMAX=1600, CDRAW=130;
@@ -1074,12 +1160,122 @@ defMask(SP.WOLF,14,10,[
  {1:[92,88,84],2:[52,48,44],3:[150,144,136],4:[232,196,64]});
 
 // keepers: a hooded cloak, a lantern held out at the side (9 = the lantern glass)
-defMask(SP.KEEPER,9,16,[
- "...333...","..33433..","..34443..","..33333..",
- ".1111111.","11111111.","1111111.8","1111111.8",
- ".111111.9",".111111.9",".111111..",".111111..",
- ".111111..",".11..11..",".22..22..",".22..22.."],
- {1:[98,84,70],2:[52,40,32],3:[80,68,58],4:[214,176,140],8:[70,64,58],9:[150,128,82]});
+// ---- people: procedural "paper doll" sprites for the keepers (16 x 32, bold outline, two-tone shading) ----
+// views: 0 front (facing you), 1 side (facing right; mirror for left), 2 back. 4 walk frames each.
+// palette: 1 outline, 2 skin, 3 blush/skin shade, 4 cloak, 5 cloak shade, 6 tunic, 7 metal, 8 hair, 9 lantern glass,
+//          10 boots/belt, 11 wood, 12 legs, 13 accent (cap, trim)
+const KEEPERS=[
+  { name:'Bram', role:'guard',      tall:true,  head:'helmet', beard:true,  braid:false, tool:'spear', robe:false,
+    skin:[226,176,138], hair:[150,74,40],  cloak:[64,84,128],  tunic:[176,160,120], legs:[82,70,60],  accent:[200,170,90] },
+  { name:'Tilda', role:'guard',     tall:false, head:'helmet', beard:false, braid:true,  tool:'spear', robe:false,
+    skin:[240,196,160], hair:[230,190,90], cloak:[132,58,52],  tunic:[190,176,140], legs:[90,74,62],  accent:[200,170,90] },
+  { name:'Old Wick', role:'gatekeeper', tall:true, head:'hood', beard:true, braid:false, tool:'staff', robe:true,
+    skin:[214,166,128], hair:[214,214,206], cloak:[92,108,70], tunic:[120,104,80], legs:[70,60,50], accent:[160,140,100] },
+  { name:'Maud', role:'steward',    tall:false, head:'cap',    beard:false, braid:false, tool:'keys',  robe:true,
+    skin:[236,186,152], hair:[110,64,40],  cloak:[150,96,140], tunic:[226,214,190], legs:[90,70,70], accent:[244,240,228] }
+];
+function shadeOf(c,k){ return [c[0]*k|0,c[1]*k|0,c[2]*k|0]; }
+function buildPerson(K){
+  const W=16,H=32, views=[];
+  for(let view=0;view<3;view++){ const frames=[];
+    for(let fr=0;fr<4;fr++){
+      const px=new Uint8Array(W*H);
+      const set=function(x,y,c){ if(x>=0&&x<W&&y>=0&&y<H) px[y*W+x]=c; };
+      const rect=function(x0,y0,x1,y1,c){ for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++) set(x,y,c); };
+      const bob=(fr===1||fr===3)?-1:0;                       // a little bounce on the passing steps
+      const top=(K.tall?4:6)+bob;                            // head top row
+      const hem=(K.robe?28:25)+(K.tall?0:0), sh=top+8;       // shoulder row, hem row
+      const side=(view===1);
+      // ---- tool behind the body (spear/staff in the far hand)
+      const toolX=side?13:(view===2?13:2);
+      const drawTool=function(){ if(K.tool==='spear'||K.tool==='staff'){ const t0=K.tool==='spear'?0:Math.max(0,top-3)+0;
+        for(let y=t0+(K.tool==='spear'?3:0);y<=30;y++) set(toolX,y,11);
+        if(K.tool==='spear'){ set(toolX,0,7); rect(toolX-1,1,toolX+1,2,7); set(toolX,3,7); }
+        else { set(toolX+1,t0,11); set(toolX+1,t0+1,11); set(toolX,t0,11); } } };
+      if(!side) drawTool();
+      // ---- legs and boots
+      if(side){
+        const fwd=(fr===1)?2:(fr===3?-2:0);
+        rect(7+fwd,hem+1,8+fwd,29,12); rect(7-fwd,hem+1,8-fwd,29,12);
+        rect(7+fwd,30,9+fwd,31,10); rect(7-fwd,30,9-fwd,31,10);
+      } else {
+        const lift=function(l){ return (fr===1&&l===0)||(fr===3&&l===1)?1:0; };
+        rect(5,hem+1,6,29-lift(0),12); rect(9,hem+1,10,29-lift(1),12);
+        rect(4,30-lift(0),6,31-lift(0),10); rect(9,30-lift(1),11,31-lift(1),10);
+      }
+      // ---- body: cloak or robe, a trapezoid widening to the hem
+      for(let y=sh;y<=hem;y++){ const k=(y-sh)/Math.max(1,hem-sh), half=side?(2.5+1.5*k):(3.6+1.6*k);
+        for(let x=0;x<W;x++){ const dx=x+0.5-8; if(Math.abs(dx)<=half) set(x,y,(dx>half-1.6)?5:4); } }
+      if(!side && view===0){ // front: tunic showing down the middle, belt, buckle
+        for(let y=sh+1;y<=hem;y++) for(let x=7;x<=8;x++) set(x,y,6);
+        const by=sh+7; for(let x=0;x<W;x++) if(px[by*W+x]===4||px[by*W+x]===5||px[by*W+x]===6) set(x,by,10);
+        set(7,by,7); set(8,by,7);
+        if(K.tool==='keys'){ set(10,by+1,7); set(11,by+2,7); set(10,by+3,7); } }
+      if(side){ const by=sh+7; for(let x=0;x<W;x++) if(px[by*W+x]===4||px[by*W+x]===5) set(x,by,10); if(K.tool==='keys'){ set(9,by+1,7); set(9,by+2,7); } }
+      // ---- arms (sleeves) and hands; the lantern hangs from one hand
+      if(side){ const sw=(fr===1)?2:(fr===3?-2:0);
+        for(let y=sh+1;y<=sh+6;y++){ const t=(y-sh-1)/5; const x=Math.round(7.5+sw*t); set(x,y,5); set(x+1,y,5); }
+        const hx=Math.round(7.5+sw), hy=sh+7; set(hx,hy,2); set(hx+1,hy,2);
+        set(hx,hy+1,1); rect(hx,hy+2,hx+1,hy+4,9); rect(hx,hy+5,hx+1,hy+5,1);
+      } else {
+        const sw=(fr===1)?1:(fr===3?-1:0);
+        rect(3,sh+1-Math.max(0,sw),3,sh+6-Math.max(0,sw),view===0?4:5); rect(12,sh+1-Math.max(0,-sw),12,sh+6-Math.max(0,-sw),5);
+        set(3,sh+7-Math.max(0,sw),2); set(12,sh+7-Math.max(0,-sw),2);
+        // lantern in the right hand (viewer's right on the front view)
+        const lx=view===0?12:3, ly=sh+8-Math.max(0,view===0?-sw:sw);
+        set(lx,ly,1); rect(lx-1+(view===0?1:0),ly+1,lx+(view===0?1:0),ly+3,9); rect(lx-1+(view===0?1:0),ly+4,lx+(view===0?1:0),ly+4,1);
+      }
+      // ---- head: big and round (the charm is in the proportions)
+      const cx=side?8.5:8, cyy=top+4;
+      for(let y=top;y<=top+7;y++) for(let x=0;x<W;x++){ const dx=(x+0.5-cx)/4.1, dy=(y+0.5-cyy)/4.0; if(dx*dx+dy*dy<=1) set(x,y,2); }
+      // hair (back of the head, sides)
+      if(view===2){ for(let y=top;y<=top+7;y++) for(let x=0;x<W;x++) if(px[y*W+x]===2) set(x,y,8);
+        if(K.braid){ for(let y=top+7;y<=sh+6;y++){ set(7,y,8); set(8,y,8); } set(7,sh+7,13); set(8,sh+7,13); } }
+      else if(side){ for(let y=top;y<=top+6;y++) for(let x=0;x<=7;x++) if(px[y*W+x]===2) set(x,y,8);
+        if(K.braid){ for(let y=top+6;y<=sh+5;y++) set(5,y,8); set(5,sh+6,13); } }
+      else { for(let y=top;y<=top+1;y++) for(let x=0;x<W;x++) if(px[y*W+x]===2) set(x,y,8);
+        set(4,top+2,8); set(11,top+2,8); set(4,top+3,8); set(11,top+3,8);
+        if(K.braid){ for(let y=top+3;y<=top+9;y++){ set(3,y,8); } set(3,top+10,13); } }
+      // face
+      if(view===0){ set(6,top+4,1); set(9,top+4,1); set(5,top+5,3); set(10,top+5,3); if(!K.beard){ set(7,top+6,3); set(8,top+6,3); } }
+      if(side){ set(10,top+4,1); set(12,top+5,2); set(10,top+5,3); }
+      // beard
+      if(K.beard && view!==2){ const x0=side?8:5, x1=side?11:10;
+        for(let y=top+5;y<=top+8;y++) for(let x=x0;x<=x1;x++) if(y>top+5||px[y*W+x]===2) set(x,y,8);
+        if(view===0){ set(6,top+5,8); set(9,top+5,8); set(7,top+6,1); set(8,top+6,1); } }
+      // headgear
+      if(K.head==='helmet'){ for(let y=top-1;y<=top+2;y++) for(let x=0;x<W;x++){ const dx=(x+0.5-cx)/4.6, dy=(y+0.5-(top+2.5))/3.6; if(dx*dx+dy*dy<=1&&y<=top+2) set(x,y,7); }
+        for(let x=0;x<W;x++){ if(px[(top+2)*W+x]===7) set(x,top+3,13); }
+        if(view===0){ set(7,top+3,7); set(8,top+3,7); set(7,top+4,7); set(8,top+4,7); } }
+      if(K.head==='cap'){ for(let y=top-1;y<=top+1;y++) for(let x=0;x<W;x++){ const dx=(x+0.5-cx)/4.4, dy=(y+0.5-(top+1.5))/2.6; if(dx*dx+dy*dy<=1) set(x,y,13); } }
+      if(K.head==='hood'){ for(let y=top-1;y<=sh;y++) for(let x=0;x<W;x++){ const dx=(x+0.5-cx)/4.9, dy=(y+0.5-(top+4))/5.0;
+          if(dx*dx+dy*dy<=1){ const face=(view===0&&x>=5&&x<=10&&y>=top+2&&y<=top+8)||(side&&x>=9&&y>=top+2&&y<=top+8);
+            if(!face) set(x,y,(x+0.5>cx+2.5)?5:4); } } }
+      if(side) drawTool();   // side view: held out in front of the body
+      // ---- bold outline round every shape (this is most of the charm at ASCII scale)
+      const out=px.slice();
+      for(let y=0;y<H;y++)for(let x=0;x<W;x++){ if(px[y*W+x]) continue;
+        const n=(x>0&&px[y*W+x-1])||(x<W-1&&px[y*W+x+1])||(y>0&&px[(y-1)*W+x])||(y<H-1&&px[(y+1)*W+x]);
+        if(n && n!==9) out[y*W+x]=1; }
+      frames.push(out);
+    }
+    views.push(frames); }
+  const pal=[null,[34,26,24],K.skin,[226,128,112],K.cloak,shadeOf(K.cloak,0.68),K.tunic,[176,180,188],K.hair,[156,132,84],[74,52,36],[124,88,54],K.legs,K.accent];
+  // where the lantern hangs in each view and frame (its light falls on the keeper at night)
+  const lan=views.map(function(fr){ return fr.map(function(px){ let sx=0,sy=0,n=0; for(let i=0;i<px.length;i++) if(px[i]===9){ sx+=i%16; sy+=(i/16)|0; n++; } return n?[sx/n,sy/n]:[8,20]; }); });
+  return { w:16, h:32, views:views, pal:pal, lan:lan, K:K };
+}
+const KMASK=KEEPERS.map(buildPerson);
+const GREETS=[
+  ["Fair day for a watch.","Wind's from the lake today."],
+  ["You'll want the view from the tower.","Stars are out. Keep to the wall."],
+  ["Gate's open. Always is, for you.","Late to be wandering, friend."],
+  ["Wipe your feet before the hall.","Kitchen fire's still warm."]];
+const GREETN=["Bram, the guard","Tilda, the guard","Old Wick, the gatekeeper","Maud, the steward"];
+let greetHook=null; const GREETT=[-1e9,-1e9,-1e9,-1e9];
+function greet(id){ const now=Date.now(); if(now-GREETT[id]<45000||!greetHook) return;
+  const g=GREETS[id], line=g[DAY.k<0.5?1:0];
+  if(greetHook(GREETN[id]+': "'+line+'"')!==false) GREETT[id]=now; }   // a card is open: say it later instead
 // a brazier on a stone post (9 = the fire)
 defMask(SP.FIRE,7,10,[
  "..9.9..",".99999.","9999999",".99999.","1111111",
@@ -1426,19 +1622,26 @@ function addKeeper(path,start,variant,lift){
 function addPeople(){
   if(!DIALS.keep||!DIALS.people||!W.keepBuilt||CR_.n>CMAX-8) return;
   buildKeeperPaths();
-  addKeeper(0,0,1,KEEP.CURH); addKeeper(1,4,1,KEEP.CURH); addKeeper(2,0,0,0); addKeeper(3,0,2,0);
+  addKeeper(0,0,0,KEEP.CURH); addKeeper(1,4,1,KEEP.CURH); addKeeper(2,0,2,0); addKeeper(3,0,3,0);   // Bram, Tilda, Old Wick, Maud
   const cx=FORT.x, cy=FORT.y;
   for(const ox of [-3.2,3.2]){ const c=addCreature(SP.FIRE, cx+ox+0.5, cy+13.3, 0, 0, 1, -1); CR_.z[c]=terr(cx+ox+0.5,cy+13.3); }
 }
 function tickKeeper(c,dt){
   const a=KPATHS[CR_.ax[c]|0]; if(!a) return;
-  if(CR_.st[c]===1){ CR_.tm[c]-=dt; CR_.vx[c]*=0.85; CR_.vy[c]*=0.85; if(CR_.tm[c]<=0) CR_.st[c]=0; return; }
+  const x=CR_.x[c], y=CR_.y[c];
+  // close by and on the same level: stop, turn to face you, say hello (once in a while)
+  const qx=P.x-x, qy=P.y-y, qd=Math.hypot(qx,qy);
+  if(qd<2.6 && qd>0.05 && Math.abs((P.z-EYE)-CR_.z[c])<1.6){
+    CR_.vx[c]=qx/qd*0.01; CR_.vy[c]=qy/qd*0.01; CR_.tm[c]=CR_.st[c]===1?Math.max(CR_.tm[c],1.5):1.5; CR_.st[c]=1;   // (while walking, tm held the distance walked)
+    greet(Math.min(3,CR_.ay[c]|0)); return; }
+  if(CR_.st[c]===1){ CR_.tm[c]-=dt; if(CR_.tm[c]<=0){ CR_.st[c]=0; CR_.tm[c]=0; } return; }   // vx,vy stay: they are the way the keeper faces
   const n=a.length/3; let wi=(CR_.ph[c]|0)%n;
-  const x=CR_.x[c], y=CR_.y[c], tx=a[wi*3], ty=a[wi*3+1], ddx=tx-x, ddy=ty-y, d=Math.hypot(ddx,ddy);
+  const tx=a[wi*3], ty=a[wi*3+1], ddx=tx-x, ddy=ty-y, d=Math.hypot(ddx,ddy);
   const sp=SPP[SP.KEEPER].speed*(DAY.k<0.5?0.8:1);
   if(d<0.2){ CR_.ph[c]=(wi+1)%n; const pause=a[wi*3+2]; if(pause>0){ CR_.st[c]=1; CR_.tm[c]=pause*(0.7+0.6*Math.random()); } return; }
   const stp=Math.min(d,sp*dt);
   CR_.x[c]=x+ddx/d*stp; CR_.y[c]=y+ddy/d*stp; CR_.vx[c]=ddx/d*sp; CR_.vy[c]=ddy/d*sp;
+  CR_.tm[c]+=stp;   // while walking, tm is the distance walked (it drives the walk cycle)
   const g=floorAt(CR_.x[c],CR_.y[c],CR_.z[c]); CR_.z[c]+=(g-CR_.z[c])*Math.min(1,dt*16);
 }
 function tick(dt){
@@ -1505,7 +1708,7 @@ function simBin(px,py){
   if(!CBIN.head){ CBIN.head=new Int32Array(N*N).fill(-1); }
   for(let k=0;k<CBIN.tn;k++) CBIN.head[CBIN.touched[k]]=-1;
   CBIN.tn=0; const R2=CDRAW*CDRAW;
-  for(let c=0;c<CR_.n;c++){ if(CR_.al[c]===0)continue; const dx=CR_.x[c]-px, dy=CR_.y[c]-py; if(dx*dx+dy*dy>R2) continue;
+  for(let c=0;c<CR_.n;c++){ if(CR_.al[c]===0||CR_.sp[c]===SP.KEEPER)continue; const dx=CR_.x[c]-px, dy=CR_.y[c]-py; if(dx*dx+dy*dy>R2) continue;
     const cell=(CR_.y[c]|0)*N+(CR_.x[c]|0);
     if(CBIN.head[cell]<0) CBIN.touched[CBIN.tn++]=cell;
     CBIN.next[c]=CBIN.head[cell]; CBIN.head[cell]=c; }
@@ -1613,7 +1816,8 @@ function boot(){
   let qCell=1, lastW=0, lastH=0, lastQ=0, govT=0;
   let img=null;
   const $=function(id){ return document.getElementById(id); };
-  function toast(msg){ const t=$('toast'); t.textContent=msg; t.style.opacity=1; clearTimeout(toast.h); toast.h=setTimeout(function(){ t.style.opacity=0; },1600); }
+  function toast(msg,ms){ const t=$('toast'); t.textContent=msg; t.style.opacity=1; clearTimeout(toast.h); toast.h=setTimeout(function(){ t.style.opacity=0; },ms||1600); }
+  greetHook=function(m){ if(['help','about','menu','seed','log','dials'].some(function(id){ const e=$(id); return e&&!e.classList.contains('hidden'); })) return false; toast(m,3400); };
   function setupGrid(force){
     const cssW=window.innerWidth, cssH=window.innerHeight;
     if(!force && cssW===lastW && cssH===lastH && qCell===lastQ) return; // no real change: don't clear the canvas
@@ -1803,7 +2007,7 @@ function boot(){
   requestAnimationFrame(frame);
 }
 
-if(IS_NODE){ module.exports={genWorld,allocGrid,buildGlyphs,renderFrame,compose,spawn,populate,tick,ecology,simBin,updatePlayer,W,RS,FB,P,IN,CR_,SP,SPP,MASKS,RESERVE,RAMP,N,WATER,EYE,terr,groundAt,DIALS,growOf,isAdult,addCreature,WALLS,buildWalls,nearestWall,allWallHits,wallBlocked,setSkyTime:function(t){skyTime=t;},setUW:function(v){UW=v;},DAY,SUN,MOON,SKY,DAYMODES,sunAltAz,sunUpdate,updateDay,relightAll,relightStep,RELIGHT,dayDate,fmtTod,setTod:function(h){DAY.tod=h;sunUpdate();},floorAt,KPATHS,KEEP,FORT,tickKeeper}; }
+if(IS_NODE){ module.exports={genWorld,allocGrid,buildGlyphs,renderFrame,compose,spawn,populate,tick,ecology,simBin,updatePlayer,W,RS,FB,P,IN,CR_,SP,SPP,MASKS,RESERVE,RAMP,N,WATER,EYE,terr,groundAt,DIALS,growOf,isAdult,addCreature,WALLS,buildWalls,nearestWall,allWallHits,wallBlocked,setSkyTime:function(t){skyTime=t;},setUW:function(v){UW=v;},DAY,SUN,MOON,SKY,DAYMODES,sunAltAz,sunUpdate,updateDay,relightAll,relightStep,RELIGHT,dayDate,fmtTod,setTod:function(h){DAY.tod=h;sunUpdate();},floorAt,KPATHS,KEEP,FORT,tickKeeper,KMASK,KL,keeperFrame,greet,GREETT,setGreet:function(f){greetHook=f;}}; }
 else boot();
 })();
 </script>
