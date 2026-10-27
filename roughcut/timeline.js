@@ -3,7 +3,8 @@
 // and the touch timeline view. Logic (top half) is DOM-free and headless-testable;
 // the view (bottom half) reads the DOM only when instantiated, never at import.
 
-import { US, uid, usToS, sToUs } from './state.js';
+import { US, uid, usToS, sToUs, clipDurUs, clipSpeed, tlToSrcUs, SPEEDS } from './state.js';
+export { clipDurUs, clipSpeed, tlToSrcUs, SPEEDS };
 import { textTrack, textDurUs, removeTextCmd, setTextCmd, TEXT_MIN_US } from './text.js';
 
 export const DEFAULT_IMAGE_US = 5 * US;   // an image clip's default length
@@ -44,7 +45,6 @@ export function insertClipCmd(project, media, index, durUs) {
     undo() { const i = t.clips.findIndex((c) => c.id === clip.id); if (i >= 0) t.clips.splice(i, 1); normalize(project); },
   };
 }
-export function clipDurUs(clip) { return Math.max(0, clip.outUs - clip.inUs); } // speed=1 in M2
 
 // Recompute contiguous tlStartUs from clip order. Single source of truth = order.
 export function normalize(project) {
@@ -68,12 +68,12 @@ export function activeClipAt(project, tlUs) {
   const i = clipIndexAt(project, tlUs);
   return i < 0 ? null : mainTrack(project).clips[i];
 }
-// Map a timeline position to source seconds within its clip (speed=1).
+// Map a timeline position to source seconds within its clip (speed-aware).
 export function sourceSecAt(project, tlUs) {
   const c = activeClipAt(project, tlUs);
   if (!c) return { clip: null, sourceSec: 0 };
   const local = Math.max(0, Math.min(tlUs - c.tlStartUs, clipDurUs(c)));
-  return { clip: c, sourceSec: usToS(c.inUs + local) };
+  return { clip: c, sourceSec: usToS(tlToSrcUs(c, local)) };
 }
 
 export function makeClip(media) {
@@ -148,7 +148,7 @@ export function detachAudioCmd(project, clipId, media) {
       const c = v.clips.find((x) => x.id === clipId); if (!c) return null;
       normalize(project);
       made = { id: uid('a'), mediaId: media.id, tlStartUs: c.tlStartUs, inUs: c.inUs, outUs: c.outUs,
-        speed: 1, gain: c.gain ?? 1, muted: false, fadeInUs: c.fadeInUs || 0, fadeOutUs: c.fadeOutUs || 0, detached: true };
+        speed: clipSpeed(c), gain: c.gain ?? 1, muted: false, fadeInUs: c.fadeInUs || 0, fadeOutUs: c.fadeOutUs || 0, detached: true };
       wasMuted = !!c.muted; c.muted = true;
       a.clips.push(made); a.clips.sort((x, y) => x.tlStartUs - y.tlStartUs);
       return made.id;
@@ -166,6 +166,33 @@ export function setClipAudioCmd(project, clipId, props) {
     label: 'Audio settings',
     do() { const c = findClip(project, clipId); if (!c) return; old = { gain: c.gain, muted: c.muted, fadeInUs: c.fadeInUs, fadeOutUs: c.fadeOutUs }; Object.assign(c, props); },
     undo() { const c = findClip(project, clipId); if (c && old) Object.assign(c, old); },
+  };
+}
+
+// Colour look (main track): preset + adjustments + LUT. props merge into clip.look; one undo step.
+export function setClipLookCmd(project, clipId, props, label = 'Look') {
+  let old = null;
+  return {
+    label,
+    do() { const c = findClip(project, clipId); if (!c) return; old = c.look ? { ...c.look } : undefined; c.look = { ...(c.look || {}), ...props }; },
+    undo() { const c = findClip(project, clipId); if (!c) return; if (old === undefined) delete c.look; else c.look = old; },
+  };
+}
+
+// Framing (main track): fit/fill, zoom, position, rotation. props may hold
+// { fit } and/or xf fields { x, y, scale, rot }; one undo step.
+export function setClipFrameCmd(project, clipId, props, label = 'Frame') {
+  let old = null;
+  const apply = (c, p) => {
+    if ('fit' in p) c.fit = p.fit === 'fill' ? 'fill' : 'fit';
+    const xf = { x: 0, y: 0, scale: 1, rot: 0, opacity: 1, ...(c.xf || {}) };
+    for (const k of ['x', 'y', 'scale', 'rot']) if (k in p) xf[k] = p[k];
+    c.xf = xf;
+  };
+  return {
+    label,
+    do() { const c = findClip(project, clipId); if (!c) return; old = { fit: c.fit, xf: c.xf ? { ...c.xf } : undefined }; apply(c, props); },
+    undo() { const c = findClip(project, clipId); if (!c || !old) return; if (old.fit === undefined) delete c.fit; else c.fit = old.fit; if (old.xf === undefined) delete c.xf; else c.xf = old.xf; },
   };
 }
 
@@ -188,6 +215,17 @@ export function setClipTransitionCmd(project, clipId, trans) {
   };
 }
 
+// Speed (main track). Source in/out stay put; the timeline re-flows.
+export function setClipSpeedCmd(project, clipId, speed) {
+  const t = mainTrack(project);
+  const sp = SPEEDS.includes(speed) ? speed : 1;
+  let old = 1;
+  return {
+    label: 'Speed',
+    do() { const c = t.clips.find((x) => x.id === clipId); if (!c) return; old = clipSpeed(c); c.speed = sp; normalize(project); },
+    undo() { const c = t.clips.find((x) => x.id === clipId); if (!c) return; c.speed = old; normalize(project); },
+  };
+}
 export function addClipCmd(project, media) {
   const t = mainTrack(project);
   const clip = makeClip(media);
@@ -248,7 +286,7 @@ export function splitClipCmd(project, clipId, atTlUs) {
       if (idx < 0) return;
       const orig = t.clips[idx];
       normalize(project);
-      const cut = orig.inUs + (atTlUs - orig.tlStartUs); // source us (speed 1)
+      const cut = tlToSrcUs(orig, atTlUs - orig.tlStartUs); // source us, speed-aware
       if (cut <= orig.inUs + MIN_CLIP_US || cut >= orig.outUs - MIN_CLIP_US) { ok = false; return; }
       origOut = orig.outUs;
       right = cloneClip(orig);
@@ -464,7 +502,7 @@ export class TimelineView {
       el.style.left = this._tlX(c.tlStartUs) + 'px';
       el.style.width = Math.max(8, this._usToPx(clipDurUs(c))) + 'px';
       el.classList.toggle('selected', c.id === this.selectedId);
-      el.querySelector('.tl-clip-label').textContent = fmtTime(clipDurUs(c));
+      el.querySelector('.tl-clip-label').textContent = fmtTime(clipDurUs(c)) + (clipSpeed(c) !== 1 ? ' \u00b7 ' + clipSpeed(c) + '\u00d7' : '');
       el.classList.toggle('muted', !!c.muted);
       // teal diamond at the front cut when this clip has a transition-in
       el.classList.toggle('has-trans', i > 0 && !!(c.transIn && c.transIn.type && c.transIn.type !== 'none'));
@@ -657,10 +695,11 @@ export class TimelineView {
           clip.tlStartUs = d.origStart + shift; clip.outUs = d.origOut - shift;
         } else clip.outUs = Math.max(d.origOut + dUs, TEXT_MIN_US);
       } else if (d.side === 'l') {
-        const newIn = Math.max(0, Math.min(d.origIn + dUs, clip.outUs - MIN_CLIP_US));
-        if (d.lane === 'a') clip.tlStartUs = Math.max(0, d.origStart + (newIn - d.origIn));   // music keeps its place on the timeline
+        const dSrc = Math.round(dUs * clipSpeed(clip));   // finger moves in timeline time; in/out live in source time
+        const newIn = Math.max(0, Math.min(d.origIn + dSrc, clip.outUs - MIN_CLIP_US));
+        if (d.lane === 'a') clip.tlStartUs = Math.max(0, d.origStart + Math.round((newIn - d.origIn) / clipSpeed(clip)));   // music keeps its place on the timeline
         clip.inUs = newIn;
-      } else clip.outUs = Math.min(srcMax, Math.max(d.origOut + dUs, clip.inUs + MIN_CLIP_US));
+      } else { const dSrc = Math.round(dUs * clipSpeed(clip)); clip.outUs = Math.min(srcMax, Math.max(d.origOut + dSrc, clip.inUs + MIN_CLIP_US)); }
       this._layout();   // in place: no element churn under the finger
       return;
     }

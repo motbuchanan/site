@@ -19,7 +19,7 @@ import {
   EncodedPacketSink, EncodedAudioPacketSource, EncodedPacket,
   canEncodeVideo, canEncodeAudio, getEncodableAudioCodecs, QUALITY_HIGH, QUALITY_MEDIUM,
 } from './mediabunny.js';
-import { readMedia, usToS, US } from './state.js';
+import { readMedia, usToS, US, clipSpeed } from './state.js';
 import { mainTrack, audioTrack, clipDurUs, normalize } from './timeline.js';
 
 // iOS and macOS Safari share a WebCodecs AAC bug: the ENCODED audio frames are valid,
@@ -35,6 +35,14 @@ const IS_APPLE_WEBKIT = (() => {
   const safari = /Safari/.test(ua) && !/Chrome|CriOS|Chromium|Edg|Android|FxiOS/.test(ua);
   return iOS || (safari && /Apple/.test(vendor));
 })();
+
+// Audio COPY (passthrough) and SELF-ENCODE are DISABLED pending a verified iOS path.
+// On a real iPhone they crashed the MP4 muxer with "Assertion failed." (unreproducible
+// in this environment, which lacks AAC/MP4 encode). Until the ffmpeg.wasm audio route
+// lands, every platform re-encodes audio via AudioBufferSource: full audio on Android
+// and desktop, completes-but-silent on iOS. Re-enable only with on-device verification.
+const ENABLE_AUDIO_COPY = false;
+const ENABLE_SELF_ENCODE = false;
 
 // Build the 2-byte AAC-LC AudioSpecificConfig for a sample rate + channel count.
 // 5 bits objectType(2=AAC-LC), 4 bits sampleRateIndex, 4 bits channelConfig, 3 bits zero.
@@ -84,6 +92,10 @@ async function encodeMixToAac(src, mix, bitrate, isCancelled) {
 import { drawTextsAt, ensureFonts } from './text.js';
 import { drawTransitionAt, planFrames, drawDualTransition, clampSrc } from './transitions.js';
 import { renderTimelineAudio } from './audio.js';
+import { drawFrame, fitBox } from './frame.js';
+import { gradeFrame, lookOf, hasLut, registerLut } from './color.js';
+import { readLut } from './state.js';
+import { muxAudioWithFfmpeg, audioBufferToWav } from './ffmpeg-audio.js';
 
 export async function canExport(codec = 'avc') {
   const reasons = [];
@@ -159,6 +171,7 @@ export function exportProject(project, opts = {}) {
         if (!m) return null;                               // unknown media -> be safe, encode
         if (c.muted || !m.hasAudio) continue;              // intentional/absent audio -> silent span, fine
         if ((c.gain ?? 1) !== 1) return null;              // volume change -> encode
+        if (clipSpeed(c) !== 1) return null;               // speed change -> encode
         if ((c.fadeInUs || 0) > 0 || (c.fadeOutUs || 0) > 0) return null;  // fades -> encode
         if (m.kind !== 'video' && m.kind !== 'audio') continue;
         contrib.push({ clip: c, media: m });
@@ -221,13 +234,14 @@ export function exportProject(project, opts = {}) {
     let audioSource = null;      // AudioBufferSource (encode path)
     let audioPacket = null;      // EncodedAudioPacketSource (copy path, or self-encode on Apple)
     let selfEncodeAac = false;   // Apple WebKit: encode the mix ourselves with a correct header
+    let useFfmpegAudio = false;  // Apple WebKit: mux audio with ffmpeg.wasm after a video-only render
     let ptPlan = null;
     let mix = null;
     const aacBitrate = (opts.quality === 'medium') ? 96000 : 160000;
     const audioInfo = { included: false, codec: null, mode: 'none', reason: '', encodable: [] };
     onProgress(0.02);
 
-    try { ptPlan = await planPassthrough(); } catch (e) { console.warn('passthrough plan failed', e); ptPlan = null; }
+    try { ptPlan = ENABLE_AUDIO_COPY ? await planPassthrough() : null; } catch (e) { console.warn('passthrough plan failed', e); ptPlan = null; }
     if (ptPlan) {
       try {
         audioPacket = new EncodedAudioPacketSource(ptPlan.codec);
@@ -240,28 +254,24 @@ export function exportProject(project, opts = {}) {
       catch (e) { console.warn('audio mix failed, exporting silent', e); audioInfo.reason = 'could not mix the audio on this device'; }
       if (cancelled) throw cancelErr();
       if (mix) {
-        try { audioInfo.encodable = (await getEncodableAudioCodecs()) || []; } catch (_) {}
-        let pick = null;
-        for (const c of ['aac', 'mp3', 'alac']) { try { if (await canEncodeAudio(c)) { pick = c; break; } } catch (_) {} }
-        if (pick) {
-          if (pick === 'aac' && IS_APPLE_WEBKIT) {
-            // Apple WebKit: encode AAC ourselves and write a correct ASC (the Safari fix).
-            try {
-              audioPacket = new EncodedAudioPacketSource('aac');
-              output.addAudioTrack(audioPacket);
-              selfEncodeAac = true; audioInfo.included = true; audioInfo.codec = 'aac'; audioInfo.mode = 'encode-fix';
-            } catch (e) { audioPacket = null; selfEncodeAac = false; }
-          }
-          if (!selfEncodeAac) {
+        if (IS_APPLE_WEBKIT) {
+          // Apple: don't add an audio track here (Safari's MP4 audio muxing is broken).
+          // Render video-only now, then mux the mixed audio in with ffmpeg.wasm after finalize.
+          useFfmpegAudio = true; audioInfo.included = true; audioInfo.codec = 'aac'; audioInfo.mode = 'ffmpeg';
+        } else {
+          try { audioInfo.encodable = (await getEncodableAudioCodecs()) || []; } catch (_) {}
+          let pick = null;
+          for (const c of ['aac', 'mp3', 'alac']) { try { if (await canEncodeAudio(c)) { pick = c; break; } } catch (_) {} }
+          if (pick) {
             try {
               audioSource = new AudioBufferSource({ codec: pick, bitrate: quality });
               output.addAudioTrack(audioSource);
               audioInfo.included = true; audioInfo.codec = pick; audioInfo.mode = 'encode';
             } catch (e) { audioSource = null; audioInfo.included = false; audioInfo.reason = 'the audio encoder would not start (' + (e?.message || e) + ')'; }
+          } else {
+            audioInfo.reason = 'this browser can’t encode audio for MP4' +
+              (audioInfo.encodable.length ? ' (it can encode: ' + audioInfo.encodable.join(', ') + ')' : ' (it reports no audio encoders)');
           }
-        } else {
-          audioInfo.reason = 'this browser can’t encode audio for MP4' +
-            (audioInfo.encodable.length ? ' (it can encode: ' + audioInfo.encodable.join(', ') + ')' : ' (it reports no audio encoders)');
         }
       } else if (!audioInfo.reason) {
         audioInfo.reason = 'there was no audio on the timeline';
@@ -302,6 +312,11 @@ export function exportProject(project, opts = {}) {
 
     // Bundled display fonts (Creepster) must be loaded before any text is drawn.
     await ensureFonts();
+    // Every LUT the cut uses must be in memory before the first frame.
+    for (const c of mainTrack(project).clips) {
+      const lut = lookOf(c).lut;
+      if (lut && !hasLut(lut.id)) { try { registerLut(lut.id, lut.size, await readLut(project.id, lut.id)); } catch (e) { console.warn('LUT missing, exporting without it', lut.id, e); } }
+    }
 
     // ---- video ----
     const dtUs = US / fps;
@@ -341,11 +356,12 @@ export function exportProject(project, opts = {}) {
           const f = await readMedia(project.id, m.opfs);
           const input = new Input({ formats: ALL_FORMATS, source: new BlobSource(f) });
           const vtrack = await input.getPrimaryVideoTrack();
-          if (vtrack) src = { kind: 'video', input, sink: new CanvasSink(vtrack, { width: W, height: H, fit: 'contain', poolSize: 2 }), media: m };
+          const box = fitBox(m.w, m.h, W, H);   // decode at the clip's own aspect; framing is applied at draw
+          if (vtrack) src = { kind: 'video', input, sink: new CanvasSink(vtrack, { width: box.w, height: box.h, fit: 'contain', poolSize: 2 }), media: m, fw: box.w, fh: box.h, clip };
           else { try { input.dispose(); } catch (_) {} }
         } else if (m && m.kind === 'image') {
           const f = await readMedia(project.id, m.opfs);
-          src = { kind: 'image', bmp: await createImageBitmap(f) };
+          src = { kind: 'image', bmp: await createImageBitmap(f), clip };
         } else if (m && m.kind === 'color') {
           src = { kind: 'color', color: m.color || '#000' };
         }
@@ -367,8 +383,8 @@ export function exportProject(project, opts = {}) {
     // Draw a static (image/color/none) source, or a decoded frame canvas, into a ctx.
     const paintStatic = (c, src, frame) => {
       c.fillStyle = (src.kind === 'color') ? src.color : bg; c.fillRect(0, 0, W, H);
-      if (src.kind === 'image' && src.bmp) drawContain(c, src.bmp, src.bmp.width, src.bmp.height, W, H);
-      else if (frame) c.drawImage(frame, 0, 0, W, H);
+      if (src.kind === 'image' && src.bmp) drawFrame(c, W, H, gradeFrame(src.bmp, src.bmp.width, src.bmp.height, src.clip), src.bmp.width, src.bmp.height, src.clip);
+      else if (frame) drawFrame(c, W, H, gradeFrame(frame, src.fw, src.fh, src.clip), src.fw, src.fh, src.clip);
     };
     // Sequential frame iterator for a source over a list of source times (us).
     // Non-video sources yield null every frame (paintStatic handles them).
@@ -434,9 +450,27 @@ export function exportProject(project, opts = {}) {
     onProgress(0.98);
     await output.finalize();       // flushes + closes the OPFS writable
     if (cancelled) throw cancelErr();
-    onProgress(1);
+    onProgress(useFfmpegAudio ? 0.9 : 1);
     // Disk-backed File; the browser streams it for preview/save/share.
     const blob = await fileHandle.getFile();
+
+    // Apple audio: the video is finished (video-only MP4); mux the mixed audio in with
+    // ffmpeg.wasm (its own AAC encode + MP4 mux, so Safari's broken path is never used).
+    if (useFfmpegAudio && mix && !cancelled) {
+      try {
+        const wav = audioBufferToWav(mix);
+        const finalBlob = await muxAudioWithFfmpeg(blob, wav, aacBitrate, (msg) => onProgress(0.95, msg));
+        onProgress(1);
+        audioInfo.included = true;
+        return { blob: finalBlob, ext: 'mp4', mime: 'video/mp4', w: W, h: H, fps, audio: audioInfo };
+      } catch (e) {
+        console.warn('ffmpeg audio mux failed; returning silent video', e);
+        audioInfo.included = false; audioInfo.mode = 'none';
+        audioInfo.reason = 'adding audio failed (' + (e?.message || e) + ')';
+        onProgress(1);
+        return { blob, ext: 'mp4', mime: 'video/mp4', w: W, h: H, fps, audio: audioInfo };
+      }
+    }
 
     // Verify the audio actually muxed. If we added a track but re-opening the file
     // finds none, the encoder silently failed (the iOS Safari AAC case), so say so
