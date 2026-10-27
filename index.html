@@ -85,7 +85,7 @@ body{background:#0a0d11;font-family:'Archivo',system-ui,sans-serif;color:var(--i
   box-shadow:0 12px 30px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.07)}
 .wm{width:min(66vw,280px);height:auto;display:inline-block}
 .w1{margin-top:clamp(2px,0.5vh,5px);font-weight:800;font-size:clamp(14px,2.1svh,16.5px);line-height:1.16;text-align:center;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
-.w2{margin-top:2px;color:var(--soft);font-size:clamp(11px,1.6svh,12.5px);line-height:1.22}
+.w2{margin-top:2px;color:var(--soft);font-size:clamp(11px,1.6svh,12.5px);line-height:1.22;min-height:1.22em}
 
 /* app grid */
 .grid{margin-top:clamp(10px,1.6vh,16px);flex:1 1 auto;min-height:0;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none}
@@ -493,7 +493,7 @@ html.nocc .app .nm::before{display:none}
         </svg></span>
       </button>
     </div>
-    <div class="tagline">made on a phone like this one &middot; v7.56 &middot; Oct 26</div>
+    <div class="tagline">made on a phone like this one &middot; v7.57 &middot; Oct 26</div>
   </div>
 </div>
 
@@ -545,7 +545,7 @@ html.nocc .app .nm::before{display:none}
     <div class="setsec">MOT-1</div>
     <div class="setgroup">
       <div class="setrow tap" data-go="about"><span class="si"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M5 21c0-4 3-7 7-7s7 3 7 7"/></svg></span><span class="st">About this phone</span><span class="chev">&rsaquo;</span></div>
-      <div class="setrow tap" data-go="update"><span class="si"><svg viewBox="0 0 24 24"><path d="M12 4v10M7 11l5 5 5-5M5 20h14"/></svg></span><span class="st">Software Update</span><span class="sv" id="updBadge">v7.56</span><span class="chev">&rsaquo;</span></div>
+      <div class="setrow tap" data-go="update"><span class="si"><svg viewBox="0 0 24 24"><path d="M12 4v10M7 11l5 5 5-5M5 20h14"/></svg></span><span class="st">Software Update</span><span class="sv" id="updBadge">v7.57</span><span class="chev">&rsaquo;</span></div>
     </div>
     <div class="setsec">Make it yours</div>
     <div class="setgroup">
@@ -587,13 +587,13 @@ html.nocc .app .nm::before{display:none}
       <div class="setrow"><span class="st">Carrier</span><span class="sv">No SIM. Makes things, not calls.</span></div>
       <div class="setrow"><span class="st">Made in</span><span class="sv">Akron, Ohio</span></div>
     </div>
-    <div class="bigver"><div class="num" id="verNum">7.56</div><div class="lbl">tap the version&hellip; maybe a few times</div></div>
+    <div class="bigver"><div class="num" id="verNum">7.57</div><div class="lbl">tap the version&hellip; maybe a few times</div></div>
   </div>
 
   <!-- SOFTWARE UPDATE -->
   <div class="setpage" data-page="update">
     <div class="sethdr"><button class="bk setback">&larr; Settings</button><h2>Software Update</h2></div>
-    <div class="bigver"><div class="num" id="verNum2">v7.56</div></div>
+    <div class="bigver"><div class="num" id="verNum2">v7.57</div></div>
     <div class="uptodate">This phone is up to date.</div>
     <div class="setsec">Recently shipped</div>
     <div class="setgroup" id="changelog"></div>
@@ -843,7 +843,7 @@ var dvReset=document.getElementById('dvReset');
 if(dvReset)dvReset.addEventListener('click',function(){t2('Wiping everything...');setTimeout(function(){t2('...just kidding. Nothing was deleted.');},1600);});
 
 /* ---- changelog from build log data (short, static mirror) ---- */
-var CHANGES=[['v7.56','New lock screen line: one person, a phone, and a team of AI specialists. The rotating lines got a refresh too, with seven new ones and four rewritten to match how things actually get built here.'],['v7.55','Everything fits a small phone now: Sudoku levels, Bloom presets, Pocket Shark player names, Nazca and the Layout Lab tabs no longer run off the edge. Nazca and Pocket Shark also stop clearing other apps\' offline copies. On the home screen, Pocket Shark and Two Cans move up front; Haunt Inc moves into Play and Spectra into Tools'],['v7.54','Every app now loads its fonts from this site instead of from Google, so the privacy promise is true all the way down. Plus: try turning off Sounds and Haptics'],['v7.53','Knight School and Five Letters fixed: both now work in private browsing, and Five Letters plays properly with your phone turned sideways. Gather and Pocket Shark tidied up too'],['v7.52','All Thumbs is complete: all ten chapters built, including the keystone that takes the real Game Shelf apart. Card, count and screenshot updated'],['v7.51','Two Cans joins the phone: a private messenger for two that turned into a little arcade. Pick a side and try the practice version right on the phone'],['v7.50','Take it: every card now links to the code, opens the app on its own, and saves the file. The lock screen lets itself in after a few seconds. Fresh taglines, true numbers, the Brew Deck points at the right build'],['v7.49','The Game Shelf takes over Board Games and Card Games: 24 games on one wooden shelf'],['v7.48','On a laptop the phone now shrinks to fit the window, so nothing gets cut off at the top or bottom'],['v7.47','RoughCut card updated to the current build: transitions, animated text in real fonts, and audio that works on iPhone too'],['v7.46','Card copy pass: the why, how and learned stories on 22 cards rewritten from my own notes'],['v7.45','The Brew Deck joins the phone, a homebrew training system with live recipe math'],['v7.44','RoughCut joins the phone, up front on the home screen'],['v7.43','Side Boss joins the phone, in the Tools folder'],['v7.42','Gather gets its own icon'],['v7.41','Gather joins the phone, in the Tools folder'],['v7.40','New settings icon that matches the dock'],['v7.39','Home screen: the eight I want you to see first, set the way I want them'],['v7.38','Home settles: eight apps up top, the four folders as the bottom row'],['v7.37','Spectra joins the phone, and the tools move into a Tools folder'],['v7.36','The Bloom card gets its first screenshots'],['v7.35','Home screen tidy: all four folders sit on the bottom row now'],['v7.34','Bloom joins the phone, and Pigment, Nazca and Bloom group into a Make folder'],['v7.33','Haunt Inc. joins the phone; Star Stuff moves into the games folder'],['v7.32','Calmer home screen: the tilt is gone, the grid still flows'],['v7.31','A new home screen: folders, a living grid behind the icons, and it tilts'],['v7.30','Measure Up joins the phone'],['v7.29','One look across every app: shared type, buttons and version badges'],['v7.28','App cards: tap any icon for the story, screenshots and file size'],['v7.27','Nazca, the drawing app'],['v7.16','The Upcard, SHARP and HARP'],['v7.15','Camera icon, designed by me in the icon studio'],['v7.11','My real aperture mark, from the source file'],['v7.9','Settings, Camera, themes, and things to find'],['v7.8','Lock screen'],['v7.7','Home screen reordered'],['v7.6','Findable by search engines'],['v7.5','Fresh taglines']];
+var CHANGES=[['v7.57','Trimmed the second half off one rotating line, so it is just "Free. No ads. No tracking. No catch." now.'],['v7.56','New lock screen line: one person, a phone, and a team of AI specialists. The rotating lines got a refresh too, with seven new ones and four rewritten to match how things actually get built here.'],['v7.55','Everything fits a small phone now: Sudoku levels, Bloom presets, Pocket Shark player names, Nazca and the Layout Lab tabs no longer run off the edge. Nazca and Pocket Shark also stop clearing other apps\' offline copies. On the home screen, Pocket Shark and Two Cans move up front; Haunt Inc moves into Play and Spectra into Tools'],['v7.54','Every app now loads its fonts from this site instead of from Google, so the privacy promise is true all the way down. Plus: try turning off Sounds and Haptics'],['v7.53','Knight School and Five Letters fixed: both now work in private browsing, and Five Letters plays properly with your phone turned sideways. Gather and Pocket Shark tidied up too'],['v7.52','All Thumbs is complete: all ten chapters built, including the keystone that takes the real Game Shelf apart. Card, count and screenshot updated'],['v7.51','Two Cans joins the phone: a private messenger for two that turned into a little arcade. Pick a side and try the practice version right on the phone'],['v7.50','Take it: every card now links to the code, opens the app on its own, and saves the file. The lock screen lets itself in after a few seconds. Fresh taglines, true numbers, the Brew Deck points at the right build'],['v7.49','The Game Shelf takes over Board Games and Card Games: 24 games on one wooden shelf'],['v7.48','On a laptop the phone now shrinks to fit the window, so nothing gets cut off at the top or bottom'],['v7.47','RoughCut card updated to the current build: transitions, animated text in real fonts, and audio that works on iPhone too'],['v7.46','Card copy pass: the why, how and learned stories on 22 cards rewritten from my own notes'],['v7.45','The Brew Deck joins the phone, a homebrew training system with live recipe math'],['v7.44','RoughCut joins the phone, up front on the home screen'],['v7.43','Side Boss joins the phone, in the Tools folder'],['v7.42','Gather gets its own icon'],['v7.41','Gather joins the phone, in the Tools folder'],['v7.40','New settings icon that matches the dock'],['v7.39','Home screen: the eight I want you to see first, set the way I want them'],['v7.38','Home settles: eight apps up top, the four folders as the bottom row'],['v7.37','Spectra joins the phone, and the tools move into a Tools folder'],['v7.36','The Bloom card gets its first screenshots'],['v7.35','Home screen tidy: all four folders sit on the bottom row now'],['v7.34','Bloom joins the phone, and Pigment, Nazca and Bloom group into a Make folder'],['v7.33','Haunt Inc. joins the phone; Star Stuff moves into the games folder'],['v7.32','Calmer home screen: the tilt is gone, the grid still flows'],['v7.31','A new home screen: folders, a living grid behind the icons, and it tilts'],['v7.30','Measure Up joins the phone'],['v7.29','One look across every app: shared type, buttons and version badges'],['v7.28','App cards: tap any icon for the story, screenshots and file size'],['v7.27','Nazca, the drawing app'],['v7.16','The Upcard, SHARP and HARP'],['v7.15','Camera icon, designed by me in the icon studio'],['v7.11','My real aperture mark, from the source file'],['v7.9','Settings, Camera, themes, and things to find'],['v7.8','Lock screen'],['v7.7','Home screen reordered'],['v7.6','Findable by search engines'],['v7.5','Fresh taglines']];
 var cl=document.getElementById('changelog');
 if(cl)CHANGES.forEach(function(x){var r=document.createElement('div');r.className='setrow';r.innerHTML='<span class="st">'+x[1]+'</span><span class="sv">'+x[0]+'</span>';cl.appendChild(r);});
 
@@ -988,7 +988,7 @@ var LINES=[
 ["Fine arts degree. No CS degree.","Turns out that's not a problem."],
 ["Built on a cheap phone. On purpose.","That's either inspiring or concerning."],
 ["You can play chess on this site.","You will probably lose. That's not a threat."],
-["Free. No ads. No tracking. No catch.","The catch is I'm showing off."],
+["Free. No ads. No tracking. No catch.",""],
 ["Almost no backend.","Two Cans needs one. Everything else runs on your phone."],
 ["Lighter than the photo you just texted.","And it has more games."],
 ["The balloon guy builds apps now.","Growth is nonlinear."],
