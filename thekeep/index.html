@@ -63,11 +63,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
  </div>
  <div id="stick"><div id="knob"></div></div>
  <div id="fps"></div>
- <button class="mb-ver" id="mbVer" type="button">v0.10.2 &middot; Oct 26</button>
+ <button class="mb-ver" id="mbVer" type="button">v0.11.0 &middot; Oct 27</button>
  <div id="toast"></div>
  <div id="help" class="hidden"><div class="card">
   <h1>How to play</h1>
-  <p><b>Move:</b> drag the left half of the screen.<br><b>Look:</b> drag the right half.<br><span style="color:var(--mb-dim)">Desktop: WASD + mouse, Shift to run.</span></p>
+  <p><b>Walk and steer:</b> drag on the left half. Push up to walk, tilt left or right to turn.<br><b>Look:</b> drag the right half. (Prefer stepping sideways? Turn it off in the dials, under Controls.)<br><span style="color:var(--mb-dim)">Desktop: WASD + mouse, Shift to run.</span></p>
   <p><b>Water:</b> wade in, look down and move to dive, look up to rise, level off to walk the bottom.</p>
   <p>Tap <b>☰ menu</b>, top right, any time for a new world, the dials, and the changelog.</p>
   <button class="btn go" id="bGo">walk</button>
@@ -88,7 +88,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
   <p class="fsize">The whole world is one HTML file. Right now: <b id="fsize">~140 KB</b>. Smaller than a single phone photo.</p>
   <p><b>Why I built it.</b> I build things on a phone by asking AI the right questions, the way I would direct a camera. I saw a clip of a tiny 3D world made of nothing but text and wanted to see if I could grow one that was actually alive, and keep growing it in the open instead of ever calling it done.</p>
   <p><b>What I learned.</b> How far you can get with almost nothing. One idea, a ray walking a height map, turned into characters, with a small world of animals living on top. Every version taught me one concrete thing: how to make a wall read as solid, how to keep the wolves from starving the world empty, how to make a forest look like real woods.</p>
-  <p style="color:var(--mb-dim);font-size:13px"><b style="color:var(--mb-soft)">Walk:</b> drag the left half of the screen. <b style="color:var(--mb-soft)">Look:</b> drag the right half. Wade into the water to swim. Tap ☰ menu for a new world, the dials, and the time of day. Walk under the gate arch and find the door under the tower stair.</p>
+  <p style="color:var(--mb-dim);font-size:13px"><b style="color:var(--mb-soft)">Walk:</b> drag the left half of the screen (tilt to turn). <b style="color:var(--mb-soft)">Look:</b> drag the right half. Wade into the water to swim. Tap ☰ menu for a new world, the dials, and the time of day. Walk under the gate arch and find the door under the tower stair.</p>
   <button class="btn go" id="aGo">walk the keep</button>
   <button class="btn" id="aFull" style="width:100%;margin-top:8px">see every version →</button>
  </div></div>
@@ -108,9 +108,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
 <script>
 (function(){
 'use strict';
-const VERSION='The Keep v0.10.2 · Oct 26 2026';
-const VER_SHORT='v0.10.2 · Oct 26'; // what the badge shows; bump with VERSION
+const VERSION='The Keep v0.11.0 · Oct 27 2026';
+const VER_SHORT='v0.11.0 · Oct 27'; // what the badge shows; bump with VERSION
 const CHANGELOG=[
+ ['v0.11.0 · Oct 27 2026','Easier to steer, and landscape fills the screen. The walk stick now steers: push up to walk, tilt it left or right to turn, so one thumb can take you anywhere and the other is free to look around (a new dial in Controls switches it back to stepping sideways). While you walk without touching the view, it eases back toward level, so a stray drag no longer leaves you looking at your feet. Turn the phone on its side and the world now fills the whole screen with a wider view, instead of a small square between black bars. The round donjon also reads round now: its shading turns smoothly with the curve of the tower, and the brick courses run around it instead of zig-zagging block by block.'],
  ['v0.10.2 · Oct 26 2026','Solid walls again. Every stone block was being drawn with its face at its back edge instead of its front edge. Seen from below, that shaved the top off every wall face and turned the one-block battlements into thin slanted needles; seen from above, the top of a wall was drawn as more wall face, so walls had no thickness and looked like paper. Faces now stand where the stone starts, and the tops of walls, battlements and towers show as their own lit surface, so you can see how thick they are.'],
  ['v0.10.1 · Oct 26 2026','The stair up to the wall-walk now runs straight on to the south rampart instead of stopping short and making you turn a corner at the top, and its handrail can no longer be stood on. Walk toward it from the courtyard or from the wall-walk and it guides you up or down the middle, while you stay free to look around. Also fixed: at midday, bright sunlit sand on the beach could flash teal and navy, because the brightest colors overflowed and wrapped around.'],
  ['v0.10.0 · Oct 26 2026','The people of the keep. The four keepers are drawn three times sharper and each is someone you can tell apart: Bram, the bearded guard in blue with a spear; Tilda, the guard in red with a long fair braid; Old Wick, the gatekeeper in a green hood with a white beard and a staff; and Maud, the steward in a purple robe and white cap with a ring of keys. You see them from the front, the side or the back depending on which way they are walking, and they swing into a walk as they go. The sun lights the side of them it falls on, and they cast a small shadow at their feet. After dark their lanterns light their own faces and throw a warm pool of light on the ground around them, and the gate braziers light the ground too. Walk up to a keeper and they stop, turn to face you and say hello.'],
@@ -161,7 +162,8 @@ const DIALS={
   on:[1,1,1,1,1,1],
   pop:[1,1,1,1,1,1],
   tod:14, dayMode:2,  // time of day in hours, and the day-length mode (see DAYMODES)
-  people:1            // the keepers (and the gate braziers)
+  people:1,           // the keepers (and the gate braziers)
+  stickTurn:1         // the walk stick turns you (1) or steps you sideways (0)
 };
 function growOf(c){
   const s=CR_.sp[c];
@@ -585,7 +587,7 @@ let FOG_R=172, FOG_G=196, FOG_B=222;
 const SKYBIT=1<<30; // marks sky cells in FB.col so compose leaves them out of the day/night exposure
 const fogLUT=new Float32Array(MAXT*4+16);
 for(let i=0;i<fogLUT.length;i++) fogLUT[i]=1-Math.exp(-(i/4)*FOGK);
-const RS={C:0,R:0,cellW:0,cellH:0,K:0,tanHalf:0,offX:0,offY:0,letterbox:false};
+const RS={C:0,R:0,cellW:0,cellH:0,K:0,tanHalf:0,offX:0,offY:0,letterbox:false,fovV:0.66};
 const FOV_V=0.66;
 const FB={col:null,px32:null};
 const TMP={flag:null,wflag:null,wdepth:null,wt:null,mirror:null,mflag:null};
@@ -594,7 +596,7 @@ let UW=0;
 
 function allocGrid(C,R,cw,ch){
   RS.C=C; RS.R=R; RS.cellW=cw; RS.cellH=ch;
-  RS.K=(R/2)/FOV_V;                    // focal in rows: vertical scale, device-independent
+  RS.K=(R/2)/(RS.fovV||FOV_V);         // focal in rows (portrait: fixed vertical view; landscape: set by setupGrid)
   RS.tanHalf=(C/2)/(RS.K*(ch/cw));     // horizontal half-angle follows the aspect
   FB.col=new Int32Array(C*R);
   FB.px32=new Uint32Array(C*cw*R*ch);
@@ -742,6 +744,7 @@ function renderFrame(px,py,pz,yaw,pitch){
   const flag=TMP.flag, wflag=TMP.wflag, wdepth=TMP.wdepth, wt=TMP.wt, mirror=TMP.mirror, mflag=TMP.mflag;
   const pz2=2*WATER-pz;
   const uw=pz<WATER;   // eye below the surface: no reflective surface, see through to the bed
+  const keepOn=!!DIALS.keep&&W.keepBuilt, RND2=(KEEP.SPR+KEEP.LIP+0.4)*(KEEP.SPR+KEEP.LIP+0.4);
   keeperFrame(px,py,fx,fy,rx,ry);
   for(let i=0;i<C;i++){
     const u=((i+0.5)/C-0.5)*2*tanH;
@@ -945,9 +948,16 @@ function renderFrame(px,py,pz,yaw,pitch){
         if(rowTop<ybuf){
           const lo=rowTop<0?0:rowTop; const f=fogLUT[(t*4)|0];
           if(riser){
-            const nx=sA?-stepX:0, ny=sA?0:-stepY;
+            let nx=sA?-stepX:0, ny=sA?0:-stepY;
+            let along=sA?(py+dy*tE):(px+dx*tE);
+            // the round donjon, its stair and lookout: a radial normal (smooth shading round the tower, not stepped
+            // block by block) and brick courses measured round the curve, so they run on instead of zig-zagging
+            if(keepOn){ const qx=px+dx*tE-FORT.x, qy=py+dy*tE-FORT.y, q2=qx*qx+qy*qy;
+              const inTunnel=qx>0.6&&qx<9.8&&qy>-2.3&&qy<1.3;   // the straight east tunnel and its walls stay flat stone
+              if(q2<RND2 && q2>0.25 && !inTunnel){ const qr=Math.sqrt(q2); nx=qx/qr; ny=qy/qr; if(nx*dx+ny*dy>0){ nx=-nx; ny=-ny; }
+                const nb=Math.max(6,Math.round(6.2832*qr/1.15)); along=(Math.atan2(qy,qx)/6.2832+0.5)*nb*1.15; } }   // a whole number of bricks round each ring: no seam
             const lit=0.64+0.46*Math.max(0,nx*LIT.x+ny*LIT.y);
-            const along=sA?(py+dy*tE):(px+dx*tE), tk=tE/K, fA=fogLUT[(tE*4)|0];
+            const tk=tE/K, fA=fogLUT[(tE*4)|0];
             const faceLo=rowA<0?0:rowA;
             for(let r=ybuf-1;r>=faceLo;r--){ if(flag[r]) continue;
               const z=pz+(horizon-r)*tk;
@@ -1731,9 +1741,12 @@ function simBin(px,py){
 
 // ---------------- player ----------------
 const P={x:200,y:246,z:0,gz:0,yaw:-Math.PI/2,pitch:0.08};
-const IN={f:0,s:0,run:false,keys:{}};
+const IN={f:0,s:0,turn:0,run:false,looking:0,keys:{}};
 function spawn(){ P.hand=null; P.rampDir=0; P.lastDir=0; P.x=200; P.y=246; P.yaw=-Math.PI/2; P.pitch=0.08; P.gz=Math.max(groundAt(P.x,P.y),WATER-0.6); P.z=P.gz+EYE; }
 function updatePlayer(dt){
+  // thumb-stick steering: tilt left or right to turn (deadzone, then a gentle curve up to about 140 degrees a second)
+  if(IN.turn){ const a=Math.abs(IN.turn); if(a>0.12){ const k=(a-0.12)/0.88; P.yaw+=Math.sign(IN.turn)*2.4*Math.pow(k,1.5)*dt; if(a>0.25) P.noLook=0; } }
+  P.lookT=(P.lookT||0)+dt;
   let mf=IN.f, ms=IN.s;
   const k=IN.keys;
   if(k.KeyW||k.ArrowUp) mf+=1; if(k.KeyS||k.ArrowDown) mf-=1;
@@ -1753,6 +1766,8 @@ function updatePlayer(dt){
     if(nz<bedEye)nz=bedEye; if(nz>surfEye)nz=surfEye;
     P.z=nz; P.gz=P.z-EYE;
   } else {
+    // walking with the view left alone: it eases back toward level, so a stray drag doesn't leave you staring at the ground
+    if(Math.abs(mf)>0.2 && P.lookT>1.5 && !IN.looking && !P.noAssist && terr(P.x+fx*4,P.y+fy*4)>WATER+0.3 && bottom>WATER+0.3){ P.pitch+=(0.04-P.pitch)*Math.min(1,dt*1.3); }
     // where am I in the keep? stairs get slower, steadier footing; every raised edge gets a ledge guard
     const kdx=P.x-FORT.x, kdy=P.y-FORT.y, kr=Math.hypot(kdx,kdy);
     const inKeep=!!DIALS.keep && Math.max(Math.abs(kdx),Math.abs(kdy))<KEEP.H;
@@ -1851,12 +1866,17 @@ function boot(){
     // consistent physical cell size: ~64 cells across the SHORTER side, 5-11px, times the quality governor
     let chCss=Math.min(cssW,cssH)/90*qCell; if(chCss<4)chCss=4; if(chCss>10)chCss=10;
     const cwCss=chCss/1.85;
-    const R=Math.max(48,Math.round(cssH/chCss));
-    // horizontal FOV cap (no fisheye on wide screens): pillarbox beyond it
-    const focalCols=(R/2)/FOV_V*(chCss/cwCss);
-    const TANH_MAX=0.82;
+    const dprG=Math.min(window.devicePixelRatio||1, 2);
+    const cwP=Math.max(2,Math.round(cwCss*dprG)), chP=Math.max(4,Math.round(chCss*dprG));   // cells in whole device pixels
+    const R=Math.max(48,Math.floor(Math.round(cssH*dprG)/chP));                               // so the grid really fills the screen
+    // portrait keeps the fixed vertical view; a wide screen (phone on its side) fills its width with a wider
+    // horizontal view (up to 90 degrees) and a slightly tighter vertical one, instead of a small square in black bars
+    const asp=cssW/cssH, wide=asp>1.2;
+    RS.fovV=wide?Math.min(FOV_V,Math.max(0.40,1.0/asp)):FOV_V;
+    const focalCols=(R/2)/RS.fovV*(chP/cwP);
+    const TANH_MAX=wide?1.0:0.82;
     const Cmax=Math.max(60,Math.round(2*focalCols*TANH_MAX));
-    let C=Math.round(cssW/cwCss); if(C>Cmax)C=Cmax; if(C<40)C=40;
+    let C=Math.floor(Math.round(cssW*dprG)/cwP); if(C>Cmax)C=Cmax; if(C<40)C=40;
     const cw=Math.max(2,Math.round(cwCss*dpr)), ch=Math.max(4,Math.round(chCss*dpr));
     allocGrid(C,R,cw,ch);
     const nW=Math.round(cssW*dpr), nH=Math.round(cssH*dpr);
@@ -1864,7 +1884,7 @@ function boot(){
     if(canvas.height!==nH) canvas.height=nH;
     canvas.style.width=cssW+'px'; canvas.style.height=cssH+'px';
     RS.offX=Math.floor((canvas.width-C*cw)/2); RS.offY=Math.floor((canvas.height-R*ch)/2);
-    RS.letterbox=(RS.offX>0||RS.offY>0);
+    RS.letterbox=(RS.offX>=cw||RS.offY>=ch);
     img=new ImageData(new Uint8ClampedArray(FB.px32.buffer),C*cw,R*ch);
     buildGlyphs(cw,ch);
   }
@@ -1882,7 +1902,7 @@ function boot(){
       const num=function(v,lo,hi,dflt){ v=parseFloat(v); return isFinite(v)?Math.min(hi,Math.max(lo,v)):dflt; };
       DIALS.seed=(parseInt(d.seed,10)>>>0)||DIALS.seed;
       DIALS.forest=num(d.forest,0.3,1.7,DIALS.forest); DIALS.water=num(d.water,0.3,1.7,DIALS.water);
-      DIALS.keep=d.keep?1:0; DIALS.structures=d.structures?1:0; DIALS.predators=d.predators?1:0; DIALS.people=(d.people===undefined)?1:(d.people?1:0);
+      DIALS.keep=d.keep?1:0; DIALS.structures=d.structures?1:0; DIALS.predators=d.predators?1:0; DIALS.people=(d.people===undefined)?1:(d.people?1:0); DIALS.stickTurn=(d.stickTurn===undefined)?1:(d.stickTurn?1:0);
       for(let i=0;i<6;i++){ if(d.on&&d.on.length===6) DIALS.on[i]=d.on[i]?1:0; if(d.pop&&d.pop.length===6) DIALS.pop[i]=num(d.pop[i],0.25,2,DIALS.pop[i]); }
       if(!DIALS.predators) DIALS.on[SP.WOLF]=0;
       DIALS.tod=num(d.tod,0,24,DIALS.tod)%24; const dm=parseInt(d.dayMode,10); if(dm>=0&&dm<DAYMODES.length) DIALS.dayMode=dm;
@@ -1907,7 +1927,7 @@ function boot(){
     const chk=function(id){ const el=$(id); return el?el.checked:true; };
     DIALS.seed=(parseInt(($('dSeed')||{}).value,10)>>>0)||DIALS.seed;
     DIALS.forest=num('dForest',1); DIALS.water=num('dWater',1);
-    DIALS.keep=chk('dKeep')?1:0; DIALS.structures=chk('dStruct')?1:0; DIALS.predators=chk('dPred')?1:0; DIALS.people=chk('dPeople')?1:0;
+    DIALS.keep=chk('dKeep')?1:0; DIALS.structures=chk('dStruct')?1:0; DIALS.predators=chk('dPred')?1:0; DIALS.people=chk('dPeople')?1:0; DIALS.stickTurn=chk('dStick')?1:0;
     const ids=['dBird','dRabbit','dDeer','dSquirrel','dFish','dWolf'];
     const pops=['pBird','pRabbit','pDeer','pSquirrel','pFish','pWolf'];
     for(let i=0;i<6;i++){ DIALS.on[i]=chk(ids[i])?1:0; DIALS.pop[i]=num(pops[i],1); }
@@ -1938,6 +1958,8 @@ function boot(){
       '<div class="dial-row"><label><input type="checkbox" id="dKeep"'+(DIALS.keep?' checked':'')+'> the keep</label></div>'+
       '<div class="dial-row"><label><input type="checkbox" id="dPeople"'+(DIALS.people?' checked':'')+'> people of the keep</label></div>'+
       '<div class="dial-row"><label><input type="checkbox" id="dStruct"'+(DIALS.structures?' checked':'')+'> landmarks</label></div>'+
+      '<div class="dial-sec">CONTROLS</div>'+
+      '<div class="dial-row"><label><input type="checkbox" id="dStick"'+(DIALS.stickTurn?' checked':'')+'> walk stick turns you (off: steps sideways)</label></div>'+
       '<div class="dial-sec">SKY</div>'+
       '<div class="dial-row"><label>time <b id="dTodV" style="font-family:var(--mb-mono);font-weight:600"></b></label><input id="dTod" type="range" min="0" max="23.75" step="0.25" value="'+(Math.round(DAY.tod*4)/4)+'"></div>'+
       '<div class="dial-row"><label>day length <b id="dDayV" style="font-family:var(--mb-mono);font-weight:600"></b></label><input id="dDay" type="range" min="0" max="4" step="1" value="'+DIALS.dayMode+'"></div>'+
@@ -1954,6 +1976,7 @@ function boot(){
     $('dTod').addEventListener('input',function(){ const v=parseFloat($('dTod').value); if(isFinite(v)){ DAY.tod=v; DIALS.tod=v; sunUpdate(); saveDials(); showSky(); } });
     $('dDay').addEventListener('input',function(){ const v=parseInt($('dDay').value,10); if(v>=0&&v<DAYMODES.length){ DAY.mode=v; DIALS.dayMode=v; updateDay(0); $('dTod').value=Math.round(DAY.tod*4)/4; saveDials(); showSky(); } });
     showSky();
+    $('dStick').addEventListener('change',function(){ DIALS.stickTurn=$('dStick').checked?1:0; saveDials(); });   // applies at once
     $('dGrow').addEventListener('click',function(){ readDialsFromCard(); genWorld(DIALS.seed); populate(DIALS.seed); spawn(); $('dials').classList.add('hidden'); toast('world '+DIALS.seed); });
     $('dLife').addEventListener('click',function(){ readDialsFromCard(); populate(DIALS.seed); $('dials').classList.add('hidden'); toast('life restocked'); });
     $('dClose').addEventListener('click',function(){ $('dials').classList.add('hidden'); });
@@ -1976,7 +1999,8 @@ function boot(){
   const typing=function(e){ const t=e.target; return !!(t&&t.tagName&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA')); };
   window.addEventListener('keydown',function(e){ if(typing(e)) return; IN.keys[e.code]=true; if(e.code.indexOf('Arrow')===0) e.preventDefault(); });
   window.addEventListener('keyup',function(e){ if(typing(e)) return; IN.keys[e.code]=false; });
-  window.addEventListener('blur',function(){ IN.keys={}; });
+  function dropInput(){ IN.keys={}; IN.f=0; IN.s=0; IN.turn=0; IN.run=false; IN.looking=0; for(const k in ptr) delete ptr[k]; stick.style.display='none'; }
+  window.addEventListener('blur',dropInput); document.addEventListener('visibilitychange',function(){ if(document.hidden) dropInput(); });
   // pointer: touch left = walk, touch right = look, mouse = look
   const ptr={};
   const stick=$('stick'), knob=$('knob');
@@ -1985,16 +2009,18 @@ function boot(){
     const role=(isTouch&&e.clientX<window.innerWidth/2)?'move':'look';
     ptr[e.pointerId]={role:role,x:e.clientX,y:e.clientY,ox:e.clientX,oy:e.clientY};
     canvas.setPointerCapture(e.pointerId);
+    if(role==='look'&&isTouch) IN.looking++;
     if(role==='move'){ stick.style.display='block'; stick.style.left=e.clientX+'px'; stick.style.top=e.clientY+'px'; knob.style.left='33px'; knob.style.top='33px'; }
   });
   canvas.addEventListener('pointermove',function(e){
     const p=ptr[e.pointerId]; if(!p) return;
     if(p.role==='look'){ if(e.pointerType!=='touch'&&e.buttons===0) return;
-      P.noLook=0; P.yaw+=(e.clientX-p.x)*0.0045; P.pitch=clamp(P.pitch-(e.clientY-p.y)*0.0038,-1.52,1.52); p.x=e.clientX; p.y=e.clientY; }
+      P.noLook=0; P.lookT=0; P.yaw+=(e.clientX-p.x)*0.0045; P.pitch=clamp(P.pitch-(e.clientY-p.y)*0.0038,-1.52,1.52); p.x=e.clientX; p.y=e.clientY; }
     else { let vx=(e.clientX-p.ox)/45, vy=(e.clientY-p.oy)/45; const l=Math.hypot(vx,vy); if(l>1){ vx/=l; vy/=l; }
-      IN.s=vx; IN.f=-vy; IN.run=l>0.97; knob.style.left=(33+vx*33)+'px'; knob.style.top=(33+vy*33)+'px'; }
+      if(DIALS.stickTurn){ IN.turn=vx; IN.s=0; IN.f=-vy; IN.run=(-vy)>0.95; } else { IN.turn=0; IN.s=vx; IN.f=-vy; IN.run=l>0.97; }
+      knob.style.left=(33+vx*33)+'px'; knob.style.top=(33+vy*33)+'px'; }
   });
-  function end(e){ const p=ptr[e.pointerId]; if(!p) return; if(p.role==='move'){ IN.f=0; IN.s=0; IN.run=false; stick.style.display='none'; } delete ptr[e.pointerId]; }
+  function end(e){ const p=ptr[e.pointerId]; if(!p) return; if(p.role==='move'){ IN.f=0; IN.s=0; IN.turn=0; IN.run=false; stick.style.display='none'; } else if(e.pointerType==='touch') IN.looking=Math.max(0,IN.looking-1); delete ptr[e.pointerId]; }
   canvas.addEventListener('pointerup',end); canvas.addEventListener('pointercancel',end);
   // go
   DIALS.seed=20260919; loadDials(); DAY.tzOff=tzOffsetHours(SITE.tz); DAY.tod=DIALS.tod; DAY.mode=DIALS.dayMode; updateDay(0);
