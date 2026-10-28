@@ -30,6 +30,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
 .mb-ver::after{content:'';position:absolute;inset:-9px} /* bigger thumb target, same look */
 .bar-sp{flex:1 1 auto}
 .btns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;pointer-events:auto}
+.seg{display:flex;gap:6px;margin-top:6px}.seg .btn{flex:1;padding:11px 6px;min-height:44px}.seg .btn.on{background:var(--mb-ink);color:#10151c;border-color:var(--mb-ink)}
 .btn{font:700 14px var(--mb-ui);color:var(--mb-ink);background:var(--mb-glass);border:1px solid var(--mb-line);padding:11px 16px;border-radius:13px;pointer-events:auto;cursor:pointer;backdrop-filter:blur(8px)}
 #fps{position:absolute;bottom:calc(10px + env(safe-area-inset-bottom));left:10px;font:600 10px var(--mb-mono);letter-spacing:.04em;color:var(--mb-soft);background:var(--mb-glass);border:1px solid var(--mb-line);padding:4px 9px;border-radius:999px}
 #toast{position:absolute;left:50%;top:64px;transform:translateX(-50%);background:rgba(16,21,28,.92);border:1px solid var(--mb-line);color:var(--mb-ink);padding:9px 16px;border-radius:18px;font:600 11px var(--mb-mono);opacity:0;transition:opacity .25s;white-space:normal;text-align:center;max-width:calc(100vw - 32px);width:max-content;z-index:950}
@@ -63,7 +64,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
  </div>
  <div id="stick"><div id="knob"></div></div>
  <div id="fps"></div>
- <button class="mb-ver" id="mbVer" type="button">v0.13.0 &middot; Oct 27</button>
+ <button class="mb-ver" id="mbVer" type="button">v0.14.0 &middot; Oct 28</button>
  <div id="toast"></div>
  <div id="help" class="hidden"><div class="card">
   <h1>How to play</h1>
@@ -85,7 +86,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
    <img src="05-predation.jpg" alt="a kill" loading="lazy">
    <img src="04-water.jpg" alt="the lake" loading="lazy">
   </div>
-  <p class="fsize">The whole world is one HTML file. Right now: <b id="fsize">~175 KB</b>. Smaller than a single phone photo.</p>
+  <p class="fsize">The whole world is one HTML file. Right now: <b id="fsize">~179 KB</b>. Smaller than a single phone photo.</p>
   <p><b>Why I built it.</b> I build things on a phone by asking AI the right questions, the way I would direct a camera. I saw a clip of a tiny 3D world made of nothing but text and wanted to see if I could grow one that was actually alive, and keep growing it in the open instead of ever calling it done.</p>
   <p><b>What I learned.</b> How far you can get with almost nothing. One idea, a ray walking a height map, turned into characters, with a small world of animals living on top. Every version taught me one concrete thing: how to make a wall read as solid, how to keep the wolves from starving the world empty, how to make a forest look like real woods.</p>
   <p style="color:var(--mb-dim);font-size:13px"><b style="color:var(--mb-soft)">Walk:</b> drag the left half of the screen (tilt to turn). <b style="color:var(--mb-soft)">Look:</b> drag the right half. Wade into the water to swim. Tap ☰ menu for a new world, the dials, and the time of day. Walk under the gate arch and find the door under the tower stair.</p>
@@ -95,6 +96,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
  <div id="menu" class="hidden" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);pointer-events:auto"><div class="card">
   <h1>Menu</h1>
   <button class="btn go" id="mSeed">new world</button>
+  <div class="dial-sec" style="margin-top:14px">DRAW THE WORLD AS</div>
+  <div id="mRender" class="seg"></div>
+  <p id="mRenderNote" style="margin:6px 0 2px;font-size:12px;opacity:.75"></p>
   <button class="btn" id="mDials" style="width:100%;margin-top:8px">dials</button>
   <button class="btn" id="mAbout" style="width:100%;margin-top:8px">about this build</button>
   <button class="btn" id="mLog" style="width:100%;margin-top:8px">changelog</button>
@@ -108,9 +112,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
 <script>
 (function(){
 'use strict';
-const VERSION='The Keep v0.13.0 · Oct 27 2026';
-const VER_SHORT='v0.13.0 · Oct 27'; // what the badge shows; bump with VERSION
+const VERSION='The Keep v0.14.0 · Oct 28 2026';
+const VER_SHORT='v0.14.0 · Oct 28'; // what the badge shows; bump with VERSION
 const CHANGELOG=[
+ ['v0.14.0 · Oct 28 2026','One world, more than one way to draw it. The menu has a new row, Draw the world as, with ASCII (the way it has always looked) and Pixels. Pixels shows the exact same picture with the letters taken away: every cell becomes a plain block of its color. Nothing else changes when you switch: same seed, same spot, same time of day, the keepers and animals carry on where they were. It is the first step of a bigger idea: the same world drawn the ways other 3D games draw theirs, side by side, so you can see what the letters add and what each way of drawing costs. Your choice is remembered on this device.'],
  ['v0.13.0 · Oct 27 2026','Ruins. The land outside the walls is older than the keep now. Ten kinds of ruin, each built a little differently every time: stone rings (some with fallen stones, a lintel across two, an altar, a king stone outside), broken round towers you can scramble up, lone arches, dolmens you can walk in under, cairns you can climb, pale temples with columns standing, broken and fallen, the shell of a farmstead with its chimney, long crumbling walls with windows, old wells, and tall standing stones with an avenue leading up to them. Each kind has its own weathered stone, with moss up the foot of the walls and lichen on the old stones. Walk into one and it tells you its name and how many you have found. A new ruins dial sets none, few, some or many.'],
  ['v0.12.0 · Oct 27 2026','The keepers have a day now. When they stop, they do something: the guards shade their eyes and look out over the wall, Old Wick leans on his staff and watches the road, and Maud checks the hall door before her rounds. Each keeper has new things to say for morning, afternoon, evening and night, and a few for when you catch them in the middle of something. At night Tilda walks down the rampart stair to the guard room and sleeps there with her helmet off and her lantern turned low; Bram keeps the wall alone till morning. A keeper coming the other way steps aside to let you pass.'],
  ['v0.11.0 · Oct 27 2026','Easier to steer, and landscape fills the screen. The walk stick now steers: push up to walk, tilt it left or right to turn, so one thumb can take you anywhere and the other is free to look around (a new dial in Controls switches it back to stepping sideways). While you walk without touching the view, it eases back toward level, so a stray drag no longer leaves you looking at your feet. Turn the phone on its side and the world now fills the whole screen with a wider view, instead of a small square between black bars. The round donjon also reads round now: its shading turns smoothly with the curve of the tower, and the brick courses run around it instead of zig-zagging block by block.'],
@@ -165,8 +170,14 @@ const DIALS={
   pop:[1,1,1,1,1,1],
   tod:14, dayMode:2,  // time of day in hours, and the day-length mode (see DAYMODES)
   people:1,           // the keepers (and the gate braziers)
-  stickTurn:1         // the walk stick turns you (1) or steps you sideways (0)
+  stickTurn:1,        // the walk stick turns you (1) or steps you sideways (0)
+  render:0            // how the same world is drawn: an index into RENDERS
 };
+// one world, many ways to draw it. Only the last step changes: every mode reads the same FB.col the raycaster fills.
+const RENDERS=[
+  {id:'ascii',  name:'ASCII',  note:'Every cell is a letter: the brighter the light, the denser the letter'},
+  {id:'pixels', name:'Pixels', note:'The same cells as plain blocks of color, no letters, so each block is letter-shaped: taller than it is wide'}
+];
 function growOf(c){
   const s=CR_.sp[c];
   if(s===SP.RABBIT||s===SP.DEER||s===SP.WOLF) return 0.52+0.48*Math.min(1,CR_.age[c]);
@@ -1312,6 +1323,7 @@ function compose(){
   const C=RS.C,R=RS.R,cw=RS.cellW,ch=RS.cellH,PW=C*cw;
   const px32=FB.px32, fb=FB.col, G=GLY.masks, nG=GLY.n;
   const uw=UW, xr=DAY.tr, xg=DAY.tg, xb=DAY.tb, tint=(xr!==1||xg!==1||xb!==1);
+  const solid=(RENDERS[DIALS.render|0]||RENDERS[0]).id==='pixels';
   for(let j=0;j<R;j++){
     let utR=0,utG=0,utB=0,um=0;
     if(uw>0){ const sgl=1-j/R; utR=12+(46-12)*sgl; utG=46+(118-46)*sgl; utB=72+(150-72)*sgl; um=uw*0.6; }
@@ -1320,10 +1332,12 @@ function compose(){
       if(um>0){ r+=(utR-r)*um; g+=(utG-g)*um; b+=(utB-b)*um; }
       const lum=(r*77+g*150+b*29)>>8;   // the glyph comes from the untinted light, so night keeps its texture
       if(tint&&!(c&SKYBIT)){ r*=xr; g*=xg; b*=xb; if(r>255)r=255; if(g>255)g=255; if(b>255)b=255; }
-      const mask=G[(lum*nG)>>8];
       const fg=(0xff000000|(b<<16)|(g<<8)|r)>>>0;
+      let base=j*ch*PW+i*cw;
+      if(solid){ for(let y=0;y<ch;y++){ const o=base+y*PW; for(let x=0;x<cw;x++) px32[o+x]=fg; } continue; }   // Pixels: the cell's color, nothing else
+      const mask=G[(lum*nG)>>8];
       const bg=(0xff000000|(((b*0.45)|0)<<16)|(((g*0.45)|0)<<8)|((r*0.45)|0))>>>0;
-      let base=j*ch*PW+i*cw, mi=0;
+      let mi=0;
       for(let y=0;y<ch;y++){ const o=base+y*PW; for(let x=0;x<cw;x++){ px32[o+x]=mask[mi++]?fg:bg; } }
     }
   }
@@ -2234,6 +2248,7 @@ function boot(){
       DIALS.seed=(parseInt(d.seed,10)>>>0)||DIALS.seed;
       DIALS.forest=num(d.forest,0.3,1.7,DIALS.forest); DIALS.water=num(d.water,0.3,1.7,DIALS.water);
       DIALS.keep=d.keep?1:0; DIALS.ruins=(d.ruins===undefined)?(d.structures===0?0:2):Math.round(num(d.ruins,0,3,2)); DIALS.predators=d.predators?1:0; DIALS.people=(d.people===undefined)?1:(d.people?1:0); DIALS.stickTurn=(d.stickTurn===undefined)?1:(d.stickTurn?1:0);
+      { const rv=parseInt(d.render,10); DIALS.render=(rv>=0&&rv<RENDERS.length)?rv:0; }
       for(let i=0;i<6;i++){ if(d.on&&d.on.length===6) DIALS.on[i]=d.on[i]?1:0; if(d.pop&&d.pop.length===6) DIALS.pop[i]=num(d.pop[i],0.25,2,DIALS.pop[i]); }
       if(!DIALS.predators) DIALS.on[SP.WOLF]=0;
       DIALS.tod=num(d.tod,0,24,DIALS.tod)%24; const dm=parseInt(d.dayMode,10); if(dm>=0&&dm<DAYMODES.length) DIALS.dayMode=dm;
@@ -2316,7 +2331,18 @@ function boot(){
   function openLog(){ closeAll(); const c=$('logCard'); c.innerHTML='<h1>Changelog</h1>'+CHANGELOG.map(function(e){ return '<p><b>'+e[0]+'</b><br>'+e[1]+'</p>'; }).join('')+'<button class="btn go" id="bLogClose">close</button>'; $('log').classList.remove('hidden'); $('bLogClose').addEventListener('click',function(){ $('log').classList.add('hidden'); }); }
   // top-right menu: one button that reaches everything, so nothing is off-screen in portrait
   const closeMenu=function(){ $('menu').classList.add('hidden'); };
-  $('bMenu').addEventListener('click',function(){ closeAll(); $('menu').classList.remove('hidden'); });
+  function paintRenderSeg(){
+    const box=$('mRender'); if(!box) return;
+    box.innerHTML=RENDERS.map(function(m,i){ return '<button class="btn'+(i===(DIALS.render|0)?' on':'')+'" data-r="'+i+'" aria-pressed="'+(i===(DIALS.render|0))+'">'+m.name+'</button>'; }).join('');
+    $('mRenderNote').textContent=(RENDERS[DIALS.render|0]||RENDERS[0]).note+'. Switching keeps you right where you are.';
+  }
+  $('mRender').addEventListener('click',function(e){
+    const b=e.target.closest?e.target.closest('button[data-r]'):null; if(!b) return;
+    const i=parseInt(b.getAttribute('data-r'),10); if(!(i>=0&&i<RENDERS.length)) return;
+    if(i===(DIALS.render|0)){ closeMenu(); return; }
+    DIALS.render=i; saveDials(); paintRenderSeg(); closeMenu(); toast('Drawn as '+RENDERS[i].name,1800);
+  });
+  $('bMenu').addEventListener('click',function(){ closeAll(); paintRenderSeg(); $('menu').classList.remove('hidden'); });
   $('mClose').addEventListener('click',closeMenu);
   $('mSeed').addEventListener('click',function(){ closeMenu(); openSeed(); });
   $('mDials').addEventListener('click',function(){ closeMenu(); openDials(); });
@@ -2390,7 +2416,7 @@ function boot(){
   requestAnimationFrame(frame);
 }
 
-if(IS_NODE){ module.exports={genWorld,allocGrid,buildGlyphs,renderFrame,compose,spawn,populate,tick,ecology,simBin,updatePlayer,W,RS,FB,P,IN,CR_,SP,SPP,MASKS,RESERVE,RAMP,N,WATER,EYE,terr,groundAt,DIALS,growOf,isAdult,addCreature,WALLS,buildWalls,nearestWall,allWallHits,wallBlocked,setSkyTime:function(t){skyTime=t;},setUW:function(v){UW=v;},DAY,SUN,MOON,SKY,DAYMODES,sunAltAz,sunUpdate,updateDay,relightAll,relightStep,RELIGHT,dayDate,fmtTod,setTod:function(h){DAY.tod=h;sunUpdate();},floorAt,KPATHS,KEEP,FORT,tickKeeper,KMASK,KL,keeperFrame,greet,GREETT,setGreet:function(f){greetHook=f;}}; }
+if(IS_NODE){ module.exports={genWorld,allocGrid,buildGlyphs,renderFrame,compose,spawn,populate,tick,ecology,simBin,updatePlayer,W,RS,FB,P,IN,CR_,SP,SPP,MASKS,RESERVE,RAMP,N,WATER,EYE,terr,groundAt,DIALS,growOf,isAdult,addCreature,WALLS,buildWalls,nearestWall,allWallHits,wallBlocked,setSkyTime:function(t){skyTime=t;},setUW:function(v){UW=v;},DAY,SUN,MOON,SKY,DAYMODES,sunAltAz,sunUpdate,updateDay,relightAll,relightStep,RELIGHT,dayDate,fmtTod,setTod:function(h){DAY.tod=h;sunUpdate();},floorAt,KPATHS,KEEP,FORT,tickKeeper,KMASK,KL,keeperFrame,greet,GREETT,setGreet:function(f){greetHook=f;},RENDERS}; }
 else boot();
 })();
 </script>
