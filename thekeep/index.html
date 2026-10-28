@@ -32,7 +32,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
 .btns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;pointer-events:auto}
 .seg{display:flex;gap:6px;margin-top:6px}.seg .btn{flex:1;padding:11px 6px;min-height:44px}.seg .btn.on{background:var(--mb-ink);color:#10151c;border-color:var(--mb-ink)}
 .btn{font:700 14px var(--mb-ui);color:var(--mb-ink);background:var(--mb-glass);border:1px solid var(--mb-line);padding:11px 16px;border-radius:13px;pointer-events:auto;cursor:pointer;backdrop-filter:blur(8px)}
-#fps{position:absolute;bottom:calc(10px + env(safe-area-inset-bottom));left:10px;font:600 10px var(--mb-mono);letter-spacing:.04em;color:var(--mb-soft);background:var(--mb-glass);border:1px solid var(--mb-line);padding:4px 9px;border-radius:999px}
+#fps{position:absolute;bottom:calc(10px + env(safe-area-inset-bottom));left:10px;max-width:calc(100% - 172px);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font:600 10px var(--mb-mono);letter-spacing:.04em;color:var(--mb-soft);background:var(--mb-glass);border:1px solid var(--mb-line);padding:4px 9px;border-radius:999px}
 #toast{position:absolute;left:50%;top:64px;transform:translateX(-50%);background:rgba(16,21,28,.92);border:1px solid var(--mb-line);color:var(--mb-ink);padding:9px 16px;border-radius:18px;font:600 11px var(--mb-mono);opacity:0;transition:opacity .25s;white-space:normal;text-align:center;max-width:calc(100vw - 32px);width:max-content;z-index:950}
 #help{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);pointer-events:auto}
 #help.hidden,#log.hidden,#seed.hidden,#dials.hidden,#menu.hidden,#about.hidden{display:none!important}
@@ -64,7 +64,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
  </div>
  <div id="stick"><div id="knob"></div></div>
  <div id="fps"></div>
- <button class="mb-ver" id="mbVer" type="button">v0.16.0 &middot; Oct 28</button>
+ <button class="mb-ver" id="mbVer" type="button">v0.16.1 &middot; Oct 28</button>
  <div id="toast"></div>
  <div id="help" class="hidden"><div class="card">
   <h1>How to play</h1>
@@ -86,7 +86,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
    <img src="05-predation.jpg" alt="a kill" loading="lazy">
    <img src="04-water.jpg" alt="the lake" loading="lazy">
   </div>
-  <p class="fsize">The whole world is one HTML file. Right now: <b id="fsize">~184 KB</b>. Smaller than a single phone photo.</p>
+  <p class="fsize">The whole world is one HTML file. Right now: <b id="fsize">~185 KB</b>. Smaller than a single phone photo.</p>
   <p><b>Why I built it.</b> I build things on a phone by asking AI the right questions, the way I would direct a camera. I saw a clip of a tiny 3D world made of nothing but text and wanted to see if I could grow one that was actually alive, and keep growing it in the open instead of ever calling it done.</p>
   <p><b>What I learned.</b> How far you can get with almost nothing. One idea, a ray walking a height map, turned into characters, with a small world of animals living on top. Every version taught me one concrete thing: how to make a wall read as solid, how to keep the wolves from starving the world empty, how to make a forest look like real woods.</p>
   <p style="color:var(--mb-dim);font-size:13px"><b style="color:var(--mb-soft)">Walk:</b> drag the left half of the screen (tilt to turn). <b style="color:var(--mb-soft)">Look:</b> drag the right half. Wade into the water to swim. Tap ☰ menu for a new world, the dials, and the time of day. Walk under the gate arch and find the door under the tower stair.</p>
@@ -112,9 +112,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
 <script>
 (function(){
 'use strict';
-const VERSION='The Keep v0.16.0 · Oct 28 2026';
-const VER_SHORT='v0.16.0 · Oct 28'; // what the badge shows; bump with VERSION
+const VERSION='The Keep v0.16.1 · Oct 28 2026';
+const VER_SHORT='v0.16.1 · Oct 28'; // what the badge shows; bump with VERSION
 const CHANGELOG=[
+ ['v0.16.1 · Oct 28 2026','From the first phone test (59 fps in ASCII, Mesh and Voxels, 53 in Pixels): a straight line ran across the clouds in Mesh and Voxels where the cloud pattern met its own edge; the clouds now wrap around without a seam. On a narrow phone the corner readout no longer runs under the version badge.'],
  ['v0.16.0 · Oct 28 2026','Voxels. A fourth way to draw the same world, the way Minecraft draws its worlds: every cell becomes a column of 1 m blocks, its height rounded to a whole block. Grass blocks with dirt sides, sand at the shore, rock on the steep slopes, snow on the peaks, the keep and every ruin in its own stone bricks, and trees as trunks and blocky crowns built to the same shapes. Corners in the shade of a taller block darken, the way block games do it. Same seed, same spot, same sun, shadows, keepers and lantern light. Like Mesh, Voxels downloads only when you pick it, and only one of the two is kept in memory at a time.'],
  ['v0.15.0 · Oct 28 2026','Mesh. A third way to draw the same world, the way most 3D games draw theirs: the ground, the stone, the trees and the water are built out of triangles and drawn by the phone\'s graphics chip. Same seed, same spot, same sun and shadows, same keepers and animals, who stand up as flat cards that turn to face you. At night the lanterns and braziers throw real pools of light. Mesh is its own file and only downloads the first time you pick it, so the world still opens as fast as before. If a phone can\'t do it, the world goes back to ASCII and tells you.'],
  ['v0.14.0 · Oct 28 2026','One world, more than one way to draw it. The menu has a new row, Draw the world as, with ASCII (the way it has always looked) and Pixels. Pixels shows the exact same picture with the letters taken away: every cell becomes a plain block of its color. Nothing else changes when you switch: same seed, same spot, same time of day, the keepers and animals carry on where they were. It is the first step of a bigger idea: the same world drawn the ways other 3D games draw theirs, side by side, so you can see what the letters add and what each way of drawing costs. Your choice is remembered on this device.'],
@@ -2441,7 +2442,7 @@ function boot(){
     const card=anyCard();
     const glm=glCur(), G=glm&&GLR[glm.id], GR=G&&G.r&&G.r.ok?G.r:null, meshOn=!!GR;
     if(now-hudT>500){ hudT=now;   // the corner readout: twice a second, clock included, card open or not
-      if(fN>0&&fT>0){ const ms=fAcc/fN; fpsTxt=Math.round(fN/fT)+' fps'+(meshOn?'':' · '+ms.toFixed(1)+' ms');
+      if(fN>0&&fT>0){ const ms=fAcc/fN; fpsTxt=Math.round(fN/fT)+' fps'+(meshOn||window.innerWidth<560?'':' · '+ms.toFixed(1)+' ms');   // a narrow screen keeps the clock clear of the version badge
         if(GR&&!card&&now-govT>4000&&now-G.t0>5000){ const fps=fN/fT;
           if(fps<24&&GR.scale>0.5){ GR.setScale(GR.scale*0.85); govT=now; } else if(fps>45&&GR.scale<1){ GR.setScale(GR.scale/0.85); govT=now; } }
         if(!meshOn&&!card&&now-govT>4000){

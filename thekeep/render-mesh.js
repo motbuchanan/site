@@ -1,4 +1,4 @@
-// The Keep · render-mesh.js · v0.15.0 · Oct 28 2026
+// The Keep · render-mesh.js · v0.16.1 · Oct 28 2026
 // The same world drawn the way most 3D games draw theirs: triangles on the graphics chip (WebGL2).
 // Nothing here makes the world. It reads the exact arrays the ASCII raycaster reads (heights, stone,
 // slabs, trees, the lit colors and shadows) and turns them into meshes. Loaded only when Mesh is picked.
@@ -308,6 +308,15 @@ function create(A){
   const vaoEmpty=gl.createVertexArray();
 
   // ---- build the static meshes from the world ----
+  // the cloud field does not repeat on its own, and a smooth texture shows that edge as a straight line across the sky;
+  // blend it with copies shifted half a tile so the edges meet, then restore the contrast the blend took out
+  function seamless(src){ const S=256, out=new Uint8Array(S*S); let mean=0; for(let i=0;i<S*S;i++) mean+=src[i]; mean/=S*S;
+    for(let y=0;y<S;y++){ const wy=Math.pow(Math.sin(Math.PI*y/S),2), y2=(y+128)&255;
+      for(let x=0;x<S;x++){ const wx=Math.pow(Math.sin(Math.PI*x/S),2), x2=(x+128)&255;
+        const a=wx*wy, b=(1-wx)*wy, c=wx*(1-wy), d=(1-wx)*(1-wy);
+        const v=a*src[y*S+x]+b*src[y*S+x2]+c*src[y2*S+x]+d*src[y2*S+x2], k=1/Math.sqrt(a*a+b*b+c*c+d*d);
+        out[y*S+x]=Math.max(0,Math.min(255,Math.round(mean+(v-mean)*k))); } }
+    return out; }
   let sig='', relPass=-1, relRow=0;
   function worldSig(){ const D=A.DIALS; return W.seed+'|'+D.keep+'|'+D.forest+'|'+D.water+'|'+D.ruins+'|'+W.ruins.length+'|'+W.keepBuilt; }
   function buildStone(){
@@ -354,8 +363,8 @@ function create(A){
       chunkMin[cy*CH+cx]=Math.min(lo,A.WATER); chunkMax[cy*CH+cx]=hi+2; } }
   function rebuild(){
     buildTerrain(); buildStone(); buildTrees();
-    gl.bindTexture(gl.TEXTURE_2D,texCl); gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,256,256,gl.RED,gl.UNSIGNED_BYTE,W.cloud);
-    gl.bindTexture(gl.TEXTURE_2D,texCl2); gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,256,256,gl.RED,gl.UNSIGNED_BYTE,W.cloud2);
+    gl.bindTexture(gl.TEXTURE_2D,texCl); gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,256,256,gl.RED,gl.UNSIGNED_BYTE,seamless(W.cloud));
+    gl.bindTexture(gl.TEXTURE_2D,texCl2); gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,256,256,gl.RED,gl.UNSIGNED_BYTE,seamless(W.cloud2));
     uploadRows(0,N); relPass=A.RELIGHT.passes; relRow=A.RELIGHT.row; sig=worldSig(); }
   // the sun moves: the core re-lights a couple of rows of the map each frame; send those rows to the chip as they change
   function syncLight(){ const RL=A.RELIGHT;
