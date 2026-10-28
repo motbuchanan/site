@@ -64,7 +64,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
  </div>
  <div id="stick"><div id="knob"></div></div>
  <div id="fps"></div>
- <button class="mb-ver" id="mbVer" type="button">v0.15.0 &middot; Oct 28</button>
+ <button class="mb-ver" id="mbVer" type="button">v0.16.0 &middot; Oct 28</button>
  <div id="toast"></div>
  <div id="help" class="hidden"><div class="card">
   <h1>How to play</h1>
@@ -86,7 +86,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
    <img src="05-predation.jpg" alt="a kill" loading="lazy">
    <img src="04-water.jpg" alt="the lake" loading="lazy">
   </div>
-  <p class="fsize">The whole world is one HTML file. Right now: <b id="fsize">~183 KB</b>. Smaller than a single phone photo.</p>
+  <p class="fsize">The whole world is one HTML file. Right now: <b id="fsize">~184 KB</b>. Smaller than a single phone photo.</p>
   <p><b>Why I built it.</b> I build things on a phone by asking AI the right questions, the way I would direct a camera. I saw a clip of a tiny 3D world made of nothing but text and wanted to see if I could grow one that was actually alive, and keep growing it in the open instead of ever calling it done.</p>
   <p><b>What I learned.</b> How far you can get with almost nothing. One idea, a ray walking a height map, turned into characters, with a small world of animals living on top. Every version taught me one concrete thing: how to make a wall read as solid, how to keep the wolves from starving the world empty, how to make a forest look like real woods.</p>
   <p style="color:var(--mb-dim);font-size:13px"><b style="color:var(--mb-soft)">Walk:</b> drag the left half of the screen (tilt to turn). <b style="color:var(--mb-soft)">Look:</b> drag the right half. Wade into the water to swim. Tap ☰ menu for a new world, the dials, and the time of day. Walk under the gate arch and find the door under the tower stair.</p>
@@ -112,9 +112,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
 <script>
 (function(){
 'use strict';
-const VERSION='The Keep v0.15.0 · Oct 28 2026';
-const VER_SHORT='v0.15.0 · Oct 28'; // what the badge shows; bump with VERSION
+const VERSION='The Keep v0.16.0 · Oct 28 2026';
+const VER_SHORT='v0.16.0 · Oct 28'; // what the badge shows; bump with VERSION
 const CHANGELOG=[
+ ['v0.16.0 · Oct 28 2026','Voxels. A fourth way to draw the same world, the way Minecraft draws its worlds: every cell becomes a column of 1 m blocks, its height rounded to a whole block. Grass blocks with dirt sides, sand at the shore, rock on the steep slopes, snow on the peaks, the keep and every ruin in its own stone bricks, and trees as trunks and blocky crowns built to the same shapes. Corners in the shade of a taller block darken, the way block games do it. Same seed, same spot, same sun, shadows, keepers and lantern light. Like Mesh, Voxels downloads only when you pick it, and only one of the two is kept in memory at a time.'],
  ['v0.15.0 · Oct 28 2026','Mesh. A third way to draw the same world, the way most 3D games draw theirs: the ground, the stone, the trees and the water are built out of triangles and drawn by the phone\'s graphics chip. Same seed, same spot, same sun and shadows, same keepers and animals, who stand up as flat cards that turn to face you. At night the lanterns and braziers throw real pools of light. Mesh is its own file and only downloads the first time you pick it, so the world still opens as fast as before. If a phone can\'t do it, the world goes back to ASCII and tells you.'],
  ['v0.14.0 · Oct 28 2026','One world, more than one way to draw it. The menu has a new row, Draw the world as, with ASCII (the way it has always looked) and Pixels. Pixels shows the exact same picture with the letters taken away: every cell becomes a plain block of its color. Nothing else changes when you switch: same seed, same spot, same time of day, the keepers and animals carry on where they were. It is the first step of a bigger idea: the same world drawn the ways other 3D games draw theirs, side by side, so you can see what the letters add and what each way of drawing costs. Your choice is remembered on this device.'],
  ['v0.13.0 · Oct 27 2026','Ruins. The land outside the walls is older than the keep now. Ten kinds of ruin, each built a little differently every time: stone rings (some with fallen stones, a lintel across two, an altar, a king stone outside), broken round towers you can scramble up, lone arches, dolmens you can walk in under, cairns you can climb, pale temples with columns standing, broken and fallen, the shell of a farmstead with its chimney, long crumbling walls with windows, old wells, and tall standing stones with an avenue leading up to them. Each kind has its own weathered stone, with moss up the foot of the walls and lichen on the old stones. Walk into one and it tells you its name and how many you have found. A new ruins dial sets none, few, some or many.'],
@@ -178,7 +179,8 @@ const DIALS={
 const RENDERS=[
   {id:'ascii',  name:'ASCII',  note:'Every cell is a letter: the brighter the light, the denser the letter'},
   {id:'pixels', name:'Pixels', note:'The same cells as plain blocks of color, no letters, so each block is letter-shaped: taller than it is wide'},
-  {id:'mesh',   name:'Mesh',   note:'The same world built from triangles on the graphics chip, the way most 3D games are drawn', file:'render-mesh.js'}
+  {id:'mesh',   name:'Mesh',   note:'The same world built from triangles on the graphics chip, the way most 3D games are drawn', file:'render-mesh.js', glob:'KeepMesh'},
+  {id:'voxel',  name:'Voxels', note:'The same world built from 1 m blocks, the way Minecraft draws its worlds: every height rounded to a whole block', file:'render-voxel.js', glob:'KeepVoxel'}
 ];
 function growOf(c){
   const s=CR_.sp[c];
@@ -2333,34 +2335,41 @@ function boot(){
   function openLog(){ closeAll(); const c=$('logCard'); c.innerHTML='<h1>Changelog</h1>'+CHANGELOG.map(function(e){ return '<p><b>'+e[0]+'</b><br>'+e[1]+'</p>'; }).join('')+'<button class="btn go" id="bLogClose">close</button>'; $('log').classList.remove('hidden'); $('bLogClose').addEventListener('click',function(){ $('log').classList.add('hidden'); }); }
   // top-right menu: one button that reaches everything, so nothing is off-screen in portrait
   const closeMenu=function(){ $('menu').classList.add('hidden'); };
-  // ---- Mesh: a second renderer in its own file, fetched only when someone picks it ----
-  let MESH=null, meshLoading=false, meshT0=0;
-  const meshWanted=function(){ return (RENDERS[DIALS.render|0]||RENDERS[0]).id==='mesh'; };
-  const meshApi={ N:N, W:W, WATER:WATER, CLOUDH:CLOUDH, DAY:DAY, SUN:SUN, MOON:MOON, SKY:SKY, RS:RS, RMAT:RMAT, CR_:CR_, SP:SP, SPP:SPP,
+  // ---- the 3D renderers (Mesh, Voxels): each in its own file, fetched only when someone picks it ----
+  const GLR={};   // id -> {r: the renderer, loading, lost, t0}
+  const glCur=function(){ const m=RENDERS[DIALS.render|0]||RENDERS[0]; return m.file?m:null; };
+  const glApi={ N:N, W:W, WATER:WATER, CLOUDH:CLOUDH, DAY:DAY, SUN:SUN, MOON:MOON, SKY:SKY, RS:RS, RMAT:RMAT, CR_:CR_, SP:SP, SPP:SPP,
     MASKS:MASKS, KMASK:KMASK, P:P, DIALS:DIALS, FORT:FORT, KEEP:KEEP, RELIGHT:RELIGHT, hash2:hash2, growOf:growOf, keeperPoseFrame:keeperPoseFrame,
     fog:function(){ return [FOG_R,FOG_G,FOG_B]; }, uw:function(){ return UW; }, skyTime:function(){ return skyTime; } };
-  let meshLost=0;
-  function meshFail(why){
-    if(MESH){ try{ MESH.destroy(); }catch(e){} MESH=null; }
-    // the phone took the graphics chip back (another app, a long sleep): keep the choice and build the Mesh again
-    if(why==='lost'&&meshLost<3){ meshLost++; if(meshWanted()) setTimeout(loadMesh,700); return; }
-    if(meshWanted()){ DIALS.render=0; saveDials(); }
-    toast(why==='no WebGL2'?"This device can't draw Mesh (it needs WebGL2). Back to ASCII.":"Mesh couldn't start here. Back to ASCII.",3800);
+  const glSlot=function(id){ return GLR[id]||(GLR[id]={r:null,loading:false,lost:0,t0:0}); };
+  function glDrop(id){ const g=GLR[id]; if(!g||!g.r) return; g.r.onLost=null; try{ g.r.destroy(); }catch(e){} g.r=null; }
+  function glFail(m,why){
+    try{ console.warn(m.name+': '+why); }catch(e){}
+    glDrop(m.id); const g=glSlot(m.id), cur=glCur();
+    // the phone took the graphics chip back (another app, a long sleep): keep the choice and build it again
+    if(why==='lost'&&g.lost<3){ g.lost++; if(cur&&cur.id===m.id) setTimeout(function(){ loadGL(m); },700); return; }
+    if(cur&&cur.id===m.id){ DIALS.render=0; saveDials(); }
+    toast(why==='no WebGL2'?"This device can't draw "+m.name+" (it needs WebGL2). Back to ASCII.":m.name+" couldn't start here. Back to ASCII.",3800);
   }
-  function loadMesh(){
-    if(MESH||meshLoading) return;
-    if(window.KeepMesh){ startMesh(); return; }
-    meshLoading=true; toast('Building the Mesh',2400);
-    const sc=document.createElement('script'); sc.src='render-mesh.js?v='+encodeURIComponent(VER_SHORT);
-    sc.onload=function(){ meshLoading=false; startMesh(); };
-    sc.onerror=function(){ meshLoading=false; meshFail('load'); };
+  function loadGL(m){
+    const g=glSlot(m.id); if(g.r||g.loading) return;
+    // one 3D renderer at a time: the other one's memory goes back to the phone
+    for(const k in GLR) if(k!==m.id) glDrop(k);
+    if(window[m.glob]){ startGL(m); return; }
+    g.loading=true; toast('Building the '+m.name,2400);
+    const sc=document.createElement('script'); sc.src=m.file+'?v='+encodeURIComponent(VER_SHORT);
+    sc.onload=function(){ g.loading=false; startGL(m); };
+    sc.onerror=function(){ g.loading=false; glFail(m,'load'); };
     document.head.appendChild(sc);
   }
-  function startMesh(){
-    try{ MESH=window.KeepMesh.create(meshApi); }catch(e){ MESH=null; }
-    if(!MESH||!MESH.ok){ const why=MESH&&MESH.error; MESH=null; meshFail(why); return; }
-    MESH.onLost=function(){ meshFail('lost'); }; meshT0=performance.now();
-    if(meshWanted()) toast('Drawn as Mesh',1800);
+  function startGL(m){
+    const c0=glCur(); if(!c0||c0.id!==m.id) return;   // picked something else while it was downloading
+    const g=glSlot(m.id); let r=null;
+    try{ r=window[m.glob].create(glApi); }catch(e){ r=null; }
+    if(!r||!r.ok){ glFail(m,r&&r.error); return; }
+    g.r=r; r.onLost=function(){ glFail(m,'lost'); }; g.t0=performance.now();
+    setTimeout(function(){ if(g.r===r) g.lost=0; },30000);   // a renderer that has run a while earns its retries back
+    const cur=glCur(); if(cur&&cur.id===m.id) toast('Drawn as '+m.name,1800);
   }
   function paintRenderSeg(){
     const box=$('mRender'); if(!box) return;
@@ -2372,7 +2381,8 @@ function boot(){
     const i=parseInt(b.getAttribute('data-r'),10); if(!(i>=0&&i<RENDERS.length)) return;
     if(i===(DIALS.render|0)){ closeMenu(); return; }
     DIALS.render=i; saveDials(); paintRenderSeg(); closeMenu();
-    if(RENDERS[i].id==='mesh'&&!(MESH&&MESH.ok)) loadMesh(); else toast('Drawn as '+RENDERS[i].name,1800);
+    const m=RENDERS[i]; if(!m.file){ for(const k in GLR) glDrop(k); }   // back to letters or pixels: hand the 3D memory back
+    if(m.file&&!(GLR[m.id]&&GLR[m.id].r&&GLR[m.id].r.ok)) loadGL(m); else toast('Drawn as '+m.name,1800);
   });
   $('bMenu').addEventListener('click',function(){ closeAll(); paintRenderSeg(); $('menu').classList.remove('hidden'); });
   $('mClose').addEventListener('click',closeMenu);
@@ -2429,11 +2439,11 @@ function boot(){
     ecoAcc+=dt; if(ecoAcc>=ECOSTEP){ ecology(); ecoAcc-=ECOSTEP; }
     relightStep(2);   // the sun moves: re-light two rows of the map per frame
     const card=anyCard();
-    const meshOn=meshWanted()&&!!MESH&&MESH.ok;
+    const glm=glCur(), G=glm&&GLR[glm.id], GR=G&&G.r&&G.r.ok?G.r:null, meshOn=!!GR;
     if(now-hudT>500){ hudT=now;   // the corner readout: twice a second, clock included, card open or not
       if(fN>0&&fT>0){ const ms=fAcc/fN; fpsTxt=Math.round(fN/fT)+' fps'+(meshOn?'':' · '+ms.toFixed(1)+' ms');
-        if(meshOn&&MESH&&!card&&now-govT>4000&&now-meshT0>5000){ const fps=fN/fT;
-          if(fps<24&&MESH.scale>0.5){ MESH.setScale(MESH.scale*0.85); govT=now; } else if(fps>45&&MESH.scale<1){ MESH.setScale(MESH.scale/0.85); govT=now; } }
+        if(GR&&!card&&now-govT>4000&&now-G.t0>5000){ const fps=fN/fT;
+          if(fps<24&&GR.scale>0.5){ GR.setScale(GR.scale*0.85); govT=now; } else if(fps>45&&GR.scale<1){ GR.setScale(GR.scale/0.85); govT=now; } }
         if(!meshOn&&!card&&now-govT>4000){
           if(ms>30 && qCell<1.9){ qCell=Math.min(1.9,qCell*1.2); govT=now; setupGrid(); }
           else if(ms<9 && qCell>1.0){ qCell=Math.max(1.0,qCell/1.15); govT=now; setupGrid(); } }
@@ -2442,9 +2452,9 @@ function boot(){
       if(skyHud&&!$('dials').classList.contains('hidden')) skyHud(); }
     if(card){ if(now-slowAt<250) return; slowAt=now; }   // a card is open: redraw 4 times a second, save the battery
     const t0=performance.now();
-    if(meshOn){ if(!MESH.shown) MESH.show(true); MESH.draw(); }
+    for(const k in GLR){ const r=GLR[k].r; if(r&&r.shown&&r!==GR) r.show(false); }
+    if(GR){ if(!GR.shown) GR.show(true); GR.draw(); }
     else {
-      if(MESH&&MESH.shown) MESH.show(false);
       renderFrame(P.x,P.y,P.z,P.yaw,P.pitch);
       compose();
       if(RS.letterbox){ ctx.fillStyle='#000'; ctx.fillRect(0,0,canvas.width,canvas.height); ctx.putImageData(img,RS.offX,RS.offY); }
@@ -2453,7 +2463,7 @@ function boot(){
     if(!card){ fAcc+=performance.now()-t0; fN++; fT+=dt; }   // frame stats only while really playing
   }
   requestAnimationFrame(frame);
-  if(meshWanted()) setTimeout(loadMesh,400);
+  if(glCur()) setTimeout(function(){ const m=glCur(); if(m) loadGL(m); },400);
 }
 
 if(IS_NODE){ module.exports={genWorld,allocGrid,buildGlyphs,renderFrame,compose,spawn,populate,tick,ecology,simBin,updatePlayer,W,RS,FB,P,IN,CR_,SP,SPP,MASKS,RESERVE,RAMP,N,WATER,EYE,terr,groundAt,DIALS,growOf,isAdult,addCreature,WALLS,buildWalls,nearestWall,allWallHits,wallBlocked,setSkyTime:function(t){skyTime=t;},setUW:function(v){UW=v;},DAY,SUN,MOON,SKY,DAYMODES,sunAltAz,sunUpdate,updateDay,relightAll,relightStep,RELIGHT,dayDate,fmtTod,setTod:function(h){DAY.tod=h;sunUpdate();},floorAt,KPATHS,KEEP,FORT,tickKeeper,KMASK,KL,keeperFrame,greet,GREETT,setGreet:function(f){greetHook=f;},RENDERS}; }
