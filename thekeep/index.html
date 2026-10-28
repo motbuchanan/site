@@ -64,7 +64,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
  </div>
  <div id="stick"><div id="knob"></div></div>
  <div id="fps"></div>
- <button class="mb-ver" id="mbVer" type="button">v0.14.0 &middot; Oct 28</button>
+ <button class="mb-ver" id="mbVer" type="button">v0.15.0 &middot; Oct 28</button>
  <div id="toast"></div>
  <div id="help" class="hidden"><div class="card">
   <h1>How to play</h1>
@@ -86,7 +86,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
    <img src="05-predation.jpg" alt="a kill" loading="lazy">
    <img src="04-water.jpg" alt="the lake" loading="lazy">
   </div>
-  <p class="fsize">The whole world is one HTML file. Right now: <b id="fsize">~179 KB</b>. Smaller than a single phone photo.</p>
+  <p class="fsize">The whole world is one HTML file. Right now: <b id="fsize">~183 KB</b>. Smaller than a single phone photo.</p>
   <p><b>Why I built it.</b> I build things on a phone by asking AI the right questions, the way I would direct a camera. I saw a clip of a tiny 3D world made of nothing but text and wanted to see if I could grow one that was actually alive, and keep growing it in the open instead of ever calling it done.</p>
   <p><b>What I learned.</b> How far you can get with almost nothing. One idea, a ray walking a height map, turned into characters, with a small world of animals living on top. Every version taught me one concrete thing: how to make a wall read as solid, how to keep the wolves from starving the world empty, how to make a forest look like real woods.</p>
   <p style="color:var(--mb-dim);font-size:13px"><b style="color:var(--mb-soft)">Walk:</b> drag the left half of the screen (tilt to turn). <b style="color:var(--mb-soft)">Look:</b> drag the right half. Wade into the water to swim. Tap ☰ menu for a new world, the dials, and the time of day. Walk under the gate arch and find the door under the tower stair.</p>
@@ -112,9 +112,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
 <script>
 (function(){
 'use strict';
-const VERSION='The Keep v0.14.0 · Oct 28 2026';
-const VER_SHORT='v0.14.0 · Oct 28'; // what the badge shows; bump with VERSION
+const VERSION='The Keep v0.15.0 · Oct 28 2026';
+const VER_SHORT='v0.15.0 · Oct 28'; // what the badge shows; bump with VERSION
 const CHANGELOG=[
+ ['v0.15.0 · Oct 28 2026','Mesh. A third way to draw the same world, the way most 3D games draw theirs: the ground, the stone, the trees and the water are built out of triangles and drawn by the phone\'s graphics chip. Same seed, same spot, same sun and shadows, same keepers and animals, who stand up as flat cards that turn to face you. At night the lanterns and braziers throw real pools of light. Mesh is its own file and only downloads the first time you pick it, so the world still opens as fast as before. If a phone can\'t do it, the world goes back to ASCII and tells you.'],
  ['v0.14.0 · Oct 28 2026','One world, more than one way to draw it. The menu has a new row, Draw the world as, with ASCII (the way it has always looked) and Pixels. Pixels shows the exact same picture with the letters taken away: every cell becomes a plain block of its color. Nothing else changes when you switch: same seed, same spot, same time of day, the keepers and animals carry on where they were. It is the first step of a bigger idea: the same world drawn the ways other 3D games draw theirs, side by side, so you can see what the letters add and what each way of drawing costs. Your choice is remembered on this device.'],
  ['v0.13.0 · Oct 27 2026','Ruins. The land outside the walls is older than the keep now. Ten kinds of ruin, each built a little differently every time: stone rings (some with fallen stones, a lintel across two, an altar, a king stone outside), broken round towers you can scramble up, lone arches, dolmens you can walk in under, cairns you can climb, pale temples with columns standing, broken and fallen, the shell of a farmstead with its chimney, long crumbling walls with windows, old wells, and tall standing stones with an avenue leading up to them. Each kind has its own weathered stone, with moss up the foot of the walls and lichen on the old stones. Walk into one and it tells you its name and how many you have found. A new ruins dial sets none, few, some or many.'],
  ['v0.12.0 · Oct 27 2026','The keepers have a day now. When they stop, they do something: the guards shade their eyes and look out over the wall, Old Wick leans on his staff and watches the road, and Maud checks the hall door before her rounds. Each keeper has new things to say for morning, afternoon, evening and night, and a few for when you catch them in the middle of something. At night Tilda walks down the rampart stair to the guard room and sleeps there with her helmet off and her lantern turned low; Bram keeps the wall alone till morning. A keeper coming the other way steps aside to let you pass.'],
@@ -176,7 +177,8 @@ const DIALS={
 // one world, many ways to draw it. Only the last step changes: every mode reads the same FB.col the raycaster fills.
 const RENDERS=[
   {id:'ascii',  name:'ASCII',  note:'Every cell is a letter: the brighter the light, the denser the letter'},
-  {id:'pixels', name:'Pixels', note:'The same cells as plain blocks of color, no letters, so each block is letter-shaped: taller than it is wide'}
+  {id:'pixels', name:'Pixels', note:'The same cells as plain blocks of color, no letters, so each block is letter-shaped: taller than it is wide'},
+  {id:'mesh',   name:'Mesh',   note:'The same world built from triangles on the graphics chip, the way most 3D games are drawn', file:'render-mesh.js'}
 ];
 function growOf(c){
   const s=CR_.sp[c];
@@ -2331,6 +2333,35 @@ function boot(){
   function openLog(){ closeAll(); const c=$('logCard'); c.innerHTML='<h1>Changelog</h1>'+CHANGELOG.map(function(e){ return '<p><b>'+e[0]+'</b><br>'+e[1]+'</p>'; }).join('')+'<button class="btn go" id="bLogClose">close</button>'; $('log').classList.remove('hidden'); $('bLogClose').addEventListener('click',function(){ $('log').classList.add('hidden'); }); }
   // top-right menu: one button that reaches everything, so nothing is off-screen in portrait
   const closeMenu=function(){ $('menu').classList.add('hidden'); };
+  // ---- Mesh: a second renderer in its own file, fetched only when someone picks it ----
+  let MESH=null, meshLoading=false, meshT0=0;
+  const meshWanted=function(){ return (RENDERS[DIALS.render|0]||RENDERS[0]).id==='mesh'; };
+  const meshApi={ N:N, W:W, WATER:WATER, CLOUDH:CLOUDH, DAY:DAY, SUN:SUN, MOON:MOON, SKY:SKY, RS:RS, RMAT:RMAT, CR_:CR_, SP:SP, SPP:SPP,
+    MASKS:MASKS, KMASK:KMASK, P:P, DIALS:DIALS, FORT:FORT, KEEP:KEEP, RELIGHT:RELIGHT, hash2:hash2, growOf:growOf, keeperPoseFrame:keeperPoseFrame,
+    fog:function(){ return [FOG_R,FOG_G,FOG_B]; }, uw:function(){ return UW; }, skyTime:function(){ return skyTime; } };
+  let meshLost=0;
+  function meshFail(why){
+    if(MESH){ try{ MESH.destroy(); }catch(e){} MESH=null; }
+    // the phone took the graphics chip back (another app, a long sleep): keep the choice and build the Mesh again
+    if(why==='lost'&&meshLost<3){ meshLost++; if(meshWanted()) setTimeout(loadMesh,700); return; }
+    if(meshWanted()){ DIALS.render=0; saveDials(); }
+    toast(why==='no WebGL2'?"This device can't draw Mesh (it needs WebGL2). Back to ASCII.":"Mesh couldn't start here. Back to ASCII.",3800);
+  }
+  function loadMesh(){
+    if(MESH||meshLoading) return;
+    if(window.KeepMesh){ startMesh(); return; }
+    meshLoading=true; toast('Building the Mesh',2400);
+    const sc=document.createElement('script'); sc.src='render-mesh.js?v='+encodeURIComponent(VER_SHORT);
+    sc.onload=function(){ meshLoading=false; startMesh(); };
+    sc.onerror=function(){ meshLoading=false; meshFail('load'); };
+    document.head.appendChild(sc);
+  }
+  function startMesh(){
+    try{ MESH=window.KeepMesh.create(meshApi); }catch(e){ MESH=null; }
+    if(!MESH||!MESH.ok){ const why=MESH&&MESH.error; MESH=null; meshFail(why); return; }
+    MESH.onLost=function(){ meshFail('lost'); }; meshT0=performance.now();
+    if(meshWanted()) toast('Drawn as Mesh',1800);
+  }
   function paintRenderSeg(){
     const box=$('mRender'); if(!box) return;
     box.innerHTML=RENDERS.map(function(m,i){ return '<button class="btn'+(i===(DIALS.render|0)?' on':'')+'" data-r="'+i+'" aria-pressed="'+(i===(DIALS.render|0))+'">'+m.name+'</button>'; }).join('');
@@ -2340,7 +2371,8 @@ function boot(){
     const b=e.target.closest?e.target.closest('button[data-r]'):null; if(!b) return;
     const i=parseInt(b.getAttribute('data-r'),10); if(!(i>=0&&i<RENDERS.length)) return;
     if(i===(DIALS.render|0)){ closeMenu(); return; }
-    DIALS.render=i; saveDials(); paintRenderSeg(); closeMenu(); toast('Drawn as '+RENDERS[i].name,1800);
+    DIALS.render=i; saveDials(); paintRenderSeg(); closeMenu();
+    if(RENDERS[i].id==='mesh'&&!(MESH&&MESH.ok)) loadMesh(); else toast('Drawn as '+RENDERS[i].name,1800);
   });
   $('bMenu').addEventListener('click',function(){ closeAll(); paintRenderSeg(); $('menu').classList.remove('hidden'); });
   $('mClose').addEventListener('click',closeMenu);
@@ -2397,9 +2429,12 @@ function boot(){
     ecoAcc+=dt; if(ecoAcc>=ECOSTEP){ ecology(); ecoAcc-=ECOSTEP; }
     relightStep(2);   // the sun moves: re-light two rows of the map per frame
     const card=anyCard();
+    const meshOn=meshWanted()&&!!MESH&&MESH.ok;
     if(now-hudT>500){ hudT=now;   // the corner readout: twice a second, clock included, card open or not
-      if(fN>0&&fT>0){ const ms=fAcc/fN; fpsTxt=Math.round(fN/fT)+' fps · '+ms.toFixed(1)+' ms';
-        if(!card&&now-govT>4000){
+      if(fN>0&&fT>0){ const ms=fAcc/fN; fpsTxt=Math.round(fN/fT)+' fps'+(meshOn?'':' · '+ms.toFixed(1)+' ms');
+        if(meshOn&&MESH&&!card&&now-govT>4000&&now-meshT0>5000){ const fps=fN/fT;
+          if(fps<24&&MESH.scale>0.5){ MESH.setScale(MESH.scale*0.85); govT=now; } else if(fps>45&&MESH.scale<1){ MESH.setScale(MESH.scale/0.85); govT=now; } }
+        if(!meshOn&&!card&&now-govT>4000){
           if(ms>30 && qCell<1.9){ qCell=Math.min(1.9,qCell*1.2); govT=now; setupGrid(); }
           else if(ms<9 && qCell>1.0){ qCell=Math.max(1.0,qCell/1.15); govT=now; setupGrid(); } }
         fAcc=0; fN=0; fT=0; }
@@ -2407,13 +2442,18 @@ function boot(){
       if(skyHud&&!$('dials').classList.contains('hidden')) skyHud(); }
     if(card){ if(now-slowAt<250) return; slowAt=now; }   // a card is open: redraw 4 times a second, save the battery
     const t0=performance.now();
-    renderFrame(P.x,P.y,P.z,P.yaw,P.pitch);
-    compose();
-    if(RS.letterbox){ ctx.fillStyle='#000'; ctx.fillRect(0,0,canvas.width,canvas.height); ctx.putImageData(img,RS.offX,RS.offY); }
-    else ctx.putImageData(img,0,0);
+    if(meshOn){ if(!MESH.shown) MESH.show(true); MESH.draw(); }
+    else {
+      if(MESH&&MESH.shown) MESH.show(false);
+      renderFrame(P.x,P.y,P.z,P.yaw,P.pitch);
+      compose();
+      if(RS.letterbox){ ctx.fillStyle='#000'; ctx.fillRect(0,0,canvas.width,canvas.height); ctx.putImageData(img,RS.offX,RS.offY); }
+      else ctx.putImageData(img,0,0);
+    }
     if(!card){ fAcc+=performance.now()-t0; fN++; fT+=dt; }   // frame stats only while really playing
   }
   requestAnimationFrame(frame);
+  if(meshWanted()) setTimeout(loadMesh,400);
 }
 
 if(IS_NODE){ module.exports={genWorld,allocGrid,buildGlyphs,renderFrame,compose,spawn,populate,tick,ecology,simBin,updatePlayer,W,RS,FB,P,IN,CR_,SP,SPP,MASKS,RESERVE,RAMP,N,WATER,EYE,terr,groundAt,DIALS,growOf,isAdult,addCreature,WALLS,buildWalls,nearestWall,allWallHits,wallBlocked,setSkyTime:function(t){skyTime=t;},setUW:function(v){UW=v;},DAY,SUN,MOON,SKY,DAYMODES,sunAltAz,sunUpdate,updateDay,relightAll,relightStep,RELIGHT,dayDate,fmtTod,setTod:function(h){DAY.tod=h;sunUpdate();},floorAt,KPATHS,KEEP,FORT,tickKeeper,KMASK,KL,keeperFrame,greet,GREETT,setGreet:function(f){greetHook=f;},RENDERS}; }
