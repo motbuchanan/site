@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0d1117">
+<title>The Keep · build log</title>
+<link rel="icon" type="image/png" href="the-keep-icon.png">
+<link rel="apple-touch-icon" href="the-keep-icon.png">
+<meta name="description" content="The Keep: a living world drawn entirely as characters. The story, how it is built, and a shot from every version.">
+<meta property="og:title" content="The Keep · build log">
+<meta property="og:description" content="A whole world drawn as characters. The story of how it is being built, one improvement at a time.">
+<meta property="og:image" content="https://motbuchanan.com/thekeep/the-keep-icon.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://motbuchanan.com/thekeep/the-keep-icon.png">
+<link href="../fonts/fonts.css" rel="stylesheet">
+<style>
+:root{--ink:#ebedef;--soft:#c2c9d1;--dim:#8b96a3;--teal:#4cf0e0;--orange:#f59847;
+  --line:#252c35;--card:#161c24;--bg:#0d1117;
+  --sys:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,system-ui,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
+  --disp:'Archivo',var(--sys)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--sys);line-height:1.6;-webkit-font-smoothing:antialiased;min-height:100svh}
+#glow{position:fixed;inset:0;z-index:-1;pointer-events:none;background:
+  conic-gradient(from 118deg at 1.3% -6.9%, transparent 0deg, rgba(76,240,224,.08) 9deg, rgba(76,240,224,.20) 26deg, rgba(76,240,224,.08) 44deg, transparent 52deg),
+  radial-gradient(46vmax 82vmax at 110% 55%, rgba(245,152,71,.08), transparent 60%),var(--bg)}
+.wrap{max-width:880px;margin:0 auto;padding:0 20px}
+a{color:var(--teal)}
+.mono{font-family:var(--mono)}
+/* hero */
+.hero{text-align:center;padding:54px 20px 40px}
+.icon{width:150px;height:150px;border-radius:28px;display:block;margin:0 auto 22px;box-shadow:0 12px 44px rgba(0,0,0,.6),0 0 0 1px var(--line)}
+.hero h1{font-family:var(--disp);font-weight:800;font-size:42px;letter-spacing:.01em;margin-bottom:8px}
+.hero .tag{font-size:18px;color:var(--soft);max-width:560px;margin:0 auto}
+.hero .sub{font-family:var(--mono);font-size:13px;color:var(--dim);margin-top:10px;letter-spacing:.02em}
+.cta{display:inline-block;margin-top:24px;background:var(--orange);color:#1a1206;font-family:var(--disp);font-weight:700;font-size:16px;text-decoration:none;padding:13px 26px;border-radius:11px}
+.cta:hover{filter:brightness(1.08)}
+.badge{display:inline-block;margin-top:16px;font-family:var(--mono);font-size:12px;color:var(--dim);border:1px solid var(--line);border-radius:20px;padding:5px 12px}
+/* sections */
+section{padding:34px 0;border-top:1px solid var(--line)}
+h2{font-family:var(--mono);font-weight:600;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--teal);margin-bottom:16px}
+p{margin:0 0 14px;color:#cfd6dd}
+p .k{color:var(--orange)}
+.lead{font-size:18px;color:var(--ink)}
+.two{display:grid;grid-template-columns:1fr;gap:12px 22px}
+@media(min-width:620px){.two{grid-template-columns:1fr 1fr}}
+.feat{border:1px solid var(--line);border-radius:12px;padding:16px 18px;background:var(--card)}
+.feat h3{font-family:var(--disp);font-weight:700;font-size:16px;margin:0 0 6px;color:#fff}
+.feat p{font-size:14px;color:var(--dim);margin:0}
+/* gallery */
+.gal{display:grid;grid-template-columns:1fr;gap:22px}
+@media(min-width:620px){.gal{grid-template-columns:1fr 1fr}}
+figure{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+figure img{width:100%;display:block;background:#000}
+figcaption{padding:12px 15px 15px}
+figcaption .v{font-family:var(--mono);font-weight:600;font-size:12px;letter-spacing:.06em;color:var(--teal)}
+figcaption .d{font-size:14px;color:var(--dim);margin-top:3px}
+/* timeline */
+.tl{list-style:none;border-left:2px solid var(--line);margin-left:6px}
+.tl li{position:relative;padding:0 0 16px 20px}
+.tl li:before{content:"";position:absolute;left:-7px;top:7px;width:10px;height:10px;border-radius:50%;background:var(--orange)}
+.tl .v{font-family:var(--mono);font-weight:600;color:var(--ink)}
+.tl .d{color:var(--dim);font-size:14px}
+footer{padding:34px 20px 60px;text-align:center;color:var(--dim);font-size:13px;border-top:1px solid var(--line)}
+footer a{color:var(--soft)}
+</style>
+</head>
+<body>
+<div id="glow"></div>
+
+<header class="hero">
+  <img class="icon" src="the-keep-icon.png" alt="The Keep icon: a stone keep on a wooded hill above a lake">
+  <h1>The Keep</h1>
+  <p class="tag">A whole world drawn as characters. A snow globe you walk around inside.</p>
+  <p class="sub">an ASCII raycaster that grows one improvement at a time</p>
+  <a class="cta" href="index.html">▶ &nbsp;walk the keep</a>
+  <div class="badge">in active development · updated Oct 29, 2026</div>
+</header>
+
+<main class="wrap">
+
+<section>
+  <h2>What it is</h2>
+  <p class="lead">The Keep is a living world rendered entirely as a grid of colored characters. No 3D engine sits underneath it. It is not a game with a score to win, and it is not a building sandbox.</p>
+  <p>It is closer to a <span class="k">snow globe you can stroll around inside</span>, and an <span class="k">ant farm you set the dials on</span>. You type a seed and get a whole reproducible world: hills, a lake, rivers, forests, and a stone keep. Then it runs. Birds flock and roost, deer move in herds, fish school, and a wolf pack hunts, breeds, and thins out. Populations rise and fall on their own and never quite empty the world.</p>
+  <p>You are the keeper, not a character in it. You walk, you look, you notice things. And because it develops live, the world you visit today is not the one you will visit next month.</p>
+</section>
+
+<section>
+  <h2>How it is built</h2>
+  <div class="two">
+    <div class="feat"><h3>One ray per column</h3><p>A heightfield raycaster walks the terrain, one ray for each column of the screen, and draws it as vertical spans of characters. That is the whole renderer.</p></div>
+    <div class="feat"><h3>Water that reflects</h3><p>Every water column runs a second march to mirror what is above it, with a depth gradient and a foam line where you cross the surface.</p></div>
+    <div class="feat"><h3>A keep of planes and mass</h3><p>The castle faces are brick planes the ray intersects directly, so walls read as solid, crenellated stone. Under them, raised ground gives the walls their thickness and makes the rampart, stairs and lookout walkable. A second layer of stone can float above the ground, which is how the gate arch, the tunnel and the round room under the tower work.</p></div>
+    <div class="feat"><h3>A world that lives</h3><p>Under the renderer, every creature is a tiny agent running steering rules and a state machine. Flocking, herding, and the hunt fall out of that, held in balance by soft floors and carrying caps.</p></div>
+    <div class="feat"><h3>A sun that moves</h3><p>The sun's place in the sky comes from the same formulas as a sunrise table, for Akron on today's date. A blurred shadow map, re-marched a few rows per frame as the sun moves, is sampled per character, so shade falls softly and swings round through the day.</p></div>
+    <div class="feat"><h3>Same on any screen</h3><p>The vertical field of view is locked and the detail auto-sizes, so the world looks correct on a phone, a tablet, or a desktop, in any orientation.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>The story so far</h2>
+  <p>Each of these is a real frame from the engine, one from about every version, in order. The whole thing began as a test level to prove one ray could walk a hill, and grew from there.</p>
+  <div class="gal">
+    <figure><img src="01-first-engine.jpg" alt="Early engine: terrain and the gate"><figcaption><div class="v">v0.1 to 0.2 · THE ENGINE</div><div class="d">One ray per column walking a heightfield, water reflections, cone trees. The first proof it could work.</div></figcaption></figure>
+    <figure><img src="02-first-life.jpg" alt="Birds and rabbits"><figcaption><div class="v">v0.3 · FIRST LIFE</div><div class="d">Birds flock and roost, rabbits graze and bolt underground. The agent layer arrives, and seeds make worlds repeatable.</div></figcaption></figure>
+    <figure><img src="03-food-web.jpg" alt="A wolf on the move"><figcaption><div class="v">v0.4 · THE FOOD WEB</div><div class="d">Deer herd, squirrels dart, fish school, and a wolf pack hunts. Prey breed, wolves starve when prey is scarce, and the whole system stays balanced.</div></figcaption></figure>
+    <figure><img src="04-water.jpg" alt="The lake"><figcaption><div class="v">v0.5 · INTO THE WATER</div><div class="d">Wade in, dive, and walk the lakebed. Underwater the view goes murky blue-green. Three kinds of tree now stand in mixed groves.</div></figcaption></figure>
+    <figure><img src="05-predation.jpg" alt="A kill on the ground"><figcaption><div class="v">v0.6 · PREDATION</div><div class="d">A wolf kill leaves a carcass, and the pack gathers to feed before it decays. The hunt happens in the open instead of off-screen.</div></figcaption></figure>
+    <figure><img src="06-shadows.jpg" alt="Soft shadows across the ground"><figcaption><div class="v">v0.6 · SOFT SHADOWS</div><div class="d">A blurred shadow map, sampled per character, lays real shade across the land and the trees. Standing stones and ruins appear.</div></figcaption></figure>
+    <figure><img src="07-plane-keep.jpg" alt="The keep as a solid mass"><figcaption><div class="v">v0.7.7 · THE PLANE KEEP</div><div class="d">The castle rebuilt from flat brick planes: a solid, crenellated mass with a taller keep rising in the middle. No more hollow walls.</div></figcaption></figure>
+    <figure><img src="08-crenellated-gate.jpg" alt="Approaching the gate"><figcaption><div class="v">v0.7.7 · THE GATE</div><div class="d">Crenellated curtain walls, corner towers, a gatehouse, and a gate cut at ground level. Walk in, then through the inner door.</div></figcaption></figure>
+    <figure><img src="09-forest.jpg" alt="The keep among a varied forest"><figcaption><div class="v">v0.7.10 · A REAL FOREST</div><div class="d">Trees now vary in height, width, and shape, from thin spires to fat firs to broad low canopies, so a stand reads like real woods.</div></figcaption></figure>
+    <figure><img src="10-real-keep.jpg" alt="The donjon and its spiral stair seen from a corner tower" loading="lazy"><figcaption><div class="v">v0.7.13 to 0.7.15 · THE REAL KEEP</div><div class="d">From the top of a corner tower: the round donjon with its spiral stair, the courtyard, the walls, and the forest beyond. The walls got their thickness from raised ground, so you can climb to the rampart and up the stair to the lookout.</div></figcaption></figure>
+    <figure><img src="11-moonlit.jpg" alt="The keep at five in the morning under a full moon" loading="lazy"><figcaption><div class="v">v0.8.0 · DAY AND NIGHT</div><div class="d">Five in the morning. The sun crosses the sky on its real arc for Akron, Ohio, so the light and every shadow move through the day; at night a moon rises opposite the sunset and the world goes blue and moonlit, never black.</div></figcaption></figure>
+    <figure><img src="12-gate-at-night.jpg" alt="A brazier burning beside the gate arch at night, the gatekeeper beyond" loading="lazy"><figcaption><div class="v">v0.9.0 · SOLID STONE AND PEOPLE</div><div class="d">The keep is built of solid blocks now instead of thin sheets, and the gate is a real arch with the wall-walk carried over it. Beyond it the gatekeeper watches the road; after dark a brazier burns on each side and the keepers carry lanterns.</div></figcaption></figure>
+    <figure><img src="13-the-keepers.jpg" alt="The four keepers by day and at night: Bram, Tilda, Old Wick and Maud" loading="lazy"><figcaption><div class="v">v0.10.0 · THE PEOPLE OF THE KEEP</div><div class="d">Bram and Tilda on the wall-walk, Old Wick in the courtyard, Maud by the hall. By day the sun lights the side it falls on; at night each lantern warms its keeper's face and the ground around them. Walk up to one and they stop, turn to you and say hello.</div></figcaption></figure>
+    <figure><img src="14-a-keepers-day.jpg" alt="Bram looking out from the wall, Old Wick leaning on his staff, Maud checking the hall door, Tilda asleep in the guard room" loading="lazy"><figcaption><div class="v">v0.12.0 · A KEEPER'S DAY</div><div class="d">When they stop, they do something. Bram shades his eyes on the wall, Old Wick leans on his staff by the road, Maud checks the hall door, and at night Tilda sleeps in the guard room with her lantern turned low.</div></figcaption></figure>
+    <figure><img src="15-the-ruins.jpg" alt="A lone arch, a pale temple with standing columns, a tall standing stone with an avenue of small stones, and a broken round tower" loading="lazy"><figcaption><div class="v">v0.13.0 · THE RUINS</div><div class="d">The land is older than the keep. A lone arch in the woods, a temple with its columns standing, broken and fallen, a tall stone at the end of its avenue, a round tower fallen down one side. Walk into one and it tells you its name.</div></figcaption></figure>
+    <figure><img src="16-two-ways.jpg" alt="The same frame from a corner tower, the left half drawn in letters and the right half in plain blocks of color" loading="lazy"><figcaption><div class="v">v0.14.0 · TWO WAYS TO DRAW IT</div><div class="d">One frame, split down the middle. Left, the letters. Right, the same cells with the letters taken away. The world underneath never changes; only the last step of drawing it does. More ways to come.</div></figcaption></figure>
+    <figure><img src="17-mesh.jpg" alt="The same frame from a corner tower, the left half drawn in letters and the right half as a 3D mesh with brick walls and a cloudy sky" loading="lazy"><figcaption><div class="v">v0.15.0 · MESH</div><div class="d">The way most 3D games draw: the ground, the stone and the trees turned into triangles for the graphics chip. Same seed, same spot, same light. It lives in its own file and only downloads when you pick it.</div></figcaption></figure>
+    <figure><img src="18-voxels.jpg" alt="The stone ring in a meadow, the left half drawn in letters and the right half in grass, dirt and stone blocks" loading="lazy"><figcaption><div class="v">v0.16.0 · VOXELS</div><div class="d">The way block games draw: every height rounded to a whole block, grass on dirt, the old stones as pale blocks, trees as trunks and blocky crowns. Same seed, same light.</div></figcaption></figure>
+    <figure><img src="19-rays.jpg" alt="The keep across the lake, the left half drawn in letters and the right half raymarched, with the keep and the trees reflected in the water" loading="lazy"><figcaption><div class="v">v0.17.0 · RAYS</div><div class="d">The way Shadertoy demos draw: no triangles, one ray per pixel walking the same heights, then toward the sun for soft shadows and off the lake for real reflections.</div></figcaption></figure>
+    <figure><img src="20-iso.jpg" alt="The keep from above at a slant, by day and by night, with a small teal figure in the courtyard" loading="lazy"><figcaption><div class="v">v0.18.0 · ISO</div><div class="d">The SimCity and Diablo view: the same blocks seen from above at a fixed slant, so nothing shrinks with distance and the keep sits like a model on a table. The teal figure is you.</div></figcaption></figure>
+    <figure><img src="21-the-rooms.jpg" alt="The great hall with its long table, a hunting tapestry and a painting, and the chapel with its altar, pews and stained glass" loading="lazy"><figcaption><div class="v">v0.19.0 · THE ROOMS</div><div class="d">A bigger keep, and rooms you can live in: the great hall with its table, hearth and tapestry, the timber kitchen, the barracks, and the chapel with its stained glass. The lookout parapet sits below your eyes now, open to the four directions.</div></figcaption></figure>
+  </div>
+</section>
+
+<section>
+  <h2>Version history</h2>
+  <ul class="tl">
+    <li><span class="v">v0.19.0</span> <span class="d">a bigger keep: wider courtyard, taller donjon with an open lookout, and furnished rooms (great hall, timber kitchen, barracks, chapel) with banners, paintings, a tapestry and stained glass; animals and fires now show in the 3D modes</span></li>
+    <li><span class="v">v0.18.0</span> <span class="d">Iso: the world from above at the fixed slant of SimCity and Diablo, following behind you, with a figure that shows through walls</span></li>
+    <li><span class="v">v0.17.1</span> <span class="d">straight wall corners in Rays: near you every ray walks the world one block at a time</span></li>
+    <li><span class="v">v0.17.0</span> <span class="d">Rays: the same world raymarched, one ray per pixel with soft shadows that follow the sun, shading in corners, and the keep and trees reflected in the lake; downloads only when you pick it</span></li>
+    <li><span class="v">v0.16.1</span> <span class="d">seamless clouds in Mesh and Voxels; the corner readout stays clear of the version badge on a narrow phone</span></li>
+    <li><span class="v">v0.16.0</span> <span class="d">Voxels: the same world as 1 m blocks, the way Minecraft draws its worlds, with grass, sand, rock, snow, stone bricks and block trees; downloads only when you pick it</span></li>
+    <li><span class="v">v0.15.0</span> <span class="d">Mesh: the same world drawn the way most 3D games draw theirs, as triangles on the graphics chip, with real lantern light at night; it downloads only when you pick it</span></li>
+    <li><span class="v">v0.14.0</span> <span class="d">one world, two ways to draw it: a new menu row switches between ASCII and Pixels, same seed, same spot, nothing else changes</span></li>
+    <li><span class="v">v0.13.0</span> <span class="d">ruins: ten kinds of old stonework out in the land, each built a little differently every time, in their own weathered stone; each one tells you its name when you find it; a dial for none, few, some or many</span></li>
+    <li><span class="v">v0.12.0</span> <span class="d">the keepers have a day: guards look out over the wall, Old Wick leans on his staff, Maud checks the doors, Tilda sleeps in the guard room at night, and everyone has more to say by time of day</span></li>
+    <li><span class="v">v0.11.0</span> <span class="d">easier to steer: the walk stick turns you and the view levels itself as you walk; landscape fills the screen; the donjon shades and bricks round its curve</span></li>
+    <li><span class="v">v0.10.2</span> <span class="d">solid walls again: stone faces stand at the front of each block and wall tops show as their own surface, so battlements stop looking like paper needles</span></li>
+    <li><span class="v">v0.10.1</span> <span class="d">the wall stair runs straight on to the rampart and guides you up and down while you look around; midday sand no longer flashes teal and navy</span></li>
+    <li><span class="v">v0.10.0</span> <span class="d">the people of the keep: four keepers you can tell apart (Bram, Tilda, Old Wick and Maud), front, side and back views with a walk, sun and shadow on them, lantern light on them and the ground at night, and they stop to greet you</span></li>
+    <li><span class="v">v0.9.1</span> <span class="d">the stair hands you off: in to the middle of the lookout at the top, out into the courtyard at the bottom, facing the way you are going</span></li>
+    <li><span class="v">v0.9.0</span> <span class="d">solid stone and people: every paper-thin wall sheet replaced by solid blocks; a stair you can climb hands-off; a second layer of stone lets floors float over open space, so the gate is a real arch with the wall-walk over it and the donjon has a ground-floor room; four keepers walk their rounds with lanterns at night, and braziers burn at the gate</span></li>
+    <li><span class="v">v0.8.0</span> <span class="d">day and night: the sun on its real arc over Akron, moving shadows, orange dusk, a moon and stars, a blue moonlit night; time and day-length dials; birds roost and wolves hunt after dark</span></li>
+    <li><span class="v">v0.7.15</span> <span class="d">stairs that feel safe: a ledge guard on every drop, a wider spiral with a handrail, steadier footing on stairs, corner towers open to the wall-walk; dials remembered on your device</span></li>
+    <li><span class="v">v0.7.14</span> <span class="d">fonts served from this site, nothing leaves for another server</span></li>
+    <li><span class="v">v0.7.13</span> <span class="d">a real keep: four thick walls with a rampart you climb, corner towers, a gatehouse, rooms in the walls, and a round donjon with a spiral stair up to a lookout</span></li>
+    <li><span class="v">v0.7.11 to 0.7.12</span> <span class="d">the "about this build" card with the live file size; shared site chrome</span></li>
+    <li><span class="v">v0.7.10</span> <span class="d">tree girth variety, app icon, this build log</span></li>
+    <li><span class="v">v0.7.7 to 0.7.9</span> <span class="d">the plane-built keep: crenellations, towers, gatehouse; portrait menu</span></li>
+    <li><span class="v">v0.7</span> <span class="d">young that follow adults and age; the keeper's dials panel</span></li>
+    <li><span class="v">v0.6</span> <span class="d">witnessable predation, soft per-pixel shadows, scattered landmarks</span></li>
+    <li><span class="v">v0.5</span> <span class="d">swimming and the underwater view, three tree types, a solid keep</span></li>
+    <li><span class="v">v0.4</span> <span class="d">the full food web, balanced; seed-driven paths</span></li>
+    <li><span class="v">v0.3</span> <span class="d">first life: birds and rabbits; the seed box</span></li>
+    <li><span class="v">v0.1 to 0.2</span> <span class="d">the raycaster, a 512×512 world, the first castle</span></li>
+  </ul>
+</section>
+
+</main>
+
+<footer>
+  <p class="mono">The Keep · built by Mot Buchanan</p>
+  <p>It develops live. Come back and it will have changed.</p>
+  <p style="margin-top:10px"><a href="index.html">▶ walk the keep</a></p>
+</footer>
+
+</body>
+</html>
