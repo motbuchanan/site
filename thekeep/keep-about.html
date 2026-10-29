@@ -77,7 +77,7 @@ footer a{color:var(--soft)}
   <p class="tag">A whole world drawn as characters. A snow globe you walk around inside.</p>
   <p class="sub">an ASCII raycaster that grows one improvement at a time</p>
   <a class="cta" href="index.html">▶ &nbsp;walk the keep</a>
-  <div class="badge">in active development · updated Oct 28, 2026</div>
+  <div class="badge">in active development · updated Oct 29, 2026</div>
 </header>
 
 <main class="wrap">
@@ -124,12 +124,15 @@ footer a{color:var(--soft)}
     <figure><img src="17-mesh.jpg" alt="The same frame from a corner tower, the left half drawn in letters and the right half as a 3D mesh with brick walls and a cloudy sky" loading="lazy"><figcaption><div class="v">v0.15.0 · MESH</div><div class="d">The way most 3D games draw: the ground, the stone and the trees turned into triangles for the graphics chip. Same seed, same spot, same light. It lives in its own file and only downloads when you pick it.</div></figcaption></figure>
     <figure><img src="18-voxels.jpg" alt="The stone ring in a meadow, the left half drawn in letters and the right half in grass, dirt and stone blocks" loading="lazy"><figcaption><div class="v">v0.16.0 · VOXELS</div><div class="d">The way block games draw: every height rounded to a whole block, grass on dirt, the old stones as pale blocks, trees as trunks and blocky crowns. Same seed, same light.</div></figcaption></figure>
     <figure><img src="19-rays.jpg" alt="The keep across the lake, the left half drawn in letters and the right half raymarched, with the keep and the trees reflected in the water" loading="lazy"><figcaption><div class="v">v0.17.0 · RAYS</div><div class="d">The way Shadertoy demos draw: no triangles, one ray per pixel walking the same heights, then toward the sun for soft shadows and off the lake for real reflections.</div></figcaption></figure>
+    <figure><img src="20-iso.jpg" alt="The keep from above at a slant, by day and by night, with a small teal figure in the courtyard" loading="lazy"><figcaption><div class="v">v0.18.0 · ISO</div><div class="d">The SimCity and Diablo view: the same blocks seen from above at a fixed slant, so nothing shrinks with distance and the keep sits like a model on a table. The teal figure is you.</div></figcaption></figure>
   </div>
 </section>
 
 <section>
   <h2>Version history</h2>
   <ul class="tl">
+    <li><span class="v">v0.18.0</span> <span class="d">Iso: the world from above at the fixed slant of SimCity and Diablo, following behind you, with a figure that shows through walls</span></li>
+    <li><span class="v">v0.17.1</span> <span class="d">straight wall corners in Rays: near you every ray walks the world one block at a time</span></li>
     <li><span class="v">v0.17.0</span> <span class="d">Rays: the same world raymarched, one ray per pixel with soft shadows that follow the sun, shading in corners, and the keep and trees reflected in the lake; downloads only when you pick it</span></li>
     <li><span class="v">v0.16.1</span> <span class="d">seamless clouds in Mesh and Voxels; the corner readout stays clear of the version badge on a narrow phone</span></li>
     <li><span class="v">v0.16.0</span> <span class="d">Voxels: the same world as 1 m blocks, the way Minecraft draws its worlds, with grass, sand, rock, snow, stone bricks and block trees; downloads only when you pick it</span></li>
