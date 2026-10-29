@@ -1,4 +1,4 @@
-// The Keep · render-mesh.js · v0.16.1 · Oct 28 2026
+// The Keep · render-mesh.js · v0.19.0 · Oct 29 2026
 // The same world drawn the way most 3D games draw theirs: triangles on the graphics chip (WebGL2).
 // Nothing here makes the world. It reads the exact arrays the ASCII raycaster reads (heights, stone,
 // slabs, trees, the lit colors and shadows) and turns them into meshes. Loaded only when Mesh is picked.
@@ -191,6 +191,17 @@ void main(){ ivec2 cell=clamp(ivec2(floor(vW.xy)),ivec2(0),ivec2(511)); float be
   vec3 cw=body*(1.0-fres)/max(a,0.01), craw=sk*fres/max(a,0.01);
   o=vec4(finish(cw,craw,vW,0.0),a); }`;
 
+
+// wall decorations (banners, paintings, tapestries): flat pictures a hand's width off the wall, from the same list the letters use
+const VS_DECO=HEAD+`
+layout(location=0) in vec3 aP; layout(location=1) in vec2 aU; layout(location=2) in vec2 aC;
+out vec3 vW; out vec2 vU; flat out ivec2 vCell;
+void main(){ vW=aP; vU=aU; vCell=ivec2(aC); gl_Position=uVP*vec4(aP,1.0); }`;
+const FS_DECO=HEAD+FINISH+`
+uniform sampler2D uD; uniform sampler2D uC; in vec3 vW; in vec2 vU; flat in ivec2 vCell; out vec4 o;
+void main(){ vec4 t=texture(uD,vU); if(t.a<0.5) discard; float sh=texelFetch(uC,vCell,0).a;
+  vec3 b=t.a<0.9?t.rgb*(0.55+0.6*(1.0-uNight)):t.rgb*0.9*sh;   // stained glass glows with the daylight behind it
+  o=vec4(finish(b,vec3(0.0),vW,uNight>0.0?pool(vW):0.0),1.0); }`;
 // ---------------- the renderer ----------------
 function create(A){
   const R={ok:false,error:'',shown:false};
@@ -361,7 +372,33 @@ function create(A){
     for(let cy=0;cy<CH;cy++)for(let cx=0;cx<CH;cx++){ let lo=1e9,hi=-1e9;
       for(let y=cy*SIDE;y<=Math.min(N-1,cy*SIDE+SIDE);y++)for(let x=cx*SIDE;x<=Math.min(N-1,cx*SIDE+SIDE);x++){ const v=W.h[y*N+x]+W.st[y*N+x]+W.tree[y*N+x]; const g=W.h[y*N+x]; if(g<lo)lo=g; if(v>hi)hi=v; }
       chunkMin[cy*CH+cx]=Math.min(lo,A.WATER); chunkMax[cy*CH+cx]=hi+2; } }
-  function rebuild(){
+
+  // ---- wall decorations ----
+  let PD=null; try{ PD=prog(VS_DECO,FS_DECO); }catch(e){ PD=null; }
+  const vaoD=gl.createVertexArray(), vbD=gl.createBuffer(); let nDeco=0, texD=null;
+  gl.bindVertexArray(vaoD); gl.bindBuffer(gl.ARRAY_BUFFER,vbD);
+  gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0,3,gl.FLOAT,false,28,0);
+  gl.enableVertexAttribArray(1); gl.vertexAttribPointer(1,2,gl.FLOAT,false,28,12);
+  gl.enableVertexAttribArray(2); gl.vertexAttribPointer(2,2,gl.FLOAT,false,28,20);
+  gl.bindVertexArray(null);
+  function buildDeco(){ nDeco=0; const L=A.DECO||[], IM=A.DECO_IMG||{}; if(!PD||!L.length) return;
+    const names=Object.keys(IM); let AW=0, AH=1; const at={};
+    for(const k of names){ at[k]=AW; AW+=IM[k].w+1; AH=Math.max(AH,IM[k].h); }
+    if(!texD){ const px=new Uint8Array(AW*AH*4);
+      for(const k of names){ const I=IM[k], ox=at[k]; for(let y=0;y<I.h;y++)for(let x=0;x<I.w;x++){ const p=I.px[y*I.w+x]; if(!p) continue;
+        const c=I.pal[p], o=(y*AW+ox+x)*4; px[o]=c[0]; px[o+1]=c[1]; px[o+2]=c[2]; px[o+3]=(I.glow&&p>1&&p<8)?204:255; } }
+      texD=tex(AW,AH,gl.RGBA8,gl.RGBA,gl.UNSIGNED_BYTE,gl.NEAREST,gl.CLAMP_TO_EDGE);
+      gl.bindTexture(gl.TEXTURE_2D,texD); gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,AW,AH,gl.RGBA,gl.UNSIGNED_BYTE,px); }
+    const v=[];
+    for(const d of L){ const I=IM[d.img]; if(!I) continue;
+      const u0=(at[d.img]+0.01)/AW, u1=(at[d.img]+I.w-0.01)/AW, t0=0.01/AH, t1=(I.h-0.01)/AH;
+      let ua=u0, ub=u1; if((d.axis==='y'&&d.ny<0)||(d.axis==='x'&&d.nx>0)){ ua=u1; ub=u0; }
+      const qa=d.axis==='y'?[d.a,d.p]:[d.p,d.a], qb=d.axis==='y'?[d.b,d.p]:[d.p,d.b];
+      const cx=Math.max(0,Math.min(N-1,Math.floor((qa[0]+qb[0])/2+d.nx*0.5))), cy=Math.max(0,Math.min(N-1,Math.floor((qa[1]+qb[1])/2+d.ny*0.5)));
+      const V=function(q,z,u,t){ v.push(q[0],q[1],z,u,t,cx,cy); };
+      V(qa,d.z0Abs,ua,t1); V(qb,d.z0Abs,ub,t1); V(qb,d.z1Abs,ub,t0); V(qa,d.z0Abs,ua,t1); V(qb,d.z1Abs,ub,t0); V(qa,d.z1Abs,ua,t0); }
+    gl.bindBuffer(gl.ARRAY_BUFFER,vbD); gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(v),gl.STATIC_DRAW); nDeco=v.length/7; }
+  function rebuild(){ buildDeco();
     buildTerrain(); buildStone(); buildTrees();
     gl.bindTexture(gl.TEXTURE_2D,texCl); gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,256,256,gl.RED,gl.UNSIGNED_BYTE,seamless(W.cloud));
     gl.bindTexture(gl.TEXTURE_2D,texCl2); gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,256,256,gl.RED,gl.UNSIGNED_BYTE,seamless(W.cloud2));
@@ -424,11 +461,11 @@ function create(A){
         spData.set([x,y,z,0, P_.wsize,P_.hsize,0,amb, uv[0],uv[1],uv[2],uv[3], ln[0],ln[1],mir,1],o); k++; continue; }
       const P_=SPP[sp], g=A.growOf(c);
       if(sp===SP.BIRD){ const fr=Math.sin(A.skyTime()*7+c*1.7)>0?1:0, uv=slotUV[atlasMap['b'+fr]];
-        spData.set([x,y,z+P_.hsize*g*0.2, P_.wsize*g,P_.hsize*g*0.55,0,1, uv[0],uv[1],uv[2],uv[3], -1,0,0,0],o); k++; continue; }
+        spData.set([x,y,z+P_.hsize*g*0.2,0, P_.wsize*g,P_.hsize*g*0.55,0,1, uv[0],uv[1],uv[2],uv[3], -1,0,0,0],o); k++; continue; }
       const key='m'+sp; if(atlasMap[key]==null) continue; const uv=slotUV[atlasMap[key]];
       // the masks face right; turn them to face the way the animal walks, as seen from here
       const mir=(C.vx[c]*(-Math.sin(yaw))+C.vy[c]*Math.cos(yaw)<0)?1:0;
-      spData.set([x,y,z, P_.wsize*g,P_.hsize*g,0,amb, uv[0],uv[1],uv[2],uv[3], -1,0,mir,sp>=SP.KEEPER?1:0],o); k++; }
+      spData.set([x,y,z,0, P_.wsize*g,P_.hsize*g,0,amb, uv[0],uv[1],uv[2],uv[3], -1,0,mir,sp>=SP.KEEPER?1:0],o); k++; }
     nSpr=k; return nl; }
 
   function draw(){
@@ -469,6 +506,8 @@ function create(A){
     if(nAll){ if(Math.hypot(px-splitX,py-splitY)>12) splitTrees(px,py);
       common(PTR,U,vp); bindTex(PTR,'uC',1,texC); bindTex(PTR,'uT',2,texT);
       for(const T of [TN,TF]){ if(!T.n) continue; gl.bindVertexArray(T.vao); gl.drawArraysInstanced(gl.TRIANGLES,0,T.nv,T.n); } }
+    if(nDeco){ common(PD,U,vp); bindTex(PD,'uD',4,texD); bindTex(PD,'uC',1,texC);
+      gl.enable(gl.POLYGON_OFFSET_FILL); gl.polygonOffset(-1,-2); gl.bindVertexArray(vaoD); gl.drawArrays(gl.TRIANGLES,0,nDeco); gl.disable(gl.POLYGON_OFFSET_FILL); }
     if(nSpr){ common(PSP,U,vp); bindTex(PSP,'uA',3,texA); gl.bindVertexArray(vaoSp); gl.bindBuffer(gl.ARRAY_BUFFER,vbSp);
       gl.bufferSubData(gl.ARRAY_BUFFER,0,spData,0,nSpr*16); gl.drawArraysInstanced(gl.TRIANGLE_STRIP,0,4,nSpr); }
     // water last, see-through near the shore
@@ -492,5 +531,5 @@ function create(A){
   try{ rebuild(); resize(); R.ok=true; }catch(e){ R.error=String(e&&e.message||e).slice(0,300); canvas.remove(); }
   return R;
 }
-window.KeepMesh={ create:create, version:'v0.15.0' };
+window.KeepMesh={ create:create, version:'v0.19.0' };
 })();

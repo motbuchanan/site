@@ -1,4 +1,4 @@
-// The Keep · render-ray.js · v0.17.0 · Oct 28 2026
+// The Keep · render-ray.js · v0.19.0 · Oct 29 2026
 // The same world drawn with rays, the way Shadertoy demos draw theirs: no triangles for the land at all. For every pixel
 // one small program walks a ray across the same height data the ASCII raycaster reads, then walks toward the sun for a
 // soft shadow and off the lake for a real reflection. Sky, light and the people are shared with the Mesh renderer.
@@ -80,7 +80,7 @@ const VS_RAY=`#version 300 es
 out vec2 vN; void main(){ vec2 p=vec2((gl_VertexID==1)?3.0:-1.0,(gl_VertexID==2)?3.0:-1.0); vN=p; gl_Position=vec4(p,0.0,1.0); }`;
 const FS_RAY=HEAD+FINISH+SKYFN+`
 uniform mat4 uInv; uniform sampler2D uMax; uniform sampler2D uH; uniform sampler2D uS; uniform sampler2D uAlb; uniform sampler2D uInf; uniform sampler2D uCr; uniform sampler2D uC;
-uniform vec3 uMatF[7]; uniform vec3 uMatT[7]; uniform float uMatCH[7]; uniform float uMatMoss[7];
+uniform vec3 uMatF[10]; uniform vec3 uMatT[10]; uniform float uMatCH[10]; uniform float uMatMoss[10];
 uniform float uDk; uniform float uDark; uniform float uCast; uniform float uWater; uniform int uSteps;
 in vec2 vN; out vec4 o;
 float hLin(vec2 p){ return texture(uH,(p+0.5)/512.0).r; }
@@ -102,29 +102,61 @@ float blockExit(vec3 ro,vec3 rd,vec3 p,float bm){ vec2 lo=floor(p.xy/8.0)*8.0, h
   vec2 e=vec2(rd.x>0.0?hi.x:lo.x, rd.y>0.0?hi.y:lo.y);
   vec2 tt=vec2(abs(rd.x)>1e-5?(e.x-ro.x)/rd.x:1e9, abs(rd.y)>1e-5?(e.y-ro.y)/rd.y:1e9);
   float tx=min(tt.x,tt.y)+0.02; if(rd.z<0.0) tx=min(tx,(bm-ro.z)/rd.z+0.01); return tx; }
-float march(vec3 ro,vec3 rd,float tmax,int steps,out int kind,out vec3 hp,out vec3 pp,out bool spent){
-  float t=0.05, tp=0.0; kind=0; pp=ro; spent=false;
+// near the camera the ray walks cell by cell, like the ASCII raycaster: it tests the exact face of every block it
+// enters, so wall edges are straight and a wall's face direction is known, not guessed. Past 80 m it switches to
+// short steps. Above the tallest thing in an 8 x 8 block it leaps over the whole block.
+float march(vec3 ro,vec3 rd,float tmax,int steps,out int kind,out vec3 hp,out vec3 pp,out bool spent,out vec3 hn){
+  float t=0.05, tp=0.0; kind=0; pp=ro; spent=false; hn=vec3(0.0); vec3 lastN=vec3(0.0);
   for(int i=0;i<260;i++){ if(i>=steps){ spent=true; break; }
     vec3 p=ro+rd*t;
     if(p.x<0.0||p.y<0.0||p.x>511.0||p.y>511.0) break;
     float bm=texelFetch(uMax,ivec2(floor(p.xy/8.0)),0).r;
-    if(p.z>bm+0.02){ if(rd.z>=0.0&&p.z>140.0) break; float tn=blockExit(ro,rd,p,bm); tp=t; t=max(tn,t+0.02); if(t>tmax) break; continue; }
+    if(p.z>bm+0.02){ if(rd.z>=0.0&&p.z>140.0) break;
+      vec2 lo=floor(p.xy/8.0)*8.0, hi=lo+8.0, e=vec2(rd.x>0.0?hi.x:lo.x, rd.y>0.0?hi.y:lo.y);
+      float tx=abs(rd.x)>1e-6?(e.x-ro.x)/rd.x:1e9, ty=abs(rd.y)>1e-6?(e.y-ro.y)/rd.y:1e9, tb=min(tx,ty)+1e-4;
+      float td=rd.z<0.0?(bm-ro.z)/rd.z+0.01:1e9;
+      tp=t; if(td<tb){ t=max(td,t+0.02); lastN=vec3(0.0); } else { t=max(tb,t+0.02); lastN=tx<ty?vec3(-sign(rd.x),0.0,0.0):vec3(0.0,-sign(rd.y),0.0); }
+      if(t>tmax) break; continue; }
     Col c=colAt(p.xy);
+    if(t<80.0){
+      ivec2 ci=ivec2(floor(p.xy)); vec2 cf=vec2(ci); vec4 s=c.s;
+      float tx=rd.x>1e-6?(cf.x+1.0-ro.x)/rd.x:(rd.x<-1e-6?(cf.x-ro.x)/rd.x:1e9);
+      float ty=rd.y>1e-6?(cf.y+1.0-ro.y)/rd.y:(rd.y<-1e-6?(cf.y-ro.y)/rd.y:1e9);
+      float t1=max(min(tx,ty),t+1e-4); vec3 nNext=tx<ty?vec3(-sign(rd.x),0.0,0.0):vec3(0.0,-sign(rd.y),0.0);
+      vec3 pX=ro+rd*t1; float gX=hLin(pX.xy)+s.x;
+      // already below the ground or a block's top at the entry: a block entered through its side, or ground we must back up to
+      if(p.z<c.g){
+        if(s.x>0.02&&lastN!=vec3(0.0)){ kind=2; hp=p; pp=p-rd*0.01; hn=lastN; return t; }
+        float a=tp, b=t; for(int j=0;j<8;j++){ float m=0.5*(a+b); if(solidAt(ro+rd*m)>0) b=m; else a=m; }
+        kind=solidAt(ro+rd*b); if(kind==0) kind=s.x>0.02?2:1; hp=ro+rd*b; pp=ro+rd*a; return b; }
+      if(s.z>s.y&&p.z>=s.y&&p.z<=s.z){ kind=3; hp=p; pp=p-rd*0.01; hn=lastN!=vec3(0.0)?lastN:vec3(0.0,0.0,rd.z<0.0?1.0:-1.0); return t; }
+      float tHit=1e9; int kh=0; vec3 nh=vec3(0.0);
+      if(pX.z<gX){ float a=t, b=t1; for(int j=0;j<10;j++){ float m=0.5*(a+b); vec3 q=ro+rd*m; if(q.z<hLin(q.xy)+s.x) b=m; else a=m; }
+        tHit=b; kh=s.x>0.02?2:1; nh=s.x>0.02?vec3(0.0,0.0,1.0):vec3(0.0); }
+      if(s.z>s.y){
+        if(rd.z<0.0&&p.z>s.z){ float tq=(s.z-ro.z)/rd.z; if(tq<=t1&&tq<tHit){ tHit=tq; kh=3; nh=vec3(0.0,0.0,1.0); } }
+        if(rd.z>0.0&&p.z<s.y){ float tq=(s.y-ro.z)/rd.z; if(tq<=t1&&tq<tHit){ tHit=tq; kh=3; nh=vec3(0.0,0.0,-1.0); } } }
+      if(s.w>0.0){ vec2 cc=cf+0.5, d=ro.xy-cc; float aa=dot(rd.xy,rd.xy), bq=dot(d,rd.xy), cq=dot(d,d)-0.04, disc=bq*bq-aa*cq;
+        if(disc>0.0&&aa>1e-8){ float tt=(-bq-sqrt(disc))/aa; if(tt>=t&&tt<=t1&&tt<tHit){ vec3 q=ro+rd*tt; if(q.z<s.w&&q.z>hLin(q.xy)){ tHit=tt; kh=5; nh=vec3(normalize(q.xy-cc),0.0); } } } }
+      for(int j=0;j<3;j++){ float tm=mix(t,t1,(float(j)+0.5)/3.0); if(tm>=tHit) break; vec3 q=ro+rd*tm;
+        if(tm>0.6&&crownAt(colAt(q.xy),q.z)){ float a=mix(t,t1,float(j)/3.0), b=tm;
+          for(int k=0;k<6;k++){ float m=0.5*(a+b); vec3 r=ro+rd*m; if(crownAt(colAt(r.xy),r.z)) b=m; else a=m; }
+          tHit=b; kh=4; nh=vec3(0.0); break; } }
+      if(kh>0){ kind=kh; hp=ro+rd*(tHit+0.002); pp=ro+rd*max(t,tHit-0.01); hn=nh; return tHit; }
+      tp=t; t=t1+1e-4; lastN=nNext; if(t>tmax) break; continue; }
     int k=0;
-    if(p.z<c.g) k=c.s.x>0.02?2:1; else if(slabAt(c,p.z)) k=3; else if(crownAt(c,p.z)&&t>0.6) k=4; else if(trunkAt(c,p)) k=5;
+    if(p.z<c.g) k=c.s.x>0.02?2:1; else if(slabAt(c,p.z)) k=3; else if(crownAt(c,p.z)) k=4; else if(trunkAt(c,p)) k=5;
     if(k>0){ float a=tp, b=t;
       for(int j=0;j<8;j++){ float m=0.5*(a+b); int km=solidAt(ro+rd*m); if(km>0){ b=m; k=km; } else a=m; }
       kind=k; hp=ro+rd*b; pp=ro+rd*a; return b; }
     float d=p.z-c.g;
     if(c.ct-c.cb>0.35) d=min(d,p.z<c.cb?c.cb-p.z:p.z-c.ct);
     if(c.s.z>c.s.y) d=min(d,p.z<c.s.y?c.s.y-p.z:p.z-c.s.z);
-    if(c.s.w>0.0) d=min(d,0.15);
-    float cap=t<80.0?0.5:0.5+(t-80.0)*0.02;
-    tp=t; t+=clamp(d*0.6,0.03+0.002*t,cap);
+    tp=t; t+=clamp(d*0.6,0.05,0.5+(t-80.0)*0.02); lastN=vec3(0.0);
     if(t>tmax) break; }
   return -1.0; }
 float shadowRay(vec3 p,vec3 L){ if(uCast<0.5||L.z<=0.0) return 1.0;
-  float res=1.0, t=0.25;
+  float res=1.0, t=0.2+0.3*hash(gl_FragCoord.xy);   // a different start per pixel: the penumbra turns to fine grain instead of banding
   for(int i=0;i<48;i++){ vec3 q=p+L*t; if(q.x<0.0||q.y<0.0||q.x>511.0||q.y>511.0||q.z>140.0) break;
     float bm=texelFetch(uMax,ivec2(floor(q.xy/8.0)),0).r;
     if(q.z>bm+1.5){ t=max(blockExit(p,L,q,-1e3),t+0.25); if(t>160.0) break; continue; }   // clear air over this block: skip it; the penumbra comes from the near walk
@@ -142,12 +174,13 @@ float bricks(vec3 w,float along,int m,out float bi,out float zi){ float ch=uMatC
     return (0.90+0.14*hash(vec2(bi,zi*3.0+1.0)))*((fz<0.08||fb<0.06)?0.78:1.0); }
   zi=floor(w.z*1.3); bi=floor(along*1.3); return 0.86+0.20*hash(vec2(bi,zi)+17.0); }
 // light and color at a hit, the same light the raycaster uses: (ambient + sun on the slope) x shadow
-vec3 shade(int kind,vec3 hp,vec3 pp,vec3 rd,float t,bool cheap,out vec3 nrm){
-  ivec2 cell=clamp(ivec2(floor(hp.xy)),ivec2(0),ivec2(511)); vec3 n=vec3(0.0,0.0,1.0); vec3 alb; int m=int(texelFetch(uInf,cell,0).r*255.0+0.5); m=min(m,6);
+vec3 shade(int kind,vec3 hp,vec3 pp,vec3 rd,float t,bool cheap,vec3 nIn,out vec3 nrm){
+  ivec2 cell=clamp(ivec2(floor(hp.xy)),ivec2(0),ivec2(511)); vec3 n=vec3(0.0,0.0,1.0); vec3 alb; int m=int(texelFetch(uInf,cell,0).r*255.0+0.5); m=min(m,9);
   vec4 sc=texelFetch(uS,cell,0);
   bool side=(kind==2&&pp.z<hLin(hp.xy)+sc.x-0.02)||(kind==3&&pp.z>sc.y+0.02&&pp.z<sc.z-0.02);
   if(side){ vec2 f=fract(hp.xy)-0.5; n=abs(f.x)>=abs(f.y)?vec3(sign(f.x),0.0,0.0):vec3(0.0,sign(f.y),0.0);
     vec2 g=pp.xy-hp.xy; if(dot(n.xy,g)<0.0) n=-n; }
+  if((kind==2||kind==3)&&dot(nIn,nIn)>0.5){ n=nIn; side=abs(nIn.z)<0.5; }
   if(kind==1){ float e=0.5; n=normalize(vec3(hLin(hp.xy-vec2(e,0))-hLin(hp.xy+vec2(e,0)),hLin(hp.xy-vec2(0,e))-hLin(hp.xy+vec2(0,e)),2.0*e));
     alb=texture(uAlb,hp.xy/512.0).rgb*(0.93+0.12*hash(floor(hp.xy*3.0))); }
   else if(kind==2||kind==3){
@@ -175,7 +208,7 @@ vec3 shade(int kind,vec3 hp,vec3 pp,vec3 rd,float t,bool cheap,out vec3 nrm){
 void main(){
   vec4 a=uInv*vec4(vN,-1.0,1.0), b=uInv*vec4(vN,1.0,1.0); vec3 ro=uEye; vec3 rd=normalize(b.xyz/b.w-a.xyz/a.w);
   int kind; vec3 hp, pp;
-  bool spent; float t=march(ro,rd,520.0,uSteps,kind,hp,pp,spent);
+  bool spent; vec3 hn; float t=march(ro,rd,520.0,uSteps,kind,hp,pp,spent,hn);
   // the water: where the ray crosses the waterline before it meets anything
   float tw=-1.0; if(ro.z>uWater&&rd.z<0.0) tw=(uWater-ro.z)/rd.z; else if(ro.z<uWater&&rd.z>0.0) tw=(uWater-ro.z)/rd.z;
   bool water=tw>0.0&&(t<0.0||tw<t);
@@ -187,14 +220,14 @@ void main(){
   if(water&&ro.z<uWater){ wp=ro+rd*tw; col=vec3(12.,46.,72.)/255.; }
   else if(water){ wp=ro+rd*tw;
     vec3 bed=vec3(30.,78.,98.)/255.;
-    if(t>0.0){ vec3 bc=shade(kind,hp,pp,rd,t,true,n); float k=exp(-(t-tw)*0.35); bed=mix(bed,bc,k*0.85); }
+    if(t>0.0){ vec3 bc=shade(kind,hp,pp,rd,t,true,hn,n); float k=exp(-(t-tw)*0.35); bed=mix(bed,bc,k*0.85); }
     vec2 rp=vec2(0.030*sin(wp.x*0.9+uTime*1.3)+0.018*sin(wp.y*1.7-uTime*0.9+wp.x*0.3), 0.030*cos(wp.y*0.8+uTime*1.1)+0.018*cos(wp.x*1.5+uTime*0.7));
     vec3 wn=normalize(vec3(rp,1.0)); vec3 rr=reflect(rd,wn); rr.z=max(rr.z,0.01);
     float fres=0.12+0.78*pow(1.0-clamp(-rd.z,0.0,1.0),3.0);
-    int k2; vec3 h2,p2; bool sp2; float t2=march(wp+vec3(0,0,0.05),rr,200.0,64,k2,h2,p2,sp2);
-    vec3 refl; if(t2>0.0){ vec3 n2; vec3 rc=shade(k2,h2,p2,rr,t2,true,n2); float f2=1.0-exp(-t2*uFogK); refl=mix(rc,uFog,f2)*uTint; } else refl=skyCol(rr);
+    int k2; vec3 h2,p2,n2i; bool sp2; float t2=march(wp+vec3(0,0,0.05),rr,200.0,64,k2,h2,p2,sp2,n2i);
+    vec3 refl; if(t2>0.0){ vec3 n2; vec3 rc=shade(k2,h2,p2,rr,t2,true,n2i,n2); float f2=1.0-exp(-t2*uFogK); refl=mix(rc,uFog,f2)*uTint; } else refl=skyCol(rr);
     col=bed*(1.0-fres); raw=refl*fres; }
-  else { wp=hp; col=shade(kind,hp,pp,rd,t,t>70.0,n); }
+  else { wp=hp; col=shade(kind,hp,pp,rd,t,t>70.0,hn,n); }
   if(uNight>0.0) warm=pool(wp);
   vec4 cp=uVP*vec4(wp,1.0); gl_FragDepth=clamp(0.5*cp.z/cp.w+0.5,0.0,1.0);
   o=vec4(finish(col,raw,wp,warm),1.0); }`;
@@ -216,6 +249,17 @@ void main(){ vec4 t=texture(uA,vUV); if(t.a<0.2) discard;
   if(vX.w>0.5&&uNight>0.02&&vX.x>=0.0){ vec2 px=vLoc*vec2(16.0,32.0); w=uNight*max(0.0,1.0-length(px-vX.xy)/12.0)*1.1; }
   o=vec4(finish(c,vec3(0.0),vW,w),1.0); }`;
 
+
+// wall decorations (banners, paintings, tapestries): flat pictures a hand's width off the wall, from the same list the letters use
+const VS_DECO=HEAD+`
+layout(location=0) in vec3 aP; layout(location=1) in vec2 aU; layout(location=2) in vec2 aC;
+out vec3 vW; out vec2 vU; flat out ivec2 vCell;
+void main(){ vW=aP; vU=aU; vCell=ivec2(aC); gl_Position=uVP*vec4(aP,1.0); }`;
+const FS_DECO=HEAD+FINISH+`
+uniform sampler2D uD; uniform sampler2D uC; in vec3 vW; in vec2 vU; flat in ivec2 vCell; out vec4 o;
+void main(){ vec4 t=texture(uD,vU); if(t.a<0.5) discard; float sh=texelFetch(uC,vCell,0).a;
+  vec3 b=t.a<0.9?t.rgb*(0.55+0.6*(1.0-uNight)):t.rgb*0.9*sh;   // stained glass glows with the daylight behind it
+  o=vec4(finish(b,vec3(0.0),vW,uNight>0.0?pool(vW):0.0),1.0); }`;
 // ---------------- the renderer ----------------
 function create(A){
   const R={ok:false,error:'',shown:false};
@@ -289,8 +333,8 @@ function create(A){
   const CR=1024, texCr=tex(CR,CR,gl.RG8,gl.RG,gl.UNSIGNED_BYTE,gl.LINEAR,gl.CLAMP_TO_EDGE);
   const texHL=tex(N,N,gl.R16F,gl.RED,gl.FLOAT,gl.LINEAR,gl.CLAMP_TO_EDGE);
   const NB=N/8, texMax=tex(NB,NB,gl.R32F,gl.RED,gl.FLOAT,gl.NEAREST,gl.CLAMP_TO_EDGE);
-  const matF=new Float32Array(21), matT=new Float32Array(21), matCH=new Float32Array(7), matMoss=new Float32Array(7);
-  for(let m=0;m<7;m++){ const M=A.RMAT[m]||A.RMAT[0]; for(let k=0;k<3;k++){ matF[m*3+k]=M.f[k]/255; matT[m*3+k]=M.t[k]/255; } matCH[m]=M.ch; matMoss[m]=M.moss; }
+  const matF=new Float32Array(30), matT=new Float32Array(30), matCH=new Float32Array(10), matMoss=new Float32Array(10);
+  for(let m=0;m<10;m++){ const M=A.RMAT[m]||A.RMAT[0]; for(let k=0;k<3;k++){ matF[m*3+k]=M.f[k]/255; matT[m*3+k]=M.t[k]/255; } matCH[m]=M.ch; matMoss[m]=M.moss; }
   function buildWorldTex(){ const h=W.h, st=W.st, sb=W.sb, su=W.su;
     const S=new Float32Array(N*N*4), AL=new Uint8Array(N*N*4), IN=new Uint8Array(N*N*4), CRD=new Uint8Array(CR*CR*2);
     for(let i=0;i<CR*CR;i++){ CRD[i*2]=255; CRD[i*2+1]=0; }   // no crown: bottom high, top low, so the edge of a crown stays crisp
@@ -334,7 +378,33 @@ function create(A){
     return out; }
   let sig='', relPass=-1, relRow=0;
   function worldSig(){ const D=A.DIALS; return W.seed+'|'+D.keep+'|'+D.forest+'|'+D.water+'|'+D.ruins+'|'+W.ruins.length+'|'+W.keepBuilt; }
-  function rebuild(){
+
+  // ---- wall decorations ----
+  let PD=null; try{ PD=prog(VS_DECO,FS_DECO); }catch(e){ PD=null; }
+  const vaoD=gl.createVertexArray(), vbD=gl.createBuffer(); let nDeco=0, texD=null;
+  gl.bindVertexArray(vaoD); gl.bindBuffer(gl.ARRAY_BUFFER,vbD);
+  gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0,3,gl.FLOAT,false,28,0);
+  gl.enableVertexAttribArray(1); gl.vertexAttribPointer(1,2,gl.FLOAT,false,28,12);
+  gl.enableVertexAttribArray(2); gl.vertexAttribPointer(2,2,gl.FLOAT,false,28,20);
+  gl.bindVertexArray(null);
+  function buildDeco(){ nDeco=0; const L=A.DECO||[], IM=A.DECO_IMG||{}; if(!PD||!L.length) return;
+    const names=Object.keys(IM); let AW=0, AH=1; const at={};
+    for(const k of names){ at[k]=AW; AW+=IM[k].w+1; AH=Math.max(AH,IM[k].h); }
+    if(!texD){ const px=new Uint8Array(AW*AH*4);
+      for(const k of names){ const I=IM[k], ox=at[k]; for(let y=0;y<I.h;y++)for(let x=0;x<I.w;x++){ const p=I.px[y*I.w+x]; if(!p) continue;
+        const c=I.pal[p], o=(y*AW+ox+x)*4; px[o]=c[0]; px[o+1]=c[1]; px[o+2]=c[2]; px[o+3]=(I.glow&&p>1&&p<8)?204:255; } }
+      texD=tex(AW,AH,gl.RGBA8,gl.RGBA,gl.UNSIGNED_BYTE,gl.NEAREST,gl.CLAMP_TO_EDGE);
+      gl.bindTexture(gl.TEXTURE_2D,texD); gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,AW,AH,gl.RGBA,gl.UNSIGNED_BYTE,px); }
+    const v=[];
+    for(const d of L){ const I=IM[d.img]; if(!I) continue;
+      const u0=(at[d.img]+0.01)/AW, u1=(at[d.img]+I.w-0.01)/AW, t0=0.01/AH, t1=(I.h-0.01)/AH;
+      let ua=u0, ub=u1; if((d.axis==='y'&&d.ny<0)||(d.axis==='x'&&d.nx>0)){ ua=u1; ub=u0; }
+      const qa=d.axis==='y'?[d.a,d.p]:[d.p,d.a], qb=d.axis==='y'?[d.b,d.p]:[d.p,d.b];
+      const cx=Math.max(0,Math.min(N-1,Math.floor((qa[0]+qb[0])/2+d.nx*0.5))), cy=Math.max(0,Math.min(N-1,Math.floor((qa[1]+qb[1])/2+d.ny*0.5)));
+      const V=function(q,z,u,t){ v.push(q[0],q[1],z,u,t,cx,cy); };
+      V(qa,d.z0Abs,ua,t1); V(qb,d.z0Abs,ub,t1); V(qb,d.z1Abs,ub,t0); V(qa,d.z0Abs,ua,t1); V(qb,d.z1Abs,ub,t0); V(qa,d.z1Abs,ua,t0); }
+    gl.bindBuffer(gl.ARRAY_BUFFER,vbD); gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(v),gl.STATIC_DRAW); nDeco=v.length/7; }
+  function rebuild(){ buildDeco();
     buildWorldTex();
     gl.bindTexture(gl.TEXTURE_2D,texCl); gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,256,256,gl.RED,gl.UNSIGNED_BYTE,seamless(W.cloud));
     gl.bindTexture(gl.TEXTURE_2D,texCl2); gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,256,256,gl.RED,gl.UNSIGNED_BYTE,seamless(W.cloud2));
@@ -399,11 +469,11 @@ function create(A){
         spData.set([x,y,z,0, P_.wsize,P_.hsize,0,amb, uv[0],uv[1],uv[2],uv[3], ln[0],ln[1],mir,1],o); k++; continue; }
       const P_=SPP[sp], g=A.growOf(c);
       if(sp===SP.BIRD){ const fr=Math.sin(A.skyTime()*7+c*1.7)>0?1:0, uv=slotUV[atlasMap['b'+fr]];
-        spData.set([x,y,z+P_.hsize*g*0.2, P_.wsize*g,P_.hsize*g*0.55,0,1, uv[0],uv[1],uv[2],uv[3], -1,0,0,0],o); k++; continue; }
+        spData.set([x,y,z+P_.hsize*g*0.2,0, P_.wsize*g,P_.hsize*g*0.55,0,1, uv[0],uv[1],uv[2],uv[3], -1,0,0,0],o); k++; continue; }
       const key='m'+sp; if(atlasMap[key]==null) continue; const uv=slotUV[atlasMap[key]];
       // the masks face right; turn them to face the way the animal walks, as seen from here
       const mir=(C.vx[c]*(-Math.sin(yaw))+C.vy[c]*Math.cos(yaw)<0)?1:0;
-      spData.set([x,y,z, P_.wsize*g,P_.hsize*g,0,amb, uv[0],uv[1],uv[2],uv[3], -1,0,mir,sp>=SP.KEEPER?1:0],o); k++; }
+      spData.set([x,y,z,0, P_.wsize*g,P_.hsize*g,0,amb, uv[0],uv[1],uv[2],uv[3], -1,0,mir,sp>=SP.KEEPER?1:0],o); k++; }
     nSpr=k; return nl; }
 
   function draw(){
@@ -435,6 +505,8 @@ function create(A){
     gl.uniform1f(PR.u.uWater,A.WATER); gl.uniform1i(PR.u.uSteps,Math.round(120+160*(scale-0.5)));
     gl.bindVertexArray(vaoEmpty); gl.drawArrays(gl.TRIANGLES,0,3);
     gl.depthFunc(gl.LEQUAL);
+    if(nDeco){ common(PD,U,vp); bindTex(PD,'uD',4,texD); bindTex(PD,'uC',1,texC);
+      gl.enable(gl.POLYGON_OFFSET_FILL); gl.polygonOffset(-1,-2); gl.bindVertexArray(vaoD); gl.drawArrays(gl.TRIANGLES,0,nDeco); gl.disable(gl.POLYGON_OFFSET_FILL); }
     if(nSpr){ common(PSP,U,vp); bindTex(PSP,'uA',3,texA); gl.bindVertexArray(vaoSp); gl.bindBuffer(gl.ARRAY_BUFFER,vbSp);
       gl.bufferSubData(gl.ARRAY_BUFFER,0,spData,0,nSpr*16); gl.drawArraysInstanced(gl.TRIANGLE_STRIP,0,4,nSpr); }
     gl.bindVertexArray(null);
@@ -454,5 +526,5 @@ function create(A){
   try{ rebuild(); resize(); R.ok=true; }catch(e){ R.error=String(e&&e.message||e).slice(0,300); canvas.remove(); }
   return R;
 }
-window.KeepRay={ create:create, version:'v0.17.0' };
+window.KeepRay={ create:create, version:'v0.19.0' };
 })();

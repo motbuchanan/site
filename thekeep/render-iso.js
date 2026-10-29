@@ -1,4 +1,4 @@
-// The Keep · render-iso.js · v0.18.0 · Oct 29 2026
+// The Keep · render-iso.js · v0.19.0 · Oct 29 2026
 // The same world seen from above at a fixed slant, the way SimCity, Diablo and Monument Valley frame theirs: an
 // isometric (orthographic) camera, so nothing shrinks with distance and the whole keep reads like a model on a table.
 // It draws the Voxels blocks; the camera follows behind you as you turn, so the walk stick works the same.
@@ -53,7 +53,7 @@ out vec3 vW; flat out ivec2 vCell; flat out int vFace; flat out int vMat; flat o
 void main(){ vW=aP.xyz; vTop=aP.w; vCell=ivec2(aC); vFace=int(aF.x+0.5); vMat=int(aF.y+0.5); vSl=int(aF.w+0.5); vAO=aF.z/255.0;
   gl_Position=uVP*vec4(aP.xyz,1.0); }`;
 const FS_VOX=HEAD+FINISH+`
-uniform sampler2D uC; uniform sampler2D uT; uniform vec3 uMatF[7]; uniform vec3 uMatT[7]; uniform float uMatCH[7];
+uniform sampler2D uC; uniform sampler2D uT; uniform vec3 uMatF[10]; uniform vec3 uMatT[10]; uniform float uMatCH[10];
 in vec3 vW; flat in ivec2 vCell; flat in int vFace; flat in int vMat; flat in int vSl; flat in float vTop; in float vAO; out vec4 o;
 void main(){
   vec4 lit=texelFetch(uC,vCell,0); float sh=vSl==1?texelFetch(uT,vCell,0).a:lit.a;
@@ -61,11 +61,11 @@ void main(){
   vec2 blk=floor(fc-0.0001*vec2(0.0,1.0)), px=floor(fract(fc)*16.0);
   float n=0.88+0.18*hash(px+blk*17.0+float(vMat)*3.1);
   vec3 c;
-  if(vMat==12){ vec3 tc=texelFetch(uT,vCell,0).rgb; float hole=hash(px+blk*5.0+float(vFace)); c=tc*(hole<0.12?0.62:1.0)*(vFace==0?1.08:(vFace==5?0.7:0.9))*sh; }
+  if(vMat==20){ vec3 tc=texelFetch(uT,vCell,0).rgb; float hole=hash(px+blk*5.0+float(vFace)); c=tc*(hole<0.12?0.62:1.0)*(vFace==0?1.08:(vFace==5?0.7:0.9))*sh; }
   else if(vFace==0){
-    if(vMat>=5&&vMat<=11){ int m=vMat-5; c=uMatT[m]; } else c=lit.rgb;
-    c*=(vMat>=5&&vMat<=11)?sh:1.0; c*=n;
-    if(vMat<5||vMat>11) c*=sh;
+    if(vMat>=5&&vMat<=14){ int m=vMat-5; c=uMatT[m]; } else c=lit.rgb;
+    c*=(vMat>=5&&vMat<=14)?sh:1.0; c*=n;
+    if(vMat<5||vMat>14) c*=sh;
   } else {
     vec2 nn=vFace==1?vec2(1,0):vFace==2?vec2(-1,0):vFace==3?vec2(0,1):vec2(0,-1);
     float lt=vFace==5?0.5:0.64+0.46*max(0.0,dot(nn,uLight.xy));
@@ -76,7 +76,7 @@ void main(){
     else if(vMat==2) base=(vW.z>vTop-0.25)?vec3(234.,238.,244.)/255.:vec3(132.,122.,108.)/255.;
     else if(vMat==3) base=vec3(132.,122.,108.)/255.;
     else if(vMat==4) base=vec3(134.,96.,67.)/255.;
-    else if(vMat<=11){ int m=vMat-5; base=uMatF[m];
+    else if(vMat<=14){ int m=vMat-5; base=uMatF[m];
       if(uMatCH[m]>0.0){ float row=floor(px.y/8.0); float py=mod(px.y,8.0), qx=mod(px.x+(mod(row+blk.y,2.0)>0.5?8.0:0.0),16.0);
         if(py<1.0||qx<1.0) base*=0.74; } }
     else base=vec3(106.,76.,48.)/255.;
@@ -161,6 +161,17 @@ void main(){ ivec2 cell=clamp(ivec2(floor(vW.xy)),ivec2(0),ivec2(511)); float be
   vec3 cw=body*(1.0-fres)/max(a,0.01), craw=sk*fres/max(a,0.01);
   o=vec4(finish(cw,craw,vW,0.0),a); }`;
 
+
+// wall decorations (banners, paintings, tapestries): flat pictures a hand's width off the wall, from the same list the letters use
+const VS_DECO=HEAD+`
+layout(location=0) in vec3 aP; layout(location=1) in vec2 aU; layout(location=2) in vec2 aC;
+out vec3 vW; out vec2 vU; flat out ivec2 vCell;
+void main(){ vW=aP; vU=aU; vCell=ivec2(aC); gl_Position=uVP*vec4(aP,1.0); }`;
+const FS_DECO=HEAD+FINISH+`
+uniform sampler2D uD; uniform sampler2D uC; in vec3 vW; in vec2 vU; flat in ivec2 vCell; out vec4 o;
+void main(){ vec4 t=texture(uD,vU); if(t.a<0.5) discard; float sh=texelFetch(uC,vCell,0).a;
+  vec3 b=t.a<0.9?t.rgb*(0.55+0.6*(1.0-uNight)):t.rgb*0.9*sh;   // stained glass glows with the daylight behind it
+  o=vec4(finish(b,vec3(0.0),vW,uNight>0.0?pool(vW):0.0),1.0); }`;
 // ---------------- the renderer ----------------
 function create(A){
   const R={ok:false,error:'',shown:false};
@@ -210,10 +221,11 @@ function create(A){
   function buildColumns(){ const h=W.h, st=W.st, WATER=A.WATER;
     for(let y=0;y<N;y++)for(let x=0;x<N;x++){ const i=y*N+x, hh=h[i];
       const g=hh+st[i]; colTop[i]=g<WATER?Math.min(Math.round(g),Math.ceil(WATER)-1):Math.round(g);
+      if(st[i]>0.3&&g>=WATER&&colTop[i]<=Math.round(hh)) colTop[i]=Math.round(hh)+1;   // a low bench or pew still stands one block up
       const xl=x>0?x-1:x, xr=x<N-1?x+1:x, yu=y>0?y-1:y, yd=y<N-1?y+1:y;
       const sx=(h[y*N+xr]-h[y*N+xl])*0.5, sy=(h[yd*N+x]-h[yu*N+x])*0.5, slope=Math.sqrt(sx*sx+sy*sy);
       let m;
-      if(st[i]>0) m=5+Math.min(6,W.ruin[i]);
+      if(st[i]>0) m=5+Math.min(9,W.ruin[i]);
       else if(W.ruin[i]===6) m=11;
       else if(W.path[i]&&hh>WATER+0.3) m=4;
       else if(hh<WATER+1.4) m=1;
@@ -257,8 +269,8 @@ function create(A){
     const rcw=0.92*(t===0?1.05:t===1?1.85:1.62)*tw, base=colTop[i], top=W.gh[i]+th;
     const cb0=W.gh[i]+th*(t===0?(0.06+0.16*tj):t===1?(0.36+0.22*tj):(0.22+0.24*tj)), cH=top-cb0;
     const zc=Math.max(base+1,Math.round(cb0)), zt=Math.max(zc+1,Math.round(top));
-    if(zc>base) box(B,x,y,base,x+1,y+1,zc,x,y,13,1|32);
-    if(!full){ const r=Math.max(1,Math.round(rcw)); box(B,x-r+1,y-r+1,zc,x+r,y+r,zt,x,y,12,0); return; }
+    if(zc>base) box(B,x,y,base,x+1,y+1,zc,x,y,21,1|32);
+    if(!full){ const r=Math.max(1,Math.round(rcw)); box(B,x-r+1,y-r+1,zc,x+r,y+r,zt,x,y,20,0); return; }
     const R=Math.ceil(rcw)+1, set=new Set(), key=function(a,b,c){ return ((a+8)*32+(b+8))*256+c; };
     for(let z=zc;z<zt;z++){ const zz=z+0.5; let q;
       if(t===0){ const u=Math.max(0,Math.min(1,(top-zz)/cH)); q=(-0.22+Math.sqrt(0.0484+3.12*u))/1.56; }
@@ -269,7 +281,7 @@ function create(A){
     set.forEach(function(k){ const lz=k%256, ab=(k-lz)/256, by=ab%32-8, bx=(ab-ab%32)/32-8;
       let skip=0; if(set.has(key(bx,by,lz+1))) skip|=1; if(lz>0&&set.has(key(bx,by,lz-1))) skip|=32;
       if(set.has(key(bx+1,by,lz))) skip|=2; if(set.has(key(bx-1,by,lz))) skip|=4; if(set.has(key(bx,by+1,lz))) skip|=8; if(set.has(key(bx,by-1,lz))) skip|=16;
-      if(skip!==63) box(B,x+bx,y+by,zc+lz,x+bx+1,y+by+1,zc+lz+1,x,y,12,skip); }); }
+      if(skip!==63) box(B,x+bx,y+by,zc+lz,x+bx+1,y+by+1,zc+lz+1,x,y,20,skip); }); }
   function buildChunk(cxi,cyi,lod){
     const s=STRIDES[lod], B=SCRATCH, ox=cxi*SIDE, oy=cyi*SIDE;
     B.nv=0; B.ni=0; B.full=false; B.sl=0;
@@ -288,7 +300,7 @@ function create(A){
         const fc=cellOf(Math.max(0,Math.min(N-1,nx)),Math.max(0,Math.min(N-1,ny)),s);
         side(B,x,y,s,d,Math.max(nH,H-64),H,H,fc[0],fc[1],mat,s===1?AOS:AO1); } }
     if(lod===0){ for(let y=oy;y<oy+SIDE;y++)for(let x=ox;x<ox+SIDE;x++){ const i=y*N+x; if(slabT[i]<=slabB[i]) continue;
-        const zb=slabB[i], zt=slabT[i], mat=colMat[i]>=5?colMat[i]:5+Math.min(6,W.ruin[i]);
+        const zb=slabB[i], zt=slabT[i], mat=colMat[i]>=5?colMat[i]:5+Math.min(9,W.ruin[i]);
         let skip=0; const cov=function(j){ return slabT[j]>slabB[j]&&slabB[j]<=zb&&slabT[j]>=zt; };
         if(cov(i+1)) skip|=2; if(cov(i-1)) skip|=4; if(cov(i+N)) skip|=8; if(cov(i-N)) skip|=16;
         B.sl=1; box(B,x,y,zb,x+1,y+1,zt,x,y,mat,skip); B.sl=0; } }
@@ -312,8 +324,8 @@ function create(A){
         const v=Math.max(g,slabT[i])+(W.tree[i]>0?W.tree[i]+2:0); if(v>hi)hi=v; }
       chunkMin[cy*CH+cx]=Math.min(lo-64,A.WATER); chunkMax[cy*CH+cx]=hi+2; } }
   // material colors for the keep and ruin stone, the same table the raycaster uses
-  const matF=new Float32Array(21), matT=new Float32Array(21), matCH=new Float32Array(7);
-  for(let m=0;m<7;m++){ const M=A.RMAT[m]||A.RMAT[0]; for(let k=0;k<3;k++){ matF[m*3+k]=M.f[k]/255; matT[m*3+k]=M.t[k]/255; } matCH[m]=M.ch; }
+  const matF=new Float32Array(30), matT=new Float32Array(30), matCH=new Float32Array(10);
+  for(let m=0;m<10;m++){ const M=A.RMAT[m]||A.RMAT[0]; for(let k=0;k<3;k++){ matF[m*3+k]=M.f[k]/255; matT[m*3+k]=M.t[k]/255; } matCH[m]=M.ch; }
   // ---- sprites: an atlas of every creature and keeper frame, built from the same pixel masks ----
   const SLOT_W=16, SLOT_H=32, ACOLS=16; const slots=[]; const atlasMap={};
   function addSlot(key,w,h,px,pal,glowIdx){ slots.push({key:key,w:w,h:h,px:px,pal:pal,glow:glowIdx}); atlasMap[key]=slots.length-1; }
@@ -356,7 +368,33 @@ function create(A){
     return out; }
   let sig='', relPass=-1, relRow=0, camYaw=A.P.yaw, zoom=1, lastT=0;
   function worldSig(){ const D=A.DIALS; return W.seed+'|'+D.keep+'|'+D.forest+'|'+D.water+'|'+D.ruins+'|'+W.ruins.length+'|'+W.keepBuilt; }
-  function rebuild(){
+
+  // ---- wall decorations ----
+  let PD=null; try{ PD=prog(VS_DECO,FS_DECO); }catch(e){ PD=null; }
+  const vaoD=gl.createVertexArray(), vbD=gl.createBuffer(); let nDeco=0, texD=null;
+  gl.bindVertexArray(vaoD); gl.bindBuffer(gl.ARRAY_BUFFER,vbD);
+  gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0,3,gl.FLOAT,false,28,0);
+  gl.enableVertexAttribArray(1); gl.vertexAttribPointer(1,2,gl.FLOAT,false,28,12);
+  gl.enableVertexAttribArray(2); gl.vertexAttribPointer(2,2,gl.FLOAT,false,28,20);
+  gl.bindVertexArray(null);
+  function buildDeco(){ nDeco=0; const L=A.DECO||[], IM=A.DECO_IMG||{}; if(!PD||!L.length) return;
+    const names=Object.keys(IM); let AW=0, AH=1; const at={};
+    for(const k of names){ at[k]=AW; AW+=IM[k].w+1; AH=Math.max(AH,IM[k].h); }
+    if(!texD){ const px=new Uint8Array(AW*AH*4);
+      for(const k of names){ const I=IM[k], ox=at[k]; for(let y=0;y<I.h;y++)for(let x=0;x<I.w;x++){ const p=I.px[y*I.w+x]; if(!p) continue;
+        const c=I.pal[p], o=(y*AW+ox+x)*4; px[o]=c[0]; px[o+1]=c[1]; px[o+2]=c[2]; px[o+3]=(I.glow&&p>1&&p<8)?204:255; } }
+      texD=tex(AW,AH,gl.RGBA8,gl.RGBA,gl.UNSIGNED_BYTE,gl.NEAREST,gl.CLAMP_TO_EDGE);
+      gl.bindTexture(gl.TEXTURE_2D,texD); gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,AW,AH,gl.RGBA,gl.UNSIGNED_BYTE,px); }
+    const v=[];
+    for(const d of L){ const I=IM[d.img]; if(!I) continue;
+      const u0=(at[d.img]+0.01)/AW, u1=(at[d.img]+I.w-0.01)/AW, t0=0.01/AH, t1=(I.h-0.01)/AH;
+      let ua=u0, ub=u1; if((d.axis==='y'&&d.ny<0)||(d.axis==='x'&&d.nx>0)){ ua=u1; ub=u0; }
+      const qa=d.axis==='y'?[d.a,d.p]:[d.p,d.a], qb=d.axis==='y'?[d.b,d.p]:[d.p,d.b];
+      const cx=Math.max(0,Math.min(N-1,Math.floor((qa[0]+qb[0])/2+d.nx*0.5))), cy=Math.max(0,Math.min(N-1,Math.floor((qa[1]+qb[1])/2+d.ny*0.5)));
+      const V=function(q,z,u,t){ v.push(q[0],q[1],z,u,t,cx,cy); };
+      V(qa,d.z0Abs,ua,t1); V(qb,d.z0Abs,ub,t1); V(qb,d.z1Abs,ub,t0); V(qa,d.z0Abs,ua,t1); V(qb,d.z1Abs,ub,t0); V(qa,d.z1Abs,ua,t0); }
+    gl.bindBuffer(gl.ARRAY_BUFFER,vbD); gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(v),gl.STATIC_DRAW); nDeco=v.length/7; }
+  function rebuild(){ buildDeco();
     freeChunks(); buildColumns(); chunkBounds();
     gl.bindTexture(gl.TEXTURE_2D,texH); gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,N,N,gl.RED,gl.FLOAT,W.h);
     gl.bindTexture(gl.TEXTURE_2D,texCl); gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,256,256,gl.RED,gl.UNSIGNED_BYTE,seamless(W.cloud));
@@ -422,11 +460,11 @@ function create(A){
         spData.set([x,y,z,0, P_.wsize,P_.hsize,0,amb, uv[0],uv[1],uv[2],uv[3], ln[0],ln[1],mir,1],o); k++; continue; }
       const P_=SPP[sp], g=A.growOf(c);
       if(sp===SP.BIRD){ const fr=Math.sin(A.skyTime()*7+c*1.7)>0?1:0, uv=slotUV[atlasMap['b'+fr]];
-        spData.set([x,y,z+P_.hsize*g*0.2, P_.wsize*g,P_.hsize*g*0.55,0,1, uv[0],uv[1],uv[2],uv[3], -1,0,0,0],o); k++; continue; }
+        spData.set([x,y,z+P_.hsize*g*0.2,0, P_.wsize*g,P_.hsize*g*0.55,0,1, uv[0],uv[1],uv[2],uv[3], -1,0,0,0],o); k++; continue; }
       const key='m'+sp; if(atlasMap[key]==null) continue; const uv=slotUV[atlasMap[key]];
       // the masks face right; turn them to face the way the animal walks, as seen from here
       const mir=(C.vx[c]*(-Math.sin(yaw))+C.vy[c]*Math.cos(yaw)<0)?1:0;
-      spData.set([x,y,z, P_.wsize*g,P_.hsize*g,0,amb, uv[0],uv[1],uv[2],uv[3], -1,0,mir,sp>=SP.KEEPER?1:0],o); k++; }
+      spData.set([x,y,z,0, P_.wsize*g,P_.hsize*g,0,amb, uv[0],uv[1],uv[2],uv[3], -1,0,mir,sp>=SP.KEEPER?1:0],o); k++; }
     nSpr=k; return nl; }
 
   function draw(){
@@ -474,6 +512,8 @@ function create(A){
       while(!chunks[c*4+l]&&l<3) l++;
       const ch=chunks[c*4+l]; if(!ch) continue; ch.used=frameNo; if(!ch.n) continue;
       gl.bindVertexArray(ch.vao); gl.drawElements(gl.TRIANGLES,ch.n,gl.UNSIGNED_INT,0); }
+    if(nDeco){ common(PD,U,vp); bindTex(PD,'uD',4,texD); bindTex(PD,'uC',1,texC);
+      gl.enable(gl.POLYGON_OFFSET_FILL); gl.polygonOffset(-1,-2); gl.bindVertexArray(vaoD); gl.drawArrays(gl.TRIANGLES,0,nDeco); gl.disable(gl.POLYGON_OFFSET_FILL); }
     { const uv=slotUV[atlasMap.me], o=Math.min(nSpr,SPMAX-1)*16, ci=(Math.max(0,Math.min(N-1,py|0)))*N+Math.max(0,Math.min(N-1,px|0));
       const amb=(W.shadRaw[ci]>0.99&&DAY.lightAlt>0.035)?1.0:0.62+0.38*W.shadRaw[ci];
       spData.set([px,py,Math.max(feet,colTop[ci]),0, 0.7,2.5,0,amb, uv[0],uv[1],uv[2],uv[3], -1,0,0,0],o); nSpr=Math.min(nSpr+1,SPMAX); }
@@ -505,5 +545,5 @@ function create(A){
   try{ rebuild(); resize(); R.ok=true; }catch(e){ R.error=String(e&&e.message||e).slice(0,300); canvas.remove(); }
   return R;
 }
-window.KeepIso={ create:create, version:'v0.18.0' };
+window.KeepIso={ create:create, version:'v0.19.0' };
 })();
