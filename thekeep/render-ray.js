@@ -1,4 +1,4 @@
-// The Keep · render-ray.js · v0.19.0 · Oct 29 2026
+// The Keep · render-ray.js · v0.20.0 · Oct 29 2026
 // The same world drawn with rays, the way Shadertoy demos draw theirs: no triangles for the land at all. For every pixel
 // one small program walks a ray across the same height data the ASCII raycaster reads, then walks toward the sun for a
 // soft shadow and off the lake for a real reflection. Sky, light and the people are shared with the Mesh renderer.
@@ -80,7 +80,7 @@ const VS_RAY=`#version 300 es
 out vec2 vN; void main(){ vec2 p=vec2((gl_VertexID==1)?3.0:-1.0,(gl_VertexID==2)?3.0:-1.0); vN=p; gl_Position=vec4(p,0.0,1.0); }`;
 const FS_RAY=HEAD+FINISH+SKYFN+`
 uniform mat4 uInv; uniform sampler2D uMax; uniform sampler2D uH; uniform sampler2D uS; uniform sampler2D uAlb; uniform sampler2D uInf; uniform sampler2D uCr; uniform sampler2D uC;
-uniform vec3 uMatF[10]; uniform vec3 uMatT[10]; uniform float uMatCH[10]; uniform float uMatMoss[10];
+uniform vec3 uMatF[14]; uniform vec3 uMatT[14]; uniform float uMatCH[14]; uniform float uMatMoss[14];
 uniform float uDk; uniform float uDark; uniform float uCast; uniform float uWater; uniform int uSteps;
 in vec2 vN; out vec4 o;
 float hLin(vec2 p){ return texture(uH,(p+0.5)/512.0).r; }
@@ -175,7 +175,7 @@ float bricks(vec3 w,float along,int m,out float bi,out float zi){ float ch=uMatC
   zi=floor(w.z*1.3); bi=floor(along*1.3); return 0.86+0.20*hash(vec2(bi,zi)+17.0); }
 // light and color at a hit, the same light the raycaster uses: (ambient + sun on the slope) x shadow
 vec3 shade(int kind,vec3 hp,vec3 pp,vec3 rd,float t,bool cheap,vec3 nIn,out vec3 nrm){
-  ivec2 cell=clamp(ivec2(floor(hp.xy)),ivec2(0),ivec2(511)); vec3 n=vec3(0.0,0.0,1.0); vec3 alb; int m=int(texelFetch(uInf,cell,0).r*255.0+0.5); m=min(m,9);
+  ivec2 cell=clamp(ivec2(floor(hp.xy)),ivec2(0),ivec2(511)); vec3 n=vec3(0.0,0.0,1.0); vec3 alb; vec4 inf0=texelFetch(uInf,cell,0); int m=int(inf0.r*255.0+0.5); if(kind==3){ int sm=int(inf0.b*255.0+0.5); if(sm>0) m=sm; } m=min(m,13);
   vec4 sc=texelFetch(uS,cell,0);
   bool side=(kind==2&&pp.z<hLin(hp.xy)+sc.x-0.02)||(kind==3&&pp.z>sc.y+0.02&&pp.z<sc.z-0.02);
   if(side){ vec2 f=fract(hp.xy)-0.5; n=abs(f.x)>=abs(f.y)?vec3(sign(f.x),0.0,0.0):vec3(0.0,sign(f.y),0.0);
@@ -333,15 +333,15 @@ function create(A){
   const CR=1024, texCr=tex(CR,CR,gl.RG8,gl.RG,gl.UNSIGNED_BYTE,gl.LINEAR,gl.CLAMP_TO_EDGE);
   const texHL=tex(N,N,gl.R16F,gl.RED,gl.FLOAT,gl.LINEAR,gl.CLAMP_TO_EDGE);
   const NB=N/8, texMax=tex(NB,NB,gl.R32F,gl.RED,gl.FLOAT,gl.NEAREST,gl.CLAMP_TO_EDGE);
-  const matF=new Float32Array(30), matT=new Float32Array(30), matCH=new Float32Array(10), matMoss=new Float32Array(10);
-  for(let m=0;m<10;m++){ const M=A.RMAT[m]||A.RMAT[0]; for(let k=0;k<3;k++){ matF[m*3+k]=M.f[k]/255; matT[m*3+k]=M.t[k]/255; } matCH[m]=M.ch; matMoss[m]=M.moss; }
+  const matF=new Float32Array(42), matT=new Float32Array(42), matCH=new Float32Array(14), matMoss=new Float32Array(14);
+  for(let m=0;m<14;m++){ const M=A.RMAT[m]||A.RMAT[0]; for(let k=0;k<3;k++){ matF[m*3+k]=M.f[k]/255; matT[m*3+k]=M.t[k]/255; } matCH[m]=M.ch; matMoss[m]=M.moss; }
   function buildWorldTex(){ const h=W.h, st=W.st, sb=W.sb, su=W.su;
     const S=new Float32Array(N*N*4), AL=new Uint8Array(N*N*4), IN=new Uint8Array(N*N*4), CRD=new Uint8Array(CR*CR*2);
     for(let i=0;i<CR*CR;i++){ CRD[i*2]=255; CRD[i*2+1]=0; }   // no crown: bottom high, top low, so the edge of a crown stays crisp
     for(let y=0;y<N;y++)for(let x=0;x<N;x++){ const i=y*N+x;
       S[i*4]=st[i]; if(su[i]>0){ S[i*4+1]=h[i]+sb[i]; S[i*4+2]=h[i]+su[i]; }
       AL[i*4]=W.ar[i]; AL[i*4+1]=W.ag[i]; AL[i*4+2]=W.ab[i]; AL[i*4+3]=255;
-      IN[i*4]=W.ruin[i]; IN[i*4+1]=W.ttype[i];
+      IN[i*4]=W.ruin[i]; IN[i*4+1]=W.ttype[i]; IN[i*4+2]=W.smat[i];
       const th=W.tree[i]; if(!(th>0)) continue;
       const t=W.ttype[i], tw=0.55+1.35*A.hash2(x,y,W.seed+96), tj=A.hash2(x,y,W.seed+93);
       const rcw=0.92*(t===0?1.05:t===1?1.85:1.62)*tw, base=W.gh[i], top=base+th;
@@ -377,7 +377,7 @@ function create(A){
         out[y*S+x]=Math.max(0,Math.min(255,Math.round(mean+(v-mean)*k))); } }
     return out; }
   let sig='', relPass=-1, relRow=0;
-  function worldSig(){ const D=A.DIALS; return W.seed+'|'+D.keep+'|'+D.forest+'|'+D.water+'|'+D.ruins+'|'+W.ruins.length+'|'+W.keepBuilt; }
+  function worldSig(){ const D=A.DIALS; return W.seed+'|'+D.keep+'|'+D.forest+'|'+D.water+'|'+D.ruins+'|'+W.ruins.length+'|'+W.keepBuilt+'|'+(D.folk||[]).join('')+'|'+(W.places?W.places.length:0); }
 
   // ---- wall decorations ----
   let PD=null; try{ PD=prog(VS_DECO,FS_DECO); }catch(e){ PD=null; }
@@ -462,7 +462,7 @@ function create(A){
       if(k>=SPMAX) continue;
       const o=k*16; const ci=(Math.max(0,Math.min(N-1,y|0)))*N+Math.max(0,Math.min(N-1,x|0));
       const shd=W.shadRaw[ci]; let amb=(shd>0.99&&A.DAY.lightAlt>0.035)?0.92:(0.56+0.36*shd);
-      if(sp===SP.KEEPER){ const id=Math.min(3,C.ay[c]|0), hx=C.vx[c], hy=C.vy[c], hl=Math.hypot(hx,hy)||1, tl=Math.hypot(ex,ey)||1;
+      if(sp===SP.KEEPER){ const id=Math.min(A.KMASK.length-1,C.ay[c]|0), hx=C.vx[c], hy=C.vy[c], hl=Math.hypot(hx,hy)||1, tl=Math.hypot(ex,ey)||1;
         const dot=-(hx*ex+hy*ey)/(hl*tl), v=dot>0.42?0:(dot<-0.42?2:1), mir=(v===1&&(hx*rx+hy*ry)<0)?1:0, fr=A.keeperPoseFrame(c);
         const uv=slotUV[atlasMap['k'+id+'_'+v+'_'+fr]]; const ln=A.KMASK[id].lan[v][fr];
         const P_=SPP[SP.KEEPER];
@@ -526,5 +526,5 @@ function create(A){
   try{ rebuild(); resize(); R.ok=true; }catch(e){ R.error=String(e&&e.message||e).slice(0,300); canvas.remove(); }
   return R;
 }
-window.KeepRay={ create:create, version:'v0.19.0' };
+window.KeepRay={ create:create, version:'v0.20.0' };
 })();

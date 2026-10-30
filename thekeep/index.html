@@ -64,7 +64,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
  </div>
  <div id="stick"><div id="knob"></div></div>
  <div id="fps"></div>
- <button class="mb-ver" id="mbVer" type="button">v0.19.0 &middot; Oct 29</button>
+ <button class="mb-ver" id="mbVer" type="button">v0.20.0 &middot; Oct 29</button>
  <div id="toast"></div>
  <div id="help" class="hidden"><div class="card">
   <h1>How to play</h1>
@@ -86,7 +86,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
    <img src="05-predation.jpg" alt="a kill" loading="lazy">
    <img src="04-water.jpg" alt="the lake" loading="lazy">
   </div>
-  <p class="fsize">The whole world is one HTML file. Right now: <b id="fsize">~203 KB</b>. Smaller than a single phone photo.</p>
+  <p class="fsize">The whole world is one HTML file. Right now: <b id="fsize">~238 KB</b>. Smaller than a single phone photo.</p>
   <p><b>Why I built it.</b> I build things on a phone by asking AI the right questions, the way I would direct a camera. I saw a clip of a tiny 3D world made of nothing but text and wanted to see if I could grow one that was actually alive, and keep growing it in the open instead of ever calling it done.</p>
   <p><b>What I learned.</b> How far you can get with almost nothing. One idea, a ray walking a height map, turned into characters, with a small world of animals living on top. Every version taught me one concrete thing: how to make a wall read as solid, how to keep the wolves from starving the world empty, how to make a forest look like real woods.</p>
   <p style="color:var(--mb-dim);font-size:13px"><b style="color:var(--mb-soft)">Walk:</b> drag the left half of the screen (tilt to turn). <b style="color:var(--mb-soft)">Look:</b> drag the right half. Wade into the water to swim. Tap ☰ menu for a new world, the dials, and the time of day. Walk under the gate arch and find the door under the tower stair.</p>
@@ -112,9 +112,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
 <script>
 (function(){
 'use strict';
-const VERSION='The Keep v0.19.0 · Oct 29 2026';
-const VER_SHORT='v0.19.0 · Oct 29'; // what the badge shows; bump with VERSION
+const VERSION='The Keep v0.20.0 · Oct 29 2026';
+const VER_SHORT='v0.20.0 · Oct 29'; // what the badge shows; bump with VERSION
 const CHANGELOG=[
+ ['v0.20.0 · Oct 29 2026','Who lives here. The world card has four new dials, and each one puts a place and a person into the valley when the world grows. Harrow Farm: a stone house under thatch, a fenced field of wheat and cabbages, a hen house and seven hens, and Edda hoeing the rows. Brookside: a timber house, a pasture with a barn, six sheep and two cows, a kitchen garden, and Tam leaning on his crook. The woodcutter\'s cabin: a log cabin in a glade with a woodpile to the eaves, a chopping block, stumps, and Osk felling two trees at the edge of the clearing. The hermit\'s hut: a stone hut above the lake shore, a jetty out over the water, a fire ring and a drying rack, and Fenwick fishing off the end. Each of them walks a day round from their own door, works, stops to talk, and goes home to bed at night. Walk onto a place and it tells you whose it is. People mention their neighbours, but only the ones who live in this world, and the keepers will tell you which way to go. Turn any of them off for an emptier valley.'],
  ['v0.19.0 · Oct 29 2026','A bigger keep. The walls stand farther out, the courtyard is half again as wide, and the donjon is taller and broader with a wider stair. Its lookout no longer hides the view: the parapet is below your eyes all the way round, with a wide opening facing north, east, south and west. The rooms are real rooms now, furnished and lived in. The great hall has a long table and benches, a hearth with shields over it, red banners, a hunting tapestry, two paintings and a map. The kitchen is built of timber, with an oven, shelves, barrels, crates and copper pans. The barracks has six beds, chests, a table, a rack of swords and a spear, and Tilda sleeps there now. The chapel is pale stone, with pews, an altar between two braziers, stained glass windows that glow with the daylight behind them, and blue banners. The donjon has a round room with a map table. Fires burn in the hearths. Every way of drawing the world shows all of it.'],
  ['v0.18.0 · Oct 29 2026','Iso. A sixth way to see the same world: from above, at the fixed slant of SimCity, Diablo and Monument Valley. The camera is isometric, so nothing shrinks as it gets farther away and the keep looks like a model on a table. It shows the Voxels blocks, swings round behind you as you turn, so the walk stick works just the same, and a small teal figure marks where you are. Step inside the walls and the figure still shows through them, faintly. Drag up or down to zoom out or in. The draw-the-world-as buttons are now two rows of three.'],
  ['v0.17.1 · Oct 28 2026','Straight corners in Rays. Rays used to move through the world in half-metre steps, so at the corner of a wall some rays slipped past the corner block before they noticed it, and the edge of the wall wobbled. Near you, every ray now walks the world one block at a time, the way the letters version does, so it meets the exact face of each block: corners are straight, and each face gets the right light. Soft shadow edges also lost a faint wood-grain banding.'],
@@ -177,6 +178,7 @@ const DIALS={
   pop:[1,1,1,1,1,1],
   tod:14, dayMode:2,  // time of day in hours, and the day-length mode (see DAYMODES)
   people:1,           // the keepers (and the gate braziers)
+  folk:[1,1,1,1],     // who lives here: Harrow Farm, Brookside, the woodcutter, the hermit (built when the world grows)
   stickTurn:1,        // the walk stick turns you (1) or steps you sideways (0)
   render:0            // how the same world is drawn: an index into RENDERS
 };
@@ -506,13 +508,13 @@ const W={
   h:new Float32Array(N*N), st:new Float32Array(N*N), tree:new Float32Array(N*N), gh:new Float32Array(N*N),
   cr:new Uint8Array(N*N), cg:new Uint8Array(N*N), cb:new Uint8Array(N*N),
   tr:new Uint8Array(N*N), tg:new Uint8Array(N*N), tb:new Uint8Array(N*N),
-  cloud:new Uint8Array(256*256), cloud2:new Uint8Array(256*256), detail:new Uint8Array(64*64), path:new Uint8Array(N*N), ttype:new Uint8Array(N*N), shad:new Float32Array(N*N), shadRaw:new Float32Array(N*N), shadTop:new Float32Array(N*N), keepBuilt:false, sb:new Float32Array(N*N), su:new Float32Array(N*N), rail:new Uint8Array(N*N), ruin:new Uint8Array(N*N), floor:new Uint8Array(N*N), ruins:[], ar:new Uint8Array(N*N), ag:new Uint8Array(N*N), ab:new Uint8Array(N*N), seed:1, shadowCells:0
+  cloud:new Uint8Array(256*256), cloud2:new Uint8Array(256*256), detail:new Uint8Array(64*64), path:new Uint8Array(N*N), ttype:new Uint8Array(N*N), shad:new Float32Array(N*N), shadRaw:new Float32Array(N*N), shadTop:new Float32Array(N*N), keepBuilt:false, sb:new Float32Array(N*N), su:new Float32Array(N*N), rail:new Uint8Array(N*N), ruin:new Uint8Array(N*N), floor:new Uint8Array(N*N), smat:new Uint8Array(N*N), ruins:[], places:[], pens:[], ar:new Uint8Array(N*N), ag:new Uint8Array(N*N), ab:new Uint8Array(N*N), seed:1, shadowCells:0
 };
 
 function genWorld(seed){
   W.seed=seed;
   const h=W.h, st=W.st, tree=W.tree;
-  st.fill(0); tree.fill(0); W.sb.fill(0); W.su.fill(0); W.rail.fill(0); W.floor.fill(0); W.ruin.fill(0); W.keepBuilt=false;
+  st.fill(0); tree.fill(0); W.sb.fill(0); W.su.fill(0); W.rail.fill(0); W.floor.fill(0); W.ruin.fill(0); W.smat.fill(0); W.places.length=0; W.pens.length=0; W.keepBuilt=false;
   for(let y=0;y<N;y++)for(let x=0;x<N;x++){
     const nx=x/N, ny=y/N;
     let v=14+32*(fbm(x*0.014,y*0.014,seed,5)-0.5);
@@ -584,6 +586,7 @@ function genWorld(seed){
   carvePath(gate[0],gate[1], 140,150, seed+81, 1.4);
   carvePath(gate[0],gate[1], LAKE.x-LAKE.r+4, LAKE.y-6, seed+83, 1.6);
   carvePath(LAKE.x, LAKE.y+LAKE.r-4, 360,360, seed+85, 1.3);
+  placeFolk(seed);   // who lives here: before the ruins, so the ruins keep clear of them
   placeStructures(seed);
   for(let y=0;y<N-1;y++)for(let x=0;x<N-1;x++){ const i=y*N+x; W.gh[i]=(h[i]+h[i+1]+h[i+N]+h[i+N+1])*0.25+st[i]; }   // tree bases, on the ground as the ruins left it
   // base colors (albedo); the light itself is applied by shadeRows so the sun can move
@@ -606,7 +609,8 @@ function genWorld(seed){
     if(W.path[i]&&st[i]===0&&hh>WATER+0.3){ const pv=hash2(x,y,seed+66); r=158+22*(pv-0.5); g=132+16*(pv-0.5); b=92+12*(pv-0.5); }
     if(W.floor[i]&&st[i]===0){ const pv=hash2(x,y,seed+67);
       if(W.floor[i]===1){ const plank=((y*3+((x/3)|0))&1)?0.92:1.04; r=(152+18*(pv-0.5))*plank; g=(110+14*(pv-0.5))*plank; b=(70+10*(pv-0.5))*plank; }   // floorboards
-      else { const k=((x+y)&1)?0.95:1.03; r=(150+20*(pv-0.5))*k; g=(146+20*(pv-0.5))*k; b=(138+18*(pv-0.5))*k; } }                                  // flagstones
+      else if(W.floor[i]===2){ const k=((x+y)&1)?0.95:1.03; r=(150+20*(pv-0.5))*k; g=(146+20*(pv-0.5))*k; b=(138+18*(pv-0.5))*k; }                // flagstones
+      else { r=104+18*(pv-0.5); g=78+12*(pv-0.5); b=54+10*(pv-0.5); } }                                                                    // tilled soil
     W.ar[i]=clamp(r,0,255); W.ag[i]=clamp(g,0,255); W.ab[i]=clamp(b,0,255);
   }
   relightAll();
@@ -631,7 +635,7 @@ function shadeRows(y0,y1,lx,ly,lz,dark,cast,sunLike){
         const xi=cx|0, yi=cy|0; if(xi<0||yi<0||xi>=N||yi>=N) break;
         const j=yi*N+xi; if(h[j]+st[j]+tree[j]>cz){ shadow=true; break; }
         const su=W.su[j]; if(su>0 && cz>=h[j]+W.sb[j]-0.2 && cz<=h[j]+su){ shadow=true; break; } } }
-    raw[i]=shadow?dark:1.0; if(W.floor[i]&&raw[i]<0.82) raw[i]=0.82;   // lamplight indoors
+    raw[i]=shadow?dark:1.0; if(W.floor[i]&&W.floor[i]<3&&raw[i]<0.82) raw[i]=0.82;   // lamplight indoors
     if(W.su[i]>0){ let sh=false; if(cast){ let cx=x+0.5, cy=y+0.5, cz=h[i]+W.su[i]+0.2;   // the top of the floating layer has its own light
       for(let k=0;k<110;k++){ cx+=sx8; cy+=sy8; cz+=sz8; const xi=cx|0, yi=cy|0; if(xi<0||yi<0||xi>=N||yi>=N) break;
         const j=yi*N+xi; if(h[j]+st[j]+tree[j]>cz){ sh=true; break; } const su=W.su[j]; if(su>0 && cz>=h[j]+W.sb[j]-0.2 && cz<=h[j]+su){ sh=true; break; } } }
@@ -697,7 +701,11 @@ const RMAT=[   // f face, t top, ch/cl course height and block length (0: rough,
   {f:[40,46,52],t:[30,36,44],ch:0,cl:0,moss:0},
   {f:[150,112,74],t:[160,122,82],ch:0.3,cl:3.2,moss:0},     // 7 timber: long boards
   {f:[118,82,52],t:[146,106,66],ch:0,cl:0,moss:0},          // 8 furniture wood
-  {f:[120,44,40],t:[170,62,54],ch:0,cl:0,moss:0}];          // 9 cloth: bed covers
+  {f:[120,44,40],t:[170,62,54],ch:0,cl:0,moss:0},          // 9 cloth: bed covers
+  {f:[164,134,80],t:[186,154,92],ch:0.22,cl:40,moss:0.1},   // 10 thatch
+  {f:[190,158,70],t:[222,190,96],ch:0,cl:0,moss:0},         // 11 wheat and hay
+  {f:[64,116,50],t:[88,148,62],ch:0,cl:0,moss:0},           // 12 cabbages and greens
+  {f:[150,108,68],t:[176,132,84],ch:0.42,cl:0.46,moss:0}];  // 13 split logs, end on
 const RUIN_KINDS=['circle','tower','arch','dolmen','cairn','temple','farm','wall','well','menhir'];
 const RUIN_NAMES={ circle:['the Old Ring','the Grey Dancers','the Moon Ring','the Whispering Stones'],
   tower:['the Broken Tower','the Hollow Tower',"the Watchman's Stump","Hob's Folly"], arch:['the Lonely Arch','the Gate to Nowhere','the Old Gate'],
@@ -738,6 +746,7 @@ function ruinSpot(R,rnd,kind){
       for(let d=1;d<=R+8;d++){ const qx=(x+ca*d)|0, qy=(y+sa*d)|0, z=h[qy*N+qx]; if(Math.abs(z-prev)>0.9||z<WATER+0.5){ ok=false; break; } prev=z; } }
     if(!ok) continue;
     for(const o of W.ruins){ if(Math.hypot(o.x-x,o.y-y)<o.r+R+16){ ok=false; break; } }
+    for(const o of W.places){ if(Math.hypot(o.x-x,o.y-y)<o.r+R+16){ ok=false; break; } }
     if(ok) return [x,y];
   }
   return null;
@@ -843,6 +852,310 @@ const RUIN_BUILD={
       for(let k=1;k<=5;k++) for(const sd of [-2,2]) if(v()<0.85) rPut(x+dx*(k*2+1)+qx*sd,y+dy*(k*2+1)+qy*sd,0.9+v()*0.9,1); }
     else for(let k=0;k<3;k++){ const an=v()*6.2832; rPut(Math.round(x+Math.cos(an)*3),Math.round(y+Math.sin(an)*3),0.8+v()*0.8,1); } }
 };
+// ---------------- who lives here: two farms, the woodcutter, the hermit (v0.20) ----------------
+// Each is a dial on the world card, built when the world grows. A place goes into the ground the way a ruin does
+// (W.st, the second layer, W.ruin), its person walks a day round from their own door and sleeps in their own bed,
+// and the animals keep to their pens. Places are laid out in their own small grid (u east, v south before a turn).
+const FOLK=[
+  {key:'farm1', name:'Harrow Farm',            who:4, R:16, b0:21,   b1:5,   blurb:'where Edda grows wheat and keeps hens',  label:'Harrow Farm: Edda, wheat and hens'},
+  {key:'farm2', name:'Brookside',              who:5, R:16, b0:21,   b1:5,   blurb:'where Tam keeps his sheep and cows',     label:'Brookside: Tam, sheep and cows'},
+  {key:'wood',  name:"the woodcutter's cabin", who:6, R:9,  b0:21.5, b1:5.5, blurb:'where Osk splits the winter wood',       label:"The woodcutter's cabin: Osk"},
+  {key:'hermit',name:"the hermit's hut",       who:7, R:7,  b0:22.5, b1:4.5, blurb:'where Fenwick fishes the lake',          label:"The hermit's hut by the lake: Fenwick"}];
+// the places a world was asked for but had no room for (said when the world grows)
+function folkMissing(){ return FOLK.filter(function(f,i){ return DIALS.folk[i]&&!folkHere(f.key); }).map(function(f){ return f.name; }); }
+function folkHere(key){ for(const p of W.places) if(p.key===key) return p; return null; }
+// a place's own grid: rot turns it a quarter at a time about (x,y)
+function fPlace(x,y,rot){ const cs=[1,0,-1,0][rot], sn=[0,1,0,-1][rot];
+  const F=function(u,v){ return [x+u*cs-v*sn, y+u*sn+v*cs]; };
+  return { x:x, y:y, rot:rot, F:F,
+    C:function(u,v){ const p=F(u+0.5,v+0.5); return [Math.floor(p[0]),Math.floor(p[1])]; },
+    D:function(u,v){ return [u*cs-v*sn, u*sn+v*cs]; } }; }
+function fCell(T,u,v){ const c=T.C(u,v); if(c[0]<3||c[1]<3||c[0]>N-4||c[1]>N-4) return -1; return c[1]*N+c[0]; }
+function fPut(T,u,v,s,mat){ const i=fCell(T,u,v); if(i<0) return; if(s>W.st[i]) W.st[i]=s; W.ruin[i]=mat; W.tree[i]=0; }
+function fSet(T,u,v,s,mat){ const i=fCell(T,u,v); if(i<0) return; W.st[i]=s; W.ruin[i]=mat; W.tree[i]=0; }
+function fSlab(T,u,v,sb,su,mat){ const i=fCell(T,u,v); if(i<0) return; W.sb[i]=sb; W.su[i]=su; W.smat[i]=mat; W.tree[i]=0; }
+function fFloor(T,u,v,f){ const i=fCell(T,u,v); if(i<0) return; W.floor[i]=f; W.tree[i]=0; }
+// a house: walls, one door, a pitched roof with its ridge along u (the roof is the second layer, so you walk in under it)
+function fHouse(T,u0,v0,u1,v1,o){ const mid=(v0+v1)/2, half=(v1-v0)/2+0.5, wH=o.wallH;
+  const roof=function(v){ return wH+0.35+o.ridge*Math.max(0,1-Math.abs(v-mid)/half); };
+  for(let v=v0;v<=v1;v++)for(let u=u0;u<=u1;u++){ const side=(v===v0||v===v1), end=(u===u0||u===u1), door=u===o.door[0]&&v===o.door[1];
+    if(door){ fSet(T,u,v,0,0); fFloor(T,u,v,o.floor); fSlab(T,u,v,o.doorH||2.3,side?roof(v):wH+0.35,o.wall); }
+    else if(side){ fSet(T,u,v,wH,o.wall); fSlab(T,u,v,wH,roof(v),o.roof); }        // the long walls, the eaves on top
+    else if(end){ fSet(T,u,v,roof(v),o.wall); }                                      // the gable ends, up to the roof line
+    else { fSet(T,u,v,0,0); fFloor(T,u,v,o.floor); fSlab(T,u,v,wH,roof(v),o.roof); } } }
+function fFence(T,u0,v0,u1,v1,gates){ const gap=function(u,v){ return gates.some(function(g){ return g[0]===u&&g[1]===v; }); };
+  for(let v=v0;v<=v1;v++)for(let u=u0;u<=u1;u++){ if(u!==u0&&u!==u1&&v!==v0&&v!==v1) continue; if(gap(u,v)){ fFloor(T,u,v,3); continue; }
+    const corner=(u===u0||u===u1)&&(v===v0||v===v1), post=corner||gap(u+1,v)||gap(u-1,v)||gap(u,v+1)||gap(u,v-1)||((u+v)%3===0);
+    if(post) fPut(T,u,v,1.25,5); else fSlab(T,u,v,0.45,1.0,5); } }   // a post and rail fence: you can see the grass under the rails
+function fPen(T,u0,v0,u1,v1){ const a=T.F(u0,v0), b=T.F(u1+1,v1+1);
+  W.pens.push({x0:Math.min(a[0],b[0]),y0:Math.min(a[1],b[1]),x1:Math.max(a[0],b[0]),y1:Math.max(a[1],b[1])}); return W.pens.length-1; }
+// a walk: [u, v, pause, pose, face u, face v] in the place's grid, out to the world as [x, y, pause, pose, face x, face y]
+function fRoute(T,list){ const o=[]; for(const w of list){ const p=T.F(w[0],w[1]), d=T.D(w[4]||0,w[5]||0); o.push(p[0],p[1],w[2]||0,w[3]||0,d[0],d[1]); } return o; }
+function fBed(T,door,inside,bed,face){ const b=fRoute(T,[door,inside,bed.concat([0,4]).slice(0,4).concat(face||[0,1])]);
+  const w=fRoute(T,[bed,inside,door]); return {bed:b, wake:w}; }
+// a straight walk with nothing in the way (low things like stumps and crop rows are fine)
+function K_ground(i){ return W.h[i]+W.st[i]; }
+function segClear(ax,ay,bx,by,maxSt){ const L=Math.hypot(bx-ax,by-ay), n=Math.max(1,Math.ceil(L/0.3));
+  for(let k=0;k<=n;k++){ const px=ax+(bx-ax)*k/n, py=ay+(by-ay)*k/n, i=(py|0)*N+(px|0); if(W.st[i]>maxSt) return false; } return true; }
+const FOLK_BUILD={
+  // Harrow Farm: a stone house under thatch, a fenced field of wheat and cabbages, a hen house and a haystack
+  farm1:function(T,p){
+    fHouse(T,-14,-13,-8,-9,{wall:4,roof:10,wallH:3.0,ridge:1.7,floor:1,door:[-11,-9]});
+    fPut(T,-13,-12,0.5,9); fPut(T,-12,-12,0.5,9); fPut(T,-10,-11,0.8,8); fPut(T,-13,-10,0.6,8); fPut(T,-9,-12,0.7,4);
+    p.fires.push(T.F(-8.5,-11.5));
+    fFence(T,-3,-14,14,3,[[5,3],[6,3]]);
+    for(let v=-13;v<=2;v++){ const crop=((v+13)&1)===0;
+      for(let u=-2;u<=13;u++){ if(u===5||u===6||!crop){ fFloor(T,u,v,3); continue; }
+        if(u<5) fPut(T,u,v,0.8+0.18*hash2(u,v,W.seed+401),11); else fPut(T,u,v,0.32+0.08*hash2(u,v,W.seed+402),12); } }
+    fFence(T,-13,-7,-5,3,[[-11,-7],[-7,3]]);                                                                 // the hen run
+    for(const q of [[-12,1],[-11,1],[-12,2],[-11,2]]) fPut(T,q[0],q[1],1.4,5);                              // the hen house
+    for(const q of [[-13,4,1.8],[-12,4,1.8],[-13,5,1.5],[-12,5,1.5]]) fPut(T,q[0],q[1],q[2],11);          // the haystack
+    p.stock.push({pen:fPen(T,-12,-6,-6,2), sp:SP.HEN, n:7});
+    p.route={ loop:fRoute(T,[[-10.5,-7.5],[-10.5,-5.5],[-6.5,1.5],[-6.5,4.6],[6.0,4.6],[6.0,-1.5,9,5,-1,0],[6.0,-5.5],[1.5,-5.5,10,5,0,-1],[6.0,-5.5],
+      [6.0,-10.5,8,5,1,0],[6.0,4.6],[-6.5,4.6],[-6.5,1.5],[-8.5,-3.5,7,1,-1,0],[-10.5,-5.5],[-10.5,-7.5],[-10.5,-10.5,6,1,1,0]]) };
+    Object.assign(p.route,fBed(T,[-10.5,-7.5],[-10.5,-10.5],[-12.0,-11.6]));
+    p.trail=T.F(6.0,7.0); p.cam=T.F(9.0,12.0).concat(T.F(-3,-5)); },
+  // Brookside: a timber house, a fenced pasture with a barn, sheep and two cows, a kitchen garden by the door
+  farm2:function(T,p){
+    fHouse(T,-14,-13,-8,-9,{wall:7,roof:5,wallH:3.0,ridge:1.5,floor:1,door:[-11,-9]});
+    fPut(T,-13,-12,0.5,9); fPut(T,-12,-12,0.5,9); fPut(T,-10,-11,0.8,8); fPut(T,-13,-10,0.9,8); fPut(T,-9,-12,0.7,4);
+    p.fires.push(T.F(-8.5,-11.5));
+    fFence(T,-3,-12,14,5,[[5,5],[6,5]]);
+    // the barn: a back wall, short sides, posts at the open front, one roof over all of it, hay at the back
+    const bR=function(v){ return 3.35+1.3*Math.max(0,1-Math.abs(v+9)/2.5); };
+    for(let v=-11;v<=-7;v++)for(let u=8;u<=13;u++){ const back=v===-11, side=(u===8||u===13)&&v<=-9, post=(u===8||u===13)&&v===-7;
+      if(back||side||post){ fSet(T,u,v,3.0,7); fSlab(T,u,v,3.0,bR(v),5); } else fSlab(T,u,v,3.0,bR(v),5); }
+    for(let u=9;u<=12;u++) fPut(T,u,-10,1.0,11);
+    fPut(T,1,2,0.6,5); fPut(T,2,2,0.6,5);                                                                      // the trough
+    for(let v=-6;v<=-2;v++)for(let u=-14;u<=-9;u++){ if(((v+6)&1)===0) fPut(T,u,v,0.34+0.08*hash2(u,v,W.seed+403),12); else fFloor(T,u,v,3); }
+    const pen=fPen(T,-2,-11,13,4);
+    p.stock.push({pen:pen, sp:SP.SHEEP, n:6}); p.stock.push({pen:pen, sp:SP.COW, n:2});
+    p.route={ loop:fRoute(T,[[-10.5,-7.5],[-4.5,6.6],[6.0,6.6],[6.0,3.0,14,2,0,-1],[2.0,-3.5,12,2,1,0],[10.5,-6.0,6,1,0,-1],
+      [6.0,4.2],[6.0,6.6],[-4.5,6.6],[-11.5,-4.5,8,1,0,-1],[-10.5,-7.5],[-10.5,-10.5,5,1,1,0]]) };
+    Object.assign(p.route,fBed(T,[-10.5,-7.5],[-10.5,-10.5],[-12.0,-11.6]));
+    p.trail=T.F(6.0,9.0); p.cam=T.F(-6.0,14.0).concat(T.F(2,-3)); },
+  // the woodcutter: a log cabin in a glade, a woodpile to the eaves, a chopping block, stumps, and two trees he is working on
+  wood:function(T,p,rnd){
+    fHouse(T,-4,-4,2,0,{wall:7,roof:5,wallH:2.9,ridge:1.5,floor:1,door:[-1,0]});
+    fPut(T,-3,-3,0.5,9); fPut(T,-3,-2,0.5,9); fPut(T,0,-2,0.8,8); fPut(T,1,-3,0.7,4);
+    p.fires.push(T.F(1.5,-2.5));
+    for(let v=-4;v<=-1;v++) fPut(T,3,v,1.5,13); for(let v=-4;v<=-2;v++) fPut(T,4,v,0.9,13);
+    fPut(T,1,3,0.55,5); fPut(T,3,4,0.45,13); fPut(T,4,4,0.45,13);
+    for(let k=0,a=0;k<7&&a<80;a++){ const an=rnd()*6.2832, rr=6.5+rnd()*2.5, u=Math.round(Math.cos(an)*rr), v=Math.round(Math.sin(an)*rr);
+      if(Math.abs(u)<=6&&Math.abs(v)<=6) continue; const i=fCell(T,u,v); if(i<0||W.st[i]>0) continue; fPut(T,u,v,0.45,5); k++; }
+    // the two trees he is felling: real trees at the edge of the glade, reachable in a straight line from the yard
+    const hub=T.F(0.5,2.5), picks=[];
+    for(let r=9;r<=17&&picks.length<2;r++) for(let oy=-r;oy<=r&&picks.length<2;oy++)for(let ox=-r;ox<=r&&picks.length<2;ox++){
+      if(Math.max(Math.abs(ox),Math.abs(oy))!==r) continue; const tx=(T.x|0)+ox, ty=(T.y|0)+oy; if(tx<4||ty<4||tx>N-5||ty>N-5) continue;
+      const i=ty*N+tx; if(!(W.tree[i]>0)) continue;
+      const cx=tx+0.5, cy=ty+0.5, dx=hub[0]-cx, dy=hub[1]-cy, dl=Math.hypot(dx,dy)||1, sx=cx+dx/dl*1.3, sy=cy+dy/dl*1.3;
+      if(picks.length){ let da=Math.atan2(sy-hub[1],sx-hub[0])-Math.atan2(picks[0][1]-hub[1],picks[0][0]-hub[0]); da=Math.abs(Math.atan2(Math.sin(da),Math.cos(da))); if(da<0.9) continue; }
+      if(!segClear(hub[0],hub[1],sx,sy,0.5)) continue;
+      picks.push([sx,sy,-dx/dl,-dy/dl]); p.keepTrees.push([i,W.tree[i]]); }
+    const W_=function(q){ const cs=[1,0,-1,0][T.rot], sn=[0,1,0,-1][T.rot], ex=q[0]-T.x, ey=q[1]-T.y;   // back from the world to the place's grid
+      return [ex*cs+ey*sn, -ex*sn+ey*cs, 16, 5, q[2]*cs+q[3]*sn, -q[2]*sn+q[3]*cs]; };
+    const trees=picks.map(W_);
+    if(trees.length<2){ trees.push([7.6,4.2,12,5,-1,0]); if(trees.length<2) trees.push([-6.6,4.2,12,5,1,0]); }
+    p.route={ loop:fRoute(T,[[-0.5,1.5],[0.4,3.5,14,5,1,0],[5.5,1.6],[5.5,-2.5,5,1,-1,0],[5.5,1.6],[0.5,2.5],trees[0],[0.5,2.5],trees[1],[0.5,2.5],
+      [0.4,3.5,10,5,1,0],[-0.5,1.5],[-0.5,-1.5,5,1,0,-1]]) };
+    Object.assign(p.route,fBed(T,[-0.5,1.5],[-0.5,-1.5],[-2.6,-2.0]));
+    p.trail=T.F(0.5,7.0); p.cam=T.F(3.5,9.5).concat(T.F(-1,-2)); },
+  // the hermit: a little stone hut under thatch above the shore, a jetty out over the water, a fire ring and a drying rack
+  hermit:function(T,p,rnd,sh){
+    fHouse(T,-3,-6,1,-2,{wall:4,roof:10,wallH:2.8,ridge:1.4,floor:1,door:[-1,-2]});
+    fPut(T,-2,-5,0.5,9); fPut(T,-2,-4,0.5,9); fPut(T,0,-5,0.7,8);
+    for(let v=-3;v<=-1;v++)for(let u=2;u<=4;u++){ if(u===3&&v===-2) continue; fPut(T,u,v,0.3,4); }
+    p.fires.push(T.F(3.5,-1.5));
+    fPut(T,-5,0,1.8,5); fPut(T,-5,2,1.8,5); fSlab(T,-5,1,1.45,1.7,5);
+    let vs=-1; for(let v=1;v<=12;v++){ const i=fCell(T,0,v); if(i>=0&&W.h[i]<WATER+0.45){ vs=v; break; } }
+    if(vs<0) vs=sh||4;
+    const vEnd=vs+6;
+    // the deck steps down from the bank in easy steps, then runs level out over the water
+    // the lake bed under the jetty is a level shallow, so the deck sits square on its posts
+    for(let v=vs;v<=vEnd+1;v++) for(const u of [-1,0,1]){ const i=fCell(T,u,v); if(i>=0&&W.h[i]<WATER) W.h[i]=Math.max(W.h[i],WATER-1.1); }
+    for(let v=vs;v<=vEnd+1;v++) for(const u of [-1,0,1]){ const i=fCell(T,u,v); if(i>=0&&W.h[i]<WATER) W.h[i]=Math.min(W.h[i],WATER-0.9); }
+    for(const u of [-1,0,1]){ const i=fCell(T,u,vs), j=fCell(T,u,vs+1); if(i>=0) W.h[i]=WATER+0.25; if(j>=0) W.h[j]=WATER-0.35; }   // a strip of beach where the deck meets the bank
+    { let prev=WATER+0.6; for(const u of [-1,0]){ const i0=fCell(T,u,vs-1); if(i0>=0) prev=Math.max(prev,K_ground(i0)); }
+      for(let v=vs;v<=vEnd;v++){ const top=Math.max(WATER+0.55,prev-0.5); let hi=top;
+        for(const u of [-1,0]){ const i=fCell(T,u,v); if(i<0) continue; const g=W.h[i]; if(g<top){ W.st[i]=top-g; W.ruin[i]=5; W.tree[i]=0; } else hi=Math.max(hi,g); }
+        prev=hi; } }
+    p.route={ loop:fRoute(T,[[-0.5,-0.5],[0.0,vs+0.5],[0.0,vEnd+0.3,45,5,0,1],[0.0,vs+2.5,8,1,0,1],[0.0,vs+0.2],[3.5,0.6,8,1,0,-1],[-3.8,1.5,5,1,-1,0],
+      [-0.5,-0.5],[-0.5,-3.5,6,1,0,-1]]) };
+    Object.assign(p.route,fBed(T,[-0.5,-0.5],[-0.5,-3.5],[-1.6,-4.0]));
+    p.trail=null; p.cam=T.F(0.0,vEnd+0.2).concat(T.F(-1,-4)); } };
+// somewhere level and clear for a place, not too near the keep, the water or anything already built
+function folkSpot(R,rnd,want){
+  const h=W.h, fMin=0.58-0.24*DIALS.forest;
+  for(let a=0;a<4000;a++){
+    const x=(40+rnd()*(N-80))|0, y=(40+rnd()*(N-80))|0;
+    const dk=Math.max(Math.abs(x-FORT.x),Math.abs(y-FORT.y)); if(dk<62+R||dk>210) continue;
+    const fo=fbm(x*0.03,y*0.03,W.seed+21,3);
+    if(a<2400&&(want==='forest'?fo<fMin+0.06:fo>fMin-0.02)) continue;   // the woodcutter wants the trees, a farm the open meadow
+    let lo=1e9,hi=-1e9,bad=false;
+    for(let oy=-R-8;oy<=R+8&&!bad;oy++)for(let ox=-R-8;ox<=R+8;ox++){ const i=(y+oy)*N+x+ox, g=h[i], inF=Math.abs(ox)<=R&&Math.abs(oy)<=R;
+      if(g<WATER+0.6){ bad=true; break; }
+      if(!inF) continue;
+      if(W.st[i]>0||g<WATER+1.2||g>40||(a<3200&&W.path[i])){ bad=true; break; } if(g<lo)lo=g; if(g>hi)hi=g; }
+    if(bad||hi-lo>(a<2400?3.2:5.0)) continue;
+    for(const o of W.places){ if(Math.hypot(o.x-x,o.y-y)<o.r+R+16){ bad=true; break; } }
+    if(!bad) return [x,y]; }
+  return null; }
+// the hermit wants the lake shore: land here, open water a few steps ahead that stays deep (the lake, not a stream)
+function hermitSpot(rnd){ const h=W.h, dirs=[[0,1,0],[-1,0,1],[0,-1,2],[1,0,3]];
+  for(let a=0;a<9000;a++){ const easy=a>=6000;   // a last, easier pass so a small lake still gets its hermit
+    const an=rnd()*6.2832, rr=LAKE.r*(0.4+1.4*rnd()), x=Math.round(LAKE.x+Math.cos(an)*rr), y=Math.round(LAKE.y+Math.sin(an)*rr);
+    if(x<24||y<24||x>N-24||y>N-24) continue;
+    if(Math.max(Math.abs(x-FORT.x),Math.abs(y-FORT.y))<(easy?62:72)) continue;
+    const g0=h[y*N+x]; if(g0<WATER+0.7||g0>WATER+6) continue;
+    for(const d of dirs){
+      let sh=-1; for(let k=2;k<=9;k++){ if(h[(y+d[1]*k)*N+x+d[0]*k]<WATER+0.2){ sh=k; break; } } if(sh<3) continue;
+      if(h[(y+d[1]*(sh-1))*N+x+d[0]*(sh-1)]>WATER+2.4) continue;   // a gentle bank, not a cliff
+      { let steep=false; for(let k=1;k<=sh;k++){ const a0=h[(y+d[1]*(k-1))*N+x+d[0]*(k-1)], a1=h[(y+d[1]*k)*N+x+d[0]*k]; if(Math.abs(a1-a0)>1.3){ steep=true; break; } } if(steep) continue; }
+      let deep=true; for(let k=sh+1;k<sh+(easy?7:11);k++){ if(!(h[(y+d[1]*k)*N+x+d[0]*k]<WATER-0.3)){ deep=false; break; } } if(!deep) continue;
+      const T=fPlace(x,y,d[2]); let lo=1e9, hi=-1e9, bad=false;
+      for(let v=-8;v<=Math.min(1,sh-2)&&!bad;v++)for(let u=-6;u<=5;u++){ const i=fCell(T,u,v); if(i<0){ bad=true; break; } const g=h[i];
+        if(W.st[i]>0||g<WATER+0.7||(!easy&&W.path[i])){ bad=true; break; } if(v<=-1){ if(g<lo)lo=g; if(g>hi)hi=g; } }
+      if(bad||hi-lo>2.6) continue;
+      for(const o of W.places){ if(Math.hypot(o.x-x,o.y-y)<o.r+7+16){ bad=true; break; } }
+      if(!bad) return {x:x,y:y,rot:d[2],sh:sh}; } }
+  return null; }
+// level the ground under a place, but never into the water and never raising the lake bed
+function folkLevel(cx,cy,R,E,floorMin){ let s=0,c=0; const h=W.h;
+  for(let oy=-R;oy<=R;oy++)for(let ox=-R;ox<=R;ox++){ if(ox*ox+oy*oy>R*R) continue; const g=h[((cy+oy)|0)*N+((cx+ox)|0)]; if(g<WATER+0.6) continue; s+=g; c++; }
+  if(!c) return; const m=Math.max(floorMin,s/c);
+  for(let oy=-E;oy<=E;oy++)for(let ox=-E;ox<=E;ox++){ const d=Math.hypot(ox,oy); if(d>E) continue; const i=((cy+oy)|0)*N+((cx+ox)|0);
+    if(h[i]<WATER+0.6) continue; const k=1-sm(R,E,d), nv=h[i]+(m-h[i])*k; h[i]=Math.max(WATER+0.6,nv); } }
+function nearestPath(x,y,maxR){ for(let r=1;r<=maxR;r++) for(let oy=-r;oy<=r;oy++)for(let ox=-r;ox<=r;ox++){ if(Math.max(Math.abs(ox),Math.abs(oy))!==r) continue;
+  const px=(x|0)+ox, py=(y|0)+oy; if(px<5||py<5||px>N-6||py>N-6) continue; if(W.path[py*N+px]) return [px,py]; } return null; }
+function placeFolk(seed){
+  const rnd=mul32((seed^0x2c1b3c6d)>>>0);
+  for(const k of [3,2,0,1]){ if(!DIALS.folk[k]) continue; const F=FOLK[k];
+    let x,y,rot=(rnd()*4)|0, sh=0;
+    if(F.key==='hermit'){ const s=hermitSpot(rnd); if(!s) continue; x=s.x; y=s.y; rot=s.rot; sh=s.sh; }
+    else { const s=folkSpot(F.R,rnd,F.key==='wood'?'forest':'meadow'); if(!s) continue; x=s[0]; y=s[1]; }
+    const T=fPlace(x,y,rot);
+    if(F.key==='hermit'){ const c=T.F(-1,-4); folkLevel(c[0],c[1],4,6,WATER+1.0); ruinClear(c[0]|0,c[1]|0,9); ruinGlade(c[0]|0,c[1]|0,6); }
+    else if(F.key==='wood'){ ruinFlatten(x,y,8); ruinClear(x,y,9); ruinGlade(x,y,5); }
+    else { ruinFlatten(x,y,17); ruinClear(x,y,23); ruinGlade(x,y,19); }
+    const p={key:F.key, name:F.name, blurb:F.blurb, who:F.who, x:x+0.5, y:y+0.5, r:F.R, dr:Math.min(F.R,11), found:false,
+      fires:[], stock:[], route:null, trail:null, keepTrees:[], b0:F.b0, b1:F.b1, slot:k};
+    { const rr=F.key==='hermit'?8:F.R+1; for(let oy=-rr;oy<=rr;oy++)for(let ox=-rr;ox<=rr;ox++){ const c=F.key==='hermit'?T.F(-1,-3):[x,y], qx=(c[0]|0)+ox, qy=(c[1]|0)+oy; if(qx>3&&qy>3&&qx<N-4&&qy<N-4) W.path[qy*N+qx]=0; } }
+    FOLK_BUILD[F.key](T,p,rnd,sh);
+    W.places.push(p);
+    if(p.trail){ const q=nearestPath(p.trail[0],p.trail[1],180); if(q) carvePath(p.trail[0],p.trail[1],q[0],q[1],seed+500+k,1.0); }
+    for(const t of p.keepTrees) W.tree[t[0]]=t[1]; }
+  // a trail is for the land between places: lift it off floors, fields, yards, pens and anything built
+  for(let i=0;i<N*N;i++){ if(W.path[i]&&(W.st[i]>0||W.floor[i]||W.su[i]>0)) W.path[i]=0; }
+  for(const pn of W.pens) for(let y=Math.floor(pn.y0);y<Math.ceil(pn.y1);y++)for(let x=Math.floor(pn.x0);x<Math.ceil(pn.x1);x++) W.path[y*N+x]=0;
+  try{ const f=JSON.parse(localStorage.getItem('keep_places_'+seed)||'[]'); if(Array.isArray(f)) for(const o of W.places) if(f.indexOf(o.key)>=0) o.found=true; }catch(e){}
+}
+// walk onto a place for the first time and it tells you whose it is
+function placeCheck(){ if(!greetHook||!W.places.length) return;
+  for(const o of W.places){ if(o.found) continue; if(Math.hypot(P.x-o.x,P.y-o.y)>o.dr) continue;
+    if(greetHook('You found '+o.name+', '+o.blurb+'.')!==false){ o.found=true;
+      try{ localStorage.setItem('keep_places_'+W.seed,JSON.stringify(W.places.filter(function(q){ return q.found; }).map(function(q){ return q.key; }))); }catch(e){} }
+    return; } }
+// which way a place lies from the keep, in words
+function dirWord(key){ const p=folkHere(key); if(!p) return 'woods';
+  const a=Math.atan2(p.y-FORT.y,p.x-FORT.x)*180/Math.PI, k=Math.round(((a+360)%360)/45)%8;
+  return ['east','south-east','south','south-west','west','north-west','north','north-east'][k]; }
+function folkSleeps(p){ const t=DAY.tod; return t>=p.b0||t<p.b1; }
+function addFolk(){
+  for(let pi=0;pi<W.places.length;pi++){ const p=W.places[pi]; if(!DIALS.folk[p.slot]||CR_.n>CMAX-40) continue;
+    for(const f of p.fires){ const c=addCreature(SP.FIRE,f[0],f[1],0,1,1,-1); CR_.z[c]=groundAt(f[0],f[1]); }
+    for(const s of p.stock){ const pen=W.pens[s.pen]; if(!pen) continue;
+      for(let k=0;k<s.n;k++){ let x=0,y=0,ok=false;
+        for(let a=0;a<40&&!ok;a++){ x=pen.x0+0.4+Math.random()*(pen.x1-pen.x0-0.8); y=pen.y0+0.4+Math.random()*(pen.y1-pen.y0-0.8); ok=W.st[(y|0)*N+(x|0)]===0; }
+        if(!ok) continue; const c=addCreature(s.sp,x,y,s.pen,0,1,-1); CR_.z[c]=groundAt(x,y); CR_.ph[c]=1; CR_.tm[c]=Math.random()*5; CR_.vx[c]=Math.random()<0.5?1:-1; } }
+    const R=p.route; if(!R) continue;
+    const n=R.loop.length/6, asleep=folkSleeps(p);
+    let x,y,ph,rt;
+    if(asleep){ const b=R.bed, m=b.length/6; x=b[(m-1)*6]; y=b[(m-1)*6+1]; ph=m-1; rt=1; }
+    else { const k=(Math.random()*n)|0; x=R.loop[k*6]; y=R.loop[k*6+1]; ph=(k+1)%n; rt=0; }
+    const c=addCreature(SP.KEEPER,x,y,100+pi,p.who,1,-1);
+    CR_.energy[c]=rt; CR_.ph[c]=ph; CR_.z[c]=floorAt(x,y,terr(x,y)+1.0);
+    if(asleep){ CR_.st[c]=2; CR_.po[c]=4; CR_.vx[c]=0.01; CR_.vy[c]=0; } }
+}
+// a person's day: round from their door and back; at bedtime they finish the round without stopping, go in and sleep
+function tickFolk(c,dt){
+  const p=W.places[(CR_.ax[c]|0)-100]; if(!p||!p.route) return;
+  const id=CR_.ay[c]|0, rt=CR_.energy[c]|0, a=rt===1?p.route.bed:(rt===2?p.route.wake:p.route.loop), n=a.length/6;
+  const x=CR_.x[c], y=CR_.y[c], qx=P.x-x, qy=P.y-y, qd=Math.hypot(qx,qy), near=qd<2.6&&qd>0.05&&Math.abs((P.z-EYE)-CR_.z[c])<1.6;
+  const night=folkSleeps(p);
+  if(CR_.st[c]===2){ if(near) greet(id,4);
+    if(!night){ CR_.st[c]=0; CR_.po[c]=0; CR_.energy[c]=2; CR_.ph[c]=1; CR_.tm[c]=0; }
+    return; }
+  if(near){
+    const walking=CR_.st[c]===0, hv=Math.hypot(CR_.vx[c],CR_.vy[c])||1;
+    if(qd<1.7&&CR_.ss[c]<0.7&&(CR_.ss[c]>0||(walking&&(CR_.vx[c]*qx+CR_.vy[c]*qy)/(hv*qd)>0.5))) sidestep(c,qx/qd,qy/qd,dt);
+    const pose=walking?0:CR_.po[c];
+    if(pose>0){ CR_.tm[c]=Math.max(CR_.tm[c],1.5); greet(id,pose); return; }
+    CR_.vx[c]=qx/qd*0.01; CR_.vy[c]=qy/qd*0.01; CR_.tm[c]=walking?1.5:Math.max(CR_.tm[c],1.5); CR_.st[c]=1; CR_.po[c]=0;
+    greet(id,pose); return; }
+  if(CR_.st[c]===1){ CR_.tm[c]-=dt; if(CR_.tm[c]<=0){ CR_.st[c]=0; CR_.tm[c]=0; CR_.po[c]=0; } return; }
+  const wi=(CR_.ph[c]|0)%n, back=CR_.ss[c]>0;
+  const tx=back?CR_.rx[c]:a[wi*6], ty=back?CR_.ry[c]:a[wi*6+1], ddx=tx-x, ddy=ty-y, d=Math.hypot(ddx,ddy);
+  const sp=SPP[SP.KEEPER].speed*(DAY.k<0.5?0.85:1)*(night&&rt===0?1.3:1);
+  if(back&&d<0.05){ CR_.ss[c]=0; return; }
+  if(back){ const stp=Math.min(d,sp*dt); CR_.x[c]=x+ddx/d*stp; CR_.y[c]=y+ddy/d*stp; CR_.tm[c]+=stp;
+    const g=floorAt(CR_.x[c],CR_.y[c],CR_.z[c]); CR_.z[c]+=(g-CR_.z[c])*Math.min(1,dt*16); return; }
+  if(d<0.2){
+    if(rt===1&&wi===n-1){ CR_.st[c]=2; CR_.po[c]=4; return; }                     // in bed
+    if(rt===2&&wi===n-1){ CR_.energy[c]=0; CR_.ph[c]=1; return; }                  // out of the door: the day's round
+    if(rt===0&&wi===0&&night){ CR_.energy[c]=1; CR_.ph[c]=1; return; }             // home at bedtime
+    CR_.ph[c]=(wi+1)%n; const pause=(night&&rt===0)?0:a[wi*6+2];
+    if(pause>0){ CR_.st[c]=1; CR_.tm[c]=pause*(0.7+0.6*Math.random()); CR_.po[c]=a[wi*6+3];
+      const fx=a[wi*6+4], fy=a[wi*6+5]; if(fx||fy){ CR_.vx[c]=fx*0.01; CR_.vy[c]=fy*0.01; } }
+    return; }
+  const stp=Math.min(d,sp*dt);
+  CR_.x[c]=x+ddx/d*stp; CR_.y[c]=y+ddy/d*stp; CR_.vx[c]=ddx/d*sp; CR_.vy[c]=ddy/d*sp; CR_.tm[c]+=stp;
+  const g=floorAt(CR_.x[c],CR_.y[c],CR_.z[c]); CR_.z[c]+=(g-CR_.z[c])*Math.min(1,dt*16);
+}
+// sheep, cows and hens: amble about their pen, stop to graze or peck, step away if you crowd them, settle at night
+function stockOk(x,y,tx,ty){ const L=Math.hypot(tx-x,ty-y), n=Math.max(1,Math.ceil(L/0.3));
+  for(let k=1;k<=n;k++){ const px=x+(tx-x)*k/n, py=y+(ty-y)*k/n, i=(py|0)*N+(px|0); if(W.st[i]>0.05||(W.su[i]>0&&W.sb[i]<1.6)) return false; } return true; }
+function tickStock(c,dt){
+  const pen=W.pens[CR_.ax[c]|0]; if(!pen) return;
+  const s=CR_.sp[c], x=CR_.x[c], y=CR_.y[c], hen=s===SP.HEN;
+  if(DAY.k<0.2&&CR_.st[c]!==1) return;
+  const qx=x-P.x, qy=y-P.y, qd=Math.hypot(qx,qy)||1;
+  if(qd<(hen?2.4:1.8)&&Math.abs(P.z-EYE-CR_.z[c])<1.5&&CR_.ph[c]<1.5){
+    const tx=clamp(x+qx/qd*3,pen.x0+0.3,pen.x1-0.3), ty=clamp(y+qy/qd*3,pen.y0+0.3,pen.y1-0.3);
+    if(stockOk(x,y,tx,ty)){ CR_.rx[c]=tx; CR_.ry[c]=ty; CR_.st[c]=1; CR_.ph[c]=2.2; } }
+  if(CR_.st[c]===0){ CR_.tm[c]-=dt; if(CR_.tm[c]>0) return;
+    const r=hen?2.5:5;
+    for(let k=0;k<6;k++){ const tx=clamp(x+(Math.random()*2-1)*r,pen.x0+0.3,pen.x1-0.3), ty=clamp(y+(Math.random()*2-1)*r,pen.y0+0.3,pen.y1-0.3);
+      if(stockOk(x,y,tx,ty)){ CR_.rx[c]=tx; CR_.ry[c]=ty; CR_.st[c]=1; CR_.ph[c]=1; return; } }
+    CR_.tm[c]=1; return; }
+  const dx=CR_.rx[c]-x, dy=CR_.ry[c]-y, d=Math.hypot(dx,dy);
+  if(d<0.12){ CR_.st[c]=0; CR_.ph[c]=1; CR_.tm[c]=hen?(0.6+Math.random()*2.2):(4+Math.random()*9); return; }
+  const v=SPP[s].speed*CR_.ph[c], stp=Math.min(d,v*dt);
+  CR_.x[c]=x+dx/d*stp; CR_.y[c]=y+dy/d*stp; CR_.vx[c]=dx/d; CR_.vy[c]=dy/d; CR_.z[c]=groundAt(CR_.x[c],CR_.y[c]);
+}
+// what the folk say: [morning, afternoon, evening, night]; {key} lines only when that place is in the world, $key is its direction
+const FGREETS=[
+  [["Hens were up before me again.","Morning! Mind the furrows, they're fresh.","{keep}Eggs go up to the keep before the dew's off."],
+   ["Wheat's coming on nicely. Don't tell it I said so.","Cabbages don't weed themselves. More's the pity.","{farm2}Tam's sheep had a go at my fence again.","{hermit}Fenwick trades a fish for a dozen eggs. Fair, I suppose."],
+   ["Last row, then supper.","Shut the hens in yet? I'd better.","{wood}Osk brought kindling. I owe him a loaf."],
+   ["Late for visitors. I'm off to bed.","The fox is about. I can feel it.","Mind the hen house on your way past."]],
+  [["Morning. Sheep don't sleep in, so neither do I.","Dew on the grass. They like that.","{farm1}Edda's hens woke me again."],
+   ["Count them with me. One, two... no, that one moved.","The brown cow is the boss. Don't tell the white one.","{wood}Osk cut my new fence posts. Good wood, that.","{keep}Old Wick lets the flock through the gate in spring."],
+   ["Bringing them in soon.","Sheep in, cows in, Tam in.","{hermit}Smoke from the hermit's fire. Fish for supper, for him."],
+   ["Shh. The flock's asleep.","Wolves about tonight. I'll keep an ear open.","Off home with you, friend."]],
+  [["Morning. Mind the chips, they fly.","Ash for the keep, oak for the fences.","Cold morning. Good for splitting."],
+   ["Stand back a bit. Thanks.","That tree's been waiting forty years. So have I.","{keep}The keep burns half my wood every winter.","{hermit}The hermit? Talks to the fish. Says they talk back."],
+   ["Last log. Then the fire.","Stack's nearly to the eaves. Nearly.","{farm2}Promised Tam more posts. Tomorrow."],
+   ["Too dark to swing an axe. Even for me.","Owl's in that oak. Don't cut the owl tree, they say.","Goodnight. Watch the stumps."]],
+  [["Fish bite at dawn. Hush now.","You walk loud.","Mist on the water. Best time."],
+   ["Nothing biting. That's fishing.","Sit if you like. Don't talk.","{keep}Too many people up at that keep.","{farm1}Eggs from Harrow. Best thing about Harrow."],
+   ["The big one's out there. I've seen him.","Fire's lit. Fish for supper, if I'm lucky.","{wood}Osk thinks I talk to fish. I listen. Different thing."],
+   ["Late. Even the fish are asleep.","Stars on the water. Two skies.","Off with you. Quietly."]]];
+// caught in the middle of something: [unused, looking, leaning, unused, asleep, working]
+const FPOSE=[
+  [null,["Counting hens. Seven. There should be seven.","Shoo, you. Not you. The hen."],null,null,["Mmm... the hens... seven...","...left the gate open... no I didn't..."],["Hoe in, pull back, step. All day.","Weeds grow faster than wheat. Always have."]],
+  [null,["That one's always at the fence. Every day."],["Leaning on the crook. Watching grass grow. Watching sheep eat it.","Good crook, this. Older than me."],null,["...forty-one... forty-two... sheep...","Mmm... the brown cow's in charge..."],null],
+  [null,["Checking the stack. Stacks lean if you don't watch them."],null,null,["...timber... mmm...","...the owl tree... no..."],["Mind your feet.","Thock. Thock. That's the sound of winter coming.","Split with the grain. Always with the grain."]],
+  [null,["The lake changes every hour. I watch it change."],null,null,["...the big one... hmm...","...two skies..."],["Shh.","Patience. The lake has plenty.","Not you. I was talking to the fish."]]];
 function placeStructures(seed){
   W.ruins.length=0;   // (W.ruin is cleared at the start of genWorld, so the keep's own materials stay)
   const n=RUIN_COUNT[DIALS.ruins|0]||0; if(!n) return;
@@ -980,10 +1293,10 @@ function sky(dx,dy,sg,px,py,pz){
 
 const RF={z:new Float32Array(16),t0:new Float32Array(16),t1:new Float32Array(16),w:new Array(16)};
 // ---- people: drawn when the march reaches them, with light and shadow on and around them ----
-const KL={n:0, x:new Float32Array(16), y:new Float32Array(16), z:new Float32Array(16), kind:new Uint8Array(16), id:new Uint8Array(16),
-  view:new Uint8Array(16), frame:new Uint8Array(16), mir:new Uint8Array(16), amb:new Float32Array(16), lat:new Float32Array(16),
-  shs:new Float32Array(16), pool:new Float32Array(16), prad:new Float32Array(16), lx:new Float32Array(16), ly:new Float32Array(16), night:0};
-const KC={n:0, t:new Float32Array(48), k:new Uint8Array(48), ty:new Uint8Array(48), sd:new Float32Array(48), sg:new Float32Array(48)};
+const KL={n:0, x:new Float32Array(24), y:new Float32Array(24), z:new Float32Array(24), kind:new Uint8Array(24), id:new Uint8Array(24),
+  view:new Uint8Array(24), frame:new Uint8Array(24), mir:new Uint8Array(24), amb:new Float32Array(24), lat:new Float32Array(24),
+  shs:new Float32Array(24), pool:new Float32Array(24), prad:new Float32Array(24), lx:new Float32Array(24), ly:new Float32Array(24), night:0};
+const KC={n:0, t:new Float32Array(72), k:new Uint8Array(72), ty:new Uint8Array(72), sd:new Float32Array(72), sg:new Float32Array(72)};
 const GE={n:0, r:new Int32Array(4096), m:new Float32Array(4096), w:new Float32Array(4096)};
 // which sprite frame: the walk cycle, or the pose a paused keeper holds (a slow loop, offset per keeper)
 function keeperPoseFrame(c){
@@ -993,16 +1306,20 @@ function keeperPoseFrame(c){
   if(po===2) return (tt%5)<3.4?5:6;                                      // lean on the staff, nod now and then
   if(po===3){ const u=tt%3.2; return u<1.3?((((u/0.22)|0)&1)?8:7):0; }   // a few knocks, then listen
   if(po===4) return (tt%3.6)<1.8?9:10;                                   // asleep, breathing
+  if(po===5){ const tl=(KEEPERS[CR_.ay[c]|0]||{}).tool;
+    if(tl==='axe'){ const u=tt%3.2; return u<2.0?((u%0.5)<0.16?12:11):0; }
+    if(tl==='hoe'){ return (tt%1.5)<0.5?12:11; }
+    if(tl==='rod'){ return (tt%5)<0.35?12:11; } }
   return 0;
 }
 function keeperFrame(px,py,fx,fy,rx,ry){
   KL.n=0; const L=DAY.light, night=clamp((0.6-DAY.k)/0.6,0,1); KL.night=night;
   const R2=CDRAW*CDRAW;
-  for(let c=0;c<CR_.n&&KL.n<16;c++){ const sp=CR_.sp[c]; if(CR_.al[c]===0||(sp!==SP.KEEPER&&sp!==SP.FIRE)) continue;
+  for(let c=0;c<CR_.n&&KL.n<24;c++){ const sp=CR_.sp[c]; if(CR_.al[c]===0||(sp!==SP.KEEPER&&sp!==SP.FIRE)) continue;
     const x=CR_.x[c], y=CR_.y[c], z=CR_.z[c], ex=x-px, ey=y-py; if(ex*ex+ey*ey>R2) continue;
     const k=KL.n++; KL.x[k]=x; KL.y[k]=y; KL.z[k]=z;
     if(sp===SP.FIRE){ KL.kind[k]=1; KL.pool[k]=night*1.1; KL.prad[k]=2.8; KL.shs[k]=0; continue; }
-    KL.kind[k]=0; const id=Math.min(3,CR_.ay[c]|0); KL.id[k]=id;
+    KL.kind[k]=0; const id=Math.min(KMASK.length-1,CR_.ay[c]|0); KL.id[k]=id;
     // which way is the keeper facing, seen from here: front, side (mirrored for left) or back
     const hx=CR_.vx[c], hy=CR_.vy[c], hl=Math.hypot(hx,hy)||1, tl=Math.hypot(ex,ey)||1;
     const dot=-(hx*ex+hy*ey)/(hl*tl), v=dot>0.42?0:(dot<-0.42?2:1);
@@ -1128,8 +1445,8 @@ function renderFrame(px,py,pz,yaw,pitch){
     for(let k=0;k<KL.n;k++){ const wx=KL.x[k]-px, wy=KL.y[k]-py, sd=(wx*dx+wy*dy)/dd;
       const reach=Math.max(0.5,KL.pool[k]>0.02?KL.prad[k]:0); if(sd<0.35-reach) continue;
       const sg=(wx*dy-wy*dx)*invLen, asg=sg<0?-sg:sg;
-      if(asg<reach&&KC.n<47){ KC.t[KC.n]=Math.max(0.3,sd-reach); KC.k[KC.n]=k; KC.ty[KC.n]=0; KC.sd[KC.n]=sd; KC.sg[KC.n]=sg; KC.n++; }
-      if(KL.kind[k]===0&&sd>=0.35&&asg<0.5&&KC.n<47){ KC.t[KC.n]=sd; KC.k[KC.n]=k; KC.ty[KC.n]=1; KC.sd[KC.n]=sd; KC.sg[KC.n]=sg; KC.n++; } }
+      if(asg<reach&&KC.n<71){ KC.t[KC.n]=Math.max(0.3,sd-reach); KC.k[KC.n]=k; KC.ty[KC.n]=0; KC.sd[KC.n]=sd; KC.sg[KC.n]=sg; KC.n++; }
+      if(KL.kind[k]===0&&sd>=0.35&&asg<0.5&&KC.n<71){ KC.t[KC.n]=sd; KC.k[KC.n]=k; KC.ty[KC.n]=1; KC.sd[KC.n]=sd; KC.sg[KC.n]=sg; KC.n++; } }
     for(let a=1;a<KC.n;a++){ for(let b=a;b>0&&KC.t[b]<KC.t[b-1];b--) kcSwap(b); }
     if(KC.n) TMP.kflag.fill(0);
     let kNext=0;
@@ -1205,7 +1522,7 @@ function renderFrame(px,py,pz,yaw,pitch){
           const f=fogLUT[(ta*4)|0], fTop=Math.floor(tA_), fBot=Math.floor(bA);
           const nxs=sA?-stepX:0, nys=sA?0:-stepY, lit=0.64+0.46*Math.max(0,nxs*LIT.x+nys*LIT.y);
           const along=sA?(py+dy*ta):(px+dx*ta), tk=ta/K, nn=(0.94+0.14*hash2(cx,cy,5))*W.shadTop[ci];
-          const sm_=W.ruin[ci], SF=RMAT[sm_].f, ST=ruinTop(sm_,cx,cy);
+          const sm_=W.smat[ci]||W.ruin[ci], SF=RMAT[sm_].f, ST=ruinTop(sm_,cx,cy);
           for(let r=r0;r<=r1;r++){ if(flag[r]) continue;
             let col;
             if(r<fTop) col=pack(ST[0]*nn,ST[1]*nn,ST[2]*nn,f);
@@ -1502,7 +1819,7 @@ function compose(){
 }
 
 // ---------------- creatures (simulation layer) ----------------
-const SP={BIRD:0,RABBIT:1,DEER:2,SQUIRREL:3,FISH:4,WOLF:5,CARCASS:6,KEEPER:7,FIRE:8};
+const SP={BIRD:0,RABBIT:1,DEER:2,SQUIRREL:3,FISH:4,WOLF:5,CARCASS:6,KEEPER:7,FIRE:8,SHEEP:9,COW:10,HEN:11};
 const SPP=[
   { speed:8.0, turn:3.2, sight:16, sep:2.4, wsize:0.86, hsize:0.38, r:52,g:50,b:60 },
   { speed:3.0, turn:5.0, sight:9,  sep:1.0, wsize:0.70, hsize:0.78, r:168,g:132,b:98 },
@@ -1512,7 +1829,10 @@ const SPP=[
   { speed:6.7, turn:4.4, sight:30, sep:2.2, wsize:1.18, hsize:1.22, r:96,g:92,b:88 },
   { speed:0, turn:0, sight:0, sep:0, wsize:1.20, hsize:0.52, r:110,g:70,b:46 },
   { speed:1.5, turn:0, sight:0, sep:0, wsize:0.50, hsize:2.00, r:98,g:84,b:70 },
-  { speed:0, turn:0, sight:0, sep:0, wsize:0.42, hsize:1.15, r:80,g:72,b:64 }
+  { speed:0, turn:0, sight:0, sep:0, wsize:0.42, hsize:1.15, r:80,g:72,b:64 },
+  { speed:1.1, turn:0, sight:0, sep:0, wsize:1.15, hsize:0.95, r:226,g:222,b:208 },
+  { speed:0.8, turn:0, sight:0, sep:0, wsize:2.00, hsize:1.55, r:200,g:190,b:180 },
+  { speed:1.9, turn:0, sight:0, sep:0, wsize:0.46, hsize:0.46, r:220,g:200,b:166 }
 ];
 const CMAX=1600, CDRAW=130;
 const CR_={ n:0,
@@ -1554,6 +1874,26 @@ defMask(SP.FISH,12,6,[
  "....1111....","..11111112..",".1111411112.","11111111112.",
  ".111111112..","....1111...."],
  {1:[72,150,168],2:[40,96,120],4:[16,22,28]});
+function defMaskFn(sp,w,h,pal,fn){ const px=new Uint8Array(w*h); fn(function(x,y,c){ if(x>=0&&x<w&&y>=0&&y<h) px[y*w+x]=c; });
+  const P=new Array(10); for(const k in pal) P[+k]=pal[k]; MASKS[sp]={w:w,h:h,px:px,pal:P}; }
+defMaskFn(SP.SHEEP,16,11,{1:[236,232,220],2:[204,198,186],3:[58,54,56],4:[20,18,20]},function(set){
+  for(let y=0;y<11;y++)for(let x=0;x<16;x++){ const dx=(x+0.5-7)/6.2, dy=(y+0.5-5.2)/3.9; if(dx*dx+dy*dy<=1) set(x,y,y>=7?2:1); }
+  for(const q of [[2,2],[5,1],[8,1],[11,2]]) set(q[0],q[1],1);                                   // the wool's bumpy back
+  for(let y=2;y<=6;y++)for(let x=11;x<=15;x++){ const dx=(x+0.5-13.2)/1.9, dy=(y+0.5-4.4)/2.2; if(dx*dx+dy*dy<=1) set(x,y,3); }
+  set(11,2,3); set(15,3,3); set(14,4,4);
+  for(const lx of [4,6,9,11]){ set(lx,9,3); set(lx,10,3); } });
+defMaskFn(SP.COW,20,14,{1:[238,234,226],2:[74,56,44],3:[50,42,38],5:[226,170,160],6:[232,224,196]},function(set){
+  for(let y=3;y<=9;y++)for(let x=2;x<=14;x++){ if((x===2||x===14)&&(y===3||y===9)) continue; set(x,y,1); }
+  for(const b of [[5,5,2.6],[11,7,2.2],[9,3.4,1.8]]) for(let y=2;y<=10;y++)for(let x=2;x<=14;x++){ if(Math.hypot(x+0.5-b[0],y+0.5-b[1])<=b[2]&&(x>2||y>3)) set(x,y,2); }
+  for(let y=2;y<=7;y++)for(let x=15;x<=18;x++) set(x,y,1); set(16,3,2); set(16,4,2); set(14,3,2);
+  for(let y=5;y<=7;y++){ set(18,y,5); set(19,y,5); } set(15,1,6); set(18,1,6);
+  for(const lx of [3,4,12,13]){ for(let y=10;y<=12;y++) set(lx,y,1); set(lx,13,3); }
+  set(9,10,5); set(10,10,5); for(let y=3;y<=8;y++) set(1,y,2); set(1,9,3); });
+defMaskFn(SP.HEN,8,8,{1:[230,206,168],2:[184,146,100],3:[214,48,40],4:[232,176,60],5:[20,16,14]},function(set){
+  for(let y=0;y<8;y++)for(let x=0;x<8;x++){ const dx=(x+0.5-3.6)/3.1, dy=(y+0.5-4.6)/2.3; if(dx*dx+dy*dy<=1) set(x,y,1); }
+  for(let y=4;y<=5;y++)for(let x=2;x<=4;x++) set(x,y,2);
+  set(5,2,1); set(6,2,1); set(5,3,1); set(6,3,1); set(6,1,3); set(5,1,3); set(7,3,3); set(7,2,4); set(6,2,5);
+  set(0,2,2); set(0,3,2); set(1,2,2); set(3,7,4); set(4,7,4); });
 defMask(SP.CARCASS,14,6,[
  "..2..2..2..2..","..2..2..2..2..",".11111111111..","1111111111111.",
  ".11111111111..","..2........2.."],
@@ -1579,7 +1919,15 @@ const KEEPERS=[
   { name:'Old Wick', role:'gatekeeper', tall:true, head:'hood', beard:true, braid:false, tool:'staff', robe:true,
     skin:[214,166,128], hair:[214,214,206], cloak:[92,108,70], tunic:[120,104,80], legs:[70,60,50], accent:[160,140,100] },
   { name:'Maud', role:'steward',    tall:false, head:'cap',    beard:false, braid:false, tool:'keys',  robe:true,
-    skin:[236,186,152], hair:[110,64,40],  cloak:[150,96,140], tunic:[226,214,190], legs:[90,70,70], accent:[244,240,228] }
+    skin:[236,186,152], hair:[110,64,40],  cloak:[150,96,140], tunic:[226,214,190], legs:[90,70,70], accent:[244,240,228] },
+  { name:'Edda', role:'farmer',     tall:false, head:'hat',    beard:false, braid:true,  tool:'hoe',   robe:true,
+    skin:[232,182,146], hair:[120,70,40],  cloak:[96,120,72],  tunic:[214,196,160], legs:[100,80,60], accent:[214,184,110] },
+  { name:'Tam', role:'shepherd',    tall:true,  head:'hat',    beard:true,  braid:false, tool:'staff', robe:false,
+    skin:[206,150,112], hair:[70,52,40],   cloak:[140,104,64], tunic:[196,180,150], legs:[80,70,60],  accent:[196,170,104] },
+  { name:'Osk', role:'woodcutter',  tall:true,  head:'cap',    beard:true,  braid:false, tool:'axe',   robe:false,
+    skin:[222,170,132], hair:[170,90,40],  cloak:[150,52,44],  tunic:[120,96,70],  legs:[70,62,54],  accent:[190,60,50] },
+  { name:'Fenwick', role:'hermit',  tall:false, head:'hood',   beard:true,  braid:false, tool:'rod',   robe:true,
+    skin:[210,164,130], hair:[226,226,218], cloak:[110,104,96], tunic:[150,140,120], legs:[80,74,66], accent:[160,150,120] }
 ];
 function shadeOf(c,k){ return [c[0]*k|0,c[1]*k|0,c[2]*k|0]; }
 // bold outline round every shape (this is most of the charm at ASCII scale); the lantern glass and the z stay bare
@@ -1600,6 +1948,8 @@ function drawSleeper(K,set,rect,alt){
     if(dx*dx+dy*dy<=1) set(x,y,y<=18+b?8:2); }                         // head bowed: mostly hair
   if(K.braid){ for(let y=20+b;y<=25;y++) set(4,y,8); set(4,26,13); }
   rect(6,23,9,23,2);                                                   // hands folded on the knees
+  if(K.tool==='axe'){ for(let y=18;y<=31;y++) set(15,y,11); rect(13,17,15,18,7); }
+  if(K.tool==='hoe'||K.tool==='rod'){ for(let y=4;y<=31;y++) set(15,y,11); if(K.tool==='hoe') rect(14,4,15,4,7); }
   if(K.tool==='spear'||K.tool==='staff'){ for(let y=6;y<=31;y++) set(15,y,11); if(K.tool==='spear'){ set(15,2,7); set(14,3,7); set(15,3,7); set(15,4,7); set(15,5,7); } }
   if(K.head==='helmet'){ rect(0,29,2,30,7); rect(0,31,2,31,13); set(1,28,7); }
   set(13,26,1); rect(12,27,13,29,9); rect(12,30,13,30,1);              // lantern on the floor
@@ -1608,7 +1958,7 @@ function drawSleeper(K,set,rect,alt){
 }
 function buildPerson(K){
   const W=16,H=32, views=[];
-  const SPECS=[[0,''],[1,''],[2,''],[3,''],[0,'look'],[0,'lean'],[0,'lean',1],[0,'knock'],[0,'knock',1],[0,'sleep'],[0,'sleep',1]];
+  const SPECS=[[0,''],[1,''],[2,''],[3,''],[0,'look'],[0,'lean'],[0,'lean',1],[0,'knock'],[0,'knock',1],[0,'sleep'],[0,'sleep',1],[0,'work'],[0,'work',1]];
   for(let view=0;view<3;view++){ const frames=[];
     for(let si=0;si<SPECS.length;si++){ const fr=SPECS[si][0], pose=SPECS[si][1], alt=SPECS[si][2]||0;
       const px=new Uint8Array(W*H);
@@ -1625,9 +1975,12 @@ function buildPerson(K){
       const drawTool=function(){ if(K.tool==='spear'||K.tool==='staff'){ const t0=K.tool==='spear'?0:Math.max(0,top-3)+0;
         for(let y=t0+(K.tool==='spear'?3:0);y<=30;y++) set(toolX,y,11);
         if(K.tool==='spear'){ set(toolX,0,7); rect(toolX-1,1,toolX+1,2,7); set(toolX,3,7); }
-        else { set(toolX+1,t0,11); set(toolX+1,t0+1,11); set(toolX,t0,11); } } };
-      const lean=(pose==='lean'&&K.tool==='staff');
-      if(!side&&!lean) drawTool();
+        else { set(toolX+1,t0,11); set(toolX+1,t0+1,11); set(toolX,t0,11); } }
+        else if(K.tool==='axe'){ for(let y=sh-3;y<=sh+9;y++) set(toolX,y,11); rect(toolX-1,sh-4,toolX+1,sh-2,7); }
+        else if(K.tool==='hoe'){ for(let y=top-1;y<=30;y++) set(toolX,y,11); rect(toolX-1,top-1,toolX+1,top-1,7); set(toolX+1,top,7); }
+        else if(K.tool==='rod'){ for(let y=1;y<=30;y++) set(toolX,y,11); set(toolX,0,14); } };
+      const lean=(pose==='lean'&&K.tool==='staff'), work=(pose==='work');
+      if(!side&&!lean&&!work) drawTool();
       // ---- legs and boots
       if(side){
         const fwd=(fr===1)?2:(fr===3?-2:0);
@@ -1649,7 +2002,19 @@ function buildPerson(K){
       if(side){ const by=sh+7; for(let x=0;x<W;x++) if(px[by*W+x]===4||px[by*W+x]===5) set(x,by,10); if(K.tool==='keys'){ set(9,by+1,7); set(9,by+2,7); } }
       // ---- arms (sleeves) and hands; the lantern hangs from one hand
       const look=pose==='look', knock=pose==='knock';
-      if(lean){   // both hands on the top of the staff, planted in front; the lantern hangs from the staff
+      if(work){   // at work: the lantern set down on the ground, both hands on the tool
+        const lgx=side?1:13; set(lgx+1,26,1); rect(lgx,27,lgx+1,29,9); rect(lgx,30,lgx+1,30,1);
+        if(!side&&K.tool!=='axe'){ rect(3,sh+1,3,sh+6,view===0?4:5); set(3,sh+7,2); }
+        if(K.tool==='axe'){
+          if(!alt){ if(side){ line(8,sh+1,6,top+1,5); set(6,top,2); set(5,top,2); line(5,top-1,3,top-4,11); rect(1,top-5,3,top-3,7); }
+                    else { line(4,sh+1,7,top-1,5); line(11,sh+1,8,top-1,5); set(7,top-1,2); set(8,top-1,2); for(let y=0;y<top-1;y++) set(7,y,11); rect(8,0,10,1,7); } }
+          else { if(side){ line(8,sh+1,12,sh+5,5); set(12,sh+5,2); set(13,sh+5,2); line(13,sh+6,15,sh+10,11); rect(14,sh+10,15,sh+12,7); }
+                 else { line(4,sh+1,7,sh+6,5); line(11,sh+1,8,sh+6,5); set(7,sh+6,2); set(8,sh+6,2); line(8,sh+7,11,28,11); rect(10,28,13,29,7); } } }
+        else if(K.tool==='hoe'){ line(8,sh+1,11,sh+4,5); set(11,sh+4,2); set(12,sh+4,2);
+          if(!alt){ line(12,sh+5,14,29,11); rect(12,30,15,30,7); } else { line(12,sh+3,14,top-1,11); rect(14,top-1,15,top+1,7); } }
+        else if(K.tool==='rod'){ line(8,sh+1,11,sh+5,5); set(11,sh+5,2); set(12,sh+5,2);
+          const tipY=alt?top+3:top-3; line(12,sh+4,15,tipY,11); for(let y=tipY+1;y<=30;y+=2) set(15,y,14); }
+      } else if(lean){   // both hands on the top of the staff, planted in front; the lantern hangs from the staff
         if(side){ for(let y=sh+3;y<=30;y++) set(12,y,11); line(8,sh+1,11,sh+4,5); set(11,sh+4,2); set(12,sh+4,2);
           set(13,sh+5,1); rect(13,sh+6,14,sh+8,9); rect(13,sh+9,14,sh+9,1); }
         else { line(3,sh+1,7,sh+4,view===0?4:5); line(12,sh+1,8,sh+4,5); set(7,sh+4,2); set(8,sh+4,2);
@@ -1691,11 +2056,13 @@ function buildPerson(K){
       if(K.head==='helmet'){ for(let y=top-1;y<=top+2;y++) for(let x=0;x<W;x++){ const dx=(x+0.5-cx)/4.6, dy=(y+0.5-(top+2.5))/3.6; if(dx*dx+dy*dy<=1&&y<=top+2) set(x,y,7); }
         for(let x=0;x<W;x++){ if(px[(top+2)*W+x]===7) set(x,top+3,13); }
         if(view===0){ set(7,top+3,7); set(8,top+3,7); set(7,top+4,7); set(8,top+4,7); } }
+      if(K.head==='hat'){ for(let y=top-2;y<=top+1;y++) for(let x=0;x<W;x++){ const dx=(x+0.5-cx)/3.3, dy=(y+0.5-(top+0.4))/2.2; if(dx*dx+dy*dy<=1) set(x,y,y===top+1?10:13); }
+        for(let x=Math.round(cx-6);x<=Math.round(cx+5);x++) set(x,top+2,13); }
       if(K.head==='cap'){ for(let y=top-1;y<=top+1;y++) for(let x=0;x<W;x++){ const dx=(x+0.5-cx)/4.4, dy=(y+0.5-(top+1.5))/2.6; if(dx*dx+dy*dy<=1) set(x,y,13); } }
       if(K.head==='hood'){ for(let y=top-1;y<=sh;y++) for(let x=0;x<W;x++){ const dx=(x+0.5-cx)/4.9, dy=(y+0.5-(top+4))/5.0;
           if(dx*dx+dy*dy<=1){ const face=(view===0&&x>=5&&x<=10&&y>=top+2&&y<=top+8)||(side&&x>=9&&y>=top+2&&y<=top+8);
             if(!face) set(x,y,(x+0.5>cx+2.5)?5:4); } } }
-      if(side&&!lean) drawTool();   // side view: held out in front of the body
+      if(side&&!lean&&!work) drawTool();   // side view: held out in front of the body
       // look out: the free hand shades the eyes. knock: the free hand up at the door, then down on the latch
       if(look||knock){
         if(side){ if(look){ line(9,sh+1,11,top+5,4); set(11,top+3,2); set(12,top+3,2); set(11,top+4,4); }
@@ -1715,7 +2082,7 @@ const KMASK=KEEPERS.map(buildPerson);
 // what each keeper says: [morning, afternoon, evening, night], a few lines each, never the same twice running
 const GREETS=[
   [["Quiet night. The good kind.","Sun's up over the lake. Wall's yours.","Fog burns off by noon, mostly."],
-   ["Fair day for a watch.","Wind's from the lake today.","I count the deer from up here. I lose track at forty."],
+   ["Fair day for a watch.","Wind's from the lake today.","I count the deer from up here. I lose track at forty.","{farm2}You can hear Tam's sheep from up here. Off to the $farm2.","{hermit}See the smoke by the lake, to the $hermit? The hermit's fire."],
    ["Light's going. Braziers soon.","Hear the wolves yet? You will.","Tilda takes the bunk tonight. I've got the wall."],
    ["Stay near the fire, friend.","Every star in its place. I checked.","~Keep it down. Tilda's asleep in the guard room."]],
   [["Morning! Mind the frost on the stair.","Slept like a stone. Don't tell Bram.","First lap's the coldest."],
@@ -1723,11 +2090,11 @@ const GREETS=[
    ["Sun's going. My bunk's calling.","Last lap, then bed.","Bram's got the night. Lucky Bram."],
    ["Bed. Finally.","Can't sleep till I've done one more lap.","Stars are out. Keep to the wall."]],
   [["Gate's open. Always is, for you.","Up early? So are my knees.","Morning road's the quiet road."],
-   ["Road's been quiet. Just how I like it.","Forty years on this gate. Never once locked it.","%My grandad said the old ruins were old when he was a boy.","Mind the cart ruts by the arch."],
+   ["Road's been quiet. Just how I like it.","Forty years on this gate. Never once locked it.","%My grandad said the old ruins were old when he was a boy.","Mind the cart ruts by the arch.","{farm1}Harrow Farm's off to the $farm1. Edda sends eggs up most mornings.","{hermit}The hermit fishes the lake, off to the $hermit. Leave him be."],
    ["Late light's the best light on the road.","Lantern's lit. Off you go, if you're going.","Owls'll be up soon."],
    ["Late to be wandering, friend.","Owls are out. They keep me company.","~Shh. Tilda's sleeping just in there."]],
   [["Bread's on. Wipe your feet before the hall.","Up the tower before breakfast? Brave.","Somebody left the hall door open again."],
-   ["Wipe your feet before the hall.","Somebody tracked mud up the stair. Was it you?","Every door in this keep, twice a day."],
+   ["Wipe your feet before the hall.","Somebody tracked mud up the stair. Was it you?","Every door in this keep, twice a day.","{wood}Woodpile's low. Osk's cabin is in the trees to the $wood.","{farm1}Edda's eggs are the best thing in my kitchen."],
    ["Kitchen fire's still warm.","Lamps lit, doors checked. Nearly done.","One more round of the doors."],
    ["Off to bed with you.","Kitchen fire's still warm.","Doors are shut. Mostly."]]];
 // caught in the middle of something: [unused, looking out, leaning, checking the door, asleep]
@@ -1736,19 +2103,25 @@ const POSEL=[null,
   ["These old knees and this old stick. We get by.","Just resting my eyes. On the road.","Lean on a staff long enough, it leans back."],
   ["Just checking the latch. Old habit.","Sticks in the damp, this one.","Locked? No. Just making sure it shuts."],
   ["Mmm... five more minutes...","...not my watch... Bram's watch...","%...the old stones... hmm..."]];
-const GREETN=["Bram, the guard","Tilda, the guard","Old Wick, the gatekeeper","Maud, the steward"];
-let greetHook=null; const GREETT=[-1e9,-1e9,-1e9,-1e9], GLAST=["","","",""];
+const GREETN=["Bram, the guard","Tilda, the guard","Old Wick, the gatekeeper","Maud, the steward","Edda, the farmer","Tam, the shepherd","Osk, the woodcutter","Fenwick, the hermit"];
+let greetHook=null; const GREETT=[-1e9,-1e9,-1e9,-1e9,-1e9,-1e9,-1e9,-1e9], GLAST=["","","","","","","",""];
 function dayPart(){ const t=DAY.tod; return t>=5.5&&t<11?0:(t>=11&&t<17?1:(t>=17&&t<21.5?2:3)); }
 function sleepHours(){ const t=DAY.tod; return t>=20||t<5.5; }   // Tilda turns in at eight and is up at half five
 function tildaAsleep(){ for(let c=0;c<CR_.n;c++) if(CR_.sp[c]===SP.KEEPER&&(CR_.ay[c]|0)===1) return CR_.st[c]===2; return false; }
 // a line starting with ~ is only said while Tilda is actually asleep
 // a line starting with % only when this world has ruins
-function pickLine(id,list){ const ok=tildaAsleep(), rn=W.ruins.length>0; list=list.filter(function(l){ return (l[0]!=='~'||ok)&&(l[0]!=='%'||rn); });
-  const bare=function(l){ return l.replace(/^[~%]/,''); };
+// a line starting with {farm1} (or {farm2}, {wood}, {hermit}, {keep}) only when that place is in this world; $farm1 in a line is which way it lies
+function lineOk(l,ok,rn){ if(l[0]==='~') return ok; if(l[0]==='%') return rn; const m=/^\{(\w+)\}/.exec(l); if(m) return m[1]==='keep'?W.keepBuilt:!!folkHere(m[1]); return true; }
+function pickLine(id,list){ const ok=tildaAsleep(), rn=W.ruins.length>0; list=list.filter(function(l){ return lineOk(l,ok,rn); });
+  if(!list.length) return '...';
+  const bare=function(l){ return l.replace(/^[~%]/,'').replace(/^\{\w+\}/,'').replace(/\$(\w+)/g,function(_,k){ return dirWord(k); }); };
   let l=list[(Math.random()*list.length)|0]; if(bare(l)===GLAST[id]&&list.length>1) l=list[(list.indexOf(l)+1)%list.length]; return bare(l); }
 function greet(id,pose){ const now=Date.now(); if(now-GREETT[id]<45000||!greetHook) return;
   let msg;
-  if(pose===4) msg=KEEPERS[id].name+' is asleep: "'+pickLine(id,POSEL[4])+'"';
+  if(id>=4){ const FP=FPOSE[id-4]||[];
+    if(pose===4) msg=KEEPERS[id].name+' is asleep: "'+pickLine(id,FP[4]||["..."])+'"';
+    else { const list=(pose>0&&FP[pose]&&Math.random()<0.6)?FP[pose]:FGREETS[id-4][dayPart()]; msg=GREETN[id]+': "'+pickLine(id,list)+'"'; } }
+  else if(pose===4) msg=KEEPERS[id].name+' is asleep: "'+pickLine(id,POSEL[4])+'"';
   else { const list=(pose>=1&&pose<=3&&Math.random()<0.5)?POSEL[pose]:GREETS[id][dayPart()]; msg=GREETN[id]+': "'+pickLine(id,list)+'"'; }
   if(greetHook(msg)!==false){ GREETT[id]=now; GLAST[id]=msg.slice(msg.indexOf('"')+1,-1); } }   // a card is open: say it later instead
 // a brazier on a stone post (9 = the fire)
@@ -1763,7 +2136,7 @@ function addCreature(sp,x,y,ax,ay,age,par){ const c=CR_.n++; CR_.sp[c]=sp; CR_.x
   CR_.age[c]=age==null?1:age; CR_.par[c]=par==null?-1:par;
   CR_.energy[c]= sp===SP.WOLF?(CR_.age[c]<1?40:92):(sp===SP.DEER?(CR_.age[c]<1?22:40):(CR_.age[c]<1?16:30)); return c; }
 
-function populate(seed){ populateLife(seed); addPeople(); }
+function populate(seed){ populateLife(seed); addPeople(); addFolk(); }
 function populateLife(seed){
   const rnd=mul32((seed^0x9e3779b9)>>>0); CR_.n=0;
   RESERVE.burrows.length=0; RESERVE.meadows.length=0; RESERVE.dens.length=0;
@@ -2179,7 +2552,7 @@ function tickKeeper(c,dt){
   const g=floorAt(CR_.x[c],CR_.y[c],CR_.z[c]); CR_.z[c]+=(g-CR_.z[c])*Math.min(1,dt*16);
 }
 function tick(dt){
-  ruinCheck();
+  ruinCheck(); placeCheck();
   if(CR_.n===0) return; buildSGrid(); const px=P.x, py=P.y;
   for(let c=0;c<CR_.n;c++){ if(CR_.al[c]===0)continue;
     if(CR_.age[c]<1){ CR_.age[c]+=dt/matureTime(CR_.sp[c]); if(CR_.age[c]>=1){ CR_.age[c]=1; CR_.par[c]=-1; } }
@@ -2190,7 +2563,8 @@ function tick(dt){
     else if(s===SP.SQUIRREL) tickSquirrel(c,dt,px,py);
     else if(s===SP.FISH) tickFish(c,dt);
     else if(s===SP.CARCASS||s===SP.FIRE) continue;
-    else if(s===SP.KEEPER) tickKeeper(c,dt);
+    else if(s===SP.KEEPER){ if(CR_.ax[c]>=100) tickFolk(c,dt); else tickKeeper(c,dt); }
+    else if(s===SP.SHEEP||s===SP.COW||s===SP.HEN) tickStock(c,dt);
     else tickWolf(c,dt); }
 }
 
@@ -2264,7 +2638,7 @@ function updatePlayer(dt){
   const l=Math.hypot(mf,ms); if(l>1){ mf/=l; ms/=l; }
   const run=(IN.run||k.ShiftLeft||k.ShiftRight)?2:1;
   const fx=Math.cos(P.yaw), fy=Math.sin(P.yaw);
-  const bottom=terr(P.x,P.y);
+  const bottom=groundAt(P.x,P.y);
   if(bottom<WATER-0.4){
     // ---- swim / wade: look down + move to dive, up to rise, level on the bed to walk it ----
     const sp=5.4*run*dt; const mvx=fx*mf-fy*ms, mvy=fy*mf+fx*ms;
@@ -2415,6 +2789,7 @@ function boot(){
       DIALS.forest=num(d.forest,0.3,1.7,DIALS.forest); DIALS.water=num(d.water,0.3,1.7,DIALS.water);
       DIALS.keep=d.keep?1:0; DIALS.ruins=(d.ruins===undefined)?(d.structures===0?0:2):Math.round(num(d.ruins,0,3,2)); DIALS.predators=d.predators?1:0; DIALS.people=(d.people===undefined)?1:(d.people?1:0); DIALS.stickTurn=(d.stickTurn===undefined)?1:(d.stickTurn?1:0);
       { const rv=parseInt(d.render,10); DIALS.render=(rv>=0&&rv<RENDERS.length)?rv:0; }
+      if(Array.isArray(d.folk)&&d.folk.length===4) for(let i=0;i<4;i++) DIALS.folk[i]=d.folk[i]?1:0;
       for(let i=0;i<6;i++){ if(d.on&&d.on.length===6) DIALS.on[i]=d.on[i]?1:0; if(d.pop&&d.pop.length===6) DIALS.pop[i]=num(d.pop[i],0.25,2,DIALS.pop[i]); }
       if(!DIALS.predators) DIALS.on[SP.WOLF]=0;
       DIALS.tod=num(d.tod,0,24,DIALS.tod)%24; const dm=parseInt(d.dayMode,10); if(dm>=0&&dm<DAYMODES.length) DIALS.dayMode=dm;
@@ -2425,7 +2800,7 @@ function boot(){
     const c=$('seedCard');
     c.innerHTML='<h1>World seed</h1><p>Type a number for that exact world, or roll a random one.</p><input id="seedIn" inputmode="numeric" value="'+W.seed+'" style="width:100%;padding:12px;font:600 16px var(--mb-mono);background:rgba(0,0,0,.5);color:var(--mb-ink);border:1px solid var(--mb-line);border-radius:13px;margin:6px 0"><div style="display:flex;gap:8px"><button class="btn go" id="seedUse" style="flex:1;margin-top:0">grow it</button><button class="btn go" id="seedRnd" style="flex:1;margin-top:0">random</button></div><button class="btn" id="seedClose" style="width:100%;margin-top:8px">cancel</button>';
     $('seed').classList.remove('hidden');
-    function apply(sv){ DIALS.seed=sv; saveDials(); genWorld(sv); populate(sv); spawn(); $('seed').classList.add('hidden'); toast('seed '+sv); }
+    function apply(sv){ DIALS.seed=sv; saveDials(); genWorld(sv); populate(sv); spawn(); $('seed').classList.add('hidden'); toast('seed '+sv+(folkMissing().length?'. No room here for '+folkMissing().join(' or '):'')); }
     $('seedUse').addEventListener('click',function(){ const v=parseInt($('seedIn').value,10); apply(isFinite(v)?(v>>>0):(Math.random()*1e9|0)); });
     $('seedRnd').addEventListener('click',function(){ apply(Math.random()*1e9|0); });
     $('seedClose').addEventListener('click',function(){ $('seed').classList.add('hidden'); });
@@ -2440,6 +2815,7 @@ function boot(){
     DIALS.seed=(parseInt(($('dSeed')||{}).value,10)>>>0)||DIALS.seed;
     DIALS.forest=num('dForest',1); DIALS.water=num('dWater',1);
     DIALS.keep=chk('dKeep')?1:0; DIALS.ruins=Math.round(num('dRuins',2)); DIALS.predators=chk('dPred')?1:0; DIALS.people=chk('dPeople')?1:0; DIALS.stickTurn=chk('dStick')?1:0;
+    for(let i=0;i<4;i++) DIALS.folk[i]=chk('dFolk'+i)?1:0;
     const ids=['dBird','dRabbit','dDeer','dSquirrel','dFish','dWolf'];
     const pops=['pBird','pRabbit','pDeer','pSquirrel','pFish','pWolf'];
     for(let i=0;i<6;i++){ DIALS.on[i]=chk(ids[i])?1:0; DIALS.pop[i]=num(pops[i],1); }
@@ -2454,7 +2830,7 @@ function boot(){
       return '<div class="dial-row"><label><input type="checkbox" id="'+id+'"'+(on?' checked':'')+'> '+label+'</label>'+
         '<input id="p'+id.slice(1)+'" type="range" min="0.25" max="2" step="0.25" value="'+pv+'"></div>';
     };
-    c.innerHTML='<h1>Keeper dials</h1><p>Set the world, then drop in. Life sliders are starting numbers. Forest, water, and ruins rebuild the ground. Your settings are remembered on this device.</p>'+
+    c.innerHTML='<h1>Keeper dials</h1><p>Set the world, then drop in. Life sliders are starting numbers. Forest, water, ruins and who lives here rebuild the ground. Your settings are remembered on this device.</p>'+
       '<input id="dSeed" inputmode="numeric" value="'+DIALS.seed+'" style="width:100%;padding:10px;font:600 16px var(--mb-mono);background:rgba(0,0,0,.5);color:var(--mb-ink);border:1px solid var(--mb-line);border-radius:13px;margin:6px 0">'+
       '<div class="dial-sec">LIFE</div>'+
       row('dBird','birds',DIALS.on[0],DIALS.pop[0])+
@@ -2470,6 +2846,9 @@ function boot(){
       '<div class="dial-row"><label><input type="checkbox" id="dKeep"'+(DIALS.keep?' checked':'')+'> the keep</label></div>'+
       '<div class="dial-row"><label><input type="checkbox" id="dPeople"'+(DIALS.people?' checked':'')+'> people of the keep</label></div>'+
       '<div class="dial-row"><label>ruins <b id="dRuinsV" style="font-family:var(--mb-mono);font-weight:600">'+RUIN_LEVELS[DIALS.ruins|0]+'</b></label><input id="dRuins" type="range" min="0" max="3" step="1" value="'+(DIALS.ruins|0)+'"></div>'+
+      '<div class="dial-sec">WHO LIVES HERE</div>'+
+      FOLK.map(function(f,i){ return '<div class="dial-row"><label><input type="checkbox" id="dFolk'+i+'"'+(DIALS.folk[i]?' checked':'')+'> '+f.label+'</label></div>'; }).join('')+
+      '<div class="dial-row" style="opacity:.75;font-size:13px">Built when you grow the world. Whoever lives here knows their neighbours.</div>'+
       '<div class="dial-sec">CONTROLS</div>'+
       '<div class="dial-row"><label><input type="checkbox" id="dStick"'+(DIALS.stickTurn?' checked':'')+'> walk stick turns you (off: steps sideways)</label></div>'+
       '<div class="dial-sec">SKY</div>'+
@@ -2490,7 +2869,9 @@ function boot(){
     $('dRuins').addEventListener('input',function(){ $('dRuinsV').textContent=RUIN_LEVELS[parseInt($('dRuins').value,10)|0]||''; });
     showSky();
     $('dStick').addEventListener('change',function(){ DIALS.stickTurn=$('dStick').checked?1:0; saveDials(); });   // applies at once
-    $('dGrow').addEventListener('click',function(){ readDialsFromCard(); genWorld(DIALS.seed); populate(DIALS.seed); spawn(); $('dials').classList.add('hidden'); toast('world '+DIALS.seed); });
+    $('dGrow').addEventListener('click',function(){ readDialsFromCard(); genWorld(DIALS.seed); populate(DIALS.seed); spawn(); $('dials').classList.add('hidden');
+      const miss=folkMissing();
+      toast('world '+DIALS.seed+(miss.length?'. No room here for '+miss.join(' or '):'')); });
     $('dLife').addEventListener('click',function(){ readDialsFromCard(); populate(DIALS.seed); $('dials').classList.add('hidden'); toast('life restocked'); });
     $('dClose').addEventListener('click',function(){ $('dials').classList.add('hidden'); });
   }

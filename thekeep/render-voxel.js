@@ -1,4 +1,4 @@
-// The Keep · render-voxel.js · v0.19.0 · Oct 29 2026
+// The Keep · render-voxel.js · v0.20.0 · Oct 29 2026
 // The same world drawn as blocks, the way Minecraft draws its worlds: every cell becomes a column of 1 m blocks.
 // Nothing here makes the world. It reads the exact arrays the ASCII raycaster reads, rounds each height to a whole
 // block, and gives each column a block type. Sky, water, light and the people are shared with the Mesh renderer.
@@ -53,7 +53,7 @@ out vec3 vW; flat out ivec2 vCell; flat out int vFace; flat out int vMat; flat o
 void main(){ vW=aP.xyz; vTop=aP.w; vCell=ivec2(aC); vFace=int(aF.x+0.5); vMat=int(aF.y+0.5); vSl=int(aF.w+0.5); vAO=aF.z/255.0;
   gl_Position=uVP*vec4(aP.xyz,1.0); }`;
 const FS_VOX=HEAD+FINISH+`
-uniform sampler2D uC; uniform sampler2D uT; uniform vec3 uMatF[10]; uniform vec3 uMatT[10]; uniform float uMatCH[10];
+uniform sampler2D uC; uniform sampler2D uT; uniform vec3 uMatF[14]; uniform vec3 uMatT[14]; uniform float uMatCH[14];
 in vec3 vW; flat in ivec2 vCell; flat in int vFace; flat in int vMat; flat in int vSl; flat in float vTop; in float vAO; out vec4 o;
 void main(){
   vec4 lit=texelFetch(uC,vCell,0); float sh=vSl==1?texelFetch(uT,vCell,0).a:lit.a;
@@ -63,9 +63,9 @@ void main(){
   vec3 c;
   if(vMat==20){ vec3 tc=texelFetch(uT,vCell,0).rgb; float hole=hash(px+blk*5.0+float(vFace)); c=tc*(hole<0.12?0.62:1.0)*(vFace==0?1.08:(vFace==5?0.7:0.9))*sh; }
   else if(vFace==0){
-    if(vMat>=5&&vMat<=14){ int m=vMat-5; c=uMatT[m]; } else c=lit.rgb;
-    c*=(vMat>=5&&vMat<=14)?sh:1.0; c*=n;
-    if(vMat<5||vMat>14) c*=sh;
+    if(vMat>=5&&vMat<=18){ int m=vMat-5; c=uMatT[m]; } else c=lit.rgb;
+    c*=(vMat>=5&&vMat<=18)?sh:1.0; c*=n;
+    if(vMat<5||vMat>18) c*=sh;
   } else {
     vec2 nn=vFace==1?vec2(1,0):vFace==2?vec2(-1,0):vFace==3?vec2(0,1):vec2(0,-1);
     float lt=vFace==5?0.5:0.64+0.46*max(0.0,dot(nn,uLight.xy));
@@ -76,7 +76,7 @@ void main(){
     else if(vMat==2) base=(vW.z>vTop-0.25)?vec3(234.,238.,244.)/255.:vec3(132.,122.,108.)/255.;
     else if(vMat==3) base=vec3(132.,122.,108.)/255.;
     else if(vMat==4) base=vec3(134.,96.,67.)/255.;
-    else if(vMat<=14){ int m=vMat-5; base=uMatF[m];
+    else if(vMat<=18){ int m=vMat-5; base=uMatF[m];
       if(uMatCH[m]>0.0){ float row=floor(px.y/8.0); float py=mod(px.y,8.0), qx=mod(px.x+(mod(row+blk.y,2.0)>0.5?8.0:0.0),16.0);
         if(py<1.0||qx<1.0) base*=0.74; } }
     else base=vec3(106.,76.,48.)/255.;
@@ -225,7 +225,7 @@ function create(A){
       const xl=x>0?x-1:x, xr=x<N-1?x+1:x, yu=y>0?y-1:y, yd=y<N-1?y+1:y;
       const sx=(h[y*N+xr]-h[y*N+xl])*0.5, sy=(h[yd*N+x]-h[yu*N+x])*0.5, slope=Math.sqrt(sx*sx+sy*sy);
       let m;
-      if(st[i]>0) m=5+Math.min(9,W.ruin[i]);
+      if(st[i]>0) m=5+Math.min(13,W.ruin[i]);
       else if(W.ruin[i]===6) m=11;
       else if(W.path[i]&&hh>WATER+0.3) m=4;
       else if(hh<WATER+1.4) m=1;
@@ -300,7 +300,7 @@ function create(A){
         const fc=cellOf(Math.max(0,Math.min(N-1,nx)),Math.max(0,Math.min(N-1,ny)),s);
         side(B,x,y,s,d,Math.max(nH,H-64),H,H,fc[0],fc[1],mat,s===1?AOS:AO1); } }
     if(lod===0){ for(let y=oy;y<oy+SIDE;y++)for(let x=ox;x<ox+SIDE;x++){ const i=y*N+x; if(slabT[i]<=slabB[i]) continue;
-        const zb=slabB[i], zt=slabT[i], mat=colMat[i]>=5?colMat[i]:5+Math.min(9,W.ruin[i]);
+        const zb=slabB[i], zt=slabT[i], mat=W.smat[i]?5+Math.min(13,W.smat[i]):(colMat[i]>=5?colMat[i]:5+Math.min(13,W.ruin[i]));
         let skip=0; const cov=function(j){ return slabT[j]>slabB[j]&&slabB[j]<=zb&&slabT[j]>=zt; };
         if(cov(i+1)) skip|=2; if(cov(i-1)) skip|=4; if(cov(i+N)) skip|=8; if(cov(i-N)) skip|=16;
         B.sl=1; box(B,x,y,zb,x+1,y+1,zt,x,y,mat,skip); B.sl=0; } }
@@ -324,8 +324,8 @@ function create(A){
         const v=Math.max(g,slabT[i])+(W.tree[i]>0?W.tree[i]+2:0); if(v>hi)hi=v; }
       chunkMin[cy*CH+cx]=Math.min(lo-64,A.WATER); chunkMax[cy*CH+cx]=hi+2; } }
   // material colors for the keep and ruin stone, the same table the raycaster uses
-  const matF=new Float32Array(30), matT=new Float32Array(30), matCH=new Float32Array(10);
-  for(let m=0;m<10;m++){ const M=A.RMAT[m]||A.RMAT[0]; for(let k=0;k<3;k++){ matF[m*3+k]=M.f[k]/255; matT[m*3+k]=M.t[k]/255; } matCH[m]=M.ch; }
+  const matF=new Float32Array(42), matT=new Float32Array(42), matCH=new Float32Array(14);
+  for(let m=0;m<14;m++){ const M=A.RMAT[m]||A.RMAT[0]; for(let k=0;k<3;k++){ matF[m*3+k]=M.f[k]/255; matT[m*3+k]=M.t[k]/255; } matCH[m]=M.ch; }
   // ---- sprites: an atlas of every creature and keeper frame, built from the same pixel masks ----
   const SLOT_W=16, SLOT_H=32, ACOLS=16; const slots=[]; const atlasMap={};
   function addSlot(key,w,h,px,pal,glowIdx){ slots.push({key:key,w:w,h:h,px:px,pal:pal,glow:glowIdx}); atlasMap[key]=slots.length-1; }
@@ -359,7 +359,7 @@ function create(A){
         out[y*S+x]=Math.max(0,Math.min(255,Math.round(mean+(v-mean)*k))); } }
     return out; }
   let sig='', relPass=-1, relRow=0;
-  function worldSig(){ const D=A.DIALS; return W.seed+'|'+D.keep+'|'+D.forest+'|'+D.water+'|'+D.ruins+'|'+W.ruins.length+'|'+W.keepBuilt; }
+  function worldSig(){ const D=A.DIALS; return W.seed+'|'+D.keep+'|'+D.forest+'|'+D.water+'|'+D.ruins+'|'+W.ruins.length+'|'+W.keepBuilt+'|'+(D.folk||[]).join('')+'|'+(W.places?W.places.length:0); }
 
   // ---- wall decorations ----
   let PD=null; try{ PD=prog(VS_DECO,FS_DECO); }catch(e){ PD=null; }
@@ -444,7 +444,7 @@ function create(A){
       if(k>=SPMAX) continue;
       const o=k*16; const ci=(Math.max(0,Math.min(N-1,y|0)))*N+Math.max(0,Math.min(N-1,x|0));
       const shd=W.shadRaw[ci]; let amb=(shd>0.99&&A.DAY.lightAlt>0.035)?0.92:(0.56+0.36*shd);
-      if(sp===SP.KEEPER){ const id=Math.min(3,C.ay[c]|0), hx=C.vx[c], hy=C.vy[c], hl=Math.hypot(hx,hy)||1, tl=Math.hypot(ex,ey)||1;
+      if(sp===SP.KEEPER){ const id=Math.min(A.KMASK.length-1,C.ay[c]|0), hx=C.vx[c], hy=C.vy[c], hl=Math.hypot(hx,hy)||1, tl=Math.hypot(ex,ey)||1;
         const dot=-(hx*ex+hy*ey)/(hl*tl), v=dot>0.42?0:(dot<-0.42?2:1), mir=(v===1&&(hx*rx+hy*ry)<0)?1:0, fr=A.keeperPoseFrame(c);
         const uv=slotUV[atlasMap['k'+id+'_'+v+'_'+fr]]; const ln=A.KMASK[id].lan[v][fr];
         const P_=SPP[SP.KEEPER];
@@ -520,5 +520,5 @@ function create(A){
   try{ rebuild(); resize(); R.ok=true; }catch(e){ R.error=String(e&&e.message||e).slice(0,300); canvas.remove(); }
   return R;
 }
-window.KeepVoxel={ create:create, version:'v0.19.0' };
+window.KeepVoxel={ create:create, version:'v0.20.0' };
 })();

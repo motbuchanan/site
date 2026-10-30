@@ -1,4 +1,4 @@
-// The Keep · render-mesh.js · v0.19.0 · Oct 29 2026
+// The Keep · render-mesh.js · v0.20.0 · Oct 29 2026
 // The same world drawn the way most 3D games draw theirs: triangles on the graphics chip (WebGL2).
 // Nothing here makes the world. It reads the exact arrays the ASCII raycaster reads (heights, stone,
 // slabs, trees, the lit colors and shadows) and turns them into meshes. Loaded only when Mesh is picked.
@@ -329,7 +329,7 @@ function create(A){
         out[y*S+x]=Math.max(0,Math.min(255,Math.round(mean+(v-mean)*k))); } }
     return out; }
   let sig='', relPass=-1, relRow=0;
-  function worldSig(){ const D=A.DIALS; return W.seed+'|'+D.keep+'|'+D.forest+'|'+D.water+'|'+D.ruins+'|'+W.ruins.length+'|'+W.keepBuilt; }
+  function worldSig(){ const D=A.DIALS; return W.seed+'|'+D.keep+'|'+D.forest+'|'+D.water+'|'+D.ruins+'|'+W.ruins.length+'|'+W.keepBuilt+'|'+(D.folk||[]).join('')+'|'+(W.places?W.places.length:0); }
   function buildStone(){
     const h=W.h, st=W.st, sb=W.sb, su=W.su, ruin=W.ruin, RM=A.RMAT, out=[]; let n=0;
     const V=function(x,y,z,nx,ny,nz,c,k,cx,cy,al,M,bot){ out.push(x,y,z,nx,ny,nz,c[0]/255,c[1]/255,c[2]/255,k,cx,cy,al,M?M.ch:0,M?M.cl:1,M?M.moss:0,bot); n++; };
@@ -347,7 +347,7 @@ function create(A){
           let ax,ay,bx,by; if(d===0){ ax=x+1;ay=y;bx=x+1;by=y+1; } else if(d===1){ ax=x;ay=y+1;bx=x;by=y; } else if(d===2){ ax=x+1;ay=y+1;bx=x;by=y+1; } else { ax=x;ay=y;bx=x+1;by=y; }
           const ha=H(ax,ay), hb=H(bx,by), alA=d<2?ay:ax, alB=d<2?by:bx;
           quad([ax,ay,ha+s2,alA],[bx,by,hb+s2,alB],[bx,by,hb+s,alB],[ax,ay,ha+s,alA],NB[d][0],NB[d][1],0,M.f,1,nx,ny,0,M,Math.min(ha,hb)+s2); } }
-      if(su[i]>0){ const M=RM[ruin[i]]||RM[0], zg=h[i], zb=zg+sb[i], zt=zg+su[i];
+      if(su[i]>0){ const M=RM[W.smat[i]||ruin[i]]||RM[0], zg=h[i], zb=zg+sb[i], zt=zg+su[i];
         const top=M.t;
         quad([x,y,zt,0],[x+1,y,zt,0],[x+1,y+1,zt,0],[x,y+1,zt,0],0,0,1,top,2,x,y,0,M,0);
         quad([x,y,zb,0],[x,y+1,zb,0],[x+1,y+1,zb,0],[x+1,y,zb,0],0,0,-1,M.f,3,x,y,0,M,0);
@@ -454,7 +454,7 @@ function create(A){
       if(k>=SPMAX) continue;
       const o=k*16; const ci=(Math.max(0,Math.min(N-1,y|0)))*N+Math.max(0,Math.min(N-1,x|0));
       const shd=W.shadRaw[ci]; let amb=(shd>0.99&&A.DAY.lightAlt>0.035)?0.92:(0.56+0.36*shd);
-      if(sp===SP.KEEPER){ const id=Math.min(3,C.ay[c]|0), hx=C.vx[c], hy=C.vy[c], hl=Math.hypot(hx,hy)||1, tl=Math.hypot(ex,ey)||1;
+      if(sp===SP.KEEPER){ const id=Math.min(A.KMASK.length-1,C.ay[c]|0), hx=C.vx[c], hy=C.vy[c], hl=Math.hypot(hx,hy)||1, tl=Math.hypot(ex,ey)||1;
         const dot=-(hx*ex+hy*ey)/(hl*tl), v=dot>0.42?0:(dot<-0.42?2:1), mir=(v===1&&(hx*rx+hy*ry)<0)?1:0, fr=A.keeperPoseFrame(c);
         const uv=slotUV[atlasMap['k'+id+'_'+v+'_'+fr]]; const ln=A.KMASK[id].lan[v][fr];
         const P_=SPP[SP.KEEPER];
@@ -531,5 +531,5 @@ function create(A){
   try{ rebuild(); resize(); R.ok=true; }catch(e){ R.error=String(e&&e.message||e).slice(0,300); canvas.remove(); }
   return R;
 }
-window.KeepMesh={ create:create, version:'v0.19.0' };
+window.KeepMesh={ create:create, version:'v0.20.0' };
 })();
