@@ -64,7 +64,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
  </div>
  <div id="stick"><div id="knob"></div></div>
  <div id="fps"></div>
- <button class="mb-ver" id="mbVer" type="button">v0.20.0 &middot; Oct 29</button>
+ <button class="mb-ver" id="mbVer" type="button">v0.21.0 &middot; Oct 30</button>
  <div id="toast"></div>
  <div id="help" class="hidden"><div class="card">
   <h1>How to play</h1>
@@ -86,7 +86,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
    <img src="05-predation.jpg" alt="a kill" loading="lazy">
    <img src="04-water.jpg" alt="the lake" loading="lazy">
   </div>
-  <p class="fsize">The whole world is one HTML file. Right now: <b id="fsize">~238 KB</b>. Smaller than a single phone photo.</p>
+  <p class="fsize">The whole world is one HTML file. Right now: <b id="fsize">~263 KB</b>. Smaller than a single phone photo.</p>
   <p><b>Why I built it.</b> I build things on a phone by asking AI the right questions, the way I would direct a camera. I saw a clip of a tiny 3D world made of nothing but text and wanted to see if I could grow one that was actually alive, and keep growing it in the open instead of ever calling it done.</p>
   <p><b>What I learned.</b> How far you can get with almost nothing. One idea, a ray walking a height map, turned into characters, with a small world of animals living on top. Every version taught me one concrete thing: how to make a wall read as solid, how to keep the wolves from starving the world empty, how to make a forest look like real woods.</p>
   <p style="color:var(--mb-dim);font-size:13px"><b style="color:var(--mb-soft)">Walk:</b> drag the left half of the screen (tilt to turn). <b style="color:var(--mb-soft)">Look:</b> drag the right half. Wade into the water to swim. Tap ☰ menu for a new world, the dials, and the time of day. Walk under the gate arch and find the door under the tower stair.</p>
@@ -112,9 +112,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
 <script>
 (function(){
 'use strict';
-const VERSION='The Keep v0.20.0 · Oct 29 2026';
-const VER_SHORT='v0.20.0 · Oct 29'; // what the badge shows; bump with VERSION
+const VERSION='The Keep v0.21.0 · Oct 30 2026';
+const VER_SHORT='v0.21.0 · Oct 30'; // what the badge shows; bump with VERSION
 const CHANGELOG=[
+ ['v0.21.0 · Oct 30 2026','Every valley has its own people. The two guards, the gatekeeper, the steward, and whoever lives at the farms, the cabin and the hut are cast fresh from the seed: new names, faces, builds and ages (a youngster on the wall, an old gatekeeper with a stoop), new hair, beards, hats and clothes, two or three ways of being (cheerful, gruff, nosy, shy, a worrier, a gossip...), and their own people among the others: married couples, brothers and sisters, a parent and a grown child, friends, rivals, sweethearts, an old grudge, a favour owed. All of it shows in what they say, and nobody ever mentions someone who does not live in this valley. The valley has a name too, said as you arrive, and the farms take names of their own. The same seed always grows the same people.'],
  ['v0.20.0 · Oct 29 2026','Who lives here. The world card has four new dials, and each one puts a place and a person into the valley when the world grows. Harrow Farm: a stone house under thatch, a fenced field of wheat and cabbages, a hen house and seven hens, and Edda hoeing the rows. Brookside: a timber house, a pasture with a barn, six sheep and two cows, a kitchen garden, and Tam leaning on his crook. The woodcutter\'s cabin: a log cabin in a glade with a woodpile to the eaves, a chopping block, stumps, and Osk felling two trees at the edge of the clearing. The hermit\'s hut: a stone hut above the lake shore, a jetty out over the water, a fire ring and a drying rack, and Fenwick fishing off the end. Each of them walks a day round from their own door, works, stops to talk, and goes home to bed at night. Walk onto a place and it tells you whose it is. People mention their neighbours, but only the ones who live in this world, and the keepers will tell you which way to go. Turn any of them off for an emptier valley.'],
  ['v0.19.0 · Oct 29 2026','A bigger keep. The walls stand farther out, the courtyard is half again as wide, and the donjon is taller and broader with a wider stair. Its lookout no longer hides the view: the parapet is below your eyes all the way round, with a wide opening facing north, east, south and west. The rooms are real rooms now, furnished and lived in. The great hall has a long table and benches, a hearth with shields over it, red banners, a hunting tapestry, two paintings and a map. The kitchen is built of timber, with an oven, shelves, barrels, crates and copper pans. The barracks has six beds, chests, a table, a rack of swords and a spear, and Tilda sleeps there now. The chapel is pale stone, with pews, an altar between two braziers, stained glass windows that glow with the daylight behind them, and blue banners. The donjon has a round room with a map table. Fires burn in the hearths. Every way of drawing the world shows all of it.'],
  ['v0.18.0 · Oct 29 2026','Iso. A sixth way to see the same world: from above, at the fixed slant of SimCity, Diablo and Monument Valley. The camera is isometric, so nothing shrinks as it gets farther away and the keep looks like a model on a table. It shows the Voxels blocks, swings round behind you as you turn, so the walk stick works just the same, and a small teal figure marks where you are. Step inside the walls and the figure still shows through them, faintly. Drag up or down to zoom out or in. The draw-the-world-as buttons are now two rows of three.'],
@@ -178,7 +179,7 @@ const DIALS={
   pop:[1,1,1,1,1,1],
   tod:14, dayMode:2,  // time of day in hours, and the day-length mode (see DAYMODES)
   people:1,           // the keepers (and the gate braziers)
-  folk:[1,1,1,1],     // who lives here: Harrow Farm, Brookside, the woodcutter, the hermit (built when the world grows)
+  folk:[1,1,1,1],     // who lives here: the wheat farm, the sheep farm, the woodcutter, the hermit (built when the world grows)
   stickTurn:1,        // the walk stick turns you (1) or steps you sideways (0)
   render:0            // how the same world is drawn: an index into RENDERS
 };
@@ -513,6 +514,9 @@ const W={
 
 function genWorld(seed){
   W.seed=seed;
+  { const vn=valleyNames(seed); W.valley=vn.valley; W.farmNames=[vn.farm1,vn.farm2]; }
+  W.cast=castValley(seed); W.castSig=seed+':'+W.cast.map(function(c){ return c.name; }).join(','); rebuildPeople();
+  W.arriveMsg='You arrive in '+W.valley+'.';
   const h=W.h, st=W.st, tree=W.tree;
   st.fill(0); tree.fill(0); W.sb.fill(0); W.su.fill(0); W.rail.fill(0); W.floor.fill(0); W.ruin.fill(0); W.smat.fill(0); W.places.length=0; W.pens.length=0; W.keepBuilt=false;
   for(let y=0;y<N;y++)for(let x=0;x<N;x++){
@@ -857,12 +861,13 @@ const RUIN_BUILD={
 // (W.st, the second layer, W.ruin), its person walks a day round from their own door and sleeps in their own bed,
 // and the animals keep to their pens. Places are laid out in their own small grid (u east, v south before a turn).
 const FOLK=[
-  {key:'farm1', name:'Harrow Farm',            who:4, R:16, b0:21,   b1:5,   blurb:'where Edda grows wheat and keeps hens',  label:'Harrow Farm: Edda, wheat and hens'},
-  {key:'farm2', name:'Brookside',              who:5, R:16, b0:21,   b1:5,   blurb:'where Tam keeps his sheep and cows',     label:'Brookside: Tam, sheep and cows'},
-  {key:'wood',  name:"the woodcutter's cabin", who:6, R:9,  b0:21.5, b1:5.5, blurb:'where Osk splits the winter wood',       label:"The woodcutter's cabin: Osk"},
-  {key:'hermit',name:"the hermit's hut",       who:7, R:7,  b0:22.5, b1:4.5, blurb:'where Fenwick fishes the lake',          label:"The hermit's hut by the lake: Fenwick"}];
+  {key:'farm1', name:'the farm',               kind:'a wheat farm',        who:4, R:16, b0:21,   b1:5,   blurb:'where {farmer} grows wheat and keeps hens', label:'A wheat farm, with hens'},
+  {key:'farm2', name:'the sheep farm',         kind:'a sheep farm',        who:5, R:16, b0:21,   b1:5,   blurb:'where {shepherd} keeps sheep and cows',     label:'A sheep farm, with cows'},
+  {key:'wood',  name:"the woodcutter's cabin", kind:"a woodcutter's cabin", who:6, R:9,  b0:21.5, b1:5.5, blurb:'where {woodcutter} splits the winter wood',  label:"A woodcutter's cabin in the trees"},
+  {key:'hermit',name:"the hermit's hut",       kind:"a hermit's hut",       who:7, R:7,  b0:22.5, b1:4.5, blurb:'where {hermit} fishes the lake',            label:"A hermit's hut by the lake"}];
+// a farm takes the name this valley gives it
 // the places a world was asked for but had no room for (said when the world grows)
-function folkMissing(){ return FOLK.filter(function(f,i){ return DIALS.folk[i]&&!folkHere(f.key); }).map(function(f){ return f.name; }); }
+function folkMissing(){ return FOLK.filter(function(f,i){ return DIALS.folk[i]&&!folkHere(f.key); }).map(function(f){ return f.kind; }); }
 function folkHere(key){ for(const p of W.places) if(p.key===key) return p; return null; }
 // a place's own grid: rot turns it a quarter at a time about (x,y)
 function fPlace(x,y,rot){ const cs=[1,0,-1,0][rot], sn=[0,1,0,-1][rot];
@@ -1037,7 +1042,7 @@ function placeFolk(seed){
     if(F.key==='hermit'){ const c=T.F(-1,-4); folkLevel(c[0],c[1],4,6,WATER+1.0); ruinClear(c[0]|0,c[1]|0,9); ruinGlade(c[0]|0,c[1]|0,6); }
     else if(F.key==='wood'){ ruinFlatten(x,y,8); ruinClear(x,y,9); ruinGlade(x,y,5); }
     else { ruinFlatten(x,y,17); ruinClear(x,y,23); ruinGlade(x,y,19); }
-    const p={key:F.key, name:F.name, blurb:F.blurb, who:F.who, x:x+0.5, y:y+0.5, r:F.R, dr:Math.min(F.R,11), found:false,
+    const p={key:F.key, name:F.key==='farm1'?W.farmNames[0]:(F.key==='farm2'?W.farmNames[1]:F.name), blurb:F.blurb, who:F.who, x:x+0.5, y:y+0.5, r:F.R, dr:Math.min(F.R,11), found:false,
       fires:[], stock:[], route:null, trail:null, keepTrees:[], b0:F.b0, b1:F.b1, slot:k};
     { const rr=F.key==='hermit'?8:F.R+1; for(let oy=-rr;oy<=rr;oy++)for(let ox=-rr;ox<=rr;ox++){ const c=F.key==='hermit'?T.F(-1,-3):[x,y], qx=(c[0]|0)+ox, qy=(c[1]|0)+oy; if(qx>3&&qy>3&&qx<N-4&&qy<N-4) W.path[qy*N+qx]=0; } }
     FOLK_BUILD[F.key](T,p,rnd,sh);
@@ -1052,7 +1057,7 @@ function placeFolk(seed){
 // walk onto a place for the first time and it tells you whose it is
 function placeCheck(){ if(!greetHook||!W.places.length) return;
   for(const o of W.places){ if(o.found) continue; if(Math.hypot(P.x-o.x,P.y-o.y)>o.dr) continue;
-    if(greetHook('You found '+o.name+', '+o.blurb+'.')!==false){ o.found=true;
+    if(greetHook('You found '+o.name+', '+fillLine(-1,o.blurb)+'.')!==false){ o.found=true;
       try{ localStorage.setItem('keep_places_'+W.seed,JSON.stringify(W.places.filter(function(q){ return q.found; }).map(function(q){ return q.key; }))); }catch(e){} }
     return; } }
 // which way a place lies from the keep, in words
@@ -1132,30 +1137,6 @@ function tickStock(c,dt){
   const v=SPP[s].speed*CR_.ph[c], stp=Math.min(d,v*dt);
   CR_.x[c]=x+dx/d*stp; CR_.y[c]=y+dy/d*stp; CR_.vx[c]=dx/d; CR_.vy[c]=dy/d; CR_.z[c]=groundAt(CR_.x[c],CR_.y[c]);
 }
-// what the folk say: [morning, afternoon, evening, night]; {key} lines only when that place is in the world, $key is its direction
-const FGREETS=[
-  [["Hens were up before me again.","Morning! Mind the furrows, they're fresh.","{keep}Eggs go up to the keep before the dew's off."],
-   ["Wheat's coming on nicely. Don't tell it I said so.","Cabbages don't weed themselves. More's the pity.","{farm2}Tam's sheep had a go at my fence again.","{hermit}Fenwick trades a fish for a dozen eggs. Fair, I suppose."],
-   ["Last row, then supper.","Shut the hens in yet? I'd better.","{wood}Osk brought kindling. I owe him a loaf."],
-   ["Late for visitors. I'm off to bed.","The fox is about. I can feel it.","Mind the hen house on your way past."]],
-  [["Morning. Sheep don't sleep in, so neither do I.","Dew on the grass. They like that.","{farm1}Edda's hens woke me again."],
-   ["Count them with me. One, two... no, that one moved.","The brown cow is the boss. Don't tell the white one.","{wood}Osk cut my new fence posts. Good wood, that.","{keep}Old Wick lets the flock through the gate in spring."],
-   ["Bringing them in soon.","Sheep in, cows in, Tam in.","{hermit}Smoke from the hermit's fire. Fish for supper, for him."],
-   ["Shh. The flock's asleep.","Wolves about tonight. I'll keep an ear open.","Off home with you, friend."]],
-  [["Morning. Mind the chips, they fly.","Ash for the keep, oak for the fences.","Cold morning. Good for splitting."],
-   ["Stand back a bit. Thanks.","That tree's been waiting forty years. So have I.","{keep}The keep burns half my wood every winter.","{hermit}The hermit? Talks to the fish. Says they talk back."],
-   ["Last log. Then the fire.","Stack's nearly to the eaves. Nearly.","{farm2}Promised Tam more posts. Tomorrow."],
-   ["Too dark to swing an axe. Even for me.","Owl's in that oak. Don't cut the owl tree, they say.","Goodnight. Watch the stumps."]],
-  [["Fish bite at dawn. Hush now.","You walk loud.","Mist on the water. Best time."],
-   ["Nothing biting. That's fishing.","Sit if you like. Don't talk.","{keep}Too many people up at that keep.","{farm1}Eggs from Harrow. Best thing about Harrow."],
-   ["The big one's out there. I've seen him.","Fire's lit. Fish for supper, if I'm lucky.","{wood}Osk thinks I talk to fish. I listen. Different thing."],
-   ["Late. Even the fish are asleep.","Stars on the water. Two skies.","Off with you. Quietly."]]];
-// caught in the middle of something: [unused, looking, leaning, unused, asleep, working]
-const FPOSE=[
-  [null,["Counting hens. Seven. There should be seven.","Shoo, you. Not you. The hen."],null,null,["Mmm... the hens... seven...","...left the gate open... no I didn't..."],["Hoe in, pull back, step. All day.","Weeds grow faster than wheat. Always have."]],
-  [null,["That one's always at the fence. Every day."],["Leaning on the crook. Watching grass grow. Watching sheep eat it.","Good crook, this. Older than me."],null,["...forty-one... forty-two... sheep...","Mmm... the brown cow's in charge..."],null],
-  [null,["Checking the stack. Stacks lean if you don't watch them."],null,null,["...timber... mmm...","...the owl tree... no..."],["Mind your feet.","Thock. Thock. That's the sound of winter coming.","Split with the grain. Always with the grain."]],
-  [null,["The lake changes every hour. I watch it change."],null,null,["...the big one... hmm...","...two skies..."],["Shh.","Patience. The lake has plenty.","Not you. I was talking to the fish."]]];
 function placeStructures(seed){
   W.ruins.length=0;   // (W.ruin is cleared at the start of genWorld, so the keep's own materials stay)
   const n=RUIN_COUNT[DIALS.ruins|0]||0; if(!n) return;
@@ -1967,9 +1948,11 @@ function buildPerson(K){
       const line=function(x0,y0,x1,y1,c){ const n=Math.max(Math.abs(x1-x0),Math.abs(y1-y0))||1; for(let s=0;s<=n;s++) set(Math.round(x0+(x1-x0)*s/n),Math.round(y0+(y1-y0)*s/n),c); };
       if(pose==='sleep'){ drawSleeper(K,set,rect,alt); frames.push(outline(px)); continue; }
       const bob=(fr===1||fr===3)?-1:((pose==='lean'&&alt)?1:0);   // a bounce on the passing steps; a nod while leaning
-      const top=(K.tall?4:6)+bob;                            // head top row
-      const hem=(K.robe?28:25)+(K.tall?0:0), sh=top+8;       // shoulder row, hem row
-      const side=(view===1);
+      const top=(K.build?(K.build==='tall'?4:(K.build==='stout'?5:6)):(K.tall?4:6))+(K.age==='young'?3:(K.age==='old'?1:0))+bob;   // head top row: the build, a youngster's height, an old stoop
+      const stout=K.build==='stout'?1:0;
+      const hem=(K.robe?28:25), sh=top+8-stout;              // shoulder row (a stout neck is short), hem row
+      const side=(view===1), so=(side&&K.age==='old')?1:0;   // so: an old head carried a pixel forward
+      const bd=K.beard===true?'full':(K.beard||'none'), hs=K.hairStyle||(K.braid?'braid':'short');
       // ---- tool behind the body (spear/staff in the far hand)
       const toolX=side?13:(view===2?13:2);
       const drawTool=function(){ if(K.tool==='spear'||K.tool==='staff'){ const t0=K.tool==='spear'?0:Math.max(0,top-3)+0;
@@ -1992,7 +1975,7 @@ function buildPerson(K){
         rect(4,30-lift(0),6,31-lift(0),10); rect(9,30-lift(1),11,31-lift(1),10);
       }
       // ---- body: cloak or robe, a trapezoid widening to the hem
-      for(let y=sh;y<=hem;y++){ const k=(y-sh)/Math.max(1,hem-sh), half=side?(2.5+1.5*k):(3.6+1.6*k);
+      for(let y=sh;y<=hem;y++){ const k=(y-sh)/Math.max(1,hem-sh), half=side?(2.5+1.5*k+0.6*stout):(3.6+1.6*k+0.9*stout);
         for(let x=0;x<W;x++){ const dx=x+0.5-8; if(Math.abs(dx)<=half) set(x,y,(dx>half-1.6)?5:4); } }
       if(!side && view===0){ // front: tunic showing down the middle, belt, buckle
         for(let y=sh+1;y<=hem;y++) for(let x=7;x<=8;x++) set(x,y,6);
@@ -2035,29 +2018,45 @@ function buildPerson(K){
         set(lx,ly,1); rect(lx-1+(view===0?1:0),ly+1,lx+(view===0?1:0),ly+3,9); rect(lx-1+(view===0?1:0),ly+4,lx+(view===0?1:0),ly+4,1);
       }
       // ---- head: big and round (the charm is in the proportions)
-      const cx=side?8.5:8, cyy=top+4;
+      const cx=side?8.5+so:8, cyy=top+4;
       for(let y=top;y<=top+7;y++) for(let x=0;x<W;x++){ const dx=(x+0.5-cx)/4.1, dy=(y+0.5-cyy)/4.0; if(dx*dx+dy*dy<=1) set(x,y,2); }
-      // hair (back of the head, sides)
-      if(view===2){ for(let y=top;y<=top+7;y++) for(let x=0;x<W;x++) if(px[y*W+x]===2) set(x,y,8);
-        if(K.braid){ for(let y=top+7;y<=sh+6;y++){ set(7,y,8); set(8,y,8); } set(7,sh+7,13); set(8,sh+7,13); } }
-      else if(side){ for(let y=top;y<=top+6;y++) for(let x=0;x<=7;x++) if(px[y*W+x]===2) set(x,y,8);
-        if(K.braid){ for(let y=top+6;y<=sh+5;y++) set(5,y,8); set(5,sh+6,13); } }
-      else { for(let y=top;y<=top+1;y++) for(let x=0;x<W;x++) if(px[y*W+x]===2) set(x,y,8);
-        set(4,top+2,8); set(11,top+2,8); set(4,top+3,8); set(11,top+3,8);
-        if(K.braid){ for(let y=top+3;y<=top+9;y++){ set(3,y,8); } set(3,top+10,13); } }
+      // hair: the style shows at the back, down the back and round the face; bald keeps a fringe low at the sides
+      const hatOn=K.head==='helmet'||K.head==='hood'||K.head==='hat';
+      if(view===2){
+        for(let y=top;y<=top+7;y++) for(let x=0;x<W;x++) if(px[y*W+x]===2&&(hs!=='bald'||y>=top+4)) set(x,y,8);
+        if(hs==='braid'){ for(let y=top+7;y<=sh+6;y++){ set(7,y,8); set(8,y,8); } set(7,sh+7,13); set(8,sh+7,13); }
+        else if(hs==='long'){ for(let y=top+7;y<=sh+4;y++) for(let x=5;x<=10;x++) set(x,y,8); }
+        else if(hs==='tied'){ for(let y=top+7;y<=top+11;y++) set(8,y,8); set(8,top+7,13); }
+        else if(hs==='bun'&&!hatOn){ for(let y=top-1;y<=top+2;y++) for(let x=6;x<=9;x++) if(Math.hypot(x+0.5-8,y+0.5-(top+0.8))<=1.9) set(x,y,8); } }
+      else if(side){
+        for(let y=top;y<=top+6;y++) for(let x=0;x<=7+so;x++) if(px[y*W+x]===2&&(hs!=='bald'||y>=top+3)) set(x,y,8);
+        if(hs==='braid'){ for(let y=top+6;y<=sh+5;y++) set(5+so,y,8); set(5+so,sh+6,13); }
+        else if(hs==='long'){ for(let y=top+6;y<=sh+3;y++) for(let x=4+so;x<=6+so;x++) set(x,y,8); }
+        else if(hs==='tied'){ for(let y=top+4;y<=top+8;y++) set(3+so,y,8); set(4+so,top+4,13); }
+        else if(hs==='bun'&&!hatOn){ for(let y=top;y<=top+2;y++) for(let x=2+so;x<=4+so;x++) set(x,y,8); } }
+      else {
+        if(hs!=='bald') for(let y=top;y<=top+1;y++) for(let x=0;x<W;x++) if(px[y*W+x]===2) set(x,y,8);
+        const sy=hs==='bald'?top+3:top+2; set(4,sy,8); set(11,sy,8); set(4,sy+1,8); set(11,sy+1,8);
+        if(hs==='braid'){ for(let y=top+3;y<=top+9;y++){ set(3,y,8); } set(3,top+10,13); }
+        else if(hs==='long'){ for(let y=top+2;y<=top+9;y++){ set(3,y,8); set(12,y,8); } set(4,top+4,8); set(11,top+4,8); }
+        else if(hs==='bun'&&!hatOn){ for(let x=7;x<=8;x++){ set(x,top-1,8); set(x,top-2,8); } set(6,top-1,8); set(9,top-1,8); } }
       // face
-      if(view===0){ set(6,top+4,1); set(9,top+4,1); set(5,top+5,3); set(10,top+5,3); if(!K.beard){ set(7,top+6,3); set(8,top+6,3); } }
-      if(side){ set(10,top+4,1); set(12,top+5,2); set(10,top+5,3); }
+      if(view===0){ set(6,top+4,1); set(9,top+4,1); set(5,top+5,3); set(10,top+5,3); if(bd==='none'||bd==='short'){ set(7,top+6,3); set(8,top+6,3); } }
+      if(side){ set(10+so,top+4,1); set(12+so,top+5,2); set(10+so,top+5,3); }
       // beard
-      if(K.beard && view!==2){ const x0=side?8:5, x1=side?11:10;
-        for(let y=top+5;y<=top+8;y++) for(let x=x0;x<=x1;x++) if(y>top+5||px[y*W+x]===2) set(x,y,8);
-        if(view===0){ set(6,top+5,8); set(9,top+5,8); set(7,top+6,1); set(8,top+6,1); } }
+      if(bd!=='none' && view!==2){ const x0=(side?8:5)+so, x1=(side?11:10)+so, y0=bd==='short'?top+7:top+5;
+        for(let y=y0;y<=top+8;y++) for(let x=x0;x<=x1;x++) if(y>top+5||px[y*W+x]===2) set(x,y,8);
+        if(bd==='long'){ for(let y=top+9;y<=sh+3;y++) for(let x=x0+1;x<=x1-1;x++) set(x,y,8); }
+        if(view===0&&bd!=='short'){ set(6,top+5,8); set(9,top+5,8); set(7,top+6,1); set(8,top+6,1); } }
       // headgear
       if(K.head==='helmet'){ for(let y=top-1;y<=top+2;y++) for(let x=0;x<W;x++){ const dx=(x+0.5-cx)/4.6, dy=(y+0.5-(top+2.5))/3.6; if(dx*dx+dy*dy<=1&&y<=top+2) set(x,y,7); }
         for(let x=0;x<W;x++){ if(px[(top+2)*W+x]===7) set(x,top+3,13); }
         if(view===0){ set(7,top+3,7); set(8,top+3,7); set(7,top+4,7); set(8,top+4,7); } }
       if(K.head==='hat'){ for(let y=top-2;y<=top+1;y++) for(let x=0;x<W;x++){ const dx=(x+0.5-cx)/3.3, dy=(y+0.5-(top+0.4))/2.2; if(dx*dx+dy*dy<=1) set(x,y,y===top+1?10:13); }
         for(let x=Math.round(cx-6);x<=Math.round(cx+5);x++) set(x,top+2,13); }
+      if(K.head==='kerchief'){ for(let y=top-1;y<=top+2;y++) for(let x=0;x<W;x++){ const dx=(x+0.5-cx)/4.4, dy=(y+0.5-(top+2.2))/3.2; if(dx*dx+dy*dy<=1) set(x,y,13); }
+        if(view===2){ set(7,top+3,13); set(8,top+3,13); set(7,top+4,13); set(9,top+4,13); }
+        else if(side){ set(3+so,top+3,13); set(2+so,top+4,13); set(3+so,top+4,13); } }
       if(K.head==='cap'){ for(let y=top-1;y<=top+1;y++) for(let x=0;x<W;x++){ const dx=(x+0.5-cx)/4.4, dy=(y+0.5-(top+1.5))/2.6; if(dx*dx+dy*dy<=1) set(x,y,13); } }
       if(K.head==='hood'){ for(let y=top-1;y<=sh;y++) for(let x=0;x<W;x++){ const dx=(x+0.5-cx)/4.9, dy=(y+0.5-(top+4))/5.0;
           if(dx*dx+dy*dy<=1){ const face=(view===0&&x>=5&&x<=10&&y>=top+2&&y<=top+8)||(side&&x>=9&&y>=top+2&&y<=top+8);
@@ -2079,51 +2078,293 @@ function buildPerson(K){
   return { w:16, h:32, views:views, pal:pal, lan:lan, K:K };
 }
 const KMASK=KEEPERS.map(buildPerson);
-// what each keeper says: [morning, afternoon, evening, night], a few lines each, never the same twice running
+// ---------------- the cast (v0.21): every valley grows its own people, from its seed alone ----------------
+// Nothing here reads the ground, the dials or the places, so a seed always gives the same people, and anything said
+// about a seed can be checked by going there. Roles, in a fixed order: the two wall guards, the gatekeeper, the steward,
+// then whoever lives at the two farms, the woodcutter's cabin and the hermit's hut. People whose place was not grown
+// into this valley are still cast; they just are not here.
+function seedRng(seed,salt){ return mul32(((seed>>>0)^Math.imul(salt|0,0x9E3779B1))>>>0); }
+const ROLES=['guard','guard','gatekeeper','steward','farmer','shepherd','woodcutter','hermit'];
+const ROLEKEY=['guard1','guard2','gatekeeper','steward','farmer','shepherd','woodcutter','hermit'];
+const ROLETOOL=['spear','spear','staff','keys','hoe','staff','axe','rod'];
+const NAMES_F=['Agnes','Alys','Bess','Bryony','Cecily','Clemence','Dora','Edith','Elspeth','Fenna','Gilly','Greta','Hester','Hilda',
+  'Ida','Joan','Kate','Lettice','Liddy','Mabel','Marigold','Meg','Nell','Olwen','Prue','Rosamund','Ruth','Sybil','Tamsin','Tess',
+  'Ursula','Winifred','Avis','Beatrix','Dulcie','Effie','Hazel','Isobel','Mattie','Orla'];
+const NAMES_M=['Abel','Alfred','Ambrose','Bartle','Cuthbert','Dunstan','Edmund','Elias','Fergus','Gideon','Godfrey','Hal','Hob','Hugh',
+  'Jory','Lambert','Leofric','Ned','Odo','Osric','Percival','Piers','Ralph','Roland','Silas','Simkin','Tobias','Walter','Wat','Wilfred',
+  'Aldous','Barnaby','Colm','Davy','Ewan','Gil','Jasper','Merrick','Oswin','Rufus'];
+const NAMES_X=['Alder','Ashlin','Bayley','Lowen','Corin','Darrow','Ellis','Emery','Fenn','Finchley','Galen','Hollis','Jessamy','Kit',
+  'Larkin','Linden','Lowry','Marlow','Merle','Oakley','Pell','Quinn','Reeve','Robin','Rookley','Rowan','Sorrel','Sidony','Teague',
+  'Tarran','Vale','Wren','Wynn','Yarrow','Emlyn','Fallon','Heddwyn','Morrow','Perry','Sennen'];
+const BYNAMES=['Ashford','Longfield','Thatcher','Brook','Underhill','Marsh','Hollin','Fairweather','Stone','Greenway','Hayward',
+  'Cooper','Millward','Fletcher','Cobb','Dunmore','Penny','Wainwright','Blackthorn','Hawthorne','Mossop','Oakes','Ridley','Sedge',
+  'Tanner','Withers','Yewdale','Barrow','Coldwell','Crane','Elmsley','Fallowfield','Garth','Kettle','Lowe','Nettleton','Pike',
+  'Rushmere','Shaw','Thorne','Bywater','Fernside','Gorse','Hatherley','Inchley','Juniper','Kemp','Lister','Merriman','Naylor',
+  'Ormsby','Pennock','Quarles','Ravensworth','Saltmarsh','Tillotson','Upwood','Venn','Weaver','Yeoman'];
+const VAL_A=['Harrow','Thorn','Ever','Mill','Black','Wether','Cold','Fern','Oak','Willow','Bright','Elder','Raven','Stag','Lark','Whin',
+  'Bracken','Hazel','Brook','Sedge','Lind','Ash','Heron','Wolf','Moss','Holm'];
+const VAL_B=['dale','ford','mere','holt','combe','wick','ley','stead','worth','by','thorpe','ham','den','field'];
+const FARMNAMES=['Harrow Farm','Brookside','Whitegate','Longacre','Coldharbour','Hollins','Ashlea','Nether Farm','Highfold','Greystones',
+  'Mossfold','Brackenbank','Thornleigh','Upper Croft','Low Croft','Fernlea','Elmside','Hilltop','Wethercote','Becksfoot'];
+const SKINS=[[244,206,176],[236,186,152],[226,176,138],[214,166,128],[198,146,108],[170,118,84],[140,94,64],[104,70,50]];
+const HAIRS=[[40,32,30],[70,52,40],[110,64,40],[150,74,40],[170,90,40],[190,96,52],[230,190,90],[200,180,140],[160,158,152],[226,226,218]];
+// clothes: cloak, tunic, legs, accent (cap, kerchief, trim), and the roles each suits; nobody in a valley wears the same
+const CLOTHES=[
+  {c:[64,84,128], t:[176,160,120],l:[82,70,60], a:[200,170,90], r:'guard steward'},
+  {c:[132,58,52], t:[190,176,140],l:[90,74,62], a:[200,170,90], r:'guard woodcutter'},
+  {c:[92,108,70], t:[120,104,80], l:[70,60,50], a:[160,140,100],r:'gatekeeper hermit woodcutter guard'},
+  {c:[150,96,140],t:[226,214,190],l:[90,70,70], a:[244,240,228],r:'steward'},
+  {c:[96,120,72], t:[214,196,160],l:[100,80,60],a:[214,184,110],r:'farmer shepherd'},
+  {c:[140,104,64],t:[196,180,150],l:[80,70,60], a:[196,170,104],r:'shepherd farmer gatekeeper'},
+  {c:[150,52,44], t:[120,96,70],  l:[70,62,54], a:[190,60,50], r:'woodcutter'},
+  {c:[110,104,96],t:[150,140,120],l:[80,74,66], a:[160,150,120],r:'hermit gatekeeper'},
+  {c:[44,56,96],  t:[200,196,184],l:[60,58,64], a:[220,210,170],r:'guard steward'},
+  {c:[176,132,52],t:[214,200,170],l:[96,78,58], a:[150,60,40], r:'farmer guard'},
+  {c:[52,110,112],t:[200,190,160],l:[70,66,60], a:[230,200,120],r:'steward shepherd guard'},
+  {c:[110,80,56], t:[180,160,130],l:[70,58,48], a:[200,180,140],r:'woodcutter hermit shepherd farmer'},
+  {c:[176,96,104],t:[226,212,196],l:[90,72,72], a:[250,236,220],r:'farmer steward'},
+  {c:[86,104,124],t:[176,170,156],l:[64,62,62], a:[200,180,120],r:'gatekeeper guard hermit'},
+  {c:[120,96,128],t:[200,190,170],l:[80,70,76], a:[220,200,150],r:'shepherd hermit gatekeeper steward'},
+  {c:[140,72,40], t:[200,170,120],l:[88,64,48], a:[230,190,90], r:'farmer woodcutter shepherd'}];
+const TRAITS=['cheerful','gruff','nosy','shy','boastful','worrier','dry','kind','proud','gossip','superstitious','tired'];
+const TRAIT_CLASH=[['cheerful','gruff'],['cheerful','worrier'],['cheerful','tired'],['shy','boastful'],['shy','gossip'],['shy','nosy'],
+  ['shy','proud'],['kind','gruff'],['gruff','shy']];
+const TRAITW={guard:{proud:2,dry:2,boastful:2,tired:2}, gatekeeper:{gossip:3,kind:2,tired:2,dry:1}, steward:{proud:3,worrier:3,nosy:3},
+  farmer:{kind:2,worrier:2,cheerful:2}, shepherd:{cheerful:2,superstitious:2,shy:1}, woodcutter:{gruff:2,boastful:2,dry:1},
+  hermit:{shy:3,gruff:2,dry:3,superstitious:2}};
+// what someone is to me -> what I am to them
+const RELREV={spouse:'spouse',sibling:'sibling',parent:'child',child:'parent',friend:'friend',rival:'rival',sweetheart:'sweetheart',
+  owes:'owed',owed:'owes',grudge:'grudge'};
+const RELW={friend:3,rival:2,sibling:2,owes:1.5,grudge:1.5,sweetheart:1,spouse:1,parent:1};
+const AGEW={guard:[0.25,0.75,0],gatekeeper:[0,0.45,0.55],steward:[0,0.7,0.3],farmer:[0.1,0.65,0.25],shepherd:[0.35,0.45,0.2],
+  woodcutter:[0.15,0.7,0.15],hermit:[0,0.3,0.7]};
+const HEADW={guard:{helmet:1},gatekeeper:{hood:4,hat:2.5,none:2,cap:1.5},steward:{cap:3,kerchief:2,none:2,hat:1},
+  farmer:{hat:5,kerchief:2.5,none:1.5,cap:1},shepherd:{hat:4,hood:3,cap:2,none:1},woodcutter:{cap:4,hood:2,none:2,kerchief:1},
+  hermit:{hood:5.5,none:2.5,hat:2}};
+const BUILDW={guard:{tall:4,stout:3,short:1},gatekeeper:{tall:2,stout:2,short:2},steward:{short:3,stout:2,tall:1},farmer:{stout:3,short:2,tall:2},
+  shepherd:{tall:3,short:2,stout:1},woodcutter:{stout:3,tall:3,short:1},hermit:{short:3,tall:2,stout:1}};
+function wpick(r,w){ let s=0; for(const k in w) s+=w[k]; let x=r()*s; for(const k in w){ x-=w[k]; if(x<0) return k; } return Object.keys(w)[0]; }
+function ipick(r,a){ return a[(r()*a.length)|0]; }
+// the valley's name and its two farms' names: their own stream, so they never shift when the people do
+function valleyNames(seed){ const r=seedRng(seed,0x7A11);
+  let a=ipick(r,VAL_A), b=ipick(r,VAL_B); if(a.slice(-1)===b[0]) b=VAL_B[(VAL_B.indexOf(b)+1)%VAL_B.length];
+  const f1=ipick(r,FARMNAMES); let f2=ipick(r,FARMNAMES); if(f2===f1) f2=FARMNAMES[(FARMNAMES.indexOf(f1)+7)%FARMNAMES.length];
+  const pre=r()<0.3?ipick(r,['Upper ','Lower ','Little ','Great ','Nether ','Far ','Old ','High ']):'';   // now and then: Little Ashford
+  return {valley:pre+a+b, farm1:f1, farm2:f2}; }
+function valleyName(seed){ return valleyNames(seed).valley; }
+function castValley(seed){
+  const r=seedRng(seed,0xC457), used=new Set(), worn=new Set(), cast=[];
+  for(let id=0;id<ROLES.length;id++){
+    const role=ROLES[id], pr=r()<0.5?'she':'he', aw=AGEW[role], ar=r();
+    const age=ar<aw[0]?'young':(ar<aw[0]+aw[1]?'adult':'old');
+    let given=null;
+    for(let k=0;k<200&&!given;k++){ const pool=r()<0.4?NAMES_X:(pr==='she'?NAMES_F:NAMES_M), g=ipick(r,pool); if(!used.has(g)) given=g; }
+    if(!given){ for(const g of (pr==='she'?NAMES_F:NAMES_M)) if(!used.has(g)){ given=g; break; } }
+    used.add(given);
+    const name=(age==='old'&&r()<0.4)?'Old '+given:given;
+    const build=wpick(r,BUILDW[role]), skin=SKINS[(r()*SKINS.length)|0];
+    const hair=(age==='old'&&r()<0.8)?HAIRS[8+((r()*2)|0)]:HAIRS[(r()*8)|0];
+    const hairStyle=pr==='she'?wpick(r,{long:3,bun:2,braid:2,tied:2,short:1})
+                              :wpick(r,{short:5,bald:age==='old'?3:(age==='adult'?1:0),tied:1.5,long:1});
+    const beard=pr==='he'?(age==='young'?wpick(r,{none:3,short:1}):wpick(r,{none:2,short:2,full:3,long:age==='old'?3:1})):'none';
+    const head=wpick(r,HEADW[role]);
+    const fits=[]; for(let k=0;k<CLOTHES.length;k++) if(!worn.has(k)&&CLOTHES[k].r.split(' ').indexOf(role)>=0) fits.push(k);
+    let ck=fits.length?fits[(r()*fits.length)|0]:-1;
+    if(ck<0) for(let k=0;k<CLOTHES.length;k++) if(!worn.has(k)){ ck=k; break; }
+    worn.add(ck); const C=CLOTHES[ck];
+    const rb=r(), robe=role==='steward'||role==='hermit'||(role==='gatekeeper'&&rb<0.5)||(role==='farmer'&&rb<(pr==='she'?0.6:0.2));
+    const w={}; for(const t of TRAITS) w[t]=1; const tb=TRAITW[role]; for(const t in tb) w[t]+=tb[t];
+    const nt=r()<0.5?2:3, traits=[];
+    for(let k=0;k<100&&traits.length<nt;k++){ const t=wpick(r,w); if(traits.indexOf(t)>=0) continue;
+      if(TRAIT_CLASH.some(function(p){ return (p[0]===t&&traits.indexOf(p[1])>=0)||(p[1]===t&&traits.indexOf(p[0])>=0); })) continue;
+      traits.push(t); }
+    cast.push({id:id, role:role, key:ROLEKEY[id], name:name, given:given, by:'', pr:pr, age:age, build:build, skin:skin, hair:hair,
+      hairStyle:hairStyle, beard:beard, head:head, tool:ROLETOOL[id], robe:robe, cloak:C.c, tunic:C.t, legs:C.l, accent:C.a,
+      traits:traits, rel:[]});
+  }
+  // relationships: 3 to 6 links, each a pair seen from both sides, at most one link per pair
+  const AI={young:0,adult:1,old:2};
+  const linked=function(a,b){ return cast[a].rel.some(function(q){ return q.to===b; }); };
+  const has=function(a,k){ return cast[a].rel.some(function(q){ return q.kind===k; }); };
+  const blood=function(a){ const seen=new Set([a]), q=[a];   // everyone a is related to by birth
+    while(q.length){ const x=q.shift(); for(const e of cast[x].rel) if((e.kind==='sibling'||e.kind==='parent'||e.kind==='child')&&!seen.has(e.to)){ seen.add(e.to); q.push(e.to); } }
+    return seen; };
+  // can b be a's <kind> (what b is to a)?
+  const can=function(a,b,k){ if(a===b||linked(a,b)) return false; const A=AI[cast[a].age], B=AI[cast[b].age];
+    if(k==='spouse'||k==='sweetheart'){ if(blood(a).has(b)||a===7||b===7) return false;   // the hermit lives alone
+      if(has(a,'spouse')||has(b,'spouse')||has(a,'sweetheart')||has(b,'sweetheart')) return false;
+      return k==='spouse'?(A>0&&B>0):(A===B); }
+    if(k==='parent'||k==='sibling'){
+      if(k==='parent'&&!(B>A&&!has(a,'parent'))) return false;
+      if(k==='sibling'&&!(Math.abs(A-B)<=1&&!(A===0&&B===2)&&!(A===2&&B===0))) return false;
+      const fa=blood(a); if(fa.has(b)) return false;   // already family: one tie is enough
+      const fam=new Set(fa); for(const x of blood(b)) fam.add(x);   // the family this would make: no couple inside it
+      for(const x of fam) for(const e of cast[x].rel) if((e.kind==='spouse'||e.kind==='sweetheart')&&fam.has(e.to)) return false;
+      return true; }
+    return true; };
+  const link=function(a,b,k){ cast[a].rel.push({to:b,kind:k}); cast[b].rel.push({to:a,kind:RELREV[k]}); };
+  let links=0; const want=3+((r()*4)|0);
+  if(r()<0.25&&can(4,5,'spouse')){ link(4,5,'spouse'); links++; }   // the two farms are one family, now and then
+  for(let k=0;k<400&&links<want;k++){ const a=(r()*8)|0, b=(r()*8)|0, kind=wpick(r,RELW); if(can(a,b,kind)){ link(a,b,kind); links++; } }
+  // families share a byname
+  const fam=cast.map(function(c){ return c.id; }), root=function(x){ while(fam[x]!==x) x=fam[x]; return x; };
+  for(const c of cast) for(const e of c.rel) if(e.kind==='spouse'||e.kind==='sibling'||e.kind==='parent'||e.kind==='child'){ const a=root(c.id), b=root(e.to); if(a!==b) fam[Math.max(a,b)]=Math.min(a,b); }
+  const byOf={}, usedBy=new Set();
+  for(const c of cast){ const f=root(c.id); if(byOf[f]==null){ let b=ipick(r,BYNAMES); for(let k=0;k<60&&usedBy.has(b);k++) b=ipick(r,BYNAMES); usedBy.add(b); byOf[f]=b; } c.by=byOf[f]; }
+  return cast; }
+// put this valley's people into the sprite set (the same 13 frames and palette slots, so every renderer just redraws)
+function rebuildPeople(){ const cast=W.cast; if(!cast||!cast.length) return;
+  KEEPERS.length=0; KMASK.length=0;
+  for(const c of cast){
+    const K={name:c.name, role:c.role, build:c.build, age:c.age, tall:c.build==='tall', head:c.head, beard:c.beard, hairStyle:c.hairStyle,
+      braid:c.hairStyle==='braid', tool:c.tool, robe:c.robe, skin:c.skin, hair:c.hair, cloak:c.cloak, tunic:c.tunic, legs:c.legs, accent:c.accent};
+    KEEPERS.push(K); KMASK.push(buildPerson(K)); GREETN[c.id]=c.name+', the '+c.role; }
+  GREETT.fill(-1e9); GLAST.fill(''); }
+// ---------------- what people say (v0.21: every line is about whoever really lives in this valley) ----------------
+// A line may start with tags in [ ]: keep, ruins, asleep2 (the second guard is really asleep), day, night, young, adult,
+// old, notold, she, he, a place (farm1 farm2 wood hermit), or a trait; all must hold for it to be said.
+// Slots: {guard1} {guard2} {gatekeeper} {steward} {farmer} {shepherd} {woodcutter} {hermit} name a person by role, and
+// {spouse} {sibling} {parent} {child} {friend} {rival} {sweetheart} {owes} {owed} {grudge} name the speaker's own people;
+// add .he .He .him .his .His .role .sib .par .kid to any of them. {me} is the speaker, {valley} the valley.
+// @farm1 is a place's name, $farm1 which way it lies from the keep. A line naming someone who is not here is never said.
+// keepers: [morning, afternoon, evening, night]
 const GREETS=[
-  [["Quiet night. The good kind.","Sun's up over the lake. Wall's yours.","Fog burns off by noon, mostly."],
-   ["Fair day for a watch.","Wind's from the lake today.","I count the deer from up here. I lose track at forty.","{farm2}You can hear Tam's sheep from up here. Off to the $farm2.","{hermit}See the smoke by the lake, to the $hermit? The hermit's fire."],
-   ["Light's going. Braziers soon.","Hear the wolves yet? You will.","Tilda takes the bunk tonight. I've got the wall."],
-   ["Stay near the fire, friend.","Every star in its place. I checked.","~Keep it down. Tilda's asleep in the guard room."]],
-  [["Morning! Mind the frost on the stair.","Slept like a stone. Don't tell Bram.","First lap's the coldest."],
-   ["You'll want the view from the tower.","%See the old stones past the trees? Older than the keep.","Two more laps and it's lunch."],
-   ["Sun's going. My bunk's calling.","Last lap, then bed.","Bram's got the night. Lucky Bram."],
+  [["Quiet night. The good kind.","Sun's up over the lake. Wall's yours.","Fog burns off by noon, mostly.","[young]Second winter on the wall. Still cold.","{guard2}'s already done a lap. Show-off."],
+   ["Fair day for a watch.","Wind's from the lake today.","I count the deer from up here. I lose track at forty.","You can hear {shepherd}'s sheep from up here. Off to the $farm2.","See the smoke by the lake, to the $hermit? That's {hermit}'s fire.","Welcome to {valley}. Mind the stair."],
+   ["Light's going. Braziers soon.","Hear the wolves yet? You will.","{guard2} takes the bunk tonight. I've got the wall."],
+   ["Stay near the fire, friend.","Every star in its place. I checked.","[asleep2]Keep it down. {guard2}'s asleep in the guard room."]],
+  [["Morning! Mind the frost on the stair.","Slept like a stone. Don't tell {guard1}.","First lap's the coldest."],
+   ["You'll want the view from the tower.","[ruins]See the old stones past the trees? Older than the keep.","Two more laps and it's lunch.","[young]{steward} says I walk too fast. I say the wall's too short."],
+   ["Sun's going. My bunk's calling.","Last lap, then bed.","{guard1}'s got the night. Lucky {guard1}."],
    ["Bed. Finally.","Can't sleep till I've done one more lap.","Stars are out. Keep to the wall."]],
-  [["Gate's open. Always is, for you.","Up early? So are my knees.","Morning road's the quiet road."],
-   ["Road's been quiet. Just how I like it.","Forty years on this gate. Never once locked it.","%My grandad said the old ruins were old when he was a boy.","Mind the cart ruts by the arch.","{farm1}Harrow Farm's off to the $farm1. Edda sends eggs up most mornings.","{hermit}The hermit fishes the lake, off to the $hermit. Leave him be."],
+  [["Gate's open. Always is, for you.","[old]Up early? So are my knees.","[notold]Up early? Good. The road's best before the carts.","Morning road's the quiet road."],
+   ["Road's been quiet. Just how I like it.","[old]Forty years on this gate. Never once locked it.","[notold]Nine years on this gate. Never once locked it.","[ruins]My grandad said the old ruins were old when he was a boy.","Mind the cart ruts by the arch.","@farm1's off to the $farm1. {farmer} sends eggs up most mornings.","{hermit} fishes the lake, off to the $hermit. Leave {hermit.him} be.","This is {valley}. Folk are friendly, mostly."],
    ["Late light's the best light on the road.","Lantern's lit. Off you go, if you're going.","Owls'll be up soon."],
-   ["Late to be wandering, friend.","Owls are out. They keep me company.","~Shh. Tilda's sleeping just in there."]],
+   ["Late to be wandering, friend.","Owls are out. They keep me company.","[asleep2]Shh. {guard2}'s sleeping just in there."]],
   [["Bread's on. Wipe your feet before the hall.","Up the tower before breakfast? Brave.","Somebody left the hall door open again."],
-   ["Wipe your feet before the hall.","Somebody tracked mud up the stair. Was it you?","Every door in this keep, twice a day.","{wood}Woodpile's low. Osk's cabin is in the trees to the $wood.","{farm1}Edda's eggs are the best thing in my kitchen."],
+   ["Wipe your feet before the hall.","Somebody tracked mud up the stair. Was it you?","Every door in this keep, twice a day.","Woodpile's low. {woodcutter}'s cabin is in the trees to the $wood.","{farmer}'s eggs are the best thing in my kitchen."],
    ["Kitchen fire's still warm.","Lamps lit, doors checked. Nearly done.","One more round of the doors."],
    ["Off to bed with you.","Kitchen fire's still warm.","Doors are shut. Mostly."]]];
-// caught in the middle of something: [unused, looking out, leaning, checking the door, asleep]
+// keepers caught in the middle of something: [unused, looking out, leaning, checking the door, asleep]
 const POSEL=[null,
   ["Nothing on the road. Nothing on the lake. Good.","Thought I saw smoke. Just the mist.","You can see three valleys from here on a clear day."],
-  ["These old knees and this old stick. We get by.","Just resting my eyes. On the road.","Lean on a staff long enough, it leans back."],
+  ["[old]These old knees and this old stick. We get by.","[notold]A gatekeeper needs a stick. It's the law. Probably.","Just resting my eyes. On the road.","Lean on a staff long enough, it leans back."],
   ["Just checking the latch. Old habit.","Sticks in the damp, this one.","Locked? No. Just making sure it shuts."],
-  ["Mmm... five more minutes...","...not my watch... Bram's watch...","%...the old stones... hmm..."]];
-const GREETN=["Bram, the guard","Tilda, the guard","Old Wick, the gatekeeper","Maud, the steward","Edda, the farmer","Tam, the shepherd","Osk, the woodcutter","Fenwick, the hermit"];
+  ["Mmm... five more minutes...","...not my watch... {guard1}'s watch...","[ruins]...the old stones... hmm..."]];
+// the folk: [morning, afternoon, evening, night]
+const FGREETS=[
+  [["Hens were up before me again.","Morning! Mind the furrows, they're fresh.","[keep]Eggs go up to the keep before the dew's off."],
+   ["Wheat's coming on nicely. Don't tell it I said so.","Cabbages don't weed themselves. More's the pity.","{shepherd}'s sheep had a go at my fence again.","{hermit} trades a fish for a dozen eggs. Fair, I suppose."],
+   ["Last row, then supper.","Shut the hens in yet? I'd better.","{woodcutter} brought kindling. I owe {woodcutter.him} a loaf."],
+   ["Late for visitors. I'm off to bed.","The fox is about. I can feel it.","Mind the hen house on your way past."]],
+  [["Morning. Sheep don't sleep in, so neither do I.","Dew on the grass. They like that.","{farmer}'s hens woke me again."],
+   ["Count them with me. One, two... no, that one moved.","The brown cow is the boss. Don't tell the white one.","{woodcutter} cut my new fence posts. Good wood, that.","{gatekeeper} lets the flock through the gate in spring."],
+   ["Bringing them in soon.","Sheep in, cows in, {me} in.","Smoke from {hermit}'s fire. Fish for supper, for {hermit.him}."],
+   ["Shh. The flock's asleep.","Wolves about tonight. I'll keep an ear open.","Off home with you, friend."]],
+  [["Morning. Mind the chips, they fly.","Oak for the fences, beech for the fires.","Cold morning. Good for splitting."],
+   ["Stand back a bit. Thanks.","[old]That tree's been waiting forty years. So have I.","[notold]That tree's older than me. Not for much longer.","[keep]The keep burns half my wood every winter.","{hermit}? Talks to the fish. Says they talk back."],
+   ["Last log. Then the fire.","Stack's nearly to the eaves. Nearly.","Promised {shepherd} more posts. Tomorrow."],
+   ["Too dark to swing an axe. Even for me.","Owl's in that oak. Don't cut the owl tree, they say.","Goodnight. Watch the stumps."]],
+  [["Fish bite at dawn. Hush now.","You walk loud.","Mist on the water. Best time."],
+   ["Nothing biting. That's fishing.","Sit if you like. Don't talk.","[keep]Too many people up at that keep.","Eggs from @farm1. Best thing about @farm1."],
+   ["The big one's out there. I've seen him.","Fire's lit. Fish for supper, if I'm lucky.","{woodcutter} thinks I talk to fish. I listen. Different thing."],
+   ["Late. Even the fish are asleep.","Stars on the water. Two skies.","Off with you. Quietly."]]];
+// the folk caught in the middle of something: [unused, looking, leaning, unused, asleep, working]
+const FPOSE=[
+  [null,["Counting hens. Seven. There should be seven.","Shoo, you. Not you. The hen."],null,null,["Mmm... the hens... seven...","...left the gate open... no I didn't..."],["Hoe in, pull back, step. All day.","Weeds grow faster than wheat. Always have."]],
+  [null,["That one's always at the fence. Every day."],["Leaning on the crook. Watching grass grow. Watching sheep eat it.","Good crook, this. Older than me."],null,["...forty-one... forty-two... sheep...","Mmm... the brown cow's in charge..."],null],
+  [null,["Checking the stack. Stacks lean if you don't watch them."],null,null,["...timber... mmm...","...the owl tree... no..."],["Mind your feet.","Thock. Thock. That's the sound of winter coming.","Split with the grain. Always with the grain."]],
+  [null,["The lake changes every hour. I watch it change."],null,null,["...the big one... hmm...","...two skies..."],["Shh.","Patience. The lake has plenty.","Not you. I was talking to the fish."]]];
+// what a person's nature makes them say, whoever they are
+const TRAITL={
+  cheerful:["[day]Lovely day for it, whatever it is!","Good to see a new face in {valley}.","Isn't it grand here? I never tire of it.","[night]A fine night! Look at those stars."],
+  gruff:["What.","Say your piece and move along.","Visitors. Hmph.","Don't touch anything."],
+  nosy:["Where are you headed? Who's asking? Me. I'm asking.","You're not from {valley}, are you? Thought not.","What's in the pack? Just curious.","Seen anything interesting? Tell me everything."],
+  shy:["Oh. Hello. Sorry. Hello.","I don't get many visitors. That's fine.","...hm? Oh. Yes. Hello.","Don't mind me."],
+  boastful:["Best in the valley at what I do. Ask anyone.","Nobody in {valley} works harder. Nobody.","I could do this with my eyes shut. Some days I do."],
+  worrier:["Did you hear thunder? I thought I heard thunder.","Mind how you go. Things happen.","[night]Out after dark? Be careful. Please.","I'll just check that again. And again."],
+  dry:["Another day in paradise.","Oh good. Company.","Exciting times. Something might happen. Probably won't."],
+  kind:["Rest a while if you're tired. No one minds.","[day]Have you eaten? You look like you haven't eaten.","If you need anything, ask. That's what neighbours are for."],
+  proud:["[keep]My family's been in {valley} longer than the keep. Nearly.","My family's been in {valley} since before the old road.","Not everyone could do this job. I can.","Look at that. Done properly. That's how it's done."],
+  gossip:["I shouldn't say. But I will.","You didn't hear it from me.","Everyone in {valley} knows everything. I just know it first."],
+  superstitious:["Don't whistle near the water. Bad luck.","Saw a magpie on my way out. Only one. Not good.","[ruins]Don't go near the old stones after dark. Just don't.","Knock on wood. There. Better."],
+  tired:["Long day. They're all long days.","Is it supper yet? It feels like supper.","[night]Bed. Soon. Very soon.","Sorry. Long night. Hello."]};
+// what a person says about their own people
+const RELL={
+  spouse:["If you see {spouse}, tell {spouse.him} supper's on.","{spouse} snores. Don't tell {spouse.him} I said so.","[keep]Married {spouse} in the chapel up at the keep. Best day.","{spouse} and I have been married longer than I can count. {spouse.He} can count. {spouse.He} reminds me."],
+  sibling:["{sibling}'s my {sibling.sib}. We don't look alike. Thank goodness.","My {sibling.sib} {sibling} and I used to race to the lake every morning.","If {sibling} says I started it, I didn't."],
+  parent:["My {parent.par}, {parent}, taught me everything I know. Most of it, anyway.","[adult]{parent} still calls me in for supper. I'm grown!","Don't tell my {parent.par} you saw me resting."],
+  child:["My {child.kid}, {child}. Grown so fast.","Have you met {child}? My {child.kid}. Good worker. Don't tell {child.him} I said so.","[old]I taught {child} everything. {child.He} forgot half of it."],
+  friend:["{friend} and I go back years.","If you see {friend}, say I said hello.","{friend}'s the best friend anyone could have. Don't tell {friend.him} that, either."],
+  rival:["{rival} thinks {rival.he}'s better at everything. {rival.He} isn't.","Did {rival} say something about me? Ignore it.","{rival} and I don't talk. Well. We argue. That's talking."],
+  sweetheart:["Have you seen {sweetheart} today? No reason.","{sweetheart}? We're just friends. Mostly. Why are you smiling?","Walking out with {sweetheart} after supper. Don't tell anyone."],
+  owes:["I owe {owes} a favour. {owes.He} won't let me forget it.","Still owe {owes} for that business last winter."],
+  owed:["{owed} owes me a favour. I'll collect one day.","{owed} still owes me. {owed.He} knows."],
+  grudge:["{grudge} and I had a falling out. Years back. I remember every word.","Don't mention {grudge} to me.","Ask {grudge} about the fence. Go on. Ask {grudge.him}."]};
+const GREETN=["","","","","","","",""];   // filled from the cast when a valley grows
 let greetHook=null; const GREETT=[-1e9,-1e9,-1e9,-1e9,-1e9,-1e9,-1e9,-1e9], GLAST=["","","","","","","",""];
 function dayPart(){ const t=DAY.tod; return t>=5.5&&t<11?0:(t>=11&&t<17?1:(t>=17&&t<21.5?2:3)); }
-function sleepHours(){ const t=DAY.tod; return t>=20||t<5.5; }   // Tilda turns in at eight and is up at half five
-function tildaAsleep(){ for(let c=0;c<CR_.n;c++) if(CR_.sp[c]===SP.KEEPER&&(CR_.ay[c]|0)===1) return CR_.st[c]===2; return false; }
-// a line starting with ~ is only said while Tilda is actually asleep
-// a line starting with % only when this world has ruins
-// a line starting with {farm1} (or {farm2}, {wood}, {hermit}, {keep}) only when that place is in this world; $farm1 in a line is which way it lies
-function lineOk(l,ok,rn){ if(l[0]==='~') return ok; if(l[0]==='%') return rn; const m=/^\{(\w+)\}/.exec(l); if(m) return m[1]==='keep'?W.keepBuilt:!!folkHere(m[1]); return true; }
-function pickLine(id,list){ const ok=tildaAsleep(), rn=W.ruins.length>0; list=list.filter(function(l){ return lineOk(l,ok,rn); });
-  if(!list.length) return '...';
-  const bare=function(l){ return l.replace(/^[~%]/,'').replace(/^\{\w+\}/,'').replace(/\$(\w+)/g,function(_,k){ return dirWord(k); }); };
-  let l=list[(Math.random()*list.length)|0]; if(bare(l)===GLAST[id]&&list.length>1) l=list[(list.indexOf(l)+1)%list.length]; return bare(l); }
+function sleepHours(){ const t=DAY.tod; return t>=20||t<5.5; }   // the second guard turns in at eight and is up at half five
+function guard2Asleep(){ for(let c=0;c<CR_.n;c++) if(CR_.sp[c]===SP.KEEPER&&(CR_.ay[c]|0)===1&&CR_.ax[c]<100) return CR_.st[c]===2; return false; }
+const FOLKKEYS=['farm1','farm2','wood','hermit'];
+const SLOT_RE=/\{(\w+)(?:\.(\w+))?\}/g, PLACE_RE=/([@$])(farm1|farm2|wood|hermit)\b/g, TAG_RE=/^\[([\w,]+)\]/;
+// who is really here: a person is here when they were spawned into this valley
+function peopleHere(){ const h=new Uint8Array(16); for(let c=0;c<CR_.n;c++) if(CR_.sp[c]===SP.KEEPER) h[Math.min(15,CR_.ay[c]|0)]=1; return h; }
+const ALLHERE=new Uint8Array(16).fill(1);
+function castOf(id){ return (W.cast&&id>=0)?W.cast[id]:null; }
+function relOf(id,kind,here){ const c=castOf(id); if(!c) return -1; for(const q of c.rel) if(q.kind===kind&&here[q.to]) return q.to; return -1; }
+// a slot's person (-1: not here, -2: not a person slot)
+function slotWho(id,key,here){ const r=ROLEKEY.indexOf(key); if(r>=0) return (here[r]&&castOf(r))?r:-1;
+  if(key==='me') return castOf(id)?id:-1; if(RELREV[key]) return relOf(id,key,here); return -2; }
+function lineOk(id,l,here){ const m=TAG_RE.exec(l), c=castOf(id);
+  if(m) for(const t of m[1].split(',')){
+    if(t==='keep'){ if(!W.keepBuilt) return false; }
+    else if(t==='ruins'){ if(!W.ruins.length) return false; }
+    else if(t==='asleep2'){ if(!guard2Asleep()) return false; }
+    else if(t==='day'){ if(dayPart()===3||DAY.k<0.5) return false; }   // daylight, not just the clock
+    else if(t==='night'){ if(dayPart()!==3) return false; }
+    else if(t==='young'||t==='adult'||t==='old'){ if(!c||c.age!==t) return false; }
+    else if(t==='notold'){ if(!c||c.age==='old') return false; }
+    else if(t==='she'||t==='he'){ if(!c||c.pr!==t) return false; }
+    else if(FOLKKEYS.indexOf(t)>=0){ if(!folkHere(t)) return false; }
+    else if(TRAITS.indexOf(t)>=0){ if(!c||c.traits.indexOf(t)<0) return false; }
+    else return false; }   // an unknown tag is never said (a typo shows up in the tests, not on screen)
+  let ok=true; SLOT_RE.lastIndex=0;
+  l.replace(SLOT_RE,function(_,k){ if(k!=='valley'&&slotWho(id,k,here)<0) ok=false; return ''; });
+  if(ok) l.replace(PLACE_RE,function(_,s,k){ if(!folkHere(k)) ok=false; return ''; });
+  return ok; }
+function pform(c,f){ const he=c.pr==='he';
+  switch(f){ case 'he': return he?'he':'she'; case 'He': return he?'He':'She'; case 'him': return he?'him':'her'; case 'his': return he?'his':'her';
+    case 'His': return he?'His':'Her'; case 'role': return 'the '+c.role; case 'full': return c.name+' '+c.by;
+    case 'sib': return he?'brother':'sister'; case 'par': return he?'father':'mother'; case 'kid': return he?'son':'daughter'; }
+  return c.name; }
+function fillLine(id,l,here){ here=here||ALLHERE;
+  l=l.replace(TAG_RE,'');
+  l=l.replace(SLOT_RE,function(_,k,f){ if(k==='valley') return W.valley||'the valley'; const c=castOf(slotWho(id,k,here)); return c?(f?pform(c,f):c.name):'someone'; });
+  return l.replace(PLACE_RE,function(_,s,k){ if(s==='$') return dirWord(k); const p=folkHere(k); return p?p.name:'the woods'; }); }
+// a line from the list that is true here, not the one just said; null when none is
+function pickLine(id,list,here){ here=here||peopleHere(); const ok=(list||[]).filter(function(l){ return l&&lineOk(id,l,here); });
+  if(!ok.length) return null;
+  let l=ok[(Math.random()*ok.length)|0]; if(fillLine(id,l,here)===GLAST[id]&&ok.length>1) l=ok[(ok.indexOf(l)+1)%ok.length];
+  return fillLine(id,l,here); }
+// their nature and their own people
+function socialLines(id,here){ const c=castOf(id); if(!c) return [];
+  let o=[]; for(const t of c.traits) if(TRAITL[t]) o=o.concat(TRAITL[t]);
+  for(const q of c.rel) if(here[q.to]&&RELL[q.kind]) o=o.concat(RELL[q.kind]);
+  return o; }
+function greetLine(id,pose,here){ const folk=id>=4, FP=folk?(FPOSE[id-4]||[]):POSEL, days=folk?FGREETS[id-4]:GREETS[id];
+  if(pose===4) return pickLine(id,FP[4],here)||'...';
+  let s=null;
+  if(pose>0&&FP[pose]&&(folk||pose<=3)&&Math.random()<(folk?0.6:0.5)) s=pickLine(id,FP[pose],here);
+  if(!s&&Math.random()<0.4) s=pickLine(id,socialLines(id,here),here);
+  if(!s&&days) s=pickLine(id,days[dayPart()],here);
+  return s||'...'; }
 function greet(id,pose){ const now=Date.now(); if(now-GREETT[id]<45000||!greetHook) return;
-  let msg;
-  if(id>=4){ const FP=FPOSE[id-4]||[];
-    if(pose===4) msg=KEEPERS[id].name+' is asleep: "'+pickLine(id,FP[4]||["..."])+'"';
-    else { const list=(pose>0&&FP[pose]&&Math.random()<0.6)?FP[pose]:FGREETS[id-4][dayPart()]; msg=GREETN[id]+': "'+pickLine(id,list)+'"'; } }
-  else if(pose===4) msg=KEEPERS[id].name+' is asleep: "'+pickLine(id,POSEL[4])+'"';
-  else { const list=(pose>=1&&pose<=3&&Math.random()<0.5)?POSEL[pose]:GREETS[id][dayPart()]; msg=GREETN[id]+': "'+pickLine(id,list)+'"'; }
-  if(greetHook(msg)!==false){ GREETT[id]=now; GLAST[id]=msg.slice(msg.indexOf('"')+1,-1); } }   // a card is open: say it later instead
+  const here=peopleHere(), K=KEEPERS[id]||{name:'Someone'}, line=greetLine(id,pose,here);
+  const msg=pose===4?K.name+' is asleep: "'+line+'"':(GREETN[id]||K.name)+': "'+line+'"';
+  if(greetHook(msg)!==false){ GREETT[id]=now; GLAST[id]=line; } }   // a card is open: say it later instead
+// arriving in a valley: said once, as soon as nothing is in the way
+function arriveCheck(){ if(W.arriveMsg&&greetHook&&greetHook(W.arriveMsg)!==false) W.arriveMsg=''; }
 // a brazier on a stone post (9 = the fire)
 defMask(SP.FIRE,7,10,[
  "..9.9..",".99999.","9999999",".99999.","1111111",
@@ -2552,7 +2793,7 @@ function tickKeeper(c,dt){
   const g=floorAt(CR_.x[c],CR_.y[c],CR_.z[c]); CR_.z[c]+=(g-CR_.z[c])*Math.min(1,dt*16);
 }
 function tick(dt){
-  ruinCheck(); placeCheck();
+  arriveCheck(); ruinCheck(); placeCheck();
   if(CR_.n===0) return; buildSGrid(); const px=P.x, py=P.y;
   for(let c=0;c<CR_.n;c++){ if(CR_.al[c]===0)continue;
     if(CR_.age[c]<1){ CR_.age[c]+=dt/matureTime(CR_.sp[c]); if(CR_.age[c]>=1){ CR_.age[c]=1; CR_.par[c]=-1; } }
@@ -2800,7 +3041,7 @@ function boot(){
     const c=$('seedCard');
     c.innerHTML='<h1>World seed</h1><p>Type a number for that exact world, or roll a random one.</p><input id="seedIn" inputmode="numeric" value="'+W.seed+'" style="width:100%;padding:12px;font:600 16px var(--mb-mono);background:rgba(0,0,0,.5);color:var(--mb-ink);border:1px solid var(--mb-line);border-radius:13px;margin:6px 0"><div style="display:flex;gap:8px"><button class="btn go" id="seedUse" style="flex:1;margin-top:0">grow it</button><button class="btn go" id="seedRnd" style="flex:1;margin-top:0">random</button></div><button class="btn" id="seedClose" style="width:100%;margin-top:8px">cancel</button>';
     $('seed').classList.remove('hidden');
-    function apply(sv){ DIALS.seed=sv; saveDials(); genWorld(sv); populate(sv); spawn(); $('seed').classList.add('hidden'); toast('seed '+sv+(folkMissing().length?'. No room here for '+folkMissing().join(' or '):'')); }
+    function apply(sv){ DIALS.seed=sv; saveDials(); genWorld(sv); populate(sv); spawn(); $('seed').classList.add('hidden'); if(folkMissing().length) W.arriveMsg+=' No room here for '+folkMissing().join(' or ')+'.'; }
     $('seedUse').addEventListener('click',function(){ const v=parseInt($('seedIn').value,10); apply(isFinite(v)?(v>>>0):(Math.random()*1e9|0)); });
     $('seedRnd').addEventListener('click',function(){ apply(Math.random()*1e9|0); });
     $('seedClose').addEventListener('click',function(){ $('seed').classList.add('hidden'); });
@@ -2870,8 +3111,7 @@ function boot(){
     showSky();
     $('dStick').addEventListener('change',function(){ DIALS.stickTurn=$('dStick').checked?1:0; saveDials(); });   // applies at once
     $('dGrow').addEventListener('click',function(){ readDialsFromCard(); genWorld(DIALS.seed); populate(DIALS.seed); spawn(); $('dials').classList.add('hidden');
-      const miss=folkMissing();
-      toast('world '+DIALS.seed+(miss.length?'. No room here for '+miss.join(' or '):'')); });
+      const miss=folkMissing(); if(miss.length) W.arriveMsg+=' No room here for '+miss.join(' or ')+'.'; });
     $('dLife').addEventListener('click',function(){ readDialsFromCard(); populate(DIALS.seed); $('dials').classList.add('hidden'); toast('life restocked'); });
     $('dClose').addEventListener('click',function(){ $('dials').classList.add('hidden'); });
   }
@@ -3009,7 +3249,7 @@ function boot(){
   if(glCur()) setTimeout(function(){ const m=glCur(); if(m) loadGL(m); },400);
 }
 
-if(IS_NODE){ module.exports={genWorld,allocGrid,buildGlyphs,renderFrame,compose,spawn,populate,tick,ecology,simBin,updatePlayer,W,RS,FB,P,IN,CR_,SP,SPP,MASKS,RESERVE,RAMP,N,WATER,EYE,terr,groundAt,DIALS,growOf,isAdult,addCreature,WALLS,buildWalls,nearestWall,allWallHits,wallBlocked,setSkyTime:function(t){skyTime=t;},setUW:function(v){UW=v;},DAY,SUN,MOON,SKY,DAYMODES,sunAltAz,sunUpdate,updateDay,relightAll,relightStep,RELIGHT,dayDate,fmtTod,setTod:function(h){DAY.tod=h;sunUpdate();},floorAt,KPATHS,KEEP,FORT,tickKeeper,KMASK,KL,keeperFrame,greet,GREETT,setGreet:function(f){greetHook=f;},RENDERS}; }
+if(IS_NODE){ module.exports={genWorld,allocGrid,buildGlyphs,renderFrame,compose,spawn,populate,tick,ecology,simBin,updatePlayer,W,RS,FB,P,IN,CR_,SP,SPP,MASKS,RESERVE,RAMP,N,WATER,EYE,terr,groundAt,DIALS,growOf,isAdult,addCreature,WALLS,buildWalls,nearestWall,allWallHits,wallBlocked,setSkyTime:function(t){skyTime=t;},setUW:function(v){UW=v;},DAY,SUN,MOON,SKY,DAYMODES,sunAltAz,sunUpdate,updateDay,relightAll,relightStep,RELIGHT,dayDate,fmtTod,setTod:function(h){DAY.tod=h;sunUpdate();},floorAt,KPATHS,KEEP,FORT,castValley,valleyName,valleyNames,seedRng,rebuildPeople,KEEPERS,GREETN,lineOk,fillLine,pickLine,greetLine,socialLines,peopleHere,ALLHERE,TRAITL,RELL,GREETS,POSEL,FGREETS,FPOSE,ROLEKEY,ROLES,NAMES_F,NAMES_M,NAMES_X,BYNAMES,CLOTHES,SKINS,HAIRS,TRAITS,TRAIT_CLASH,RELREV,dayPart,folkMissing,tickKeeper,KMASK,KL,keeperFrame,greet,GREETT,setGreet:function(f){greetHook=f;},RENDERS}; }
 else boot();
 })();
 </script>

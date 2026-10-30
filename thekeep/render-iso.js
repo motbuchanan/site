@@ -1,4 +1,4 @@
-// The Keep · render-iso.js · v0.20.0 · Oct 29 2026
+// The Keep · render-iso.js · v0.21.0 · Oct 30 2026
 // The same world seen from above at a fixed slant, the way SimCity, Diablo and Monument Valley frame theirs: an
 // isometric (orthographic) camera, so nothing shrinks with distance and the whole keep reads like a model on a table.
 // It draws the Voxels blocks; the camera follows behind you as you turn, so the walk stick works the same.
@@ -327,8 +327,11 @@ function create(A){
   const matF=new Float32Array(42), matT=new Float32Array(42), matCH=new Float32Array(14);
   for(let m=0;m<14;m++){ const M=A.RMAT[m]||A.RMAT[0]; for(let k=0;k<3;k++){ matF[m*3+k]=M.f[k]/255; matT[m*3+k]=M.t[k]/255; } matCH[m]=M.ch; }
   // ---- sprites: an atlas of every creature and keeper frame, built from the same pixel masks ----
-  const SLOT_W=16, SLOT_H=32, ACOLS=16; const slots=[]; const atlasMap={};
+  const SLOT_W=16, SLOT_H=32, ACOLS=16; const slots=[]; const atlasMap={}; const slotUV=[]; let texA=null, atlasSig='';
   function addSlot(key,w,h,px,pal,glowIdx){ slots.push({key:key,w:w,h:h,px:px,pal:pal,glow:glowIdx}); atlasMap[key]=slots.length-1; }
+  // the atlas: every person in this valley (they are recast with each valley), the animals, the birds
+  function castKey(){ return (W.castSig||'')+'|'+A.KMASK.length; }
+  function buildAtlas(){ slots.length=0; slotUV.length=0; for(const k in atlasMap) delete atlasMap[k];
   for(let id=0;id<A.KMASK.length;id++){ const M=A.KMASK[id]; for(let v=0;v<M.views.length;v++) for(let f=0;f<M.views[v].length;f++) addSlot('k'+id+'_'+v+'_'+f,16,32,M.views[v][f],M.pal,9); }
   for(const sp in A.MASKS){ const M=A.MASKS[sp]; addSlot('m'+sp,M.w,M.h,M.px,M.pal,9); }
   { const BW=16,BH=8; for(let fr=0;fr<2;fr++){ const px=new Uint8Array(BW*BH);   // birds: a small dark wing-beat V
@@ -343,13 +346,15 @@ function create(A){
       if((x>0&&px[y*W+x-1])||(x<W-1&&px[y*W+x+1])||(y>0&&px[(y-1)*W+x])||(y<H-1&&px[(y+1)*W+x])) out[y*W+x]=1; }
     addSlot('me',W,H,out,[null,[18,22,28],[236,190,150],[76,240,224],[36,160,150],[52,46,44]],-1); }
   const ARows=Math.ceil(slots.length/ACOLS), AW=ACOLS*SLOT_W, AH=ARows*SLOT_H, atlas=new Uint8Array(AW*AH*4);
-  const slotUV=[];
   slots.forEach(function(s,i){ const ox=(i%ACOLS)*SLOT_W, oy=((i/ACOLS)|0)*SLOT_H;
     for(let y=0;y<s.h;y++)for(let x=0;x<s.w;x++){ const pi=s.px[y*s.w+x]; if(!pi) continue; const c=s.pal[pi]||[255,0,255]; const o=((oy+y)*AW+ox+x)*4;
       atlas[o]=c[0]; atlas[o+1]=c[1]; atlas[o+2]=c[2]; atlas[o+3]=(pi===s.glow)?128:255; }
     slotUV.push([ox/AW,oy/AH,(ox+s.w)/AW,(oy+s.h)/AH]); });
-  const texA=tex(AW,AH,gl.RGBA8,gl.RGBA,gl.UNSIGNED_BYTE,gl.NEAREST,gl.CLAMP_TO_EDGE);
+  if(texA) gl.deleteTexture(texA);
+  texA=tex(AW,AH,gl.RGBA8,gl.RGBA,gl.UNSIGNED_BYTE,gl.NEAREST,gl.CLAMP_TO_EDGE);
   gl.bindTexture(gl.TEXTURE_2D,texA); gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,AW,AH,gl.RGBA,gl.UNSIGNED_BYTE,atlas);
+  atlasSig=castKey(); }
+  buildAtlas();
   const SPMAX=400, spData=new Float32Array(SPMAX*16); let nSpr=0;
   const vaoSp=gl.createVertexArray(), vbSp=gl.createBuffer();
   gl.bindVertexArray(vaoSp); gl.bindBuffer(gl.ARRAY_BUFFER,vbSp); gl.bufferData(gl.ARRAY_BUFFER,spData.byteLength,gl.DYNAMIC_DRAW);
@@ -367,7 +372,7 @@ function create(A){
         out[y*S+x]=Math.max(0,Math.min(255,Math.round(mean+(v-mean)*k))); } }
     return out; }
   let sig='', relPass=-1, relRow=0, camYaw=A.P.yaw, zoom=1, lastT=0;
-  function worldSig(){ const D=A.DIALS; return W.seed+'|'+D.keep+'|'+D.forest+'|'+D.water+'|'+D.ruins+'|'+W.ruins.length+'|'+W.keepBuilt+'|'+(D.folk||[]).join('')+'|'+(W.places?W.places.length:0); }
+  function worldSig(){ const D=A.DIALS; return W.seed+'|'+D.keep+'|'+D.forest+'|'+D.water+'|'+D.ruins+'|'+W.ruins.length+'|'+W.keepBuilt+'|'+(W.places?W.places.map(function(p){ return p.key; }).join(','):'')+'|'+(W.castSig||''); }
 
   // ---- wall decorations ----
   let PD=null; try{ PD=prog(VS_DECO,FS_DECO); }catch(e){ PD=null; }
@@ -394,7 +399,7 @@ function create(A){
       const V=function(q,z,u,t){ v.push(q[0],q[1],z,u,t,cx,cy); };
       V(qa,d.z0Abs,ua,t1); V(qb,d.z0Abs,ub,t1); V(qb,d.z1Abs,ub,t0); V(qa,d.z0Abs,ua,t1); V(qb,d.z1Abs,ub,t0); V(qa,d.z1Abs,ua,t0); }
     gl.bindBuffer(gl.ARRAY_BUFFER,vbD); gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(v),gl.STATIC_DRAW); nDeco=v.length/7; }
-  function rebuild(){ buildDeco();
+  function rebuild(){ if(atlasSig!==castKey()) buildAtlas(); buildDeco();
     freeChunks(); buildColumns(); chunkBounds();
     gl.bindTexture(gl.TEXTURE_2D,texH); gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,N,N,gl.RED,gl.FLOAT,W.h);
     gl.bindTexture(gl.TEXTURE_2D,texCl); gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,256,256,gl.RED,gl.UNSIGNED_BYTE,seamless(W.cloud));
@@ -545,5 +550,5 @@ function create(A){
   try{ rebuild(); resize(); R.ok=true; }catch(e){ R.error=String(e&&e.message||e).slice(0,300); canvas.remove(); }
   return R;
 }
-window.KeepIso={ create:create, version:'v0.20.0' };
+window.KeepIso={ create:create, version:'v0.21.0' };
 })();

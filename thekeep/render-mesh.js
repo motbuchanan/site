@@ -1,4 +1,4 @@
-// The Keep · render-mesh.js · v0.20.0 · Oct 29 2026
+// The Keep · render-mesh.js · v0.21.0 · Oct 30 2026
 // The same world drawn the way most 3D games draw theirs: triangles on the graphics chip (WebGL2).
 // Nothing here makes the world. It reads the exact arrays the ASCII raycaster reads (heights, stone,
 // slabs, trees, the lit colors and shadows) and turns them into meshes. Loaded only when Mesh is picked.
@@ -296,21 +296,26 @@ function create(A){
     gl.bindBuffer(gl.ARRAY_BUFFER,TF.ib); gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(far),gl.DYNAMIC_DRAW); TF.n=far.length/8; }
 
   // ---- sprites: an atlas of every creature and keeper frame, built from the same pixel masks ----
-  const SLOT_W=16, SLOT_H=32, ACOLS=16; const slots=[]; const atlasMap={};
+  const SLOT_W=16, SLOT_H=32, ACOLS=16; const slots=[]; const atlasMap={}; const slotUV=[]; let texA=null, atlasSig='';
   function addSlot(key,w,h,px,pal,glowIdx){ slots.push({key:key,w:w,h:h,px:px,pal:pal,glow:glowIdx}); atlasMap[key]=slots.length-1; }
+  // the atlas: every person in this valley (they are recast with each valley), the animals, the birds
+  function castKey(){ return (W.castSig||'')+'|'+A.KMASK.length; }
+  function buildAtlas(){ slots.length=0; slotUV.length=0; for(const k in atlasMap) delete atlasMap[k];
   for(let id=0;id<A.KMASK.length;id++){ const M=A.KMASK[id]; for(let v=0;v<M.views.length;v++) for(let f=0;f<M.views[v].length;f++) addSlot('k'+id+'_'+v+'_'+f,16,32,M.views[v][f],M.pal,9); }
   for(const sp in A.MASKS){ const M=A.MASKS[sp]; addSlot('m'+sp,M.w,M.h,M.px,M.pal,9); }
   { const BW=16,BH=8; for(let fr=0;fr<2;fr++){ const px=new Uint8Array(BW*BH);   // birds: a small dark wing-beat V
       for(let x=0;x<BW;x++){ const ax=Math.abs(x-7.5)/7.5; const y=Math.round(fr?(2+3.5*ax):(5-3*ax+2*ax*ax)); for(let d=0;d<2;d++){ const yy=Math.min(BH-1,Math.max(0,y+d)); px[yy*BW+x]=1; } }
       px[4*BW+7]=1; px[4*BW+8]=1; addSlot('b'+fr,BW,BH,px,[null,[46,44,54]],-1); } }
   const ARows=Math.ceil(slots.length/ACOLS), AW=ACOLS*SLOT_W, AH=ARows*SLOT_H, atlas=new Uint8Array(AW*AH*4);
-  const slotUV=[];
   slots.forEach(function(s,i){ const ox=(i%ACOLS)*SLOT_W, oy=((i/ACOLS)|0)*SLOT_H;
     for(let y=0;y<s.h;y++)for(let x=0;x<s.w;x++){ const pi=s.px[y*s.w+x]; if(!pi) continue; const c=s.pal[pi]||[255,0,255]; const o=((oy+y)*AW+ox+x)*4;
       atlas[o]=c[0]; atlas[o+1]=c[1]; atlas[o+2]=c[2]; atlas[o+3]=(pi===s.glow)?128:255; }
     slotUV.push([ox/AW,oy/AH,(ox+s.w)/AW,(oy+s.h)/AH]); });
-  const texA=tex(AW,AH,gl.RGBA8,gl.RGBA,gl.UNSIGNED_BYTE,gl.NEAREST,gl.CLAMP_TO_EDGE);
+  if(texA) gl.deleteTexture(texA);
+  texA=tex(AW,AH,gl.RGBA8,gl.RGBA,gl.UNSIGNED_BYTE,gl.NEAREST,gl.CLAMP_TO_EDGE);
   gl.bindTexture(gl.TEXTURE_2D,texA); gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,AW,AH,gl.RGBA,gl.UNSIGNED_BYTE,atlas);
+  atlasSig=castKey(); }
+  buildAtlas();
   const SPMAX=400, spData=new Float32Array(SPMAX*16); let nSpr=0;
   const vaoSp=gl.createVertexArray(), vbSp=gl.createBuffer();
   gl.bindVertexArray(vaoSp); gl.bindBuffer(gl.ARRAY_BUFFER,vbSp); gl.bufferData(gl.ARRAY_BUFFER,spData.byteLength,gl.DYNAMIC_DRAW);
@@ -329,7 +334,7 @@ function create(A){
         out[y*S+x]=Math.max(0,Math.min(255,Math.round(mean+(v-mean)*k))); } }
     return out; }
   let sig='', relPass=-1, relRow=0;
-  function worldSig(){ const D=A.DIALS; return W.seed+'|'+D.keep+'|'+D.forest+'|'+D.water+'|'+D.ruins+'|'+W.ruins.length+'|'+W.keepBuilt+'|'+(D.folk||[]).join('')+'|'+(W.places?W.places.length:0); }
+  function worldSig(){ const D=A.DIALS; return W.seed+'|'+D.keep+'|'+D.forest+'|'+D.water+'|'+D.ruins+'|'+W.ruins.length+'|'+W.keepBuilt+'|'+(W.places?W.places.map(function(p){ return p.key; }).join(','):'')+'|'+(W.castSig||''); }
   function buildStone(){
     const h=W.h, st=W.st, sb=W.sb, su=W.su, ruin=W.ruin, RM=A.RMAT, out=[]; let n=0;
     const V=function(x,y,z,nx,ny,nz,c,k,cx,cy,al,M,bot){ out.push(x,y,z,nx,ny,nz,c[0]/255,c[1]/255,c[2]/255,k,cx,cy,al,M?M.ch:0,M?M.cl:1,M?M.moss:0,bot); n++; };
@@ -398,7 +403,7 @@ function create(A){
       const V=function(q,z,u,t){ v.push(q[0],q[1],z,u,t,cx,cy); };
       V(qa,d.z0Abs,ua,t1); V(qb,d.z0Abs,ub,t1); V(qb,d.z1Abs,ub,t0); V(qa,d.z0Abs,ua,t1); V(qb,d.z1Abs,ub,t0); V(qa,d.z1Abs,ua,t0); }
     gl.bindBuffer(gl.ARRAY_BUFFER,vbD); gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(v),gl.STATIC_DRAW); nDeco=v.length/7; }
-  function rebuild(){ buildDeco();
+  function rebuild(){ if(atlasSig!==castKey()) buildAtlas(); buildDeco();
     buildTerrain(); buildStone(); buildTrees();
     gl.bindTexture(gl.TEXTURE_2D,texCl); gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,256,256,gl.RED,gl.UNSIGNED_BYTE,seamless(W.cloud));
     gl.bindTexture(gl.TEXTURE_2D,texCl2); gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,256,256,gl.RED,gl.UNSIGNED_BYTE,seamless(W.cloud2));
@@ -531,5 +536,5 @@ function create(A){
   try{ rebuild(); resize(); R.ok=true; }catch(e){ R.error=String(e&&e.message||e).slice(0,300); canvas.remove(); }
   return R;
 }
-window.KeepMesh={ create:create, version:'v0.20.0' };
+window.KeepMesh={ create:create, version:'v0.21.0' };
 })();
