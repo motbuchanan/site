@@ -56,7 +56,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
 @media (max-width:380px){ #chat{width:calc(60% - 10px);max-height:min(62vh,max(40vh,240px));padding:10px 11px} #chLine{font-size:14px} #chat .ch-btns .btn{font-size:12px} }
 #chat .ch-who{flex:none;font:600 10px var(--mb-mono);letter-spacing:.06em;color:var(--mb-dim);text-transform:uppercase;margin-bottom:6px;overflow-wrap:anywhere}
 #chat .ch-who b{color:var(--mb-teal);display:block;font:800 15px var(--mb-ui);letter-spacing:-.01em;text-transform:none;margin-bottom:1px}
-#chLine{flex:1 1 auto;min-height:1.5em;overflow:auto;font:500 15px/1.42 var(--mb-ui);margin:0 0 10px;overflow-wrap:anywhere}
+#chLine{flex:1 1 auto;min-height:1.5em;overflow:auto;font:500 15px/1.42 var(--mb-ui);margin:0 0 10px;overflow-wrap:break-word;hyphens:none}
 #chat .ch-btns{flex:none;display:flex;gap:6px;align-items:center}
 #chat .ch-btns .btn{flex:1;padding:10px 4px;min-height:44px;font-size:13px;min-width:0;white-space:nowrap}
 #chMore{background:var(--mb-teal);color:#06110f;border:0}
@@ -74,7 +74,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
  </div>
  <div id="stick"><div id="knob"></div></div>
  <div id="fps"></div>
- <button class="mb-ver" id="mbVer" type="button">v0.22.0 &middot; Oct 30</button>
+ <button class="mb-ver" id="mbVer" type="button">v0.23.0 &middot; Oct 30</button>
  <div id="toast"></div>
  <div id="chat" class="hidden" role="dialog" aria-live="polite"><div class="ch-who"><b id="chName"></b><span id="chRole"></span></div><p id="chLine"></p><div class="ch-dots" id="chDots"></div><div class="ch-btns"><button class="btn" id="chMore" type="button">more</button><button class="btn" id="chBye" type="button">goodbye</button></div></div>
  <div id="help" class="hidden"><div class="card">
@@ -97,7 +97,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
    <img src="05-predation.jpg" alt="a kill" loading="lazy">
    <img src="04-water.jpg" alt="the lake" loading="lazy">
   </div>
-  <p class="fsize">The whole world is one HTML file. Right now: <b id="fsize">~299 KB</b>. Smaller than a single phone photo.</p>
+  <p class="fsize">The whole world is one HTML file. Right now: <b id="fsize">~324 KB</b>. Smaller than a single phone photo.</p>
   <p><b>Why I built it.</b> I build things on a phone by asking AI the right questions, the way I would direct a camera. I saw a clip of a tiny 3D world made of nothing but text and wanted to see if I could grow one that was actually alive, and keep growing it in the open instead of ever calling it done.</p>
   <p><b>What I learned.</b> How far you can get with almost nothing. One idea, a ray walking a height map, turned into characters, with a small world of animals living on top. Every version taught me one concrete thing: how to make a wall read as solid, how to keep the wolves from starving the world empty, how to make a forest look like real woods.</p>
   <p style="color:var(--mb-dim);font-size:13px"><b style="color:var(--mb-soft)">Walk:</b> drag the left half of the screen (tilt to turn). <b style="color:var(--mb-soft)">Look:</b> drag the right half. Wade into the water to swim. Tap ☰ menu for a new world, the dials, and the time of day. Walk under the gate arch and find the door under the tower stair.</p>
@@ -123,9 +123,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
 <script>
 (function(){
 'use strict';
-const VERSION='The Keep v0.22.0 · Oct 30 2026';
-const VER_SHORT='v0.22.0 · Oct 30'; // what the badge shows; bump with VERSION
+const VERSION='The Keep v0.23.0 · Oct 30 2026';
+const VER_SHORT='v0.23.0 · Oct 30'; // what the badge shows; bump with VERSION
 const CHANGELOG=[
+ ['v0.23.0 · Oct 30 2026','Happenings. Every valley now has a calendar of small things that happen in it: market day every seventh day in the courtyard, a wedding when the valley has sweethearts, a new baby for a married couple, quarrels, the harvest, a festival at the keep, storms, a lost sheep or hen and who found it, the hermit landing a big fish and someone else swearing they caught a bigger one. Some things really happen while you are there: after dark, while the farmer sleeps, a wolf may take a sheep or a hen (never more than half the flock, and the flock is whole again by morning), and the hermit sometimes lands a big one at the end of a long sit on the dock. People talk about the last week, newest first, and only about people who live here: who was wed, whose baby, whose hen, and when. When sweethearts marry, they are husband and wife from that day on.'],
+ ['v0.22.1 · Oct 30 2026','Clearer talk. Lines that only made sense with context you never had are now plain sentences: I check every door in this keep twice a day, not Every door in this keep, twice a day. A visit now reads like a conversation: a greeting or what they are busy with, then their own work, then the valley round about. One line per subject, never warm and standoffish at once, at most one line about their nature, and when they mention their own people they say who they are, my brother or my friend. Greetings only open and goodbyes only close. Names ending in s no longer break. Directions are one word, northeast rather than north-east, so they never split across a line in the card. No more owls, since the valley has none yet.'],
  ['v0.22.0 · Oct 30 2026','Talk. Walk up to anyone and a small card opens at the bottom right: their name, what they do, and the first thing they say. Tap more for the next thing, three to five a visit, or say goodbye, or just walk away. What they say depends on the time of day, their nature, their own people, what lives in the valley and where things are, and nobody talks about people, places or animals that are not here. Come back later and you hear new things; nobody repeats themselves until they have run out. Over six hundred lines, and a few small stories told over two or three cards. The two guards are the night guard and the day guard now. The card stays clear of the walk stick.'],
  ['v0.21.1 · Oct 30 2026','A proper dock for the hermit. The jetty was solid timber down to the lake bed, stepping down the bank in jagged half-metre blocks. Now it is one level deck of planks a hand above the water, with the lake running on underneath, and a path graded evenly down the bank to it. Swim up to it and you can climb out onto the planks.'],
  ['v0.21.0 · Oct 30 2026','Every valley has its own people. The two guards, the gatekeeper, the steward, and whoever lives at the farms, the cabin and the hut are cast fresh from the seed: new names, faces, builds and ages (a youngster on the wall, an old gatekeeper with a stoop), new hair, beards, hats and clothes, two or three ways of being (cheerful, gruff, nosy, shy, a worrier, a gossip...), and their own people among the others: married couples, brothers and sisters, a parent and a grown child, friends, rivals, sweethearts, an old grudge, a favour owed. All of it shows in what they say, and nobody ever mentions someone who does not live in this valley. The valley has a name too, said as you arrive, and the farms take names of their own. The same seed always grows the same people.'],
@@ -527,7 +529,7 @@ const W={
 
 function genWorld(seed){
   closeChat();
-  W.seed=seed;
+  W.seed=seed; W.vday=0; W.live=[]; W.lastTod=null; W.events=null; W.taken={}; W.fishDay=null;
   { const vn=valleyNames(seed); W.valley=vn.valley; W.farmNames=[vn.farm1,vn.farm2]; }
   W.cast=castValley(seed); W.castSig=seed+':'+W.cast.map(function(c){ return c.name; }).join(','); rebuildPeople();
   W.arriveMsg='You arrive in '+W.valley+'.';
@@ -1081,7 +1083,7 @@ function placeCheck(){ if(!greetHook||!W.places.length) return;
 // which way a place lies from the keep, in words
 function dirWord(key){ const p=folkHere(key); if(!p) return 'woods';
   const a=Math.atan2(p.y-FORT.y,p.x-FORT.x)*180/Math.PI, k=Math.round(((a+360)%360)/45)%8;
-  return ['east','south-east','south','south-west','west','north-west','north','north-east'][k]; }
+  return ['east','southeast','south','southwest','west','northwest','north','northeast'][k]; }
 function folkSleeps(p){ const t=DAY.tod; return t>=p.b0||t<p.b1; }
 function addFolk(){
   for(let pi=0;pi<W.places.length;pi++){ const p=W.places[pi]; if(!DIALS.folk[p.slot]||CR_.n>CMAX-40) continue;
@@ -1115,7 +1117,8 @@ function tickFolk(c,dt){
     if(pose>0){ CR_.tm[c]=Math.max(CR_.tm[c],1.5); talk(c,id,pose); return; }
     CR_.vx[c]=qx/qd*0.01; CR_.vy[c]=qy/qd*0.01; CR_.tm[c]=walking?1.5:Math.max(CR_.tm[c],1.5); CR_.st[c]=1; CR_.po[c]=0;
     talk(c,id,pose); return; }
-  if(CR_.st[c]===1){ CR_.tm[c]-=dt; if(CR_.tm[c]<=0){ CR_.st[c]=0; CR_.tm[c]=0; CR_.po[c]=0; } return; }
+  if(CR_.st[c]===1){ CR_.tm[c]-=dt; if(CR_.tm[c]<=0){ if(CR_.po[c]===5&&id===7&&DAY.tod>=5&&DAY.tod<12&&W.fishDay!==valleyDay()){ W.fishDay=valleyDay(); if(Math.random()<0.1&&!eventsForDay(W.seed,valleyDay()).some(function(e){ return e.kind==='big_fish'; })) logEvent('big_fish',[7],'hermit',FISHSIZE[(Math.random()*(FISHSIZE.length-1))|0]); }
+    CR_.st[c]=0; CR_.tm[c]=0; CR_.po[c]=0; } return; }
   const wi=(CR_.ph[c]|0)%n, back=CR_.ss[c]>0;
   const tx=back?CR_.rx[c]:a[wi*6], ty=back?CR_.ry[c]:a[wi*6+1], ddx=tx-x, ddy=ty-y, d=Math.hypot(ddx,ddy);
   const sp=SPP[SP.KEEPER].speed*(DAY.k<0.5?0.85:1)*(night&&rt===0?1.3:1);
@@ -2253,96 +2256,96 @@ function rebuildPeople(){ const cast=W.cast; if(!cast||!cast.length) return;
 // or 'any'; part is 0 morning, 1 afternoon, 2 evening, 3 night, or a for any time.
 const TALK={
  guard1:{
-  0:["Quiet night. The good kind.","[day]Sun's up over the lake. Wall's yours.","Fog burns off by noon, mostly.","{guard2}'s already done a lap. Show-off.","Night watch is over. Nearly. Ten more steps."],
-  1:["[deer]I count the deer from up here. I lose track after a dozen.","You can hear {shepherd}'s sheep from up here. Off to the $farm2.","See the smoke by the lake, to the $hermit? That's {hermit}'s fire.","Welcome to {valley}. Mind the stair.","I sleep in the afternoon, mostly. This is me awake."],
-  2:["[day]Light's going. Braziers soon.","{guard2} takes the bunk tonight. I've got the wall.","Evening's my morning. Strange life.","[wolves]Hear the wolves yet? You will."],
-  3:["Stay near the fire, friend.","Every star in its place. I checked.","[asleep2]Keep it down. {guard2}'s asleep in the guard room.","Night watch. Me, the stars, and the owls.","Somebody has to be awake. Tonight it's me.","[wolves]Wolves out past the trees. They won't come near the fire."],
+  0:["Quiet night on the wall. The good kind.","[day]Sun's up over the lake. My watch is nearly done.","Fog burns off by noon, mostly.","{guard2} has already done a lap of the wall. Show-off.","My night watch is nearly over. Ten more steps."],
+  1:["[deer]I count the deer from up here. I lose track after a dozen.","You can hear {shepherd}'s sheep from up here. Off to the $farm2.","See the smoke by the lake, to the $hermit? That's {hermit}'s fire.","[first]Welcome to {valley}. Mind the stair.","I keep the night watch, so I sleep most afternoons. This is me awake. Just about."],
+  2:["[day]Light's going. Braziers soon.","{guard2} takes the bunk tonight. I've got the wall.","Evening's my morning. That's the night watch for you.","[wolves]Hear the wolves yet? You will."],
+  3:["Stay near the braziers tonight, friend. Wolves don't like the light.","Every star in its place. I checked.","[asleep2]Keep it down. {guard2} is asleep in the guard room.","Night watch. Just me and the stars.","Somebody has to be awake. Tonight it's me.","[wolves]Wolves out past the trees. They won't come near the fire."],
   a:["[young]Second winter on the wall. Still cold.","The night watch is mine. I like it. Fewer questions.","I've walked this wall so often I could do it asleep. Don't tell {steward}."]},
  guard2:{
-  0:["Morning! Mind the frost on the stair.","Slept like a stone. Don't tell {guard1}.","First lap's the coldest.","[day]Up with the sun. Somebody has to be."],
-  1:["You'll want the view from the tower.","[ruins]See the old stones past the trees? Older than the keep.","Two more laps and it's lunch.","[young]{steward} says I walk too fast. I say the wall's too short."],
-  2:["[day]Sun's going. My bunk's calling.","Last lap, then bed.","{guard1}'s got the night. Lucky {guard1}.","Bunk in the guard room, then up at half five. Every day."],
-  3:["Bed. Finally.","Can't sleep till I've done one more lap.","Stars are out. Keep to the wall."],
+  0:["[first]Morning! Mind the frost on the stair.","Slept like a stone. Don't tell {guard1}.","The first lap of the wall is always the coldest.","[day]Up with the sun. Somebody has to be."],
+  1:["You'll want the view from the tower.","[ruins]See the old stones past the trees? Older than the keep.","Two more laps of the wall and it's lunch.","[young]{steward} says I walk too fast. I say the wall's too short."],
+  2:["[day]Sun's going. My bunk's calling.","[leaving]One last lap of the wall, then bed.","[leaving]{guard1} has the night. Lucky {guard1}.","[leaving]Bunk in the guard room soon, then up at half five. Every day."],
+  3:["[leaving]Nearly time for my bunk. Finally.","Can't sleep till I've done one more lap.","Stars are out. One look along the wall, then my bunk."],
   a:["Four corner towers, one gate, and me. Two of us, counting {guard1}.","Day watch is mine. Nights are {guard1}'s.","I like the day watch. You see who's coming."]},
  guard:{
-  a:["Wall's four sides. I've counted.","Up here you see the whole valley. Most of it, anyway.","[wolves]Wolves keep to the trees. Usually.","[deer]Deer come down to the lake at dawn. Every day. Like they're on watch too.","[birds]The birds roost in the tall trees past the wall. You can set a clock by them.","Spear's mostly for leaning on. Don't tell anyone.","Nothing happens here. That's the job.","Watch the merlons. Half of them are loose.","The corner towers are the best for a sit-down.","[farm1,day]Off to the $farm1 you can see @farm1's field from the wall.","[wood]Smoke from the trees to the $wood. That'll be {woodcutter}.","[hermit,day]Someone fishing the lake. {hermit}, out on the dock.","[ruins]On a clear day you can see @ruin from here. Off to the $ruin.","Helmet's too big. It was my {parent.par}'s.","[keep]Best view in {valley}: top of the donjon. Take the stair round.","The stair's steep. The view's worth it.","They say the keep was built in a single summer. They say a lot of things.","Keep your eyes on the road and your feet on the stone. That's the whole job.","I counted the steps up the donjon once. I'll count them again tomorrow. I lost my place."]},
+  a:["Wall's four sides. I've counted.","Up here you see the whole valley. Most of it, anyway.","[wolves]Wolves keep to the trees. Usually.","[deer]Deer come down to the lake at dawn. Every day. Like they're on watch too.","[birds]The birds roost in the tall trees past the wall. You can set a clock by them.","Spear's mostly for leaning on. Don't tell anyone.","Nothing ever happens here. Keeping it that way is the job.","Mind the battlements. Half the stones up here are loose.","The corner towers are the best for a sit-down.","[farm1,day]From the wall you can see the field at @farm1, off to the $farm1.","[wood,day]Smoke from the trees to the $wood. That'll be {woodcutter}.","[hermit,day]Someone fishing the lake. {hermit}, out on the dock.","[ruins]On a clear day you can see @ruin from here. Off to the $ruin.","Helmet's too big. It was my {parent.par}'s.","[keep]Best view in {valley}: top of the donjon. Take the stair round.","The stair's steep. The view's worth it.","They say the keep was built in a single summer. They say a lot of things.","Keep your eyes on the road and your feet on the stone. That's the whole job.","I counted the steps up the donjon once. I'll count them again tomorrow. I lost my place."]},
  gatekeeper:{
-  0:["Gate's open. Always is, for you.","[old]Up early? So are my knees.","[notold]Up early? Good. The road's best before the carts.","Morning road's the quiet road.","[day]First light on the arch. Best part of the day."],
-  1:["Road's been quiet. Just how I like it.","[old]Forty years on this gate. Never once locked it.","[notold]Nine years on this gate. Never once locked it.","[ruins]My grandad said the old ruins were old when he was a boy.","Mind the cart ruts by the arch.","@farm1's off to the $farm1. {farmer} sends eggs up most mornings.","{hermit} fishes the lake, off to the $hermit. Leave {hermit.him} be.","This is {valley}. Folk are friendly, mostly."],
-  2:["[day]Late light's the best light on the road.","Lantern's lit. Off you go, if you're going.","Owls'll be up soon.","Braziers are lit. That's the gate shut, as much as it ever is."],
-  3:["Late to be wandering, friend.","Owls are out. They keep me company.","[asleep2]Shh. {guard2}'s sleeping just in there.","Night road's no place for a stranger. Stay by the fire."],
-  a:["Not many come through {valley}. The ones that do, I remember.","The road goes south from the gate. Where it goes after that, I couldn't tell you.","A gate's a door you don't close. That's what my old master said.","[old]I've seen four stewards come and go. {steward}'s the best of them. Don't tell {steward.him}.","[notold]Old gatekeeper before me sat right here forty years. Big chair to fill.","[farm2]{shepherd} brings the flock past here in spring. Takes an hour.","[wood]{woodcutter} drags logs right through my arch. Look at those ruts.","Everyone in {valley} comes past this gate sooner or later. Except {hermit}.","Lean on the arch if you like. It's held up so far.","[ruins]Strangers always ask about @ruin. I say: old. That's all I know.","I know every stone in this arch by name. Well. By number.","My lantern has two moods: lit and not lit.","Fair warning: {guard1} tells long stories at night.","Sit a moment. The road isn't going anywhere."]},
+  0:["[first]Gate's open. Always is. Come through.","[old]Up early? So are my knees.","[notold]Up early? Good. The road's best before the carts.","The road's always quiet in the morning.","[day]First light on the arch. Best part of the day."],
+  1:["Road's been quiet. Just how I like it.","[old]Forty years on this gate. Never once locked it.","[notold]Nine years on this gate. Never once locked it.","[ruins]My grandad said the old ruins were old when he was a boy.","Mind the cart ruts under the arch. They'll turn your ankle.","@farm1 is off to the $farm1. {farmer} sends eggs up most mornings.","{hermit} fishes the lake, off to the $hermit. Leave {hermit.him} be.","This is {valley}. Folk are friendly, mostly."],
+  2:["[day]Late light's the best light on the road.","[last]Lantern's lit. Off you go, if you're going.","Nearly time to light the braziers.","Braziers are lit. That's as shut as this gate ever gets."],
+  3:["[first]Late to be wandering, friend.","Quiet out here at night. The braziers keep me company.","[asleep2]Shh. {guard2} is sleeping just in there.","Night road's no place for a stranger. Stay by the fire."],
+  a:["Not many come through {valley}. The ones that do, I remember.","The road goes south from the gate. Where it goes after that, I couldn't tell you.","A gate's a door you don't close. That's what my old master said.","[old]I've seen four stewards come and go. {steward} is the best of them. Don't tell {steward.him}.","[notold]Old gatekeeper before me sat right here forty years. Big chair to fill.","[farm2]{shepherd} brings the flock past here in spring. Takes an hour to get them all through.","[wood]{woodcutter} drags logs right through my arch. Look at those ruts.","Everyone in {valley} comes past this gate sooner or later. Except {hermit}.","Lean on the arch if you like. It's held up so far.","[ruins]Strangers always ask about @ruin. I say: old. That's all I know.","I know every stone in this arch by name. Well. By number.","My lantern has two moods: lit and not lit.","Fair warning: {guard1} tells long stories at night.","[invite]Sit a moment. The road isn't going anywhere."]},
  steward:{
-  0:["Bread's on. Wipe your feet before the hall.","Up the tower before breakfast? Brave.","Somebody left the hall door open again.","Morning count: doors, lamps, stores. In that order."],
-  1:["Wipe your feet before the hall.","Somebody tracked mud up the stair. Was it you?","Every door in this keep, twice a day.","Woodpile's low. {woodcutter}'s cabin is in the trees to the $wood.","{farmer}'s eggs are the best thing in my kitchen."],
-  2:["Kitchen fire's still warm.","Lamps lit, doors checked. Nearly done.","One more round of the doors."],
-  3:["Off to bed with you.","Kitchen fire's still warm.","Doors are shut. Mostly."],
-  a:["The great hall table seats twenty. It has never seated twenty.","The map in the round room is older than me. Some of the roads on it aren't there any more.","Two chests in the round room. One's full of candles. The other's full of more candles.","Don't touch the tapestry. It's holding the wall up. Probably.","The chapel glass came over the hills in straw. Not one pane broke.","I keep the keys. All of them. Even the ones that don't open anything.","The kitchen smokes when the wind's from the lake. Nothing to be done.","The barracks beds are made. Whether anyone sleeps in them is not my business.","Somebody's been at the honey. I'll find out who.","A keep runs on lists. I am the lists.","The banners want washing. They've wanted washing for a year.","Have you seen the painting of the ship in the hall? Nobody knows who painted it.","[farm1]Eggs from @farm1, cabbages from @farm1. We'd starve without {farmer}.","[farm2]{shepherd}'s wool keeps the barracks warm. And {guard1} grumpy.","[wood]If the woodpile's low, it's {woodcutter}'s fault. If it's high, it's mine.","[hermit,fish]{hermit} sends up fish now and then. Never comes in, though.","Mind the third step up to the hall. It's a liar."]},
+  0:["Bread's on. Wipe your feet before the hall.","You're up early. Breakfast isn't till the bread's out.","Somebody left the hall door open again.","Every morning I count the doors, the lamps and the stores. In that order."],
+  1:["Wipe your feet before the hall.","Somebody tracked mud up the stair. Was it you?","I check every door in this keep twice a day.","Woodpile's low. {woodcutter}'s cabin is in the trees to the $wood.","{farmer}'s eggs are the best thing in my kitchen."],
+  2:["Kitchen fire's still warm.","[leaving]Lamps lit, doors checked. My day's nearly done.","[leaving]One more round of the doors and I'm done."],
+  3:["[last]Off to bed with you.","Kitchen fire's still warm.","All the doors are shut for the night. Mostly."],
+  a:["The great hall table seats twenty. It has never seated twenty.","The map in the round room is older than me. Some of the roads on it aren't there any more.","Two chests in the round room. One's full of candles. The other's full of more candles.","Don't touch the tapestry. It's holding the wall up. Probably.","The chapel glass came over the hills in straw. Not one pane broke.","I keep the keys. All of them. Even the ones that don't open anything.","The kitchen smokes when the wind's from the lake. Nothing to be done.","The barracks beds are made. Whether anyone sleeps in them is not my business.","Somebody's been at the honey. I'll find out who.","A keep runs on lists. I am the lists.","The banners want washing. They've wanted washing for a year.","Have you seen the painting of the ship in the hall? Nobody knows who painted it.","[farm1]Eggs and cabbages from @farm1. We'd starve without {farmer}.","[farm2]{shepherd}'s wool keeps the barracks warm. {guard1} says it itches.","[wood]If the woodpile's low, it's {woodcutter}'s fault. If it's high, it's mine.","[hermit,fish]{hermit} sends up fish now and then. Never comes in, though.","Mind the third step up to the hall. It's lower than it looks."]},
  farmer:{
-  0:["Hens were up before me again.","Morning! Mind the furrows, they're fresh.","[keepers]Eggs go up to the keep before the dew's off.","Seven hens, seven eggs. Most days."],
+  0:["Hens were up before me again.","[first]Morning! Mind the furrows, they're fresh.","[keepers]Eggs go up to the keep before the dew's off.","Seven hens, seven eggs. Most days."],
   1:["Wheat's coming on nicely. Don't tell it I said so.","Cabbages don't weed themselves. More's the pity.","{shepherd}'s sheep had a go at my fence again.","[fish]{hermit} trades a fish for a dozen eggs. Fair, I suppose."],
-  2:["Last row, then supper.","Shut the hens in yet? I'd better.","{woodcutter} brought kindling. I owe {woodcutter.him} a loaf."],
-  3:["Late for visitors. I'm off to bed.","The fox is about. I can feel it.","Mind the hen house on your way past."],
-  a:["Wheat on this side, cabbages on that. Same as my {parent.par} did.","A field's a long conversation. You talk, it ignores you, then one day it answers.","The haystack's bigger than the hen house. That's how I like it.","Every furrow straight. Nearly every furrow.","That one hen. The speckled one. She runs this farm.","Stone house, thatch roof. Warm in winter, if the thatch holds.","Rain or no rain, the hoe goes in at sunup.","[keepers]Half my wheat goes up to the keep. The other half goes into me.","I name the hens. I won't tell you the names. You'd laugh.","Weeds are just plants in a hurry.","[farm2]{shepherd} and I share a fence. And an argument about the fence.","[wolves]Wolves come close in the dark. The hens know before I do.","Mud in spring, dust in summer. Somewhere in between, a good day.","There's more to wheat than you'd think. There's also less.","My hands know this field better than my head does.","@farm1. Not much of a name. Not much of a farm. Mine, though.","[wood]{woodcutter} made the hen house. It's held up better than mine would have."]},
+  2:["[leaving]One last row to hoe, then supper.","Have I shut the hens in yet? I'll check in a minute.","{woodcutter} brought kindling. I owe {woodcutter.him} a loaf."],
+  3:["[last]It's late for visitors. I'm off to bed.","The fox is about. I can feel it.","Hens are shut in for the night. Mind you don't wake them."],
+  a:["Wheat on this side, cabbages on that. Same as my {parent.par} did.","A field's a long conversation. You talk, it ignores you, then one day it answers.","The haystack's bigger than the hen house. That's how I like it.","I keep every furrow straight. Nearly every furrow.","That one hen. The speckled one. She runs this farm.","Stone house, thatch roof. Warm in winter, if the thatch holds.","Rain or no rain, the hoe goes in at sunup.","[keepers]Half my wheat goes up to the keep. The other half goes into me.","I name the hens. I won't tell you the names. You'd laugh.","Weeds are just plants in a hurry.","[farm2]{shepherd} and I share a fence. And an argument about the fence.","[wolves]Wolves come close in the dark. The hens know before I do.","Mud in spring, dust in summer. Somewhere in between, a good day.","There's more to wheat than you'd think. There's also less.","My hands know this field better than my head does.","@farm1. Not much of a name. Not much of a farm. Mine, though.","[wood]{woodcutter} made the hen house. It's held up better than mine would have."]},
  shepherd:{
   0:["Morning. Sheep don't sleep in, so neither do I.","[day]Dew on the grass. They like that.","{farmer}'s hens woke me again.","Six sheep, two cows. Count's right. Good start."],
   1:["Count them with me. One, two... no, that one moved.","The bigger cow is the boss. Don't tell the other one.","{woodcutter} cut my new fence posts. Good wood, that.","{gatekeeper} lets the flock through the gate in spring."],
-  2:["Bringing them in soon.","Sheep in, cows in, me in.","[fish]Smoke from {hermit}'s fire. Fish for supper, for {hermit.him}."],
-  3:["Shh. The flock's asleep.","[wolves]Wolves about tonight. I'll keep an ear open.","Off home with you, friend."],
-  a:["Every sheep's got a face of its own. You stop seeing it as a flock.","The barn leaks at one end. The cows know which end.","Trough wants filling twice a day. More when it's warm.","[young]My first flock. My only flock. I'd fight a wolf for them. A small wolf.","[old]Fifty years of sheep. They haven't got any cleverer. Neither have I.","A good crook's worth more than a good hat. I have both.","The kitchen garden by the door's mine too. Beans, mostly. Beans and hope.","Sheep follow the first sheep. People aren't much different.","[farm1]{farmer}'s field is fenced. Mine leaks sheep.","[wolves]I've lost sheep to wolves. Not this year. Not yet.","@farm2. Doesn't sound like much. Sounds like home to me.","Wool, milk, and a lot of standing about. That's the work.","The sheep don't need me. I like to think they do.","[deer]Deer come right up to my fence at dusk. Cheeky.","That one with the dark face? Trouble. Lovely, but trouble."]},
+  2:["[leaving]I'll be bringing the flock in soon.","Sheep in, cows in, me in.","[fish,day]Smoke from {hermit}'s fire. That'll be fish for supper again."],
+  3:["The flock's asleep. Keep your voice low and we'll get on fine.","[wolves]Wolves about tonight. I'll keep an ear open.","[last]Off home with you, friend."],
+  a:["Every sheep's got a face of its own. You stop seeing it as a flock.","The barn leaks at one end. The cows know which end.","Trough wants filling twice a day. More when it's warm.","[young]My first flock. My only flock. I'd fight a wolf for them. A small wolf.","[old]Fifty years of sheep. They haven't got any cleverer. Neither have I.","A good crook's worth more than a good hat. I have both.","The kitchen garden by the door's mine too. Beans, mostly. Beans and hope.","Sheep follow the first sheep. People aren't much different.","[farm1]{farmer}'s field has a proper fence. Mine leaks sheep.","[wolves]I've lost sheep to wolves. Not this year. Not yet.","@farm2. Doesn't sound like much. Sounds like home to me.","Wool, milk, and a lot of standing about. That's the work.","The sheep don't need me. I like to think they do.","[deer]Deer come right up to my fence at dusk. Cheeky.","That one with the dark face? Trouble. Lovely, but trouble."]},
  woodcutter:{
   0:["Morning. Mind the chips, they fly.","Oak for the fences, beech for the fires.","Cold morning. Good for splitting."],
   1:["Stand back a bit. Thanks.","[old]That tree's been waiting forty years. So have I.","[notold]That tree's older than me. Not for much longer.","[keepers]The keep burns half my wood every winter.","{hermit}? Talks to the fish. Says they talk back."],
-  2:["Last log. Then the fire.","Stack's nearly to the eaves. Nearly.","Promised {shepherd} more posts. Tomorrow."],
-  3:["Too dark to swing an axe. Even for me.","Owl's in that oak. Don't cut the owl tree, they say.","Goodnight. Watch the stumps."],
-  a:["Two trees this week. Both picked out a year ago.","You cut one, you leave ten. That's how there's still a forest.","Chopping block's older than the cabin. Older than me, I'd say.","Log cabin, log fire, log pile. Very consistent life.","[squirrels]Squirrels throw things at me. I've earned it.","[birds]Every tree I fell, the birds tell the whole forest about it.","The trick's not the swing. It's where you stand.","Woodpile goes to the eaves before the first frost. Every year.","[farm2,keep]{shepherd}'s posts, {farmer}'s hen house, the keep's fires. All from these trees.","[farm1]I owe {farmer} for a loaf. I always owe {farmer} for a loaf.","Sharp axe, dull life. I like it that way.","Listen. That creak? That's a tree thinking about falling.","Bark comes off easier in spring. Don't ask how I know.","@wood. Just a cabin in the trees. It's enough.","[deer]Deer walk right through the glade. They know I won't chase them."]},
+  2:["Last log of the day. My fire can wait a bit.","My woodpile's nearly up to the eaves. Nearly.","I promised {shepherd} more fence posts. Tomorrow, maybe."],
+  3:["Too dark to swing an axe now. Even for me.","There's an old oak out there I'll never cut. Bad luck, they say.","[last]Goodnight. Watch out for the stumps on your way."],
+  a:["Two trees to fell this week. I picked them out a year ago.","You cut one, you leave ten. That's how there's still a forest.","Chopping block's older than the cabin. Older than me, I'd say.","Log cabin, log fire, log pile. Very consistent life.","[squirrels]Squirrels throw things at me. I've earned it.","[birds]Every tree I fell, the birds tell the whole forest about it.","The trick's not the swing. It's where you stand.","Woodpile goes to the eaves before the first frost. Every year.","[farm2,keep]{shepherd}'s posts, {farmer}'s hen house, the keep's fires. All from these trees.","[farm1]I owe {farmer} for a loaf. I always owe {farmer} for a loaf.","Sharp axe, dull life. I like it that way.","Listen. That creak? That's a tree thinking about falling.","Bark comes off easier in spring. Don't ask how I know.","Four log walls and a woodpile. It's enough.","[deer]Deer walk right through the glade. They know I won't chase them."]},
  hermit:{
-  0:["[fish]Fish bite at dawn. Hush now.","You walk loud.","Mist on the water. Best time."],
-  1:["Nothing biting. That's fishing.","Sit if you like. Don't talk.","[keepers]Too many people up at that keep.","Eggs from @farm1. Best thing about @farm1."],
+  0:["[fish]Fish bite at dawn. Talk quiet, if you're staying.","You walk loud. The fish can hear you.","Mist on the water. Best time of day for fishing."],
+  1:["Nothing's biting. That's fishing.","[aloof]Sit if you like. Just don't talk.","[keepers]Too many people up at that keep.","Eggs from @farm1. Best thing about @farm1."],
   2:["[fish]The big one's out there. I've seen him.","[fish]Fire's lit. Fish for supper, if I'm lucky.","{woodcutter} thinks I talk to fish. I listen. Different thing."],
-  3:["[fish]Late. Even the fish are asleep.","Stars on the water. Two skies.","Off with you. Quietly."],
-  a:["I came here to be alone. You're making that hard.","The dock's new. Well. New to me.","Hut, fire, lake. What else is there?","[fish,keep]There's a fish in this lake older than the keep. I mean to meet him.","[fish]You can see them from the end of the dock, if you're still. You're not still.","[fish]The drying rack's for fish. The fish don't agree.","[old]I've forgotten more about this lake than most people know. I've forgotten most of it.","Wind on the water tells you everything. If you listen. Nobody listens.","[keepers]They send someone down from the keep now and then. To see if I'm still alive. I am.","I don't talk much. This is a lot, for me.","The lake's the same every day. Completely different every day.","[ruins]@ruin? Old. Older than names. Leave it be.","Patience. That's the whole secret. That, and worms.","@hermit. They call it that, do they. Fine.","[farm2]{shepherd}'s sheep come down to drink some evenings. Polite enough."]},
+  3:["[fish]Late. Even the fish are asleep.","Stars on the water. Two skies, one above and one below.","[last]Off with you now. Quietly."],
+  a:["[aloof]I came here to be alone. You're making that hard.","The dock's new. Well. New to me.","A hut, a fire and a lake. What else does anyone need?","[fish,keep]There's a fish in this lake older than the keep. I mean to meet him.","[fish]You can see them from the end of the dock, if you're still. You're not still.","[fish]The drying rack's for fish. The fish don't agree.","[old]I've forgotten more about this lake than most people know. I've forgotten most of it.","Wind on the water tells you everything. If you listen. Nobody listens.","[keepers]They send someone down from the keep now and then. To see if I'm still alive. I am.","I don't talk much. This is a lot, for me.","The lake looks the same every day. It never is.","[ruins]@ruin? Old. Older than names. Leave it be.","Patience. That's the whole secret. That, and worms.","@hermit. They call it that, do they. Fine.","[farm2]{shepherd}'s sheep come down to drink some evenings. Polite enough."]},
  keep:{
-  a:["You're new. Welcome to the keep.","[ruins]Seen @ruin yet? Off to the $ruin. Worth the walk.","The chapel's quiet if you need quiet.","The kitchen is warm. That's where everyone ends up.","{gatekeeper} knows everyone. Ask {gatekeeper.him} anything.","{steward} runs this keep. The rest of us live in it.","The great hall's for feasts. We haven't had a feast in a while.","Mind the spiral stair. It goes round more than you'd think.","[farm1]Bread from @farm1's wheat. Best in {valley}.","The barracks snore. All of them.","The lookout's open on all four sides. Bring a coat.","Those banners? Older than anyone here."]},
+  a:["[first]You're new. Welcome to the keep.","[ruins]Seen @ruin yet? Off to the $ruin. Worth the walk.","The chapel's quiet if you need quiet.","[invite]Sit down if you're tired. There's a bench by the hall.","The kitchen is warm. That's where everyone ends up.","{gatekeeper} knows everyone. Ask {gatekeeper.him} anything.","{steward} runs this keep. The rest of us live in it.","The great hall's for feasts. We haven't had a feast in a while.","Mind the spiral stair. It goes round more than you'd think.","[farm1]The bread here's made from @farm1 wheat. Best in {valley}.","Everyone in the barracks snores. Every one of them.","The lookout's open on all four sides. Bring a coat.","The banners in the hall are older than anyone here."]},
  folk:{
-  a:["You're not from {valley}. Walking through?","[keep]The keep's that way, if you're looking for company. I'm not.","[keepers]They've got a whole kitchen up at the keep. Imagine.","Long way to the next valley, they say. Never been.","[farm1]If you're hungry, @farm1 has eggs.","[ruins]Walked past @ruin? Don't linger after dark.","[nothermit]Nice to have someone to talk to. Briefly.","Mind where you step. Everything out here is somebody's.","[wolves]Keep to the paths at night. Wolves.","[birds]Hear the birds? Means nothing's coming. When they stop, something is.","[keepers]Up at the keep they eat at a long table. Out here we eat standing up."]},
+  a:["[first]You're not from {valley}. Walking through?","[keep]The keep's that way, if you want a crowd. Out here it's mostly me and the work.","[keepers]They've got a whole kitchen up at the keep. Imagine.","[nothermit]Long way to the next valley, they say. Never been.","[farm1]If you're hungry, @farm1 has eggs.","[ruins]Walked past @ruin? Don't linger after dark.","[invite]Nice to have someone to talk to. Briefly.","Mind where you step. Everything out here is somebody's.","[wolves]Keep to the paths at night. There are wolves about.","[birds]Hear the birds? Means nothing's coming. When they stop, something is.","[invite]Sit down if you're tired. Ground's free.","[night]Ask me the time and I'll tell you by the stars.","[keepers]Up at the keep they eat at a long table. Out here we eat standing up."]},
  any:{
-  0:["Morning.","Early, isn't it.","[day]Sun's barely up and here you are.","Morning! Sleep well?","[day]Mist's lifting. Should be a fair day.","Good morning, traveller."],
-  1:["Afternoon.","Warm enough, for {valley}.","Half the day gone already.","Busy afternoon. Well. Afternoon.","Midday quiet. Nice, that."],
-  2:["Evening.","Getting dark. Mind how you go.","Supper soon, for some of us.","[day]Long shadows. Long day.","[day]Evening. The light's going gold."],
-  3:["It's late.","Can't sleep?","Quiet night.","Mind the dark, friend.","Stars are out. Good night for it.","Late to be out walking."],
-  a:["Lovely spot, {valley}. Bit quiet.","Where are you headed?","Welcome to {valley}.","Don't see many new faces.","[nothermit]Stay a while, if you like.","Not much happens in {valley}. That's the point.","Everyone knows everyone here. Now they'll know you.","[keep]The keep's been here longer than anyone remembers.","[keep]{gatekeeper} will tell you about the road. At length.","[ruins]There are old stones all over {valley}. Nobody knows who put them there.","[ruins]Found any of the old places yet? There's one called @ruin.","[farm1]{farmer} at @farm1 grows the wheat for half the valley.","[farm2]{shepherd} at @farm2 keeps sheep. And opinions.","[wood]{woodcutter} lives in the trees to the $wood. Mostly keeps to {woodcutter.him}self.","[hermit]{hermit} lives down by the lake. Doesn't say much.","[hermit]You can see {hermit}'s dock from the shore. {hermit.He} fishes off it all day.","[wolves]There are wolves in {valley}. They don't bother people. Mostly.","[deer]Deer everywhere this year.","[fish]The lake's full of fish, if you've the patience.","[rabbits]Rabbits in every bank. You'll see them bolt.","[squirrels]Squirrels in the trees, making a racket.","[birds]Birds flock over the lake at dusk. Worth seeing.","[keep]The road through {valley} is older than the keep. So they say.","[nothermit]I've lived in {valley} all my life. Never seen the end of it.","[wood]Smoke over the trees? That's {woodcutter}.","[farm1]You'll know @farm1 by the field. You can't miss it.","[farm2]Follow the bleating to @farm2. Off to the $farm2.","[farm1,keep]@farm1's off to the $farm1 of the keep.","[hermit]The hermit's hut is to the $hermit, down by the water.","[wood]{woodcutter}'s cabin is off to the $wood, in the thick of the trees.","Sit down if you're tired. Ground's free.","Funny weather lately. Or is it always like this?","The lake's lovely in the evening.","[keep]Climb the donjon. You'll see why they built the keep here.","Mind your step. That's my advice for everything.","Is that a new face? It is.","You've a traveller's look. Dusty boots.","A traveller. Haven't had one of those in a while.","Things are steady here. I like steady.","You'll find {valley} small. Small's good.","They say the hills round {valley} keep the weather out. They don't.","Talk to everyone. That's how you learn a place.","Every valley's got its stories. Ours are quiet ones.","Don't believe everything {gatekeeper} tells you.","[keep]If you want gossip, try {steward}. If you want the truth, try someone else.","[nothermit]I'd show you round, but I'm busy. Busy-ish.","You're welcome here. Just don't eat the last of anything.","A good day's work and a good night's sleep. That's {valley}.","Nobody hurries here. You'll see.","[keep]The keep bell? No bell. People just know.","If you get lost, walk downhill. You'll find the lake.","[farm1,farm2,keep]Two farms, one keep, one lake. That's {valley}, near enough.","[keepers]Four keepers up at the keep. You'll have met some by now.","[nothermit]Kind of you to stop and talk.","[ruins]They say the old stones hum at night. I've never heard it. I've never listened.","There's always more to see. Keep walking.","Rain's good for the land. Bad for the mood.","Ask me tomorrow, I'll have more to say.","You walk like someone who's walked a long way.","Tell them in the next valley that {valley} said hello.","Every path here goes somewhere. Some of them go somewhere twice."]},
+  0:["[first]Morning.","[first]Early, isn't it.","[day]Sun's barely up and here you are.","[first]Morning! Sleep well?","[day]Mist's lifting. Should be a fair day.","[first]Good morning, traveller."],
+  1:["[first]Afternoon.","Warm enough, for {valley}.","Half the day gone already. Where does it go?","Afternoons go quick. Mornings take their time.","It's quiet around midday. I like that."],
+  2:["[first]Evening.","[last]Getting dark. Mind how you go.","It'll be supper soon, for some of us.","[day]Long shadows. Long day.","[day]Evening. The light's going gold."],
+  3:["[first]It's late.","[first]Can't sleep?","[first]Quiet night.","[last]Mind the dark, friend.","Stars are out. Good night for it.","[first]Late to be out walking."],
+  a:["Lovely spot, {valley}. Bit quiet.","[first]Where are you headed?","[first]Welcome to {valley}.","[first]Don't see many new faces.","[invite]Stay a while, if you like.","Not much happens in {valley}. That's the point.","Everyone knows everyone here. Now they'll know you.","[keep]The keep's been here longer than anyone remembers.","[keep]{gatekeeper} will tell you about the road. At length.","[ruins]There are old stones all over {valley}. Nobody knows who put them there.","[ruins]Found any of the old places yet? There's one called @ruin.","[farm1]{farmer} at @farm1 grows the wheat for half the valley.","[farm2]{shepherd} at @farm2 keeps sheep. And opinions.","[wood]{woodcutter} lives in the trees to the $wood. Mostly keeps to {woodcutter.him}self.","[hermit]{hermit} lives down by the lake. Doesn't say much.","[hermit]You can see {hermit}'s dock from the shore. {hermit.He} fishes off it all day.","[wolves]There are wolves in {valley}. They don't bother people. Mostly.","[deer]Deer everywhere this year.","[fish]The lake's full of fish, if you've the patience.","[rabbits,day]Rabbits in every bank. You'll see them bolt.","[squirrels,day]Squirrels in the trees, making a racket.","[birds]Birds flock over the lake at dusk. Worth seeing.","[keep]The road through {valley} is older than the keep. So they say.","[nothermit]I've lived in {valley} all my life. Never seen the end of it.","[wood,day]Smoke over the trees? That's {woodcutter}.","[farm1]You'll know @farm1 by the field. You can't miss it.","[farm2]Follow the bleating to @farm2. Off to the $farm2.","[farm1,keep]@farm1 is off to the $farm1 of the keep.","[hermit]The hermit's hut is to the $hermit, down by the water.","[wood]{woodcutter}'s cabin is off to the $wood, in the thick of the trees.","Funny weather lately. Or is it always like this?","The lake's lovely in the evening.","[keep]Climb the donjon. You'll see why they built the keep here.","Mind your step. That's my advice for everything.","[first]Is that a new face? It is.","[first]You've a traveller's look. Dusty boots.","[first]A traveller. Haven't had one of those in a while.","Things are steady here. I like steady.","You'll find {valley} small. Small's good.","They say the hills round {valley} keep the weather out. They don't.","Talk to everyone. That's how you learn a place.","Every valley's got its stories. Ours are quiet ones.","Don't believe everything {gatekeeper} tells you.","[keep]If you want gossip, try {steward}. If you want the truth, try someone else.","[aloof]I'd show you round, but I'm busy. Busy-ish.","[invite]You're welcome here. Just don't eat the last of anything.","A good day's work and a good night's sleep. That's {valley}.","Nobody hurries here. You'll see.","[keep]There's no bell at the keep. People just know when it's supper.","If you get lost, walk downhill. You'll find the lake.","[farm1,farm2,keep]Two farms, one keep, one lake. That's {valley}, near enough.","[keepers]Four keepers up at the keep. Gate, wall, wall and kitchen.","[invite]Kind of you to stop and talk.","[ruins]They say the old stones hum at night. I've never heard it. I've never listened.","[last]There's always more to see. Keep walking.","Rain's good for the land. Bad for the mood.","[last]Ask me tomorrow. I'll have more to say.","You walk like someone who's walked a long way.","[last]Tell them in the next valley that {valley} said hello.","Every path here goes somewhere. Some of them take the long way."]},
  trait:{
-  cheerful:["[day]Lovely day for it, whatever it is!","Good to see a new face in {valley}.","Isn't it grand here? I never tire of it.","[night]A fine night! Look at those stars.","Everything's better with company. Even this.","What a day. What a lovely, ordinary day."],
-  gruff:["What.","Say your piece and move along.","Visitors. Hmph.","Don't touch anything.","I'm busy. I'm always busy.","Hmph. Fine. Hello."],
-  nosy:["Where are you headed? Who's asking? Me. I'm asking.","You're not from {valley}, are you? Thought not.","What's in the pack? Just curious.","Seen anything interesting? Tell me everything.","Who've you talked to so far? What did they say about me?"],
-  shy:["Oh. Hello. Sorry. Hello.","I don't get many visitors. That's fine.","...hm? Oh. Yes. Hello.","Don't mind me.","I'm not much for talking. Sorry."],
+  cheerful:["[day]Lovely day for it, whatever it is!","[first]Good to see a new face in {valley}.","Isn't it grand here? I never tire of it.","[night]A fine night! Look at those stars.","[invite]Everything's better with company. Even this.","What a day. What a lovely, ordinary day."],
+  gruff:["[first]What.","[last]Well, that's your piece said. Move along.","[first]Visitors. Hmph.","[aloof]Don't touch anything.","[aloof]I'm busy. I'm always busy.","[first]Hmph. Fine. Hello."],
+  nosy:["Where are you headed? Who's asking? Me. I'm asking.","[first]You're not from {valley}, are you? Thought not.","What's in the pack? Just curious.","Seen anything interesting? Tell me everything.","Who've you talked to so far? What did they say about me?"],
+  shy:["[first]Oh. Hello. Sorry. Hello.","I'm not one for visitors. You're all right, though.","[first]...hm? Oh. Yes. Hello.","Don't mind me.","I'm not much for talking. Sorry."],
   boastful:["Best in the valley at what I do. Ask anyone.","Nobody in {valley} works harder. Nobody.","I could do this with my eyes shut. Some days I do.","They'll write songs about me one day. Short ones.","Everything you've seen round here? I've done it better."],
-  worrier:["Did you hear thunder? I thought I heard thunder.","Mind how you go. Things happen.","[night]Out after dark? Be careful. Please.","I'll just check that again. And again.","[wolves]Do you think the wolves are closer this year? I think they're closer."],
-  dry:["Another day in paradise.","Oh good. Company.","Exciting times. Something might happen. Probably won't.","I'd show you round, but you've seen it.","Welcome to {valley}. Try to contain yourself."],
-  kind:["Rest a while if you're tired. No one minds.","[day]Have you eaten? You look like you haven't eaten.","If you need anything, ask. That's what neighbours are for.","You're welcome here. Truly.","Mind yourself out there. I mean it kindly."],
+  worrier:["Did you hear thunder? I thought I heard thunder.","[last]Mind how you go. Things happen.","[night]Out after dark? Be careful. Please.","Did I shut the door? I'm sure I did. Fairly sure.","[wolves]Do you think the wolves are closer this year? I think they're closer."],
+  dry:["Another day in paradise.","[first]Oh good. Company.","Exciting times. Something might happen. Probably won't.","I'd show you round, but you've seen it.","[first]Welcome to {valley}. Try to contain yourself."],
+  kind:["[invite]Rest a while if you're tired. No one minds.","[day]Have you eaten? You look like you haven't eaten.","[invite]If you need anything, ask. That's what neighbours are for.","[invite]You're welcome here. Truly.","[last]Mind yourself out there. I mean it kindly."],
   proud:["[keep,nothermit]My family's been in {valley} longer than the keep. Nearly.","[nothermit]My family's been in {valley} since before the old road.","Not everyone could do this job. I can.","Look at that. Done properly. That's how it's done.","{valley} is the best valley. I've never seen another, but I'm sure."],
-  gossip:["I shouldn't say. But I will.","You didn't hear it from me.","Everyone in {valley} knows everything. I just know it first.","Oh, the things I could tell you. Sit down.","Ask me about anyone. Anyone at all."],
+  gossip:["I shouldn't say. But I will.","You didn't hear it from me.","Everyone in {valley} knows everything. I just know it first.","[invite]Oh, the things I could tell you. Sit down.","[invite]Ask me about anyone. Anyone at all."],
   superstitious:["Don't whistle near the water. Bad luck.","Saw a magpie on my way out. Only one. Not good.","[ruins]Don't go near the old stones after dark. Just don't.","Knock on wood. There. Better.","Never count the stars. You'll count one too many."],
-  tired:["Long day. They're all long days.","Is it supper yet? It feels like supper.","[night]Bed. Soon. Very soon.","Sorry. Long night. Hello.","I could sleep standing up. I have."]},
+  tired:["Long day. They're all long days.","Is it bedtime yet? It feels like bedtime.","[night]Bed. Soon. Very soon.","[first]Sorry. Long night. Hello.","I could sleep standing up. I have."]},
  rel:{
-  spouse:["If you see {spouse}, tell {spouse.him} supper's on.","{spouse} snores. Don't tell {spouse.him} I said so.","[keep]Married {spouse} in the chapel up at the keep. Best day.","{spouse} and I have been married longer than I can count. {spouse.He} can count. {spouse.He} reminds me.","{spouse} is {spouse.role}. I'm married to the job, too. {spouse.His} job.","I'd be lost without {spouse}. Don't tell {spouse.him}. {spouse.He}'d never let it go.","{spouse} thinks I don't notice the little things. I notice. I just don't say.","We argue, {spouse} and I. Then we have supper. That's a marriage."],
-  sibling:["{sibling}'s my {sibling.sib}. We don't look alike. Thank goodness.","My {sibling.sib} {sibling} and I used to race to the lake every morning.","If {sibling} says I started it, I didn't.","{sibling} got the brains. I got the looks. Ask anyone. Don't ask {sibling}.","My {sibling.sib}'s {sibling.role} now. Proud of {sibling.him}. Quietly.","{sibling} and I share a name and not much else.","We fought every day as children, {sibling} and I. Now it's every other day."],
-  parent:["My {parent.par}, {parent}, taught me everything I know. Most of it, anyway.","[adult]{parent} still calls me in for supper. I'm grown!","Don't tell my {parent.par} you saw me resting.","{parent} says I'll do well. {parent.He} also says I'll catch cold. Both, probably.","[young]My {parent.par}'s {parent.role}. One day I'll be... something. We'll see.","Have you met my {parent.par}? {parent}. You can't miss {parent.him}."],
-  child:["My {child.kid}, {child}. Grown so fast.","Have you met {child}? My {child.kid}. Good worker. Don't tell {child.him} I said so.","[old]I taught {child} everything. {child.He} forgot half of it.","If you see {child}, tell {child.him} to eat something.","{child}'s {child.role} now. I worry. Every day, I worry.","My {child.kid} {child} thinks I don't know things. I know things."],
-  friend:["{friend} and I go back years.","If you see {friend}, say I said hello.","{friend}'s the best friend anyone could have. Don't tell {friend.him} that, either.","{friend} and I sit up late some nights. Talking about nothing. Best kind of talk.","You've met {friend}? Then you've met the best of {valley}.","{friend} would do anything for me. I'd do most things for {friend.him}.","When I'm low, {friend} turns up. Every time. Don't know how {friend.he} knows."],
-  rival:["{rival} thinks {rival.he}'s better at everything. {rival.He} isn't.","Did {rival} say something about me? Ignore it.","{rival} and I don't talk. Well. We argue. That's talking.","Whatever {rival} told you, the opposite is true.","{rival} and I have been at it for years. Neither of us remembers why.","One day I'll beat {rival} at something. Anything.","{rival.He}'s not so bad, {rival}. Don't repeat that."],
-  sweetheart:["Have you seen {sweetheart} today? No reason.","{sweetheart}? We're just friends. Mostly. Why are you smiling?","Walking out with {sweetheart} after supper. Don't tell anyone.","Does {sweetheart} ever mention me? Just wondering.","If you see {sweetheart}, say... no. Don't say anything.","{sweetheart}'s got the best laugh in {valley}. Don't tell {sweetheart.him} I said."],
-  owes:["I owe {owes} a favour. {owes.He} won't let me forget it.","Still owe {owes} for that business last winter.","{owes} helped me out once. I'll pay it back. One day.","If {owes} asks, I'm working on it."],
-  owed:["{owed} owes me a favour. I'll collect one day.","{owed} still owes me. {owed.He} knows.","I helped {owed} out once. {owed.He} hasn't forgotten. Neither have I.","Don't lend {owed} anything. Ask me how I know."],
-  grudge:["{grudge} and I had a falling out. Years back. I remember every word.","Don't mention {grudge} to me.","Ask {grudge} about the fence. Go on. Ask {grudge.him}.","I'll forgive {grudge} one day. Not today.","{grudge} knows what {grudge.he} did."]},
+  spouse:["If you see my {spouse.mate} {spouse}, tell {spouse.him} supper's on.","My {spouse.mate} {spouse} snores. Don't tell {spouse.him} I said so.","[keep]Married {spouse} in the chapel up at the keep. Best day.","{spouse} and I have been married longer than I can count. {spouse.He} can count. {spouse.He} reminds me.","My {spouse.mate} {spouse} is {spouse.role}, so I end up doing half {spouse.his} job as well.","I'd be lost without my {spouse.mate} {spouse}. Don't tell {spouse.him}. {spouse.He}'d never let it go.","My {spouse.mate} {spouse} thinks I don't notice the little things. I notice. I just don't say.","We argue, {spouse} and I. Then we have supper. That's a marriage."],
+  sibling:["{sibling} is my {sibling.sib}. We don't look alike. Thank goodness.","My {sibling.sib} {sibling} and I used to race to the lake every morning.","If my {sibling.sib} {sibling} says I started it, I didn't.","My {sibling.sib} {sibling} got the brains. I got the looks. Ask anyone. Don't ask {sibling}.","My {sibling.sib}'s {sibling.role} now. Proud of {sibling.him}. Quietly.","My {sibling.sib} {sibling} and I grew up under one roof. That's where the likeness ends.","We fought every day as children, my {sibling.sib} {sibling} and I. Now it's every other day."],
+  parent:["My {parent.par}, {parent}, taught me everything I know. Most of it, anyway.","[adult]My {parent.par} {parent} still calls me in for supper. I'm grown!","Don't tell my {parent.par} you saw me resting.","My {parent.par} {parent} says I'll do well. {parent.He} also says I'll catch cold. Both, probably.","[young]My {parent.par}'s {parent.role}. One day I'll be... something. We'll see.","Have you met my {parent.par}? {parent}. You can't miss {parent.him}."],
+  child:["My {child.kid}, {child}. Grown so fast.","Have you met {child}? My {child.kid}. Good worker. Don't tell {child.him} I said so.","[old]I taught my {child.kid} {child} everything. {child.He} forgot half of it.","If you see my {child.kid} {child}, tell {child.him} to eat something.","My {child.kid} {child} is {child.role} now. I worry. Every day, I worry.","My {child.kid} {child} thinks I don't know things. I know things."],
+  friend:["{friend} and I are old friends. We go back years.","If you see my friend {friend}, say I said hello.","{friend} is the best friend anyone could have. Don't tell {friend.him} that.","My friend {friend} and I sit up late some nights, talking about nothing. Best kind of talk.","You've met my friend {friend}? Then you've met the best of {valley}.","My friend {friend} would do anything for me. I'd do most things for {friend.him}.","When I'm low, my friend {friend} turns up. Every time. Don't know how {friend.he} knows."],
+  rival:["{rival} thinks {rival.he}'s better at everything. {rival.He} isn't.","Did {rival} say something about me? We don't get on. Ignore it.","{rival} and I don't talk. Well. We argue. That's talking.","Whatever {rival} told you, the opposite is true.","{rival} and I have been at it for years. Neither of us remembers why.","One day I'll beat {rival} at something. Anything.","{rival} and I don't get on. But {rival.he}'s not so bad. Don't repeat that."],
+  sweetheart:["Have you seen {sweetheart} today? No reason. No reason at all.","{sweetheart}? We're just friends. Mostly. Why are you smiling?","Walking out with {sweetheart} after supper. Don't tell anyone.","Does {sweetheart} ever mention me? Just wondering.","If you see {sweetheart}, say... no. Don't say anything.","{sweetheart} has the best laugh in {valley}. Don't tell {sweetheart.him} I said."],
+  owes:["I owe {owes} a favour. {owes.He} won't let me forget it.","Still owe {owes} for that business last winter.","{owes} helped me out once. I owe {owes.him}. I'll pay it back one day.","I owe {owes} a favour. If {owes.he} asks, I'm working on it."],
+  owed:["{owed} owes me a favour. I'll collect one day.","{owed} still owes me a favour. {owed.He} knows.","I helped {owed} out once. {owed.He} hasn't forgotten. Neither have I.","Don't lend {owed} anything. {owed.He} still owes me. Ask me how I know."],
+  grudge:["{grudge} and I had a falling out. Years back. I remember every word.","Don't mention {grudge} to me. We had a falling out.","{grudge} and I fell out last winter. Ask {grudge.him} about it. Watch {grudge.him} go red.","I'll forgive {grudge} one day. Not today.","{grudge} and I don't speak. {grudge.He} knows what {grudge.he} did."]},
  // caught in the middle of something: 1 looking out, 2 leaning, 3 checking a door, 4 asleep, 5 at work
  pose:{
-  1:["Nothing on the road. Nothing on the lake. Good.","Thought I saw smoke. Just the mist.","You can see three valleys from here on a clear day.","Just looking. That's half the job.","Shh. I'm watching something. No, it's gone."],
-  2:["[old]These old knees and this old stick. We get by.","[notold]A gatekeeper needs a stick. It's the law. Probably.","Just resting my eyes. On the road.","Lean on a staff long enough, it leans back.","Leaning on the crook. Watching grass grow. Watching sheep eat it.","Good crook, this. Older than me."],
-  3:["Just checking the latch. Old habit.","Sticks in the damp, this one.","Locked? No. Just making sure it shuts."],
+  1:["Nothing on the road. Nothing on the lake. Good.","Thought I saw smoke out there. It was just the mist.","You can see three valleys from here on a clear day.","Just looking. That's half the job.","Shh. I'm watching something. No, it's gone."],
+  2:["[old]These old knees and this old stick. We get by.","[notold]A gatekeeper needs a stick. It's the law. Probably.","Just resting my eyes. I'm still watching the road.","Lean on a staff long enough and it starts leaning on you.","Leaning on the crook. Watching grass grow. Watching sheep eat it.","Good crook, this. Older than me."],
+  3:["Just checking the latch. Old habit.","This latch sticks in the damp.","Locked? No. Just making sure it shuts."],
   4:["Mmm... five more minutes...","...not my watch... {guard1}'s watch...","[ruins]...the old stones... hmm...","Mmm... the hens... seven...","...left the gate open... no I didn't...","...forty-one... forty-two... sheep...","...timber... mmm...","...the big one... hmm...","...two skies..."],
-  5:["Mind your feet.","Can't stop. If I stop, I won't start again.","Hoe in, pull back, step. All day.","Weeds grow faster than wheat. Always have.","Thock. Thock. That's the sound of winter coming.","Split with the grain. Always with the grain.","Shh.","[fish]Patience. The lake has plenty.","Not you. I was talking to the fish."]},
+  5:["Mind your feet, I'm working here.","[aloof]Can't stop to talk. If I stop, I won't start again.","Hoe in, pull back, step. All day.","Weeds grow faster than wheat. Always have.","Thock. Thock. That's the sound of winter coming.","Split with the grain. Always with the grain.","Shh.","[fish]Patience. The lake has plenty.","Not you. I was talking to the fish."]},
  // which pose lines suit which role (by index into TALK.pose[n])
 };
 // pose 4 (asleep) and 5 (work) lines belong to whoever sleeps or works that way
@@ -2351,34 +2354,170 @@ const POSEWHO={4:{guard2:[0,1,2],farmer:[0,3,4],shepherd:[0,5],woodcutter:[0,6],
 // more of the same, kept apart so the lists above stay readable
 const TALKX={
  guard1:{a:["I saw a light on the lake once, at night. >> Moving slow, out on the water. >> Turned out to be {hermit}'s lantern. Still gave me a fright.","Night's long on the wall. I count the braziers. Two. Every time."]},
- guard2:{a:["{guard1} leaves the wall cold for me every morning. I'm sure of it.","Best part of the day watch: you see everyone come and go.","[young]Some day I'll have the night watch. Some day I won't want it.","When I'm done here I'll walk every road out of {valley}. Maybe."]},
- guard:{a:["First week on the wall, I dropped my spear over the side. >> It's still down there somewhere. >> Don't tell {steward}.","[keep]From the lookout you can see the whole of {valley}. Every roof.","Stone's warm by midday. You learn the good spots.","The wind's different every corner. Northeast corner's the cruel one.","Ask me the time. I'll know it by the shadows on the wall.","They built this wall to keep things out. Mostly it keeps me in."]},
+ guard2:{a:["{guard1} lets the brazier go out before I come on. Every morning. On purpose, I'm sure of it.","Best part of the day watch: you see everyone come and go.","[young]Some day I'll have the night watch. Some day I won't want it.","When I'm done here I'll walk every road out of {valley}. Maybe."]},
+ guard:{a:["First week on the wall, I dropped my spear over the side. >> It's still down there somewhere. >> Don't tell {steward}.","[keep]From the lookout you can see the whole of {valley}. Every roof.","Stone's warm by midday. You learn the good spots.","The wind's different every corner. Northeast corner's the cruel one.","[day]Ask me the time. I'll know it by the shadows on the wall.","They built this wall to keep things out. Mostly it keeps me in."]},
  gatekeeper:{a:["Let me tell you about this arch. >> A cart got stuck in it once. Wheel off, the lot. >> Took four of us all day. Still the best story in {valley}.","Everyone thinks the gate's for keeping people out. It's for knowing who's in.","[old]My eyes aren't what they were. My ears make up for it.","I keep a count of who comes through. In my head. It's a short count.","[keep]Through the arch, past the braziers, and you're in. That's the whole keep, really.","[ruins]Folk walking out to @ruin always come back quieter. Funny, that.","The road's in good shape. I'd know. I've stared at it long enough."]},
- steward:{a:["Do you know what's in the two chests in the round room? >> Candles. >> Mostly candles. I like telling people that.","[farm2]Wool from @farm2, eggs from @farm1, wood from the trees. That's the keep fed and warm.","The kitchen hearth hasn't gone out in years. I'd know. It's my job to know.","Every room in this keep has a list. Every list has a room.","The chapel's the only room nobody tracks mud into. Respect, I suppose.","I sleep in the hall when it's cold. Don't tell anyone.","[hermit]Someone should take {hermit} a blanket for the winter. That someone is usually me.","If something's missing, it's in the round room. Usually."]},
+ steward:{a:["Do you know what's in the two chests in the round room? >> Candles. >> Mostly candles. I like telling people that.","[farm2]Wool from @farm2, eggs from @farm1, wood from the trees. That's the keep fed and warm.","The kitchen hearth hasn't gone out in years. I'd know. It's my job to know.","Every room in this keep has its own list of what's in it. I wrote them all.","The chapel's the only room nobody tracks mud into. Respect, I suppose.","I sleep in the hall when it's cold. Don't tell anyone.","[hermit]Someone should take {hermit} a blanket for the winter. That someone is usually me.","If something's missing, it's in the round room. Usually."]},
  farmer:{a:["Want to know a secret? >> I talk to the wheat. >> It doesn't talk back. That's why I like it.","Fresh eggs most mornings. Ask nicely.","The hen house door sticks. The hens have learned to wait.","[farm2]When {shepherd}'s sheep get out, they come straight for my cabbages. Every time.","A farm's never finished. That's the good news and the bad news.","[keepers]Bread up at the keep is made with my wheat. Tell them that.","Haystack's for the hens and the cold months. And for sitting on, when nobody's looking.","My hoe's older than my hens. Older than me, some days.","Hens go in at dusk. I go in a bit after.","You can tell a lot about a person by how they walk through a field. You walked round it. Good."]},
- shepherd:{a:["[keep]Last spring one of the sheep went missing. >> Found her three days later halfway up the keep's stair. >> Never found out what she wanted up there.","Sheep know the way home. I just go with them.","The cows give milk. The sheep give wool. I give them both a hard time.","Barn's got room for twice this many. Room to grow.","[wolves]If the wolves come close, the cows stand in a ring. Clever things.","I've a name for every sheep. I'll not tell you them. You'd laugh.","Best sound in the world: the flock settling at dusk.","[keep]{gatekeeper} says I smell of sheep. I say {gatekeeper} smells of lantern oil.","[hermit]{hermit} sometimes walks up to watch the flock. Doesn't say anything. Just watches.","Wet wool's the worst smell there is. You get used to it. You don't.","Trough, gate, count, trough. That's a day.","My crook's for leaning, mostly. The sheep don't take orders."]},
+ shepherd:{a:["[keep]Last spring one of the sheep went missing. >> Found her three days later halfway up the keep's stair. >> Never found out what she wanted up there.","Sheep know the way home. I just go with them.","The cows give milk. The sheep give wool. I give them both a hard time.","Barn's got room for twice this many. Room to grow.","[wolves]If the wolves come close, the cows stand in a ring. Clever things.","I've a name for every sheep. I'll not tell you them. You'd laugh.","Best sound in the world: the flock settling at dusk.","[keep]{gatekeeper} says I smell of sheep. I say {gatekeeper} smells of lantern oil.","[hermit]{hermit} sometimes walks up to watch the flock. Doesn't say anything. Just watches.","Wet wool's the worst smell there is. You get used to it. You don't.","Fill the trough, check the gate, count the sheep, fill the trough again. That's my day.","My crook's for leaning, mostly. The sheep don't take orders."]},
  woodcutter:{a:["My first tree, I got the cut wrong. >> It fell on the cabin. The old cabin. >> This is the new cabin.","Every stump out there, I remember the tree.","Wood splits best on a cold morning. Don't ask me why. I just know.","The axe wants sharpening every evening. So do I, some days.","[farm2]{shepherd} wants posts. {farmer} wants kindling. Everybody wants something from these trees.","[keep]{steward} counts every log I send up. I count them too. We never agree.","Quiet in the glade. Just me and the chopping.","I plant two for every one I fell. You'll not see them grow. Your grandchildren might.","[birds]The birds were here first. I just work around them.","The cabin smells of sap and smoke. Best smell there is.","Felling's easy. Knowing which tree to fell. That's the work.","[hermit,fish]{hermit} buys firewood with fish. I've more fish than I can eat."]},
- hermit:{a:["I wasn't always a hermit. >> Used to talk to people all day long. >> This is why I stopped.","You found the hut, then. Not many do.","[fish]Biggest fish I ever caught, I let go. He was older than me.","The water's cold. The fire's warm. That's all a body needs.","Rain on the lake sounds like applause. For nobody.","[keepers]Up at the keep they think I'm strange. I think they're loud.","Sit. Watch. Say nothing. That's fishing, and it's most of living.","[fish]The fish come close at dusk. Curious things.","Dock's level now. Good planks. Good for sitting.","[birds]Birds come down to the water at dusk. They know when it's quiet.","I've a pot, a rod, and a roof. Riches.","[old,keep]I'll be here when the keep's gone. Me or someone just like me.","You can stay. Just don't splash."]},
- any:{a:["[ruins,keep]You'll find @ruin off to the $ruin of the keep. Strange place.","If you're walking on from {valley}, take bread. The roads are long.","The nights are clear in {valley}. Clearer than anywhere, they say.","[farm1]The field at @farm1 goes gold come harvest. Worth seeing.","[wood]The trees to the $wood are the oldest in {valley}.","[hermit]Down by the lake to the $hermit, that's where you'll find {hermit}. If {hermit.he} wants finding.","Everyone in {valley} has a story. Most of them are about sheep.","[keepers,farm1]The keep eats what @farm1 grows. Fair trade, mostly.","My grandmother told me about the year the lake froze. >> Solid, edge to edge. >> She walked right across it. Or so she said.","Ask anyone the way and they'll tell you. Then they'll tell you something else.","[ruins]Nobody remembers who built @ruin. Nobody remembers who forgot.","{valley}'s not on any map I've seen. Suits us.","There's a saying in {valley}: the lake knows. Nobody knows what it knows.","If you've time, walk the whole of {valley}. It doesn't take long. It takes all day.","[deer,wolves]Deer and wolves both in {valley}. They keep each other honest."]},
+ hermit:{a:["I wasn't always a hermit. >> Used to talk to people all day long. >> This is why I stopped.","[first]You found the hut, then. Not many do.","[fish]Biggest fish I ever caught, I let go. He was older than me.","The water's cold. The fire's warm. That's all a body needs.","Rain on the lake sounds like applause. For nobody.","[keepers]Up at the keep they think I'm strange. I think they're loud.","Sit. Watch. Say nothing. That's fishing, and it's most of living.","[fish]The fish come close at dusk. Curious things.","Good planks on this dock. Good for sitting.","[birds]Birds come down to the water at dusk. They know when it's quiet.","I've a pot, a rod, and a roof. Riches.","[old,keep]I'll be here when the keep's gone. Me or someone just like me.","You can stay. Just don't splash."]},
+ any:{a:["[ruins,keep]You'll find @ruin off to the $ruin of the keep. Strange place.","If you're walking on from {valley}, take bread. The roads are long.","The nights are clear in {valley}. Clearer than anywhere, they say.","[farm1]The field at @farm1 goes gold come harvest. Worth seeing.","[wood]The trees to the $wood are the oldest in {valley}.","[hermit]Down by the lake to the $hermit, that's where you'll find {hermit}. If {hermit.he} wants finding.","Everyone in {valley} has a story. Most of them are about sheep.","[keepers,farm1]The keep eats what @farm1 grows. Fair trade, mostly.","My grandmother told me about the year the lake froze. >> Solid, edge to edge. >> She walked right across it. Or so she said.","Ask anyone the way and they'll tell you. Then they'll tell you something else.","[ruins]Nobody remembers who built @ruin. Nobody remembers who forgot.","{valley} isn't on any map I've seen. Suits us.","There's a saying in {valley}: the lake knows. Nobody knows what it knows.","If you've time, walk the whole of {valley}. It doesn't take long. It takes all day.","[deer,wolves]Deer and wolves both in {valley}. They keep each other honest."]},
  rel:{
-  spouse:["{spouse} and I don't agree on much. We agree on each other.","Wouldn't trade {spouse} for the whole keep. Maybe for the kitchen."],
-  sibling:["When we were small, {sibling} and I dug a hole to the other side of {valley}. Got about a foot.","{sibling} still owes me a pie from when we were children. I haven't forgotten."],
-  parent:["{parent} worked harder than anyone I know. Still does.","Everything I do, I hear {parent}'s voice telling me how to do it better."],
-  child:["{child} has my hands and {child.his} own head. Good mix.","I'm proud of {child}. I'd never say it to {child.his} face."],
-  friend:["{friend} and I could sit an hour and not say a word. That's a friend.","Tell {friend} I've not forgotten the thing. {friend.He}'ll know."],
+  spouse:["My {spouse.mate} {spouse} and I don't agree on much. We agree on each other.","[keep]Wouldn't trade my {spouse.mate} {spouse} for the whole keep. Maybe for the kitchen."],
+  sibling:["When we were small, my {sibling.sib} {sibling} and I dug a hole to the other side of {valley}. Got about a foot.","My {sibling.sib} {sibling} still owes me a pie from when we were children. I haven't forgotten."],
+  parent:["My {parent.par} {parent} worked harder than anyone I know. Still does.","Everything I do, I hear my {parent.par}'s voice telling me how to do it better."],
+  child:["My {child.kid} {child} has my hands and {child.his} own head. Good mix.","I'm proud of my {child.kid} {child}. I'd never say it to {child.his} face."],
+  friend:["My friend {friend} and I could sit an hour and not say a word. That's a friend.","Tell my friend {friend} I've not forgotten. {friend.He}'ll know what I mean."],
   rival:["{rival} beat me once. Once. {rival.He} still talks about it.","If {rival} is doing it, I'll do it better. That's how it goes."],
   sweetheart:["Don't look at me like that. {sweetheart} and I are... it's nothing. It's something.","{sweetheart} picked me a flower yesterday. I've still got it. Don't tell."],
   owes:["{owes} pulled me out of the lake once. Long story. I still owe {owes.him}.","One day I'll pay {owes} back. {owes.He}'ll be so surprised."],
-  owed:["I lent {owed} my best boots. That was two winters ago.","{owed}'s good for it. Eventually. Very eventually."],
-  grudge:["Some things you don't forgive. What {grudge} did is one of them.","If {grudge} walks in, I walk out. That's the arrangement."]}
+  owed:["I lent {owed} my best boots. That was two winters ago.","{owed} owes me, but {owed.he}'s good for it. Eventually."],
+  grudge:["Some things you don't forgive. What {grudge} did is one of them.","{grudge} and I fell out years ago. If {grudge.he} walks in, I walk out."]}
 };
+// what people say about the happenings of the last week. [ev_kind] ties a line to the newest happening of that kind;
+// evin / evfirst / evsecond: said by someone it happened to (anyone, the first, the second); otherwise by someone else.
+// {eva} {evb} the people it happened to (with .he .him .his and the rest), {evother} the other one, {evwhen} when,
+// {evnote} what (the size of a fish, sheep or hen), {evkid} girl or boy, {evname} the baby's name.
+const TALKE={
+ farmer:["[ev_market,evin]Market day {evwhen} up at the keep. Sold every egg I had.","[ev_market,evin]Took cabbages to market {evwhen}. Came home with a new hoe and no cabbages.",
+  "[ev_harvest,evin]We started bringing the wheat in {evwhen}. My back knows it.","[ev_harvest,evin]Harvest started {evwhen}. Every pair of hands is welcome. Even yours.",
+  "[ev_hentaken,evin]A wolf got into the hen run {evwhen}. Took a hen and left the feathers.","[ev_hentaken,evin]Lost a hen to the wolves {evwhen}. I've counted the rest twice since.",
+  "[ev_storm]The storm {evwhen} had the hens in a state. Not an egg in the morning."],
+ shepherd:["[ev_market,evin]Took wool up to market {evwhen}. Sold the lot.","[ev_market,evin]Market day {evwhen}. The sheep stayed home. I did not.",
+  "[ev_sheeptaken,evin]A wolf took one of my sheep {evwhen}. Right out of the pen.","[ev_sheeptaken,evin]Lost a sheep to the wolves {evwhen}. I'll be sleeping with one eye open.",
+  "[ev_storm]The storm {evwhen} had the flock bunched up in a corner till dawn."],
+ steward:["[ev_festival,evin]The festival {evwhen} took me a week to plan and one night to undo.","[ev_festival,evin]Still clearing up after the festival {evwhen}. Lanterns everywhere.",
+  "[ev_market,keep]Market day {evwhen}. The courtyard's still full of straw.","[ev_wedding,keep]I set the chapel for the wedding {evwhen}. {eva} and {evb}. Not a candle out of place."],
+ hermit:["[ev_bigfish,evin]Caught a big one {evwhen}. {evnote}. Let him go.","[ev_bigfish,evin]That fish {evwhen}. {evnote}. Fought me half the morning.",
+  "[ev_bigger,evsecond]{eva} says {eva.he} caught a bigger fish than mine {evwhen}. {eva.He} didn't.","[ev_bigger,evsecond]A bigger fish than mine? {eva}? I'll believe it when I see it."],
+ guard:["[ev_sheeptaken]Saw the wolves go for {eva}'s pen {evwhen}, in the dark. Too far off to do a thing.","[ev_storm,keep]The storm {evwhen} near blew me off the wall."],
+ gatekeeper:["[ev_market,keep]Market day {evwhen}. Half the valley came through my gate.","[ev_lost]{eva} came through the gate {evwhen} asking after a lost {evnote}. {evb} found it."],
+ any:[
+  "[ev_market,keep]It was market day in the courtyard {evwhen}. You missed it.","[ev_market]{eva} had the best stall at market {evwhen}. Eggs gone by noon.",
+  "[ev_wedding,evin]{evother} and I were wed {evwhen}. I'm still smiling.","[ev_wedding,evin]Married {evwhen}. It hasn't sunk in yet.",
+  "[ev_wedding]{eva} and {evb} were wed {evwhen}. Lovely do.","[ev_wedding,keep]Did you hear? A wedding in the chapel {evwhen}. {eva} and {evb}.",
+  "[ev_wedding]I cried at {eva} and {evb}'s wedding {evwhen}. Don't tell anyone.","[ev_wedding]{eva} and {evb} finally wed {evwhen}. Took them long enough.",
+  "[ev_baby,evin]We had a little {evkid} {evwhen}. {evname}. I haven't slept since.","[ev_baby,evin]Our little {evkid} {evname} came home {evwhen}. Loudest thing in {valley}.",
+  "[ev_baby]{eva} and {evb} had a baby {evkid} {evwhen}. They've called the baby {evname}.","[ev_baby]A new baby in {valley}! {eva} and {evb}'s {evkid}, arrived {evwhen}.",
+  "[ev_baby,gossip]I've seen the baby. {evname}. Already as loud as {eva}.","[ev_baby]If you hear crying in the night, that's {evname}. {eva} and {evb}'s new {evkid}.",
+  "[ev_quarrel,evin]{evother} and I had words {evwhen}. I was right, for the record.","[ev_quarrel,evin]{evother} and I had a falling out {evwhen}. We're still not speaking.",
+  "[ev_quarrel]{eva} and {evb} had a shouting match {evwhen}. Half the valley heard it.","[ev_quarrel,gossip]You didn't hear it from me, but {eva} and {evb} fell out {evwhen}.",
+  "[ev_quarrel]{eva} and {evb} were at it again {evwhen}. Over nothing, as usual.",
+  "[ev_harvest]{eva} started the harvest at @farm1 {evwhen}.","[ev_harvest,keepers]The keep will eat well this winter. {eva} started bringing the wheat in {evwhen}.",
+  "[ev_festival,keep]There was a festival at the keep {evwhen}. Lanterns everywhere. My feet still hurt from dancing.","[ev_festival,keep]You missed the festival {evwhen}. {eva} ran it. Music till late.",
+  "[ev_festival,keep]Best festival in years, {evwhen}. Ask anyone.","[ev_festival,keep,gossip]At the festival {evwhen}, {eva} danced. {eva.He} never dances.",
+  "[ev_storm]That storm {evwhen}. I thought the roof would go.","[ev_storm]Did the storm {evwhen} wake you? Thunder like I've never heard.",
+  "[ev_storm,farm1]The storm {evwhen} flattened a row of {farmer}'s wheat.","[ev_storm,keep]The storm {evwhen} blew one of the banners clean off the wall.",
+  "[ev_storm,hermit]{hermit} says the lake was white with waves in the storm {evwhen}.",
+  "[ev_lost,evfirst]One of my {evnotes} went missing {evwhen}. {evother} found it, thank goodness.","[ev_lost,evsecond]Found one of {eva}'s {evnotes} wandering about {evwhen}. Walked it all the way home.",
+  "[ev_lost]{eva} lost a {evnote} {evwhen}. {evb} found it. Happy ending.","[ev_lost]Half of {valley} was out looking for {eva}'s {evnote} {evwhen}.",
+  "[ev_bigfish]{eva} landed a fish {evnote} {evwhen}. Or so {eva.he} says.","[ev_bigfish]Have you heard about {eva}'s fish? {evnote}, {evwhen}.",
+  "[ev_bigger,evfirst]{evb} thinks {evb.he} caught the big one. Mine {evwhen} was bigger. {evnote}.","[ev_bigger,evfirst]Caught a fish {evwhen} that beats {evb}'s. {evnote}. {evb.He}'s sulking.",
+  "[ev_bigger]{eva} swears {eva.he} caught a bigger fish than {evb} {evwhen}. Nobody believes {eva.him}.","[ev_bigger,gossip]{eva} and {evb} are arguing about fish again. Since {evwhen}.",
+  "[ev_sheeptaken]Wolves got one of {eva}'s sheep {evwhen}. Poor {eva}.","[ev_sheeptaken,keep]{eva} came up to the keep {evwhen}. A wolf had one of the sheep in the night.",
+  "[ev_sheeptaken,worrier]Wolves took a sheep {evwhen}. What next? That's what I want to know.",
+  "[ev_hentaken]A wolf took one of {eva}'s hens {evwhen}.","[ev_hentaken,gossip]{eva} lost a hen to the wolves {evwhen}. Says it was the speckled one.",
+  "[ev_hentaken]Feathers all over {eva}'s hen run {evwhen}. A wolf, they say."]};
+// ---------------- happenings (v0.23): a valley's calendar, and things that really happen in it ----------------
+// eventsForDay(seed, day) is the seed's alone (it reads the cast, never the ground or the dials), so a valley's past is
+// the same for everyone and can be worked out for any day. Live happenings from the running world (a wolf taking a sheep
+// or a hen, the hermit landing a big fish) are logged as they happen. People talk about the last week, newest first,
+// and only about happenings whose people are actually in this valley.
+// day: whole valley-days from your arrival (0 = the day you arrived; negative = before you came)
+const EVKINDS=['market','wedding','baby','quarrel','harvest','festival','storm','lost_animal','big_fish','bigger_fish','sheep_taken','hen_taken'];
+const EVTAG={market:'market',wedding:'wedding',baby:'baby',quarrel:'quarrel',harvest:'harvest',festival:'festival',storm:'storm',
+  lost_animal:'lost',big_fish:'bigfish',bigger_fish:'bigger',sheep_taken:'sheeptaken',hen_taken:'hentaken'};
+const FISHSIZE=['as long as my forearm','as long as an arm','as heavy as a full bucket','the size of a small dog','as long as a fence rail'];   // smallest to biggest
+const CASTCACHE={};
+function castFor(seed){ if(!CASTCACHE[seed]){ const k=Object.keys(CASTCACHE); if(k.length>40) delete CASTCACHE[k[0]]; CASTCACHE[seed]=castValley(seed); } return CASTCACHE[seed]; }
+function pairOf(cast,kind){ for(const c of cast) for(const q of c.rel) if(q.kind===kind&&q.to>c.id) return [c.id,q.to]; return null; }
+// the one day the valley's sweethearts marry, and the one day a couple has a baby (null when there is no such pair)
+function weddingDay(seed){ const p=pairOf(castFor(seed),'sweetheart'); if(!p) return null; const r=seedRng(seed,0x0E7F); return {day:-10+((r()*40)|0), who:p}; }
+function babyDay(seed){ const C=castFor(seed); let p=null;
+  for(const c of C) for(const q of c.rel) if(q.kind==='spouse'&&q.to>c.id&&c.age!=='old'&&C[q.to].age!=='old'){ p=[c.id,q.to]; break; }
+  if(!p) return null; const r=seedRng(seed,0x0E80), pool=r()<0.5?NAMES_F:NAMES_M, used=new Set(C.map(function(c){ return c.given; }));
+  let name=pool[(r()*pool.length)|0]; for(let k=0;k<20&&used.has(name);k++) name=pool[(r()*pool.length)|0];
+  return {day:-12+((r()*50)|0), who:p, kid:pool===NAMES_F?'girl':'boy', name:name}; }
+// the day's own happenings, and the random draw left over for the day after's bigger-fish claim
+function evBase(seed,day){
+  const C=castFor(seed), r=seedRng(((seed>>>0)^Math.imul(day+100003,0x2C1B3C6D))>>>0,0x0E7E), out=[];
+  const add=function(e){ if(out.length<2){ e.day=day; out.push(e); } };
+  const s7=(seed>>>0)%7, d7=((day%7)+7)%7, d30=((day%30)+30)%30, b30=(seed>>>3)%30;
+  if(d7===s7) add({kind:'market', who:[4,5], where:'keep', hour:9});
+  const wd=weddingDay(seed); if(wd&&wd.day===day) add({kind:'wedding', who:wd.who, where:'keep', hour:14});
+  const bd=babyDay(seed); if(bd&&bd.day===day) add({kind:'baby', who:bd.who, where:'', hour:4, kid:bd.kid, name:bd.name});
+  if(d30===b30) add({kind:'festival', who:[3], where:'keep', hour:18});
+  if(d30===(b30+11)%30) add({kind:'harvest', who:[4], where:'farm1', hour:8});
+  const x=r(), y=r(), z=r(), w=r();
+  if(x<0.07){ let p=pairOf(C,'rival')||pairOf(C,'grudge')||[4,5]; add({kind:'quarrel', who:p, where:'', hour:10+((y*8)|0)}); }
+  if(z<0.05) add({kind:'storm', who:[], where:'', hour:((w*5)|0)});   // storms come in the small hours
+  if(w<0.06){ const sheep=y<0.5, owner=sheep?5:4, finders=[0,1,2,3,6,7,4,5].filter(function(i){ return i!==owner; }), f=finders[(x*finders.length*13|0)%finders.length];
+    add({kind:'lost_animal', who:[owner,f], where:sheep?'farm2':'farm1', hour:7+((z*10)|0), note:sheep?'sheep':'hen'}); }
+  if(y>0.95) add({kind:'big_fish', who:[7], where:'hermit', hour:6, note:FISHSIZE[(z*(FISHSIZE.length-1))|0]});
+  return {out:out, r:r, add:add, C:C}; }
+function eventsForDay(seed,day){ const b=evBase(seed,day), r=b.r, C=b.C;
+  // a rival or a friend of the hermit claims a bigger one the day after a big catch that really happened
+  const big=evBase(seed,day-1).out.filter(function(e){ return e.kind==='big_fish'; })[0];
+  if(big&&r()<0.6){ let cl=-1; for(const q of C[7].rel) if(q.kind==='rival'||q.kind==='friend'){ cl=q.to; break; } if(cl<0) cl=6;
+    const i0=FISHSIZE.indexOf(big.note), i=i0+1+((r()*(FISHSIZE.length-1-i0))|0);
+    b.add({kind:'bigger_fish', who:[cl,7], where:'hermit', hour:16, note:FISHSIZE[Math.min(FISHSIZE.length-1,i)]}); }
+  return b.out; }
+// the valley's own day count, from your arrival (A7 will tie this to real days)
+function valleyDay(){ return W.vday|0; }
+function logEvent(kind,who,where,note){ W.live.push({day:valleyDay(), hour:DAY.tod, kind:kind, who:who||[], where:where||'', note:note||'', live:true});
+  if(W.live.length>30) W.live.shift(); eventsRefresh(); }
+// the last week, newest first; today's only once they have happened
+function eventsRefresh(){ const d0=valleyDay(), o=[];
+  for(let d=d0;d>=d0-6;d--){ const L=W.live.filter(function(e){ return e.day===d; }).concat(eventsForDay(W.seed,d));
+    L.sort(function(a,b){ return b.hour-a.hour; }); for(const e of L) if(d<d0||e.hour<=DAY.tod) o.push(e); }
+  W.events=o; W.evTod=DAY.tod; }
+// a new valley-day: the flocks are made whole again, and the week moves on
+function dayTick(){ const t=DAY.tod;
+  if(W.lastTod!=null&&t<W.lastTod-12){ W.vday=(W.vday|0)+1; restock(); eventsRefresh(); }
+  else if(W.events&&Math.floor(t)!==Math.floor(W.evTod||0)) eventsRefresh();   // today's happenings come in as their hour passes
+  W.lastTod=t; }
+function restock(){ for(const p of W.places) for(const s of p.stock){ const pen=W.pens[s.pen]; if(!pen) continue; let n=0;
+    for(let c=0;c<CR_.n;c++) if(CR_.al[c]&&CR_.sp[c]===s.sp&&(CR_.ax[c]|0)===s.pen) n++;
+    for(let k=n;k<s.n&&CR_.n<CMAX;k++){ let x=0,y=0,ok=false;
+      for(let a=0;a<40&&!ok;a++){ x=pen.x0+0.4+Math.random()*(pen.x1-pen.x0-0.8); y=pen.y0+0.4+Math.random()*(pen.y1-pen.y0-0.8); ok=W.st[(y|0)*N+(x|0)]===0; }
+      if(!ok) continue; const c=addCreature(s.sp,x,y,s.pen,0,1,-1); CR_.z[c]=groundAt(x,y); CR_.ph[c]=1; CR_.tm[c]=Math.random()*5; CR_.vx[c]=Math.random()<0.5?1:-1; } } }
+// a wolf may take a sheep or a hen at night, while its keeper sleeps, and never more than half the flock
+function nightOf(){ return DAY.tod>=12?valleyDay():valleyDay()-1; }   // a night belongs to the day it began on
+function keeperAbed(p){ for(let c=0;c<CR_.n;c++) if(CR_.al[c]&&CR_.sp[c]===SP.KEEPER&&(CR_.ay[c]|0)===p.who&&CR_.ax[c]>=100) return CR_.st[c]===2; return folkSleeps(p); }
+function stockTakeable(t){ const pen=CR_.ax[t]|0, sp=CR_.sp[t];
+  if(W.taken&&W.taken[pen]===nightOf()) return false;              // one a night from any pen, at most
+  for(const p of W.places) for(const s of p.stock) if(s.pen===pen&&s.sp===sp){ if(!folkSleeps(p)||!keeperAbed(p)) return false; let n=0;
+    for(let c=0;c<CR_.n;c++) if(CR_.al[c]&&CR_.sp[c]===sp&&(CR_.ax[c]|0)===pen) n++;
+    return n-1>=Math.ceil(s.n/2); }
+  return false; }
+function stockOwner(t){ const pen=CR_.ax[t]|0; for(const p of W.places) for(const s of p.stock) if(s.pen===pen) return p; return null; }
+// the sweethearts' wedding turns them into a married couple from that day on
+function wedNow(id){ const wd=weddingDay(W.seed), d=valleyDay(); if(!wd||d<wd.day||(d===wd.day&&DAY.tod<14)) return -1; return wd.who[0]===id?wd.who[1]:(wd.who[1]===id?wd.who[0]:-1); }
+// which happening a line is about: the newest one of its kind this person may speak of
+function evBind(e,id,here){ const kind=e.evkind; if(!W.events) eventsRefresh();
+  for(const ev of W.events){ if(EVTAG[ev.kind]!==kind) continue;
+    let ok=true; for(const w of ev.who) if(!here[w]||!castOf(w)) ok=false; if(!ok) continue;
+    const at=ev.who.indexOf(id);
+    if(e.evrole==='in'&&at<0) continue; if(e.evrole==='first'&&at!==0) continue; if(e.evrole==='second'&&at!==1) continue; if(!e.evrole&&at>=0) continue;
+    if(ev.where&&ev.where!=='keep'&&!folkHere(ev.where)) continue; if(ev.where==='keep'&&!W.keepBuilt) continue;
+    return ev; }
+  return null; }
+// the small hours belong to the night before: at 1 am on day 3 it was the night of day 2
+// a key for one happening, so hearing about last week's market doesn't make this week's old news
+function evKey(ev){ return ev.day+':'+ev.hour+':'+ev.kind; }
+function evWhen(ev){ const d=valleyDay()-ev.day;
+  if(ev.hour<5){ if(d<=0) return DAY.tod<5?'earlier tonight':'last night'; if(d===1) return 'the night before last'; }
+  else if(d<=0) return ev.hour<11?'this morning':(ev.hour<17?'earlier today':'this evening');
+  else if(d===1) return ev.hour>=18?'last night':'yesterday';
+  return ['','','two days back','three days back','four days back','five days back','six days back'][d]||'a week back'; }
 // ---------------- the talk engine (v0.22): a short chat card, true lines only, new ones first ----------------
 // LINES is built once from TALK. A visit is one opening of the card: 3 to 5 lines, never the same line twice in a
 // visit, and lines already heard from this person in this valley only come back once every unheard one is used up.
 const LINES=[];
 function lineHash(t){ let h=0x811c9dc5; for(let i=0;i<t.length;i++){ h^=t.charCodeAt(i); h=Math.imul(h,0x01000193); } return 'L'+(h>>>0).toString(36); }
 (function(){
-  const add=function(who,part,pose,text,extra){ const ch=text.split(' >> '); const e={id:lineHash(who+'|'+text), who:who, part:part, pose:pose, text:ch[0], chain:ch.slice(1), check:ch.join(' ')};
+  const add=function(who,part,pose,text,extra){ const ch=text.split(' >> '), tg=(/^\[([\w,]+)\]/.exec(text)||['',''])[1].split(','); const e={id:lineHash(who+'|'+text), who:who, part:part, pose:pose, text:ch[0], chain:ch.slice(1), check:ch.join(' '), first:tg.indexOf('first')>=0, last:tg.indexOf('last')>=0};
     if(extra) for(const k in extra) e[k]=extra[k]; LINES.push(e); };
   for(const T of [TALK,TALKX]) for(const who in T){ if(who==='trait'||who==='rel'||who==='pose') continue;
     for(const pt in T[who]) for(const t of T[who][pt]) add(who,pt==='a'?-1:+pt,0,t); }
@@ -2386,6 +2525,7 @@ function lineHash(t){ let h=0x811c9dc5; for(let i=0;i<t.length;i++){ h^=t.charCo
     add('any',-1,0,m?'['+tr+','+m[1]+']'+t.slice(m[0].length):'['+tr+']'+t,{trait:tr}); }
   for(const T of [TALK,TALKX]) for(const k in T.rel) for(const t of T.rel[k]) add('any',-1,0,t,{rel:k});
   for(const ps in POSEWHO) for(const who in POSEWHO[ps]) for(const ix of POSEWHO[ps][who]) add(who,-1,+ps,TALK.pose[ps][ix]);
+  for(const who in TALKE) for(const t of TALKE[who]) add(who,-1,0,t);
 })();
 const GREETN=["","","","","","","",""];   // "name, the role", filled from the cast when a valley grows
 let greetHook=null, chatHook=null; const GREETT=[-1e9,-1e9,-1e9,-1e9,-1e9,-1e9,-1e9,-1e9], GLAST=["","","","","","","",""];
@@ -2401,15 +2541,21 @@ function peopleHere(){ const h=new Uint8Array(16), life={}; for(const k in LIFEK
   h.life=life; return h; }
 const ALLHERE=new Uint8Array(16).fill(1);
 function castOf(id){ return (W.cast&&id>=0)?W.cast[id]:null; }
-function relOf(id,kind,here){ const c=castOf(id); if(!c) return -1; for(const q of c.rel) if(q.kind===kind&&here[q.to]) return q.to; return -1; }
+function relOf(id,kind,here){ const c=castOf(id); if(!c) return -1;
+  if(kind==='spouse'||kind==='sweetheart'){ const w=wedNow(id); if(w>=0) return (kind==='spouse'&&here[w])?w:-1; } for(const q of c.rel) if(q.kind===kind&&here[q.to]) return q.to; return -1; }
 // a slot's person (-1: not here, -2: not a person slot)
-function slotWho(id,key,here){ const r=ROLEKEY.indexOf(key); if(r>=0) return (here[r]&&castOf(r))?r:-1;
+let LINE_EV=null;   // the happening the line being checked or filled is about
+const EVSLOT={evwhen:1,evnote:1,evnotes:1,evkid:1,evname:1};
+function evPerson(id,key){ const e=LINE_EV; if(!e) return -1; if(key==='eva') return e.who[0]; if(key==='evb') return e.who[1]; if(key==='evother') return e.who[0]===id?e.who[1]:e.who[0]; return -1; }
+function slotWho(id,key,here){ if(key==='eva'||key==='evb'||key==='evother'){ const w=evPerson(id,key); return (w!=null&&w>=0&&here[w]&&castOf(w))?w:-1; }
+  if(EVSLOT[key]) return LINE_EV?-3:-1;
+  const r=ROLEKEY.indexOf(key); if(r>=0) return (here[r]&&castOf(r))?r:-1;
   if(key==='me') return castOf(id)?id:-1; if(RELREV[key]) return relOf(id,key,here); return -2; }
 function placeHere(k){ return k==='ruin'?W.ruins.length>0:!!folkHere(k); }
 function placeName(k){ if(k==='ruin') return W.ruins.length?W.ruins[0].name:'the old stones'; const p=folkHere(k); return p?p.name:'the woods'; }
 function placeDir(k){ if(k!=='ruin') return dirWord(k); const r=W.ruins[0]; if(!r) return 'woods';
   const a=Math.atan2(r.y-FORT.y,r.x-FORT.x)*180/Math.PI, q=Math.round(((a+360)%360)/45)%8;
-  return ['east','south-east','south','south-west','west','north-west','north','north-east'][q]; }
+  return ['east','southeast','south','southwest','west','northwest','north','northeast'][q]; }
 const OWNPLACE={4:'farm1',5:'farm2',6:'wood',7:'hermit'};
 // who: the list the line comes from. Lines everyone shares never name the speaker's own home as if it were someone
 // else's, and only keepers (who stand at the keep) give bare directions, which are measured from the keep.
@@ -2420,6 +2566,10 @@ function lineOk(id,l,here,who){ const m=TAG_RE.exec(l), c=castOf(id);
     if(t==='keep'){ if(!W.keepBuilt) return false; }
     else if(t==='keepers'){ if(!W.keepBuilt||!(here[0]||here[1]||here[2]||here[3])) return false; }
     else if(t==='nothermit'){ if(id===7) return false; }
+    else if(t==='first'||t==='last'||t==='leaving'){ }
+    else if(t.indexOf('ev_')===0||t==='evin'||t==='evfirst'||t==='evsecond'){ if(!LINE_EV) return false; }
+    else if(t==='invite'){ if(id===7) return false; }   // the hermit came here to be alone
+    else if(t==='aloof'){ if(c&&(c.traits.indexOf('cheerful')>=0||c.traits.indexOf('kind')>=0||c.traits.indexOf('gossip')>=0)) return false; }
     else if(t==='ruins'){ if(!W.ruins.length) return false; }
     else if(t==='asleep2'){ if(!guard2Asleep()) return false; }
     else if(t==='day'){ if(dayPart()===3||DAY.k<0.5) return false; }   // daylight, not just the clock
@@ -2432,19 +2582,22 @@ function lineOk(id,l,here,who){ const m=TAG_RE.exec(l), c=castOf(id);
     else if(TRAITS.indexOf(t)>=0){ if(!c||c.traits.indexOf(t)<0) return false; }
     else return false; }   // an unknown tag is never said (a typo shows up in the tests, not on screen)
   let ok=true; SLOT_RE.lastIndex=0;
-  l.replace(SLOT_RE,function(_,k){ if(k==='valley') return ''; const w=slotWho(id,k,here); if(w<0||(w===id&&k!=='me')) ok=false; return ''; });   // nobody talks about themselves by role
+  l.replace(SLOT_RE,function(_,k){ if(k==='valley') return ''; const w=slotWho(id,k,here); if(w===-3) return ''; if(w<0||(w===id&&k!=='me'&&k!=='eva'&&k!=='evb')) ok=false; return ''; });   // nobody talks about themselves by role
   if(ok) l.replace(PLACE_RE,function(_,s,k){ if(!placeHere(k)) ok=false; return ''; });
   return ok; }
 function roleName(c){ return c.id===0?'the night guard':(c.id===1?'the day guard':'the '+c.role); }
 function pform(c,f){ const he=c.pr==='he';
   switch(f){ case 'he': return he?'he':'she'; case 'He': return he?'He':'She'; case 'him': return he?'him':'her'; case 'his': return he?'his':'her';
     case 'His': return he?'His':'Her'; case 'role': return roleName(c); case 'full': return c.name+' '+c.by;
-    case 'sib': return he?'brother':'sister'; case 'par': return he?'father':'mother'; case 'kid': return he?'son':'daughter'; }
+    case 'sib': return he?'brother':'sister'; case 'mate': return he?'husband':'wife'; case 'par': return he?'father':'mother'; case 'kid': return he?'son':'daughter'; }
   return c.name; }
 function fillLine(id,l,here){ here=here||ALLHERE;
   l=l.replace(TAG_RE,'');
-  l=l.replace(SLOT_RE,function(_,k,f){ if(k==='valley') return W.valley||'the valley'; const c=castOf(slotWho(id,k,here)); return c?(f?pform(c,f):c.name):'someone'; });
+  l=l.replace(SLOT_RE,function(_,k,f){ if(k==='valley') return W.valley||'the valley';
+    if(LINE_EV&&EVSLOT[k]){ const e=LINE_EV; if(k==='evwhen') return evWhen(e); if(k==='evkid') return e.kid||'baby'; if(k==='evname') return e.name||'';
+      if(k==='evnote') return e.note||''; if(k==='evnotes') return e.note==='sheep'?'sheep':(e.note||'')+'s'; } const c=castOf(slotWho(id,k,here)); return c?(f?pform(c,f):c.name):'someone'; });
   l=l.replace(PLACE_RE,function(_,s,k){ return s==='$'?placeDir(k):placeName(k); });
+  l=l.replace(/(^|[^.])([.!?] )([a-z])/g,function(_,z,a,b){ return z+a+b.toUpperCase(); });   // a filled-in phrase that starts a sentence
   return l.charAt(0).toUpperCase()+l.slice(1); }
 // which lists a person draws from
 function whoOk(id,who){ const k=ROLEKEY[id]; return who===k||who==='any'||(who==='guard'&&id<2)||(who==='keep'&&id<4)||(who==='folk'&&id>=4); }
@@ -2453,28 +2606,67 @@ const HEARD={}, VISITS={}; let heardN=0;
 function heardKey(id){ return W.seed+':'+id; }
 function heardAdd(key,lid){ const m=HEARD[key]||(HEARD[key]=new Map()); m.delete(lid); m.set(lid,++heardN); }
 // the lines for one visit: up to n (3 to 5), the first suited to the moment, the rest new ones first, stories kept in order
+// what a line is about, so one visit never says the same kind of thing twice
+const TOPICS={ruin:/@ruin|old stones|old places/i, supper:/supper/i, bed:/\bbunk\b|\bbed\b|bedtime/i, woodpile:/woodpile|eaves/i,
+  doors:/\bdoors?\b|\blatch\b/i, view:/\bview\b|lookout|whole valley|whole of|from up here|from here|from the wall/i, watch:/night watch|day watch/i,
+  stars:/\bstars?\b/i, wolves:/\bwol(f|ves)\b/i, deer:/\bdeer\b/i, fish:/\bfish/i, hens:/\bhens?\b/i, eggs:/\beggs?\b/i, smoke:/\bsmoke\b/i};
+// stance: a visit is welcoming or keeps you at arm's length or is on its way out, never two of those at once
+const STANCES=['invite','aloof','leaving'];
+(function(){ for(const e of LINES){ const tg=(/^\[([\w,]+)\]/.exec(e.text)||['',''])[1].split(',');
+  e.topics=[]; for(const k in TOPICS) if(TOPICS[k].test(e.check)) e.topics.push(k);
+  e.stance=STANCES.filter(function(t){ return tg.indexOf(t)>=0; })[0]||'';
+  const ek=tg.filter(function(t){ return t.indexOf('ev_')===0; })[0]; e.evkind=ek?ek.slice(3):'';
+  e.evrole=tg.indexOf('evin')>=0?'in':(tg.indexOf('evfirst')>=0?'first':(tg.indexOf('evsecond')>=0?'second':''));
+  // where it sits in a visit: their own world first, then places and people round about, then talk, then their nature, then their own people
+  e.cat=e.who!=='any'?1:(e.rel?5:(e.trait?4:(/[@$]|\{(guard1|guard2|gatekeeper|steward|farmer|shepherd|woodcutter|hermit)\b/.test(e.check)?2:3)));
+  if(e.evkind){ e.topics.push('ev_'+e.evkind); e.cat=0.5; } } })();
+// the lines for one visit: 3 to 5, opening with what they are doing or the time of day, then their own world, then
+// out to the valley; new lines first, one per topic, one attitude, at most one about their nature, and at most one
+// about each of their own people (and that one says who the person is to them)
 function talkPick(id,pose,here,n){ here=here||peopleHere();
   const key=heardKey(id), visit=VISITS[key]||0, heard=HEARD[key]||new Map(), dp=dayPart();
   const r=seedRng(((W.seed>>>0)^Math.imul(id+1,0x9E37)^Math.imul(visit+1,0x85EB)^heardN)>>>0,0x7A1E);
   if(n==null) n=pose===4?1+((r()*2)|0):3+((r()*3)|0);
-  const out=[], used=new Set();
-  const fresh=function(e){ return !heard.has(e.id); };
-  const take=function(e){ used.add(e.id); out.push({id:e.id,text:fillLine(id,e.text,here)});
-    for(let k=0;k<e.chain.length;k++) out.push({id:e.id+'.'+(k+1),text:fillLine(id,e.chain[k],here)}); };
-  const pool=function(test){ const room=5-out.length, a=[];   // a story only starts if all of it fits in this visit
-    for(const e of LINES) if(!used.has(e.id)&&1+e.chain.length<=room&&whoOk(id,e.who)&&test(e)&&lineOk(id,e.check,here,e.who)) a.push(e); return a; };
+  const picks=[], used=new Set(), topics=new Set(), relTo=new Set(); let stance='', traitN=0, anyN=0, count=0;
+  const evOf=new Map(), hid=function(e){ const v=evOf.get(e.id); return v?e.id+'@'+evKey(v):e.id; };
+  const fresh=function(e){ return !heard.has(hid(e)); };
+  const fits=function(e){
+    if(used.has(e.id)||1+e.chain.length>5-count) return false;               // a story only starts if all of it fits
+    if(e.first&&count>0) return false; if(e.last&&count!==n-1) return false;  // greetings open, goodbyes close
+    for(const t of e.topics) if(topics.has(t)) return false;
+    if(e.stance&&stance&&e.stance!==stance) return false;
+    if(e.trait&&traitN>=1) return false;
+    if(e.cat===3&&anyN>=2) return false;
+    if(e.rel){ const w=relOf(id,e.rel,here); if(w<0||relTo.has(w)) return false; }
+    return true; };
+  const take=function(e){ used.add(e.id); for(const t of e.topics) topics.add(t); if(e.stance) stance=e.stance;
+    if(e.trait) traitN++; if(e.cat===3) anyN++; if(e.rel) relTo.add(relOf(id,e.rel,here)); picks.push(e); count+=1+e.chain.length; };
+  const pool=function(test){ const a=[]; for(const e of LINES){ if(!whoOk(id,e.who)||!test(e)||!fits(e)) continue;
+      let ev=null; if(e.evkind){ ev=evBind(e,id,here); if(!ev) continue; }
+      if(/longer than I can count/.test(e.text)&&wedNow(id)>=0) continue;
+      LINE_EV=ev; const ok=lineOk(id,e.check,here,e.who); LINE_EV=null; if(ok){ if(ev) evOf.set(e.id,ev); a.push(e); } } return a; };
   // newest-unheard first, then the ones heard longest ago; weighted by how much the line belongs to this person
   const choose=function(a){ if(!a.length) return null; const f=a.filter(fresh), src=f.length?f:a;
-    if(!f.length){ let best=null, bt=1e18; for(const e of src){ const t=heard.get(e.id)||0; if(t<bt){ bt=t; best=e; } } return best; }
+    if(!f.length){ let best=null, bt=1e18; for(const e of src){ const t=heard.get(hid(e))||0; if(t<bt){ bt=t; best=e; } } return best; }
     let tot=0; const w=src.map(function(e){ const v=(e.who==='any'?(e.trait||e.rel?2:1):3); tot+=v; return v; });
     let x=r()*tot; for(let i=0;i<src.length;i++){ x-=w[i]; if(x<0) return src[i]; } return src[src.length-1]; };
+  const out=function(){ const head=picks.slice(0,1), mid=picks.slice(1).filter(function(e){ return !e.last; }), tail=picks.slice(1).filter(function(e){ return e.last; });
+    mid.sort(function(a,b){ return a.cat-b.cat; });
+    const o=[]; for(const e of head.concat(mid,tail)){ LINE_EV=evOf.get(e.id)||null; o.push({id:hid(e),text:fillLine(id,e.text,here)}); for(let k=0;k<e.chain.length;k++) o.push({id:e.id+'.'+(k+1),text:fillLine(id,e.chain[k],here)}); LINE_EV=null; }
+    return o.slice(0,5); };
   // caught in the middle of something (or asleep): that comes first
   if(pose>0){ const e=choose(pose===4?pool(function(e){ return e.pose===4; }):pool(function(e){ return e.pose===pose; }).filter(fresh)); if(e) take(e);   // a pose line already heard is not worth repeating
-    if(pose===4){ while(out.length<n){ const e2=choose(pool(function(e){ return e.pose===4; })); if(!e2) break; take(e2); } return out.slice(0,n); } }
-  // then a line for this time of day from their own lists, if there is one they have not said yet
-  if(out.length<n){ const own=pool(function(e){ return e.pose===0&&e.part===dp&&e.who!=='any'; }).filter(fresh); const e=choose(own); if(e) take(e); }
-  while(out.length<n){ const e=choose(pool(function(e){ return e.pose===0&&(e.part===-1||e.part===dp); })); if(!e) break; take(e); }
-  return out.slice(0,5); }
+    if(pose===4){ while(count<n){ const e2=choose(pool(function(e){ return e.pose===4; })); if(!e2) break; take(e2); } return out(); } }
+  // otherwise open with a greeting or a line of their own for this time of day
+  if(!count){ const a=pool(function(e){ return e.pose===0&&(e.first&&(e.part===-1||e.part===dp)||(e.part===dp&&e.who!=='any')); }); const e=choose(a.filter(fresh).length?a.filter(fresh):a); if(e) take(e); }
+  // the newest happening they can speak of comes next
+  if(count<n){ const a=pool(function(e){ return e.pose===0&&!!e.evkind; }).filter(fresh);
+    a.sort(function(x,y){ const ex=evOf.get(x.id), ey=evOf.get(y.id); return (ey.day*100+ey.hour)-(ex.day*100+ex.hour); });
+    if(a.length){ const top=a.filter(function(e){ const v=evOf.get(e.id), w0=evOf.get(a[0].id); return v===w0; }); take(top[(r()*top.length)|0]); } }
+  // at least one more line from their own world
+  if(count<n){ const e=choose(pool(function(e){ return e.pose===0&&e.who!=='any'&&(e.part===-1||e.part===dp); })); if(e) take(e); }
+  while(count<n){ const e=choose(pool(function(e){ return e.pose===0&&(e.part===-1||e.part===dp); })); if(!e) break; take(e); }
+  return out(); }
 // ---- the chat card: opened by walking up to someone, closed by goodbye or walking away ----
 const CHAT={id:-1,key:'',lines:[],k:0,shut:-1e12}, COOL={};   // COOL[key] = {t: when the card closed, id, away: you have stepped away since}
 function chatPerson(id){ for(let c=0;c<CR_.n;c++) if(CR_.sp[c]===SP.KEEPER&&(CR_.ay[c]|0)===id) return c; return -1; }
@@ -2791,16 +2983,22 @@ function tickWolf(c,dt){
     // draw the pack to a fresh kill
     if(CR_.energy[c]<75 && CR_.tgt[c]<0){ const carc=nearestSp(x,y,34,SP.CARCASS); if(carc>=0){ CR_.tgt[c]=carc; CR_.st[c]=2; CR_.tm[c]=6; } }
     if(CR_.st[c]===0 && CR_.energy[c]<(DAY.k<0.5?72:62) && CR_.tgt[c]<0){   // wolves hunt sooner after dark
+      if(DAY.k<0.5&&Math.random()<0.25){ const q=[nearestSp(x,y,40,SP.SHEEP),nearestSp(x,y,40,SP.HEN)].filter(function(q){ return q>=0&&stockTakeable(q); })[0];
+        if(q!=null){ CR_.tgt[c]=q; CR_.st[c]=1; CR_.tm[c]=25; } }   // a farm's flock, while its keeper sleeps
+      if(CR_.tgt[c]<0){
       let t=nearestSp(x,y,300,SP.RABBIT); let td=t>=0?((CR_.x[t]-x)*(CR_.x[t]-x)+(CR_.y[t]-y)*(CR_.y[t]-y)):1e9;
       let t2=nearestSp(x,y,300,SP.DEER); let td2=t2>=0?((CR_.x[t2]-x)*(CR_.x[t2]-x)+(CR_.y[t2]-y)*(CR_.y[t2]-y)):1e9;
-      const pick=(td2<td)?t2:t; if(pick>=0){ CR_.tgt[c]=pick; CR_.st[c]=1; }
+      const pick=(td2<td)?t2:t; if(pick>=0){ CR_.tgt[c]=pick; CR_.st[c]=1; } }
     }
     if(CR_.st[c]===1){
       const tg=CR_.tgt[c];
-      if(tg<0||tg>=CR_.n||CR_.al[tg]===0||(CR_.sp[tg]!==SP.RABBIT&&CR_.sp[tg]!==SP.DEER)){ CR_.tgt[c]=-1; CR_.st[c]=0; }
+      const stk=tg>=0&&tg<CR_.n&&(CR_.sp[tg]===SP.SHEEP||CR_.sp[tg]===SP.HEN);
+      if(tg<0||tg>=CR_.n||CR_.al[tg]===0||(CR_.sp[tg]!==SP.RABBIT&&CR_.sp[tg]!==SP.DEER&&!stk)||(stk&&CR_.tm[c]<=0)){ CR_.tgt[c]=-1; CR_.st[c]=0; }
       else { let ax=CR_.x[tg]-x, ay=CR_.y[tg]-y; const ad=Math.hypot(ax,ay)+1e-4;
         vx+=((ax/ad)*p.speed*1.35-vx)*Math.min(1,dt*4); vy+=((ay/ad)*p.speed*1.35-vy)*Math.min(1,dt*4);
-        if(ad<2.0){ CR_.sp[tg]=SP.CARCASS; CR_.st[tg]=0; CR_.vx[tg]=0; CR_.vy[tg]=0; CR_.energy[tg]=55; CR_.tm[tg]=50; CR_.z[tg]=Math.max(terr(CR_.x[tg],CR_.y[tg]),WATER)+0.15; CR_.al[tg]=1; CR_.tgt[c]=tg; CR_.st[c]=2; CR_.tm[c]=7; } }
+        if(ad<2.0&&stk&&!stockTakeable(tg)){ CR_.tgt[c]=-1; CR_.st[c]=0; }
+        else if(ad<2.0){ if(stk){ const ow=stockOwner(tg); (W.taken||(W.taken={}))[CR_.ax[tg]|0]=nightOf(); if(ow) logEvent(CR_.sp[tg]===SP.SHEEP?'sheep_taken':'hen_taken',[ow.who],ow.key,CR_.sp[tg]===SP.SHEEP?'sheep':'hen'); }
+          CR_.sp[tg]=SP.CARCASS; CR_.st[tg]=0; CR_.vx[tg]=0; CR_.vy[tg]=0; CR_.energy[tg]=55; CR_.tm[tg]=50; CR_.z[tg]=Math.max(terr(CR_.x[tg],CR_.y[tg]),WATER)+0.15; CR_.al[tg]=1; CR_.tgt[c]=tg; CR_.st[c]=2; CR_.tm[c]=7; } }
     } else {
       let sepx=0,sepy=0,cox=0,coy=0,cnt=0;
       forNeighbors(c,16,function(o,dx,dy,d2){ if(CR_.sp[o]!==SP.WOLF)return; const d=Math.sqrt(d2)+1e-4;
@@ -2929,7 +3127,7 @@ function tickKeeper(c,dt){
   const g=floorAt(CR_.x[c],CR_.y[c],CR_.z[c]); CR_.z[c]+=(g-CR_.z[c])*Math.min(1,dt*16);
 }
 function tick(dt){
-  chatTick(); arriveCheck(); ruinCheck(); placeCheck();
+  dayTick(); chatTick(); arriveCheck(); ruinCheck(); placeCheck();
   if(CR_.n===0) return; buildSGrid(); const px=P.x, py=P.y;
   for(let c=0;c<CR_.n;c++){ if(CR_.al[c]===0)continue;
     if(CR_.age[c]<1){ CR_.age[c]+=dt/matureTime(CR_.sp[c]); if(CR_.age[c]>=1){ CR_.age[c]=1; CR_.par[c]=-1; } }
@@ -3252,7 +3450,7 @@ function boot(){
     const showSky=function(){ $('dTodV').textContent=fmtTod(DAY.tod); $('dDayV').textContent=DAYNAMES[DAY.mode]||''; $('dTod').disabled=(DAYMODES[DAY.mode]<0); if(!held) $('dTod').value=Math.round(DAY.tod*4)/4; };
     skyHud=showSky;   // frame() keeps the card's clock and slider in step with the running day
     $('dTod').addEventListener('pointerdown',function(){ held=true; }); window.addEventListener('pointerup',function(){ held=false; }); window.addEventListener('pointercancel',function(){ held=false; });
-    $('dTod').addEventListener('input',function(){ const v=parseFloat($('dTod').value); if(isFinite(v)){ DAY.tod=v; DIALS.tod=v; sunUpdate(); saveDials(); showSky(); } });
+    $('dTod').addEventListener('input',function(){ const v=parseFloat($('dTod').value); if(isFinite(v)){ DAY.tod=v; DIALS.tod=v; W.lastTod=null; sunUpdate(); saveDials(); showSky(); } });
     $('dDay').addEventListener('input',function(){ const v=parseInt($('dDay').value,10); if(v>=0&&v<DAYMODES.length){ DAY.mode=v; DIALS.dayMode=v; updateDay(0); $('dTod').value=Math.round(DAY.tod*4)/4; saveDials(); showSky(); } });
     $('dRuins').addEventListener('input',function(){ $('dRuinsV').textContent=RUIN_LEVELS[parseInt($('dRuins').value,10)|0]||''; });
     showSky();
@@ -3396,7 +3594,7 @@ function boot(){
   if(glCur()) setTimeout(function(){ const m=glCur(); if(m) loadGL(m); },400);
 }
 
-if(IS_NODE){ module.exports={genWorld,allocGrid,buildGlyphs,renderFrame,compose,spawn,populate,tick,ecology,simBin,updatePlayer,W,RS,FB,P,IN,CR_,SP,SPP,MASKS,RESERVE,RAMP,N,WATER,EYE,terr,groundAt,DIALS,growOf,isAdult,addCreature,WALLS,buildWalls,nearestWall,allWallHits,wallBlocked,setSkyTime:function(t){skyTime=t;},setUW:function(v){UW=v;},DAY,SUN,MOON,SKY,DAYMODES,sunAltAz,sunUpdate,updateDay,relightAll,relightStep,RELIGHT,dayDate,fmtTod,setTod:function(h){DAY.tod=h;sunUpdate();},floorAt,KPATHS,KEEP,FORT,TALK,TALKX,LINES,POSEWHO,talkPick,talk,chatMore,closeChat,chatTick,CHAT,HEARD,VISITS,heardKey,heardAdd,lineOk,whoOk,placeName,placeDir,setChat:function(h){chatHook=h;},castValley,valleyName,valleyNames,seedRng,rebuildPeople,KEEPERS,GREETN,lineOk,fillLine,peopleHere,ALLHERE,ROLEKEY,ROLES,NAMES_F,NAMES_M,NAMES_X,BYNAMES,CLOTHES,SKINS,HAIRS,TRAITS,TRAIT_CLASH,RELREV,dayPart,folkMissing,tickKeeper,KMASK,KL,keeperFrame,GREETT,setGreet:function(f){greetHook=f;},RENDERS}; }
+if(IS_NODE){ module.exports={genWorld,allocGrid,buildGlyphs,renderFrame,compose,spawn,populate,tick,ecology,simBin,updatePlayer,W,RS,FB,P,IN,CR_,SP,SPP,MASKS,RESERVE,RAMP,N,WATER,EYE,terr,groundAt,DIALS,growOf,isAdult,addCreature,WALLS,buildWalls,nearestWall,allWallHits,wallBlocked,setSkyTime:function(t){skyTime=t;},setUW:function(v){UW=v;},DAY,SUN,MOON,SKY,DAYMODES,sunAltAz,sunUpdate,updateDay,relightAll,relightStep,RELIGHT,dayDate,fmtTod,setTod:function(h){DAY.tod=h;sunUpdate();},floorAt,KPATHS,KEEP,FORT,eventsForDay,weddingDay,babyDay,valleyDay,logEvent,eventsRefresh,dayTick,restock,stockTakeable,stockOwner,evBind,evWhen,evKey,evBase,keeperAbed,FISHSIZE,TALKE,EVTAG,EVKINDS,wedNow,relOf,TALK,TALKX,LINES,POSEWHO,talkPick,talk,chatMore,closeChat,chatTick,CHAT,HEARD,VISITS,heardKey,heardAdd,lineOk,whoOk,placeName,placeDir,setChat:function(h){chatHook=h;},castValley,valleyName,valleyNames,seedRng,rebuildPeople,KEEPERS,GREETN,lineOk,fillLine,peopleHere,ALLHERE,ROLEKEY,ROLES,NAMES_F,NAMES_M,NAMES_X,BYNAMES,CLOTHES,SKINS,HAIRS,TRAITS,TRAIT_CLASH,RELREV,dayPart,folkMissing,tickKeeper,KMASK,KL,keeperFrame,GREETT,setGreet:function(f){greetHook=f;},RENDERS}; }
 else boot();
 })();
 </script>
