@@ -74,7 +74,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
  </div>
  <div id="stick"><div id="knob"></div></div>
  <div id="fps"></div>
- <button class="mb-ver" id="mbVer" type="button">v0.23.0 &middot; Oct 30</button>
+ <button class="mb-ver" id="mbVer" type="button">v0.23.1 &middot; Oct 30</button>
  <div id="toast"></div>
  <div id="chat" class="hidden" role="dialog" aria-live="polite"><div class="ch-who"><b id="chName"></b><span id="chRole"></span></div><p id="chLine"></p><div class="ch-dots" id="chDots"></div><div class="ch-btns"><button class="btn" id="chMore" type="button">more</button><button class="btn" id="chBye" type="button">goodbye</button></div></div>
  <div id="help" class="hidden"><div class="card">
@@ -97,7 +97,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
    <img src="05-predation.jpg" alt="a kill" loading="lazy">
    <img src="04-water.jpg" alt="the lake" loading="lazy">
   </div>
-  <p class="fsize">The whole world is one HTML file. Right now: <b id="fsize">~324 KB</b>. Smaller than a single phone photo.</p>
+  <p class="fsize">The whole world is one HTML file. Right now: <b id="fsize">~333 KB</b>. Smaller than a single phone photo.</p>
   <p><b>Why I built it.</b> I build things on a phone by asking AI the right questions, the way I would direct a camera. I saw a clip of a tiny 3D world made of nothing but text and wanted to see if I could grow one that was actually alive, and keep growing it in the open instead of ever calling it done.</p>
   <p><b>What I learned.</b> How far you can get with almost nothing. One idea, a ray walking a height map, turned into characters, with a small world of animals living on top. Every version taught me one concrete thing: how to make a wall read as solid, how to keep the wolves from starving the world empty, how to make a forest look like real woods.</p>
   <p style="color:var(--mb-dim);font-size:13px"><b style="color:var(--mb-soft)">Walk:</b> drag the left half of the screen (tilt to turn). <b style="color:var(--mb-soft)">Look:</b> drag the right half. Wade into the water to swim. Tap ☰ menu for a new world, the dials, and the time of day. Walk under the gate arch and find the door under the tower stair.</p>
@@ -123,9 +123,10 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
 <script>
 (function(){
 'use strict';
-const VERSION='The Keep v0.23.0 · Oct 30 2026';
-const VER_SHORT='v0.23.0 · Oct 30'; // what the badge shows; bump with VERSION
+const VERSION='The Keep v0.23.1 · Oct 30 2026';
+const VER_SHORT='v0.23.1 · Oct 30'; // what the badge shows; bump with VERSION
 const CHANGELOG=[
+ ['v0.23.1 · Oct 30 2026','Real storms. A storm on the valley calendar now really happens, at any hour of the day or night, and lasts an hour to three. The sky goes grey, the land darkens, rain comes down across the screen in every view and lightning flashes now and then (no sound). Under a roof the rain stops. The flocks bunch up in a corner of the pen, and the folk at the farms, the woodcutter and the hermit go indoors and come back out when it passes. While it lasts people talk about the storm, and afterwards they talk about it the right way for when it came: a night storm woke them, a day storm caught them out.'],
  ['v0.23.0 · Oct 30 2026','Happenings. Every valley now has a calendar of small things that happen in it: market day every seventh day in the courtyard, a wedding when the valley has sweethearts, a new baby for a married couple, quarrels, the harvest, a festival at the keep, storms, a lost sheep or hen and who found it, the hermit landing a big fish and someone else swearing they caught a bigger one. Some things really happen while you are there: after dark, while the farmer sleeps, a wolf may take a sheep or a hen (never more than half the flock, and the flock is whole again by morning), and the hermit sometimes lands a big one at the end of a long sit on the dock. People talk about the last week, newest first, and only about people who live here: who was wed, whose baby, whose hen, and when. When sweethearts marry, they are husband and wife from that day on.'],
  ['v0.22.1 · Oct 30 2026','Clearer talk. Lines that only made sense with context you never had are now plain sentences: I check every door in this keep twice a day, not Every door in this keep, twice a day. A visit now reads like a conversation: a greeting or what they are busy with, then their own work, then the valley round about. One line per subject, never warm and standoffish at once, at most one line about their nature, and when they mention their own people they say who they are, my brother or my friend. Greetings only open and goodbyes only close. Names ending in s no longer break. Directions are one word, northeast rather than north-east, so they never split across a line in the card. No more owls, since the valley has none yet.'],
  ['v0.22.0 · Oct 30 2026','Talk. Walk up to anyone and a small card opens at the bottom right: their name, what they do, and the first thing they say. Tap more for the next thing, three to five a visit, or say goodbye, or just walk away. What they say depends on the time of day, their nature, their own people, what lives in the valley and where things are, and nobody talks about people, places or animals that are not here. Come back later and you hear new things; nobody repeats themselves until they have run out. Over six hundred lines, and a few small stories told over two or three cards. The two guards are the night guard and the day guard now. The card stays clear of the walk stick.'],
@@ -265,6 +266,7 @@ function sunUpdate(){
   const k=DAY.k, nd=1-k, du=DAY.dusk;
   DAY.expo=0.54+0.46*k;   // the night floor keeps the glyphs readable: moonlit, never black
   DAY.tr=DAY.expo*(1-0.22*nd)*(1+0.16*du); DAY.tg=DAY.expo*(1-0.10*nd)*(1+0.02*du); DAY.tb=DAY.expo*(1+0.22*nd)*(1-0.14*du);
+  stormLight();
   skyUpdate();
 }
 function updateDay(dt){
@@ -1106,8 +1108,8 @@ function tickFolk(c,dt){
   const p=W.places[(CR_.ax[c]|0)-100]; if(!p||!p.route) return;
   const id=CR_.ay[c]|0, rt=CR_.energy[c]|0, a=rt===1?p.route.bed:(rt===2?p.route.wake:p.route.loop), n=a.length/6;
   const x=CR_.x[c], y=CR_.y[c], qx=P.x-x, qy=P.y-y, qd=Math.hypot(qx,qy), near=talkNear(c,qd)&&qd>0.05&&Math.abs((P.z-EYE)-CR_.z[c])<1.6;
-  const night=folkSleeps(p);
-  if(CR_.st[c]===2){ if(near) talk(c,id,4);
+  const night=folkSleeps(p)||stormLevel()>0.3, storm=night&&!folkSleeps(p);
+  if(CR_.st[c]===2){ CR_.po[c]=folkSleeps(p)?4:0; if(near) talk(c,id,CR_.po[c]===4?4:0);
     if(!night){ CR_.st[c]=0; CR_.po[c]=0; CR_.energy[c]=2; CR_.ph[c]=1; CR_.tm[c]=0; }
     return; }
   if(near){
@@ -1117,19 +1119,20 @@ function tickFolk(c,dt){
     if(pose>0){ CR_.tm[c]=Math.max(CR_.tm[c],1.5); talk(c,id,pose); return; }
     CR_.vx[c]=qx/qd*0.01; CR_.vy[c]=qy/qd*0.01; CR_.tm[c]=walking?1.5:Math.max(CR_.tm[c],1.5); CR_.st[c]=1; CR_.po[c]=0;
     talk(c,id,pose); return; }
+  if(CR_.st[c]===1&&rt===0&&CR_.tm[c]>0.4&&stormLevel()>0.3) CR_.tm[c]=0.4;   // no lingering out in it
   if(CR_.st[c]===1){ CR_.tm[c]-=dt; if(CR_.tm[c]<=0){ if(CR_.po[c]===5&&id===7&&DAY.tod>=5&&DAY.tod<12&&W.fishDay!==valleyDay()){ W.fishDay=valleyDay(); if(Math.random()<0.1&&!eventsForDay(W.seed,valleyDay()).some(function(e){ return e.kind==='big_fish'; })) logEvent('big_fish',[7],'hermit',FISHSIZE[(Math.random()*(FISHSIZE.length-1))|0]); }
     CR_.st[c]=0; CR_.tm[c]=0; CR_.po[c]=0; } return; }
   const wi=(CR_.ph[c]|0)%n, back=CR_.ss[c]>0;
   const tx=back?CR_.rx[c]:a[wi*6], ty=back?CR_.ry[c]:a[wi*6+1], ddx=tx-x, ddy=ty-y, d=Math.hypot(ddx,ddy);
-  const sp=SPP[SP.KEEPER].speed*(DAY.k<0.5?0.85:1)*(night&&rt===0?1.3:1);
+  const sp=SPP[SP.KEEPER].speed*(DAY.k<0.5?0.85:1)*(storm&&rt!==2?2:(night&&rt===0?1.3:1));
   if(back&&d<0.05){ CR_.ss[c]=0; return; }
   if(back){ const stp=Math.min(d,sp*dt); CR_.x[c]=x+ddx/d*stp; CR_.y[c]=y+ddy/d*stp; CR_.tm[c]+=stp;
     const g=floorAt(CR_.x[c],CR_.y[c],CR_.z[c]); CR_.z[c]+=(g-CR_.z[c])*Math.min(1,dt*16); return; }
   if(d<0.2){
-    if(rt===1&&wi===n-1){ CR_.st[c]=2; CR_.po[c]=4; return; }                     // in bed
+    if(rt===1&&wi===n-1){ CR_.st[c]=2; CR_.po[c]=folkSleeps(p)?4:0; return; }     // in bed, or indoors out of the storm
     if(rt===2&&wi===n-1){ CR_.energy[c]=0; CR_.ph[c]=1; return; }                  // out of the door: the day's round
     if(rt===0&&wi===0&&night){ CR_.energy[c]=1; CR_.ph[c]=1; return; }             // home at bedtime
-    CR_.ph[c]=(wi+1)%n; const pause=(night&&rt===0)?0:a[wi*6+2];
+    CR_.ph[c]=(storm&&rt===0&&wi<n-wi)?(wi-1+n)%n:(wi+1)%n; const pause=(night&&rt===0)?0:a[wi*6+2];
     if(pause>0){ CR_.st[c]=1; CR_.tm[c]=pause*(0.7+0.6*Math.random()); CR_.po[c]=a[wi*6+3];
       const fx=a[wi*6+4], fy=a[wi*6+5]; if(fx||fy){ CR_.vx[c]=fx*0.01; CR_.vy[c]=fy*0.01; } }
     return; }
@@ -1144,6 +1147,11 @@ function tickStock(c,dt){
   const pen=W.pens[CR_.ax[c]|0]; if(!pen) return;
   const s=CR_.sp[c], x=CR_.x[c], y=CR_.y[c], hen=s===SP.HEN;
   if(DAY.k<0.2&&CR_.st[c]!==1) return;
+  if(stormLevel()>0.3&&CR_.st[c]!==1){ const H=penHuddle(pen), hx=clamp(H[0]+((c%3)-1)*0.5,pen.x0+0.3,pen.x1-0.3), hy=clamp(H[1]+((((c/3)|0)%3)-1)*0.5,pen.y0+0.3,pen.y1-0.3);
+    if(Math.hypot(hx-x,hy-y)<=0.3){ CR_.tm[c]=1; return; }
+    const mx=(x+hx)/2, my=(y+hy)/2;
+    if(stockOk(x,y,hx,hy)){ CR_.rx[c]=hx; CR_.ry[c]=hy; CR_.st[c]=1; CR_.ph[c]=1.6; }
+    else if(stockOk(x,y,mx,my)){ CR_.rx[c]=mx; CR_.ry[c]=my; CR_.st[c]=1; CR_.ph[c]=1.6; } else { CR_.tm[c]=1; return; } }
   const qx=x-P.x, qy=y-P.y, qd=Math.hypot(qx,qy)||1;
   if(qd<(hen?2.4:1.8)&&Math.abs(P.z-EYE-CR_.z[c])<1.5&&CR_.ph[c]<1.5){
     const tx=clamp(x+qx/qd*3,pen.x0+0.3,pen.x1-0.3), ty=clamp(y+qy/qd*3,pen.y0+0.3,pen.y1-0.3);
@@ -1258,6 +1266,7 @@ function skyUpdate(){
   SKY.sr=255; SKY.sg=250-80*du; SKY.sb=215-130*du;      // sun disc, orange at the horizon
   const hl=Math.hypot(SUN.x,SUN.y)||1; SKY.hx=SUN.x/hl; SKY.hy=SUN.y/hl;
   // fog meets the horizon; the world is tinted by compose afterwards, so the fog is stored pre-tint
+  stormSky();
   FOG_R=clamp(SKY.hr/DAY.tr,0,255); FOG_G=clamp(SKY.hg/DAY.tg,0,255); FOG_B=clamp(SKY.hb/DAY.tb,0,255);
 }
 // a sky color divided by the day tint, for sky that reaches the screen through world cells (the lake's reflection)
@@ -1268,7 +1277,7 @@ function sky(dx,dy,sg,px,py,pz){
   let hr=SKY.hr, hg=SKY.hg, hb=SKY.hb;
   if(SKY.du>0){ const side=0.35+0.65*Math.max(0,(dx*SKY.hx+dy*SKY.hy)/hl); const w=SKY.du*side; hr+=(255-hr)*w*0.85; hg+=(150-hg)*w*0.75; hb+=(70-hb)*w*0.85; }
   let r=hr+(SKY.tr-hr)*tt, g=hg+(SKY.tg-hg)*tt, b=hb+(SKY.tb-hb)*tt;
-  const nd=SKY.nd;
+  const nd=SKY.nd*(1-(DAY.storm||0));
   if(nd>0 && sg>0.02){ // stars, fixed to the sky, a faint twinkle
     const sx=Math.floor(Math.atan2(dy,dx)*160), sy=Math.floor(Math.atan(sg/hl)*160); const hs=hash2(sx,sy,77);
     if(hs>0.985){ const br=nd*(0.5+0.5*hash2(sx,sy,78))*(0.7+0.3*Math.sin(skyTime*2.5+hs*60)); r+=(232-r)*br; g+=(236-g)*br; b+=(255-b)*br; }
@@ -2383,10 +2392,10 @@ const TALKE={
  farmer:["[ev_market,evin]Market day {evwhen} up at the keep. Sold every egg I had.","[ev_market,evin]Took cabbages to market {evwhen}. Came home with a new hoe and no cabbages.",
   "[ev_harvest,evin]We started bringing the wheat in {evwhen}. My back knows it.","[ev_harvest,evin]Harvest started {evwhen}. Every pair of hands is welcome. Even yours.",
   "[ev_hentaken,evin]A wolf got into the hen run {evwhen}. Took a hen and left the feathers.","[ev_hentaken,evin]Lost a hen to the wolves {evwhen}. I've counted the rest twice since.",
-  "[ev_storm]The storm {evwhen} had the hens in a state. Not an egg in the morning."],
+  "[ev_storm,evnight]The storm {evwhen} had the hens in a state. Not an egg in the morning."],
  shepherd:["[ev_market,evin]Took wool up to market {evwhen}. Sold the lot.","[ev_market,evin]Market day {evwhen}. The sheep stayed home. I did not.",
   "[ev_sheeptaken,evin]A wolf took one of my sheep {evwhen}. Right out of the pen.","[ev_sheeptaken,evin]Lost a sheep to the wolves {evwhen}. I'll be sleeping with one eye open.",
-  "[ev_storm]The storm {evwhen} had the flock bunched up in a corner till dawn."],
+  "[ev_storm,evnight]The storm {evwhen} had the flock bunched up in a corner till dawn."],
  steward:["[ev_festival,evin]The festival {evwhen} took me a week to plan and one night to undo.","[ev_festival,evin]Still clearing up after the festival {evwhen}. Lanterns everywhere.",
   "[ev_market,keep]Market day {evwhen}. The courtyard's still full of straw.","[ev_wedding,keep]I set the chapel for the wedding {evwhen}. {eva} and {evb}. Not a candle out of place."],
  hermit:["[ev_bigfish,evin]Caught a big one {evwhen}. {evnote}. Let him go.","[ev_bigfish,evin]That fish {evwhen}. {evnote}. Fought me half the morning.",
@@ -2407,7 +2416,7 @@ const TALKE={
   "[ev_harvest]{eva} started the harvest at @farm1 {evwhen}.","[ev_harvest,keepers]The keep will eat well this winter. {eva} started bringing the wheat in {evwhen}.",
   "[ev_festival,keep]There was a festival at the keep {evwhen}. Lanterns everywhere. My feet still hurt from dancing.","[ev_festival,keep]You missed the festival {evwhen}. {eva} ran it. Music till late.",
   "[ev_festival,keep]Best festival in years, {evwhen}. Ask anyone.","[ev_festival,keep,gossip]At the festival {evwhen}, {eva} danced. {eva.He} never dances.",
-  "[ev_storm]That storm {evwhen}. I thought the roof would go.","[ev_storm]Did the storm {evwhen} wake you? Thunder like I've never heard.",
+  "[ev_storm]That storm {evwhen}. I thought the roof would go.","[ev_storm,evnight]Did the storm {evwhen} wake you? Thunder like I've never heard.",
   "[ev_storm,farm1]The storm {evwhen} flattened a row of {farmer}'s wheat.","[ev_storm,keep]The storm {evwhen} blew one of the banners clean off the wall.",
   "[ev_storm,hermit]{hermit} says the lake was white with waves in the storm {evwhen}.",
   "[ev_lost,evfirst]One of my {evnotes} went missing {evwhen}. {evother} found it, thank goodness.","[ev_lost,evsecond]Found one of {eva}'s {evnotes} wandering about {evwhen}. Walked it all the way home.",
@@ -2451,7 +2460,7 @@ function evBase(seed,day){
   if(d30===(b30+11)%30) add({kind:'harvest', who:[4], where:'farm1', hour:8});
   const x=r(), y=r(), z=r(), w=r();
   if(x<0.07){ let p=pairOf(C,'rival')||pairOf(C,'grudge')||[4,5]; add({kind:'quarrel', who:p, where:'', hour:10+((y*8)|0)}); }
-  if(z<0.05) add({kind:'storm', who:[], where:'', hour:((w*5)|0)});   // storms come in the small hours
+  if(z<0.09) add({kind:'storm', who:[], where:'', hour:((w*24)|0), dur:1+((w*977)%1)*2, peak:0.6+0.4*((w*311)%1)});   // any hour, an hour to three long
   if(w<0.06){ const sheep=y<0.5, owner=sheep?5:4, finders=[0,1,2,3,6,7,4,5].filter(function(i){ return i!==owner; }), f=finders[(x*finders.length*13|0)%finders.length];
     add({kind:'lost_animal', who:[owner,f], where:sheep?'farm2':'farm1', hour:7+((z*10)|0), note:sheep?'sheep':'hen'}); }
   if(y>0.95) add({kind:'big_fish', who:[7], where:'hermit', hour:6, note:FISHSIZE[(z*(FISHSIZE.length-1))|0]});
@@ -2496,7 +2505,7 @@ function stockOwner(t){ const pen=CR_.ax[t]|0; for(const p of W.places) for(cons
 function wedNow(id){ const wd=weddingDay(W.seed), d=valleyDay(); if(!wd||d<wd.day||(d===wd.day&&DAY.tod<14)) return -1; return wd.who[0]===id?wd.who[1]:(wd.who[1]===id?wd.who[0]:-1); }
 // which happening a line is about: the newest one of its kind this person may speak of
 function evBind(e,id,here){ const kind=e.evkind; if(!W.events) eventsRefresh();
-  for(const ev of W.events){ if(EVTAG[ev.kind]!==kind) continue;
+  for(const ev of W.events){ if(EVTAG[ev.kind]!==kind) continue; if(ev.kind==='storm'&&stormOngoing(ev)) continue;
     let ok=true; for(const w of ev.who) if(!here[w]||!castOf(w)) ok=false; if(!ok) continue;
     const at=ev.who.indexOf(id);
     if(e.evrole==='in'&&at<0) continue; if(e.evrole==='first'&&at!==0) continue; if(e.evrole==='second'&&at!==1) continue; if(!e.evrole&&at>=0) continue;
@@ -2511,6 +2520,81 @@ function evWhen(ev){ const d=valleyDay()-ev.day;
   else if(d<=0) return ev.hour<11?'this morning':(ev.hour<17?'earlier today':'this evening');
   else if(d===1) return ev.hour>=18?'last night':'yesterday';
   return ['','','two days back','three days back','four days back','five days back','six days back'][d]||'a week back'; }
+// ---------------- storms (v0.23.1): the calendar's storms really happen ----------------
+// A storm on the calendar (any hour, an hour to three long) darkens the sky and the land in every view, brings rain
+// and lightning, sends the flocks into a corner of the pen and the folk indoors, and people talk about it while it lasts.
+var STORMC={day:null,seed:null,list:[]};
+function stormWindows(){ const d0=valleyDay(); if(STORMC.day===d0&&STORMC.seed===W.seed) return STORMC.list;
+  const L=[]; for(const d of [d0-1,d0]) for(const e of eventsForDay(W.seed,d)) if(e.kind==='storm'){ const s=(d-d0)*24+e.hour; L.push({s:s,e:s+e.dur,k:e.peak}); }
+  STORMC.day=d0; STORMC.seed=W.seed; STORMC.list=L; return L; }
+// 0 = no storm, up to 1 = the worst of it; it builds and dies away over about twenty minutes
+function stormLevel(){ if(W.seed==null) return 0; const t=DAY.tod; let lv=0;
+  for(const w of stormWindows()){ if(t<w.s||t>=w.e) continue; lv=Math.max(lv,Math.min(1,(t-w.s)/0.35,(w.e-t)/0.35)*w.k); } return lv; }
+function stormOngoing(ev){ return DAY.tod<(ev.day-valleyDay())*24+ev.hour+(ev.dur||0); }
+// is there a roof (a house, the barn, the keep) over this spot, above head height?
+function underCover(x,y,z){ const i=(y|0)*N+(x|0); if(i<0||i>=N*N) return false; if(W.su[i]>0&&W.h[i]+W.sb[i]>z) return true;
+  for(const w of WALLS) if(w.axis==='roof'&&x>=w.x0&&x<=w.x1&&y>=w.y0&&y<=w.y1&&w.h>z) return true; return false; }
+// the sky and the land go grey and dim; a lightning flash lights everything for a moment
+function stormLight(){ const st=stormLevel(), f=DAY.flash||0; DAY.storm=st; if(st<=0&&f<=0) return;
+  const m=(1-0.32*st)*(1+0.9*f); DAY.tr*=m; DAY.tg*=m; DAY.tb*=m; }
+function stormSky(){ const st=DAY.storm||0, f=DAY.flash||0; if(st<=0&&f<=0) return;
+  const k=DAY.k, g=0.22+0.78*k, w=0.85*st;
+  const mix=function(a,b){ return a+(b-a)*w; };
+  SKY.tr=mix(SKY.tr,86*g); SKY.tg=mix(SKY.tg,92*g); SKY.tb=mix(SKY.tb,102*g);
+  SKY.hr=mix(SKY.hr,118*g); SKY.hg=mix(SKY.hg,124*g); SKY.hb=mix(SKY.hb,132*g);
+  SKY.cr=mix(SKY.cr,150); SKY.cg=mix(SKY.cg,154); SKY.cb=mix(SKY.cb,162); SKY.cl*=1-0.35*st;
+  SKY.sr=mix(SKY.sr,SKY.hr); SKY.sg=mix(SKY.sg,SKY.hg); SKY.sb=mix(SKY.sb,SKY.hb);   // the sun and moon go behind it
+  SKY.du*=1-st;
+  if(f>0){ const q=0.75*f; SKY.tr+=(225-SKY.tr)*q; SKY.tg+=(230-SKY.tg)*q; SKY.tb+=(245-SKY.tb)*q; SKY.hr+=(235-SKY.hr)*q; SKY.hg+=(238-SKY.hg)*q; SKY.hb+=(250-SKY.hb)*q; } }
+// rain and lightning, drawn over whichever view is on (no sound: nothing here plays on its own)
+var RAIN={cv:null,cx:null,d:null,on:false,flash:0,f2:0,next:6,w:0,h:0};
+function rainFrame(dt,paused){ if(!RAIN.cv){ const cv=document.createElement('canvas'), ref=document.getElementById('c'); if(!ref) return;
+    cv.id='rain'; cv.style.cssText='position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;display:none';
+    ref.parentNode.insertBefore(cv,ref.nextSibling); RAIN.cv=cv; RAIN.cx=cv.getContext('2d'); RAIN.d=new Float32Array(420*3);
+    for(let i=0;i<420;i++){ RAIN.d[i*3]=Math.random(); RAIN.d[i*3+1]=Math.random(); RAIN.d[i*3+2]=0.8+Math.random()*0.5; } }
+  const lv=DAY.storm||0;
+  // lightning: now and then in the thick of it, often with a second flicker
+  if(lv>0.45&&!paused){ RAIN.next-=dt; if(RAIN.next<=0){ RAIN.flash=1; RAIN.f2=Math.random()<0.6?0.12+Math.random()*0.12:0; RAIN.next=3+Math.random()*12/lv; } }
+  if(RAIN.f2>0){ RAIN.f2-=dt; if(RAIN.f2<=0){ RAIN.flash=Math.max(RAIN.flash,0.7); RAIN.f2=0; } }
+  RAIN.flash=Math.max(0,RAIN.flash-dt*4.5); DAY.flash=RAIN.flash*Math.min(1,lv*2);
+  if(lv<=0.02&&RAIN.flash<=0){ if(RAIN.on){ RAIN.cx.clearRect(0,0,RAIN.w,RAIN.h); RAIN.cv.style.display='none'; RAIN.on=false; } return; }
+  const s=Math.min(1.5,window.devicePixelRatio||1), W2=Math.round(window.innerWidth*s), H2=Math.round(window.innerHeight*s);
+  if(W2!==RAIN.w||H2!==RAIN.h){ RAIN.cv.width=RAIN.w=W2; RAIN.cv.height=RAIN.h=H2; }
+  if(!RAIN.on){ RAIN.cv.style.display='block'; RAIN.on=true; }
+  const cx=RAIN.cx; cx.clearRect(0,0,W2,H2);
+  const inside=underCover(P.x,P.y,P.z), wet=!inside&&UW<=0;
+  if(DAY.flash>0){ cx.fillStyle='rgba(235,240,255,'+(DAY.flash*(inside?0.12:0.28)).toFixed(3)+')'; cx.fillRect(0,0,W2,H2); }
+  if(!wet) return;
+  const n=Math.floor(420*lv), L=H2*0.06, sl=-0.18, D=RAIN.d; if(paused) dt=0;
+  cx.strokeStyle='rgba(196,210,230,'+(0.22+0.22*lv).toFixed(3)+')'; cx.lineWidth=Math.max(1,s); cx.beginPath();
+  for(let i=0;i<n;i++){ let y=D[i*3+1]+dt*1.6*D[i*3+2]; let x=D[i*3]+dt*1.6*D[i*3+2]*sl*H2/W2; if(y>1){ y-=1; x=Math.random(); } if(x<0) x+=1;
+    D[i*3]=x; D[i*3+1]=y; const px=x*W2, py=y*H2, l=L*D[i*3+2]; cx.moveTo(px,py); cx.lineTo(px+sl*l,py+l); }
+  cx.stroke(); }
+// what people say while it's coming down
+const TALKS={
+ farmer:["[ev_storm,evday]The storm {evwhen} sent the hens running for the coop. Not an egg since.","[stormnow,day]The hens are huddled in a corner of the run. Sulking, by the look of them.","[stormnow]This rain'll do the wheat good. If it doesn't flatten it."],
+ shepherd:["[ev_storm,evday]Got soaked to the skin bringing the flock in {evwhen}.","[stormnow,day]The flock's packed into a corner of the pen. Can't say I blame them.","[stormnow]Sheep don't mind rain. It's the thunder they hate."],
+ hermit:["[stormnow]Fish bite in the rain, they say. I'm not going out to find out."],
+ woodcutter:["[ev_storm,wood]The storm {evwhen} brought a big branch down by my door. Saves me a job.","[stormnow]Keep clear of the big trees in this. Lightning likes them."],
+ guard:["[stormnow,keep]Rain like this, nobody's coming over the wall. Small mercies.","[stormnow,keep]Wet through, and three hours of watch to go."],
+ gatekeeper:["[stormnow,keep]Nobody on the road in this. Not even me."],
+ steward:["[ev_storm,keep,evday]Rain came in under the hall door {evwhen}. I'm still mopping.","[stormnow,keep]Shut the hall door behind you. The rain gets everywhere."],
+ any:["[ev_storm,evday]Got caught out in the storm {evwhen}. My boots are still wet.","[ev_storm,evday]Had to stop work {evwhen}. Couldn't see my hand for the rain.",
+  "[stormnow,stormout]Get inside! It's coming down!","[stormnow]Listen to that thunder. It's right on top of us.","[stormnow,stormout]You'll catch your death out here. Get under a roof.",
+  "[stormnow]Wet enough for you?","[stormnow,worrier]Is that lightning getting closer? I think it's getting closer.","[stormnow,cheerful]I like a good storm. From indoors.",
+  "[stormnow,stormout,gruff]Don't stand there dripping. In or out."]};
+// where a pen's animals bunch up in a storm: the corner with the most clear ground round it
+function penHuddle(pen){ if(pen.hud) return pen.hud; let best=null, bs=-1;
+  for(const q of [[pen.x0+1.2,pen.y0+1.2],[pen.x1-1.2,pen.y0+1.2],[pen.x0+1.2,pen.y1-1.2],[pen.x1-1.2,pen.y1-1.2]]){ let s=0;
+    for(let dy=-1;dy<=1;dy++) for(let dx=-1;dx<=1;dx++){ const i=((q[1]+dy)|0)*N+((q[0]+dx)|0); if(!(W.st[i]>0.05||(W.su[i]>0&&W.sb[i]<1.6))) s++; }
+    if(s>bs){ bs=s; best=q; } }
+  return pen.hud=best; }
+// the lines that only fit fair weather, never said while a storm is on
+const CLEAR_RE=/\b(stars?|quiet night|sun's up|warm enough|lovely day|fine night)\b/i;
+// a night storm is only talked about as a night storm once the morning after has come
+function stormNightOver(ev){ const start=ev.day*24+ev.hour, morn=(ev.hour>=20?(ev.day+1)*24:ev.day*24)+5; return valleyDay()*24+DAY.tod>=morn&&valleyDay()*24+DAY.tod>=start; }
+// is this person out in it (not indoors)?
+function outInIt(id){ for(let c=0;c<CR_.n;c++) if(CR_.al[c]&&CR_.sp[c]===SP.KEEPER&&(CR_.ay[c]|0)===id) return !underCover(CR_.x[c],CR_.y[c],CR_.z[c]+1.6); return true; }
 // ---------------- the talk engine (v0.22): a short chat card, true lines only, new ones first ----------------
 // LINES is built once from TALK. A visit is one opening of the card: 3 to 5 lines, never the same line twice in a
 // visit, and lines already heard from this person in this valley only come back once every unheard one is used up.
@@ -2526,6 +2610,7 @@ function lineHash(t){ let h=0x811c9dc5; for(let i=0;i<t.length;i++){ h^=t.charCo
   for(const T of [TALK,TALKX]) for(const k in T.rel) for(const t of T.rel[k]) add('any',-1,0,t,{rel:k});
   for(const ps in POSEWHO) for(const who in POSEWHO[ps]) for(const ix of POSEWHO[ps][who]) add(who,-1,+ps,TALK.pose[ps][ix]);
   for(const who in TALKE) for(const t of TALKE[who]) add(who,-1,0,t);
+  for(const who in TALKS) for(const t of TALKS[who]) add(who,-1,0,t);
 })();
 const GREETN=["","","","","","","",""];   // "name, the role", filled from the cast when a valley grows
 let greetHook=null, chatHook=null; const GREETT=[-1e9,-1e9,-1e9,-1e9,-1e9,-1e9,-1e9,-1e9], GLAST=["","","","","","","",""];
@@ -2568,6 +2653,9 @@ function lineOk(id,l,here,who){ const m=TAG_RE.exec(l), c=castOf(id);
     else if(t==='nothermit'){ if(id===7) return false; }
     else if(t==='first'||t==='last'||t==='leaving'){ }
     else if(t.indexOf('ev_')===0||t==='evin'||t==='evfirst'||t==='evsecond'){ if(!LINE_EV) return false; }
+    else if(t==='evnight'||t==='evday'){ if(!LINE_EV) return false; const nt=LINE_EV.hour>=20||LINE_EV.hour<5; if(nt!==(t==='evnight')) return false; if(nt&&!stormNightOver(LINE_EV)) return false; }
+    else if(t==='stormnow'){ if(stormLevel()<0.25) return false; }
+    else if(t==='stormout'){ if(underCover(P.x,P.y,P.z)||!outInIt(id)) return false; }
     else if(t==='invite'){ if(id===7) return false; }   // the hermit came here to be alone
     else if(t==='aloof'){ if(c&&(c.traits.indexOf('cheerful')>=0||c.traits.indexOf('kind')>=0||c.traits.indexOf('gossip')>=0)) return false; }
     else if(t==='ruins'){ if(!W.ruins.length) return false; }
@@ -2619,7 +2707,8 @@ const STANCES=['invite','aloof','leaving'];
   e.evrole=tg.indexOf('evin')>=0?'in':(tg.indexOf('evfirst')>=0?'first':(tg.indexOf('evsecond')>=0?'second':''));
   // where it sits in a visit: their own world first, then places and people round about, then talk, then their nature, then their own people
   e.cat=e.who!=='any'?1:(e.rel?5:(e.trait?4:(/[@$]|\{(guard1|guard2|gatekeeper|steward|farmer|shepherd|woodcutter|hermit)\b/.test(e.check)?2:3)));
-  if(e.evkind){ e.topics.push('ev_'+e.evkind); e.cat=0.5; } } })();
+  if(e.evkind){ e.topics.push('ev_'+e.evkind); e.cat=0.5; }
+  e.storm=tg.indexOf('stormnow')>=0; if(e.storm){ e.topics.push('stormnow'); e.cat=0.4; } } })();
 // the lines for one visit: 3 to 5, opening with what they are doing or the time of day, then their own world, then
 // out to the valley; new lines first, one per topic, one attitude, at most one about their nature, and at most one
 // about each of their own people (and that one says who the person is to them)
@@ -2628,7 +2717,7 @@ function talkPick(id,pose,here,n){ here=here||peopleHere();
   const r=seedRng(((W.seed>>>0)^Math.imul(id+1,0x9E37)^Math.imul(visit+1,0x85EB)^heardN)>>>0,0x7A1E);
   if(n==null) n=pose===4?1+((r()*2)|0):3+((r()*3)|0);
   const picks=[], used=new Set(), topics=new Set(), relTo=new Set(); let stance='', traitN=0, anyN=0, count=0;
-  const evOf=new Map(), hid=function(e){ const v=evOf.get(e.id); return v?e.id+'@'+evKey(v):e.id; };
+  const stormy=stormLevel()>0.05, evOf=new Map(), hid=function(e){ const v=evOf.get(e.id); return v?e.id+'@'+evKey(v):e.id; };
   const fresh=function(e){ return !heard.has(hid(e)); };
   const fits=function(e){
     if(used.has(e.id)||1+e.chain.length>5-count) return false;               // a story only starts if all of it fits
@@ -2644,6 +2733,7 @@ function talkPick(id,pose,here,n){ here=here||peopleHere();
   const pool=function(test){ const a=[]; for(const e of LINES){ if(!whoOk(id,e.who)||!test(e)||!fits(e)) continue;
       let ev=null; if(e.evkind){ ev=evBind(e,id,here); if(!ev) continue; }
       if(/longer than I can count/.test(e.text)&&wedNow(id)>=0) continue;
+      if(stormy&&CLEAR_RE.test(e.text)) continue;
       LINE_EV=ev; const ok=lineOk(id,e.check,here,e.who); LINE_EV=null; if(ok){ if(ev) evOf.set(e.id,ev); a.push(e); } } return a; };
   // newest-unheard first, then the ones heard longest ago; weighted by how much the line belongs to this person
   const choose=function(a){ if(!a.length) return null; const f=a.filter(fresh), src=f.length?f:a;
@@ -2659,6 +2749,8 @@ function talkPick(id,pose,here,n){ here=here||peopleHere();
     if(pose===4){ while(count<n){ const e2=choose(pool(function(e){ return e.pose===4; })); if(!e2) break; take(e2); } return out(); } }
   // otherwise open with a greeting or a line of their own for this time of day
   if(!count){ const a=pool(function(e){ return e.pose===0&&(e.first&&(e.part===-1||e.part===dp)||(e.part===dp&&e.who!=='any')); }); const e=choose(a.filter(fresh).length?a.filter(fresh):a); if(e) take(e); }
+  // in a storm, the storm comes first
+  if(count<n&&stormLevel()>=0.25){ const e=choose(pool(function(e){ return e.pose===0&&e.storm; })); if(e) take(e); }
   // the newest happening they can speak of comes next
   if(count<n){ const a=pool(function(e){ return e.pose===0&&!!e.evkind; }).filter(fresh);
     a.sort(function(x,y){ const ex=evOf.get(x.id), ey=evOf.get(y.id); return (ey.day*100+ey.hour)-(ex.day*100+ex.hour); });
@@ -3588,13 +3680,14 @@ function boot(){
       if(RS.letterbox){ ctx.fillStyle='#000'; ctx.fillRect(0,0,canvas.width,canvas.height); ctx.putImageData(img,RS.offX,RS.offY); }
       else ctx.putImageData(img,0,0);
     }
+    rainFrame(dt,card);
     if(!card){ fAcc+=performance.now()-t0; fN++; fT+=dt; }   // frame stats only while really playing
   }
   requestAnimationFrame(frame);
   if(glCur()) setTimeout(function(){ const m=glCur(); if(m) loadGL(m); },400);
 }
 
-if(IS_NODE){ module.exports={genWorld,allocGrid,buildGlyphs,renderFrame,compose,spawn,populate,tick,ecology,simBin,updatePlayer,W,RS,FB,P,IN,CR_,SP,SPP,MASKS,RESERVE,RAMP,N,WATER,EYE,terr,groundAt,DIALS,growOf,isAdult,addCreature,WALLS,buildWalls,nearestWall,allWallHits,wallBlocked,setSkyTime:function(t){skyTime=t;},setUW:function(v){UW=v;},DAY,SUN,MOON,SKY,DAYMODES,sunAltAz,sunUpdate,updateDay,relightAll,relightStep,RELIGHT,dayDate,fmtTod,setTod:function(h){DAY.tod=h;sunUpdate();},floorAt,KPATHS,KEEP,FORT,eventsForDay,weddingDay,babyDay,valleyDay,logEvent,eventsRefresh,dayTick,restock,stockTakeable,stockOwner,evBind,evWhen,evKey,evBase,keeperAbed,FISHSIZE,TALKE,EVTAG,EVKINDS,wedNow,relOf,TALK,TALKX,LINES,POSEWHO,talkPick,talk,chatMore,closeChat,chatTick,CHAT,HEARD,VISITS,heardKey,heardAdd,lineOk,whoOk,placeName,placeDir,setChat:function(h){chatHook=h;},castValley,valleyName,valleyNames,seedRng,rebuildPeople,KEEPERS,GREETN,lineOk,fillLine,peopleHere,ALLHERE,ROLEKEY,ROLES,NAMES_F,NAMES_M,NAMES_X,BYNAMES,CLOTHES,SKINS,HAIRS,TRAITS,TRAIT_CLASH,RELREV,dayPart,folkMissing,tickKeeper,KMASK,KL,keeperFrame,GREETT,setGreet:function(f){greetHook=f;},RENDERS}; }
+if(IS_NODE){ module.exports={genWorld,allocGrid,buildGlyphs,renderFrame,compose,spawn,populate,tick,ecology,simBin,updatePlayer,W,RS,FB,P,IN,CR_,SP,SPP,MASKS,RESERVE,RAMP,N,WATER,EYE,terr,groundAt,DIALS,growOf,isAdult,addCreature,WALLS,buildWalls,nearestWall,allWallHits,wallBlocked,setSkyTime:function(t){skyTime=t;},setUW:function(v){UW=v;},DAY,SUN,MOON,SKY,DAYMODES,sunAltAz,sunUpdate,updateDay,relightAll,relightStep,RELIGHT,dayDate,fmtTod,setTod:function(h){DAY.tod=h;sunUpdate();},floorAt,KPATHS,KEEP,FORT,eventsForDay,weddingDay,babyDay,valleyDay,logEvent,eventsRefresh,dayTick,restock,stockTakeable,stockOwner,evBind,evWhen,evKey,stormLevel,stormWindows,stormOngoing,underCover,stormLight,TALKS,STORMC,evBase,keeperAbed,FISHSIZE,TALKE,EVTAG,EVKINDS,wedNow,relOf,TALK,TALKX,LINES,POSEWHO,talkPick,talk,chatMore,closeChat,chatTick,CHAT,HEARD,VISITS,heardKey,heardAdd,lineOk,whoOk,placeName,placeDir,setChat:function(h){chatHook=h;},castValley,valleyName,valleyNames,seedRng,rebuildPeople,KEEPERS,GREETN,lineOk,fillLine,peopleHere,ALLHERE,ROLEKEY,ROLES,NAMES_F,NAMES_M,NAMES_X,BYNAMES,CLOTHES,SKINS,HAIRS,TRAITS,TRAIT_CLASH,RELREV,dayPart,folkMissing,tickKeeper,KMASK,KL,keeperFrame,GREETT,setGreet:function(f){greetHook=f;},RENDERS}; }
 else boot();
 })();
 </script>
