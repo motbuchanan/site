@@ -86,8 +86,29 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
 #intro button{font-family:'Archivo',sans-serif;cursor:pointer;-webkit-tap-highlight-color:transparent}
 #intro .choices button{font:600 17px/1.15 'Archivo',sans-serif;padding:16px 22px;border-radius:12px;letter-spacing:.01em;min-height:52px}
 #intro .pri{background:#f59847;color:#1e1209;border:1px solid #f59847}
-#inStory{background:transparent;color:rgba(238,220,188,.55);border:1px solid rgba(238,220,188,.18);display:flex;flex-direction:column;align-items:center;gap:4px}
-#inStory .soon{font:500 11px/1 'Archivo',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#4cf0e0;opacity:.8}
+#intro .choices button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+#intro .choices button[hidden]{display:none}
+@media (min-aspect-ratio:1/1) and (min-width:560px){#intro .choices button{min-width:150px}}
+#leaveCard .btn{min-height:44px}
+#intro .choices .hint{font:400 12.5px/1.25 'Archivo',sans-serif;letter-spacing:0;opacity:.72}
+#intro .sec{background:transparent;color:#eedcbc;border:1px solid rgba(238,220,188,.28)}
+#inNew h2{font:600 clamp(26px,7vw,38px)/1.1 'Cormorant Garamond',serif;color:#eedcbc;margin:8px 0 0;text-align:center;letter-spacing:.02em}
+#inNew h3{font:600 clamp(20px,5.4vw,26px)/1.15 'Cormorant Garamond',serif;color:#eedcbc;margin:6px 0 -6px;text-align:center}
+#inNew{gap:16px!important}
+#inNew .nmrow{display:flex;gap:8px;width:min(380px,100%)}
+#inName{flex:1;min-width:0;font:600 18px/1.2 'Archivo',sans-serif;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.05);color:#eedcbc;border:1px solid rgba(238,220,188,.28);min-height:50px}
+#inName:focus{outline:2px solid #4cf0e0;outline-offset:2px}
+#inDice{font:600 15px/1 'Archivo',sans-serif;padding:0 16px;border-radius:12px;min-height:50px;flex:0 0 auto}
+#inNew .note{font:400 13.5px/1.45 'Archivo',sans-serif;color:#9a8a78;margin:0;text-align:center;max-width:380px}
+#inRows{display:flex;flex-direction:column;gap:10px;width:min(380px,100%)}
+#inRows .lbl{font:600 11.5px/1 'Archivo',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#9a8a78;margin:0 0 6px 2px}
+#inRows .opts{display:flex;gap:6px}
+#inRows .opts button{flex:1;min-width:0;min-height:44px;border-radius:10px;background:rgba(255,255,255,.035);border:1px solid rgba(238,220,188,.16);color:#eedcbc;font:500 14.5px/1 'Archivo',sans-serif;padding:0 4px}
+#inRows .opts button.on{border-color:#4cf0e0;background:rgba(76,240,224,.1);box-shadow:0 0 0 1px #4cf0e0 inset}
+#inSurprise{background:none;border:1px dashed rgba(238,220,188,.3);color:#eedcbc;font:500 14.5px/1 'Archivo',sans-serif;padding:0 18px;min-height:44px;border-radius:10px}
+#inNew .warn{font:500 13.5px/1.4 'Archivo',sans-serif;color:#f59847;margin:0;text-align:center;max-width:380px}
+#inNew .warn[hidden]{display:none}
+@media (max-height:500px) and (min-width:560px){#inRows{display:grid;grid-template-columns:1fr 1fr;width:min(680px,100%);column-gap:14px}#inNew h2{font-size:24px;margin-top:0}#inNew{gap:10px!important}}
 #intro .links{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
 #intro .links button{background:none;border:0;color:rgba(154,138,120,.85);font:500 14px/1 'Archivo',sans-serif;padding:12px 14px;min-height:44px}
 #intro button:focus-visible,#intro .vcard:focus-visible{outline:2px solid #4cf0e0;outline-offset:3px}
@@ -104,7 +125,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
 #inViews .note{font:400 13.5px/1.4 'Archivo',sans-serif;color:#9a8a78;margin:0;text-align:center}
 #intro .vbtns{display:flex;gap:10px;width:min(360px,100%);position:sticky;bottom:0;z-index:2;padding:10px 0 calc(10px + env(safe-area-inset-bottom));margin-bottom:calc(-20px - env(safe-area-inset-bottom));background:#0d0907;box-shadow:0 -14px 18px 6px #0d0907}
 #intro .vbtns button{flex:1;font:600 16px/1 'Archivo',sans-serif;padding:15px 18px;border-radius:12px;min-height:50px}
-#inBack{background:transparent;color:#eedcbc;border:1px solid rgba(238,220,188,.25)}
+#inBack,#inNBack{background:transparent;color:#eedcbc;border:1px solid rgba(238,220,188,.25)}
 @media (max-height:480px){#inViews{gap:10px}#inViews h2{font-size:22px;margin-top:0}#intro .vcard img{aspect-ratio:16/7}#inViews .note{font-size:12.5px}}
 @media (max-height:700px){#intro .vcard span{font-size:12px}#intro .vcard b{font-size:14px}}
 #inToast{position:absolute;left:50%;bottom:calc(64px + env(safe-area-inset-bottom));transform:translateX(-50%);max-width:min(92%,420px);background:rgba(16,21,28,.94);border:1px solid rgba(255,255,255,.12);color:#eedcbc;padding:10px 16px;border-radius:16px;font:500 14px/1.35 'Archivo',sans-serif;text-align:center;opacity:0;pointer-events:none;transition:opacity .25s}
@@ -122,10 +143,21 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
    <h1>The Keep</h1>
    <p class="sub">A living valley, drawn in letters.</p>
    <div class="choices">
-    <button id="inWander" class="pri" type="button">Wander</button>
-    <button id="inStory" type="button" aria-disabled="true">Story<span class="soon">Coming next</span></button>
+    <button id="inCont" class="pri" type="button" hidden>Continue<span class="hint" id="inContWho"></span></button>
+    <button id="inStory" class="pri" type="button">New story<span class="hint">your own name and home</span></button>
+    <button id="inWander" class="sec" type="button">Wander<span class="hint">any valley, no name</span></button>
    </div>
    <div class="links"><button id="inReplay" type="button">Replay intro</button><button id="inAbout" type="button">About</button></div>
+  </section>
+  <section id="inNew" hidden>
+   <h2>Who are you?</h2>
+   <p class="warn" id="inReplace" hidden></p>
+   <div class="nmrow"><input id="inName" type="text" maxlength="18" value="Traveler" autocomplete="off" autocapitalize="words" spellcheck="false" enterkeyhint="go" aria-label="Your name"><button id="inDice" class="sec" type="button">Another</button></div>
+   <h3>Where did you grow up?</h3>
+   <p class="note">Your parents keep a small keep in a quiet valley. What is it like? Leave a row alone and it can be anything.</p>
+   <div id="inRows"></div>
+   <button id="inSurprise" type="button">Surprise me</button>
+   <div class="vbtns"><button id="inNBack" type="button">Back</button><button id="inBegin" class="pri" type="button">Begin</button></div>
   </section>
   <section id="inViews" hidden>
    <h2>How do you want to see the world?</h2>
@@ -144,7 +176,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
  </div>
  <div id="stick"><div id="knob"></div></div>
  <div id="fps"></div>
- <button class="mb-ver" id="mbVer" type="button">v0.25.0 &middot; Nov 1</button>
+ <button class="mb-ver" id="mbVer" type="button">v0.25.1 &middot; Nov 1</button>
  <div id="toast"></div>
  <div id="chat" class="hidden" role="dialog" aria-live="polite"><div class="ch-who"><b id="chName"></b><span id="chRole"></span></div><p id="chLine"></p><div class="ch-dots" id="chDots"></div><div class="ch-btns"><button class="btn" id="chMore" type="button">more</button><button class="btn" id="chBye" type="button">goodbye</button></div></div>
  <div id="help" class="hidden"><div class="card">
@@ -171,8 +203,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
    <img src="12-gate-at-night.jpg" alt="a brazier at the gate arch" loading="lazy">
    <img src="11-moonlit.jpg" alt="the keep by moonlight" loading="lazy">
   </div>
-  <p><b>Coming next: Story.</b> You'll start in your own home valley, with your own name, and the roads will lead you out into the wider world.</p>
-  <p class="fsize">The whole game is one HTML file, plus a file for each 3D view. Right now: <b id="fsize">~435 KB</b>. Smaller than a single phone photo.</p>
+  <p><b>Story.</b> Start a story and you pick your name and the kind of valley you grew up in. You wake at home, where your parents keep a small keep and everyone knows you. Coming next: errands, a journal, and a first trip over the hills.</p>
+  <p class="fsize">The whole game is one HTML file, plus a file for each 3D view. Right now: <b id="fsize">~461 KB</b>. Smaller than a single phone photo.</p>
   <p><b>Why I built it.</b> I build things on a phone, directing AI the way I would direct a camera. I saw a clip of a tiny 3D world made of nothing but text and wanted to see if I could grow one that was actually alive, and keep growing it in the open instead of ever calling it done.</p>
   <p><b>What I learned.</b> How far you can get with almost nothing. One idea, a ray walking a height map, turned into characters, with a small world of animals living on top. Every version taught me one concrete thing: how to make a wall read as solid, how to keep the wolves from starving the world empty, how to make a forest look like real woods.</p>
   <p style="color:var(--mb-dim);font-size:13px"><b style="color:var(--mb-soft)">Walk:</b> drag the left half of the screen (tilt to turn). <b style="color:var(--mb-soft)">Look:</b> drag the right half. Wade into the water to swim. Tap ☰ menu for a new world, the dials, and the time of day. Walk under the gate arch and find the door under the tower stair.</p>
@@ -1084,14 +1116,15 @@ var SKIPAT=-1e9;   // a tap that skips the scene must not also land on the page 
 function skip(){ if(done||!ACTIVE) return; SKIPAT=performance.now(); start=performance.now()-END*1000; }
 function fresh(){ return performance.now()-SKIPAT<350; }
 function pageLive(){ page.style.opacity='1'; page.classList.add('live'); page.setAttribute('aria-hidden','false'); skipEl.style.opacity=0;
-  setTimeout(function(){ var b=document.getElementById('inWander'); if(b&&ACTIVE&&curPanel==='main'){ try{ b.focus({preventScroll:true}); }catch(e){} } },60); }
+  setTimeout(function(){ var c=document.getElementById('inCont'), b=(c&&!c.hidden)?c:document.getElementById('inStory'); if(b&&ACTIVE&&curPanel==='main'){ try{ b.focus({preventScroll:true}); }catch(e){} } },60); }
 fxc.addEventListener('pointerdown',skip);
 // while the hearth is up it owns the keyboard: nothing reaches the world underneath
 function aboutUp(){ var a=document.getElementById('about'); return !!(a&&!a.classList.contains('hidden')); }
 function onKey(e){ if(!ACTIVE) return;
   if(aboutUp()){ if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); document.getElementById('about').classList.add('hidden'); var ab=document.getElementById('inAbout'); if(ab){ try{ ab.focus({preventScroll:true}); }catch(x){} } } return; }   // the about card has the keyboard while it is open
   if(!done){ if(e.key==='Enter'||e.key===' '||e.key==='Escape'){ e.preventDefault(); skip(); } e.stopPropagation(); return; }
-  if(e.key==='Escape'){ e.preventDefault(); if(curPanel==='views') showPanel('main'); }
+  if(e.key==='Escape'){ e.preventDefault(); if(curPanel==='views') showPanel(NEXT==='story-new'?'new':'main'); else if(curPanel==='new') showPanel('main'); }
+  if(e.key==='Enter'&&curPanel==='new'&&e.target&&e.target.id==='inName'){ e.preventDefault(); e.stopPropagation(); begin(); return; }
   if(e.key==='Tab'||e.key==='Enter'||e.key===' '||e.key==='Escape') { e.stopPropagation(); return; }
   e.stopPropagation(); }
 window.addEventListener('keydown',onKey,true); window.addEventListener('keyup',function(e){ if(ACTIVE) e.stopPropagation(); },true);
@@ -1105,26 +1138,65 @@ function recall(k){ var v=null; try{ v=localStorage.getItem(k); }catch(e){} if(v
 
 // panels: the opening page and the view cards
 var curPanel='main';
-function showPanel(p){ curPanel=p; document.getElementById('inMain').hidden=(p!=='main'); document.getElementById('inViews').hidden=(p!=='views'); }
+function showPanel(p){ curPanel=p; document.getElementById('inMain').hidden=(p!=='main'); document.getElementById('inViews').hidden=(p!=='views'); document.getElementById('inNew').hidden=(p!=='new'); try{ page.scrollTop=0; }catch(e){} SKIPAT=performance.now(); }
 var VIEWSEL=0;
 function paintViews(){ var cs=document.querySelectorAll('#inCards .vcard'); for(var i=0;i<cs.length;i++){ var on=(+cs[i].getAttribute('data-r')===VIEWSEL); cs[i].classList.toggle('on',on); cs[i].setAttribute('aria-checked',on?'true':'false'); } }
 function finishNow(){ if(done) return; if(raf){ cancelAnimationFrame(raf); raf=0; } render(END); done=true; pageLive(); }
+var NEXT='wander', GOING=false;
+function views(){ VIEWSEL=HOOKS.render?HOOKS.render():0; paintViews(); showPanel('views');
+  setTimeout(function(){ var b=document.querySelector('#inCards .vcard.on'); if(b){ try{ b.focus({preventScroll:true}); }catch(e){} } },40); }
+function viewsDone(){ return recall('keep_view_chosen')==='1'||SEEN_VIEWS; }
+// leave the hearth for the world: the hook regrows the valley when a story needs it, while the page still covers the screen
+function go(kind,data){ if(GOING) return; GOING=true;
+  if(kind==='wander'){ if(HOOKS.go) HOOKS.go('wander'); GOING=false; close(); return; }
+  var btn=document.getElementById(curPanel==='views'?'inWalk':(curPanel==='new'?'inBegin':'inCont')); if(btn) btn.textContent=kind==='story-new'?'Going home...':'Walking...';
+  setTimeout(function(){ requestAnimationFrame(function(){ setTimeout(function(){ try{ if(HOOKS.go) HOOKS.go(kind,data); }catch(e){} GOING=false; close(); },0); }); },30); }
+// the opening page: Continue when a story is saved; New story is the first choice otherwise
+function paintMain(){ var st=HOOKS.story?HOOKS.story():null, c=document.getElementById('inCont'), n=document.getElementById('inStory');
+  c.hidden=!st; n.classList.toggle('pri',!st); n.classList.toggle('sec',!!st);
+  if(st) document.getElementById('inContWho').textContent=st.name+', of '+st.home; }
+// the new story card: a name (Traveler, a random one, or your own) and four rows for the home valley
+var WANT=[-1,-1,-1,-1], TRAITS=null;
+function paintRows(){ var el=document.getElementById('inRows'); if(!TRAITS) TRAITS=HOOKS.traits?HOOKS.traits():[]; var h='';
+  for(var i=0;i<TRAITS.length;i++){ h+='<div role="radiogroup" aria-label="'+TRAITS[i].name+'"><div class="lbl">'+TRAITS[i].name+'</div><div class="opts">';
+    for(var v=0;v<3;v++) h+='<button type="button" role="radio" aria-checked="'+(WANT[i]===v)+'" class="'+(WANT[i]===v?'on':'')+'" data-t="'+i+'" data-v="'+v+'">'+TRAITS[i].words[v]+'</button>';
+    h+='</div></div>'; }
+  el.innerHTML=h; }
+function story(){ if(!done){ if(!page.classList.contains('live')) return; finishNow(); }
+  var st=HOOKS.story?HOOKS.story():null, w=document.getElementById('inReplace');
+  w.hidden=!st; if(st) w.textContent='Starting a new story forgets '+st.name+'\'s story. Continue is on the page before this one.';
+  paintRows(); showPanel('new'); }
+function cleanIn(v){ if(HOOKS.clean) return HOOKS.clean(v); v=String(v||'').replace(/<[^>]*>/g,''); try{ v=v.replace(/[^\p{L}\p{M}' .-]/gu,''); }catch(e){} v=v.replace(/\s+/g,' ').replace(/^[ .'-]+|[ .'-]+$/g,'').trim().slice(0,18); return v||'Traveler'; }
+function begin(){ var nm=cleanIn(document.getElementById('inName').value); document.getElementById('inName').value=nm;
+  NEXT='story-new'; DATA={name:nm, want:WANT.slice()};
+  if(viewsDone()) go('story-new',DATA); else views(); }
+var DATA=null;
 function wander(){ if(!done){ if(!page.classList.contains('live')) return; finishNow(); }
-  if(recall('keep_view_chosen')==='1'||SEEN_VIEWS){ close(); return; }
+  NEXT='wander'; DATA=null;
+  if(viewsDone()){ go('wander'); return; }
   VIEWSEL=HOOKS.render?HOOKS.render():0; paintViews(); showPanel('views');
   setTimeout(function(){ var b=document.querySelector('#inCards .vcard.on'); if(b){ try{ b.focus({preventScroll:true}); }catch(e){} } },40); }
 var SEEN_VIEWS=false;
-function walkIn(){ store('keep_view_chosen','1'); SEEN_VIEWS=true; var r=VIEWSEL; if(HOOKS.setRender) HOOKS.setRender(r,true); close(); }
+function walkIn(){ if(GOING) return; store('keep_view_chosen','1'); SEEN_VIEWS=true; var r=VIEWSEL; if(HOOKS.setRender) HOOKS.setRender(r,true); go(NEXT,DATA); }
 function toast(msg){ var t=document.getElementById('inToast'); t.textContent=msg; t.classList.add('on'); clearTimeout(toast.h); toast.h=setTimeout(function(){ t.classList.remove('on'); },1900); }
 function G(f){ return function(e){ if(fresh()) return; f(e); }; }
 document.getElementById('inWander').addEventListener('click',G(wander));
-document.getElementById('inStory').addEventListener('click',G(function(){ toast('Story is coming next: you will start in your own home valley.'); }));
+document.getElementById('inStory').addEventListener('click',G(story));
+document.getElementById('inCont').addEventListener('click',G(function(){ if(!done){ if(!page.classList.contains('live')) return; finishNow(); } NEXT='story-cont'; DATA=null; go('story-cont'); }));
+document.getElementById('inNBack').addEventListener('click',G(function(){ showPanel('main'); }));
+document.getElementById('inBegin').addEventListener('click',G(begin));
+document.getElementById('inDice').addEventListener('click',G(function(){ var el=document.getElementById('inName'), old=el.value, nm=old;
+  for(var k=0;k<8&&nm===old;k++) nm=HOOKS.randomName?HOOKS.randomName():'Traveler'; el.value=nm; }));
+document.getElementById('inSurprise').addEventListener('click',G(function(){ for(var i=0;i<4;i++) WANT[i]=(Math.random()*3)|0; paintRows(); toast('A valley picked for you. Change any row you like.'); }));
+document.getElementById('inRows').addEventListener('click',function(e){ if(fresh()) return; var b=e.target.closest?e.target.closest('button[data-t]'):null; if(!b) return;
+  var t=+b.getAttribute('data-t'), v=+b.getAttribute('data-v'); WANT[t]=WANT[t]===v?-1:v; paintRows();
+  var nb=document.querySelector('#inRows button[data-t="'+t+'"][data-v="'+v+'"]'); if(nb){ try{ nb.focus({preventScroll:true}); }catch(x){} } });
 document.getElementById('inReplay').addEventListener('click',G(function(){ play(false); }));
 document.getElementById('inAbout').addEventListener('click',G(function(){ if(HOOKS.about) HOOKS.about(); }));
-document.getElementById('inBack').addEventListener('click',G(function(){ showPanel('main'); }));
+document.getElementById('inBack').addEventListener('click',G(function(){ showPanel(NEXT==='story-new'?'new':'main'); }));
 document.getElementById('inWalk').addEventListener('click',G(walkIn));
 document.getElementById('inCards').addEventListener('click',function(e){ if(fresh()) return; var b=e.target.closest?e.target.closest('.vcard'):null; if(!b) return; VIEWSEL=+b.getAttribute('data-r'); paintViews(); });
-document.getElementById('inCards').addEventListener('dblclick',function(e){ var b=e.target.closest?e.target.closest('.vcard'):null; if(b) walkIn(); });
+document.getElementById('inCards').addEventListener('dblclick',function(e){ if(fresh()) return; var b=e.target.closest?e.target.closest('.vcard'):null; if(b) walkIn(); });
 
 var INERT=[];
 function setInert(on){
@@ -1143,7 +1215,7 @@ function close(){ var was=ACTIVE; ACTIVE=false; if(raf){ cancelAnimationFrame(ra
   if(was&&HOOKS.closed) HOOKS.closed(); }
 
 // start: called once by the game after the world has grown. hooks: render(), setRender(i), about(), closed()
-function startIntro(hooks){ HOOKS=hooks||{}; ACTIVE=true; root.classList.remove('gone'); root.setAttribute('aria-hidden','false'); setInert(true);
+function startIntro(hooks){ HOOKS=hooks||{}; ACTIVE=true; try{ paintMain(); }catch(e){} root.classList.remove('gone'); root.setAttribute('aria-hidden','false'); setInert(true);
   var short=recall('keep_intro_seen')==='1';
   if(/[?&]replay=1/.test(location.search)){ short=false; try{ history.replaceState(null,'',location.pathname+location.search.replace(/([?&])replay=1(&|$)/,function(m,a,b){ return b?a:''; }).replace(/[?&]$/,'')+location.hash); }catch(e){} }   // asked for from the menu: the whole scene again
   var fontsReady=Promise.all([
@@ -1164,9 +1236,10 @@ return {start:startIntro, close:close, skip:skip, get active(){ return ACTIVE; }
 })();
 if(typeof window!=='undefined') window.KEEP_INTRO=KEEP_INTRO;   // (for the tests)
 
-const VERSION='The Keep v0.25.0 · Nov 1 2026';
-const VER_SHORT='v0.25.0 · Nov 1'; // what the badge shows; bump with VERSION
+const VERSION='The Keep v0.25.1 · Nov 1 2026';
+const VER_SHORT='v0.25.1 · Nov 1'; // what the badge shows; bump with VERSION
 const CHANGELOG=[
+ ['v0.25.1 · Nov 1 2026','Story begins. The opening page now has New story next to Wander. Give yourself a name (or tap Another for one), say what your home valley is like (forest, water, ruins, wildlife, or surprise me), and you wake at home. Your parents keep its small keep: two new people, found only in your home valley, who walk the hall, the kitchen and the chapel and greet you by name. Everyone at home knows you now, and nobody there takes you for a stranger. Your story is saved on this device, so the next time you come the page offers Continue. Wander still drops you into a valley as before, and the two never overwrite each other.'],
  ['v0.25.0 · Nov 1 2026','The hearth. The Keep now opens on a stone hearth in a keep hall at sunrise: the light comes through the window, finds the words The Keep in the dark, and the embers rise. It plays in full on your first visit and as a short fade after that, and a tap skips it. Then the opening page: Wander, or Story, which is coming next. The first time you wander you pick how to see the world from six cards: ASCII, the original letters, or Pixels, Mesh, Voxels, Rays or Iso. You can change it any time in the menu, where you can also replay the intro. The about card is rewritten for the game as it is now.'],
  ['v0.24.1 · Oct 31 2026','Every valley shaped by its own seed. When you travel, the valley you walk into now grows with settings that come from its seed: some are thick forest, some are lake country, some are full of old ruins, some are quiet and some are busy with wildlife. The same seed always grows the same valley for anyone who types it. A random valley is now fully random. A new choice at the end of a road, Choose a valley, lets you pick forest, water, ruins and wildlife, and finds a valley like that for you. Your own dials still shape the world you grow from the menu, and travelling never changes them.'],
  ['v0.24.0 · Oct 31 2026','Roads out. Every valley now has one to three roads leaving it, each cut through a pass in the hills and joined to the trails. Near the top of each road stands a signpost: WELCOME on the side you see coming in, FAREWELL on the side you see going out. Walk past the end of a road and a card asks where next: stay (the default), a random valley, or a seed you type, with this valley seed shown to copy. You arrive in the new valley on the road facing the way you came, and typing a seed brings you back to the same valley and the same people (other valleys grow with the standard settings, and your own settings are kept). Every third day a peddler walks in by one road with pans, needles and thread, spends the day by the gate braziers and leaves by another road at first light.'],
@@ -1578,8 +1651,9 @@ function genWorld(seed){
   W.seed=seed; W.vday=0; W.live=[]; W.lastTod=null; W.events=null; W.taken={}; W.fishDay=null;
   PED.cyc=null; PED.gone=null; PED.phase=''; PED.route=null; PED.lastTod=null; PED.ways=null; PED.shelter=undefined; ROADS.sign=-1;
   { const vn=valleyNames(seed); W.valley=vn.valley; W.farmNames=[vn.farm1,vn.farm2]; }
-  W.cast=castValley(seed); W.castSig=seed+':'+W.cast.map(function(c){ return c.name; }).join(','); rebuildPeople();
-  W.arriveMsg='You arrive in '+W.valley+'.';
+  W.cast=castValley(seed); if(storyHomeHere(seed)) W.cast.push.apply(W.cast,castParents(seed,STORY.name,W.cast));
+  W.castSig=seed+':'+W.cast.map(function(c){ return c.name; }).join(','); rebuildPeople();
+  W.arriveMsg=(storyHomeHere(seed)?'You are home in ':'You arrive in ')+W.valley+'.'; storyAt(seed);
   const h=W.h, st=W.st, tree=W.tree;
   st.fill(0); tree.fill(0); W.sb.fill(0); W.su.fill(0); W.rail.fill(0); W.floor.fill(0); W.ruin.fill(0); W.smat.fill(0); W.places.length=0; W.pens.length=0; W.keepBuilt=false;
   for(let y=0;y<N;y++)for(let x=0;x<N;x++){
@@ -3894,6 +3968,134 @@ function seedParse(v){ v=String(v==null?'':v).trim(); if(!/^\d{1,10}$/.test(v)) 
 // ---------------- the talk engine (v0.22): a short chat card, true lines only, new ones first ----------------
 // LINES is built once from TALK. A visit is one opening of the card: 3 to 5 lines, never the same line twice in a
 // visit, and lines already heard from this person in this valley only come back once every unheard one is used up.
+// ---------------- the story start (v0.25.1): your name, your home valley, your parents ----------------
+// MODE is picked on the opening page each visit: 'wander' (any valley, no name) or 'story' (your own name and home).
+// The save is one key, keep_journal = {v:1, story:{name, home, at, started, want}|null, wander:{}}. Wander never touches
+// story, and the old keep_dials keeps the wanderer's valley (saveDials swaps it back in while a story is being played).
+var MODE='wander', JOURNAL={v:1, story:null, wander:{}}, STORY=null, SAVE_OK=true;
+const STORY_SALT=0x9A2E;
+const NAME_SMALL={de:1,da:1,di:1,du:1,van:1,von:1,der:1,le:1,la:1,of:1,del:1,dos:1,das:1};
+function cleanName(v){ v=String(v==null?'':v).replace(/<[^>]*>/g,'');
+  try{ v=v.replace(/[^\p{L}\p{M}' .-]/gu,''); }catch(e){ v=v.replace(/[^A-Za-zÀ-ɏ' .-]/g,''); }
+  v=v.replace(/\s+/g,' ').replace(/^[ .'-]+|[ .'-]+$/g,'').slice(0,18).replace(/[ .'-]+$/,'').trim();
+  let letter=false; try{ letter=/\p{L}/u.test(v); }catch(e){ letter=/[A-Za-zÀ-ɏ]/.test(v); }
+  if(!letter) return 'Traveler';
+  return v.split(' ').map(function(w,i){ if(i>0&&NAME_SMALL[w.toLowerCase()]) return w.toLowerCase(); return w.charAt(0).toUpperCase()+w.slice(1); }).join(' '); }
+function nameHash(s){ let h=0x811c9dc5; s=String(s).toLowerCase(); for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,0x01000193); } return h>>>0; }
+// a name for the dice button: any given name from the people tables
+function randomName(r){ r=r||Math.random; const all=NAMES_F.concat(NAMES_M,NAMES_X); return all[(r()*all.length)|0]; }
+// your home: the first seed after a hash of your name whose valley has the traits you picked (-1 = any), where nobody
+// already has your name. The same name and the same picks always give the same home.
+function homeSeed(want,name){ const nm=cleanName(name).toLowerCase(); want=(want||[]).slice(0,4); while(want.length<4) want.push(-1);
+  let s=(nameHash(nm)^0x48304D45)>>>0;
+  for(let k=0;k<160000;k++){ s=(s+0x9E3779B1)>>>0; const tr=valleyTraits(s); let ok=true;
+    for(let i=0;i<4;i++) if(want[i]>=0&&tr[i]!==want[i]){ ok=false; break; }
+    if(!ok) continue;
+    const cast=castValley(s), fn=nm.split(' ')[0]; if(cast.some(function(c){ const g=c.given.toLowerCase(); return g===nm||g===fn; })) continue;
+    return s; }
+  const f=chooseSeed(want,nameHash(nm),40000); return f==null?nameHash(nm):f; }
+function atHome(){ return MODE==='story'&&!!STORY&&(W.seed>>>0)===STORY.home; }
+function storyHomeHere(seed){ return MODE==='story'&&!!STORY&&(seed>>>0)===STORY.home; }
+function youName(){ return MODE==='story'&&STORY?STORY.name:'traveler'; }
+// your parents: two more people in the home keep only, from the same tables as everyone, with a family name nobody
+// else in the valley has. Drawn from their own stream after the cast, so the valley's own people never change.
+const PARENT_IDS=[9,10];
+function castParents(seed,name,cast){ const r=seedRng(seed>>>0,STORY_SALT), cn=cleanName(name), nm=cn.toLowerCase(), fn=nm.split(' ')[0], out=[];
+  const used=new Set(cast.map(function(c){ return c.given; })), byUsed=new Set(cast.map(function(c){ return c.by; })), worn=new Set();
+  for(const c of cast) for(let k=0;k<CLOTHES.length;k++) if(CLOTHES[k].c===c.cloak) worn.add(k);
+  let by=ipick(r,BYNAMES); for(let k=0;k<80&&byUsed.has(by);k++) by=ipick(r,BYNAMES);
+  { const w=cn.split(' '); if(w.length>1){ const last=w[w.length-1]; if(last.length>1&&!byUsed.has(last)) by=last; } }   // a two-word name: your family name is theirs
+  const pr0=r()<0.5?'she':'he', pr1=r()<0.85?(pr0==='she'?'he':'she'):pr0;
+  for(let j=0;j<2;j++){ const pr=j?pr1:pr0, age=r()<0.6?'adult':'old';
+    let given=null; for(let k=0;k<200&&!given;k++){ const pool=r()<0.35?NAMES_X:(pr==='she'?NAMES_F:NAMES_M), g=ipick(r,pool); if(!used.has(g)&&g.toLowerCase()!==nm&&g.toLowerCase()!==fn) given=g; }
+    if(!given) given=pr==='she'?'Agnes':'Abel';
+    used.add(given);
+    const hair=(age==='old'&&r()<0.7)?HAIRS[8+((r()*2)|0)]:HAIRS[(r()*8)|0];
+    const hairStyle=pr==='she'?wpick(r,{long:2,bun:3,braid:2,tied:2,short:1}):wpick(r,{short:5,bald:age==='old'?3:1,tied:1,long:1});
+    const beard=pr==='he'?wpick(r,{none:2,short:2,full:3,long:age==='old'?2:0.5}):'none';
+    const fits=[]; for(let k=0;k<CLOTHES.length;k++) if(!worn.has(k)) fits.push(k);
+    const ck=fits.length?fits[(r()*fits.length)|0]:j; worn.add(ck); const C=CLOTHES[ck];
+    const w={}; for(const t of TRAITS) w[t]=1; w.kind+=3; w.worrier+=2; w.proud+=1; w.dry+=1; w.gossip=0; w.shy=0; w.nosy=0.5;
+    const traits=[]; for(let k=0;k<60&&traits.length<2;k++){ const t=wpick(r,w); if(traits.indexOf(t)>=0) continue;
+      if(TRAIT_CLASH.some(function(p){ return (p[0]===t&&traits.indexOf(p[1])>=0)||(p[1]===t&&traits.indexOf(p[0])>=0); })) continue; traits.push(t); }
+    out.push({id:PARENT_IDS[j], role:'parent', key:j?'home2':'home1', name:given, given:given, by:by, pr:pr, age:age,
+      build:wpick(r,{tall:2,stout:2,short:2}), skin:SKINS[(r()*SKINS.length)|0], hair:hair, hairStyle:hairStyle, beard:beard,
+      head:wpick(r,{none:3,cap:2,kerchief:pr==='she'?2:0.3,hat:1}), tool:j?'none':'keys', robe:r()<0.5, cloak:C.c, tunic:C.t, legs:C.l, accent:C.a,
+      traits:traits, rel:[]}); }
+  out[0].rel.push({to:PARENT_IDS[1],kind:'spouse'}); out[1].rel.push({to:PARENT_IDS[0],kind:'spouse'});
+  return out; }
+// the journal: in browser storage when it can be, in memory when it can't (everything still plays for the visit)
+function journalLoad(){ let o=null;
+  try{ o=JSON.parse(localStorage.getItem('keep_journal')||'null'); }catch(e){ o=null; }
+  JOURNAL={v:1, story:null, wander:{}};
+  if(o&&typeof o==='object'){ const s=o.story;
+    if(s&&typeof s==='object'&&typeof s.name==='string'&&isFinite(+s.home)){
+      const home=(+s.home)>>>0, at=isFinite(+s.at)?((+s.at)>>>0):home;
+      JOURNAL.story={name:cleanName(s.name), home:home, at:at, started:typeof s.started==='string'?s.started.slice(0,10):'', want:Array.isArray(s.want)?s.want.slice(0,4).map(function(v){ v=v|0; return v>=-1&&v<=2?v:-1; }):[-1,-1,-1,-1]}; }
+    if(o.wander&&typeof o.wander==='object') JOURNAL.wander=o.wander; }
+  STORY=JOURNAL.story; return JOURNAL; }
+function journalSave(){ try{ localStorage.setItem('keep_journal',JSON.stringify(JOURNAL)); SAVE_OK=true; return true; }catch(e){ SAVE_OK=false; return false; } }
+function storyAt(seed){ if(MODE==='story'&&STORY&&STORY.at!==(seed>>>0)){ STORY.at=seed>>>0; journalSave(); } }
+function storyNew(name,want){ name=cleanName(name); want=(want||[]).slice(0,4).map(function(v){ v=v|0; return v>=-1&&v<=2?v:-1; }); while(want.length<4) want.push(-1);
+  const home=homeSeed(want,name), d=new Date(), pad=function(n){ return (n<10?'0':'')+n; };
+  JOURNAL.story={name:name, home:home, at:home, started:d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()), want:want};
+  STORY=JOURNAL.story; MODE='story'; journalSave(); return STORY; }
+// at home: you wake in the courtyard by the great hall, and one of your parents is at its door, looking out for you
+function spawnHome(){ P.hand=null; P.rampDir=0; P.lastDir=0; P.x=FORT.x-11+0.5; P.y=FORT.y-9.2; P.yaw=-Math.PI/2; P.pitch=0.04;
+  P.gz=floorAt(P.x,P.y,groundAt(P.x,P.y)); P.z=P.gz+EYE;
+  for(let c=0;c<CR_.n;c++) if(CR_.al[c]&&CR_.sp[c]===SP.KEEPER&&(CR_.ay[c]|0)===PARENT_IDS[0]&&CR_.ax[c]===6){ const a=KPATHS[6], w=PARENT_DOOR;
+    CR_.x[c]=a[w*3]; CR_.y[c]=a[w*3+1]; CR_.z[c]=floorAt(CR_.x[c],CR_.y[c],groundAt(CR_.x[c],CR_.y[c])); CR_.ph[c]=w+1; CR_.st[c]=1; CR_.tm[c]=14; CR_.po[c]=1; CR_.vx[c]=0; CR_.vy[c]=0.01; CR_.ss[c]=0; } }
+let PARENT_DOOR=2;   // the waypoint on path 6 at the hall door (set in buildKeeperPaths)
+function goHome(first){ closeChat(); const h=STORY.home;
+  DIALS.trav=1; applyWorld(seedDials(h)); DIALS.seed=h; genWorld(h); populate(h); spawnHome();
+  W.arriveMsg=(first?'You wake at home in ':'You are home in ')+W.valley+'.';
+  VISITED.push({seed:h, name:W.valley, t:Date.now()}); if(VISITED.length>200) VISITED.shift();
+  ROADS.cool=Date.now()+20000; ROADS.sign=-1; }
+// lines no one at home says to someone who grew up there (they take you for a stranger)
+const AWAY_FR=['Welcome to {valley}','Welcome to the keep','Good morning, traveller','A traveller. Haven','Visitors. Hmph',
+  "You've a traveller's look","You're not from {valley}","Everyone knows everyone here. Now","You'll find {valley} small","Talk to everyone. That's how you learn",
+  "You're welcome here","Nobody hurries here. You'll see","If you get lost, walk downhill","walked a long way","That's the whole keep, really","You found the hut, then",
+  "You'll find @ruin off to","that's where you'll find {hermit}","If you've time, walk the whole","not one for visitors","I'd show you round, but you've seen it",
+  "You'll know @farm1 by the field","Climb the donjon. You'll see why","Have you met my {parent.par}","Have you met {child}","The keep's that way, if you want a crowd",
+  "Night road's no place for a stranger","You'll want the view from the tower","new face","It's late for visitors","I'd show you round, but I'm busy",
+  "This is {valley}. Folk are friendly","Lovely spot, {valley}","Tell them in the next valley","If you're walking on from {valley}","Not many come through {valley}"];
+// your parents' own lines ({you} is you; {spouse} is your other parent)
+const TALKPAR={parent:{
+ 0:["[first]Morning, {you}. You slept late. Or I woke early. One of the two.","[first]There you are, {you}. Bread's out, if {steward} hasn't hidden it.",
+   "Your {spouse.par} was up before the birds again.","[day]First light on the wall. I never tire of it."],
+ 1:["[first]{you}! Come here. Let me look at you. Yes. Still you.","The kitchen roof wants mending. Everything wants mending. That's a keep.",
+   "{steward} has the books in hand. Don't say I said so. It'll go to {steward.his} head.","[keepers]{gatekeeper} says the road was busy this morning. Two carts. Busy, for us."],
+ 2:["[first]Evening, {you}. Supper soon. Don't wander off.","[day]Sun's going over the hills. I used to watch it from the wall with you on my shoulders.",
+   "Your {spouse.par} saved you a seat by the fire."],
+ 3:["[first]Still up, {you}? So am I. Keeps don't sleep, and nor do the people who keep them.","One more look at the gate, then bed. Same as every night.",
+   "[wolves]Hear the wolves? They've never come past the braziers. Not once."],
+ a:["[first]{you}. Good. I was hoping you'd come by.","You grew up in these halls. Some days I still see you running along the wall-walk.",
+   "{valley} isn't much, but it's ours. It's yours too, {you}. Don't forget that.","Every road out of {valley} goes over the hills. I've walked a few of them. Not far.",
+   "[old]My knees know every stair in this keep. They tell me about each one.","{guard1} and {guard2} keep the wall. I keep them. Someone has to.",
+   "If you ever go over the hills, {you}, come back and tell me what you saw.","Your {spouse.par} and I met at a market in another valley. Ask me about it some winter.",
+   "The keep's small. Small keeps are easier to love.","[keep]Been up the donjon lately? The view hasn't changed. That's what I like about it.",
+   "[hermit]If you go down to the lake, let {hermit} be. Kind enough, but likes the quiet.","[worrier]Did you eat? You never eat when you're out walking.",
+   "[proud]Best kept keep in any valley. I'd say that even if it weren't ours.","[dry]You're home. The keep is still standing. Two good things in one day.",
+   "[stormnow]Listen to it come down. Stay in tonight, {you}.","[stormnow,stormout]In, {you}! In! You'll catch your death."]}};
+// what the people of your home valley say to you (only ever at home, so {you} is your name)
+const TALKHOME={
+ guard1:["[home]Night watch again, {you}. You used to sneak up here when you couldn't sleep.","[home]You again, {you}. Your {home1.par} was asking after you."],
+ guard2:["[home]{you}! Race you round the wall, like when you were small. I'd win now.","[home]Your {home2.par} had me look for you from the wall twice today."],
+ gatekeeper:["[home]{you}. Off out again? The road will still be there tomorrow.","[home]I've watched you walk under this arch since you were knee high, {you}.",
+   "[home]One day you'll take that road over the hills, {you}. Everyone in {valley} says so."],
+ steward:["[home]{you}, there you are. Your {home1.par} was asking for you.","[home]Wipe your feet, {you}. I don't care whose keep it is.",
+   "[home]The books balance, {you}. Tell your {home2.par} I said so."],
+ farmer:["[home]{you}! You've grown again. Or I've shrunk.","[home]Tell your {home1.par} the field's coming on fine."],
+ shepherd:["[home]Hello, {you}. The lambs remember you. Sheep never forget a face.","[home]Out walking again, {you}? Mind the flock."],
+ woodcutter:["[home]{you}. Need wood for the hall? Tell {steward} and I'll bring it up.","[home]You used to stack my woodpile wrong, {you}. Every winter."],
+ hermit:["[home]{you}. You used to throw stones at my fish. Don't.","[home]Tell your {home1.par} thanks for the bread."],
+ keep:["[home]The hall's not the same when you're out, {you}."],
+ folk:["[home]All the way out here, {you}? The keep must be dull today."],
+ any:["[home]{you}! Good to see you about.","[home]Hello, {you}. Everyone in {valley} knows you, so you can't get up to much.","[home]Off out again, {you}?",
+   "[home]Your {home2.par} was asking for you.","[home,first]{you}! Good to see you.","[home,first]Well, if it isn't {you}."]};
+// has anyone in this valley already said this line to you?
+function heardByAny(lid){ if(!W.cast) return false; for(const c of W.cast){ const m=HEARD[W.seed+':'+c.id]; if(m&&m.has(lid)) return true; } return false; }
+
 const LINES=[];
 function lineHash(t){ let h=0x811c9dc5; for(let i=0;i<t.length;i++){ h^=t.charCodeAt(i); h=Math.imul(h,0x01000193); } return 'L'+(h>>>0).toString(36); }
 (function(){
@@ -3909,6 +4111,8 @@ function lineHash(t){ let h=0x811c9dc5; for(let i=0;i<t.length;i++){ h^=t.charCo
   for(const who in TALKS) for(const t of TALKS[who]) add(who,-1,0,t);
   for(const who in TALKP) for(const t of TALKP[who]) add(who,-1,0,t);
   for(const t of TALKP4) add('peddler',-1,4,t);
+  for(const who in TALKPAR) for(const pt in TALKPAR[who]) for(const t of TALKPAR[who][pt]) add(who,pt==='a'?-1:+pt,0,t);
+  for(const who in TALKHOME) for(const t of TALKHOME[who]) add(who,-1,0,t);
 })();
 const GREETN=["","","","","","","",""];   // "name, the role", filled from the cast when a valley grows
 let greetHook=null, chatHook=null; const GREETT=[-1e9,-1e9,-1e9,-1e9,-1e9,-1e9,-1e9,-1e9,-1e9], GLAST=["","","","","","","","",""];
@@ -3930,7 +4134,9 @@ function relOf(id,kind,here){ const c=castOf(id); if(!c) return -1;
 let LINE_EV=null;   // the happening the line being checked or filled is about
 const EVSLOT={evwhen:1,evnote:1,evnotes:1,evkid:1,evname:1};
 function evPerson(id,key){ const e=LINE_EV; if(!e) return -1; if(key==='eva') return e.who[0]; if(key==='evb') return e.who[1]; if(key==='evother') return e.who[0]===id?e.who[1]:e.who[0]; return -1; }
-function slotWho(id,key,here){ if(key==='eva'||key==='evb'||key==='evother'){ const w=evPerson(id,key); return (w!=null&&w>=0&&here[w]&&castOf(w))?w:-1; }
+function slotWho(id,key,here){ if(key==='you') return -3;
+  if(key==='home1'||key==='home2'){ const w=PARENT_IDS[key==='home1'?0:1]; return (here[w]&&castOf(w))?w:-1; }
+  if(key==='eva'||key==='evb'||key==='evother'){ const w=evPerson(id,key); return (w!=null&&w>=0&&here[w]&&castOf(w))?w:-1; }
   if(EVSLOT[key]) return LINE_EV?-3:-1;
   const r=ROLEKEY.indexOf(key); if(r>=0) return (here[r]&&castOf(r))?r:-1;
   if(key==='me') return castOf(id)?id:-1; if(RELREV[key]) return relOf(id,key,here); return -2; }
@@ -3950,6 +4156,7 @@ function lineOk(id,l,here,who){ const m=TAG_RE.exec(l), c=castOf(id);
     else if(t==='keepers'){ if(!W.keepBuilt||!(here[0]||here[1]||here[2]||here[3])) return false; }
     else if(t==='nothermit'){ if(id===7) return false; }
     else if(t==='first'||t==='last'||t==='leaving'){ }
+    else if(t==='home'){ if(!atHome()) return false; }
     else if(t.indexOf('ev_')===0||t==='evin'||t==='evfirst'||t==='evsecond'){ if(!LINE_EV) return false; }
     else if(t==='evnight'||t==='evday'){ if(!LINE_EV) return false; const nt=LINE_EV.hour>=20||LINE_EV.hour<5; if(nt!==(t==='evnight')) return false; if(nt&&!stormNightOver(LINE_EV)) return false; }
     else if(t==='stormnow'){ if(stormLevel()<0.25) return false; }
@@ -3971,7 +4178,7 @@ function lineOk(id,l,here,who){ const m=TAG_RE.exec(l), c=castOf(id);
   l.replace(SLOT_RE,function(_,k){ if(k==='valley') return ''; const w=slotWho(id,k,here); if(w===-3) return ''; if(w<0||(w===id&&k!=='me'&&k!=='eva'&&k!=='evb')) ok=false; return ''; });   // nobody talks about themselves by role
   if(ok) l.replace(PLACE_RE,function(_,s,k){ if(!placeHere(k)) ok=false; return ''; });
   return ok; }
-function roleName(c){ return c.id===0?'the night guard':(c.id===1?'the day guard':'the '+c.role); }
+function roleName(c){ if(c.role==='parent') return c.pr==='he'?'your father':'your mother'; return c.id===0?'the night guard':(c.id===1?'the day guard':'the '+c.role); }
 function pform(c,f){ const he=c.pr==='he';
   switch(f){ case 'he': return he?'he':'she'; case 'He': return he?'He':'She'; case 'him': return he?'him':'her'; case 'his': return he?'his':'her';
     case 'His': return he?'His':'Her'; case 'role': return roleName(c); case 'full': return c.name+' '+c.by;
@@ -3979,14 +4186,14 @@ function pform(c,f){ const he=c.pr==='he';
   return c.name; }
 function fillLine(id,l,here){ here=here||ALLHERE;
   l=l.replace(TAG_RE,'');
-  l=l.replace(SLOT_RE,function(_,k,f){ if(k==='valley') return W.valley||'the valley';
+  l=l.replace(SLOT_RE,function(_,k,f){ if(k==='valley') return W.valley||'the valley'; if(k==='you') return youName();
     if(LINE_EV&&EVSLOT[k]){ const e=LINE_EV; if(k==='evwhen') return evWhen(e); if(k==='evkid') return e.kid||'baby'; if(k==='evname') return e.name||'';
       if(k==='evnote') return e.note||''; if(k==='evnotes') return e.note==='sheep'?'sheep':(e.note||'')+'s'; } const c=castOf(slotWho(id,k,here)); return c?(f?pform(c,f):c.name):'someone'; });
   l=l.replace(PLACE_RE,function(_,s,k){ return s==='$'?placeDir(k):placeName(k); });
   l=l.replace(/(^|[^.])([.!?] )([a-z])/g,function(_,z,a,b){ return z+a+b.toUpperCase(); });   // a filled-in phrase that starts a sentence
   return l.charAt(0).toUpperCase()+l.slice(1); }
 // which lists a person draws from
-function whoOk(id,who){ if(id===ROLEPED) return who==='peddler'; const k=ROLEKEY[id]; return who===k||who==='any'||(who==='guard'&&id<2)||(who==='keep'&&id<4)||(who==='folk'&&id>=4); }
+function whoOk(id,who){ if(id===ROLEPED) return who==='peddler'; if(id===PARENT_IDS[0]||id===PARENT_IDS[1]) return who==='parent'; const k=ROLEKEY[id]; return who===k||who==='any'||(who==='guard'&&id<2)||(who==='keep'&&id<4)||(who==='folk'&&id>=4); }
 // what has been heard: per valley and person, line id -> the order it was heard in
 const HEARD={}, VISITS={}; let heardN=0;
 function heardKey(id){ return W.seed+':'+id; }
@@ -4006,7 +4213,8 @@ const STANCES=['invite','aloof','leaving'];
   // where it sits in a visit: their own world first, then places and people round about, then talk, then their nature, then their own people
   e.cat=e.who!=='any'?1:(e.rel?5:(e.trait?4:(/[@$]|\{(guard1|guard2|gatekeeper|steward|farmer|shepherd|woodcutter|hermit)\b/.test(e.check)?2:3)));
   if(e.evkind){ e.topics.push('ev_'+e.evkind); e.cat=0.5; }
-  e.storm=tg.indexOf('stormnow')>=0; if(e.storm){ e.topics.push('stormnow'); e.cat=0.4; } } })();
+  e.storm=tg.indexOf('stormnow')>=0; if(e.storm){ e.topics.push('stormnow'); e.cat=0.4; }
+  e.home=tg.indexOf('home')>=0; e.away=AWAY_FR.some(function(f){ return e.check.indexOf(f)>=0; }); } })();
 // the lines for one visit: 3 to 5, opening with what they are doing or the time of day, then their own world, then
 // out to the valley; new lines first, one per topic, one attitude, at most one about their nature, and at most one
 // about each of their own people (and that one says who the person is to them)
@@ -4015,7 +4223,7 @@ function talkPick(id,pose,here,n){ here=here||peopleHere();
   const r=seedRng(((W.seed>>>0)^Math.imul(id+1,0x9E37)^Math.imul(visit+1,0x85EB)^heardN)>>>0,0x7A1E);
   if(n==null) n=pose===4?1+((r()*2)|0):3+((r()*3)|0);
   const picks=[], used=new Set(), topics=new Set(), relTo=new Set(); let stance='', traitN=0, anyN=0, count=0;
-  const stormy=stormLevel()>0.05, evOf=new Map(), hid=function(e){ const v=evOf.get(e.id); return v?e.id+'@'+evKey(v):e.id; };
+  const home=atHome(), stormy=stormLevel()>0.05, evOf=new Map(), hid=function(e){ const v=evOf.get(e.id); return v?e.id+'@'+evKey(v):e.id; };
   const fresh=function(e){ return !heard.has(hid(e)); };
   const fits=function(e){
     if(used.has(e.id)||1+e.chain.length>5-count) return false;               // a story only starts if all of it fits
@@ -4032,6 +4240,7 @@ function talkPick(id,pose,here,n){ here=here||peopleHere();
       let ev=null; if(e.evkind){ ev=evBind(e,id,here); if(!ev) continue; }
       if(/longer than I can count/.test(e.text)&&wedNow(id)>=0) continue;
       if(stormy&&CLEAR_RE.test(e.text)) continue;
+      if(home&&e.away) continue;
       LINE_EV=ev; const ok=lineOk(id,e.check,here,e.who); LINE_EV=null; if(ok){ if(ev) evOf.set(e.id,ev); a.push(e); } } return a; };
   // newest-unheard first, then the ones heard longest ago; weighted by how much the line belongs to this person
   const choose=function(a){ if(!a.length) return null; const f=a.filter(fresh), src=f.length?f:a;
@@ -4046,13 +4255,16 @@ function talkPick(id,pose,here,n){ here=here||peopleHere();
   if(pose>0){ const e=choose(pose===4?pool(function(e){ return e.pose===4; }):pool(function(e){ return e.pose===pose; }).filter(fresh)); if(e) take(e);   // a pose line already heard is not worth repeating
     if(pose===4){ while(count<n){ const e2=choose(pool(function(e){ return e.pose===4; })); if(!e2) break; take(e2); } return out(); } }
   // otherwise open with a greeting or a line of their own for this time of day
-  if(!count){ const a=pool(function(e){ return e.pose===0&&(e.first&&(e.part===-1||e.part===dp)||(e.part===dp&&e.who!=='any')); }); const e=choose(a.filter(fresh).length?a.filter(fresh):a); if(e) take(e); }
+  if(!count){ const par=id===PARENT_IDS[0]||id===PARENT_IDS[1];   // your parents always open by greeting you
+    const a=pool(function(e){ return e.pose===0&&(e.first&&(e.part===-1||e.part===dp)||(!par&&e.part===dp&&e.who!=='any')); }); const e=choose(a.filter(fresh).length?a.filter(fresh):a); if(e) take(e); }
   // in a storm, the storm comes first
   if(count<n&&stormLevel()>=0.25){ const e=choose(pool(function(e){ return e.pose===0&&e.storm; })); if(e) take(e); }
   // the newest happening they can speak of comes next
   if(count<n){ const a=pool(function(e){ return e.pose===0&&!!e.evkind; }).filter(fresh);
     a.sort(function(x,y){ const ex=evOf.get(x.id), ey=evOf.get(y.id); return (ey.day*100+ey.hour)-(ex.day*100+ex.hour); });
     if(a.length){ const top=a.filter(function(e){ const v=evOf.get(e.id), w0=evOf.get(a[0].id); return v===w0; }); take(top[(r()*top.length)|0]); } }
+  // at home: one line about you
+  if(count<n&&home){ const hp=pool(function(e){ return e.pose===0&&e.home; }).filter(fresh), nb=hp.filter(function(e){ return !heardByAny(e.id); }); const e=choose(nb.length?nb:hp); if(e) take(e); }   // (only ones not heard yet, and ones nobody else has said first: no nagging)
   // at least one more line from their own world
   if(count<n){ const e=choose(pool(function(e){ return e.pose===0&&e.who!=='any'&&(e.part===-1||e.part===dp); })); if(e) take(e); }
   while(count<n){ const e=choose(pool(function(e){ return e.pose===0&&(e.part===-1||e.part===dp); })); if(!e) break; take(e); }
@@ -4437,6 +4649,14 @@ function buildKeeperPaths(){
   // 5: and back up in the morning, ending where she left her round
   const back=[]; for(let k=bed.length/3-1;k>=0;k--) back.push(bed[k*3],bed[k*3+1],0); back.push(0,Wk,0);
   KPATHS.push(back);
+  // 6: a parent: the hall hearth, the hall door, round the donjon to look down the gate passage, and back
+  { const out=[-14.5,-20.6,9, -7.5,-20.6,0, -7.5,-16,0, -11,-16,0, -11,-12.4,6].concat(arc([215,190,165,135,100]),[0,18.5,7]), n=out.length/3, p6=out.slice();
+    for(let k=n-2;k>=1;k--) p6.push(out[k*3],out[k*3+1],0);
+    KPATHS.push(p6); PARENT_DOOR=4; }
+  // 7: the other parent: the kitchen hearth, out of its door, round the east side, into the chapel, and back
+  { const out=[8.5,-20.6,8, 13,-20.6,0, 13,-17,0, 11,-16,0, 11,-12.4,0].concat(arc([-40,-10,20,50]),[4.5,13,0, 4,17,0, 7.5,17,0, 12.5,17,8]), n=out.length/3, p7=out.slice();
+    for(let k=n-2;k>=1;k--) p7.push(out[k*3],out[k*3+1],0);
+    KPATHS.push(p7); }
   // what a keeper does at a pause: [pose, face x, face y]; 1 look out, 2 lean on the staff, 3 check the door, 4 asleep
   KACT.length=0;
   for(let p=0;p<KPATHS.length;p++){ const a=KPATHS[p], n=a.length/3, acts=new Array(n).fill(null);
@@ -4445,7 +4665,9 @@ function buildKeeperPaths(){
       else if(p===2){ acts[w]=y>KEEP.H?[2,0,1]:[2,1,0]; }                                   // Wick leans: on the road, in the barracks
       else if(p===3){ if(Math.abs(x+11)<0.01&&Math.abs(y+12.4)<0.01) acts[w]=[3,0,-1];     // Maud checks the hall door
                       else if(Math.abs(x+0.5)<0.01&&Math.abs(y+3.4)<0.01) acts[w]=[1,0,-1]; } // and looks out north from the lookout
-      else if(p===4&&w===n-1) acts[w]=[4,1,0]; }
+      else if(p===4&&w===n-1) acts[w]=[4,1,0];
+      else if(p===6) acts[w]=y<-18?[1,0,-1]:[1,0,1];                                    // a parent at the hearth, then looking out
+      else if(p===7) acts[w]=y<-18?[1,0,-1]:[1,1,0]; }                                  // at the kitchen fire, then at the altar
     KACT.push(acts); }
   for(let p=0;p<KPATHS.length;p++){ const a=KPATHS[p]; for(let k=0;k<a.length;k+=3){ a[k]+=FORT.x; a[k+1]+=FORT.y; } }
 }
@@ -4458,6 +4680,7 @@ function addPeople(){
   if(!DIALS.keep||!DIALS.people||!W.keepBuilt||CR_.n>CMAX-8) return;
   buildKeeperPaths();
   addKeeper(0,0,0,KEEP.CURH); const tl=addKeeper(1,4,1,KEEP.CURH); addKeeper(2,0,2,0); addKeeper(3,0,3,0);   // Bram, Tilda, Old Wick, Maud
+  if(W.cast&&W.cast[PARENT_IDS[0]]){ addKeeper(6,0,PARENT_IDS[0],0); addKeeper(7,0,PARENT_IDS[1],0); }   // at home in a story: your parents
   if(sleepHours()){ const a=KPATHS[4], n=a.length/3, bx=a[(n-1)*3], by=a[(n-1)*3+1];
     CR_.x[tl]=bx; CR_.y[tl]=by; CR_.z[tl]=floorAt(bx,by,terr(bx,by)); CR_.ax[tl]=4; CR_.ph[tl]=n-1; CR_.st[tl]=2; CR_.po[tl]=4; CR_.vx[tl]=0.01; CR_.vy[tl]=0; }
   const cx=FORT.x, cy=FORT.y;
@@ -4476,7 +4699,7 @@ function sidestep(c,ux,uy,dt){ const s=Math.min(0.7-CR_.ss[c],1.4*dt); if(s<=0) 
 }
 function tickKeeper(c,dt){
   const path=CR_.ax[c]|0, a=KPATHS[path]; if(!a) return;
-  const x=CR_.x[c], y=CR_.y[c], id=Math.min(3,CR_.ay[c]|0);
+  const ay=CR_.ay[c]|0, x=CR_.x[c], y=CR_.y[c], id=ay>=PARENT_IDS[0]?ay:Math.min(3,ay);
   const qx=P.x-x, qy=P.y-y, qd=Math.hypot(qx,qy), near=talkNear(c,qd)&&qd>0.05&&Math.abs((P.z-EYE)-CR_.z[c])<1.6;
   // asleep: stays put till morning (you can tiptoe past); then back up to the wall
   if(CR_.st[c]===2){ if(near) talk(c,id,4);
@@ -4757,7 +4980,10 @@ function boot(){
   var LEAVE=null;   // the road end the leave card is open for (cleared whenever cards close, so nothing holds you)
   function closeAll(){ LEAVE=null; for(let i=0;i<OVERLAYS.length;i++) $(OVERLAYS[i]).classList.add('hidden'); }
   // the dials remember both states across reloads (seed, species, predators, keep, landmarks, forest, water)
-  function saveDials(){ try{ const o=JSON.parse(JSON.stringify(DIALS)); if(DIALS.trav){ const w=PLAYER_LAND; for(const k of WORLD_KEYS) o[k]=w[k]; o.on=w.on.slice(); o.pop=w.pop.slice(); o.folk=w.folk.slice(); } localStorage.setItem('keep_dials',JSON.stringify(o)); }catch(e){} }
+  var WANDER=null;   // the wanderer's valley (seed, trav, home), kept in keep_dials while a story is played
+  function saveDials(){ try{ const o=JSON.parse(JSON.stringify(DIALS));
+    if(MODE==='story'&&WANDER){ o.seed=WANDER.seed; o.trav=WANDER.trav; o.home=WANDER.home; const w=WANDER.land; for(const k of WORLD_KEYS) o[k]=w[k]; o.on=w.on.slice(); o.pop=w.pop.slice(); o.folk=w.folk.slice(); localStorage.setItem('keep_dials',JSON.stringify(o)); return; }
+    if(DIALS.trav){ const w=PLAYER_LAND; for(const k of WORLD_KEYS) o[k]=w[k]; o.on=w.on.slice(); o.pop=w.pop.slice(); o.folk=w.folk.slice(); } localStorage.setItem('keep_dials',JSON.stringify(o)); }catch(e){} }
   function saveSeedOnly(seed){ DIALS.seed=seed>>>0; saveDials(); }
   function saveSeedOnlyOld(seed){ try{ const d=JSON.parse(localStorage.getItem('keep_dials')||'null'); if(d&&typeof d==='object'){ d.seed=seed; localStorage.setItem('keep_dials',JSON.stringify(d)); } else saveDials(); }catch(e){} }
   function loadDials(){
@@ -4779,7 +5005,7 @@ function boot(){
   function openSeed(){
     closeAll();
     const c=$('seedCard');
-    c.innerHTML='<h1>World seed</h1><p>Type a number for that exact world, or roll a random one.</p>'+(DIALS.trav?'<p id="seedTravNote" style="color:var(--mb-teal)">Grown from here, a seed uses your own dials, so it can look different from a valley you travelled to.</p>':'')+'<input id="seedIn" inputmode="numeric" value="'+(DIALS.trav?DIALS.home:W.seed)+'" style="width:100%;padding:12px;font:600 16px var(--mb-mono);background:rgba(0,0,0,.5);color:var(--mb-ink);border:1px solid var(--mb-line);border-radius:13px;margin:6px 0"><div style="display:flex;gap:8px"><button class="btn go" id="seedUse" style="flex:1;margin-top:0">grow it</button><button class="btn go" id="seedRnd" style="flex:1;margin-top:0">random</button></div><button class="btn" id="seedClose" style="width:100%;margin-top:8px">cancel</button>';
+    c.innerHTML='<h1>World seed</h1><p>Type a number for that exact world, or roll a random one.</p>'+(DIALS.trav&&MODE!=='story'?'<p id="seedTravNote" style="color:var(--mb-teal)">Grown from here, a seed uses your own dials, so it can look different from a valley you travelled to.</p>':'')+'<input id="seedIn" inputmode="numeric" value="'+(MODE==='story'?W.seed:(DIALS.trav?DIALS.home:W.seed))+'" style="width:100%;padding:12px;font:600 16px var(--mb-mono);background:rgba(0,0,0,.5);color:var(--mb-ink);border:1px solid var(--mb-line);border-radius:13px;margin:6px 0"><div style="display:flex;gap:8px"><button class="btn go" id="seedUse" style="flex:1;margin-top:0">grow it</button><button class="btn go" id="seedRnd" style="flex:1;margin-top:0">random</button></div><button class="btn" id="seedClose" style="width:100%;margin-top:8px">cancel</button>';
     $('seed').classList.remove('hidden');
     function apply(sv){ DIALS.seed=sv; DIALS.home=sv; if(DIALS.trav){ DIALS.trav=0; applyWorld(PLAYER_LAND); } saveDials(); genWorld(sv); populate(sv); spawn(); $('seed').classList.add('hidden'); if(folkMissing().length) W.arriveMsg+=' No room here for '+folkMissing().join(' or ')+'.'; }
     $('seedUse').addEventListener('click',function(){ const v=parseInt($('seedIn').value,10); apply(isFinite(v)?(v>>>0):(Math.random()*1e9|0)); });
@@ -4791,7 +5017,7 @@ function boot(){
   function openLeave(e){ closeAll(); LEAVE=e; $('leaveCard').classList.remove('choose'); const sd=W.seed>>>0, c=$('leaveCard'), road=e.name.charAt(0).toUpperCase()+e.name.slice(1);
     c.innerHTML='<h1>Leaving '+W.valley+'</h1><p class="lvp">'+road+' goes on over the hills to another valley. Every valley you travel to is shaped by its own seed: its forest, water, ruins and wildlife.</p>'+
       '<div class="fsize" style="display:flex;align-items:center;gap:8px;justify-content:space-between"><span>This valley is seed <b id="lvSeed">'+sd+'</b></span><button class="btn" id="lvCopy" style="padding:8px 12px">copy</button></div>'+
-      '<button class="btn go" id="lvStay" style="width:100%;margin-top:4px">Stay in '+W.valley+'</button>'+
+      '<button class="btn go" id="lvStay" style="width:100%;margin-top:4px">Stay in '+W.valley+'</button>'+(MODE==='story'&&STORY&&!atHome()?'<button class="btn" id="lvHome" style="width:100%;margin-top:8px">Home to '+valleyName(STORY.home)+'</button>':'')+
       '<div id="lvWays" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px"><button class="btn" id="lvRnd" style="flex:1">A random valley</button><button class="btn" id="lvType" style="flex:1">Type a seed</button><button class="btn" id="lvChoose">Choose a valley</button></div>'+
       '<div id="lvTypeRow" style="display:none;gap:8px;margin-top:8px"><input id="lvIn" inputmode="numeric" placeholder="seed number" style="flex:1 1 auto;width:100%;min-width:0;padding:11px;font:600 16px var(--mb-mono);background:rgba(0,0,0,.5);color:var(--mb-ink);border:1px solid var(--mb-line);border-radius:13px"><button class="btn go" id="lvGo" style="flex:0 0 auto;width:auto;margin-top:0">go</button></div>';
     $('leave').classList.remove('hidden');
@@ -4801,6 +5027,7 @@ function boot(){
       try{ if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(String(sd)).then(function(){ toast('Seed '+sd+' copied',1800); },function(){ toast('Seed '+sd,2400); }); ok=true; } }catch(err){}
       if(!ok) toast('Seed '+sd,2400); });
     $('lvRnd').addEventListener('click',function(){ leaveGo((Math.random()*4294967296)>>>0); });
+    if($('lvHome')) $('lvHome').addEventListener('click',function(){ if(STORY) leaveGo(STORY.home); });
     $('lvChoose').addEventListener('click',function(){ openChoose(); });
     $('lvType').addEventListener('click',function(){ $('lvTypeRow').style.display='flex'; try{ $('lvIn').focus(); }catch(err){} });
     $('lvGo').addEventListener('click',function(){ const v=seedParse($('lvIn').value); if(v!=null) leaveGo(v); else toast('A seed is a whole number from 0 to 4294967295',2200); });
@@ -4853,7 +5080,7 @@ function boot(){
   }
   function openDials(){
     closeAll();
-    const c=$('dialsCard'), T=DIALS.trav?PLAYER_LAND:DIALS, seedShown=DIALS.trav?DIALS.home:DIALS.seed;
+    const c=$('dialsCard'), T=DIALS.trav?PLAYER_LAND:DIALS, seedShown=MODE==='story'?W.seed:(DIALS.trav?DIALS.home:DIALS.seed);
     const row=function(id,label,on,pv){
       return '<div class="dial-row"><label><input type="checkbox" id="'+id+'"'+(on?' checked':'')+'> '+label+'</label>'+
         '<input id="p'+id.slice(1)+'" type="range" min="0.25" max="2" step="0.25" value="'+pv+'"></div>';
@@ -4997,13 +5224,21 @@ function boot(){
   function end(e){ const p=ptr[e.pointerId]; if(!p) return; if(p.role==='move'){ IN.f=0; IN.s=0; IN.turn=0; IN.run=false; stick.style.display='none'; } else if(e.pointerType==='touch') IN.looking=Math.max(0,IN.looking-1); delete ptr[e.pointerId]; }
   canvas.addEventListener('pointerup',end); canvas.addEventListener('pointercancel',end);
   // go
-  DIALS.seed=20260919; loadDials(); DAY.tzOff=tzOffsetHours(SITE.tz); DAY.tod=DIALS.tod; DAY.mode=DIALS.dayMode; updateDay(0);
+  DIALS.seed=20260919; loadDials(); WANDER={seed:DIALS.seed>>>0, trav:DIALS.trav?1:0, home:DIALS.home>>>0, land:worldOf(PLAYER_LAND)}; journalLoad(); DAY.tzOff=tzOffsetHours(SITE.tz); DAY.tod=DIALS.tod; DAY.mode=DIALS.dayMode; updateDay(0);
   genWorld(DIALS.seed); populate(DIALS.seed); spawn(); setupGrid();
   // first visit ever: show the "about this build" card once, then it lives in the menu
   showSize();
   if(/[?&]nointro=1/.test(location.search)) KEEP_INTRO.close();
   else { try{ KEEP_INTRO.start({ render:function(){ return DIALS.render|0; }, setRender:function(i){ DIALS.render=i; saveDials(); paintRenderSeg(); },
       about:function(){ openAbout(); $('about').style.zIndex='1100'; $('aGo').textContent='back'; },
+      story:function(){ return STORY?{name:STORY.name, home:valleyName(STORY.home)}:null; },
+      randomName:function(){ return randomName(); }, clean:function(v){ return cleanName(v); },
+      traits:function(){ return TRAITS37.map(function(t){ return {name:t.name, words:t.words.map(function(w){ return w==='few or none'?'few':w; })}; }); },
+      go:function(kind,data){ try{
+          if(kind==='story-new'){ storyNew(data.name,data.want); goHome(true); if(!SAVE_OK) setTimeout(function(){ toast('Saving is off in this browser, so this story lasts until you close the page.',3600); },2200); }
+          else if(kind==='story-cont'&&STORY){ MODE='story'; if(STORY.at===STORY.home) goHome(false); else travelTo(STORY.at); }
+          else { MODE='wander'; }
+        }catch(e){ MODE='wander'; } },
       closed:function(){ $('about').style.zIndex=''; $('aGo').textContent='walk the keep';
         const m=glCur(); if(m){ loadGL(m); } else { for(const k in GLR) glDrop(k); } } }); }catch(e){ try{ KEEP_INTRO.close(); }catch(e2){} } }
   let last=performance.now(), fAcc=0, fN=0, fT=0, acc=0, ecoAcc=0, slowAt=0, hudT=0, fpsTxt='';
@@ -5048,7 +5283,7 @@ function boot(){
   if(glCur()&&!KEEP_INTRO.active) setTimeout(function(){ const m=glCur(); if(m&&!KEEP_INTRO.active) loadGL(m); },400);
 }
 
-if(IS_NODE){ module.exports={genWorld,allocGrid,buildGlyphs,renderFrame,compose,spawn,populate,tick,ecology,simBin,updatePlayer,W,RS,FB,P,IN,CR_,SP,SPP,MASKS,RESERVE,RAMP,N,WATER,EYE,terr,groundAt,DIALS,growOf,isAdult,addCreature,WALLS,buildWalls,nearestWall,allWallHits,wallBlocked,setSkyTime:function(t){skyTime=t;},setUW:function(v){UW=v;},DAY,SUN,MOON,SKY,DAYMODES,sunAltAz,sunUpdate,updateDay,relightAll,relightStep,RELIGHT,dayDate,fmtTod,setTod:function(h){DAY.tod=h;sunUpdate();},floorAt,KPATHS,KEEP,FORT,eventsForDay,weddingDay,babyDay,valleyDay,logEvent,eventsRefresh,dayTick,restock,stockTakeable,stockOwner,evBind,evWhen,evKey,seedDials,valleyTraits,chooseSeed,applyWorld,worldOf,TRAITS37,WORLD_KEYS,getPlayerLand:function(){ return PLAYER_LAND; },seedParse,babyFor,pedWays,pedShelter,carveRoads,exitAngles,roadCheck,roadStay,travelTo,spawnAtExit,VISITED,ROADS,PED,pedTick,pedDay,pedFind,pedRouteIn,pedPitch,pedWay,TALKP,ROAD_DIALS,ROLEPED,stormLevel,stormWindows,stormOngoing,underCover,stormLight,TALKS,STORMC,evBase,keeperAbed,FISHSIZE,TALKE,EVTAG,EVKINDS,wedNow,relOf,TALK,TALKX,LINES,POSEWHO,talkPick,talk,chatMore,closeChat,chatTick,CHAT,HEARD,VISITS,heardKey,heardAdd,lineOk,whoOk,placeName,placeDir,setChat:function(h){chatHook=h;},castValley,valleyName,valleyNames,seedRng,rebuildPeople,KEEPERS,GREETN,lineOk,fillLine,peopleHere,ALLHERE,ROLEKEY,ROLES,NAMES_F,NAMES_M,NAMES_X,BYNAMES,CLOTHES,SKINS,HAIRS,TRAITS,TRAIT_CLASH,RELREV,dayPart,folkMissing,tickKeeper,KMASK,KL,keeperFrame,GREETT,setGreet:function(f){greetHook=f;},RENDERS}; }
+if(IS_NODE){ module.exports={genWorld,allocGrid,buildGlyphs,renderFrame,compose,spawn,populate,tick,ecology,simBin,updatePlayer,W,RS,FB,P,IN,CR_,SP,SPP,MASKS,RESERVE,RAMP,N,WATER,EYE,terr,groundAt,DIALS,growOf,isAdult,addCreature,WALLS,buildWalls,nearestWall,allWallHits,wallBlocked,setSkyTime:function(t){skyTime=t;},setUW:function(v){UW=v;},DAY,SUN,MOON,SKY,DAYMODES,sunAltAz,sunUpdate,updateDay,relightAll,relightStep,RELIGHT,dayDate,fmtTod,setTod:function(h){DAY.tod=h;sunUpdate();},floorAt,KPATHS,KEEP,FORT,eventsForDay,weddingDay,babyDay,valleyDay,logEvent,eventsRefresh,dayTick,restock,stockTakeable,stockOwner,evBind,evWhen,evKey,seedDials,valleyTraits,chooseSeed,applyWorld,worldOf,TRAITS37,WORLD_KEYS,getPlayerLand:function(){ return PLAYER_LAND; },seedParse,babyFor,pedWays,pedShelter,carveRoads,exitAngles,roadCheck,roadStay,travelTo,spawnAtExit,VISITED,ROADS,PED,pedTick,pedDay,pedFind,pedRouteIn,pedPitch,pedWay,TALKP,ROAD_DIALS,ROLEPED,stormLevel,stormWindows,stormOngoing,underCover,stormLight,TALKS,STORMC,evBase,keeperAbed,FISHSIZE,TALKE,EVTAG,EVKINDS,wedNow,relOf,TALK,TALKX,LINES,POSEWHO,talkPick,talk,chatMore,closeChat,chatTick,CHAT,HEARD,VISITS,heardKey,heardAdd,lineOk,whoOk,placeName,placeDir,setChat:function(h){chatHook=h;},castValley,valleyName,valleyNames,seedRng,rebuildPeople,KEEPERS,GREETN,lineOk,fillLine,peopleHere,ALLHERE,cleanName,nameHash,randomName,homeSeed,castParents,atHome,storyHomeHere,youName,journalLoad,journalSave,storyNew,storyAt,spawnHome,goHome,PARENT_IDS,AWAY_FR,TALKPAR,TALKHOME,getMode:function(){ return MODE; },setMode:function(m){ MODE=m; },getStory:function(){ return STORY; },getJournal:function(){ return JOURNAL; },getParentDoor:function(){ return PARENT_DOOR; },KACT,ROLEKEY,ROLES,NAMES_F,NAMES_M,NAMES_X,BYNAMES,CLOTHES,SKINS,HAIRS,TRAITS,TRAIT_CLASH,RELREV,dayPart,folkMissing,tickKeeper,KMASK,KL,keeperFrame,GREETT,setGreet:function(f){greetHook=f;},RENDERS}; }
 else boot();
 })();
 </script>
