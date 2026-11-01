@@ -74,25 +74,27 @@ footer a{color:var(--soft)}
 <header class="hero">
   <img class="icon" src="the-keep-icon.png" alt="The Keep icon: a stone keep on a wooded hill above a lake">
   <h1>The Keep</h1>
-  <p class="tag">A whole world drawn as characters. A snow globe you walk around inside.</p>
-  <p class="sub">an ASCII raycaster that grows one improvement at a time</p>
+  <p class="tag">A living valley, drawn in letters. Walk in, listen to the people, and leave by the road.</p>
+  <p class="sub">a world of letters that grows one improvement at a time</p>
   <a class="cta" href="index.html">▶ &nbsp;walk the keep</a>
-  <div class="badge">in active development · updated Oct 30, 2026</div>
+  <div class="badge">in active development · updated Nov 1, 2026</div>
 </header>
 
 <main class="wrap">
 
 <section>
   <h2>What it is</h2>
-  <p class="lead">The Keep is a living world rendered entirely as a grid of colored characters. No 3D engine sits underneath it. It is not a game with a score to win, and it is not a building sandbox.</p>
-  <p>It is closer to a <span class="k">snow globe you can stroll around inside</span>, and an <span class="k">ant farm you set the dials on</span>. You type a seed and get a whole reproducible world: hills, a lake, rivers, forests, and a stone keep. Then it runs. Birds flock and roost, deer move in herds, fish school, and a wolf pack hunts, breeds, and thins out. Populations rise and fall on their own and never quite empty the world.</p>
-  <p>You are the keeper, not a character in it. You walk, you look, you notice things. And because it develops live, the world you visit today is not the one you will visit next month.</p>
+  <p class="lead">The Keep is a living valley drawn as a grid of colored characters, the way it began, or in five other ways, four of them on the graphics chip. It is not a game with a score to win, and it is not a building sandbox.</p>
+  <p>It opens on a stone hearth at sunrise. Then you walk into a valley: hills, a lake, forests, farms, a stone keep, and <span class="k">people who live there</span>. Guards walk the wall, the farmer works the field, the hermit fishes off his dock. Each of them has a name, a family, friends and grudges, and a day of their own, and if you walk up to them they talk: about their work, each other, and what happened this week.</p>
+  <p>Things happen. Market days, weddings, new babies, quarrels and harvests. At night a wolf might take a hen. Storms roll in at any hour and everyone heads indoors.</p>
+  <p>And the valley is not alone. Roads lead out through the hills to <span class="k">other valleys</span>, each grown from its own seed, with its own people, forests, water and ruins. Take a random one, choose the kind you want, or type a seed to find one again. Draw it all in ASCII letters, the original, or in Pixels, Mesh, Voxels, Rays or Iso.</p>
+  <p>Coming next: <span class="k">Story</span>, where you start in your own home valley, with your own name, and the roads lead you out into the wider world. It develops live, so the world you visit today is not the one you will visit next month.</p>
 </section>
 
 <section>
   <h2>How it is built</h2>
   <div class="two">
-    <div class="feat"><h3>One ray per column</h3><p>A heightfield raycaster walks the terrain, one ray for each column of the screen, and draws it as vertical spans of characters. That is the whole renderer.</p></div>
+    <div class="feat"><h3>One ray per column</h3><p>A heightfield raycaster walks the terrain, one ray for each column of the screen, and draws it as vertical spans of characters. That is the whole renderer for the letters; Mesh, Voxels, Rays and Iso redraw the same world on the graphics chip.</p></div>
     <div class="feat"><h3>Water that reflects</h3><p>Every water column runs a second march to mirror what is above it, with a depth gradient and a foam line where you cross the surface.</p></div>
     <div class="feat"><h3>A keep of planes and mass</h3><p>The castle faces are brick planes the ray intersects directly, so walls read as solid, crenellated stone. Under them, raised ground gives the walls their thickness and makes the rampart, stairs and lookout walkable. A second layer of stone can float above the ground, which is how the gate arch, the tunnel and the round room under the tower work.</p></div>
     <div class="feat"><h3>A world that lives</h3><p>Under the renderer, every creature is a tiny agent running steering rules and a state machine. Flocking, herding, and the hunt fall out of that, held in balance by soft floors and carrying caps.</p></div>
@@ -129,12 +131,16 @@ footer a{color:var(--soft)}
     <figure><img src="22-who-lives-here.jpg" alt="Harrow Farm with its wheat field and stone house, Brookside with sheep and cows in the pasture, Osk the woodcutter at his cabin, and the hermit's hut above the lake with its jetty" loading="lazy"><figcaption><div class="v">v0.20.0 · WHO LIVES HERE</div><div class="d">Four new dials on the world card, each a place and a person. Two farms, one of wheat and hens and one of sheep and cows, a woodcutter in his glade, and a hermit who fishes off his jetty. They work through the day, talk when you walk up, sleep at night, and mention their neighbours only if their neighbours were grown into this world.</div></figcaption></figure>
     <figure><img src="23-the-cast.jpg" alt="Two rows of eight people outside the gate, each row a different valley: guards in helmets, a hooded gatekeeper, a steward in a kerchief, farmers in straw hats, a woodcutter and an old hermit" loading="lazy"><figcaption><div class="v">v0.21.0 · THE CAST</div><div class="d">Two valleys, two casts. Every seed grows its own people: new names, faces, builds and ages, hair, beards, hats and clothes, a nature of their own, and their own people among the others. The same eight jobs, never the same eight people.</div></figcaption></figure>
     <figure><img src="24-talk.jpg" alt="A farmer in a straw hat among his hens, with a small card at the bottom right showing his name, The Farmer, and the line: Rain or no rain, the hoe goes in at sunup" loading="lazy"><figcaption><div class="v">v0.22.0 · TALK</div><div class="d">Walk up to anyone and a small card opens: who they are, and the first thing they say. Tap more for the next. Over six hundred lines, picked by the time of day, the speaker's nature and their own people, and only ever about people and places that are really in the valley you are standing in.</div></figcaption></figure>
+    <figure><img src="26-storm.jpg" alt="Rain coming down across a valley, the keep grey behind it" loading="lazy"><figcaption><div class="v">v0.23.1 · STORMS</div><div class="d">Storms come at any hour. The sky greys, the rain comes down in every view, lightning flashes, the flocks bunch up and the folk go indoors.</div></figcaption></figure>
+    <figure><img src="27-roads-out.jpg" alt="The card at the end of a road: stay, a random valley, type a seed, or choose a valley" loading="lazy"><figcaption><div class="v">v0.24 · ROADS OUT</div><div class="d">Roads lead out through the hills. At the end of one you can stay, take a random valley, type a seed, or choose the kind of valley you want. Every valley grows from its own seed.</div></figcaption></figure>
+    <figure><img src="25-the-hearth.jpg" alt="A stone hearth at sunrise, the words The Keep lit by the light from the window" loading="lazy"><figcaption><div class="v">v0.25.0 · THE HEARTH</div><div class="d">The Keep now opens on a hearth at sunrise. The light comes through the window, finds the title in the dark and moves on, and then the embers rise. After it, you pick how to see the world.</div></figcaption></figure>
   </div>
 </section>
 
 <section>
   <h2>Version history</h2>
   <ul class="tl">
+    <li><span class="v">v0.25.0</span> <span class="d">the hearth: the game opens on a stone hearth at sunrise, the light finds the title in the dark and the embers rise; an opening page with Wander and Story (coming next); the first time you wander, six cards to pick how to see the world; the about card rewritten for the game as it is now</span></li>
     <li><span class="v">v0.24.1</span> <span class="d">every valley shaped by its own seed: travel brings thick forest, lake country, valleys full of ruins or busy with wildlife; a random valley is fully random, and Choose a valley at the end of a road finds one with the forest, water, ruins and wildlife you pick</span></li>
     <li><span class="v">v0.24.0</span> <span class="d">roads out: every valley has one to three roads through passes in the hills, each with a signpost; at the end of a road a card offers stay, a random valley or a typed seed; a peddler walks in every third day and sets up by the gate</span></li>
     <li><span class="v">v0.23.1</span> <span class="d">real storms: they come at any hour, an hour to three long; the sky greys, rain falls in every view, lightning flashes, the flocks bunch up and the folk go indoors, and people talk about the storm while it lasts and after</span></li>

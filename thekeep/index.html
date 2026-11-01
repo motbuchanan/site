@@ -67,9 +67,75 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
 #chat .ch-dots{flex:none;font:600 10px var(--mb-mono);color:var(--mb-dim);letter-spacing:.1em;margin:-4px 0 8px}
 #stick{position:absolute;width:110px;height:110px;border-radius:50%;border:2px solid rgba(255,255,255,.35);display:none;pointer-events:none;margin-left:-55px;margin-top:-55px}
 #knob{position:absolute;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.35);left:33px;top:33px}
+
+/* the hearth (v0.25.0): opening scene, opening page and view cards, above everything else */
+#intro{position:fixed;inset:0;z-index:1000;background:#0d0907;color:#eedcbc;font-family:'Archivo',system-ui,sans-serif;-webkit-tap-highlight-color:transparent;transition:opacity .35s}
+#intro.gone{opacity:0;pointer-events:none}
+#intro canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+#inFx{touch-action:manipulation}
+#inSkip{position:absolute;right:16px;bottom:calc(14px + env(safe-area-inset-bottom));font:500 12px/1 'Archivo',sans-serif;color:rgba(238,220,188,.4);letter-spacing:.02em;pointer-events:none}
+#inPage{position:absolute;inset:0;overflow-y:auto;opacity:0;pointer-events:none;
+  background:radial-gradient(120% 70% at 50% 108%,rgba(245,152,71,.16),transparent 60%),#0d0907}
+#inPage.live{pointer-events:auto}
+#inPage section{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:calc(20px + env(safe-area-inset-top)) 16px calc(20px + env(safe-area-inset-bottom))}
+#inPage section[hidden]{display:none}
+#inMain h1{font:600 clamp(44px,13vw,76px)/1 'Cormorant Garamond',serif;letter-spacing:.06em;color:#eedcbc;margin:0}
+#inMain .sub{font:400 15px/1.5 'Archivo',sans-serif;color:#9a8a78;margin:-10px 0 0;text-align:center}
+#intro .choices{display:flex;flex-direction:column;gap:12px;width:min(300px,100%)}
+@media (min-aspect-ratio:1/1) and (min-width:560px){#intro .choices{flex-direction:row;width:auto}#intro .choices button{min-width:180px}}
+#intro button{font-family:'Archivo',sans-serif;cursor:pointer;-webkit-tap-highlight-color:transparent}
+#intro .choices button{font:600 17px/1.15 'Archivo',sans-serif;padding:16px 22px;border-radius:12px;letter-spacing:.01em;min-height:52px}
+#intro .pri{background:#f59847;color:#1e1209;border:1px solid #f59847}
+#inStory{background:transparent;color:rgba(238,220,188,.55);border:1px solid rgba(238,220,188,.18);display:flex;flex-direction:column;align-items:center;gap:4px}
+#inStory .soon{font:500 11px/1 'Archivo',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#4cf0e0;opacity:.8}
+#intro .links{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+#intro .links button{background:none;border:0;color:rgba(154,138,120,.85);font:500 14px/1 'Archivo',sans-serif;padding:12px 14px;min-height:44px}
+#intro button:focus-visible,#intro .vcard:focus-visible{outline:2px solid #4cf0e0;outline-offset:3px}
+#inViews{justify-content:flex-start!important}
+#inViews h2{font:600 clamp(26px,7vw,38px)/1.1 'Cormorant Garamond',serif;color:#eedcbc;margin:8px 0 0;text-align:center;letter-spacing:.02em}
+#inCards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;width:min(520px,100%)}
+@media (min-width:560px){#inCards{grid-template-columns:repeat(3,minmax(0,1fr));width:min(760px,100%)}}
+#intro .vcard{background:rgba(255,255,255,.035);border:1px solid rgba(238,220,188,.16);border-radius:12px;padding:0 0 9px;color:#eedcbc;text-align:left;display:flex;flex-direction:column;gap:3px;overflow:hidden;min-height:44px}
+#intro .vcard img{width:100%;height:auto;aspect-ratio:16/10;object-fit:cover;display:block;background:#18110c;margin-bottom:5px}
+#intro .vcard b{font:600 15px/1.15 'Archivo',sans-serif;padding:0 10px}
+#intro .vcard span{font:400 12.5px/1.3 'Archivo',sans-serif;color:#9a8a78;padding:0 10px}
+#intro .vcard i{font:500 10.5px/1.2 'Archivo',sans-serif;font-style:normal;letter-spacing:.06em;text-transform:uppercase;color:#f59847;opacity:.85;padding:2px 10px 0}
+#intro .vcard.on{border-color:#4cf0e0;background:rgba(76,240,224,.08);box-shadow:0 0 0 1px #4cf0e0 inset}
+#inViews .note{font:400 13.5px/1.4 'Archivo',sans-serif;color:#9a8a78;margin:0;text-align:center}
+#intro .vbtns{display:flex;gap:10px;width:min(360px,100%);position:sticky;bottom:0;z-index:2;padding:10px 0 calc(10px + env(safe-area-inset-bottom));margin-bottom:calc(-20px - env(safe-area-inset-bottom));background:#0d0907;box-shadow:0 -14px 18px 6px #0d0907}
+#intro .vbtns button{flex:1;font:600 16px/1 'Archivo',sans-serif;padding:15px 18px;border-radius:12px;min-height:50px}
+#inBack{background:transparent;color:#eedcbc;border:1px solid rgba(238,220,188,.25)}
+@media (max-height:480px){#inViews{gap:10px}#inViews h2{font-size:22px;margin-top:0}#intro .vcard img{aspect-ratio:16/7}#inViews .note{font-size:12.5px}}
+@media (max-height:700px){#intro .vcard span{font-size:12px}#intro .vcard b{font-size:14px}}
+#inToast{position:absolute;left:50%;bottom:calc(64px + env(safe-area-inset-bottom));transform:translateX(-50%);max-width:min(92%,420px);background:rgba(16,21,28,.94);border:1px solid rgba(255,255,255,.12);color:#eedcbc;padding:10px 16px;border-radius:16px;font:500 14px/1.35 'Archivo',sans-serif;text-align:center;opacity:0;pointer-events:none;transition:opacity .25s}
+#inToast.on{opacity:1}
 </style>
 </head>
 <body>
+<div id="intro" aria-hidden="false">
+ <canvas id="inStage" aria-hidden="true"></canvas>
+ <canvas id="inGrid" aria-hidden="true"></canvas>
+ <canvas id="inFx" aria-label="Opening scene: a stone hearth in a keep hall at sunrise"></canvas>
+ <div id="inSkip">Tap to skip</div>
+ <main id="inPage" aria-hidden="true">
+  <section id="inMain">
+   <h1>The Keep</h1>
+   <p class="sub">A living valley, drawn in letters.</p>
+   <div class="choices">
+    <button id="inWander" class="pri" type="button">Wander</button>
+    <button id="inStory" type="button" aria-disabled="true">Story<span class="soon">Coming next</span></button>
+   </div>
+   <div class="links"><button id="inReplay" type="button">Replay intro</button><button id="inAbout" type="button">About</button></div>
+  </section>
+  <section id="inViews" hidden>
+   <h2>How do you want to see the world?</h2>
+   <div id="inCards" role="radiogroup" aria-label="How to draw the world"><button class="vcard" type="button" role="radio" aria-checked="false" data-r="0"><img src="views/view-ascii.jpg" alt="" loading="lazy" width="320" height="200"><b>ASCII</b><span>Letters, the original</span></button><button class="vcard" type="button" role="radio" aria-checked="false" data-r="1"><img src="views/view-pixels.jpg" alt="" loading="lazy" width="320" height="200"><b>Pixels</b><span>Blocks of color, no letters</span></button><button class="vcard" type="button" role="radio" aria-checked="false" data-r="2"><img src="views/view-mesh.jpg" alt="" loading="lazy" width="320" height="200"><b>Mesh</b><span>Triangles, like most 3D games</span><i>needs a newer phone</i></button><button class="vcard" type="button" role="radio" aria-checked="false" data-r="3"><img src="views/view-voxel.jpg" alt="" loading="lazy" width="320" height="200"><b>Voxels</b><span>Cubes, like Minecraft</span><i>needs a newer phone</i></button><button class="vcard" type="button" role="radio" aria-checked="false" data-r="4"><img src="views/view-ray.jpg" alt="" loading="lazy" width="320" height="200"><b>Rays</b><span>Soft shadows and a lake that reflects</span><i>needs a newer phone</i></button><button class="vcard" type="button" role="radio" aria-checked="false" data-r="5"><img src="views/view-iso.jpg" alt="" loading="lazy" width="320" height="200"><b>Iso</b><span>From above at a slant, like SimCity</span><i>needs a newer phone</i></button></div>
+   <p class="note">You can change this any time in the menu.</p>
+   <div class="vbtns"><button id="inBack" type="button">Back</button><button id="inWalk" class="pri" type="button">Walk in</button></div>
+  </section>
+  <div id="inToast" role="status" aria-live="polite"></div>
+ </main>
+</div>
 <canvas id="c"></canvas>
 <div id="hud">
  <div id="bar">
@@ -78,7 +144,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
  </div>
  <div id="stick"><div id="knob"></div></div>
  <div id="fps"></div>
- <button class="mb-ver" id="mbVer" type="button">v0.24.1 &middot; Oct 31</button>
+ <button class="mb-ver" id="mbVer" type="button">v0.25.0 &middot; Nov 1</button>
  <div id="toast"></div>
  <div id="chat" class="hidden" role="dialog" aria-live="polite"><div class="ch-who"><b id="chName"></b><span id="chRole"></span></div><p id="chLine"></p><div class="ch-dots" id="chDots"></div><div class="ch-btns"><button class="btn" id="chMore" type="button">more</button><button class="btn" id="chBye" type="button">goodbye</button></div></div>
  <div id="help" class="hidden"><div class="card">
@@ -90,19 +156,24 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
  </div></div>
  <div id="about" class="hidden" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.72);pointer-events:auto"><div class="card">
   <h1>The Keep</h1>
-  <p style="color:var(--mb-soft)">A whole world drawn as characters. A snow globe you walk around inside.</p>
-  <p><b>It's all text.</b> Everything here, the hills, the water, the wolves, the keep, is drawn with the characters on your keyboard: @ # * = and dots. The screen is a grid of them. Each spot picks a character by how light or dark it should be and tints it a color, and as you move the whole grid gets re-typed dozens of times a second. No 3D engine, no photos. It's ASCII art you can walk around inside.</p>
+  <p style="color:var(--mb-soft)">A living valley, drawn in letters. Walk in, listen to the people, and leave by the road.</p>
+  <p><b>It began as all text.</b> The hills, the water, the people, the keep: everything is drawn with the characters on your keyboard, @ # * = and dots. Each spot on the screen picks a character by how light it should be and tints it a color, and the whole grid is re-typed dozens of times a second. It's ASCII art you can walk around inside.</p>
+  <p><b>Who lives here.</b> Every valley has its own people: guards on the wall, a gatekeeper, a steward, farmers, a shepherd, a woodcutter and a hermit down by the lake. They have names, families, friends and grudges, and they keep their own hours. Walk up to anyone and they'll talk about their work, each other, and what happened this week.</p>
+  <p><b>Things happen.</b> Market days, weddings, new babies, quarrels and harvests. At night a wolf might take a hen. Storms roll in at any hour, the rain comes down and everyone heads indoors.</p>
+  <p><b>Roads out.</b> Every valley has roads through the hills. Walk to the end of one and you can stay, take a random valley, choose the kind of valley you want, or type a seed. A seed always grows the same valley, with the same people, so you can find your way back.</p>
+  <p><b>Six ways to see it.</b> ASCII, all letters, is the original. Pixels, Mesh, Voxels, Rays and Iso draw the same world other ways, the last four on the graphics chip. Change it any time in the menu.</p>
   <div class="shots">
+   <img src="25-the-hearth.jpg" alt="the hearth at sunrise, the title lit by the light from the window" loading="lazy">
+   <img src="24-talk.jpg" alt="a farmer among his hens, talking" loading="lazy">
+   <img src="26-storm.jpg" alt="rain in a valley" loading="lazy">
+   <img src="27-roads-out.jpg" alt="a signpost on the road out" loading="lazy">
+   <img src="23-the-cast.jpg" alt="the people of two valleys" loading="lazy">
    <img src="12-gate-at-night.jpg" alt="a brazier at the gate arch" loading="lazy">
    <img src="11-moonlit.jpg" alt="the keep by moonlight" loading="lazy">
-   <img src="10-real-keep.jpg" alt="the donjon and its spiral stair" loading="lazy">
-   <img src="07-plane-keep.jpg" alt="the keep" loading="lazy">
-   <img src="09-forest.jpg" alt="the forest" loading="lazy">
-   <img src="05-predation.jpg" alt="a kill" loading="lazy">
-   <img src="04-water.jpg" alt="the lake" loading="lazy">
   </div>
-  <p class="fsize">The whole world is one HTML file. Right now: <b id="fsize">~369 KB</b>. Smaller than a single phone photo.</p>
-  <p><b>Why I built it.</b> I build things on a phone by asking AI the right questions, the way I would direct a camera. I saw a clip of a tiny 3D world made of nothing but text and wanted to see if I could grow one that was actually alive, and keep growing it in the open instead of ever calling it done.</p>
+  <p><b>Coming next: Story.</b> You'll start in your own home valley, with your own name, and the roads will lead you out into the wider world.</p>
+  <p class="fsize">The whole game is one HTML file, plus a file for each 3D view. Right now: <b id="fsize">~435 KB</b>. Smaller than a single phone photo.</p>
+  <p><b>Why I built it.</b> I build things on a phone, directing AI the way I would direct a camera. I saw a clip of a tiny 3D world made of nothing but text and wanted to see if I could grow one that was actually alive, and keep growing it in the open instead of ever calling it done.</p>
   <p><b>What I learned.</b> How far you can get with almost nothing. One idea, a ray walking a height map, turned into characters, with a small world of animals living on top. Every version taught me one concrete thing: how to make a wall read as solid, how to keep the wolves from starving the world empty, how to make a forest look like real woods.</p>
   <p style="color:var(--mb-dim);font-size:13px"><b style="color:var(--mb-soft)">Walk:</b> drag the left half of the screen (tilt to turn). <b style="color:var(--mb-soft)">Look:</b> drag the right half. Wade into the water to swim. Tap ☰ menu for a new world, the dials, and the time of day. Walk under the gate arch and find the door under the tower stair.</p>
   <button class="btn go" id="aGo">walk the keep</button>
@@ -118,6 +189,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
   <button class="btn" id="mAbout" style="width:100%;margin-top:8px">about this build</button>
   <button class="btn" id="mLog" style="width:100%;margin-top:8px">changelog</button>
   <button class="btn" id="mHelp" style="width:100%;margin-top:8px">how to play</button>
+  <button class="btn" id="mIntro" style="width:100%;margin-top:8px">replay the intro</button>
   <button class="btn" id="mClose" style="width:100%;margin-top:10px">close</button>
  </div></div>
  <div id="leave" class="hidden" style="position:absolute;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.55);pointer-events:auto"><div class="card" id="leaveCard"></div></div>
@@ -128,9 +200,974 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
 <script>
 (function(){
 'use strict';
-const VERSION='The Keep v0.24.1 · Oct 31 2026';
-const VER_SHORT='v0.24.1 · Oct 31'; // what the badge shows; bump with VERSION
+
+// ---------------- the hearth (v0.25.0): the opening scene, the opening page and the view cards ----------------
+// The scene is the approved intro spike (Oct 31 to Nov 1), drawn in the same character grid as the world. It plays in full on
+// a first visit and as a short fade on later ones; a tap skips it. The game waits underneath, frozen, until you walk in.
+var KEEP_INTRO=(function(){
+'use strict';
+var root=(typeof document!=='undefined')?document.getElementById('intro'):null;
+if(!root) return {active:false,start:function(){},close:function(){}};
+var cv=document.getElementById('inStage'),ctx=cv.getContext('2d');
+var glc=document.getElementById('inGrid'),fxc=document.getElementById('inFx'),fx=fxc.getContext('2d');
+var page=document.getElementById('inPage'),skipEl=document.getElementById('inSkip');
+var CAPTURE=/[?&]capture=1/.test(location.search);
+var RM=matchMedia('(prefers-reduced-motion: reduce)').matches||/[?&]rm=1/.test(location.search);
+var SHORT=false, SHORT_T=6.3;   // the short version holds the lit room as it stands at 6.3 s, title revealed
+var END=RM?4.6:9.6;
+
+function clamp(x,a,b){return x<a?a:x>b?b:x}
+function ss(a,b,x){x=clamp((x-a)/(b-a),0,1);return x*x*(3-2*x)}
+function lerp(a,b,t){return a+(b-a)*t}
+function hash(x,y){var h=Math.sin(x*127.1+y*311.7)*43758.5453;return h-Math.floor(h)}
+function noise(x,y){var ix=Math.floor(x),iy=Math.floor(y),fx=x-ix,fy=y-iy;
+  var a=hash(ix,iy),b=hash(ix+1,iy),c=hash(ix,iy+1),d=hash(ix+1,iy+1);
+  fx=fx*fx*(3-2*fx);fy=fy*fy*(3-2*fy);return lerp(lerp(a,b,fx),lerp(c,d,fx),fy)}
+function fbm(x,y){return noise(x,y)*.6+noise(x*2.1+5.2,y*2.1+1.3)*.3+noise(x*4.3,y*4.3)*.1}
+function mix3(a,b,t){return [lerp(a[0],b[0],t),lerp(a[1],b[1],t),lerp(a[2],b[2],t)]}
+
+/* palette of materials */
+var C={
+  stone:[0.55,0.48,0.41],stoneL:[0.72,0.64,0.55],breast:[0.62,0.55,0.48],mortar:[0.26,0.21,0.18],
+  wood:[0.55,0.34,0.18],woodD:[0.34,0.20,0.11],iron:[0.34,0.33,0.34],pewter:[0.70,0.71,0.72],brass:[0.92,0.68,0.30],
+  wax:[0.95,0.89,0.76],leaf:[0.34,0.62,0.28],terra:[0.78,0.40,0.24],dog:[0.74,0.70,0.66],dogD:[0.42,0.39,0.37],
+  teal:[0.20,0.66,0.62],gold:[0.95,0.74,0.32],rug:[0.70,0.18,0.13],rugD:[0.42,0.10,0.08],flag:[0.52,0.48,0.44],
+  log:[0.46,0.26,0.13],logE:[0.86,0.64,0.40],soot:[0.24,0.15,0.11],fruit:[0.92,0.42,0.16],eye:[0.15,0.10,0.08]
+};
+var RAMP=' .:-=+*#%@';
+
+var W,H,DPR,cw,ch,fs,cols,rows,M=4,NC,NR,N;
+var GL,BR,BG,BB,K,DY,TX,LM,FLF,CLF,VG,OBJ,RIM,NEAR,STAMP=false;
+var L={};               /* layout */
+var LIGHTS=[];          /* small flames: candles and sconce */
+var TT=null,HA=null,HT=null;
+
+function idx(x,y){return (y+M)*NC+(x+M)}
+function put(x,y,g,col,kind,dyn,tex,lm){
+  if(x<-M||y<-M||x>=cols+M||y>=rows+M)return;
+  var i=idx(x,y);GL[i]=g;BR[i]=col[0];BG[i]=col[1];BB[i]=col[2];K[i]=kind==null?1:kind;DY[i]=dyn===true?6:(dyn||0);
+  TX[i]=tex==null?hash(x*1.3+7,y*2.1+3):tex;LM[i]=lm==null?1:lm;OBJ[i]=STAMP?1:0;
+}
+function dark(c,k){return [c[0]*k,c[1]*k,c[2]*k]}
+/* stamp a small piece of glyph art; ':' inside a piece reads as its shaded body */
+function stamp(x0,y0,lines,keys,def,lm){
+  var was=STAMP;STAMP=true;try{
+  for(var r=0;r<lines.length;r++)for(var c=0;c<lines[r].length;c++){
+    var g=lines[r][c];if(g===' ')continue;
+    var k=keys&&keys[r]&&keys[r][c]&&keys[r][c]!==' '?keys[r][c]:def;
+    if(k==='f'){put(x0+c,y0+r,"'",C.gold,4,0,0,1);LIGHTS.push({x:x0+c,y:y0+r+1});continue}
+    if(k==='F'){put(x0+c,y0+r,'o',C.gold,6,0,0,1);continue}
+    var col=KEY[k]||C.wood;if(g===':')col=dark(col,0.55);
+    put(x0+c,y0+r,g,col,1,0,null,lm);
+  }
+  }finally{STAMP=was}
+}
+var KEY={w:C.wood,W:C.woodD,p:C.pewter,b:C.brass,c:C.wax,i:C.iron,g:C.leaf,t:C.terra,d:C.dog,D:C.dogD,k:C.teal,y:C.gold,
+  r:C.fruit,R:C.rug,h:[0.58,0.54,0.50],s:C.stoneL,L:C.log,e:C.logE,E:C.eye,x:C.soot};
+
+/* glyph art, drawn for the fine grid */
+var ART={
+  candle:{l:['  f  ','  F  ',' |\'| ',' | | ',' | | ','_[_]_','\\___/',' /_\\ '],
+          k:['  f  ','  F  ',' ccc ',' ccc ',' ccc ','bbbbb','bbbbb',' bbb ']},
+  jug:{l:['   ____','  (____)','  /::::\\__',' |::::::|  )',' |::::::| /',' |::::::|/','  \\____/']},
+  owl:{l:[' /\\_/\\ ','( O v O )',' (:\\:/:)','  (:::)',' _/\'-\'\\_'],k:['       ','  y   y  ','','','']},
+  bowl:{l:['  o@Oo ',' (O@o@o)','\\_______/','   [_]'],k:['  rrrr ',' rrrrrrr','wwwwwwwww','   www']},
+  tankard:{l:[' _______','|=======|_','|:::::::| \\','|::(o)::| |','|:::::::|_/','|_______|']},
+  pot:{l:['    _|_','  _/===\\_',' /:::::::\\','(:::::::::)',' \\_______/']},
+  key:{l:['_________','\\#######/',' \\#####/','  \\###/']},
+  wood:{l:['    (O)(o)','  (o)(O)(o)(O)','(O)(o)(O)(o)(O)']},
+  woodS:{l:['  (O)',' (o)(O)','(O)(o)(O)']},
+  hound:(function(){
+    var l=['                          ,-~~-.',
+           '   ____.---------------.-\';;;;;;`-._',
+           '  /;;;;;;;;;;;;;;;;;;;;;;;;;;-;;;;;;o)',
+           ' (;;(;;;;;;;;;;;;;;;;;;;;;___.----\'\'',
+           '~~`-\\_____;___________/',
+           '      (_____)  (_____)'];
+    var k=l.map(function(row){return row.replace(/[^ ]/g,function(c){return c===';'?'h':'d'})});
+    k[2]=k[2].substring(0,29)+'E'+k[2].substring(30,36)+'E'+k[2].substring(37);
+    return {l:l,k:k};
+  })(),
+  chair:{l:['|\\','||\\','|| |','||#|','||#|','||#|_________','||#|#########|','||_|_________|','||  |       ||','||  |       ||',"''  '       ''"],
+         k:['','','','  R','  R','  R','  R RRRRRRRRR','','','','']},
+  tower:{l:['n_n_n_n_n','|:::::::|','|::/^\\::|','|::|:|::|','|::|_|::|','|_______|']},
+  sconce:{l:['  f  ','  F  ',' |\'| ','\\___/','  |  ',' _|_ '],k:['  f  ','  F  ',' ccc ','iiiii','  i  ',' iii ']},
+  plant:{l:['\\ | /',' \\|/ ','-\\|/-',' _|_ ','(___)'],k:['ggggg','ggggg','ggggg',' ttt ','ttttt']},
+  sillc:{l:[' f ',' F ','|\'|','_I_'],k:[' f ',' F ','ccc','bbb']}
+};
+
+function layout(){
+  DPR=Math.min(window.devicePixelRatio||1,2);
+  W=innerWidth;H=innerHeight;
+  cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);fxc.width=cv.width;fxc.height=cv.height;
+  cw=Math.max(4.6,Math.min(clamp(W/72,5,9.5),H/74/1.12*0.6));fs=cw/0.6;ch=fs*1.12;
+  cols=Math.ceil(W/cw);rows=Math.ceil(H/ch);
+  NC=cols+2*M;NR=rows+2*M;N=NC*NR;
+  GL=new Array(N);BR=new Float32Array(N);BG=new Float32Array(N);BB=new Float32Array(N);
+  K=new Uint8Array(N);DY=new Uint8Array(N);TX=new Float32Array(N);LM=new Float32Array(N);
+  FLF=new Float32Array(N);CLF=new Float32Array(N);VG=new Float32Array(N);OBJ=new Uint8Array(N);RIM=new Float32Array(N);
+  L.bk=null;build();bakeLight();makeGlows();glLayout();bakeReveal();
+  NEAR=new Uint8Array(N);
+  for(var yy=-M;yy<rows+M;yy++)for(var xx=-M;xx<cols+M;xx++){var ii=idx(xx,yy);
+    if(Math.abs(xx-L.cx)<=L.W2+4&&yy>=L.mT-2&&yy<=L.F+3){NEAR[ii]=1;continue}
+    if(!(OBJ[ii]||K[ii]!==1))continue;
+    for(var dy=-2;dy<=2;dy++)for(var dx=-2;dx<=2;dx++){var X=xx+dx,Y=yy+dy;if(X<-M||Y<-M||X>=cols+M||Y>=rows+M)continue;NEAR[idx(X,Y)]=1}}
+}
+
+/* ---------- the room, built once per layout ---------- */
+function build(){
+  LIGHTS=[];
+  var cx=Math.floor(cols/2),wide=cols>=110;
+  var Z=wide?rows/48:cols/44;
+  var F=Math.round(rows*(wide?0.81:0.84));
+  var OH=Math.round(rows*0.17),AH=Math.max(4,Math.round(rows*0.075));
+  var y0=F-OH,mT=y0-AH-Math.round(4*Z);
+  var W2=wide?Math.min(40,Math.floor(cols*0.15)):Math.min(30,Math.floor(cols*0.38));
+  var OW=W2-Math.round(5*Z);
+  L={cx:cx,F:F,OH:OH,AH:AH,y0:y0,mT:mT,W2:W2,OW:OW,wide:wide,Z:Z,archTop:Math.round(y0-AH-0.5-2.2)};
+  buildTitle();
+  var T=TT;
+
+  /* walls: varied stone courses */
+  var yy=-M,course=0;
+  while(yy<F){
+    var hgt=Math.round((2+(hash(course,5)>0.5?1:0)+hash(course,8)*0.6)*Z*0.95);
+    var xx=-M-Math.floor(hash(course,6)*8),blk=0;
+    while(xx<cols+M){
+      var bw=Math.round((3+hash(course*7+blk,11)*6)*Z);
+      var tint=0.78+hash(course,blk+40)*0.4,warm=hash(blk,course+90)*0.08;
+      var col=[C.stone[0]*tint+warm,C.stone[1]*tint+warm*0.5,C.stone[2]*tint];
+      var fam=Math.floor(hash(blk,course)*3);
+      for(var r=0;r<hgt;r++)for(var c=0;c<bw;c++){
+        var X=xx+c,Y=yy+r;if(Y>=F)continue;
+        if(c===0)put(X,Y,r===0?'|':':',dark(C.mortar,0.7),1,0,0.2,0.8);
+        else if(r===hgt-1)put(X,Y,hash(X,Y)>0.4?'_':'.',dark(col,0.7),1,0,0.3,0.8);
+        else put(X,Y,'x',col,1,5,0.16+fam*0.2+hash(X,Y)*0.18+(r===0?0.12:0),0.78);
+      }
+      xx+=bw;blk++;
+    }
+    yy+=hgt;course++;
+  }
+  /* ceiling beam */
+  for(var x=-M;x<cols+M;x++){for(var y=-M;y<=1;y++)put(x,y,y===1?'=':(y===0?'_':'#'),C.woodD,1,0,0.5,0.8);
+    if(x%14===0){put(x,2,'\\',C.woodD,1,0,0.5,0.8);put(x+1,2,'/',C.woodD,1,0,0.5,0.8)}}
+
+  /* chimney breast above the mantel */
+  for(var y2=3;y2<mT;y2++)for(var x2=cx-W2-1;x2<=cx+W2+1;x2++){
+    var edge=(x2===cx-W2-1||x2===cx+W2+1);
+    var by=Math.floor((y2-3)/3),bxw=(by%2?7:9),u0=x2-cx+90+(by%2)*4,bx=Math.floor(u0/bxw);
+    var tn=0.86+hash(bx,by)*0.3;
+    if(edge)put(x2,y2,'|',C.mortar,1,0,0.3);
+    else if(u0%bxw===0)put(x2,y2,':',C.mortar,1,0,0.3);
+    else if((y2-3)%3===2)put(x2,y2,'_',dark(C.breast,0.75*tn),1,0,0.3,0.9);
+    else put(x2,y2,'x',[C.breast[0]*tn,C.breast[1]*tn,C.breast[2]*tn],1,4,0.4+hash(bx,by)*0.3);
+  }
+
+  /* floor flagstones */
+  var fy=F,fc=0;
+  while(fy<rows+M){
+    var fh=Math.min(Math.round(4*Z),1+Math.floor(fc*0.9*Z)),fw=Math.round((5+fc*2)*Z),off=Math.floor(hash(fc,3)*fw);
+    for(var r2=0;r2<fh;r2++)for(var x3=-M;x3<cols+M;x3++){
+      var Y2=fy+r2,u=x3+off+600,bi=Math.floor(u/fw),j=u%fw===0;
+      var tn2=0.8+hash(bi,fc)*0.35;
+      var colF=[C.flag[0]*tn2,C.flag[1]*tn2*0.97,C.flag[2]*tn2*0.92];
+      if(r2===fh-1)put(x3,Y2,'_',dark(colF,0.75),1,0,0.3);
+      else if(j)put(x3,Y2,x3<cx-3?'/':x3>cx+3?'\\':'|',C.mortar,1,0,0.3);
+      else put(x3,Y2,'x',colF,1,6,0.3+hash(x3,Y2)*0.35);
+    }
+    fy+=fh;fc++;
+  }
+  /* hearth slab */
+  for(var x4=cx-W2-3;x4<=cx+W2+3;x4++){put(x4,F,'_',C.stoneL,1,0,0.6);put(x4,F+1,'=',C.stoneL,1,0,0.6);put(x4,F+2,(x4-cx)%9===0?'|':'-',dark(C.stoneL,0.8),1,0,0.4)}
+
+  /* fireplace surround: dressed jambs and a ring of voussoirs */
+  var oc=y0,rx=OW+0.5,ry=AH+0.5,rt=Math.round(3.2*Z*0.75),rtv=2.2;
+  function inOpen(x,y){if(Math.abs(x-cx)>OW||y>F-1)return false;if(y>=oc)return true;
+    var dx=(x-cx)/rx,dy=(y-oc)/ry;return dx*dx+dy*dy<=1}
+  function inRing(x,y){if(y>F-1)return false;var dx=(x-cx)/(rx+rt),dy=(y-oc)/(ry+rtv);
+    if(y>=oc)return Math.abs(x-cx)<=OW+rt;return dx*dx+dy*dy<=1}
+  for(var y5=mT+4;y5<F;y5++)for(var x5=cx-W2;x5<=cx+W2;x5++){
+    if(inOpen(x5,y5)){K[idx(x5,y5)]=3;GL[idx(x5,y5)]=' ';continue}
+    if(inRing(x5,y5)&&y5<oc+1){STAMP=true;
+      var ang=Math.atan2((y5-oc)*1.8,x5-cx),seg=(ang+Math.PI)/(Math.PI/17),fr=seg-Math.floor(seg);
+      var jg=fr<0.14;var a2=Math.abs(ang+Math.PI/2);
+      var vt=0.95+hash(Math.floor(seg),3)*0.2;
+      put(x5,y5,jg?(a2<0.2?'|':ang<-Math.PI/2?'\\':'/'):(hash(x5,y5)>0.3?'#':'%'),jg?C.mortar:dark(C.stoneL,1.1*vt),1,0,0.7,1.15);STAMP=false;
+      continue;
+    }
+    var jh=3,row=Math.floor((y5-mT-4)/jh),bw2=row%2?7:9,u2=x5-cx+90+(row%2)*3;
+    var jx=u2%bw2===0,jy=(y5-mT-4)%jh===jh-1;
+    var tn3=0.9+hash(Math.floor(u2/bw2),row)*0.25;
+    put(x5,y5,jx?'|':jy?'_':(hash(x5,y5)>0.55?'=':'-'),jx?C.mortar:[C.stoneL[0]*tn3,C.stoneL[1]*tn3,C.stoneL[2]*tn3],1,0,0.5,0.95);
+  }
+  stamp(cx-4,Math.round(oc-ry-rtv)-2,ART.key.l,null,'s',1.2);
+  /* mantel shelf with a moulding and corbels */
+  STAMP=true;
+  for(var x6=cx-W2-3;x6<=cx+W2+3;x6++){
+    var endL=x6===cx-W2-3,endR=x6===cx+W2+3;
+    put(x6,mT,'_',C.wood,1,0,0.7);
+    put(x6,mT+1,endL?'[':endR?']':'=',C.wood,1,0,0.7);
+    put(x6,mT+2,endL?'[':endR?']':'=',dark(C.wood,0.9),1,0,0.7);
+    put(x6,mT+3,endL?'\\':endR?'/':((x6-cx)%8===0?'+':'-'),C.woodD,1,0,0.5);
+  }
+  STAMP=false;
+  stamp(cx-W2,mT+4,['###','\\##',' \\#','  \\'],null,'W');
+  stamp(cx+W2-2,mT+4,['###','##/','#/ ','/  '],null,'W');
+
+  /* logs on andirons, coals, crane and pot */
+  for(var x9=cx-OW;x9<=cx+OW;x9++){K[idx(x9,F-1)]=5;GL[idx(x9,F-1)]='.'}
+  function log(a,b,y){for(var x=a;x<=b;x++){put(x,y-1,x===a||x===b?' ':'_',C.log,1,0,0.6,1.5);
+    put(x,y,x===a?'(':x===b?'O':(hash(x,y)>0.7?'-':'='),x===b?C.logE:C.log,1,0,0.6,1.5)}}
+  log(cx-OW+3,cx-2,F-2);log(cx+1,cx+OW-3,F-2);
+  log(cx-Math.floor(OW*0.55),cx+Math.floor(OW*0.5),F-4);
+  [cx-OW+4,cx+OW-4].forEach(function(ax){
+    put(ax-1,F-1,'_',C.iron,1,0,0.5,1.4);put(ax,F-1,'|',C.iron,1,0,0.5,1.4);put(ax+1,F-1,'_',C.iron,1,0,0.5,1.4);
+    put(ax,F-2,'|',C.iron,1,0,0.5,1.4);put(ax,F-3,'o',C.brass,1,0,0.5,1.4)});
+  for(var x10=cx-OW;x10<=cx;x10++)put(x10,oc+2,x10===cx-OW?'+':'=',C.iron,1,0,0.4,1.3);
+  put(cx-OW+1,oc+3,'\\',C.iron,1,0,0.4,1.3);put(cx-OW+2,oc+4,'\\',C.iron,1,0,0.4,1.3);
+  put(cx,oc+3,'J',C.iron,1,0,0.4,1.3);
+  stamp(cx-5,oc+3,ART.pot.l,null,'i',1.5);
+
+  /* mantel objects */
+  var top=mT;
+  stamp(cx-W2+1,top-8,ART.candle.l,ART.candle.k,'b');
+  stamp(cx+W2-5,top-8,ART.candle.l,ART.candle.k,'b');
+  stamp(cx-W2+8,top-7,ART.jug.l,null,'p');
+  stamp(cx-8,top-5,ART.owl.l,ART.owl.k,'w');
+  stamp(cx+3,top-4,ART.bowl.l,ART.bowl.k,'w');
+  stamp(cx+W2-15,top-6,ART.tankard.l,null,'p');
+
+  /* woodpile beside the hearth */
+  if(wide)stamp(cx+W2+5,F-2,ART.wood.l,null,'e');else stamp(cols-10,F-1,ART.woodS.l,null,'e');
+
+  /* rug in front of the fire */
+  var RW=wide?Math.round(16*Z):Math.round(cols*0.22),RH=Math.round(5*Z),ry0=F+4,mid=ry0+(RH-1)/2,rcx=wide?cx:cx+7;L.rcx=rcx;L.rugMid=mid;
+  for(var r3=0;r3<RH;r3++){var hw=RW+Math.round(r3*0.8),Y3=ry0+r3;
+    for(var x11=rcx-hw-2;x11<=rcx+hw+2;x11++){
+      var dxr=x11-rcx,ax=Math.abs(dxr);
+      if(ax>hw){put(x11,Y3,ax===hw+2?'~':'"',dark(C.gold,0.75),1,0,0.5);continue}
+      if(r3===0||r3===RH-1||ax===hw){put(x11,Y3,r3===0||r3===RH-1?'=':'|',C.gold,1,0,0.6);continue}
+      if(r3===1||r3===RH-2||ax===hw-2||ax===hw-1){put(x11,Y3,ax>=hw-2&&!(r3===1||r3===RH-2)?':':'-',C.teal,1,0,0.6);continue}
+      var d=ax/2.4+Math.abs(Y3-mid),ring=Math.floor(d+0.5)%4;
+      if(d<1.2)put(x11,Y3,d<0.6?'O':'o',dark(C.teal,1.5),1,0,0.6);
+      else if(ring===0)put(x11,Y3,dxr<0?'<':'>',C.gold,1,0,0.6);
+      else if(ring===1)put(x11,Y3,'x',C.rug,1,0,0.6);
+      else if(ring===2)put(x11,Y3,':',C.rugD,1,0,0.5);
+      else put(x11,Y3,'+',dark(C.rug,1.15),1,0,0.6);
+    }
+  }
+  /* the hound, asleep by the hearth, nose toward the fire */
+  stamp(wide?cx-RW-30:1,F+4,ART.hound.l,ART.hound.k,'d',1.15);
+
+  /* window: placed clear of the title so the sunrise is never covered */
+  var wx0,wx1,wy0,wy1;
+  if(wide){wx1=T.x0-8;wx0=Math.max(3,wx1-30);wy0=5;wy1=Math.min(F-16,Math.round((T.top+T.bot)/2)-8)}
+  else{wx0=4;wx1=Math.min(31,Math.round(cols*0.43));wy0=6;wy1=T.top-6}
+  L.win={x0:wx0,x1:wx1,y0:wy0,y1:wy1};
+  var gx0=wx0+2,gx1=wx1-2,gy0=wy0+1,gy1=wy1,gmx=(gx0+gx1)/2,arH=Math.round(2.4*Z);
+  L.glass={x0:gx0,x1:gx1,y0:gy0,y1:gy1,mx:Math.round(gmx)};
+  var hf=[],hn=[],gh=gy1-gy0;
+  for(var x12=gx0;x12<=gx1;x12++){
+    hf[x12]=gy1-Math.round(gh*0.30+Math.sin(x12*0.33)*1.6+Math.sin(x12*0.13+1.3)*1.4);
+    hn[x12]=gy1-Math.round(gh*0.12+Math.sin(x12*0.51+2)*1.0+Math.sin(x12*0.21)*0.8);
+  }
+  L.hillF=hf;L.hillN=hn;
+  function inArch(x,y,ex){var dx=(x-gmx)/((gx1-gx0)/2+ex+0.5),dy=(y-(gy0+arH))/(arH+ex+0.5);return y>=gy0+arH||dx*dx+dy*dy<=1}
+  for(var y13=wy0-2;y13<=wy1;y13++)for(var x13=wx0-1;x13<=wx1+1;x13++){
+    var inG=x13>=gx0&&x13<=gx1&&y13>=gy0&&inArch(x13,y13,0);
+    var inS=inArch(x13,y13,2.4)&&y13>=wy0-2&&x13>=wx0&&x13<=wx1;
+    if(inG){
+      if(x13===L.glass.mx){put(x13,y13,'|',C.stoneL,1,0,0.6);continue}
+      K[idx(x13,y13)]=2;GL[idx(x13,y13)]=' ';
+    }else if(inS){
+      var inner=x13>=gx0-1&&x13<=gx1+1&&inArch(x13,y13,1);
+      put(x13,y13,inner?(x13<gmx?']':'['):((y13+Math.floor(x13/4))%3===0?'_':'#'),dark(C.stoneL,inner?0.8:1),1,0,0.65);
+    }
+  }
+  for(var x14=wx0-2;x14<=wx1+2;x14++){put(x14,wy1+1,'_',C.stoneL,1,0,0.7);put(x14,wy1+2,'=',C.stoneL,1,0,0.7);put(x14,wy1+3,x14===wx0-2||x14===wx1+2?'|':'-',dark(C.stoneL,0.75),1,0,0.5)}
+  stamp(gx0+1,gy1-4,ART.plant.l,ART.plant.k,'g');
+  stamp(gx1-3,gy1-3,ART.sillc.l,ART.sillc.k,'b');
+
+  /* tapestry with the keep's tower */
+  var bx0,bwid,by0,bh;
+  if(wide){bx0=T.x1+8;bwid=Math.round(11*Z);by0=5;bh=Math.min(Math.round(16*Z),F-22)}
+  else{bwid=Math.round(cols*0.24);bx0=cols-bwid-4;by0=5;bh=T.top-8}
+  if(bx0+bwid<cols+M){
+    for(var x15=bx0-1;x15<=bx0+bwid;x15++)put(x15,by0,x15===bx0-1||x15===bx0+bwid?'o':'=',x15===bx0-1||x15===bx0+bwid?C.brass:C.iron,1,0,0.6);
+    for(var r4=1;r4<bh;r4++)for(var c4=0;c4<bwid;c4++){
+      var X4=bx0+c4,Y4=by0+r4;
+      if(r4===bh-1){put(X4,Y4,c4%2===0?'\\':'/',C.teal,1,0,0.5);continue}
+      if(c4===0||c4===bwid-1){put(X4,Y4,'|',C.gold,1,0,0.6);continue}
+      if(c4===1||c4===bwid-2){put(X4,Y4,r4%2?'<':'>',dark(C.gold,0.8),1,0,0.6);continue}
+      put(X4,Y4,(r4+c4)%2?':':';',C.teal,1,0,0.5);
+    }
+    stamp(Math.floor(bx0+bwid/2)-4,by0+Math.max(2,Math.floor(bh/2)-3),ART.tower.l,null,'y');
+  }
+
+  /* iron wall sconce */
+  if(wide)stamp(cx-W2-9,mT-4,ART.sconce.l,ART.sconce.k,'i');
+  else if(cols-cx-W2>=7)stamp(cols-6,mT+3,ART.sconce.l,ART.sconce.k,'i');
+
+  /* a high-backed chair in a wider room */
+  if(wide)stamp(Math.max(2,cx-W2-34),F-5,ART.chair.l,ART.chair.k,'w',1.15);
+
+  L.fireX=cx;L.fireY=F-5;
+}
+
+/* static light falloffs, baked once per layout */
+function bakeLight(){
+  var fxp=(L.fireX+0.5)*cw,fyp=(L.fireY+0.5)*ch;
+  for(var y=-M;y<rows+M;y++)for(var x=-M;x<cols+M;x++){
+    var i=idx(x,y),px=(x+0.5)*cw,py=(y+0.5)*ch;
+    var dxf=(px-fxp)/H,dyf=(py-fyp)/H;FLF[i]=1.6/(1+(dxf*dxf+dyf*dyf*1.5)*18);
+    var cand=0;for(var j=0;j<LIGHTS.length;j++){var Lx=(LIGHTS[j].x+0.5)*cw-px,Ly=(LIGHTS[j].y+0.5)*ch-py;cand+=0.45/(1+(Lx*Lx+Ly*Ly)/(H*H*0.0012))}
+    CLF[i]=cand;
+    if(OBJ[i]&&K[i]===1&&x>-M&&y>-M){var lft=OBJ[i-1]&&K[i-1]===1,up=OBJ[i-NC]&&K[i-NC]===1;RIM[i]=!lft?1:(!up?0.55:0)}
+    var vx=(px/W-0.5)*2,vy=(py/H-0.52)*2;VG[i]=1-0.34*clamp(vx*vx*(L.wide?0.3:0.5)+vy*vy*0.7,0,1.3);
+  }
+}
+
+/* ---------- per-moment state ---------- */
+var S={};
+function computeState(t){
+  if(RM){
+    S.sunT=0.58;S.sceneIn=ss(0,0.6,t);S.titleIn=1;S.titleA=ss(0.4,1.4,t)*(1-ss(3.0,3.8,t));
+    S.sceneOut=1-ss(3.0,4.0,t);S.pageA=ss(3.9,4.6,t);S.zoom=1;S.dx=0;S.dy=0;S.ft=1.7+t*0.25;S.emb=false;
+  }else{
+    S.sunT=ss(0.4,7.0,t);
+    S.sceneIn=ss(0,0.8,t);
+    S.titleIn=ss(1.2,2.6,t);
+    S.titleA=S.titleIn*(1-ss(6.6,8.0,t));
+    S.sceneOut=1-ss(7.1,8.9,t);
+    S.pageA=ss(8.9,9.6,t);
+    S.zoom=1+0.05*ss(0,10,t);
+    S.dx=4*Math.sin(t*0.55)+1.5*Math.sin(t*1.3+1);
+    S.dy=3*Math.sin(t*0.45+0.8)-6*ss(0,10,t);
+    S.ft=t;S.emb=true;
+  }
+  S.t=t;
+  S.flick=0.84+0.16*noise(S.ft*3.1,0.5)+0.05*Math.sin(S.ft*17);
+  sunlight(RM?6.0:t);
+}
+
+/* ---------- morning sun: one broad beam through the whole window, toward the viewer ---------- */
+function sunPos(t){
+  var G=L.glass,gy0=G.y0*ch,gw=(G.x1-G.x0)*cw,R=gw*0.13;
+  /* the sun climbs and drifts across the sky, so its bright core crosses the panes */
+  var x=(G.mx+(G.x1-G.x0)*lerp(0.26,-0.18,ss(1.0,9.5,t)))*cw;
+  var hc=clamp(Math.floor((G.mx+(G.x1-G.x0)*0.26)),G.x0,G.x1),hillTop=(L.hillF[hc]+1)*ch;
+  var clearY=hillTop-0.85*R,topY=gy0+R*1.8,Hs=Math.max(R,clearY-topY),A=2.2*R/1.5;
+  var y=t<1.8?clearY+(1.8-t)*A:clearY-Hs*(1-Math.exp(-(t-1.8)*A/Hs));
+  return [x,y,R];
+}
+function herm(keys,t){ /* cubic through [t,value,slope] keys */
+  if(t<=keys[0][0])return keys[0][1];var n=keys.length;if(t>=keys[n-1][0])return keys[n-1][1];
+  var i=0;while(t>keys[i+1][0])i++;
+  var t0=keys[i][0],h=keys[i+1][0]-t0,u=(t-t0)/h,p0=keys[i][1],p1=keys[i+1][1],m0=keys[i][2]*h,m1=keys[i+1][2]*h,u2=u*u,u3=u2*u;
+  return (2*u3-3*u2+1)*p0+(u3-2*u2+u)*m0+(-2*u3+3*u2)*p1+(u3-u2)*m1;
+}
+function beamKeys(){
+  var G=L.glass,gy1=(G.y1+1)*ch,tTop=TT.top*ch,tBot=(TT.bot+1)*ch,bottom=H-ch*2,hearth=(L.F+10)*ch;
+  /* lower edge of the beam: clears the sill at 2.5 s, meets the top of the title at 3.5 s, the bottom of it at 5.2 s,
+     reaches the floor after that, then the patch slides back toward the hearth */
+  var k=[[1.8,gy1-ch],[2.5,gy1+ch*2.5],[3.5,tTop+ch*1.6],[5.2,tBot+ch*2.8],[6.0,bottom],[8.5,hearth]];
+  return k.map(function(p,i){var a=k[Math.max(0,i-1)],b=k[Math.min(k.length-1,i+1)];
+    var m=(i===0||i===k.length-1||i===4)?0:(b[1]-a[1])/(b[0]-a[0]);return [p[0],p[1],m]});
+}
+/* the moment the beam first covers each title cell, so the letters light exactly where the light is */
+function bakeReveal(){
+  var keep={};for(var q in S)keep[q]=S[q];
+  TT.cells.forEach(function(e){e.tf=99});
+  for(var t=1.8;t<=8.6;t+=0.03){
+    S.sunT=ss(0.4,7.0,t);sunlight(t);
+    for(var i=0;i<TT.cells.length;i++){var e=TT.cells[i];if(e.tf<99)continue;
+      if(beamAt((e.x+0.5)*cw,(e.y+0.5)*ch)>0.12)e.tf=t}
+  }
+  var miss=0;TT.cells.forEach(function(e){if(e.tf>=99){miss++;e.tf=8.6}});L.revMiss=miss;
+  HT=new Float32Array(cols*rows);for(var q=0;q<HT.length;q++)HT[q]=99;
+  TT.cells.forEach(function(e){for(var dy=-2;dy<=2;dy++)for(var dx=-3;dx<=3;dx++){var X=e.x+dx,Y=e.y+dy;
+    if(X<0||Y<0||X>=cols||Y>=rows)continue;var ii=Y*cols+X;if(e.tf<HT[ii])HT[ii]=e.tf}});
+  for(var q2 in keep)S[q2]=keep[q2];
+}
+function sunlight(t){
+  var G=L.glass;
+  var gx0=G.x0*cw,gx1=(G.x1+1)*cw,gy0=G.y0*ch,gy1=(G.y1+1)*ch;
+  S.ghw=(gx1-gx0)/2;S.ghh=(gy1-gy0)/2;S.gcx=(gx0+gx1)/2;S.gcy=(gy0+gy1)/2;S.arc=Math.round(2.4*L.Z)*ch;
+  var sp=sunPos(t);S.sunX=sp[0];S.sunY=sp[1];S.sunR=sp[2];
+  S.lightOn=ss(1.75,2.7,t);
+  if(!L.bk)L.bk=beamKeys();
+  var low=herm(L.bk,t);
+  var gox=ss(1.8,6.0,t),back=ss(6.0,8.5,t);
+  S.my=lerp(0.85,1.0,gox)-0.25*back;S.ey=low-S.ghh*S.my;
+  /* while it crosses the title the beam is aimed and widened so its front sweeps every letter */
+  var tcx=((TT.x0+TT.x1)/2+0.5)*cw,thw=((TT.x1-TT.x0)/2+3)*cw,tmy=((TT.top+TT.bot)/2+0.5)*ch;
+  var sT=clamp((tmy-S.gcy)/Math.max(ch,S.ey-S.gcy),0.15,1.5);
+  var exT=S.gcx+(tcx-S.gcx)/sT,mxT=clamp(1+(thw/S.ghw-1)/sT,1.2,6);
+  var exR=(L.rcx+0.5)*cw,mxR=1.8;
+  var w2=ss(5.3,6.6,t);
+  S.ex=lerp(exT,exR,w2);S.mx=lerp(mxT,mxR,w2)-0.3*back;
+  S.onFloor=ss(5.5,6.0,t);S.endFade=1-S.onFloor;
+  S.pI=S.lightOn*lerp(0.9,1.2,ss(3,8,t));
+  S.pCol=mix3(mix3([1.0,0.50,0.30],[1.0,0.76,0.42],ss(1.8,3.6,t)),[1.0,0.92,0.74],ss(5.0,8.0,t));
+  /* floor patch is the end of the beam where it meets the floor */
+  S.pcx=S.ex;S.pcy=S.ey;S.psx=S.mx;S.psy=S.my;S.pfloor=S.onFloor;
+  S.sill=ss(0.3,1.6,t)*(1-0.6*S.lightOn)*0.55;
+  S.amb=0.24+0.34*S.sunT;
+  S.ambC=mix3([0.55,0.62,0.90],[1.0,0.86,0.66],ss(0.6,0.9,S.sunT)*0.4+ss(1.8,6,t)*0.6);
+}
+function sRange(a,b,c,e){ /* s in [0,1] with |a-b*s| <= c+e*s */
+  var lo=0,hi=1;
+  function lin(A,B){if(Math.abs(B)<1e-9){if(A>0)lo=2;return}var v=A/B;if(B>0){if(v>lo)lo=v}else{if(v<hi)hi=v}}
+  lin(a-c,b+e);lin(-(a+c),-(b-e));
+  return [lo,hi];
+}
+var BEAMG='.',BEAMC=0;
+/* strength (0..1) of the beam at a point, and the glyph that runs along it */
+function beamAt(px,py){
+  if(S.pI<=0.002)return 0;
+  var a=px-S.gcx,ay=py-S.gcy,bx=S.ex-S.gcx,by=S.ey-S.gcy;
+  var rx=sRange(a,bx,S.ghw,S.ghw*(S.mx-1));if(rx[0]>rx[1])return 0;
+  var ry=sRange(ay,by,S.ghh,S.ghh*(S.my-1));
+  var lo=Math.max(rx[0],ry[0]),hi=Math.min(rx[1],ry[1]);if(lo>hi)return 0;
+  var s=(lo+hi)/2,kx=1+(S.mx-1)*s,ky=1+(S.my-1)*s;
+  var lx=(a-bx*s)/kx,ly=(ay-by*s)/ky;
+  var inside=Math.min((S.ghw-Math.abs(lx))*kx/cw,(S.ghh-Math.abs(ly))*ky/ch);
+  var soft=ss(-0.2,1.1,inside);if(soft<=0)return 0;
+  /* leading bars and the mullion cast darker stripes through the volume */
+  var gxC=(lx+S.ghw)/cw+L.glass.x0,gyC=(ly+S.ghh)/ch+L.glass.y0;
+  var la=gxC+2*gyC,lb=gxC-2*gyC,da=Math.abs(la-8*Math.round(la/8)),db=Math.abs(lb-8*Math.round(lb/8));
+  var line=Math.max(ss(1.2,0.45,da),ss(1.2,0.45,db),ss(0.9,0.3,Math.abs(gxC-L.glass.mx-0.5)));
+  /* panes nearest the sun glow brightest */
+  var du=(lx-(S.sunX-S.gcx))/S.ghw,dv=(ly-(S.sunY-S.gcy))/S.ghh,pw=0.38+0.62*Math.exp(-(du*du+dv*dv)*1.6);
+  var fs=(1-0.35*s)*(1-S.endFade*ss(0.7,1.0,s));
+  var dxv=bx+(S.mx-1)*lx,dyv=by+(S.my-1)*ly,ang=Math.atan2(dyv,dxv)*57.3;
+  BEAMG=(ang>68&&ang<112)?'|':(ang>=22&&ang<=68)?'\\':(ang>=112&&ang<=158)?'/':'-';
+  return soft*(1-0.5*line)*(0.55+0.45*pw)*fs;
+}
+/* the window-shaped patch on the floor, leading lines included */
+function patchAt(px,py){
+  if(S.pI<=0.002||S.pfloor<=0)return 0;
+  var dy=(py-S.pcy)/S.psy;if(Math.abs(dy)>S.ghh+2*ch)return 0;
+  var dx=(px-S.pcx)/S.psx;if(Math.abs(dx)>S.ghw+2*cw)return 0;
+  var ix=(S.ghw-Math.abs(dx))*S.psx/cw,iy=(S.ghh-Math.abs(dy))*S.psy/ch,inside=Math.min(ix,iy);
+  var soft=ss(-0.4,1.6,inside);if(soft<=0)return 0;
+  var gxC=(dx+S.ghw)/cw+L.glass.x0,gyC=(dy+S.ghh)/ch+L.glass.y0;
+  var la=gxC+2*gyC,lb=gxC-2*gyC,da=Math.abs(la-8*Math.round(la/8)),db=Math.abs(lb-8*Math.round(lb/8));
+  var line=Math.max(ss(1.3,0.5,da),ss(1.3,0.5,db),ss(0.9,0.3,Math.abs(gxC-L.glass.mx-0.5)));
+  return soft*(1-0.7*line)*S.pfloor;
+}
+function leadAt(x,y){var a=((Math.floor(x)+Math.floor(y)*2)%8+8)%8,b=((Math.floor(x)-Math.floor(y)*2)%8+8)%8;return a===0||b===0}
+
+function skyAt(v01){
+  var st=S.sunT,top,bot;
+  if(st<0.35){var k=st/0.35;top=mix3([0.04,0.12,0.20],[0.22,0.34,0.48],k);bot=mix3([0.08,0.20,0.26],[0.92,0.48,0.32],k)}
+  else if(st<0.7){var k2=(st-0.35)/0.35;top=mix3([0.22,0.34,0.48],[0.62,0.74,0.82],k2);bot=mix3([0.92,0.48,0.32],[1.0,0.80,0.46],k2)}
+  else{var k3=(st-0.7)/0.3;top=mix3([0.62,0.74,0.82],[0.80,0.89,0.93],k3);bot=mix3([1.0,0.80,0.46],[1.0,0.93,0.78],k3)}
+  return mix3(top,bot,v01);
+}
+function firePal(f){
+  var s=[[0.32,0.05,0.02],[0.66,0.14,0.04],[0.90,0.32,0.08],[0.98,0.60,0.26],[1.0,0.84,0.50],[1.0,0.97,0.86]];
+  f=clamp(f,0,0.999)*(s.length-1);var i=Math.floor(f);return mix3(s[i],s[i+1],f-i);
+}
+
+/* ---------- shading one cell ---------- */
+var o=[0,0,0,' '];
+function shade(x,y){
+  var i=idx(x,y),k=K[i],px=(x+0.5)*cw,py=(y+0.5)*ch,t=S.ft,g;
+  var r,gg,b;
+  if(k===2){ /* window glass: sky, two hill lines, the sun */
+    var G=L.glass,v01=clamp((y-G.y0)/(G.y1-G.y0),0,1),sky=skyAt(v01);
+    var hfY=L.hillF[x],hnY=L.hillN[x];
+    var R=S.sunR;
+    var sunCx=S.sunX,sunCy=S.sunY;
+    var d=Math.hypot(px-sunCx,(py-sunCy)*0.95)/R;
+    var disc=ss(1.05,0.85,d),halo=Math.exp(-d*d/5)*0.75;
+    if(y>hnY){ /* near hill with trees */
+      var lit=0.10+0.40*S.sunT;
+      r=0.12*lit*2.2;gg=0.22*lit*2.2;b=0.12*lit*2.2;
+      g=y===hnY+1?(hash(x,2)>0.45?'^':'A'):(hash(x,y)>0.5?'w':'v');
+    }else if(y>hfY){ /* far hill, cooler */
+      var lit2=0.14+0.5*S.sunT,rim=y===hfY+1?halo:0;
+      r=0.20*lit2*2+rim*0.6;gg=0.28*lit2*2+rim*0.4;b=0.34*lit2*2+0.06*(1-S.sunT)+rim*0.15;
+      g=y===hfY+1?(hash(x,1)>0.5?'^':'n'):(hash(x,y)>0.5?'m':'~');
+    }else{
+      var kk=disc+halo*(0.5+S.sunT);
+      r=sky[0]+kk;gg=sky[1]+kk*0.86;b=sky[2]+kk*0.5;
+      var star=S.sunT<0.25&&hash(x,y)>0.9?(0.25-S.sunT)*3:0;
+      if(leadAt(x,y)){var a8=((x+2*y)%8+8)%8===0,b8=((x-2*y)%8+8)%8===0;g=a8&&b8?'x':(a8?'/':'\\');r=r*0.28+0.05;gg=gg*0.28+0.05;b=b*0.28+0.06}
+      else if(disc>0.5)g=d<0.5?'@':'O';else if(kk>0.55)g='o';else if(star>0.1){g='*';r+=star*0.4;gg+=star*0.9;b+=star*0.9}
+      else{var el=r*0.3+gg*0.55+b*0.15,hv=hash(x*3+1,y*5+2);g=el>0.6?(hv>0.7?'~':(hv>0.35?'-':'.')):el>0.32?(hv>0.75?'~':(hv>0.4?'-':'.')):el>0.15?(hv>0.6?'-':'.'):(hv>0.75?'.':' ')}
+    }
+    if(S.pI>0.01){var gA=beamAt(px,py)*S.pI;if(gA>0.1){var gc2=S.pCol;r+=gA*gc2[0]*0.6;gg+=gA*gc2[1]*0.5;b+=gA*gc2[2]*0.32;
+}}
+  }else if(k===3||k===5){ /* fire */
+    var fx=(x-L.cx)/L.OW,fy=(L.F-5.5-y)/(L.OH+L.AH-5);
+    var n=fbm(fx*3.2,fy*3.4-t*2.4);
+    var flame=(1.12-fy*1.2-fx*fx*1.05+(n-0.5)*1.15)*S.flick;
+    if(k===5||fy<-0.08){
+      var cn=noise(x*0.7+t*0.8,y*3+t*0.5);var hot=cn>0.5;
+      var c=firePal(hot?0.55+cn*0.35:0.25+cn*0.2);r=c[0];gg=c[1];b=c[2];g=hot?(cn>0.75?'*':(cn>0.62?'o':';')):(cn>0.35?',':'.');
+    }else if(flame>0.12){
+      var fc=firePal(clamp(flame*0.92,0,1));r=fc[0]*1.15;gg=fc[1]*1.1;b=fc[2];
+      if(flame>0.97)g='@';else if(flame>0.82)g='#';else if(flame>0.66)g=hash(x,Math.floor(t*8))>0.5?'%':'&';
+      else if(flame>0.5)g=hash(x,y+Math.floor(t*7))>0.5?'*':'$';
+      else if(flame>0.34)g=(n>0.5)===(fx<0)?')':'(';else if(flame>0.22)g=hash(x,y+Math.floor(t*6))>0.5?'^':"'";else g='.';
+    }else{ /* sooty firebox bricks lit by the fire */
+      var fl=S.flick*(0.35+0.55*clamp(1-fy,0,1));
+      r=C.soot[0]*fl*1.5;gg=C.soot[1]*fl*0.9;b=C.soot[2]*fl*0.7;g=(y%3===0)?'_':(((x+(Math.floor(y/3)%2)*3)%6===0)?'|':' ');
+    }
+    if(S.pI>0.01){var fA=beamAt(px,py)*S.pI;if(fA>0.05){var fq=Math.min(1,fA)*0.75;r=Math.max(r,fq);gg=Math.max(gg,fq*0.86);b=Math.max(b,fq*0.56);if(g===' '&&fA>0.3)g='.'}}
+  }else if(k===4){ /* candle flame tip */
+    var fl2=noise(t*6+x,y);g=fl2>0.66?'^':fl2>0.33?"'":',';
+    r=1.0;gg=0.80+0.15*fl2;b=0.42;
+  }else if(k===6){ /* candle flame core */
+    var fl3=noise(t*5+x*3,y+2);g=fl3>0.6?'0':fl3>0.3?'o':'()'.charAt(Math.floor(fl3*20)%2);
+    r=1.0;gg=0.92;b=0.66;
+  }else if(k===1){
+    var base0=BR[i],base1=BG[i],base2=BB[i],lm=LM[i];
+    var fire=S.flick*FLF[i],cand=CLF[i];
+    var bm=(S.pI>0.002&&y>=L.F)?patchAt(px,py)*S.pI*2.3:0,pc=S.pCol;
+    r=base0*lm*(S.amb*S.ambC[0]+fire*1.0+cand*1.0+bm*pc[0]);
+    gg=base1*lm*(S.amb*S.ambC[1]+fire*0.52+cand*0.72+bm*pc[1]);
+    b=base2*lm*(S.amb*S.ambC[2]+fire*0.20+cand*0.35+bm*pc[2]);
+    if(bm>0){r+=bm*pc[0]*0.2;gg+=bm*pc[1]*0.16;b+=bm*pc[2]*0.1}
+    var sA=S.pI>0.002?beamAt(px,py)*S.pI:0,bg=BEAMG;
+    if(sA>0){ /* a warm multiplicative lift, so dark lines inside an object stay darker than its lit fill */
+      var sa=Math.min(1,sA);r=r*(1+2.3*sa)+0.06*sa;gg=gg*(1+1.8*sa)+0.05*sa;b=b*(1+0.9*sa)+0.02*sa;
+      var sc=ss(0,0.3,sa);r=lerp(r,1.0*(1-Math.exp(-r*1.6)),sc);gg=lerp(gg,0.92*(1-Math.exp(-gg*1.6)),sc);b=lerp(b,0.70*(1-Math.exp(-b*1.6)),sc)}
+    if(RIM[i]&&S.pI>0.01){var rl=RIM[i]*S.pI*0.75;r+=rl*pc[0]*base0;gg+=rl*pc[1]*base1;b+=rl*pc[2]*base2}
+    var Wn=L.win;
+    if(S.pI>0.01&&y>=Wn.y0-2&&y<=Wn.y1+3&&x>=Wn.x0-2&&x<=Wn.x1+2){var wl=S.pI*0.65;r+=wl*pc[0]*base0;gg+=wl*pc[1]*base1;b+=wl*pc[2]*base2}if(S.sill>0.01&&y>Wn.y1&&y<=Wn.y1+3&&x>=Wn.x0-2&&x<=Wn.x1+2){r+=S.sill*0.55*base0;gg+=S.sill*0.22*base1;b+=S.sill*0.16*base2}
+    g=GL[i];
+    if(DY[i]){var Lu=(r*0.35+gg*0.5+b*0.15)*1.25+(TX[i]-0.5)*0.55;g=RAMP.charAt(clamp(Math.floor(Lu*RAMP.length),2,DY[i]))}
+    /* inside the beam the air itself takes over the cell: light glyphs running along the rays */
+    if(sA>0.2&&!NEAR[i]&&(g===' '||g==='.'||g===':')&&hash(x*1.7,y*0.9+Math.floor(S.t*2.2)*7)<sA*0.5&&!(HA&&x>=0&&y>=0&&x<cols&&y<rows&&HA[y*cols+x]<1)){
+      var bc=S.pCol,bv=0.6+0.8*sA;
+      g=sA>0.5?bg:(sA>0.32?':':'.');
+      r=Math.max(r,bc[0]*bv);gg=Math.max(gg,bc[1]*bv*0.92);b=Math.max(b,bc[2]*bv*0.8);
+    }
+  }else{o[3]=' ';return o}
+  var vig=VG[i];if(sA>0)vig=lerp(vig,1,Math.min(1,sA*1.5));
+  var tb=titleHalo(x,y);
+  var m=vig*tb*S.sceneIn*S.sceneOut;
+  o[0]=r*m;o[1]=gg*m;o[2]=b*m;o[3]=g;return o;
+}
+
+var LUT=new Uint8Array(1025);for(var li=0;li<=1024;li++)LUT[li]=Math.round(255*Math.pow(li/1024,0.82));
+function c8(v){return LUT[v<=0?0:v>=1?1024:(v*1024)|0]}
+function toCss(r,g,b){return 'rgb('+c8(r)+','+c8(g)+','+c8(b)+')'}
+
+/* ---------- particles (analytic, so any moment can be drawn) ---------- */
+var EMBERS=[],SPARKS=[],MOTES=[];
+(function(){
+  for(var i=0;i<260;i++){var h=[hash(i,1),hash(i,2),hash(i,3),hash(i,4),hash(i,5),hash(i,6),hash(i,7)];
+    EMBERS.push({t0:6.4+h[1]*1.7,ff:h[0]<0.55,x0:h[2],y0:h[3],vy:0.16+0.26*h[4],amp:0.5+1.6*h[5],fr:1.2+h[6]*2.4,ph:h[3]*6.28,life:1.4+h[5]*1.1,drift:(h[1]-0.5)*2})}
+  for(var j=0;j<14;j++)SPARKS.push({per:1.4+hash(j,11)*1.4,ph:hash(j,12)*3,x0:(hash(j,13)-0.5)})
+  for(var m=0;m<320;m++)MOTES.push({x:hash(m,21),y:hash(m,22),sp:0.2+hash(m,23)*0.6,ph:hash(m,24)*6.28})
+})();
+
+/* soft glow sprites, made once per layout instead of a gradient per spark */
+var GLOW={};
+function makeGlows(){
+  [['ember','245,140,60'],['sun','255,220,150']].forEach(function(p){
+    var s=64,c=document.createElement('canvas');c.width=c.height=s;var g=c.getContext('2d');
+    var gr=g.createRadialGradient(s/2,s/2,0,s/2,s/2,s/2);gr.addColorStop(0,'rgba('+p[1]+',1)');gr.addColorStop(1,'rgba('+p[1]+',0)');
+    g.fillStyle=gr;g.fillRect(0,0,s,s);GLOW[p[0]]=c;
+  });
+}
+function glowAt(px,py,kind,alpha,rad){
+  fx.globalCompositeOperation='lighter';fx.globalAlpha=alpha;
+  fx.drawImage(GLOW[kind],px-rad,py-rad,rad*2,rad*2);
+  fx.globalCompositeOperation='source-over';fx.globalAlpha=1;
+}
+function drawEmber(px,py,heat,alpha,noGlow){
+  var ci=Math.floor(px/cw),ri=Math.floor(py/ch);
+  var c=firePal(0.35+heat*0.6);
+  if(!noGlow)glowAt(px,py,'ember',0.3*alpha,cw*2.2);
+  fx.globalAlpha=alpha;fx.fillStyle=toCss(c[0]*1.1,c[1]*1.05,c[2]);
+  fx.fillText(heat>0.7?'*':heat>0.4?'+':heat>0.2?"'":'.',ci*cw+cw/2,ri*ch+ch/2);fx.globalAlpha=1;
+}
+
+/* ---------- the cell buffer and the GPU grid ---------- */
+var CB=null,gl=null,GLS={};
+function cellCode(g,bold){var c=g.charCodeAt(0)-32;return c<=0||c>94?0:c+(bold?96:0)}
+function initGL(){
+  try{gl=glc.getContext('webgl2',{alpha:true,premultipliedAlpha:true,antialias:false,preserveDrawingBuffer:true})}catch(e){gl=null}
+  if(!gl)return;
+  var vs='#version 300 es\nin vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
+  var fsrc='#version 300 es\nprecision highp float;uniform sampler2D cells;uniform sampler2D atlas;uniform vec2 res;uniform float dpr;uniform vec3 cam;uniform vec2 cell;uniform vec2 gridN;uniform float margin;uniform vec2 aCell;uniform vec2 aSize;uniform float aCols;out vec4 o;'+
+    'void main(){vec2 fc=vec2(gl_FragCoord.x,res.y*dpr-gl_FragCoord.y)/dpr;vec2 g=(fc-res*.5-cam.xy)/cam.z+res*.5;vec2 cc=floor(g/cell);vec2 ci=cc+margin;'+
+    'if(ci.x<0.||ci.y<0.||ci.x>=gridN.x||ci.y>=gridN.y){o=vec4(0.);return;}vec4 c=texelFetch(cells,ivec2(ci),0);float gi=floor(c.a*255.+.5);if(gi<.5){o=vec4(0.);return;}'+
+    'vec2 lc=(g-cc*cell)/cell;vec2 ap=vec2(mod(gi,aCols),floor(gi/aCols))*aCell+1.+lc*(aCell-2.);float a=texture(atlas,ap/aSize).a;o=vec4(c.rgb*a,a);}';
+  function sh(type,src){var s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw gl.getShaderInfoLog(s);return s}
+  try{
+    var pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,vs));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,fsrc));gl.linkProgram(pr);
+    if(!gl.getProgramParameter(pr,gl.LINK_STATUS))throw gl.getProgramInfoLog(pr);
+    gl.useProgram(pr);GLS.pr=pr;
+    var b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
+    var loc=gl.getAttribLocation(pr,'p');gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
+    GLS.cells=gl.createTexture();GLS.atlas=gl.createTexture();
+    ['cells','atlas','res','dpr','cam','cell','gridN','margin','aCell','aSize','aCols'].forEach(function(n){GLS['u_'+n]=gl.getUniformLocation(pr,n)});
+    gl.uniform1i(GLS.u_cells,0);gl.uniform1i(GLS.u_atlas,1);
+  }catch(e){console.warn(e);gl=null}
+}
+function glLayout(){
+  CB=new Uint8Array(N*4);
+  if(!gl)return;
+  glc.width=cv.width;glc.height=cv.height;gl.viewport(0,0,glc.width,glc.height);
+  /* atlas: every printable glyph in the room weight and the title weight */
+  var aw=Math.ceil(cw*DPR)+2,ah=Math.ceil(ch*DPR)+2,cols16=16,rowsA=12;
+  var ac=document.createElement('canvas');ac.width=aw*cols16;ac.height=ah*rowsA;var a=ac.getContext('2d');
+  a.fillStyle='#fff';a.textAlign='center';a.textBaseline='middle';
+  for(var k=1;k<192;k++){var code=(k%96),bold=k>=96;if(code<1||code>94)continue;
+    a.font=(bold?'700 ':'500 ')+(fs*DPR)+'px "JetBrains Mono"';
+    var col=k%cols16,row=Math.floor(k/cols16);
+    a.save();a.beginPath();a.rect(col*aw+1,row*ah+1,aw-2,ah-2);a.clip();
+    a.fillText(String.fromCharCode(code+32),col*aw+1+(aw-2)/2,row*ah+1+(ah-2)/2);a.restore();
+  }
+  gl.activeTexture(gl.TEXTURE1);gl.bindTexture(gl.TEXTURE_2D,GLS.atlas);
+  gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,false);
+  gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,ac);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+  gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,GLS.cells);
+  gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,NC,NR,0,gl.RGBA,gl.UNSIGNED_BYTE,CB);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.NEAREST);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.NEAREST);
+  gl.uniform2f(GLS.u_res,W,H);gl.uniform1f(GLS.u_dpr,DPR);gl.uniform2f(GLS.u_cell,cw,ch);gl.uniform2f(GLS.u_gridN,NC,NR);
+  gl.uniform1f(GLS.u_margin,M);gl.uniform2f(GLS.u_aCell,aw,ah);gl.uniform2f(GLS.u_aSize,ac.width,ac.height);gl.uniform1f(GLS.u_aCols,cols16);
+}
+function setCell(x,y,r,g,b,code){
+  if(x<-M||y<-M||x>=cols+M||y>=rows+M)return;
+  var j=((y+M)*NC+(x+M))*4;CB[j]=c8(r);CB[j+1]=c8(g);CB[j+2]=c8(b);CB[j+3]=code;
+}
+function flushCells(){
+  if(gl){
+    gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,GLS.cells);
+    gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,NC,NR,gl.RGBA,gl.UNSIGNED_BYTE,CB);
+    gl.uniform3f(GLS.u_cam,S.dx,S.dy,S.zoom);
+    gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
+    return;
+  }
+  /* fallback without WebGL2: draw the same buffer with text */
+  ctx.save();ctx.translate(W/2+S.dx,H/2+S.dy);ctx.scale(S.zoom,S.zoom);ctx.translate(-W/2,-H/2);
+  ctx.textAlign='center';ctx.textBaseline='middle';var last='',lf='';
+  for(var y=-M;y<rows+M;y++)for(var x=-M;x<cols+M;x++){
+    var j=((y+M)*NC+(x+M))*4,code=CB[j+3];if(!code)continue;
+    var f=(code>=96?'700 ':'500 ')+fs+'px "JetBrains Mono"';if(f!==lf){ctx.font=f;lf=f}
+    var css='rgb('+CB[j]+','+CB[j+1]+','+CB[j+2]+')';if(css!==last){ctx.fillStyle=css;last=css}
+    ctx.fillText(String.fromCharCode((code%96)+32),x*cw+cw/2,y*ch+ch/2);
+  }
+  ctx.restore();
+}
+
+/* ---------- frame ---------- */
+function render(t){
+  var u=t;
+  if(SHORT&&!RM){ t=SHORT_T; computeState(t);
+    S.sceneIn=ss(0,0.35,u); S.sceneOut=1-ss(0.8,1.35,u); S.pageA=ss(1.0,1.6,u); S.emb=false;
+    S.ft=SHORT_T+u; S.flick=0.84+0.16*noise(S.ft*3.1,0.5)+0.05*Math.sin(S.ft*17); }
+  else computeState(t);
+  var vis=S.sceneIn*S.sceneOut;
+  /* back layer: dark room, hearth warmth and the haze of the sunbeam */
+  ctx.setTransform(DPR,0,0,DPR,0,0);ctx.globalCompositeOperation='source-over';ctx.globalAlpha=1;
+  ctx.fillStyle='#0d0907';ctx.fillRect(0,0,W,H);
+  ctx.translate(W/2+S.dx,H/2+S.dy);ctx.scale(S.zoom,S.zoom);ctx.translate(-W/2,-H/2);
+  var fpx=(L.fireX+0.5)*cw,fpy=(L.fireY+0.5)*ch;
+  if(vis>0.002){
+    var ga=0.30*S.flick*vis;
+    var gg=ctx.createRadialGradient(fpx,fpy,0,fpx,fpy,H*0.5);
+    gg.addColorStop(0,'rgba(245,120,40,'+ga+')');gg.addColorStop(0.4,'rgba(200,80,30,'+(ga*0.35)+')');gg.addColorStop(1,'rgba(120,40,10,0)');
+    ctx.fillStyle=gg;ctx.fillRect(-W,-H,W*3,H*3);
+    drawShafts(vis);
+  }
+  /* grid layer: every room cell, then the title cells, into one buffer */
+  CB.fill(0);
+  if(vis>0.002){
+    for(var y=-M;y<rows+M;y++)for(var x=-M;x<cols+M;x++){
+      var r=shade(x,y);if(r[3]===' '||r[0]+r[1]+r[2]<0.02)continue;
+      var j=((y+M)*NC+(x+M))*4;CB[j]=c8(r[0]);CB[j+1]=c8(r[1]);CB[j+2]=c8(r[2]);CB[j+3]=cellCode(r[3],false);
+    }
+  }
+  /* front layer: motes, sparks, title glints, embers */
+  fx.setTransform(DPR,0,0,DPR,0,0);fx.clearRect(0,0,W,H);
+  fx.translate(W/2+S.dx,H/2+S.dy);fx.scale(S.zoom,S.zoom);fx.translate(-W/2,-H/2);
+  fx.font='600 '+fs+'px "JetBrains Mono"';fx.textAlign='center';fx.textBaseline='middle';
+  writeTitle(t);
+  flushCells();
+  if(vis>0.002){
+    drawMotes(vis);drawBloom(vis);
+    if(S.emb)for(var i=0;i<SPARKS.length;i++){var sk=SPARKS[i],a=((t+sk.ph)%sk.per)/sk.per;
+      drawEmber(fpx+sk.x0*L.OW*cw*0.8+Math.sin(a*6+i)*cw*1.5,fpy+ch*3-a*ch*14,1-a,vis*(1-a)*0.9)}
+  }
+  if(S.emb&&t>6.2)drawEmberRise(t);
+
+  page.style.opacity=S.pageA.toFixed(3);
+  var live=S.pageA>0.6;page.classList.toggle('live',live);page.setAttribute('aria-hidden',live?'false':'true');
+  skipEl.style.opacity=(SHORT||u>END-1.2||CAPTURE)?0:1;
+}
+
+/* a very faint smooth glow under the glyph beam, and the bloom at the window */
+var BGc=null,BGx=null;
+function drawShafts(vis){
+  if(S.pI<0.01)return;
+  var on=S.pI*vis,c=S.pCol,rgb=Math.round(255*c[0])+','+Math.round(225*c[1])+','+Math.round(185*c[2]);
+  ctx.save();ctx.globalCompositeOperation='lighter';
+  var bs=Math.max(S.ghw,S.ghh)*1.6;ctx.globalAlpha=0.12*on;ctx.drawImage(GLOW.sun,S.gcx-bs,S.gcy-bs,bs*2,bs*2);ctx.restore();
+  var sc=0.2,bw=Math.ceil(W*sc)+2,bh=Math.ceil(H*sc)+2;
+  if(!BGc||BGc.width!==bw||BGc.height!==bh){BGc=document.createElement('canvas');BGc.width=bw;BGc.height=bh;BGx=BGc.getContext('2d')}
+  BGx.setTransform(1,0,0,1,0,0);BGx.clearRect(0,0,bw,bh);BGx.setTransform(sc,0,0,sc,0,0);
+  var pts=[];[-1,1].forEach(function(sx){[-1,1].forEach(function(sy){
+    pts.push([S.gcx+sx*S.ghw,S.gcy+sy*S.ghh]);pts.push([S.ex+sx*S.ghw*S.mx,S.ey+sy*S.ghh*S.my])})});
+  var hull=convexHull(pts);
+  var lg=BGx.createLinearGradient(S.gcx,S.gcy,S.ex,S.ey+S.ghh*S.my);
+  lg.addColorStop(0,'rgba('+rgb+','+(0.025*on)+')');lg.addColorStop(1,'rgba('+rgb+','+(0.005*on)+')');
+  BGx.fillStyle=lg;BGx.beginPath();hull.forEach(function(q,i){i?BGx.lineTo(q[0],q[1]):BGx.moveTo(q[0],q[1])});BGx.closePath();BGx.fill();
+  ctx.save();ctx.globalCompositeOperation='lighter';ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
+  ctx.drawImage(BGc,0,0,bw,bh,0,0,bw/sc,bh/sc);ctx.restore();
+}
+function drawBloom(vis){
+  if(S.pI<0.01)return;
+  var bs=Math.max(S.ghw,S.ghh)*1.7;
+  fx.globalCompositeOperation='lighter';fx.globalAlpha=0.05*S.pI*vis;
+  fx.drawImage(GLOW.sun,S.gcx-bs,S.gcy-bs,bs*2,bs*2);
+  fx.globalCompositeOperation='source-over';fx.globalAlpha=1;
+}
+function drawMotes(vis){ /* dust glinting inside the beam */
+  if(RM||S.pI<0.02)return;
+  for(var i=0;i<110;i++){var m=MOTES[i];
+    var s=((m.x+S.t*0.035*m.sp)%1+1)%1,lx=(m.y*2-1)*S.ghw*0.9,ly=(hash(i,31)*2-1)*S.ghh*0.9;
+    var kx=1+(S.mx-1)*s,ky=1+(S.my-1)*s;
+    var px=S.gcx+(S.ex-S.gcx)*s+lx*kx+Math.sin(S.t*m.sp+m.ph)*cw,py=S.gcy+(S.ey-S.gcy)*s+ly*ky+Math.cos(S.t*0.5+m.ph)*ch*0.6;
+    var v=beamAt(px,py);if(v<0.15)continue;
+    var tw=0.5+0.5*Math.sin(S.t*2.6+m.ph*4);
+    fx.globalAlpha=vis*S.pI*v*(0.45+0.55*tw);fx.fillStyle='rgb(255,240,205)';
+    fx.fillText(tw>0.8?'*':"'",Math.floor(px/cw)*cw+cw/2,Math.floor(py/ch)*ch+ch/2);
+  }
+  fx.globalAlpha=1;
+}
+
+function convexHull(P){
+  P=P.slice().sort(function(a,b){return a[0]-b[0]||a[1]-b[1]});
+  function cr(o,a,b){return (a[0]-o[0])*(b[1]-o[1])-(a[1]-o[1])*(b[0]-o[0])}
+  var lo=[],up=[];
+  P.forEach(function(p){while(lo.length>1&&cr(lo[lo.length-2],lo[lo.length-1],p)<=0)lo.pop();lo.push(p)});
+  for(var i=P.length-1;i>=0;i--){var p=P[i];while(up.length>1&&cr(up[up.length-2],up[up.length-1],p)<=0)up.pop();up.push(p)}
+  up.pop();lo.pop();return lo.concat(up);
+}
+
+/* ---------- the title, built from the same character grid ---------- */
+function buildTitle(){
+  var gw=Math.ceil(cols*cw),gh=Math.ceil(rows*ch);
+  var mc=document.createElement('canvas');mc.width=gw;mc.height=gh;
+  var m=mc.getContext('2d',{willReadFrequently:true});
+  function setF(px){m.font='700 '+px+'px "Cormorant Garamond"';if('letterSpacing' in m)m.letterSpacing='0.12em'}
+  setF(100);var capK=m.measureText('H').actualBoundingBoxAscent/100;
+  var wide=L.wide,maxW=W*0.92,lines=[];
+  var bottom=(L.archTop-0.8)*ch;
+  var cxp=Math.floor(W/2/cw)*cw+cw/2;
+  if(wide){
+    var capR=clamp(Math.round(rows*0.14),9,14),f=capR*ch/capK;setF(f);
+    var sx1=Math.min(1,maxW/m.measureText('THE KEEP').width);
+    lines.push({s:'THE KEEP',f:f,sx:sx1,base:bottom});
+  }else{
+    var capK2=clamp(Math.round(rows*0.10),8,12),fK=capK2*ch/capK;setF(fK);
+    var sx=Math.min(1,maxW/m.measureText('KEEP').width);
+    var capT=Math.round(capK2*0.74),fT=capT*ch/capK;
+    lines.push({s:'KEEP',f:fK,sx:sx,base:bottom});
+    lines.push({s:'THE',f:fT,sx:Math.min(1,sx*1.12),base:bottom-capK2*ch-1.3*ch});
+  }
+  m.fillStyle='#fff';m.strokeStyle='#fff';m.lineJoin='round';m.textAlign='center';m.textBaseline='alphabetic';
+  lines.forEach(function(l){setF(l.f);m.save();m.translate(cxp,Math.round(l.base));m.scale(l.sx,1);m.lineWidth=cw*0.55/l.sx;m.fillText(l.s,0,0);m.strokeText(l.s,0,0);m.restore()});
+  var data=m.getImageData(0,0,gw,gh).data;
+  var cov=new Float32Array(cols*rows);
+  for(var y=0;y<rows;y++)for(var x=0;x<cols;x++){
+    var x0=Math.floor(x*cw),x1=Math.floor((x+1)*cw),y0=Math.floor(y*ch),y1=Math.floor((y+1)*ch),sum=0,n=0;
+    for(var yy=y0;yy<y1;yy++)for(var xx=x0;xx<x1;xx++){sum+=data[(yy*gw+xx)*4+3];n++}
+    cov[y*cols+x]=n?sum/n/255:0;
+  }
+  function C2(x,y){return x<0||y<0||x>=cols||y>=rows?0:cov[y*cols+x]}
+  HA=new Float32Array(cols*rows);for(var q=0;q<HA.length;q++)HA[q]=1;
+  var cells=[],top=1e9,bot=-1e9,xmin=1e9,xmax=-1e9;
+  for(var y2=0;y2<rows;y2++)for(var x2=0;x2<cols;x2++){
+    var c=C2(x2,y2);if(c<0.22)continue;
+    var gx=C2(x2+1,y2)-C2(x2-1,y2),gy=C2(x2,y2+1)-C2(x2,y2-1),ax=Math.abs(gx),ay=Math.abs(gy);
+    var h1=hash(x2*3.1,y2*1.7),g,gb,body=c>=0.5;
+    if(body){g='#';gb=h1>0.6?'W':(h1>0.3?'@':'M')}
+    else if(ay>ax*1.5){g=gy>0?'_':'-';gb='='}
+    else if(ax>ay*1.5){g=c>0.38?'#':'|';gb=c>0.38?'@':'|'}
+    else{g=gx*gy>0?'/':'\\';gb=g}
+    if(!body&&c<0.3){g=gy>0?'.':(gy<0?"'":':');gb=g}
+    cells.push({x:x2,y:y2,c:c,body:body,g:g,gb:gb,h1:h1,h2:hash(x2*5.3+1,y2*2.9+4),h3:hash(x2*0.7+9,y2*7.1+2)});
+    top=Math.min(top,y2);bot=Math.max(bot,y2);xmin=Math.min(xmin,x2);xmax=Math.max(xmax,x2);
+  }
+  /* dark outline: room glyphs around the letters are pushed down hard */
+  cells.forEach(function(e){
+    for(var dy=-2;dy<=2;dy++)for(var dx=-3;dx<=3;dx++){var X=e.x+dx,Y=e.y+dy;if(X<0||Y<0||X>=cols||Y>=rows)continue;
+      var d=Math.max(Math.abs(dx),Math.abs(dy)),v=d===0?0:d<=1?0.05:d<=2?0.4:0.72;
+      var ii=Y*cols+X;if(v<HA[ii])HA[ii]=v}
+  });
+  cells.forEach(function(e){e.yN=(e.y-top)/Math.max(1,bot-top)});
+  TT={cells:cells,top:top,bot:bot,x0:xmin,x1:xmax};
+}
+function titlePresence(){
+  if(RM)return S.titleA;
+  return ss(1.1,2.3,S.t)*(1-ss(6.9,8.0,S.t));
+}
+function titleHalo(x,y){
+  if(!HA||x<0||y<0||x>=cols||y>=rows)return 1;
+  var h=HA[y*cols+x];if(h>=1)return 1;
+  if(RM)return lerp(1,h,titlePresence());
+  /* the outline appears only where the light has reached */
+  var tr=HT[y*cols+x];if(S.t<tr)return 1;
+  return lerp(1,h,ss(tr,tr+0.3,S.t)*(1-ss(6.9,8.0,S.t)));
+}
+function writeTitle(t){
+  if(!TT)return;
+  var amb=0.95+0.25*S.sunT,Z=L.Z;
+  for(var i=0;i<TT.cells.length;i++){var e=TT.cells[i];
+    var r=1;if(!RM&&t<e.tf)continue; /* nothing of the title exists until the light touches it */
+    var vis=RM?S.titleA:(SHORT?S.sceneIn*S.sceneOut:S.sceneIn);
+    var td=6.5+(1-e.yN)*0.7+e.h2*0.5; /* lower rows go first */
+    if(!RM&&t>td){var age=t-td;if(age<1.6&&e.h1>0.55){
+      var px=(e.x+0.5)*cw+Math.sin(age*3+e.h3*6)*cw*1.2+(e.h3-0.5)*cw*4*age;
+      var py=(e.y+0.5)*ch-age*H*0.09-age*age*H*0.11;
+      drawEmber(px,py,1-age/1.6,1-ss(0.9,1.6,age),e.h2<0.6)}continue}
+    var heat=RM?0:ss(td-0.6,td,t);
+    var k=1-r,ox=Math.round((e.h2-0.5)*28*Z*k*k),oy=Math.round((e.h3-0.5)*16*Z*k*k);
+    var cpx=(e.x+0.5)*cw,cpy=(e.y+0.5)*ch;
+    var rev=RM?1:ss(e.tf,e.tf+0.3,t);
+    var hh=RM?0.3:rev*Math.min(1,0.25*Math.min(1,beamAt(cpx,cpy)*S.pI)+0.95*Math.exp(-Math.pow((t-e.tf-0.3)/0.4,2)));
+    var lit=e.body?[1.0,0.80,0.42]:[0.90,0.62,0.30];
+    lit=mix3(lit,[1.0,0.62,0.28],e.yN*0.3);lit=mix3(lit,S.pCol,0.15);
+    var f=(0.92+0.08*S.flick)*amb;lit=[lit[0]*f,lit[1]*f,lit[2]*f];
+    var dk=(0.55+0.6*e.yN)*(0.9+0.1*S.flick);var darkc=[0.30*dk,0.15*dk,0.07*dk];
+    var col=lit;
+    var g=e.g;
+    if(hh>0.05){col=mix3(col,[1.0,0.97,0.86],Math.min(1,hh*0.9));col=col.map(function(v){return v*(1+hh*0.35)});}
+    if(heat>0){col=mix3(col,[1.0,0.48,0.14],heat);if(heat>0.5&&e.body)g='*'}
+    var al=vis*(RM?1:ss(e.tf-0.02,e.tf+0.18,t));
+    if(r<0.88){g=".:'*+"[Math.floor(hash(e.x,e.y+Math.floor(t*12))*5)];al*=0.25+0.55*r;col=mix3([0.7,0.4,0.18],col,r)}
+    if(false)glowAt((e.x+ox+0.5)*cw,(e.y+oy+0.5)*ch,'sun',hh*0.18,cw*3);
+    setCell(e.x+ox,e.y+oy,col[0]*al,col[1]*al,col[2]*al,cellCode(g,true));
+  }
+}
+
+function drawEmberRise(t){
+  var w=ss(6.4,7.8,t)*(1-ss(8.2,9.4,t));
+  if(w>0.005){
+    var top=H*(1-ss(6.4,8.6,t)*0.95);
+    var g=fx.createLinearGradient(0,H+40,0,top);
+    g.addColorStop(0,'rgba(245,152,71,'+(0.32*w)+')');g.addColorStop(0.5,'rgba(220,90,30,'+(0.13*w)+')');g.addColorStop(1,'rgba(180,60,20,0)');
+    fx.globalCompositeOperation='lighter';fx.fillStyle=g;fx.fillRect(-W,-H,W*3,H*3);fx.globalCompositeOperation='source-over';
+  }
+  fx.font='600 '+fs+'px "JetBrains Mono"';
+  var fade=1-ss(8.9,9.5,t);
+  var fpx=(L.fireX+0.5)*cw,fpy=(L.fireY+0.5)*ch;
+  for(var i=0;i<EMBERS.length;i++){var e=EMBERS[i],age=t-e.t0;if(age<0||age>e.life)continue;
+    var lf=age/e.life;
+    var x0=e.ff?fpx+(e.x0-0.5)*L.OW*cw*2:e.x0*W*1.1-W*0.05;
+    var y0=e.ff?fpy+e.y0*ch*2:H+ch*(1+e.y0*2);
+    var px=x0+Math.sin(age*e.fr+e.ph)*e.amp*cw*1.6+e.drift*cw*age;
+    var py=y0-e.vy*H*age-0.08*H*age*age;
+    var al=ss(0,0.12,lf)*(1-ss(0.6,1,lf))*fade;
+    if(al>0.01)drawEmber(px,py,1-lf,al);
+  }
+}
+
+var start=0,raf=0,done=false,ACTIVE=false,ready=false,HOOKS={},PLAYSHORT=false;
+function frame(now){ if(!ACTIVE){ raf=0; return; } var t=(now-start)/1000;if(t>=END){render(END);done=true;raf=0;pageLive();return}render(t);raf=requestAnimationFrame(frame)}
+function play(short){ SHORT=!!short&&!RM; PLAYSHORT=!!short; END=RM?4.6:(SHORT?1.6:9.6); done=false; page.classList.remove('live'); showPanel('main');
+  start=performance.now()-((RM&&short)?3000:0);   // reduced motion, come back: the still room for a moment, then the page
+  if(!raf) raf=requestAnimationFrame(frame); }
+var SKIPAT=-1e9;   // a tap that skips the scene must not also land on the page that appears under it
+function skip(){ if(done||!ACTIVE) return; SKIPAT=performance.now(); start=performance.now()-END*1000; }
+function fresh(){ return performance.now()-SKIPAT<350; }
+function pageLive(){ page.style.opacity='1'; page.classList.add('live'); page.setAttribute('aria-hidden','false'); skipEl.style.opacity=0;
+  setTimeout(function(){ var b=document.getElementById('inWander'); if(b&&ACTIVE&&curPanel==='main'){ try{ b.focus({preventScroll:true}); }catch(e){} } },60); }
+fxc.addEventListener('pointerdown',skip);
+// while the hearth is up it owns the keyboard: nothing reaches the world underneath
+function aboutUp(){ var a=document.getElementById('about'); return !!(a&&!a.classList.contains('hidden')); }
+function onKey(e){ if(!ACTIVE) return;
+  if(aboutUp()){ if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); document.getElementById('about').classList.add('hidden'); var ab=document.getElementById('inAbout'); if(ab){ try{ ab.focus({preventScroll:true}); }catch(x){} } } return; }   // the about card has the keyboard while it is open
+  if(!done){ if(e.key==='Enter'||e.key===' '||e.key==='Escape'){ e.preventDefault(); skip(); } e.stopPropagation(); return; }
+  if(e.key==='Escape'){ e.preventDefault(); if(curPanel==='views') showPanel('main'); }
+  if(e.key==='Tab'||e.key==='Enter'||e.key===' '||e.key==='Escape') { e.stopPropagation(); return; }
+  e.stopPropagation(); }
+window.addEventListener('keydown',onKey,true); window.addEventListener('keyup',function(e){ if(ACTIVE) e.stopPropagation(); },true);
+function onResize(){ if(!ACTIVE||!ready) return; layout(); if(done) render(END); }
+addEventListener('resize',onResize);
+
+// remembered between visits: whether the full scene has played here, and whether a view has been picked
+var SEEN_MEM=false;
+function store(k,v){ try{ localStorage.setItem(k,v); return; }catch(e){} try{ sessionStorage.setItem(k,v); }catch(e){} }
+function recall(k){ var v=null; try{ v=localStorage.getItem(k); }catch(e){} if(v==null){ try{ v=sessionStorage.getItem(k); }catch(e){} } return v; }
+
+// panels: the opening page and the view cards
+var curPanel='main';
+function showPanel(p){ curPanel=p; document.getElementById('inMain').hidden=(p!=='main'); document.getElementById('inViews').hidden=(p!=='views'); }
+var VIEWSEL=0;
+function paintViews(){ var cs=document.querySelectorAll('#inCards .vcard'); for(var i=0;i<cs.length;i++){ var on=(+cs[i].getAttribute('data-r')===VIEWSEL); cs[i].classList.toggle('on',on); cs[i].setAttribute('aria-checked',on?'true':'false'); } }
+function finishNow(){ if(done) return; if(raf){ cancelAnimationFrame(raf); raf=0; } render(END); done=true; pageLive(); }
+function wander(){ if(!done){ if(!page.classList.contains('live')) return; finishNow(); }
+  if(recall('keep_view_chosen')==='1'||SEEN_VIEWS){ close(); return; }
+  VIEWSEL=HOOKS.render?HOOKS.render():0; paintViews(); showPanel('views');
+  setTimeout(function(){ var b=document.querySelector('#inCards .vcard.on'); if(b){ try{ b.focus({preventScroll:true}); }catch(e){} } },40); }
+var SEEN_VIEWS=false;
+function walkIn(){ store('keep_view_chosen','1'); SEEN_VIEWS=true; var r=VIEWSEL; if(HOOKS.setRender) HOOKS.setRender(r,true); close(); }
+function toast(msg){ var t=document.getElementById('inToast'); t.textContent=msg; t.classList.add('on'); clearTimeout(toast.h); toast.h=setTimeout(function(){ t.classList.remove('on'); },1900); }
+function G(f){ return function(e){ if(fresh()) return; f(e); }; }
+document.getElementById('inWander').addEventListener('click',G(wander));
+document.getElementById('inStory').addEventListener('click',G(function(){ toast('Story is coming next: you will start in your own home valley.'); }));
+document.getElementById('inReplay').addEventListener('click',G(function(){ play(false); }));
+document.getElementById('inAbout').addEventListener('click',G(function(){ if(HOOKS.about) HOOKS.about(); }));
+document.getElementById('inBack').addEventListener('click',G(function(){ showPanel('main'); }));
+document.getElementById('inWalk').addEventListener('click',G(walkIn));
+document.getElementById('inCards').addEventListener('click',function(e){ if(fresh()) return; var b=e.target.closest?e.target.closest('.vcard'):null; if(!b) return; VIEWSEL=+b.getAttribute('data-r'); paintViews(); });
+document.getElementById('inCards').addEventListener('dblclick',function(e){ var b=e.target.closest?e.target.closest('.vcard'):null; if(b) walkIn(); });
+
+var INERT=[];
+function setInert(on){
+  if(on){ INERT=[]; var hud=document.getElementById('hud');
+    Array.prototype.forEach.call(document.body.children,function(el){ if(el===root||el.tagName==='SCRIPT'||el===hud) return; el.inert=true; INERT.push(el); });
+    if(hud) Array.prototype.forEach.call(hud.children,function(el){ if(el.id==='about') return; el.inert=true; INERT.push(el); }); }
+  else { INERT.forEach(function(el){ try{ el.inert=false; }catch(e){} }); INERT=[]; } }
+// close: give back the graphics context and the canvases, and let the world run
+function close(){ var was=ACTIVE; ACTIVE=false; if(raf){ cancelAnimationFrame(raf); raf=0; } setInert(false);
+  root.classList.add('gone'); root.setAttribute('aria-hidden','true');
+  try{ if(gl){ var ext=gl.getExtension('WEBGL_lose_context'); if(ext) ext.loseContext(); } }catch(e){}
+  gl=null; GLS={};
+  [cv,glc,fxc].forEach(function(c){ try{ c.width=1; c.height=1; }catch(e){} });
+  CB=null; GL=null; BR=BG=BB=null;
+  setTimeout(function(){ try{ root.parentNode&&root.parentNode.removeChild(root); }catch(e){} },400);
+  if(was&&HOOKS.closed) HOOKS.closed(); }
+
+// start: called once by the game after the world has grown. hooks: render(), setRender(i), about(), closed()
+function startIntro(hooks){ HOOKS=hooks||{}; ACTIVE=true; root.classList.remove('gone'); root.setAttribute('aria-hidden','false'); setInert(true);
+  var short=recall('keep_intro_seen')==='1';
+  if(/[?&]replay=1/.test(location.search)){ short=false; try{ history.replaceState(null,'',location.pathname+location.search.replace(/([?&])replay=1(&|$)/,function(m,a,b){ return b?a:''; }).replace(/[?&]$/,'')+location.hash); }catch(e){} }   // asked for from the menu: the whole scene again
+  var fontsReady=Promise.all([
+    document.fonts.load('700 80px "Cormorant Garamond"'),
+    document.fonts.load('500 16px "JetBrains Mono"'),
+    document.fonts.load('600 16px "Archivo"')
+  ]).catch(function(){});
+  var timeout=new Promise(function(res){ setTimeout(res,2500); });
+  Promise.race([fontsReady,timeout]).then(function(){
+    if(!ACTIVE) return;
+    try{ initGL(); layout(); ready=true; }catch(e){ close(); return; }
+    if(CAPTURE){ window.__render=function(t,sh){ SHORT=!!sh; render(t); }; window.__end=END; window.__ready=true; render(0); return; }
+    store('keep_intro_seen','1');
+    play(short);
+  });
+}
+return {start:startIntro, close:close, skip:skip, get active(){ return ACTIVE; }, get done(){ return done; }, panel:function(){ return curPanel; }};
+})();
+if(typeof window!=='undefined') window.KEEP_INTRO=KEEP_INTRO;   // (for the tests)
+
+const VERSION='The Keep v0.25.0 · Nov 1 2026';
+const VER_SHORT='v0.25.0 · Nov 1'; // what the badge shows; bump with VERSION
 const CHANGELOG=[
+ ['v0.25.0 · Nov 1 2026','The hearth. The Keep now opens on a stone hearth in a keep hall at sunrise: the light comes through the window, finds the words The Keep in the dark, and the embers rise. It plays in full on your first visit and as a short fade after that, and a tap skips it. Then the opening page: Wander, or Story, which is coming next. The first time you wander you pick how to see the world from six cards: ASCII, the original letters, or Pixels, Mesh, Voxels, Rays or Iso. You can change it any time in the menu, where you can also replay the intro. The about card is rewritten for the game as it is now.'],
  ['v0.24.1 · Oct 31 2026','Every valley shaped by its own seed. When you travel, the valley you walk into now grows with settings that come from its seed: some are thick forest, some are lake country, some are full of old ruins, some are quiet and some are busy with wildlife. The same seed always grows the same valley for anyone who types it. A random valley is now fully random. A new choice at the end of a road, Choose a valley, lets you pick forest, water, ruins and wildlife, and finds a valley like that for you. Your own dials still shape the world you grow from the menu, and travelling never changes them.'],
  ['v0.24.0 · Oct 31 2026','Roads out. Every valley now has one to three roads leaving it, each cut through a pass in the hills and joined to the trails. Near the top of each road stands a signpost: WELCOME on the side you see coming in, FAREWELL on the side you see going out. Walk past the end of a road and a card asks where next: stay (the default), a random valley, or a seed you type, with this valley seed shown to copy. You arrive in the new valley on the road facing the way you came, and typing a seed brings you back to the same valley and the same people (other valleys grow with the standard settings, and your own settings are kept). Every third day a peddler walks in by one road with pans, needles and thread, spends the day by the gate braziers and leaves by another road at first light.'],
  ['v0.23.1 · Oct 30 2026','Real storms. A storm on the valley calendar now really happens, at any hour of the day or night, and lasts an hour to three. The sky goes grey, the land darkens, rain comes down across the screen in every view and lightning flashes now and then (no sound). Under a roof the rain stops. The flocks bunch up in a corner of the pen, and the folk at the farms, the woodcutter and the hermit go indoors and come back out when it passes. While it lasts people talk about the storm, and afterwards they talk about it the right way for when it came: a night storm woke them, a day storm caught them out.'],
@@ -3909,6 +4946,9 @@ function boot(){
     box.innerHTML=RENDERS.map(function(m,i){ return '<button class="btn'+(i===(DIALS.render|0)?' on':'')+'" data-r="'+i+'" aria-pressed="'+(i===(DIALS.render|0))+'">'+m.name+'</button>'; }).join('');
     $('mRenderNote').textContent=(RENDERS[DIALS.render|0]||RENDERS[0]).note+'. Switching keeps you right where you are.';
   }
+  function chooseRender(i){ if(!(i>=0&&i<RENDERS.length)) return; DIALS.render=i; saveDials(); paintRenderSeg();
+    const m=RENDERS[i]; if(!m.file){ for(const k in GLR) glDrop(k); return; }
+    if(!(GLR[m.id]&&GLR[m.id].r&&GLR[m.id].r.ok)) loadGL(m); }
   $('mRender').addEventListener('click',function(e){
     const b=e.target.closest?e.target.closest('button[data-r]'):null; if(!b) return;
     const i=parseInt(b.getAttribute('data-r'),10); if(!(i>=0&&i<RENDERS.length)) return;
@@ -3924,6 +4964,7 @@ function boot(){
   $('mLog').addEventListener('click',function(){ closeMenu(); openLog(); });
   $('mAbout').addEventListener('click',function(){ closeMenu(); openAbout(); });
   $('mHelp').addEventListener('click',function(){ closeMenu(); openHelp(); });
+  $('mIntro').addEventListener('click',function(){ closeMenu(); location.href=location.pathname+'?replay=1'+location.hash; });
   $('bGo').addEventListener('click',function(){ $('help').classList.add('hidden'); });
   $('aGo').addEventListener('click',function(){ $('about').classList.add('hidden'); try{localStorage.setItem('keep_about_seen','1');}catch(e){} });
   $('aFull').addEventListener('click',function(){ location.href='keep-about.html'; });
@@ -3959,12 +5000,18 @@ function boot(){
   DIALS.seed=20260919; loadDials(); DAY.tzOff=tzOffsetHours(SITE.tz); DAY.tod=DIALS.tod; DAY.mode=DIALS.dayMode; updateDay(0);
   genWorld(DIALS.seed); populate(DIALS.seed); spawn(); setupGrid();
   // first visit ever: show the "about this build" card once, then it lives in the menu
-  try{ if(!localStorage.getItem('keep_about_seen')) openAbout(); else showSize(); }catch(e){ openAbout(); }
+  showSize();
+  if(/[?&]nointro=1/.test(location.search)) KEEP_INTRO.close();
+  else { try{ KEEP_INTRO.start({ render:function(){ return DIALS.render|0; }, setRender:function(i){ DIALS.render=i; saveDials(); paintRenderSeg(); },
+      about:function(){ openAbout(); $('about').style.zIndex='1100'; $('aGo').textContent='back'; },
+      closed:function(){ $('about').style.zIndex=''; $('aGo').textContent='walk the keep';
+        const m=glCur(); if(m){ loadGL(m); } else { for(const k in GLR) glDrop(k); } } }); }catch(e){ try{ KEEP_INTRO.close(); }catch(e2){} } }
   let last=performance.now(), fAcc=0, fN=0, fT=0, acc=0, ecoAcc=0, slowAt=0, hudT=0, fpsTxt='';
   const STEP=1/15, ECOSTEP=2.5;
   const anyCard=function(){ for(let i=0;i<OVERLAYS.length;i++){ if(!$(OVERLAYS[i]).classList.contains('hidden')) return true; } return false; };
   function frame(now){
     requestAnimationFrame(frame);
+    if(KEEP_INTRO.active){ last=now; return; }   // the hearth is up: the world waits underneath
     const dt=Math.min(0.05,(now-last)/1000); last=now; skyTime=now/1000;
     updateDay(dt);
     if(!LEAVE) updatePlayer(dt);   // the leave card holds you at the end of the road
@@ -3998,7 +5045,7 @@ function boot(){
     if(!card){ fAcc+=performance.now()-t0; fN++; fT+=dt; }   // frame stats only while really playing
   }
   requestAnimationFrame(frame);
-  if(glCur()) setTimeout(function(){ const m=glCur(); if(m) loadGL(m); },400);
+  if(glCur()&&!KEEP_INTRO.active) setTimeout(function(){ const m=glCur(); if(m&&!KEEP_INTRO.active) loadGL(m); },400);
 }
 
 if(IS_NODE){ module.exports={genWorld,allocGrid,buildGlyphs,renderFrame,compose,spawn,populate,tick,ecology,simBin,updatePlayer,W,RS,FB,P,IN,CR_,SP,SPP,MASKS,RESERVE,RAMP,N,WATER,EYE,terr,groundAt,DIALS,growOf,isAdult,addCreature,WALLS,buildWalls,nearestWall,allWallHits,wallBlocked,setSkyTime:function(t){skyTime=t;},setUW:function(v){UW=v;},DAY,SUN,MOON,SKY,DAYMODES,sunAltAz,sunUpdate,updateDay,relightAll,relightStep,RELIGHT,dayDate,fmtTod,setTod:function(h){DAY.tod=h;sunUpdate();},floorAt,KPATHS,KEEP,FORT,eventsForDay,weddingDay,babyDay,valleyDay,logEvent,eventsRefresh,dayTick,restock,stockTakeable,stockOwner,evBind,evWhen,evKey,seedDials,valleyTraits,chooseSeed,applyWorld,worldOf,TRAITS37,WORLD_KEYS,getPlayerLand:function(){ return PLAYER_LAND; },seedParse,babyFor,pedWays,pedShelter,carveRoads,exitAngles,roadCheck,roadStay,travelTo,spawnAtExit,VISITED,ROADS,PED,pedTick,pedDay,pedFind,pedRouteIn,pedPitch,pedWay,TALKP,ROAD_DIALS,ROLEPED,stormLevel,stormWindows,stormOngoing,underCover,stormLight,TALKS,STORMC,evBase,keeperAbed,FISHSIZE,TALKE,EVTAG,EVKINDS,wedNow,relOf,TALK,TALKX,LINES,POSEWHO,talkPick,talk,chatMore,closeChat,chatTick,CHAT,HEARD,VISITS,heardKey,heardAdd,lineOk,whoOk,placeName,placeDir,setChat:function(h){chatHook=h;},castValley,valleyName,valleyNames,seedRng,rebuildPeople,KEEPERS,GREETN,lineOk,fillLine,peopleHere,ALLHERE,ROLEKEY,ROLES,NAMES_F,NAMES_M,NAMES_X,BYNAMES,CLOTHES,SKINS,HAIRS,TRAITS,TRAIT_CLASH,RELREV,dayPart,folkMissing,tickKeeper,KMASK,KL,keeperFrame,GREETT,setGreet:function(f){greetHook=f;},RENDERS}; }
