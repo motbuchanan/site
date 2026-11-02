@@ -32,6 +32,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
 .btns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;pointer-events:auto}
 .seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px}.seg .btn{padding:11px 2px;min-height:44px;font-size:13px;min-width:0}.seg .btn.on{background:var(--mb-ink);color:#10151c;border-color:var(--mb-ink)}
 .btn{font:700 14px var(--mb-ui);color:var(--mb-ink);background:var(--mb-glass);border:1px solid var(--mb-line);padding:11px 16px;border-radius:13px;pointer-events:auto;cursor:pointer;backdrop-filter:blur(8px)}
+#cmp{position:absolute;top:calc(8px + env(safe-area-inset-top));left:0;right:0;margin:0 auto;width:min(300px,calc(100vw - 200px));height:30px;pointer-events:none;display:block}
+#toast{top:calc(64px + env(safe-area-inset-top))!important}
 #fps{position:absolute;bottom:calc(10px + env(safe-area-inset-bottom));left:10px;max-width:calc(100% - 172px);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font:600 10px var(--mb-mono);letter-spacing:.04em;color:var(--mb-soft);background:var(--mb-glass);border:1px solid var(--mb-line);padding:4px 9px;border-radius:999px}
 #toast{position:absolute;left:50%;top:64px;transform:translateX(-50%);background:rgba(16,21,28,.92);border:1px solid var(--mb-line);color:var(--mb-ink);padding:9px 16px;border-radius:18px;font:600 11px var(--mb-mono);opacity:0;transition:opacity .25s;white-space:normal;text-align:center;max-width:calc(100vw - 32px);width:max-content;z-index:950}
 #help{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);pointer-events:auto}
@@ -175,13 +177,15 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
   <button class="btn menu" id="bMenu">☰ menu</button>
  </div>
  <div id="stick"><div id="knob"></div></div>
+ <canvas id="cmp" aria-hidden="true"></canvas>
  <div id="fps"></div>
- <button class="mb-ver" id="mbVer" type="button">v0.25.1 &middot; Nov 1</button>
+ <button class="mb-ver" id="mbVer" type="button">v0.25.2 &middot; Nov 1</button>
  <div id="toast"></div>
  <div id="chat" class="hidden" role="dialog" aria-live="polite"><div class="ch-who"><b id="chName"></b><span id="chRole"></span></div><p id="chLine"></p><div class="ch-dots" id="chDots"></div><div class="ch-btns"><button class="btn" id="chMore" type="button">more</button><button class="btn" id="chBye" type="button">goodbye</button></div></div>
  <div id="help" class="hidden"><div class="card">
   <h1>How to play</h1>
   <p><b>Walk and steer:</b> drag on the left half. Push up to walk, tilt left or right to turn.<br><b>Look:</b> drag the right half. (Prefer stepping sideways? Turn it off in the dials, under Controls.)<br><span style="color:var(--mb-dim)">Desktop: WASD + mouse, Shift to run.</span></p>
+  <p><b>Compass:</b> the strip at the top shows which way you face. People measure directions from the keep: when someone says the farm is to the northeast, stand at the keep and turn until NE is in the middle. On errands an orange mark shows the way (a hollow one means the road out to another valley); you can turn it off in the dials, under Controls.</p>
   <p><b>Water:</b> wade in, look down and move to dive, look up to rise, level off to walk the bottom.</p>
   <p>Tap <b>☰ menu</b>, top right, any time for a new world, the dials, and the changelog.</p>
   <button class="btn go" id="bGo">walk</button>
@@ -204,7 +208,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
    <img src="11-moonlit.jpg" alt="the keep by moonlight" loading="lazy">
   </div>
   <p><b>Story.</b> Start a story and you pick your name and the kind of valley you grew up in. You wake at home, where your parents keep a small keep and everyone knows you. Coming next: errands, a journal, and a first trip over the hills.</p>
-  <p class="fsize">The whole game is one HTML file, plus a file for each 3D view. Right now: <b id="fsize">~461 KB</b>. Smaller than a single phone photo.</p>
+  <p class="fsize">The whole game is one HTML file, plus a file for each 3D view. Right now: <b id="fsize">~468 KB</b>. Smaller than a single phone photo.</p>
   <p><b>Why I built it.</b> I build things on a phone, directing AI the way I would direct a camera. I saw a clip of a tiny 3D world made of nothing but text and wanted to see if I could grow one that was actually alive, and keep growing it in the open instead of ever calling it done.</p>
   <p><b>What I learned.</b> How far you can get with almost nothing. One idea, a ray walking a height map, turned into characters, with a small world of animals living on top. Every version taught me one concrete thing: how to make a wall read as solid, how to keep the wolves from starving the world empty, how to make a forest look like real woods.</p>
   <p style="color:var(--mb-dim);font-size:13px"><b style="color:var(--mb-soft)">Walk:</b> drag the left half of the screen (tilt to turn). <b style="color:var(--mb-soft)">Look:</b> drag the right half. Wade into the water to swim. Tap ☰ menu for a new world, the dials, and the time of day. Walk under the gate arch and find the door under the tower stair.</p>
@@ -1236,9 +1240,10 @@ return {start:startIntro, close:close, skip:skip, get active(){ return ACTIVE; }
 })();
 if(typeof window!=='undefined') window.KEEP_INTRO=KEEP_INTRO;   // (for the tests)
 
-const VERSION='The Keep v0.25.1 · Nov 1 2026';
-const VER_SHORT='v0.25.1 · Nov 1'; // what the badge shows; bump with VERSION
+const VERSION='The Keep v0.25.2 · Nov 1 2026';
+const VER_SHORT='v0.25.2 · Nov 1'; // what the badge shows; bump with VERSION
 const CHANGELOG=[
+ ['v0.25.2 · Nov 1 2026','A compass. A strip across the top shows which way you face: N, NE, E and round, with north in teal. People give directions from the keep (the farm to the northeast, the pond to the southeast), so now you can turn until that word is in the middle and walk. It is ready to show the way on errands too: an orange mark for where to go, or a hollow one for the nearest road out when the next step is in another valley. Errands come next, and the mark can be turned off in the dials, under Controls.'],
  ['v0.25.1 · Nov 1 2026','Story begins. The opening page now has New story next to Wander. Give yourself a name (or tap Another for one), say what your home valley is like (forest, water, ruins, wildlife, or surprise me), and you wake at home. Your parents keep its small keep: two new people, found only in your home valley, who walk the hall, the kitchen and the chapel and greet you by name. Everyone at home knows you now, and nobody there takes you for a stranger. Your story is saved on this device, so the next time you come the page offers Continue. Wander still drops you into a valley as before, and the two never overwrite each other.'],
  ['v0.25.0 · Nov 1 2026','The hearth. The Keep now opens on a stone hearth in a keep hall at sunrise: the light comes through the window, finds the words The Keep in the dark, and the embers rise. It plays in full on your first visit and as a short fade after that, and a tap skips it. Then the opening page: Wander, or Story, which is coming next. The first time you wander you pick how to see the world from six cards: ASCII, the original letters, or Pixels, Mesh, Voxels, Rays or Iso. You can change it any time in the menu, where you can also replay the intro. The about card is rewritten for the game as it is now.'],
  ['v0.24.1 · Oct 31 2026','Every valley shaped by its own seed. When you travel, the valley you walk into now grows with settings that come from its seed: some are thick forest, some are lake country, some are full of old ruins, some are quiet and some are busy with wildlife. The same seed always grows the same valley for anyone who types it. A random valley is now fully random. A new choice at the end of a road, Choose a valley, lets you pick forest, water, ruins and wildlife, and finds a valley like that for you. Your own dials still shape the world you grow from the menu, and travelling never changes them.'],
@@ -1314,6 +1319,7 @@ const DIALS={
   people:1,           // the keepers (and the gate braziers)
   folk:[1,1,1,1],     // who lives here: the wheat farm, the sheep farm, the woodcutter, the hermit (built when the world grows)
   stickTurn:1,        // the walk stick turns you (1) or steps you sideways (0)
+  marker:1,           // the compass shows the way on errands (1) or only which way you face (0)
   render:0            // how the same world is drawn: an index into RENDERS
 };
 // one world, many ways to draw it. Only the last step changes: every mode reads the same FB.col the raycaster fills.
@@ -3832,7 +3838,10 @@ function carveRoads(seed){
         doorA:0, doorB:-1, mat:'deco', img:img, nx:nx, ny:ny, open:true}); };
     plank(1,'signIn'); plank(-1,'signOut');
     let ox=pts[n-1][0]-pts[Math.max(0,n-7)][0], oy=pts[n-1][1]-pts[Math.max(0,n-7)][1]; const ol=Math.hypot(ox,oy)||1;
-    W.exits.push({id:W.exits.length, x:ex, y:ey, dx:ox/ol, dy:oy/ol, signX:cx, signY:cy, name:'the '+roadDirName(ex,ey)+' road', pts:pts, join:J});
+    const outW=['east','southeast','south','southwest','west','northwest','north','northeast'][Math.round(((Math.atan2(oy,ox)*180/Math.PI+360)%360)/45)%8];   // the way you walk out
+    const W8R=['east','southeast','south','southwest','west','northwest','north','northeast'], oi=W8R.indexOf(outW), taken=function(n){ return W.exits.some(function(q){ return q.name==='the '+n+' road'; }); };
+    let rname=outW; if(taken(rname)) rname=roadDirName(ex,ey); for(let k=1;k<8&&taken(rname);k++) rname=W8R[(oi+(k%2?1:-1)*Math.ceil(k/2)+8)%8];   // the way out, else the old name, else the nearest free word
+    W.exits.push({id:W.exits.length, x:ex, y:ey, dx:ox/ol, dy:oy/ol, signX:cx, signY:cy, name:'the '+rname+' road', pts:pts, join:J});
     done.push(ang); return true; };
   // every planned road; if one can't be made, the nearest workable way round from it; and never a valley with no road out
   for(let k=0;k<angles.length;k++){ if(!apart(angles[k])) continue; if(road(angles[k],k,false)) continue;
@@ -4095,6 +4104,31 @@ const TALKHOME={
    "[home]Your {home2.par} was asking for you.","[home,first]{you}! Good to see you.","[home,first]Well, if it isn't {you}."]};
 // has anyone in this valley already said this line to you?
 function heardByAny(lid){ if(!W.cast) return false; for(const c of W.cast){ const m=HEARD[W.seed+':'+c.id]; if(m&&m.has(lid)) return true; } return false; }
+
+// ---------------- the compass (v0.25.2): which way you face, and later the way to an errand ----------------
+// Bearings are compass degrees: 0 north (-y), 90 east (+x), 180 south, 270 west. P.yaw 0 is east, so heading = yaw + 90.
+// NAV.provider is set by the errands (P2): it returns {seed, x, y, label, exit?} for the next step, or null. A step in
+// this valley is pointed at directly; a step in another valley points at the nearest road out (or the road named by exit).
+var NAV={provider:null};
+function compassDeg(a){ return ((a%360)+360)%360; }
+function heading(){ return compassDeg(P.yaw*180/Math.PI+90); }
+function bearingTo(x,y){ return compassDeg(Math.atan2(y-P.y,x-P.x)*180/Math.PI+90); }
+function relBearing(b){ let d=compassDeg(b-heading()); if(d>180) d-=360; return d; }   // -180..180, + is to your right
+function navGoal(){ if(!DIALS.marker||typeof NAV.provider!=='function') return null;
+  let seed=null, x=NaN, y=NaN, exit=null, label='';
+  try{ const t=NAV.provider(); if(!t||typeof t!=='object') return null;   // every field read inside the try, turned into plain values
+    if(t.seed!=null){ seed=Number(t.seed); if(!Number.isFinite(seed)) return null; seed=seed>>>0; }
+    if(t.x!=null&&t.y!=null){ x=Number(t.x); y=Number(t.y); }
+    if(t.exit!=null){ exit=Number(t.exit); if(!Number.isFinite(exit)) exit=null; }
+    label=t.label==null?'':String(t.label); }catch(e){ return null; }
+  if(seed==null||seed===(W.seed>>>0)){ if(!Number.isFinite(x)||!Number.isFinite(y)) return null;
+    return {x:x, y:y, road:false, label:label, here:Math.hypot(x-P.x,y-P.y)<2}; }
+  let best=null, bd=1e18;
+  for(const e of (W.exits||[])){ if(exit!=null&&e.id!==exit) continue; const d=Math.hypot(e.x-P.x,e.y-P.y); if(d<bd){ bd=d; best=e; } }
+  if(!best&&exit!=null) for(const e of (W.exits||[])){ const d=Math.hypot(e.x-P.x,e.y-P.y); if(d<bd){ bd=d; best=e; } }   // that road is gone: any road
+  return best?{x:best.x, y:best.y, road:true, label:best.name||'the road', here:bd<2}:null; }
+const CMP_SPAN=120;   // degrees shown across the strip
+const CMP_LABELS=['N','NE','E','SE','S','SW','W','NW'];
 
 const LINES=[];
 function lineHash(t){ let h=0x811c9dc5; for(let i=0;i<t.length;i++){ h^=t.charCodeAt(i); h=Math.imul(h,0x01000193); } return 'L'+(h>>>0).toString(36); }
@@ -4992,7 +5026,7 @@ function boot(){
       const num=function(v,lo,hi,dflt){ v=parseFloat(v); return isFinite(v)?Math.min(hi,Math.max(lo,v)):dflt; };
       DIALS.seed=(parseInt(d.seed,10)>>>0)||DIALS.seed;
       DIALS.forest=num(d.forest,0.3,1.7,DIALS.forest); DIALS.water=num(d.water,0.3,1.7,DIALS.water);
-      DIALS.keep=d.keep?1:0; DIALS.ruins=(d.ruins===undefined)?(d.structures===0?0:2):Math.round(num(d.ruins,0,3,2)); DIALS.predators=d.predators?1:0; DIALS.people=(d.people===undefined)?1:(d.people?1:0); DIALS.stickTurn=(d.stickTurn===undefined)?1:(d.stickTurn?1:0);
+      DIALS.keep=d.keep?1:0; DIALS.ruins=(d.ruins===undefined)?(d.structures===0?0:2):Math.round(num(d.ruins,0,3,2)); DIALS.predators=d.predators?1:0; DIALS.people=(d.people===undefined)?1:(d.people?1:0); DIALS.stickTurn=(d.stickTurn===undefined)?1:(d.stickTurn?1:0); DIALS.marker=(d.marker===undefined)?1:(d.marker?1:0);
       { const rv=parseInt(d.render,10); DIALS.render=(rv>=0&&rv<RENDERS.length)?rv:0; }
       if(Array.isArray(d.folk)&&d.folk.length===4) for(let i=0;i<4;i++) DIALS.folk[i]=d.folk[i]?1:0;
       for(let i=0;i<6;i++){ if(d.on&&d.on.length===6) DIALS.on[i]=d.on[i]?1:0; if(d.pop&&d.pop.length===6) DIALS.pop[i]=num(d.pop[i],0.25,2,DIALS.pop[i]); }
@@ -5068,7 +5102,7 @@ function boot(){
     const chk=function(id){ const el=$(id); return el?el.checked:true; };
     DIALS.seed=(parseInt(($('dSeed')||{}).value,10)>>>0)||DIALS.seed;
     DIALS.forest=num('dForest',1); DIALS.water=num('dWater',1);
-    DIALS.keep=chk('dKeep')?1:0; DIALS.ruins=Math.round(num('dRuins',2)); DIALS.predators=chk('dPred')?1:0; DIALS.people=chk('dPeople')?1:0; DIALS.stickTurn=chk('dStick')?1:0;
+    DIALS.keep=chk('dKeep')?1:0; DIALS.ruins=Math.round(num('dRuins',2)); DIALS.predators=chk('dPred')?1:0; DIALS.people=chk('dPeople')?1:0; DIALS.stickTurn=chk('dStick')?1:0; DIALS.marker=chk('dMarker')?1:0;
     for(let i=0;i<4;i++) DIALS.folk[i]=chk('dFolk'+i)?1:0;
     const ids=['dBird','dRabbit','dDeer','dSquirrel','dFish','dWolf'];
     const pops=['pBird','pRabbit','pDeer','pSquirrel','pFish','pWolf'];
@@ -5106,6 +5140,7 @@ function boot(){
       '<div class="dial-row" style="opacity:.75;font-size:13px">Built when you grow the world. Whoever lives here knows their neighbours.</div>'+
       '<div class="dial-sec">CONTROLS</div>'+
       '<div class="dial-row"><label><input type="checkbox" id="dStick"'+(DIALS.stickTurn?' checked':'')+'> walk stick turns you (off: steps sideways)</label></div>'+
+      '<div class="dial-row"><label><input type="checkbox" id="dMarker"'+(DIALS.marker?' checked':'')+'> compass shows the way on errands (off: just which way you face)</label></div>'+
       '<div class="dial-sec">SKY</div>'+
       '<div class="dial-row"><label>time <b id="dTodV" style="font-family:var(--mb-mono);font-weight:600"></b></label><input id="dTod" type="range" min="0" max="23.75" step="0.25" value="'+(Math.round(DAY.tod*4)/4)+'"></div>'+
       '<div class="dial-row"><label>day length <b id="dDayV" style="font-family:var(--mb-mono);font-weight:600"></b></label><input id="dDay" type="range" min="0" max="4" step="1" value="'+DIALS.dayMode+'"></div>'+
@@ -5124,6 +5159,7 @@ function boot(){
     $('dRuins').addEventListener('input',function(){ $('dRuinsV').textContent=RUIN_LEVELS[parseInt($('dRuins').value,10)|0]||''; });
     showSky();
     $('dStick').addEventListener('change',function(){ DIALS.stickTurn=$('dStick').checked?1:0; saveDials(); });   // applies at once
+    $('dMarker').addEventListener('change',function(){ DIALS.marker=$('dMarker').checked?1:0; saveDials(); CMP.key=''; });
     $('dGrow').addEventListener('click',function(){ readDialsFromCard(); genWorld(DIALS.seed); populate(DIALS.seed); spawn(); $('dials').classList.add('hidden');
       const miss=folkMissing(); if(miss.length) W.arriveMsg+=' No room here for '+miss.join(' or ')+'.'; });
     $('dLife').addEventListener('click',function(){ if(DIALS.trav){ DIALS.stickTurn=$('dStick').checked?1:0; saveDials(); } else readDialsFromCard(); populate(DIALS.seed); $('dials').classList.add('hidden'); toast('life restocked'); });
@@ -5241,6 +5277,36 @@ function boot(){
         }catch(e){ MODE='wander'; } },
       closed:function(){ $('about').style.zIndex=''; $('aGo').textContent='walk the keep';
         const m=glCur(); if(m){ loadGL(m); } else { for(const k in GLR) glDrop(k); } } }); }catch(e){ try{ KEEP_INTRO.close(); }catch(e2){} } }
+  const CMP={key:'', w:0, h:0, dpr:0, state:null};
+  function compassFrame(){ const cv=$('cmp'); if(!cv) return; const r=cv.getBoundingClientRect(), dpr=Math.min(3,window.devicePixelRatio||1);
+    const W0=Math.round(r.width*dpr), H0=Math.round(r.height*dpr); if(W0<20||H0<10) return;
+    const h=heading(), g=navGoal(), gb=g?bearingTo(g.x,g.y):null;
+    const key=W0+'x'+H0+':'+Math.round(h*4)+':'+(g?Math.round(gb*4)+(g.road?'r':'')+(g.here?'h':''):'-');
+    if(key===CMP.key) return; CMP.key=key;
+    if(cv.width!==W0) cv.width=W0; if(cv.height!==H0) cv.height=H0;   // only when it truly changes
+    const c=cv.getContext('2d'), w=W0, hh=H0, ppd=w/CMP_SPAN, mid=w/2;
+    c.clearRect(0,0,w,hh);
+    c.fillStyle='rgba(10,14,20,.62)'; c.strokeStyle='rgba(255,255,255,.14)'; c.lineWidth=dpr;
+    const rr=8*dpr; c.beginPath(); c.moveTo(rr,0); c.lineTo(w-rr,0); c.quadraticCurveTo(w,0,w,rr); c.lineTo(w,hh-rr); c.quadraticCurveTo(w,hh,w-rr,hh); c.lineTo(rr,hh); c.quadraticCurveTo(0,hh,0,hh-rr); c.lineTo(0,rr); c.quadraticCurveTo(0,0,rr,0); c.closePath(); c.fill(); c.stroke();
+    c.save(); c.beginPath(); c.rect(1,1,w-2,hh-2); c.clip();
+    const shown=[];
+    for(let d=0;d<360;d+=15){ let rel=d-h; rel=((rel+540)%360)-180; if(Math.abs(rel)>CMP_SPAN/2+8) continue; const x=mid+rel*ppd;
+      if(d%45===0){ const lab=CMP_LABELS[d/45], card=d%90===0;
+        c.font=(card?'700 ':'600 ')+Math.round((card?11:9.5)*dpr)+'px "JetBrains Mono", ui-monospace, monospace'; c.textAlign='center'; c.textBaseline='middle';
+        c.fillStyle=d===0?'#4cf0e0':(card?'rgba(238,232,220,.95)':'rgba(238,232,220,.6)'); c.fillText(lab,x,hh*0.44); shown.push(lab); }
+      else { c.fillStyle='rgba(238,232,220,.35)'; c.fillRect(Math.round(x-dpr/2),hh*0.70,dpr,hh*0.16); } }
+    // the way on: a diamond where it lies, or a chevron at the edge it is beyond
+    let mark=null;
+    if(g&&g.here){ c.strokeStyle='#f59847'; c.lineWidth=1.6*dpr; c.beginPath(); c.arc(mid,hh*0.62,6*dpr,0,Math.PI*2); c.stroke(); mark={rel:0, edge:0, road:g.road, here:true}; }
+    else if(g){ const rel=relBearing(gb), half=CMP_SPAN/2; c.fillStyle='#f59847';
+      if(Math.abs(rel)<=half-4){ const x=mid+rel*ppd, y=hh*0.64, s=3.8*dpr; c.beginPath(); c.moveTo(x,y-s); c.lineTo(x+s,y); c.lineTo(x,y+s); c.lineTo(x-s,y); c.closePath();
+          if(g.road){ c.strokeStyle='#f59847'; c.lineWidth=1.6*dpr; c.stroke(); } else c.fill(); mark={rel:rel, edge:0, road:g.road}; }
+      else { const sd=rel>0?1:-1, x=sd>0?w-7*dpr:7*dpr, y=hh*0.62, s=4.6*dpr; c.beginPath(); c.moveTo(x+sd*s*0.6,y); c.lineTo(x-sd*s*0.4,y-s); c.lineTo(x-sd*s*0.4,y+s); c.closePath(); c.fill(); mark={rel:rel, edge:sd, road:g.road}; } }
+    c.restore();
+    // the middle: which way you face
+    c.fillStyle='rgba(238,232,220,.9)'; c.beginPath(); c.moveTo(mid-4*dpr,hh); c.lineTo(mid+4*dpr,hh); c.lineTo(mid,hh-5*dpr); c.closePath(); c.fill();
+    CMP.state={heading:h, shown:shown, mark:mark, goal:g}; }
+  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(function(){ CMP.key=''; });
   let last=performance.now(), fAcc=0, fN=0, fT=0, acc=0, ecoAcc=0, slowAt=0, hudT=0, fpsTxt='';
   const STEP=1/15, ECOSTEP=2.5;
   const anyCard=function(){ for(let i=0;i<OVERLAYS.length;i++){ if(!$(OVERLAYS[i]).classList.contains('hidden')) return true; } return false; };
@@ -5266,6 +5332,7 @@ function boot(){
         fAcc=0; fN=0; fT=0; }
       $('fps').textContent=fpsTxt+(fpsTxt?' · ':'')+CR_.n+' alive · '+fmtTod(DAY.tod);
       if(skyHud&&!$('dials').classList.contains('hidden')) skyHud(); }
+    if(!card){ try{ compassFrame(); }catch(e){} }
     if(card){ if(now-slowAt<250) return; slowAt=now; }   // a card is open: redraw 4 times a second, save the battery
     const t0=performance.now();
     for(const k in GLR){ const r=GLR[k].r; if(r&&r.shown&&r!==GR) r.show(false); }
@@ -5283,7 +5350,7 @@ function boot(){
   if(glCur()&&!KEEP_INTRO.active) setTimeout(function(){ const m=glCur(); if(m&&!KEEP_INTRO.active) loadGL(m); },400);
 }
 
-if(IS_NODE){ module.exports={genWorld,allocGrid,buildGlyphs,renderFrame,compose,spawn,populate,tick,ecology,simBin,updatePlayer,W,RS,FB,P,IN,CR_,SP,SPP,MASKS,RESERVE,RAMP,N,WATER,EYE,terr,groundAt,DIALS,growOf,isAdult,addCreature,WALLS,buildWalls,nearestWall,allWallHits,wallBlocked,setSkyTime:function(t){skyTime=t;},setUW:function(v){UW=v;},DAY,SUN,MOON,SKY,DAYMODES,sunAltAz,sunUpdate,updateDay,relightAll,relightStep,RELIGHT,dayDate,fmtTod,setTod:function(h){DAY.tod=h;sunUpdate();},floorAt,KPATHS,KEEP,FORT,eventsForDay,weddingDay,babyDay,valleyDay,logEvent,eventsRefresh,dayTick,restock,stockTakeable,stockOwner,evBind,evWhen,evKey,seedDials,valleyTraits,chooseSeed,applyWorld,worldOf,TRAITS37,WORLD_KEYS,getPlayerLand:function(){ return PLAYER_LAND; },seedParse,babyFor,pedWays,pedShelter,carveRoads,exitAngles,roadCheck,roadStay,travelTo,spawnAtExit,VISITED,ROADS,PED,pedTick,pedDay,pedFind,pedRouteIn,pedPitch,pedWay,TALKP,ROAD_DIALS,ROLEPED,stormLevel,stormWindows,stormOngoing,underCover,stormLight,TALKS,STORMC,evBase,keeperAbed,FISHSIZE,TALKE,EVTAG,EVKINDS,wedNow,relOf,TALK,TALKX,LINES,POSEWHO,talkPick,talk,chatMore,closeChat,chatTick,CHAT,HEARD,VISITS,heardKey,heardAdd,lineOk,whoOk,placeName,placeDir,setChat:function(h){chatHook=h;},castValley,valleyName,valleyNames,seedRng,rebuildPeople,KEEPERS,GREETN,lineOk,fillLine,peopleHere,ALLHERE,cleanName,nameHash,randomName,homeSeed,castParents,atHome,storyHomeHere,youName,journalLoad,journalSave,storyNew,storyAt,spawnHome,goHome,PARENT_IDS,AWAY_FR,TALKPAR,TALKHOME,getMode:function(){ return MODE; },setMode:function(m){ MODE=m; },getStory:function(){ return STORY; },getJournal:function(){ return JOURNAL; },getParentDoor:function(){ return PARENT_DOOR; },KACT,ROLEKEY,ROLES,NAMES_F,NAMES_M,NAMES_X,BYNAMES,CLOTHES,SKINS,HAIRS,TRAITS,TRAIT_CLASH,RELREV,dayPart,folkMissing,tickKeeper,KMASK,KL,keeperFrame,GREETT,setGreet:function(f){greetHook=f;},RENDERS}; }
+if(IS_NODE){ module.exports={genWorld,allocGrid,buildGlyphs,renderFrame,compose,spawn,populate,tick,ecology,simBin,updatePlayer,W,RS,FB,P,IN,CR_,SP,SPP,MASKS,RESERVE,RAMP,N,WATER,EYE,terr,groundAt,DIALS,growOf,isAdult,addCreature,WALLS,buildWalls,nearestWall,allWallHits,wallBlocked,setSkyTime:function(t){skyTime=t;},setUW:function(v){UW=v;},DAY,SUN,MOON,SKY,DAYMODES,sunAltAz,sunUpdate,updateDay,relightAll,relightStep,RELIGHT,dayDate,fmtTod,setTod:function(h){DAY.tod=h;sunUpdate();},floorAt,KPATHS,KEEP,FORT,eventsForDay,weddingDay,babyDay,valleyDay,logEvent,eventsRefresh,dayTick,restock,stockTakeable,stockOwner,evBind,evWhen,evKey,seedDials,valleyTraits,chooseSeed,applyWorld,worldOf,TRAITS37,WORLD_KEYS,getPlayerLand:function(){ return PLAYER_LAND; },seedParse,babyFor,pedWays,pedShelter,carveRoads,exitAngles,roadCheck,roadStay,travelTo,spawnAtExit,VISITED,ROADS,PED,pedTick,pedDay,pedFind,pedRouteIn,pedPitch,pedWay,TALKP,ROAD_DIALS,ROLEPED,stormLevel,stormWindows,stormOngoing,underCover,stormLight,TALKS,STORMC,evBase,keeperAbed,FISHSIZE,TALKE,EVTAG,EVKINDS,wedNow,relOf,TALK,TALKX,LINES,POSEWHO,talkPick,talk,chatMore,closeChat,chatTick,CHAT,HEARD,VISITS,heardKey,heardAdd,lineOk,whoOk,placeName,placeDir,setChat:function(h){chatHook=h;},castValley,valleyName,valleyNames,seedRng,rebuildPeople,KEEPERS,GREETN,lineOk,fillLine,peopleHere,ALLHERE,NAV,navGoal,heading,bearingTo,relBearing,compassDeg,CMP_SPAN,cleanName,nameHash,randomName,homeSeed,castParents,atHome,storyHomeHere,youName,journalLoad,journalSave,storyNew,storyAt,spawnHome,goHome,PARENT_IDS,AWAY_FR,TALKPAR,TALKHOME,getMode:function(){ return MODE; },setMode:function(m){ MODE=m; },getStory:function(){ return STORY; },getJournal:function(){ return JOURNAL; },getParentDoor:function(){ return PARENT_DOOR; },KACT,ROLEKEY,ROLES,NAMES_F,NAMES_M,NAMES_X,BYNAMES,CLOTHES,SKINS,HAIRS,TRAITS,TRAIT_CLASH,RELREV,dayPart,folkMissing,tickKeeper,KMASK,KL,keeperFrame,GREETT,setGreet:function(f){greetHook=f;},RENDERS}; }
 else boot();
 })();
 </script>
