@@ -32,6 +32,24 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
 .btns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;pointer-events:auto}
 .seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px}.seg .btn{padding:11px 2px;min-height:44px;font-size:13px;min-width:0}.seg .btn.on{background:var(--mb-ink);color:#10151c;border-color:var(--mb-ink)}
 .btn{font:700 14px var(--mb-ui);color:var(--mb-ink);background:var(--mb-glass);border:1px solid var(--mb-line);padding:11px 16px;border-radius:13px;pointer-events:auto;cursor:pointer;backdrop-filter:blur(8px)}
+#journal.hidden{display:none!important}
+#bar .btn.menu{min-height:44px}
+#chat.asking .ch-dots{display:none}
+#journal .btn{min-height:44px}
+#journal .card{width:min(460px,calc(100vw - 24px));max-height:calc(100vh - 24px);display:flex;flex-direction:column}
+#jBody{flex:1 1 auto;overflow:auto;min-height:120px;margin-top:8px;-webkit-overflow-scrolling:touch}
+#journal .jtabs{display:flex;gap:6px;flex:none}
+#journal .jtabs .btn{flex:1;min-width:0;min-height:44px;padding:8px 2px;font-size:13px;margin:0}
+#journal .jtabs .btn.on{background:var(--mb-teal);color:#06110f;border-color:var(--mb-teal)}
+#jBody .jt{padding:10px 2px;border-bottom:1px solid var(--mb-line);font:500 14.5px/1.45 var(--mb-ui);margin:0}
+#jBody .jt.done{opacity:.55}
+#jBody .jt.open::before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:#f59847;margin:0 8px 2px 0}
+#jBody .jempty{color:var(--mb-dim);font:500 14px/1.5 var(--mb-ui);padding:12px 2px}
+#jBody .jv{width:100%;text-align:left;display:block;min-height:48px;margin:0 0 6px;padding:9px 12px;font:600 14px/1.3 var(--mb-ui)}
+#jBody .jv small{display:block;font:500 11.5px/1.3 var(--mb-mono);color:var(--mb-dim);margin-top:3px;letter-spacing:.02em}
+#jBody .jdet{padding:8px 4px 12px;font:500 14px/1.5 var(--mb-ui)}
+#jBody .jdet .btn{min-height:44px;margin-top:8px}
+#jBody dl{margin:6px 0;font:500 14.5px/1.5 var(--mb-ui)} #jBody dt{color:var(--mb-dim);font:600 11px var(--mb-mono);letter-spacing:.06em;text-transform:uppercase;margin-top:10px} #jBody dd{margin:2px 0 0}
 #cmp{position:absolute;top:calc(8px + env(safe-area-inset-top));left:0;right:0;margin:0 auto;width:min(300px,calc(100vw - 200px));height:30px;pointer-events:none;display:block}
 #toast{top:calc(64px + env(safe-area-inset-top))!important}
 #fps{position:absolute;bottom:calc(10px + env(safe-area-inset-bottom));left:10px;max-width:calc(100% - 172px);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font:600 10px var(--mb-mono);letter-spacing:.04em;color:var(--mb-soft);background:var(--mb-glass);border:1px solid var(--mb-line);padding:4px 9px;border-radius:999px}
@@ -66,6 +84,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
 #chat .ch-btns{flex:none;display:flex;gap:6px;align-items:center}
 #chat .ch-btns .btn{flex:1;padding:10px 4px;min-height:44px;font-size:13px;min-width:0;white-space:nowrap}
 #chMore{background:var(--mb-teal);color:#06110f;border:0}
+#chat.asking{max-height:min(86vh,calc(100vh - 56px))}
+#chat .ch-ask{flex:none;display:none;flex-direction:row;flex-wrap:wrap;gap:6px;margin:0 0 8px}
+#chat .ch-ask .btn{flex:1 1 40%;min-width:0;min-height:44px;padding:9px 8px;font-size:13px;line-height:1.25;background:rgba(245,152,71,.14);border-color:rgba(245,152,71,.55);color:var(--mb-ink);white-space:normal;text-align:left;margin:0}
 #chat .ch-dots{flex:none;font:600 10px var(--mb-mono);color:var(--mb-dim);letter-spacing:.1em;margin:-4px 0 8px}
 #stick{position:absolute;width:110px;height:110px;border-radius:50%;border:2px solid rgba(255,255,255,.35);display:none;pointer-events:none;margin-left:-55px;margin-top:-55px}
 #knob{position:absolute;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.35);left:33px;top:33px}
@@ -173,19 +194,21 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
 <canvas id="c"></canvas>
 <div id="hud">
  <div id="bar">
+  <button class="btn menu" id="bJournal" type="button">journal</button>
   <div class="bar-sp"></div>
   <button class="btn menu" id="bMenu">☰ menu</button>
  </div>
  <div id="stick"><div id="knob"></div></div>
  <canvas id="cmp" aria-hidden="true"></canvas>
  <div id="fps"></div>
- <button class="mb-ver" id="mbVer" type="button">v0.25.2 &middot; Nov 1</button>
+ <button class="mb-ver" id="mbVer" type="button">v0.26.0 &middot; Nov 2</button>
  <div id="toast"></div>
- <div id="chat" class="hidden" role="dialog" aria-live="polite"><div class="ch-who"><b id="chName"></b><span id="chRole"></span></div><p id="chLine"></p><div class="ch-dots" id="chDots"></div><div class="ch-btns"><button class="btn" id="chMore" type="button">more</button><button class="btn" id="chBye" type="button">goodbye</button></div></div>
+ <div id="chat" class="hidden" role="dialog" aria-live="polite"><div class="ch-who"><b id="chName"></b><span id="chRole"></span></div><p id="chLine"></p><div class="ch-dots" id="chDots"></div><div class="ch-ask" id="chAsk"></div><div class="ch-btns"><button class="btn" id="chMore" type="button">more</button><button class="btn" id="chBye" type="button">goodbye</button></div></div>
  <div id="help" class="hidden"><div class="card">
   <h1>How to play</h1>
   <p><b>Walk and steer:</b> drag on the left half. Push up to walk, tilt left or right to turn.<br><b>Look:</b> drag the right half. (Prefer stepping sideways? Turn it off in the dials, under Controls.)<br><span style="color:var(--mb-dim)">Desktop: WASD + mouse, Shift to run.</span></p>
   <p><b>Compass:</b> the strip at the top shows which way you face. People measure directions from the keep: when someone says the farm is to the northeast, stand at the keep and turn until NE is in the middle. On errands an orange mark shows the way (a hollow one means the road out to another valley); you can turn it off in the dials, under Controls.</p>
+  <p><b>Talk and errands:</b> walk up to anyone to talk. When someone asks you something, answer with the buttons on the card; walk away and the question waits for next time. Your <b>journal</b>, top left, keeps your errands, the valleys you have walked, and who you met there, and can take you back to any of them.</p>
   <p><b>Water:</b> wade in, look down and move to dive, look up to rise, level off to walk the bottom.</p>
   <p>Tap <b>☰ menu</b>, top right, any time for a new world, the dials, and the changelog.</p>
   <button class="btn go" id="bGo">walk</button>
@@ -207,13 +230,19 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
    <img src="12-gate-at-night.jpg" alt="a brazier at the gate arch" loading="lazy">
    <img src="11-moonlit.jpg" alt="the keep by moonlight" loading="lazy">
   </div>
-  <p><b>Story.</b> Start a story and you pick your name and the kind of valley you grew up in. You wake at home, where your parents keep a small keep and everyone knows you. Coming next: errands, a journal, and a first trip over the hills.</p>
-  <p class="fsize">The whole game is one HTML file, plus a file for each 3D view. Right now: <b id="fsize">~468 KB</b>. Smaller than a single phone photo.</p>
+  <p><b>Story.</b> Start a story and you pick your name and the kind of valley you grew up in. You wake at home, where your parents keep a small keep and everyone knows you. They will send you on errands: to the steward, out to the farms, and with a letter over the hills. Your journal keeps it all, and every road leads to the same valley each time, so you can always find your way home.</p>
+  <p class="fsize">The whole game is one HTML file, plus a file for each 3D view. Right now: <b id="fsize">~498 KB</b>. Smaller than a single phone photo.</p>
   <p><b>Why I built it.</b> I build things on a phone, directing AI the way I would direct a camera. I saw a clip of a tiny 3D world made of nothing but text and wanted to see if I could grow one that was actually alive, and keep growing it in the open instead of ever calling it done.</p>
   <p><b>What I learned.</b> How far you can get with almost nothing. One idea, a ray walking a height map, turned into characters, with a small world of animals living on top. Every version taught me one concrete thing: how to make a wall read as solid, how to keep the wolves from starving the world empty, how to make a forest look like real woods.</p>
   <p style="color:var(--mb-dim);font-size:13px"><b style="color:var(--mb-soft)">Walk:</b> drag the left half of the screen (tilt to turn). <b style="color:var(--mb-soft)">Look:</b> drag the right half. Wade into the water to swim. Tap ☰ menu for a new world, the dials, and the time of day. Walk under the gate arch and find the door under the tower stair.</p>
   <button class="btn go" id="aGo">walk the keep</button>
   <button class="btn" id="aFull" style="width:100%;margin-top:8px">see every version →</button>
+ </div></div>
+ <div id="journal" class="hidden" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.62);pointer-events:auto" role="dialog" aria-label="Journal"><div class="card" id="jCard">
+  <h1 id="jTitle">Journal</h1>
+  <div class="jtabs" role="tablist"><button class="btn" type="button" role="tab" data-t="threads">Threads</button><button class="btn" type="button" role="tab" data-t="lore">Lore</button><button class="btn" type="button" role="tab" data-t="valleys">Valleys</button><button class="btn" type="button" role="tab" data-t="me">Me</button></div>
+  <div id="jBody"></div>
+  <button class="btn" id="jClose" type="button" style="width:100%;margin-top:10px">close</button>
  </div></div>
  <div id="menu" class="hidden" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);pointer-events:auto"><div class="card">
   <h1>Menu</h1>
@@ -221,6 +250,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
   <div class="dial-sec" style="margin-top:14px">DRAW THE WORLD AS</div>
   <div id="mRender" class="seg"></div>
   <p id="mRenderNote" style="margin:6px 0 2px;font-size:12px;opacity:.75"></p>
+  <button class="btn" id="mJournal" style="width:100%;margin-top:8px">journal</button>
   <button class="btn" id="mDials" style="width:100%;margin-top:8px">dials</button>
   <button class="btn" id="mAbout" style="width:100%;margin-top:8px">about this build</button>
   <button class="btn" id="mLog" style="width:100%;margin-top:8px">changelog</button>
@@ -1240,9 +1270,10 @@ return {start:startIntro, close:close, skip:skip, get active(){ return ACTIVE; }
 })();
 if(typeof window!=='undefined') window.KEEP_INTRO=KEEP_INTRO;   // (for the tests)
 
-const VERSION='The Keep v0.25.2 · Nov 1 2026';
-const VER_SHORT='v0.25.2 · Nov 1'; // what the badge shows; bump with VERSION
+const VERSION='The Keep v0.26.0 · Nov 2 2026';
+const VER_SHORT='v0.26.0 · Nov 2'; // what the badge shows; bump with VERSION
 const CHANGELOG=[
+ ['v0.26.0 · Nov 2 2026','Errands, replies and the journal. People can now ask you things, and you answer with buttons on the chat card. In a story your parent sends you to the steward, the steward sends you out to the farms with a question, and then there is a letter to carry over the hills to the steward of the next valley, and maybe an answer to bring home. Wanderers get asked to carry letters too. The compass mark leads you to the next person, or to the right road out. Every road now leads to one valley, the same one each time, and the road you came in by leads back. The leave card says where a road goes and can take you somewhere you have been. The journal (top left) keeps your threads, every valley you have walked, who you met there, and who you are, and it can take you straight back to any valley.'],
  ['v0.25.2 · Nov 1 2026','A compass. A strip across the top shows which way you face: N, NE, E and round, with north in teal. People give directions from the keep (the farm to the northeast, the pond to the southeast), so now you can turn until that word is in the middle and walk. It is ready to show the way on errands too: an orange mark for where to go, or a hollow one for the nearest road out when the next step is in another valley. Errands come next, and the mark can be turned off in the dials, under Controls.'],
  ['v0.25.1 · Nov 1 2026','Story begins. The opening page now has New story next to Wander. Give yourself a name (or tap Another for one), say what your home valley is like (forest, water, ruins, wildlife, or surprise me), and you wake at home. Your parents keep its small keep: two new people, found only in your home valley, who walk the hall, the kitchen and the chapel and greet you by name. Everyone at home knows you now, and nobody there takes you for a stranger. Your story is saved on this device, so the next time you come the page offers Continue. Wander still drops you into a valley as before, and the two never overwrite each other.'],
  ['v0.25.0 · Nov 1 2026','The hearth. The Keep now opens on a stone hearth in a keep hall at sunrise: the light comes through the window, finds the words The Keep in the dark, and the embers rise. It plays in full on your first visit and as a short fade after that, and a tap skips it. Then the opening page: Wander, or Story, which is coming next. The first time you wander you pick how to see the world from six cards: ASCII, the original letters, or Pixels, Mesh, Voxels, Rays or Iso. You can change it any time in the menu, where you can also replay the intro. The about card is rewritten for the game as it is now.'],
@@ -1659,7 +1690,7 @@ function genWorld(seed){
   { const vn=valleyNames(seed); W.valley=vn.valley; W.farmNames=[vn.farm1,vn.farm2]; }
   W.cast=castValley(seed); if(storyHomeHere(seed)) W.cast.push.apply(W.cast,castParents(seed,STORY.name,W.cast));
   W.castSig=seed+':'+W.cast.map(function(c){ return c.name; }).join(','); rebuildPeople();
-  W.arriveMsg=(storyHomeHere(seed)?'You are home in ':'You arrive in ')+W.valley+'.'; storyAt(seed);
+  W.arriveMsg=(storyHomeHere(seed)?'You are home in ':'You arrive in ')+W.valley+'.'; storyAt(seed); visitNote(seed);
   const h=W.h, st=W.st, tree=W.tree;
   st.fill(0); tree.fill(0); W.sb.fill(0); W.su.fill(0); W.rail.fill(0); W.floor.fill(0); W.ruin.fill(0); W.smat.fill(0); W.places.length=0; W.pens.length=0; W.keepBuilt=false;
   for(let y=0;y<N;y++)for(let x=0;x<N;x++){
@@ -3864,11 +3895,11 @@ function spawnAtExit(e){ const L=e.pts.length, q=e.pts[Math.max(0,L-1-7)];
   P.hand=null; P.rampDir=0; P.lastDir=0; P.x=q[0]; P.y=q[1]; P.yaw=Math.atan2(-e.dy,-e.dx); P.pitch=0.04;
   P.gz=Math.max(groundAt(P.x,P.y),WATER-0.6); P.z=P.gz+EYE; }
 // the one way between valleys: grow the new one (with the usual dials), arrive on the road that faces the way you came
-function travelTo(seed,from){ seed=seed>>>0; closeChat();
+function travelTo(seed,from,fromSeed){ seed=seed>>>0; closeChat();
   DIALS.trav=1; applyWorld(seedDials(seed));   // a valley you travel to is shaped by its own seed, never by your dials
   DIALS.seed=seed; genWorld(seed); populate(seed);
   let ex=W.exits[0]||null;
-  if(from&&W.exits.length){ let best=1e9; for(const e of W.exits){ const d=e.dx*from.dx+e.dy*from.dy; if(d<best){ best=d; ex=e; } } }
+  if(from&&W.exits.length) ex=arriveExit(seed,from,fromSeed)||ex;
   if(ex) spawnAtExit(ex); else spawn();
   VISITED.push({seed:seed, name:W.valley, t:Date.now()}); if(VISITED.length>200) VISITED.shift();
   ROADS.cool=Date.now()+20000; ROADS.sign=-1;
@@ -4005,7 +4036,7 @@ function homeSeed(want,name){ const nm=cleanName(name).toLowerCase(); want=(want
   const f=chooseSeed(want,nameHash(nm),40000); return f==null?nameHash(nm):f; }
 function atHome(){ return MODE==='story'&&!!STORY&&(W.seed>>>0)===STORY.home; }
 function storyHomeHere(seed){ return MODE==='story'&&!!STORY&&(seed>>>0)===STORY.home; }
-function youName(){ return MODE==='story'&&STORY?STORY.name:'traveler'; }
+function youName(){ return MODE==='story'&&STORY?String(STORY.name).split(' ')[0]:'traveler'; }
 // your parents: two more people in the home keep only, from the same tables as everyone, with a family name nobody
 // else in the valley has. Drawn from their own stream after the cast, so the valley's own people never change.
 const PARENT_IDS=[9,10];
@@ -4041,13 +4072,15 @@ function journalLoad(){ let o=null;
     if(s&&typeof s==='object'&&typeof s.name==='string'&&isFinite(+s.home)){
       const home=(+s.home)>>>0, at=isFinite(+s.at)?((+s.at)>>>0):home;
       JOURNAL.story={name:cleanName(s.name), home:home, at:at, started:typeof s.started==='string'?s.started.slice(0,10):'', want:Array.isArray(s.want)?s.want.slice(0,4).map(function(v){ v=v|0; return v>=-1&&v<=2?v:-1; }):[-1,-1,-1,-1]}; }
-    if(o.wander&&typeof o.wander==='object') JOURNAL.wander=o.wander; }
+    if(o.wander&&typeof o.wander==='object'&&!Array.isArray(o.wander)) JOURNAL.wander=o.wander;
+    if(s&&typeof s==='object'&&JOURNAL.story){ for(const k of ['valleys','links','tasks','letters','lessons','offered','away']) if(s[k]!=null) JOURNAL.story[k]=s[k]; ensureJ(JOURNAL.story); } }
+  ensureJ(JOURNAL.wander);
   STORY=JOURNAL.story; return JOURNAL; }
 function journalSave(){ try{ localStorage.setItem('keep_journal',JSON.stringify(JOURNAL)); SAVE_OK=true; return true; }catch(e){ SAVE_OK=false; return false; } }
 function storyAt(seed){ if(MODE==='story'&&STORY&&STORY.at!==(seed>>>0)){ STORY.at=seed>>>0; journalSave(); } }
 function storyNew(name,want){ name=cleanName(name); want=(want||[]).slice(0,4).map(function(v){ v=v|0; return v>=-1&&v<=2?v:-1; }); while(want.length<4) want.push(-1);
   const home=homeSeed(want,name), d=new Date(), pad=function(n){ return (n<10?'0':'')+n; };
-  JOURNAL.story={name:name, home:home, at:home, started:d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()), want:want};
+  JOURNAL.story=ensureJ({name:name, home:home, at:home, started:d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()), want:want});
   STORY=JOURNAL.story; MODE='story'; journalSave(); return STORY; }
 // at home: you wake in the courtyard by the great hall, and one of your parents is at its door, looking out for you
 function spawnHome(){ P.hand=null; P.rampDir=0; P.lastDir=0; P.x=FORT.x-11+0.5; P.y=FORT.y-9.2; P.yaw=-Math.PI/2; P.pitch=0.04;
@@ -4129,6 +4162,159 @@ function navGoal(){ if(!DIALS.marker||typeof NAV.provider!=='function') return n
   return best?{x:best.x, y:best.y, road:true, label:best.name||'the road', here:bd<2}:null; }
 const CMP_SPAN=120;   // degrees shown across the strip
 const CMP_LABELS=['N','NE','E','SE','S','SW','W','NW'];
+
+// ---------------- P2 (v0.26.0): roads that lead somewhere, errands, replies and the journal ----------------
+// Each mode keeps its own part of keep_journal: JOURNAL.story (with name/home/at) or JOURNAL.wander, and in it
+//   valleys {seed: {n name, f first day, l last day, m bitmask of people met}}, links {seed: {exitId: seed}},
+//   tasks {steward, grain} (the home tutorial), letters [..], lessons {steward, replies, journal, roads}, offered {seed:1}, away.
+var VISIT_ON=IS_NODE;   // visits are noted once a mode is picked (the valley grown behind the hearth is not a visit)
+function dayNum(){ return Math.floor(Date.now()/86400000); }
+function modeJ(){ const J=MODE==='story'&&STORY?STORY:JOURNAL.wander; return ensureJ(J); }
+const ENSURED=new WeakSet();
+function ensureJ(J){ if(!J||typeof J!=='object') return {valleys:{},links:{},tasks:{},letters:[],lessons:{},offered:{}}; if(ENSURED.has(J)) return J;
+  const obj=function(k){ if(!J[k]||typeof J[k]!=='object'||Array.isArray(J[k])) J[k]={}; };
+  obj('valleys'); obj('links'); obj('tasks'); obj('lessons'); obj('offered');
+  for(const k in J.valleys){ const v=J.valleys[k]; if(!v||typeof v!=='object'||!isFinite(+k)) delete J.valleys[k]; }
+  for(const k in J.links){ if(!J.links[k]||typeof J.links[k]!=='object') delete J.links[k]; }
+  if(!Array.isArray(J.letters)) J.letters=[];
+  J.letters=J.letters.filter(function(L){ return L&&typeof L==='object'&&typeof L.s==='string'&&isFinite(+L.o)&&isFinite(+L.d); });
+  ENSURED.add(J); return J; }
+// ---- roads: each road leads to one valley, decided the first time it matters, and kept ----
+function neighborSeed(seed,i){ let s=(seedRng(((seed>>>0)^(i|0))>>>0,0x4E1B)()*4294967296)>>>0; if(s===(seed>>>0)) s=(s+1)>>>0; return s; }
+function linksOf(seed){ const L=modeJ().links; const k=String(seed>>>0); if(!L[k]||typeof L[k]!=='object') L[k]={}; return L[k]; }
+function destOf(seed,exitId){ const L=modeJ().links[String(seed>>>0)]; const v=L&&L[exitId]; return (v!=null&&isFinite(+v))?(+v>>>0):neighborSeed(seed,exitId); }
+function fixDest(seed,exitId){ const L=linksOf(seed); if(L[exitId]==null){ L[exitId]=neighborSeed(seed,exitId); journalSave(); } return +L[exitId]>>>0; }
+// arriving by a road: the road you come in on leads back to where you came from (when that road is not already spoken for)
+function arriveExit(seed,from,fromSeed){ const ex=W.exits.slice().sort(function(a,b){ return (a.dx*from.dx+a.dy*from.dy)-(b.dx*from.dx+b.dy*from.dy); });
+  if(!ex.length) return null; if(fromSeed==null||(fromSeed>>>0)===(seed>>>0)) return ex[0];
+  const L=linksOf(seed), fs=fromSeed>>>0;
+  for(const e of ex) if(L[e.id]!=null&&(+L[e.id]>>>0)===fs) return e;
+  for(const e of ex) if(L[e.id]==null&&neighborSeed(seed,e.id)!==fs&&!exitReserved(seed,e.id)){ L[e.id]=fs; journalSave(); return e; }
+  for(const e of ex) if(L[e.id]==null&&neighborSeed(seed,e.id)===fs) return e;
+  return ex[0]; }
+function exitReserved(seed,id){ for(const L of modeJ().letters) if(L.s!=='done'&&(L.o>>>0)===(seed>>>0)&&L.e===id) return true; return false; }
+// which road out of here leads (one or more valleys on) toward a seed, or null
+function routeExit(target){ target=target>>>0; const here=W.seed>>>0; if(!W.exits.length) return null;
+  for(const e of W.exits) if(destOf(here,e.id)===target) return e.id;
+  const links=modeJ().links, seen=new Set([here]); let front=W.exits.map(function(e){ return {s:destOf(here,e.id), first:e.id}; });
+  for(let depth=0;depth<4&&front.length;depth++){ const next=[];
+    for(const f of front){ if(f.s===target) return f.first; if(seen.has(f.s)) continue; seen.add(f.s);
+      const L=links[String(f.s)]; if(L) for(const k in L){ const v=+L[k]>>>0; if(!seen.has(v)) next.push({s:v, first:f.first}); } }
+    front=next; }
+  return null; }
+// ---- visits: the journal's list of valleys ----
+function visitNote(seed){ if(!VISIT_ON) return; const J=modeJ(), k=String(seed>>>0), d=dayNum(), v=J.valleys[k];
+  if(v&&typeof v==='object'){ v.n=W.valley; v.l=d; } else J.valleys[k]={n:W.valley, f:d, l:d, m:0};
+  const ks=Object.keys(J.valleys); if(ks.length>300){ ks.sort(function(a,b){ return (J.valleys[a].l||0)-(J.valleys[b].l||0); }); for(let i=0;i<ks.length-300;i++) delete J.valleys[ks[i]]; }
+  if(MODE==='story'&&STORY&&(seed>>>0)!==STORY.home) J.away=1;
+  journalSave(); }
+function noteMet(id){ if(!VISIT_ON||id<0||id>30) return; const v=modeJ().valleys[String(W.seed>>>0)]; if(v&&typeof v==='object'){ const b=(v.m|0)|(1<<id); if(b!==(v.m|0)){ v.m=b; journalSave(); } } }
+// ---- errands ----
+// the home errand: whoever lives out in the valley is asked about their work
+const ERRANDS={4:{place:'farm1', topic:'whether the grain is in', lines:['The grain? Nearly in. Two more days, if the weather holds.','Tell {steward} that. Two days, no more.'],
+    plain:'Two more days for the grain.', better:'The grain is all in.'},
+  5:{place:'farm2', topic:'whether the lambs are all counted', lines:['Counted twice. Two short, and then I found them asleep behind the wall.','So all there. Tell {steward} all there.'],
+    plain:'The lambs are all there.', better:'Every lamb counted, no trouble at all.'},
+  6:{place:'wood', topic:'when there will be wood for the hall', lines:["There's a stack by the cabin. I'll bring it up when my back allows.","Tomorrow, say. Tell {steward} tomorrow."],
+    plain:'Wood tomorrow, when the back allows.', better:'The wood is on its way now.'}};
+function errandTarget(here){ const k=(seedRng(W.seed>>>0,0x0E44)()*3)|0; for(let j=0;j<3;j++){ const id=[4,5,6][(k+j)%3]; if(here[id]&&castOf(id)&&folkHere(ERRANDS[id].place)) return id; } return -1; }
+// letters: from someone here to the steward of the valley down one of this valley's roads
+function letterFacts(o,op,exitId,kind){ const d=fixDest(o,exitId), dc=castValley(d)[3], oc=castOf(op)||castValley(o)[op]||{name:'someone',by:''}, ex=W.exits.find(function(e){ return e.id===exitId; });
+  return {k:kind, s:'offer', o:o>>>0, op:op, on:(oc.name+' '+(oc.by||'')).trim(), ov:W.valley, d:d, dp:3, dn:dc.name+' '+dc.by, dg:dc.given, dv:valleyName(d), e:exitId, r:ex?ex.name:'the road', t:Date.now()}; }
+function letterExit(o){ if(!W.exits.length) return -1; return W.exits[(seedRng(o>>>0,0x1E77)()*W.exits.length)|0].id; }
+function openLetter(J){ return J.letters.find(function(L){ return L.s!=='done'&&L.s!=='offer'; })||null; }
+// what the person in front of you has to say about an errand (or null for ordinary talk)
+// a script: {lines:[{text, on}], ask:{opts:[{label, pick, reply:[text]}]}}
+function taskTalk(id,here){ if(id<0) return null; const J=modeJ(), L=J.lessons, T=J.tasks, seed=W.seed>>>0, home=atHome(), story=MODE==='story'&&!!STORY;
+  const save=function(){ journalSave(); };
+  // letters first: delivering one, or bringing an answer home
+  for(const Lt of J.letters){
+    if(Lt.s==='carry'&&Lt.d===seed&&id===Lt.dp) return {lines:[{text:'A letter? For me?'},{text:'From {lo}. From {lon}.'},{text:'Will you wait while I write an answer, and carry it back?', on:function(){ L.replies=1; save(); }}],
+      ask:{opts:[{label:"I'll carry it", pick:function(){ Lt.s='reply'; Lt.t=Date.now(); save(); }, reply:['Here. Give it to {lon} with my thanks.']},
+                 {label:"I'm not going back that way", pick:function(){ Lt.s=Lt.k==='wander'?'done':'delivered'; Lt.t=Date.now(); save(); }, reply:["Then I'll send it with the peddler. Thank you for bringing it."]}]}, letter:Lt};
+    if((Lt.s==='reply'||Lt.s==='delivered')&&Lt.o===seed&&id===Lt.op){ const ans=Lt.s==='reply';
+      return {lines:ans?[{text:"You're back! And you've an answer from {ldn}?"},{text:GOODNEWS[(Lt.d+Lt.o)%GOODNEWS.length]},{text:'Thank you, {you}.', on:function(){ Lt.s='done'; Lt.a=1; Lt.t=Date.now(); save(); }}]
+                       :[{text:'You took the letter to {ldn}?'},{text:'Then it is done. An answer will come when it comes. Thank you, {you}.', on:function(){ Lt.s='done'; Lt.t=Date.now(); save(); }}], letter:Lt}; } }
+  // the gatekeeper's lesson: roads, signposts and the card at the end
+  if(id===2&&!L.roads) return {lines:[{text:'Heading out? Then listen.'},{text:'Every road out of {valley} has a signpost. Welcome on the way in, farewell on the way out.'},
+    {text:"Walk to the end and you'll be asked if you want to go on. Each road leads to one valley, and it's the same valley every time."},
+    {text:'The way back is the road you came in by. And if someone has sent you somewhere, your compass knows the way.', on:function(){ L.roads=1; save(); }}]};
+  if(story&&home){ const par=id===PARENT_IDS[0]||id===PARENT_IDS[1], tgt=errandTarget(here), G=T.grain||null;
+    // a parent starts you off: go and see the steward
+    if(par&&!L.steward&&!G&&tgt>=0) return {lines:[{text:'{you}, there you are. {steward} was asking for you this morning.'},{text:"You'll find {steward} about the keep. The hall, most likely."},
+      {text:'Off you go. And come and tell me how you get on.', on:function(){ L.steward=1; if(!T.steward) T.steward={s:'go'}; save(); }}]};
+    // the steward's errand: it teaches replies
+    if(id===3&&(!G||G.s==='offer')&&tgt>=0){ const E=ERRANDS[tgt];
+      return {lines:[{text:G?'{you}. About that errand.':'{you}! Just the one I wanted.', on:function(){ L.steward=1; save(); }},
+        {text:'Will you go out to @'+E.place+' and ask {t'+tgt+'} '+E.topic+'?'}],
+        ask:{opts:[{label:"I'll go", pick:function(){ T.grain={s:'go', to:tgt}; if(T.steward) T.steward.s='done'; L.replies=1; save(); }, reply:['Good. Come straight back and tell me what was said.']},
+                   {label:'Not now', pick:function(){ T.grain={s:'offer', to:tgt, no:((G&&G.no)|0)+1}; if(T.steward) T.steward.s='done'; L.replies=1; save(); }, reply:["Then later. It'll keep."]}]}}; }
+    if(G&&G.s==='go'&&id===3) return {lines:[{text:'Well? Have you asked {t'+G.to+'} yet?'},{text:'@'+ERRANDS[G.to].place+'. Off you go.'}]};
+    if(G&&G.s==='go'&&id===G.to){ const E=ERRANDS[G.to];
+      return {lines:[{text:E.lines[0]},{text:E.lines[1]},{text:'Will you tell {steward} that, word for word?'}],
+        ask:{opts:[{label:'Word for word', pick:function(){ G.s='back'; G.said='plain'; save(); }, reply:['Good. Off you go.']},
+                   {label:"I'll make it sound better", pick:function(){ G.s='back'; G.said='better'; save(); }, reply:['Suit yourself. {steward} will know.']}]}}; }
+    if(G&&G.s==='back'&&id===3){ const E=ERRANDS[G.to]||ERRANDS[4], lines=[];
+      lines.push({text:G.said==='plain'?'"'+E.plain+'" Good. Plain news is the best kind.':'"'+E.better+'" Is that so? I doubt {t'+G.to+'} would put it like that. Next time, just tell me what was said.', on:function(){ G.s='done'; save(); }});
+      if(!L.journal) lines.push({text:'One more thing. You should keep a journal, {you}. Write down who you meet and what they ask of you.'},{text:"It's at the top of the screen, left of the compass. Use it.", on:function(){ L.journal=1; save(); }});
+      if(!J.letters.some(function(x){ return x.k==='home'; })) lines.push({text:'And your {home1.par} was looking for you. Something about a letter.'});
+      return {lines:lines}; }
+    // a parent's letter over the hills: once the errand is done, or once you have been away
+    if(id===PARENT_IDS[0]&&((G&&(G.s==='done'||(G.no|0)>=2))||J.away||(tgt<0&&L.steward))){ let Lt=J.letters.find(function(x){ return x.k==='home'; });
+      if(!Lt||(Lt.s==='offer'&&Date.now()-(Lt.t||0)>120000)){ const ex=Lt?Lt.e:letterExit(seed); if(ex<0) return null;
+        if(!Lt){ Lt=letterFacts(seed,PARENT_IDS[0],ex,'home'); Lt.t=0; J.letters.push(Lt); save(); }
+        const lines=[{text:"{you}. I've a letter that needs to go over the hills."},{text:"It's for {ldn}, the steward at {ldv}. Take {lr} and keep going."}];
+        if(!L.journal) lines.push({text:"Write it in your journal so you don't forget. Top of the screen, left of the compass.", on:function(){ L.journal=1; save(); }});
+        lines.push({text:'Will you take it?'});
+        return {lines:lines, ask:{opts:[{label:"I'll take it", pick:function(){ Lt.s='carry'; Lt.t=Date.now(); L.replies=1; save(); }, reply:["Thank you. {ldg} may give you something to bring back. Mind the road."]},
+                                        {label:'Not yet', pick:function(){ Lt.t=Date.now(); save(); }, reply:["When you're ready, then. It's waited this long."]}]}, letter:Lt}; } } }
+  // wandering: a steward may ask you to carry a letter down a road (once per valley, one letter at a time)
+  if(!story&&id===3&&!J.offered[String(seed)]&&!openLetter(J)&&W.exits.length){ const ex=letterExit(seed); if(ex<0) return null;
+    const Lt=letterFacts(seed,3,ex,'wander');
+    return {lines:[{text:"You've the look of someone who walks. Would you carry a letter for me?"},{text:"It's for {ldn}, the steward at {ldv}, along {lr}."}],
+      ask:{opts:[{label:"I'll take it", pick:function(){ J.offered[String(seed)]=1; Lt.s='carry'; J.letters=J.letters.filter(function(x){ return x.s!=='done'||Date.now()-(x.t||0)<30*86400000; }); J.letters.push(Lt); L.replies=1; save(); }, reply:['Good. Your compass will see you right.']},
+                 {label:'Not today', pick:function(){ J.offered[String(seed)]=1; save(); }, reply:['No matter. Someone always comes through.']}]}, letter:Lt}; }
+  return null; }
+const GOODNEWS=['Good news. Very good news.','Ah. That settles it, then. Good.','Just as I hoped.','Well. That will make for a better winter.'];
+// fill a script line: the letter's own words first, then the usual slots ({you}, {steward}, @farm1...)
+function fillTask(id,text,here,Lt,tgtNames){ let t=text;
+  if(Lt){ t=t.replace(/\{lon\}/g,Lt.on).replace(/\{lo\}/g,Lt.ov).replace(/\{ldn\}/g,Lt.dn).replace(/\{ldg\}/g,Lt.dg||Lt.dn).replace(/\{ldv\}/g,Lt.dv).replace(/\{lr\}/g,Lt.r); }
+  t=t.replace(/\{t(\d)\}/g,function(_,d){ const c=castOf(+d); return c?c.name:'them'; });
+  return fillLine(id,t,here||ALLHERE); }
+// ---- the compass marker: the next step of the errand that matters most ----
+function navStep(){ const J=modeJ(), T=J.tasks;
+  const Lt=J.letters.find(function(x){ return x.s==='carry'||x.s==='reply'||x.s==='delivered'; });
+  if(Lt) return Lt.s==='carry'?{seed:Lt.d, pid:Lt.dp}:{seed:Lt.o, pid:Lt.op};
+  if(MODE==='story'&&STORY){ const G=T.grain;
+    if(G&&G.s==='go') return {seed:STORY.home, pid:G.to};
+    if(G&&G.s==='back') return {seed:STORY.home, pid:3};
+    if(G&&G.s==='done'&&!J.letters.some(function(x){ return x.k==='home'; })) return {seed:STORY.home, pid:PARENT_IDS[0]};
+    if(T.steward&&T.steward.s==='go'&&(!G||G.s==='offer')) return {seed:STORY.home, pid:3}; }
+  return null; }
+NAV.provider=function(){ const st=navStep(); if(!st) return null;
+  if((st.seed>>>0)===(W.seed>>>0)){ const c=chatPerson(st.pid); return c<0?null:{seed:st.seed, x:CR_.x[c], y:CR_.y[c]}; }
+  const ex=routeExit(st.seed); return {seed:st.seed, exit:ex}; };
+// ---- the threads, in the traveler's own words ----
+function threadNotes(){ const J=modeJ(), T=J.tasks, out=[], home=STORY?valleyName(STORY.home):'';
+  const nm=function(seed,pid){ const c=castValley(seed)[pid]; return c?c.name:'someone'; };
+  for(const Lt of J.letters.slice().reverse()){ const fromWho=Lt.k==='home'?'my '+parentWord():Lt.on;
+    const txt=Lt.s==='offer'?(fromWho.charAt(0).toUpperCase()+fromWho.slice(1)+' has a letter for '+Lt.dn+', the steward at '+Lt.dv+'.'+(Lt.t?' I said not yet.':''))
+      :Lt.s==='carry'?('A letter from '+fromWho+' for '+Lt.dn+', the steward at '+Lt.dv+'. '+cap(Lt.r)+' from '+Lt.ov+'.')
+      :Lt.s==='reply'?(Lt.dn+' gave me an answer to take back to '+fromWho+' in '+Lt.ov+'.')
+      :Lt.s==='delivered'?('I gave '+Lt.dn+' the letter. I should tell '+fromWho+' in '+Lt.ov+'.')
+      :('I carried a letter from '+fromWho+' to '+Lt.dn+' in '+Lt.dv+(Lt.a?', and brought an answer back.':'.'));
+    out.push({open:Lt.s!=='done', text:txt}); }
+  if(STORY&&MODE==='story'){ const G=T.grain, h=STORY.home;
+    if(G){ const who=nm(h,G.to), E=ERRANDS[G.to]||ERRANDS[4], st=nm(h,3);
+      out.push({open:G.s!=='done', text:G.s==='offer'?(st+' wants someone to ask '+who+' '+E.topic+'. I said not now.')
+        :G.s==='go'?(st+' wants to know '+E.topic+'. I am to ask '+who+'.'):G.s==='back'?(who+' told me: "'+E.lines[0]+'" I should tell '+st+'.')
+        :('I asked '+who+' '+E.topic+' and told '+st+(G.said==='plain'?' word for word.':', with a little polish.'))}); }
+    if(T.steward&&T.steward.s==='go'&&!G) out.push({open:true, text:'My '+parentWord()+' says '+nm(h,3)+' was asking for me. In the hall, most likely.'}); }
+  out.sort(function(a,b){ return (b.open?1:0)-(a.open?1:0); });
+  return out; }
+function parentWord(){ if(!STORY) return 'parent'; const c=castParents(STORY.home,STORY.name,castValley(STORY.home))[0]; return c.pr==='he'?'father':'mother'; }
+function cap(s){ s=String(s||''); return s.charAt(0).toUpperCase()+s.slice(1); }
+function dayAgo(d){ const n=dayNum()-(d|0); return n<=0?'today':(n===1?'yesterday':n+' days ago'); }
 
 const LINES=[];
 function lineHash(t){ let h=0x811c9dc5; for(let i=0;i<t.length;i++){ h^=t.charCodeAt(i); h=Math.imul(h,0x01000193); } return 'L'+(h>>>0).toString(36); }
@@ -4311,13 +4497,27 @@ function talk(c,id,pose){
   const key=heardKey(id), now=Date.now(), cl=COOL[key];
   if(now-CHAT.shut<1500) return;                                   // a breath after any card closes
   if(cl&&(!cl.away||now-cl.t<25000)) return;                       // not straight back to the same person
-  const here=peopleHere(), lines=talkPick(id,pose,here); if(!lines.length) return;
+  const here=peopleHere(); let lines, ts=null;
+  if(pose!==4){ try{ ts=taskTalk(id,here); }catch(e){ ts=null; } }   // asleep people have no errands
+  if(ts) lines=ts.lines.map(function(l,i){ return {id:'T'+i, text:fillTask(id,l.text,here,ts.letter), on:l.on}; });
+  else lines=talkPick(id,pose,here);
+  if(!lines.length) return;
+  CHAT.ts=ts; CHAT.picked=false; noteMet(id);
   VISITS[key]=(VISITS[key]||0)+1;
   const p=castOf(id); CHAT.id=id; CHAT.key=key; CHAT.lines=lines; CHAT.k=0;
   chatHook.open(p?p.name+' '+p.by:'Someone', p?(roleName(p)+(pose===4?' · asleep':'')):'');
   chatShow(); }
-function chatShow(){ const L=CHAT.lines[CHAT.k]; heardAdd(CHAT.key,L.id); if(chatHook) chatHook.line(L.text,CHAT.k>=CHAT.lines.length-1,CHAT.k,CHAT.lines.length); }
-function chatMore(){ if(CHAT.id<0) return; if(CHAT.k<CHAT.lines.length-1){ CHAT.k++; chatShow(); } else closeChat(); }
+function chatShow(){ const L=CHAT.lines[CHAT.k]; if(L.id.charAt(0)!=='T') heardAdd(CHAT.key,L.id);
+  if(L.on&&!L.fired){ L.fired=true; try{ L.on(); }catch(e){} }   // an errand moves on once, when its line is shown
+  const last=CHAT.k>=CHAT.lines.length-1, ask=(last&&CHAT.ts&&CHAT.ts.ask&&!CHAT.picked)?CHAT.ts.ask.opts.map(function(o){ return o.label; }):null;
+  if(chatHook) chatHook.line(L.text,last,CHAT.k,CHAT.lines.length,ask); }
+// a reply: recorded once, before the next line shows; walking away leaves the question for next time
+function chatPick(i){ if(CHAT.id<0||!CHAT.ts||!CHAT.ts.ask||CHAT.picked) return; const o=CHAT.ts.ask.opts[i]; if(!o) return; CHAT.picked=true;
+  try{ o.pick(); }catch(e){}
+  const here=peopleHere(); for(const t of (o.reply||[])) CHAT.lines.push({id:'T'+CHAT.lines.length, text:fillTask(CHAT.id,t,here,CHAT.ts.letter)});
+  if(CHAT.k<CHAT.lines.length-1){ CHAT.k++; chatShow(); } else closeChat(); }
+function chatMore(){ if(CHAT.id<0) return; if(CHAT.ts&&CHAT.ts.ask&&!CHAT.picked&&CHAT.k>=CHAT.lines.length-1) return;   // the question waits for an answer (or goodbye)
+  if(CHAT.k<CHAT.lines.length-1){ CHAT.k++; chatShow(); } else closeChat(); }
 function closeChat(){ if(CHAT.id<0) return; COOL[CHAT.key]={t:Date.now(),id:CHAT.id,away:false}; CHAT.shut=Date.now(); CHAT.id=-1; if(chatHook) chatHook.close(); }
 // every tick: close the card when you walk away (or a card covers it), and notice when you have left the last person
 function chatTick(){
@@ -4967,15 +5167,17 @@ function boot(){
   function toast(msg,ms){ const t=$('toast'); t.textContent=msg; t.style.opacity=1; clearTimeout(toast.h); toast.h=setTimeout(function(){ t.style.opacity=0; },ms||1600); }
   // the chat card: name and role, one line at a time, more and goodbye
   chatHook={
-    blocked:function(){ return ['help','about','menu','seed','log','dials','leave'].some(function(id){ const e=$(id); return e&&!e.classList.contains('hidden'); }); },
+    blocked:function(){ return ['help','about','menu','seed','log','dials','leave','journal'].some(function(id){ const e=$(id); return e&&!e.classList.contains('hidden'); }); },
     open:function(name,role){ $('chName').textContent=name; $('chRole').textContent=role; $('chat').classList.remove('hidden'); },
-    line:function(text,last,k,n){ $('chLine').textContent=text; $('chDots').textContent=n>1?Array.from({length:n},function(_,i){ return i<=k?'\u25cf':'\u25cb'; }).join(' '):'';
-      $('chMore').style.display=last?'none':''; },
+    line:function(text,last,k,n,ask){ $('chLine').textContent=text; $('chDots').textContent=n>1?Array.from({length:n},function(_,i){ return i<=k?'\u25cf':'\u25cb'; }).join(' '):'';
+      $('chMore').style.display=(last||ask)?'none':''; const A=$('chAsk'); A.innerHTML='';
+      if(ask){ ask.forEach(function(lb,i){ const b=document.createElement('button'); b.className='btn'; b.type='button'; b.textContent=lb; b.addEventListener('click',function(){ chatPick(i); }); A.appendChild(b); }); A.style.display='flex'; } else A.style.display='none'; $('chat').classList.toggle('asking',!!ask); },
     close:function(){ $('chat').classList.add('hidden'); } };
   $('chMore').addEventListener('click',function(){ chatMore(); });
   $('chBye').addEventListener('click',function(){ closeChat(); });
-  window.addEventListener('keydown',function(e){ if(CHAT.id<0) return; if(e.key==='Enter'){ chatMore(); e.preventDefault(); } else if(e.key==='Escape') closeChat(); });
-  greetHook=function(m){ if(['help','about','menu','seed','log','dials','leave'].some(function(id){ const e=$(id); return e&&!e.classList.contains('hidden'); })) return false; toast(m,3400); };
+  window.addEventListener('keydown',function(e){ if(CHAT.id<0||anyJournal()) return; if(e.key==='Enter'){ chatMore(); e.preventDefault(); } else if(e.key==='Escape') closeChat(); else if(/^[1-4]$/.test(e.key)&&CHAT.ts&&CHAT.ts.ask&&!CHAT.picked){ chatPick(+e.key-1); e.preventDefault(); } });
+  function anyJournal(){ const j=$('journal'); return !!(j&&!j.classList.contains('hidden')); }
+  greetHook=function(m){ if(['help','about','menu','seed','log','dials','leave','journal'].some(function(id){ const e=$(id); return e&&!e.classList.contains('hidden'); })) return false; toast(m,3400); };
   function setupGrid(force){
     const cssW=window.innerWidth, cssH=window.innerHeight;
     if(!force && cssW===lastW && cssH===lastH && qCell===lastQ) return; // no real change: don't clear the canvas
@@ -5009,7 +5211,7 @@ function boot(){
   $('mbVer').textContent=VER_SHORT;
   $('mbVer').addEventListener('click',function(){ toast(VER_SHORT+' loaded · seed '+W.seed+' · '+RS.C+'x'+RS.R+(RS.letterbox?' · letterboxed':'')); });
   // one card at a time: every opener closes the rest first, so nothing paints dead behind another card
-  const OVERLAYS=['help','about','menu','seed','log','dials','leave'];
+  const OVERLAYS=['help','about','menu','seed','log','dials','leave','journal'];
   let skyHud=null;   // set by openDials: refreshes the sky dials' clock while the card is open
   var LEAVE=null;   // the road end the leave card is open for (cleared whenever cards close, so nothing holds you)
   function closeAll(){ LEAVE=null; for(let i=0;i<OVERLAYS.length;i++) $(OVERLAYS[i]).classList.add('hidden'); }
@@ -5049,9 +5251,14 @@ function boot(){
   // the leave card: at the end of a road. Stay is the default (the first button, Enter, Escape, or a tap outside the card)
   LEAVE=null;
   function openLeave(e){ closeAll(); LEAVE=e; $('leaveCard').classList.remove('choose'); const sd=W.seed>>>0, c=$('leaveCard'), road=e.name.charAt(0).toUpperCase()+e.name.slice(1);
-    c.innerHTML='<h1>Leaving '+W.valley+'</h1><p class="lvp">'+road+' goes on over the hills to another valley. Every valley you travel to is shaped by its own seed: its forest, water, ruins and wildlife.</p>'+
+    const dest=fixDest(sd,e.id), dname=valleyName(dest), J=modeJ(), been=!!J.valleys[String(dest)], toHome=MODE==='story'&&STORY&&dest===STORY.home;
+    const beenList=Object.keys(J.valleys).filter(function(k){ return (+k>>>0)!==sd; });
+    c.innerHTML='<h1>Leaving '+W.valley+'</h1><p class="lvp">'+road+' goes over the hills to '+dname+'.'+(been?' You have been there.':'')+' Every valley is shaped by its own seed: its forest, water, ruins and wildlife.</p>'+
       '<div class="fsize" style="display:flex;align-items:center;gap:8px;justify-content:space-between"><span>This valley is seed <b id="lvSeed">'+sd+'</b></span><button class="btn" id="lvCopy" style="padding:8px 12px">copy</button></div>'+
-      '<button class="btn go" id="lvStay" style="width:100%;margin-top:4px">Stay in '+W.valley+'</button>'+(MODE==='story'&&STORY&&!atHome()?'<button class="btn" id="lvHome" style="width:100%;margin-top:8px">Home to '+valleyName(STORY.home)+'</button>':'')+
+      '<button class="btn go" id="lvStay" style="width:100%;margin-top:4px">Stay in '+W.valley+'</button>'+
+      '<button class="btn" id="lvOn" style="width:100%;margin-top:8px">'+(toHome?'Home to '+dname:'Walk on to '+dname)+'</button>'+
+      (MODE==='story'&&STORY&&!atHome()&&!toHome?'<button class="btn" id="lvHome" style="width:100%;margin-top:8px">Home to '+valleyName(STORY.home)+'</button>':'')+
+      (beenList.length?'<button class="btn" id="lvBeen" style="width:100%;margin-top:8px">Somewhere I\'ve been</button>':'')+
       '<div id="lvWays" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px"><button class="btn" id="lvRnd" style="flex:1">A random valley</button><button class="btn" id="lvType" style="flex:1">Type a seed</button><button class="btn" id="lvChoose">Choose a valley</button></div>'+
       '<div id="lvTypeRow" style="display:none;gap:8px;margin-top:8px"><input id="lvIn" inputmode="numeric" placeholder="seed number" style="flex:1 1 auto;width:100%;min-width:0;padding:11px;font:600 16px var(--mb-mono);background:rgba(0,0,0,.5);color:var(--mb-ink);border:1px solid var(--mb-line);border-radius:13px"><button class="btn go" id="lvGo" style="flex:0 0 auto;width:auto;margin-top:0">go</button></div>';
     $('leave').classList.remove('hidden');
@@ -5061,11 +5268,56 @@ function boot(){
       try{ if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(String(sd)).then(function(){ toast('Seed '+sd+' copied',1800); },function(){ toast('Seed '+sd,2400); }); ok=true; } }catch(err){}
       if(!ok) toast('Seed '+sd,2400); });
     $('lvRnd').addEventListener('click',function(){ leaveGo((Math.random()*4294967296)>>>0); });
-    if($('lvHome')) $('lvHome').addEventListener('click',function(){ if(STORY) leaveGo(STORY.home); });
+    if($('lvHome')) $('lvHome').addEventListener('click',function(){ if(STORY) leaveGo(STORY.home,true); });
+    $('lvOn').addEventListener('click',function(){ leaveGo(dest); });
+    if($('lvBeen')) $('lvBeen').addEventListener('click',function(){ openBeen(); });
     $('lvChoose').addEventListener('click',function(){ openChoose(); });
     $('lvType').addEventListener('click',function(){ $('lvTypeRow').style.display='flex'; try{ $('lvIn').focus(); }catch(err){} });
     $('lvGo').addEventListener('click',function(){ const v=seedParse($('lvIn').value); if(v!=null) leaveGo(v); else toast('A seed is a whole number from 0 to 4294967295',2200); });
     $('lvIn').addEventListener('keydown',function(ev){ if(ev.key==='Enter'){ $('lvGo').click(); ev.preventDefault(); } else if(ev.key==='Escape'){ leaveStay(); ev.preventDefault(); } ev.stopPropagation(); }); }
+  // ---- the journal: threads, lore, valleys, me ----
+  let JTAB='threads', JOPEN=null, JCONF=null;
+  function openJournal(tab){ closeAll(); if(tab) JTAB=tab; JOPEN=null; JCONF=null; $('journal').classList.remove('hidden'); paintJournal(); try{ $('jClose').focus({preventScroll:true}); }catch(e){} }
+  function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  function paintJournal(){ const J=modeJ(), B=$('jBody'); let h='';
+    $('jTitle').textContent=MODE==='story'&&STORY?(STORY.name+'\'s journal'):'Journal';
+    document.querySelectorAll('#journal .jtabs .btn').forEach(function(b){ const on=b.getAttribute('data-t')===JTAB; b.classList.toggle('on',on); b.setAttribute('aria-selected',on?'true':'false'); });
+    if(!SAVE_OK) h+='<p class="jempty">Saving is off in this browser, so this journal lasts until you close the page.</p>';
+    if(JTAB==='threads'){ const T=threadNotes(); if(!T.length) h+='<p class="jempty">Nothing yet. People will ask things of you. When they do, it goes here.</p>';
+      for(const t of T) h+='<p class="jt '+(t.open?'open':'done')+'">'+esc(t.text)+'</p>'; }
+    else if(JTAB==='lore'){ h+='<p class="jempty">Nothing yet. Old stones and old folk know things.</p>'; }
+    else if(JTAB==='valleys'){ const ks=Object.keys(J.valleys).sort(function(a,b){ return (J.valleys[b].l||0)-(J.valleys[a].l||0); });
+      if(!ks.length) h+='<p class="jempty">Nowhere yet.</p>';
+      for(const k of ks){ const v=J.valleys[k], sd=+k>>>0, here=sd===(W.seed>>>0), home=MODE==='story'&&STORY&&sd===STORY.home;
+        let met=0; for(let i=0;i<31;i++) if((v.m|0)&(1<<i)) met++;
+        h+='<button class="btn jv" type="button" data-s="'+sd+'">'+esc(v.n||valleyName(sd))+(home?' &middot; home':'')+(here?' &middot; you are here':'')+'<small>seed '+sd+' &middot; first came '+dayAgo(v.f)+' &middot; met '+met+'</small></button>';
+        if(JOPEN===sd){ const cast=castValley(sd).concat(home?castParents(sd,STORY.name,castValley(sd)):[]), names=[];
+          for(const c of cast) if((v.m|0)&(1<<c.id)) names.push(esc(c.name+' '+c.by)+' <span style="color:var(--mb-dim)">('+esc(c.role==='parent'?(c.pr==='he'?'your father':'your mother'):roleName(c).replace(/^the /,''))+')</span>');
+          h+='<div class="jdet">'+(names.length?'People I met: '+names.join(', ')+'.':'I did not stop to talk to anyone here.');
+          if(!here){ h+=JCONF===sd?'<div style="display:flex;gap:8px"><button class="btn go" id="jGo" type="button" style="flex:1">Go to '+esc(v.n||valleyName(sd))+'</button><button class="btn" id="jNo" type="button" style="flex:1">Stay</button></div>'
+                                 :'<button class="btn" id="jTravel" type="button" style="width:100%">Travel here</button>'; }
+          h+='</div>'; } } }
+    else { const story=MODE==='story'&&STORY;
+      h+='<dl><dt>Name</dt><dd>'+(story?esc(STORY.name):'No name. People call you traveler.')+'</dd>';
+      if(story) h+='<dt>Home</dt><dd>'+esc(valleyName(STORY.home))+' <span style="color:var(--mb-dim)">(seed '+STORY.home+')</span></dd>';
+      if(story) h+='<dt>What people call you</dt><dd>'+esc(youName())+'</dd>';
+      h+='<dt>Valleys walked</dt><dd>'+Object.keys(J.valleys).length+'</dd>';
+      if(story&&STORY.started) h+='<dt>Story began</dt><dd>'+esc(STORY.started)+'</dd>';
+      h+='</dl>'; }
+    B.innerHTML=h;
+    B.querySelectorAll('.jv').forEach(function(b){ b.addEventListener('click',function(){ const sd=+b.getAttribute('data-s')>>>0; JOPEN=JOPEN===sd?null:sd; JCONF=null; paintJournal(); }); });
+    if($('jTravel')) $('jTravel').addEventListener('click',function(){ JCONF=JOPEN; paintJournal(); try{ $('jGo').focus({preventScroll:true}); }catch(e){} });
+    if($('jNo')) $('jNo').addEventListener('click',function(){ JCONF=null; paintJournal(); });
+    if($('jGo')) $('jGo').addEventListener('click',function(){ const sd=JCONF; if(sd==null) return; quickTravel(sd); }); }
+  // travel straight to a valley you have been to: no road, so nothing about the roads changes
+  function quickTravel(sd){ closeAll(); closeChat(); $('leave').classList.add('hidden'); LEAVE=null;
+    travelTo(sd>>>0); saveSeedOnly(sd>>>0); if(folkMissing().length) W.arriveMsg+=' No room here for '+folkMissing().join(' or ')+'.'; }
+  document.querySelectorAll('#journal .jtabs .btn').forEach(function(b){ b.addEventListener('click',function(){ JTAB=b.getAttribute('data-t'); JOPEN=null; JCONF=null; paintJournal(); }); });
+  $('jClose').addEventListener('click',function(){ $('journal').classList.add('hidden'); });
+  $('journal').addEventListener('click',function(ev){ if(ev.target===$('journal')) $('journal').classList.add('hidden'); });
+  window.addEventListener('keydown',function(ev){ if(!anyJournal()) return; if(ev.key==='Escape'){ if(JCONF!=null){ JCONF=null; paintJournal(); } else $('journal').classList.add('hidden'); ev.preventDefault(); ev.stopPropagation(); } },true);
+  $('bJournal').addEventListener('click',function(){ openJournal(); });
+  $('mJournal').addEventListener('click',function(){ closeMenu(); openJournal(); });
   // choose a valley: pick what you want of each trait, and the nearest seed that has it is found (it is still an ordinary seed)
   let CHOOSE=[-1,-1,-1,-1];
   function openChoose(){ const c=$('leaveCard');
@@ -5083,12 +5335,20 @@ function boot(){
       if(sd==null){ toast('No valley like that turned up. Try fewer choices.',2400); return; }
       leaveGo(sd); });
     try{ $('chGo').focus({preventScroll:true}); }catch(err){} }
+  // somewhere you have been: straight there (no road walked, so no road changes)
+  function openBeen(){ const c=$('leaveCard'), J=modeJ(), sd=W.seed>>>0; c.classList.add('choose');
+    const ks=Object.keys(J.valleys).filter(function(k){ return (+k>>>0)!==sd; }).sort(function(a,b){ return (J.valleys[b].l||0)-(J.valleys[a].l||0); }).slice(0,12);
+    let h='<h1>Somewhere I\'ve been</h1><div style="display:flex;flex-direction:column;gap:6px;max-height:52vh;overflow:auto">';
+    for(const k of ks){ const v=J.valleys[k], home=MODE==='story'&&STORY&&(+k>>>0)===STORY.home; h+='<button class="btn lvb" data-s="'+k+'" style="width:100%;margin:0;text-align:left">'+esc(v.n||valleyName(+k))+(home?' (home)':'')+' <span style="opacity:.6;font-size:12px">'+dayAgo(v.l)+'</span></button>'; }
+    h+='</div><button class="btn" id="lbBack" style="width:100%;margin-top:10px">back</button>'; c.innerHTML=h;
+    c.querySelectorAll('.lvb').forEach(function(b){ b.addEventListener('click',function(){ leaveGo(+b.getAttribute('data-s')>>>0,true); }); });
+    $('lbBack').addEventListener('click',function(){ const e=LEAVE; if(e) openLeave(e); }); }
   function leaveStay(){ if(LEAVING) return; const e=LEAVE; $('leave').classList.add('hidden'); LEAVE=null; if(e) roadStay(e,Date.now()); }
   let LEAVING=false;
-  function leaveGo(seed){ const e=LEAVE; if(!e||LEAVING) return; LEAVING=true;
+  function leaveGo(seed,quick){ const e=LEAVE; if(!e||LEAVING) return; LEAVING=true; const fromSeed=W.seed>>>0;
     $('leaveCard').classList.remove('choose'); $('leaveCard').innerHTML='<h1>Leaving '+W.valley+'</h1><p class="lvwalk">Walking over the hills...</p>';
     setTimeout(function(){ requestAnimationFrame(function(){ setTimeout(function(){
-      $('leave').classList.add('hidden'); LEAVE=null; LEAVING=false; travelTo(seed,e); saveSeedOnly(seed);
+      $('leave').classList.add('hidden'); LEAVE=null; LEAVING=false; if(quick) travelTo(seed); else travelTo(seed,e,fromSeed); saveSeedOnly(seed);
       if(folkMissing().length) W.arriveMsg+=' No room here for '+folkMissing().join(' or ')+'.'; },0); }); },30); }
   $('leave').addEventListener('click',function(ev){ if(ev.target===$('leave')) leaveStay(); });
   window.addEventListener('keydown',function(ev){ if(!LEAVE||$('leave').classList.contains('hidden')) return; if(ev.target&&ev.target.id==='lvIn') return;
@@ -5264,16 +5524,16 @@ function boot(){
   genWorld(DIALS.seed); populate(DIALS.seed); spawn(); setupGrid();
   // first visit ever: show the "about this build" card once, then it lives in the menu
   showSize();
-  if(/[?&]nointro=1/.test(location.search)) KEEP_INTRO.close();
+  if(/[?&]nointro=1/.test(location.search)){ VISIT_ON=true; visitNote(W.seed); KEEP_INTRO.close(); }
   else { try{ KEEP_INTRO.start({ render:function(){ return DIALS.render|0; }, setRender:function(i){ DIALS.render=i; saveDials(); paintRenderSeg(); },
       about:function(){ openAbout(); $('about').style.zIndex='1100'; $('aGo').textContent='back'; },
       story:function(){ return STORY?{name:STORY.name, home:valleyName(STORY.home)}:null; },
       randomName:function(){ return randomName(); }, clean:function(v){ return cleanName(v); },
       traits:function(){ return TRAITS37.map(function(t){ return {name:t.name, words:t.words.map(function(w){ return w==='few or none'?'few':w; })}; }); },
-      go:function(kind,data){ try{
+      go:function(kind,data){ VISIT_ON=true; try{
           if(kind==='story-new'){ storyNew(data.name,data.want); goHome(true); if(!SAVE_OK) setTimeout(function(){ toast('Saving is off in this browser, so this story lasts until you close the page.',3600); },2200); }
           else if(kind==='story-cont'&&STORY){ MODE='story'; if(STORY.at===STORY.home) goHome(false); else travelTo(STORY.at); }
-          else { MODE='wander'; }
+          else { MODE='wander'; visitNote(W.seed); }
         }catch(e){ MODE='wander'; } },
       closed:function(){ $('about').style.zIndex=''; $('aGo').textContent='walk the keep';
         const m=glCur(); if(m){ loadGL(m); } else { for(const k in GLR) glDrop(k); } } }); }catch(e){ try{ KEEP_INTRO.close(); }catch(e2){} } }
@@ -5350,7 +5610,7 @@ function boot(){
   if(glCur()&&!KEEP_INTRO.active) setTimeout(function(){ const m=glCur(); if(m&&!KEEP_INTRO.active) loadGL(m); },400);
 }
 
-if(IS_NODE){ module.exports={genWorld,allocGrid,buildGlyphs,renderFrame,compose,spawn,populate,tick,ecology,simBin,updatePlayer,W,RS,FB,P,IN,CR_,SP,SPP,MASKS,RESERVE,RAMP,N,WATER,EYE,terr,groundAt,DIALS,growOf,isAdult,addCreature,WALLS,buildWalls,nearestWall,allWallHits,wallBlocked,setSkyTime:function(t){skyTime=t;},setUW:function(v){UW=v;},DAY,SUN,MOON,SKY,DAYMODES,sunAltAz,sunUpdate,updateDay,relightAll,relightStep,RELIGHT,dayDate,fmtTod,setTod:function(h){DAY.tod=h;sunUpdate();},floorAt,KPATHS,KEEP,FORT,eventsForDay,weddingDay,babyDay,valleyDay,logEvent,eventsRefresh,dayTick,restock,stockTakeable,stockOwner,evBind,evWhen,evKey,seedDials,valleyTraits,chooseSeed,applyWorld,worldOf,TRAITS37,WORLD_KEYS,getPlayerLand:function(){ return PLAYER_LAND; },seedParse,babyFor,pedWays,pedShelter,carveRoads,exitAngles,roadCheck,roadStay,travelTo,spawnAtExit,VISITED,ROADS,PED,pedTick,pedDay,pedFind,pedRouteIn,pedPitch,pedWay,TALKP,ROAD_DIALS,ROLEPED,stormLevel,stormWindows,stormOngoing,underCover,stormLight,TALKS,STORMC,evBase,keeperAbed,FISHSIZE,TALKE,EVTAG,EVKINDS,wedNow,relOf,TALK,TALKX,LINES,POSEWHO,talkPick,talk,chatMore,closeChat,chatTick,CHAT,HEARD,VISITS,heardKey,heardAdd,lineOk,whoOk,placeName,placeDir,setChat:function(h){chatHook=h;},castValley,valleyName,valleyNames,seedRng,rebuildPeople,KEEPERS,GREETN,lineOk,fillLine,peopleHere,ALLHERE,NAV,navGoal,heading,bearingTo,relBearing,compassDeg,CMP_SPAN,cleanName,nameHash,randomName,homeSeed,castParents,atHome,storyHomeHere,youName,journalLoad,journalSave,storyNew,storyAt,spawnHome,goHome,PARENT_IDS,AWAY_FR,TALKPAR,TALKHOME,getMode:function(){ return MODE; },setMode:function(m){ MODE=m; },getStory:function(){ return STORY; },getJournal:function(){ return JOURNAL; },getParentDoor:function(){ return PARENT_DOOR; },KACT,ROLEKEY,ROLES,NAMES_F,NAMES_M,NAMES_X,BYNAMES,CLOTHES,SKINS,HAIRS,TRAITS,TRAIT_CLASH,RELREV,dayPart,folkMissing,tickKeeper,KMASK,KL,keeperFrame,GREETT,setGreet:function(f){greetHook=f;},RENDERS}; }
+if(IS_NODE){ module.exports={genWorld,allocGrid,buildGlyphs,renderFrame,compose,spawn,populate,tick,ecology,simBin,updatePlayer,W,RS,FB,P,IN,CR_,SP,SPP,MASKS,RESERVE,RAMP,N,WATER,EYE,terr,groundAt,DIALS,growOf,isAdult,addCreature,WALLS,buildWalls,nearestWall,allWallHits,wallBlocked,setSkyTime:function(t){skyTime=t;},setUW:function(v){UW=v;},DAY,SUN,MOON,SKY,DAYMODES,sunAltAz,sunUpdate,updateDay,relightAll,relightStep,RELIGHT,dayDate,fmtTod,setTod:function(h){DAY.tod=h;sunUpdate();},floorAt,KPATHS,KEEP,FORT,eventsForDay,weddingDay,babyDay,valleyDay,logEvent,eventsRefresh,dayTick,restock,stockTakeable,stockOwner,evBind,evWhen,evKey,seedDials,valleyTraits,chooseSeed,applyWorld,worldOf,TRAITS37,WORLD_KEYS,getPlayerLand:function(){ return PLAYER_LAND; },seedParse,babyFor,pedWays,pedShelter,carveRoads,exitAngles,roadCheck,roadStay,travelTo,spawnAtExit,VISITED,ROADS,PED,pedTick,pedDay,pedFind,pedRouteIn,pedPitch,pedWay,TALKP,ROAD_DIALS,ROLEPED,stormLevel,stormWindows,stormOngoing,underCover,stormLight,TALKS,STORMC,evBase,keeperAbed,FISHSIZE,TALKE,EVTAG,EVKINDS,wedNow,relOf,TALK,TALKX,LINES,POSEWHO,talkPick,talk,chatMore,closeChat,chatTick,CHAT,HEARD,VISITS,heardKey,heardAdd,lineOk,whoOk,placeName,placeDir,setChat:function(h){chatHook=h;},castValley,valleyName,valleyNames,seedRng,rebuildPeople,KEEPERS,GREETN,lineOk,fillLine,peopleHere,ALLHERE,taskTalk,fillTask,chatPick,navStep,routeExit,destOf,fixDest,neighborSeed,linksOf,arriveExit,visitNote,noteMet,modeJ,ensureJ,threadNotes,ERRANDS,errandTarget,letterExit,chatPerson,resetTalk:function(){ for(const k in COOL) delete COOL[k]; CHAT.shut=0; },setVisit:function(v){ VISIT_ON=v; },NAV,navGoal,heading,bearingTo,relBearing,compassDeg,CMP_SPAN,cleanName,nameHash,randomName,homeSeed,castParents,atHome,storyHomeHere,youName,journalLoad,journalSave,storyNew,storyAt,spawnHome,goHome,PARENT_IDS,AWAY_FR,TALKPAR,TALKHOME,getMode:function(){ return MODE; },setMode:function(m){ MODE=m; },getStory:function(){ return STORY; },getJournal:function(){ return JOURNAL; },getParentDoor:function(){ return PARENT_DOOR; },KACT,ROLEKEY,ROLES,NAMES_F,NAMES_M,NAMES_X,BYNAMES,CLOTHES,SKINS,HAIRS,TRAITS,TRAIT_CLASH,RELREV,dayPart,folkMissing,tickKeeper,KMASK,KL,keeperFrame,GREETT,setGreet:function(f){greetHook=f;},RENDERS}; }
 else boot();
 })();
 </script>
