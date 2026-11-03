@@ -366,7 +366,7 @@ html.embed .topbar-inner{padding-left:96px}
     </div>
   </div>
   <div id="toast"></div>
-  <button class="mb-ver" id="mbVer" type="button" onclick="showVer()">v3.0.5 &middot; Oct 24</button>
+  <button class="mb-ver" id="mbVer" type="button" onclick="showVer()">v3.1.0 &middot; Nov 3</button>
 </div>
 
 <script>
@@ -641,7 +641,7 @@ var MODULES=[
    +tips('dos',[
       "<b>Chock the trailer wheels</b> or confirm the <b>dock lock</b> is engaged before you drive on.",
       "Check the <b>dock plate / leveler</b> is seated, rated for the load, and clear of gaps.",
-      "Watch for <b>trailer creep</b> \u2014 repeated loading can walk a trailer away from the dock. Re-check.",
+      "Watch for <b>trailer creep</b>: repeated loading can walk a trailer away from the dock. Re-check.",
       "Cross the gap <b>slow and square</b>; know where every edge is."])
    +tips('donts',[
       "<b>Never</b> drive onto a trailer that isn't secured, or one you can't confirm is chocked or locked.",
@@ -656,7 +656,7 @@ var MODULES=[
    +block("Ramps & grades")
    +tips('dos',[
       "Keep the <b>load pointed upgrade</b> going up or down, loaded or empty.",
-      "Drive straight up and down. <b>Never turn or angle across a ramp</b> \u2014 that's a sideways tip waiting to happen.",
+      "Drive straight up and down. <b>Never turn or angle across a ramp</b>: that's a sideways tip waiting to happen.",
       "Slow down and give yourself room to stop on any slope."])
    +block("Narrow aisles & tight spots","Square up early, mind your tail-swing on both sides, and use the horn before you enter. If your view is blocked, stop and check rather than nosing in.")
    +block("Stacking & racking")
@@ -844,7 +844,7 @@ function tipoverLab(){
        +'<path d="M143 96 L157 108" stroke="#ffce6a" stroke-width="2.6"/>'
        +'<circle id="tipCG" cx="150" cy="96" r="4.5" fill="#2fbf71"/>'
      +'</g>'
-     +'<text id="tipMsg" x="150" y="196" text-anchor="middle" font-size="12" font-family="ui-monospace,monospace" font-weight="700" fill="#9aa1ad">Tap replay to watch</text>'
+     +'<text id="tipMsg" x="150" y="196" text-anchor="middle" font-size="11" font-family="ui-monospace,monospace" font-weight="700" fill="#9aa1ad">Tap replay to watch</text>'
    +'</svg></div>'
    +'<div class="cta" style="margin:12px 0 0"><button class="btn ghost" onclick="playTip()">▷ Replay the tip-over</button></div></div>';
 }
@@ -853,14 +853,14 @@ function playTip(){
   if(!t)return;
   var standUp=(store.truck==='reach'||store.truck==='pallet');
   t.style.transition='none';t.style.transform='rotate(0deg)';if(cg)cg.setAttribute('fill','#2fbf71');
-  msg.textContent='Hard turn... the load throws the weight sideways';msg.setAttribute('fill','#9aa1ad');
+  msg.textContent='Hard turn: the weight goes sideways';msg.setAttribute('fill','#9aa1ad');
   setTimeout(function(){if(cg)cg.setAttribute('fill','#e63a2e');
     t.style.transition='transform 1.4s cubic-bezier(.55,0,.5,1)';t.style.transform='rotate(90deg)';
     if(sh){sh.style.transition='all 1.4s';sh.setAttribute('rx','30');sh.setAttribute('cx','120');}
-    msg.textContent=standUp?'Open-back stand-up: trained exit is to step back and off':'It rolls onto its side \u2014 the cage lands where a jumper would be';
+    msg.textContent=standUp?'Stand-up: step back and off, away from the fall':'The cage lands where a jumper would be';
     msg.setAttribute('fill',standUp?'#2fbf71':'#e63a2e');},500);
   setTimeout(function(){
-    msg.textContent=standUp?'Know YOUR model\u2019s escape direction \u2014 drill it hands-on':'Belted in, you ride it down safely. Do NOT jump.';
+    msg.textContent=standUp?'Know your model: drill the exit hands-on':'Belted in, you ride it down. Do NOT jump.';
     msg.setAttribute('fill','#2fbf71');},2200);
   setTimeout(function(){t.style.transition='transform .6s';t.style.transform='rotate(0deg)';
     if(sh){sh.setAttribute('rx','58');sh.setAttribute('cx','150');}if(cg)cg.setAttribute('fill','#2fbf71');
@@ -1064,8 +1064,8 @@ function driveGuide(){
   return stepGuide([
     {g:GL.lever,h:'Select direction first',p:(t==='pallet'?'Point the tiller and twist the throttle the way you want to go.':'Truck stopped, choose Forward or Reverse on the direction control. Never flip direction while still rolling.')},
     {g:GL.go,h:'Ease onto the accelerator',p:'Smooth and gentle. Let speed build; don\u2019t stab the pedal. Keep it to a walk indoors and around people.'},
-    {g:GL.brake,h:'Look, then stop early',p:'Watch well ahead. Lift off and brake sooner than feels necessary \u2014 several tons take distance to stop.'},
-    {g:GL.rev,h:'Reversing',p:(t==='reach'||t==='pallet'?'Face your direction of travel and go slow \u2014 the load end is behind you.':'Turn and look over your shoulder in the direction you\u2019re going. Sound the horn before you back up. Never rely only on mirrors.')},
+    {g:GL.brake,h:'Look, then stop early',p:'Watch well ahead. Lift off and brake sooner than feels necessary: several tons take distance to stop.'},
+    {g:GL.rev,h:'Reversing',p:(t==='reach'||t==='pallet'?'Face your direction of travel and go slow. The load end is behind you.':'Turn and look over your shoulder in the direction you\u2019re going. Sound the horn before you back up. Never rely only on mirrors.')},
     {g:GL.look,h:'Blocked view = go in reverse',p:'If the load blocks your forward view, travel in reverse (except up a ramp) so you can see where you\u2019re going.'}
   ]);
 }
@@ -1218,7 +1218,16 @@ function animCanvas(id,h,draw){
   loop();
 }
 function eo(k){return 1-Math.pow(1-Math.min(Math.max(k,0),1),3);}
-function cap(ctx,W,H,txt){ctx.fillStyle='#ffce6a';ctx.font='600 12px ui-monospace,monospace';ctx.textAlign='center';ctx.fillText(txt,W/2,H-8);}
+function cap(ctx,W,H,txt,color){
+  ctx.fillStyle=color||'#ffce6a';ctx.textAlign='center';var max=W-16,fs=12;
+  ctx.font='600 '+fs+'px ui-monospace,monospace';
+  while(ctx.measureText(txt).width>max && fs>10){fs--;ctx.font='600 '+fs+'px ui-monospace,monospace';}
+  if(ctx.measureText(txt).width<=max){ctx.fillText(txt,W/2,H-8);return;}
+  var words=txt.split(' '),l1='',l2='';
+  for(var i=0;i<words.length;i++){var tryl=(l1?l1+' ':'')+words[i];if(ctx.measureText(tryl).width<=max&&!l2){l1=tryl;}else{l2=(l2?l2+' ':'')+words[i];}}
+  while(ctx.measureText(l2).width>max && fs>9){fs--;ctx.font='600 '+fs+'px ui-monospace,monospace';}
+  ctx.fillText(l1,W/2,H-8-fs-2);ctx.fillText(l2,W/2,H-8);
+}
 
 /* side-view forklift facing right; ox=rear x, gy=ground y */
 function drawSideFork(ctx,ox,gy,forkH,tilt,loadOn){
@@ -1247,14 +1256,16 @@ function loadDraw(ctx,W,H,t){
   var gy=H-26,per=7.4,tt=t%per,pileX=W*0.60,startX=W*0.04,pickX=pileX-70;
   ctx.fillStyle='#2b303b';ctx.fillRect(0,gy+3,W,2);
   var bx,fh,tilt,load,c;
-  if(tt<1.6){var k=eo(tt/1.6);bx=startX+k*(pickX-startX);fh=6;tilt=0;load=false;c='Square up and approach straight on';drawGroundPallet(ctx,pileX,gy);}
-  else if(tt<2.5){bx=pickX;fh=6;tilt=0;load=false;c='Forks all the way under the load';drawGroundPallet(ctx,pileX,gy);}
+  var palletOnTop=false;
+  if(tt<1.6){var k=eo(tt/1.6);bx=startX+k*(pickX-startX);fh=6;tilt=0;load=false;c='Square up and approach straight on';palletOnTop=true;}
+  else if(tt<2.5){bx=pickX;fh=6;tilt=0;load=false;c='Forks all the way under the load';palletOnTop=true;}
   else if(tt<3.5){var k=eo((tt-2.5)/1.0);bx=pickX;fh=6+k*42;tilt=0;load=true;c='Lift clear of the floor';}
   else if(tt<4.2){var k=eo((tt-3.5)/0.7);bx=pickX;fh=48;tilt=-0.13*k;load=true;c='Tilt back to cradle it';}
   else if(tt<5.0){var k=eo((tt-4.2)/0.8);bx=pickX;fh=48-k*36;tilt=-0.13;load=true;c='Lower to travel height';}
   else if(tt<6.6){var k=eo((tt-5.0)/1.6);bx=pickX-k*(pickX-startX);fh=12;tilt=-0.13;load=true;c='Travel low, 4 to 6 inches off the floor';}
   else{bx=startX;fh=12;tilt=-0.13;load=true;c='Set down in reverse order';}
   drawSideFork(ctx,bx,gy,fh,tilt,load);
+  if(palletOnTop)drawGroundPallet(ctx,pileX,gy);   /* pallet drawn after the truck so the tines read as sliding INTO it */
   cap(ctx,W,H,c);
 }
 
@@ -1277,14 +1288,17 @@ function travelDraw(ctx,W,H,t){
 }
 
 /* top-view forklift for pedestrian anim; cx,cy body center, th heading */
-function drawTopFork(ctx,cx,cy,th,sc){
+function drawTopFork(ctx,cx,cy,th,sc,steer){
   ctx.save();ctx.translate(cx,cy);ctx.rotate(th);ctx.scale(sc,sc);
   ctx.fillStyle='rgba(0,0,0,.35)';ctx.beginPath();ctx.ellipse(2,3,34,20,0,0,7);ctx.fill();
   ctx.fillStyle='#9aa1ad';ctx.fillRect(24,-11,20,4);ctx.fillRect(24,7,20,4);
   var g=ctx.createLinearGradient(0,-18,0,18);g.addColorStop(0,'#ffc94a');g.addColorStop(1,'#f19100');
   ctx.fillStyle=g;rrp(ctx,-28,-18,52,36,7);ctx.fill();ctx.strokeStyle='#b06f00';ctx.lineWidth=1.4;rrp(ctx,-28,-18,52,36,7);ctx.stroke();
   ctx.fillStyle='#4a9eff';ctx.beginPath();ctx.arc(-4,0,5,0,7);ctx.fill();
-  ctx.fillStyle='#0d0f14';ctx.fillRect(-26,-22,10,7);ctx.fillRect(-26,15,10,7);ctx.fillRect(14,-22,10,7);ctx.fillRect(14,15,10,7);
+  ctx.fillStyle='#0d0f14';ctx.fillRect(14,-22,10,7);ctx.fillRect(14,15,10,7);
+  var sa=steer||0;
+  ctx.save();ctx.translate(-21,-18.5);ctx.rotate(sa);ctx.fillRect(-5,-3.5,10,7);ctx.restore();
+  ctx.save();ctx.translate(-21,18.5);ctx.rotate(sa);ctx.fillRect(-5,-3.5,10,7);ctx.restore();
   ctx.restore();
 }
 function drawPed(ctx,x,y,danger){
@@ -1294,72 +1308,68 @@ function drawPed(ctx,x,y,danger){
   ctx.moveTo(x,y+7);ctx.lineTo(x-4,y+15);ctx.moveTo(x,y+7);ctx.lineTo(x+4,y+15);ctx.stroke();
 }
 function pedDraw(ctx,W,H,t){
-  var per=7.5,tt=t%per,BL=48,BW=16;
-  function cl(v){return Math.max(0,Math.min(1,v));}
-  // truck drives up, then turns RIGHT; the REAR swings LEFT into the walkway
-  var driveP = cl((tt-0.3)/2.0);   // 0-1: drive up phase
-  var turnP  = cl((tt-2.6)/2.4);   // 0-1: turn phase
-  var resetP = cl((tt-6.0)/1.2);   // fade/reset
-  var p = turnP*(1-resetP);
-  // truck path: starts bottom-right, drives up, then curves right
-  // pivot = where the front axle is when the turn begins
-  var pivotX=W*0.62, pivotY=H*0.38;
-  var startY=H*0.95;
-  // during drive phase, truck moves up; during turn phase, heading rotates
-  var ty = startY - driveP*(startY - pivotY);
-  var tx = pivotX;
-  var heading = -Math.PI/2; // pointing up
-  if(turnP>0){
-    // front axle follows a circular arc to the right
-    var turnR = 70, ang = p * (Math.PI*0.45);
-    tx = pivotX + turnR*(1-Math.cos(ang));
-    ty = pivotY - turnR*Math.sin(ang);
-    heading = -Math.PI/2 + ang;
-  }
-  // rear-outer corner position (the wide swing side = LEFT of the truck)
-  function rearOuter(pp){
-    var a = -Math.PI/2 + pp*(Math.PI*0.45);
-    var fx = pivotX + 70*(1-Math.cos(a));
-    var fy = pivotY - 70*Math.sin(a);
-    var dx=Math.cos(a),dy=Math.sin(a),px=-dy,py=dx;
-    return {x:fx + dx*(-BL) + px*(-BW), y:fy + dy*(-BL) + py*(-BW)};
-  }
-  // walkway: runs VERTICALLY on the LEFT side of the canvas
-  // the rear swings left into it
-  var wkX = W*0.18, wkW = 56;
-  ctx.fillStyle='rgba(74,158,255,.06)';ctx.fillRect(wkX-wkW/2,0,wkW,H);
-  ctx.strokeStyle='rgba(74,158,255,.5)';ctx.setLineDash([8,6]);ctx.lineWidth=2;
-  ctx.beginPath();ctx.moveTo(wkX-wkW/2,0);ctx.lineTo(wkX-wkW/2,H);ctx.moveTo(wkX+wkW/2,0);ctx.lineTo(wkX+wkW/2,H);ctx.stroke();ctx.setLineDash([]);
-  ctx.fillStyle='#4a9eff';ctx.font='600 10px ui-monospace,monospace';ctx.textAlign='center';
-  ctx.save();ctx.translate(wkX-wkW/2-10,H/2);ctx.rotate(-Math.PI/2);ctx.fillText('WALKWAY',0,0);ctx.restore();
-  // pedestrian standing in the walkway, at the height where the tail will reach
-  var pedFinal = rearOuter(1);
-  var pedX = wkX, pedY = Math.min(pedFinal.y+6, pivotY+10);
-  drawPed(ctx, pedX, pedY, false); // draw first as safe, overdraw if danger
-  // swept ribbon showing where the rear sweeps (only during turn)
-  if(p>0.02){
-    ctx.fillStyle='rgba(230,58,46,0.14)';ctx.beginPath();
-    // outer edge (rear-outer corner, the wide path)
-    for(var s=0;s<=p+0.001;s+=0.025){var ro=rearOuter(s);if(s===0)ctx.moveTo(ro.x,ro.y);else ctx.lineTo(ro.x,ro.y);}
-    // inner edge (front axle path, the tight path) going back
-    for(var s2=p;s2>=0;s2-=0.025){
-      var a2=-Math.PI/2+s2*(Math.PI*0.45);
-      ctx.lineTo(pivotX+70*(1-Math.cos(a2)), pivotY-70*Math.sin(a2));
+  /* Real rear-steer kinematics. The reference point is the FRONT axle (the drive wheels):
+     it moves along the heading; the rear axle is steered, so the yaw rate is v*tan(steer)/L
+     and the back end swings around the front. One pass is precomputed per canvas size. */
+  var L=40, HW=18, FA=19, RA=-21, FL=44;          // axle spacing, half width, front/rear axle offsets, fork tip
+  var wkR=W*0.30, wkW=Math.min(74,W*0.26);         // walkway: right edge, width
+  var laneX=wkR+HW+7;                              // truck centerline, body 7px clear of the walkway edge
+  var startY=H*0.98+22, turnY=H*0.56;              // turn begins when the front axle reaches turnY
+  var V=52, VT=30, STEER=Math.atan(L/21);                 // speed px/s, rear-steer angle for a 21px front-axle radius
+  var key=W+'x'+H;
+  if(!pedDraw._c||pedDraw._c.key!==key){
+    var dt=1/60, P={x:laneX,y:startY,h:-Math.PI/2}, st=0, turned=0, poses=[], tt=0, phase=0, danger=-1, ran=0, C0=0;
+    var pedX=wkR-14, pedY=0;
+    for(var i=0;i<60*14;i++){
+      var dir={x:Math.cos(P.h),y:Math.sin(P.h)};
+      if(phase===0 && P.y<=turnY){phase=1; pedY=P.y+4;}      // pedestrian stands beside where the REAR axle is at turn-in
+      if(phase===1){st=Math.min(STEER,st+STEER*dt*2.2);}
+      if(phase===1 && turned>Math.PI*0.40){phase=2;}
+      if(phase===2){st=Math.max(0,st-STEER*dt*4.5); if(st===0){phase=3; ran=0;}}
+      var v=(phase===1||phase===2)?VT:V; if(phase===3){ran+=V*dt; if(ran>14){v=0;}}
+      if(phase===0 && i<48){v=0;}                                 // short hold before it rolls
+      var w=v*Math.tan(st)/L;                                    // yaw rate; right turn = clockwise on screen
+      P.h+=w*dt; turned+=w*dt; P.x+=dir.x*v*dt; P.y+=dir.y*v*dt;
+      var lp={x:Math.sin(P.h),y:-Math.cos(P.h)};                 // unit vector to the truck's LEFT
+      var rl={x:P.x+dir.x*(-28-FA)+lp.x*HW, y:P.y+dir.y*(-28-FA)+lp.y*HW}; // rear-left corner
+      var fl={x:P.x+dir.x*(24-FA)+lp.x*HW,  y:P.y+dir.y*(24-FA)+lp.y*HW};  // front-left corner
+      var hit=(phase>0 && rl.x<pedX+7 && Math.abs(rl.y-pedY)<20);
+      if(hit&&danger<0)danger=tt;
+      poses.push({x:P.x,y:P.y,h:P.h,st:st,rl:rl,fl:fl,t:tt,phase:phase,hit:hit});
+      tt+=dt;
+      if(phase===3&&ran>14&&tt>0){ if(!C0){C0=tt;} if(tt-C0>2.2)break; }
     }
+    pedDraw._c={key:key,poses:poses,pedX:pedX,pedY:pedY,danger:danger,len:poses[poses.length-1].t};
+  }
+  var C=pedDraw._c, per=C.len+1.6, tl=t%per, hold=tl>C.len, fade=hold?Math.max(0,1-(tl-C.len)/1.6):1;
+  var idx=Math.min(C.poses.length-1,Math.floor(Math.min(tl,C.len)*60)), q=C.poses[idx];
+  // walkway
+  ctx.fillStyle='rgba(74,158,255,.07)';ctx.fillRect(wkR-wkW,0,wkW,H);
+  ctx.strokeStyle='rgba(74,158,255,.55)';ctx.setLineDash([8,6]);ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(wkR-wkW,0);ctx.lineTo(wkR-wkW,H);ctx.moveTo(wkR,0);ctx.lineTo(wkR,H);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle='#4a9eff';ctx.font='600 10px ui-monospace,monospace';ctx.textAlign='center';
+  ctx.save();ctx.translate(wkR-wkW-9,H/2);ctx.rotate(-Math.PI/2);ctx.fillText('WALKWAY',0,0);ctx.restore();
+  ctx.globalAlpha=fade;
+  // swept band of the truck's LEFT side: outer edge = rear-left corner path, inner edge = front-left corner path
+  var s0=0; while(s0<idx && C.poses[s0].phase===0) s0++;
+  if(q.phase>0 && idx>s0+1){
+    ctx.fillStyle='rgba(230,58,46,0.16)';ctx.beginPath();
+    for(var a=s0;a<=idx;a++){var r=C.poses[a].rl;if(a===s0)ctx.moveTo(r.x,r.y);else ctx.lineTo(r.x,r.y);}
+    for(var b=idx;b>=s0;b--){var f=C.poses[b].fl;ctx.lineTo(f.x,f.y);}
     ctx.closePath();ctx.fill();
-    // bold trail of the rear-outer corner
-    ctx.strokeStyle='rgba(230,58,46,0.9)';ctx.lineWidth=3;ctx.beginPath();
-    for(var s3=0;s3<=p+0.001;s3+=0.025){var ro3=rearOuter(s3);if(s3===0)ctx.moveTo(ro3.x,ro3.y);else ctx.lineTo(ro3.x,ro3.y);}
+    ctx.strokeStyle='rgba(230,58,46,0.92)';ctx.lineWidth=3;ctx.beginPath();
+    for(var c=s0;c<=idx;c++){var r2=C.poses[c].rl;if(c===s0)ctx.moveTo(r2.x,r2.y);else ctx.lineTo(r2.x,r2.y);}
     ctx.stroke();
   }
-  // check if rear-outer corner has reached the walkway
-  var curR = turnP>0 ? rearOuter(p) : {x:tx-BL*Math.cos(heading)-BW*(-Math.sin(heading)), y:ty-BL*Math.sin(heading)-BW*Math.cos(heading)};
-  var danger = (curR.x < wkX+wkW/2) && p>0.3;
-  if(danger) drawPed(ctx, pedX, pedY, true); // redraw in red
-  // draw the truck body
-  var bcx = tx + Math.cos(heading)*(-BL/2), bcy = ty + Math.sin(heading)*(-BL/2);
-  drawTopFork(ctx, bcx, bcy, heading, 0.9);
-  cap(ctx,W,H, danger?'The BACK swings WIDE into the walkway':'Driving a turn: watch where the rear sweeps');
+  var danger=C.danger>=0 && tl>=C.danger;
+  drawPed(ctx,C.pedX,C.pedY,danger);
+  var cx=q.x+Math.cos(q.h)*(-FA), cy=q.y+Math.sin(q.h)*(-FA);
+  drawTopFork(ctx,cx,cy,q.h,1,q.st);
+  if(q.st>0.2){ctx.strokeStyle='rgba(255,176,32,.95)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(q.x,q.y,7,0,7);ctx.stroke();
+    ctx.fillStyle='#ffb020';ctx.font='600 9px ui-monospace,monospace';ctx.textAlign='left';ctx.fillText('FRONT PIVOTS',q.x+12,q.y+3);}
+  if(danger){ctx.fillStyle='#e63a2e';ctx.font='700 11px ui-monospace,monospace';ctx.textAlign='left';ctx.fillText('CLIPPED',C.pedX+12,C.pedY-14);}
+  ctx.globalAlpha=1;
+  cap(ctx,W,H, q.phase===0?'Driving straight, walkway on the left':(danger?'Hard right turn: the REAR swings LEFT into the walkway':'Hard right turn: the front pivots, the rear swings wide'));
 }
 
 function initLoadAnim(){animCanvas('loadCv',150,loadDraw);}
@@ -1383,7 +1393,7 @@ function startupCockpitHTML(){
    +'<rect x="60" y="118" width="26" height="14" rx="3" fill="#2c313c" stroke="#454b5c"/><rect x="96" y="118" width="26" height="14" rx="3" fill="#2c313c" stroke="#454b5c"/>'
    +'<circle id="cockHi" cx="70" cy="66" r="20" fill="none" stroke="#2fbf71" stroke-width="3"/>'
    +'</svg>'
-   +'<div class="cockcap" id="cockCap"><b>\u2014</b><span></span></div>'
+   +'<div class="cockcap" id="cockCap"><b>...</b><span></span></div>'
    +'<div class="cockdots" id="cockDots"></div></div>';
 }
 function initStartupAnim(){
@@ -1429,7 +1439,7 @@ function cylinderAnimHTML(){
    +'<circle cx="132" cy="60" r="3" fill="#4a9eff"/></g>'
    +'<g id="cylPin" opacity="0"><rect x="115" y="108" width="6" height="14" rx="2" fill="#2fbf71"/><circle cx="118" cy="124" r="4" fill="#2fbf71"/></g>'
    +'</svg>'
-   +'<div class="cockcap" id="cylCap"><b>\u2014</b><span></span></div>'
+   +'<div class="cockcap" id="cylCap"><b>...</b><span></span></div>'
    +'<div class="cockdots" id="cylDots"></div></div>';
 }
 function initCylinderAnim(){
@@ -1439,9 +1449,9 @@ function initCylinderAnim(){
   var steps=[
    {h:'Engine off, close the valve',p:'No flame or spark nearby. Close the service valve fully.',do:function(){valve.style.transform='rotate(90deg)';coupler.setAttribute('d','M26 80 H94');coupler.setAttribute('stroke','#9aa1ad');relief.style.transform='rotate(38deg)';pin.setAttribute('opacity','0');body.style.opacity='1';}},
    {h:'Run the line dry',p:'Start the engine and let it run until it dies, emptying the fuel line.',do:function(){coupler.setAttribute('stroke','#5b616b');}},
-   {h:'Disconnect the coupling',p:'Gloves on \u2014 escaping propane is cold enough to burn. Uncouple the hose.',do:function(){coupler.setAttribute('d','M26 80 H60');}},
+   {h:'Disconnect the coupling',p:'Gloves on: escaping propane is cold enough to burn. Uncouple the hose.',do:function(){coupler.setAttribute('d','M26 80 H60');}},
    {h:'Swap the cylinder',p:'Remove the empty, set the full one on the bracket.',do:function(){body.style.opacity='.35';setTimeout(function(){body.style.opacity='1';},300);}},
-   {h:'Seat it \u2014 relief valve at 12 o\u2019clock',p:'Locate it on the pin so the relief valve points straight up.',do:function(){relief.style.transform='rotate(0deg)';pin.setAttribute('opacity','1');}},
+   {h:'Seat it: relief valve at 12 o\u2019clock',p:'Locate it on the pin so the relief valve points straight up.',do:function(){relief.style.transform='rotate(0deg)';pin.setAttribute('opacity','1');}},
    {h:'Strap, reconnect, open slowly',p:'Strap tight, reconnect the coupling, open the valve slowly, then check for leaks by smell and sound.',do:function(){coupler.setAttribute('d','M26 80 H94');coupler.setAttribute('stroke','#2fbf71');valve.style.transform='rotate(0deg)';}}
   ];
   valve.style.transition=relief.style.transition=body.style.transition='all .5s';
@@ -1454,26 +1464,44 @@ function initCylinderAnim(){
 }
 
 function dockDraw(ctx,W,H,t){
-  var gy=H-24,per=7,tt=t%per,floorEdge=W*0.40,trailerX=W*0.56;
-  ctx.fillStyle='#2b303b';ctx.fillRect(0,gy+3,floorEdge,2);
-  ctx.fillStyle='#1c2028';ctx.fillRect(trailerX,gy-64,W*0.5,60);ctx.strokeStyle='#3a4150';ctx.lineWidth=1.5;ctx.strokeRect(trailerX,gy-64,W*0.5,60);
-  ctx.fillStyle='#2b303b';ctx.fillRect(trailerX,gy+3,W*0.5,2);
-  ctx.fillStyle='#0d0f14';ctx.beginPath();ctx.arc(trailerX+46,gy+2,9,0,7);ctx.fill();
-  ctx.fillStyle='#5b616b';ctx.fillRect(floorEdge-4,gy-3,trailerX-floorEdge+8,6);
-  var chocked=tt>1.6, ccx=trailerX+46-14;
+  var gy=H-62,per=8,tt=t%per,floorEdge=W*0.44,trailerX=floorEdge+18;
+  // warehouse slab and dock face
+  ctx.fillStyle='#1b1f27';ctx.fillRect(0,gy,floorEdge,38);
+  ctx.fillStyle='#2b303b';ctx.fillRect(0,gy,floorEdge,3);
+  ctx.fillStyle='#ffb020';for(var hz=0;hz<floorEdge;hz+=14){ctx.fillRect(hz,gy+6,7,3);}   // hazard edge stripe on the dock face
+  ctx.fillStyle='#10131a';ctx.fillRect(floorEdge-6,gy+3,6,35);                        // dock bumper
+  // trailer: bed at floor height, open rear, wheels under the bed near the far end
+  var bedEnd=W+4, roofY=gy-78;
+  ctx.fillStyle='#262b35';ctx.fillRect(trailerX,gy,bedEnd-trailerX,6);                     // bed deck
+  ctx.strokeStyle='#3a4150';ctx.lineWidth=2;ctx.strokeRect(trailerX,roofY,bedEnd-trailerX,gy-roofY); // body outline
+  ctx.fillStyle='rgba(58,65,80,.18)';ctx.fillRect(trailerX,roofY,bedEnd-trailerX,gy-roofY);
+  ctx.clearRect(trailerX-2,roofY+2,3,gy-roofY-4);                                             // open rear
+  ctx.fillStyle='#1b1f27';ctx.fillRect(trailerX,gy+6,bedEnd-trailerX,10);                   // frame rail
+  var wx=trailerX+92;
+  ctx.fillStyle='#0d0f14';ctx.beginPath();ctx.arc(wx,gy+24,11,0,7);ctx.arc(wx+26,gy+24,11,0,7);ctx.fill();
+  ctx.fillStyle='#3a4150';ctx.beginPath();ctx.arc(wx,gy+24,3.5,0,7);ctx.arc(wx+26,gy+24,3.5,0,7);ctx.fill();
+  ctx.fillStyle='#2b303b';ctx.fillRect(floorEdge-6,gy+34,W,2);                               // ground under the trailer
+  // dock plate bridging the gap
+  var plateDown=tt>1.6;
+  ctx.fillStyle='#5b616b';
+  if(plateDown){ctx.fillRect(floorEdge-10,gy-2,trailerX-floorEdge+22,5);}
+  else{ctx.save();ctx.translate(floorEdge-10,gy-2);ctx.rotate(-0.6);ctx.fillRect(0,0,trailerX-floorEdge+22,5);ctx.restore();}
+  // chock at the rear wheel
+  var chocked=tt>1.6, ccx=wx-12;
   ctx.fillStyle=chocked?'#2fbf71':'#e63a2e';
-  ctx.beginPath();ctx.moveTo(ccx,gy);ctx.lineTo(ccx-11,gy+3);ctx.lineTo(ccx,gy+3);ctx.closePath();ctx.fill();
+  ctx.beginPath();ctx.moveTo(ccx,gy+35);ctx.lineTo(ccx-12,gy+35);ctx.lineTo(ccx,gy+24);ctx.closePath();ctx.fill();
   var bx,msg;
-  if(tt<1.6){bx=W*0.06;msg='Chock the wheels / set the dock lock';}
-  else if(tt<2.4){bx=W*0.06;msg='Plate seated, chock set';}
-  else if(tt<5.2){var k=eo((tt-2.4)/2.8);bx=W*0.06+k*(trailerX+34-W*0.06);msg='Cross slow and square';}
-  else{bx=trailerX+34;msg='On the trailer, every edge known';}
+  if(tt<1.6){bx=W*0.04;msg='Chock the wheels, set the dock lock, lower the plate';}
+  else if(tt<2.6){bx=W*0.04;msg='Plate seated, chock set: now it is safe to cross';}
+  else if(tt<6.0){var k=eo((tt-2.6)/3.4);bx=W*0.04+k*(trailerX+36-W*0.04);msg='Cross slow and square, forks low';}
+  else{bx=trailerX+36;msg='On the trailer, every edge known';}
   drawSideFork(ctx,bx,gy,12,-0.1,false);
   ctx.textAlign='left';ctx.font='700 12px ui-monospace,monospace';
   ctx.fillStyle=chocked?'#2fbf71':'#e63a2e';ctx.fillText(chocked?'SECURED':'NOT SECURED',12,22);
+  ctx.fillStyle='#8b929e';ctx.font='600 9px ui-monospace,monospace';ctx.textAlign='left';ctx.fillText('DOCK',8,gy+28);ctx.fillText('TRAILER',trailerX+6,roofY+12);
   cap(ctx,W,H,msg);
 }
-function initDockAnim(){animCanvas('dockCv',160,dockDraw);}
+function initDockAnim(){animCanvas('dockCv',196,dockDraw);}
 function dockAnimHTML(){return '<div class="explain"><div class="ecap"><span>Dock crossing</span><span>side view \u00B7 looping</span></div><canvas id="dockCv"></canvas></div>';}
 
 /* ---------- icons ---------- */
@@ -1500,13 +1528,13 @@ var BASE_QUIZ=[
   a:["Sound the horn and go","Confirm the trailer is chocked or the dock lock is set, and the plate is seated","Lower the forks to the floor"],c:1,
   why:"An unsecured trailer can roll or tip and drop you and the truck off the dock. Chock the wheels or engage the dock lock, and check the dock plate, before you drive on."},
  {q:"You've finished every module in this app. Can you start operating the truck?",
-  a:["Yes, training is complete","No \u2014 hands-on training and a workplace evaluation come next","Only if a coworker says it's fine"],c:1,
+  a:["Yes, training is complete","No. Hands-on training and a workplace evaluation come next","Only if a coworker says it's fine"],c:1,
   why:"Formal instruction is one of three required parts. Take your completion record to your trainer for the hands-on portion and evaluation."},
  {q:"A lift truck's stable base is shaped like a...",
   a:["Rectangle, like a car","Triangle","Circle"],c:1,
   why:"The rear axle pivots at its center, so the stable base is a triangle: two front wheels and the rear pivot point."},
  {q:"The load looks heavy but the forks lifted it fine. What do you do?",
-  a:["Drive it \u2014 if it lifted, it's safe","Check the load's weight against the data plate capacity","Add counterweight to be safe"],c:1,
+  a:["Drive it. If it lifted, it's safe","Check the load's weight against the data plate capacity","Add counterweight to be safe"],c:1,
   why:"A truck lifts right up to the point it tips. Verify against rated capacity at the stated load center - never guess."},
  {q:"How should you carry a load while traveling?",
   a:["Raised high for visibility","Low, 4\u20136 inches off the floor","At whatever height feels natural"],c:1,
@@ -1524,7 +1552,7 @@ var BASE_QUIZ=[
   a:["When they're in a marked walkway","Always","Only if they make eye contact first"],c:1,
   why:"Pedestrians always have the right of way. Horn, eye contact, and walking pace around people - and never assume they've seen you."},
  {q:"Empty trucks...",
-  a:["Cannot tip over","Can still tip \u2014 the center of gravity sits farther back","Corner fine at full speed"],c:1,
+  a:["Cannot tip over","Can still tip. The center of gravity sits farther back","Corner fine at full speed"],c:1,
   why:"Without a load the CG shifts rearward; a fast corner can still roll the truck."},
  {q:"You're leaving the truck to grab lunch, 40 feet away. You must...",
   a:["Leave it idling, you'll be quick","Forks down, neutral, brake set, power off, key out","Just set the brake"],c:1,
@@ -1553,7 +1581,7 @@ var TYPE_QUIZ={
    a:["One in, one out for quick exits","Both fully inside the operator compartment","Wherever balance feels best"],c:1,
    why:"A foot outside the chassis gets crushed against racking. Both feet stay in, dead-man pedal down."},
   {q:"On many stand-up trucks with an open back, the trained tip-over response is...",
-   a:["Same as sit-down: stay in and brace","Step back and off, away from the fall \u2014 as drilled for your model","Climb the mast"],c:1,
+   a:["Same as sit-down: stay in and brace","Step back and off, away from the fall, as drilled for your model","Climb the mast"],c:1,
    why:"Open-back stand-up trucks often train a step-off exit - the opposite of sit-down rules. Your hands-on trainer drills which applies to your model."}],
  pallet:[
   {q:"Walking your pallet jack, you should be positioned...",
@@ -1606,7 +1634,7 @@ function drawResult(){
    +'<div class="eyebrow">Knowledge check</div>'
    +'<div class="big '+(pass?'pass':'fail')+'">'+pct+'%</div>'
    +'<p style="color:#cbd0d9;font-size:15px;margin:4px 0 2px">'+quizState.score+' of '+QUIZ.length+' correct</p>'
-   +'<p style="color:'+(pass?'#2fbf71':'#ffb020')+';font-weight:700;margin:0 0 4px">'+(pass?'Passed the knowledge check':'Not passed yet \u2014 review and retry')+'</p>'
+   +'<p style="color:'+(pass?'#2fbf71':'#ffb020')+';font-weight:700;margin:0 0 4px">'+(pass?'Passed the knowledge check':'Not passed yet. Review and retry')+'</p>'
    +wrongList
    +'<div class="cta" style="margin:20px 0 0"><button class="btn ghost" onclick="openModule(\'quiz\')">Retake</button><button class="btn" onclick="goHome()">Back to deck</button></div>'
    +'</div>';
@@ -1620,7 +1648,7 @@ function allDone(){
   return m && store.progress['quiz'];
 }
 function checkComplete(){
-  if(allDone()){ if(!store.completedAt){store.completedAt=Date.now();toast('Training complete \u2014 saved to this iPad');} archiveRecord(); save(); }
+  if(allDone()){ if(!store.completedAt){store.completedAt=Date.now();toast('Training complete. Saved to this iPad');} archiveRecord(); save(); }
 }
 function openCert(){
   enterSection();
@@ -1726,11 +1754,11 @@ function renderPrint(id){
   if(document.getElementById('evName'))readEvalForm(id);
   var rec=recById(id); if(!rec)return; var ev=rec.eval||{}, idq=esc(id).replace(/'/g,"\\'");
   var fd=new Date(rec.formalDate).toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'});
-  var ed=ev.date?new Date(ev.date+'T00:00').toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'}):'\u2014';
-  var modRows=rec.modules.map(function(m){return '<div class="row"><span>'+esc(m.t)+'</span><b class="ok">'+(m.done?'DONE':'\u2014')+'</b></div>';}).join('')
+  var ed=ev.date?new Date(ev.date+'T00:00').toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'}):'not yet';
+  var modRows=rec.modules.map(function(m){return '<div class="row"><span>'+esc(m.t)+'</span><b class="ok">'+(m.done?'DONE':'-')+'</b></div>';}).join('')
     +'<div class="row"><span>Knowledge check</span><b class="ok">'+Math.round(rec.quizBest/rec.quizLen*100)+'%</b></div>';
   var evRows=(ev.items)?evalSections(rec).map(function(s){return s.items.map(function(it){var v=ev.items[it[0]];
-      return '<div class="row"><span>'+it[1]+'</span><b class="'+(v==='ok'?'ok':(v==='no'?'no':''))+'">'+(v==='ok'?'Competent':(v==='no'?'Needs work':'\u2014'))+'</b></div>';}).join('');}).join('')
+      return '<div class="row"><span>'+it[1]+'</span><b class="'+(v==='ok'?'ok':(v==='no'?'no':''))+'">'+(v==='ok'?'Competent':(v==='no'?'Needs work':'-'))+'</b></div>';}).join('');}).join('')
     :'<p style="color:#9aa1ad">No hands-on evaluation recorded yet.</p>';
   var resultTxt=ev.result==='ok'?'COMPETENT TO OPERATE':(ev.result==='no'?'NEEDS MORE PRACTICE':'Not yet evaluated');
   document.getElementById('printBody').innerHTML=
@@ -1757,12 +1785,12 @@ function renderSources(){
    '<div class="trwrap"><div class="trhead"><div class="eyebrow">What this is built from</div><h2>Sources &amp; how to use this</h2></div>'
    +'<div class="notice" style="margin:0 0 14px"><b>Read this first</b><p>LiftSafe is a <b>study aid for the classroom (formal-instruction) portion</b> of powered-industrial-truck operator training. It is <b>not a certification</b>. Finishing it does not by itself make anyone a qualified operator. Certification requires hands-on practical training, a workplace performance evaluation, and site-specific instruction by the employer.</p></div>'
    +'<div class="evsec"><h3>Primary regulation</h3>'
-   +srcRow('OSHA 29 CFR 1910.178','Powered Industrial Trucks \u2014 the federal standard for forklift design, use, training and evaluation.')
+   +srcRow('OSHA 29 CFR 1910.178','Powered Industrial Trucks: the federal standard for forklift design, use, training and evaluation.')
    +srcRow('OSHA 29 CFR 1910.110','Storage and handling of liquefied petroleum gas (propane).')+'</div>'
    +'<div class="evsec"><h3>Federal safety research</h3>'
    +srcRow('NIOSH Publication 2001-109','Preventing injuries and deaths of workers who operate or work near forklifts. Public-domain source of the tip-over survival guidance.')+'</div>'
    +'<div class="evsec"><h3>Consensus standard</h3>'
-   +srcRow('ANSI/ITSDF B56.1','Safety standard for low- and high-lift trucks \u2014 design, operation, and maintenance.')+'</div>'
+   +srcRow('ANSI/ITSDF B56.1','Safety standard for low- and high-lift trucks: design, operation, and maintenance.')+'</div>'
    +'<div class="evsec"><h3>Also referenced</h3>'
    +srcRow('Industrial Truck Association','The seven-class system for powered industrial trucks.')
    +srcRow('Manufacturer operator manual','The authority for your specific truck\u2019s controls, capacity, and maintenance.')+'</div>'
@@ -1850,7 +1878,7 @@ function syncProgress(){
   arc.setAttribute('stroke-dashoffset',(circ*(1-done/total)).toFixed(1));
   document.getElementById('ringTxt').textContent=Math.round(done/total*100)+'%';
   document.getElementById('progLabel').textContent=done+' of '+total+' modules complete';
-  document.getElementById('progWho').textContent=allDone()?'All done \u2014 open your completion record below.':'Finish all modules, then pass the knowledge check.';
+  document.getElementById('progWho').textContent=allDone()?'All done. Open your completion record below.':'Finish all modules, then pass the knowledge check.';
   if(done===total)arc.setAttribute('stroke','#2fbf71');
 }
 
@@ -1883,7 +1911,7 @@ function openSelect(){enterSection();renderSelect();var bb=document.getElementBy
 
 /* toast + version */
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('show');},2000);}
-function showVer(){toast('v3.0.5 loaded');}
+function showVer(){toast('v3.1.0 loaded');}
 
 /* boot */
 /* service worker registration removed for site embed (single-file, no sw.js at site root) */
