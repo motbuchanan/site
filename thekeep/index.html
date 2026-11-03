@@ -35,7 +35,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
 #fps{position:absolute;bottom:calc(10px + env(safe-area-inset-bottom));left:10px;max-width:calc(100% - 172px);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font:600 10px var(--mb-mono);letter-spacing:.04em;color:var(--mb-soft);background:var(--mb-glass);border:1px solid var(--mb-line);padding:4px 9px;border-radius:999px}
 #toast{position:absolute;left:50%;top:64px;transform:translateX(-50%);background:rgba(16,21,28,.92);border:1px solid var(--mb-line);color:var(--mb-ink);padding:9px 16px;border-radius:18px;font:600 11px var(--mb-mono);opacity:0;transition:opacity .25s;white-space:normal;text-align:center;max-width:calc(100vw - 32px);width:max-content;z-index:950}
 #help{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);pointer-events:auto}
-#help.hidden,#log.hidden,#seed.hidden,#dials.hidden,#menu.hidden,#about.hidden,#leave.hidden{display:none!important}
+#help.hidden,#log.hidden,#seed.hidden,#dials.hidden,#menu.hidden,#about.hidden,#leave.hidden,#journal.hidden{display:none!important}
 .btn.menu{font:700 12px var(--mb-mono);letter-spacing:.04em;padding:9px 14px;border-radius:8px}
 .shots{display:flex;gap:8px;overflow-x:auto;margin:10px 0;padding-bottom:4px;-webkit-overflow-scrolling:touch}
 .shots img{height:116px;border-radius:8px;flex:0 0 auto;border:1px solid var(--mb-line);background:#000}
@@ -53,6 +53,25 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
 .card .go{margin-top:12px;width:100%;padding:13px 18px;font:800 15px var(--mb-ui);background:var(--mb-teal);color:#06110f;border:0}
 #chat{position:absolute;right:10px;bottom:calc(46px + env(safe-area-inset-bottom));width:min(360px,calc(50% - 16px));max-height:min(60vh,max(34vh,210px));overflow:hidden;display:flex;flex-direction:column;background:rgba(16,21,28,.92);border:1px solid var(--mb-line);border-radius:16px;padding:12px 14px 12px;pointer-events:auto;z-index:4;color:var(--mb-ink);backdrop-filter:blur(8px);transition:opacity .18s;touch-action:manipulation}
 #chat.hidden{display:none}
+.jcard{width:min(420px,calc(100vw - 24px));max-width:none!important;display:flex;flex-direction:column;padding:16px 16px 14px!important}
+.jcard h1{margin:0 0 10px}
+.jtabs{display:flex;gap:4px;margin:0 0 12px;flex:none}
+.jtabs button{flex:1;min-width:0;min-height:44px;padding:8px 2px;font:600 13px var(--mb-ui);background:transparent;color:var(--mb-soft);border:1px solid var(--mb-line);border-radius:10px}
+.jtabs button[aria-selected="true"]{color:#0b0f14;background:var(--mb-teal);border-color:var(--mb-teal)}
+.jbody{overflow:auto;flex:1 1 auto;min-height:120px}
+.jbody ul{list-style:none;margin:0;padding:0}
+.jbody li{padding:9px 0 9px 14px;border-bottom:1px solid rgba(255,255,255,.06);position:relative;line-height:1.4}
+.jbody li:before{content:'';position:absolute;left:0;top:16px;width:6px;height:6px;border-radius:50%;background:var(--mb-teal)}
+.jbody li.done{color:var(--mb-dim)}.jbody li.done:before{background:var(--mb-dim)}
+.jbody h3{font:700 11px var(--mb-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mb-dim);margin:14px 0 2px}
+.jbody .jempty{color:var(--mb-soft);margin:6px 0}
+.jv{width:100%;text-align:left;display:block;background:rgba(255,255,255,.03);border:1px solid var(--mb-line);border-radius:12px;color:var(--mb-ink);padding:10px 12px;margin:0 0 8px;min-height:44px;font:600 14px var(--mb-ui)}
+.jv small{display:block;font:500 12px var(--mb-ui);color:var(--mb-dim);margin-top:2px}
+.jv .tag{font:700 10px var(--mb-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mb-teal);margin-left:6px}
+.jvd{margin:-4px 0 10px;padding:8px 12px 10px;border-left:2px solid var(--mb-line);font-size:13px;color:var(--mb-soft)}
+.jvd .row{display:flex;gap:8px;margin-top:8px}.jvd .row .btn{flex:1;min-height:44px;margin:0}
+.jme p{margin:6px 0}.jme b{color:var(--mb-ink)}
+.jnote{font-size:12.5px;color:#f5b27a;margin:8px 0 0}
 #lvWays #lvChoose{flex:1 1 100%;margin:0}
 #leaveCard .lvwalk{font:600 15px var(--mb-mono);color:var(--mb-teal);text-align:center;margin:18px 0}
 @media (max-height:500px){ #leaveCard .lvp{display:none} #lvWays .btn{flex:1 1 0!important;min-width:0;padding-left:6px;padding-right:6px;font-size:14px} #leaveCard h1{margin:0 0 6px} }
@@ -62,6 +81,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
 #chat .ch-who b{color:var(--mb-teal);display:block;font:800 15px var(--mb-ui);letter-spacing:-.01em;text-transform:none;margin-bottom:1px}
 #chLine{flex:1 1 auto;min-height:1.5em;overflow:auto;font:500 15px/1.42 var(--mb-ui);margin:0 0 10px;overflow-wrap:break-word;hyphens:none}
 #chat .ch-btns{flex:none;display:flex;gap:6px;align-items:center}
+#chat .ch-opts{flex:none;display:flex;flex-direction:column;gap:6px;margin:0 0 8px}
+#chat .ch-opts:empty{display:none}
+#chat.asking{max-height:min(86vh,560px)}
+#chat.asking #chLine{flex:none;overflow:visible}
+#chat .ch-opts .btn{width:100%;white-space:normal;text-align:left;min-height:44px;padding:9px 12px;font:600 13.5px/1.25 var(--mb-ui);border-color:rgba(76,240,224,.45);color:#e9fffc}
+#chat .ch-opts .btn:before{content:'\203A  ';color:var(--mb-teal)}
 #chat .ch-btns .btn{flex:1;padding:10px 4px;min-height:44px;font-size:13px;min-width:0;white-space:nowrap}
 #chMore{background:var(--mb-teal);color:#06110f;border:0}
 #chat .ch-dots{flex:none;font:600 10px var(--mb-mono);color:var(--mb-dim);letter-spacing:.1em;margin:-4px 0 8px}
@@ -86,8 +111,26 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
 #intro button{font-family:'Archivo',sans-serif;cursor:pointer;-webkit-tap-highlight-color:transparent}
 #intro .choices button{font:600 17px/1.15 'Archivo',sans-serif;padding:16px 22px;border-radius:12px;letter-spacing:.01em;min-height:52px}
 #intro .pri{background:#f59847;color:#1e1209;border:1px solid #f59847}
-#inStory{background:transparent;color:rgba(238,220,188,.55);border:1px solid rgba(238,220,188,.18);display:flex;flex-direction:column;align-items:center;gap:4px}
-#inStory .soon{font:500 11px/1 'Archivo',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#4cf0e0;opacity:.8}
+#intro .choices button{display:flex;flex-direction:column;align-items:center;gap:5px}
+#intro .choices button[hidden]{display:none}
+#intro .choices button:not(.pri){background:transparent;color:#eedcbc;border:1px solid rgba(238,220,188,.28)}
+#intro .choices .soon{font:500 12px/1.2 'Archivo',sans-serif;letter-spacing:.01em;opacity:.72}
+#inNew{justify-content:flex-start!important;gap:18px!important}
+#inNew h2{font:600 clamp(28px,8vw,40px)/1.1 'Cormorant Garamond',serif;color:#eedcbc;margin:10px 0 0;text-align:center;letter-spacing:.02em}
+#intro .nfield{width:min(420px,100%);display:flex;flex-direction:column;gap:9px}
+#intro .nfield label,#intro .nfield .lbl{font:600 14px/1.2 'Archivo',sans-serif;color:#c9b79c}
+#intro .nrow{display:flex;gap:8px}
+#inName{flex:1 1 auto;min-width:0;font:600 18px/1.2 'Archivo',sans-serif;color:#eedcbc;background:rgba(255,255,255,.05);border:1px solid rgba(238,220,188,.25);border-radius:12px;padding:12px 14px;min-height:50px}
+#inName:focus{outline:2px solid #4cf0e0;outline-offset:2px}
+#intro .ghost{flex:0 0 auto;background:transparent;color:#eedcbc;border:1px solid rgba(238,220,188,.28);border-radius:12px;font:600 15px/1 'Archivo',sans-serif;padding:0 16px;min-height:50px}
+#intro .chips{display:flex;flex-wrap:wrap;gap:8px}
+#intro .chip{background:rgba(255,255,255,.04);color:#eedcbc;border:1px solid rgba(238,220,188,.25);border-radius:999px;font:600 15px/1 'Archivo',sans-serif;padding:0 16px;min-height:44px}
+#intro .chip[aria-pressed="true"]{background:rgba(76,240,224,.14);border-color:#4cf0e0;color:#e9fffc}
+#intro .chip.sur{border-style:dashed}
+#inNew .note{font:400 13.5px/1.4 'Archivo',sans-serif;color:#9a8a78;margin:0}
+#inReplace{color:#f5b27a!important;text-align:center;max-width:420px}
+#inNBack{background:transparent;color:#eedcbc;border:1px solid rgba(238,220,188,.25)}
+#intro.gone #inPage,#intro.gone #inPage *{pointer-events:none!important}
 #intro .links{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
 #intro .links button{background:none;border:0;color:rgba(154,138,120,.85);font:500 14px/1 'Archivo',sans-serif;padding:12px 14px;min-height:44px}
 #intro button:focus-visible,#intro .vcard:focus-visible{outline:2px solid #4cf0e0;outline-offset:3px}
@@ -128,10 +171,21 @@ html.fromshelf #inPage #inViews{padding-top:calc(58px + env(safe-area-inset-top)
    <h1>The Keep</h1>
    <p class="sub">A living valley, drawn in letters.</p>
    <div class="choices">
-    <button id="inWander" class="pri" type="button">Wander</button>
-    <button id="inStory" type="button" aria-disabled="true">Story<span class="soon">Coming next</span></button>
+    <button id="inCont" class="pri" type="button" hidden><span>Continue</span><span class="soon" id="inContWho"></span></button>
+    <button id="inStory" class="pri" type="button"><span id="inStoryT">Story</span><span class="soon" id="inStoryS">Start in your own home valley</span></button>
+    <button id="inWander" type="button"><span>Wander</span><span class="soon">Any valley, no name</span></button>
    </div>
    <div class="links"><button id="inReplay" type="button">Replay intro</button><button id="inAbout" type="button">About</button></div>
+  </section>
+  <section id="inNew" hidden>
+   <h2>Who are you?</h2>
+   <p class="note" id="inReplace" hidden></p>
+   <div class="nfield"><label for="inName">Your name</label>
+    <div class="nrow"><input id="inName" type="text" maxlength="18" autocomplete="off" autocapitalize="words" spellcheck="false" enterkeyhint="go" value="Traveler"><button id="inRoll" class="ghost" type="button">Another</button></div></div>
+   <div class="nfield"><span class="lbl" id="inHomeLbl">Where you grew up has plenty of</span>
+    <div class="chips" role="group" aria-labelledby="inHomeLbl"><button class="chip" type="button" data-c="0" aria-pressed="false">Forest</button><button class="chip" type="button" data-c="1" aria-pressed="false">Water</button><button class="chip" type="button" data-c="2" aria-pressed="false">Ruins</button><button class="chip" type="button" data-c="3" aria-pressed="false">Wildlife</button><button class="chip sur" type="button" id="inSurprise">Surprise me</button></div>
+    <p class="note">Pick any, or none. Your parents keep the keep there.</p></div>
+   <div class="vbtns"><button id="inNBack" type="button">Back</button><button id="inBegin" class="pri" type="button">Begin</button></div>
   </section>
   <section id="inViews" hidden>
    <h2>How do you want to see the world?</h2>
@@ -147,13 +201,14 @@ html.fromshelf #inPage #inViews{padding-top:calc(58px + env(safe-area-inset-top)
 <div id="hud">
  <div id="bar">
   <div class="bar-sp"></div>
+  <button class="btn menu" id="bJournal" type="button">journal</button>
   <button class="btn menu" id="bMenu">☰ menu</button>
  </div>
  <div id="stick"><div id="knob"></div></div>
  <div id="fps"></div>
- <button class="mb-ver" id="mbVer" type="button">v0.25.1 &middot; Nov 3</button>
+ <button class="mb-ver" id="mbVer" type="button">v0.28.0 &middot; Nov 3</button>
  <div id="toast"></div>
- <div id="chat" class="hidden" role="dialog" aria-live="polite"><div class="ch-who"><b id="chName"></b><span id="chRole"></span></div><p id="chLine"></p><div class="ch-dots" id="chDots"></div><div class="ch-btns"><button class="btn" id="chMore" type="button">more</button><button class="btn" id="chBye" type="button">goodbye</button></div></div>
+ <div id="chat" class="hidden" role="dialog" aria-live="polite"><div class="ch-who"><b id="chName"></b><span id="chRole"></span></div><p id="chLine"></p><div class="ch-dots" id="chDots"></div><div class="ch-opts" id="chOpts"></div><div class="ch-btns"><button class="btn" id="chMore" type="button">more</button><button class="btn" id="chBye" type="button">goodbye</button></div></div>
  <div id="help" class="hidden"><div class="card">
   <h1>How to play</h1>
   <p><b>Walk and steer:</b> drag on the left half. Push up to walk, tilt left or right to turn.<br><b>Look:</b> drag the right half. (Prefer stepping sideways? Turn it off in the dials, under Controls.)<br><span style="color:var(--mb-dim)">Desktop: WASD + mouse, Shift to run.</span></p>
@@ -178,8 +233,12 @@ html.fromshelf #inPage #inViews{padding-top:calc(58px + env(safe-area-inset-top)
    <img src="12-gate-at-night.jpg" alt="a brazier at the gate arch" loading="lazy">
    <img src="11-moonlit.jpg" alt="the keep by moonlight" loading="lazy">
   </div>
-  <p><b>Coming next: Story.</b> You'll start in your own home valley, with your own name, and the roads will lead you out into the wider world.</p>
-  <p class="fsize">The whole game is one HTML file, plus a file for each 3D view. Right now: <b id="fsize">~438 KB</b>. Smaller than a single phone photo.</p>
+  <p><b>What they call you.</b> What you choose is remembered. Enough of one kind earns you a nickname, then a title, and not all of them are kind. Over the hills, people you have never met tell stories about you, a little wrong. And the old stones and the old folk remember the land as it was: the Ring-builders, the Hollow Kings, the Long Quarrel. Your journal keeps every piece you find.</p>
+  <p><b>The one who left.</b> Somebody at the keep has a brother, sister, son or daughter who walked away years ago. In Story it is someone at your home keep. Somebody on the road has seen them. Find them, decide what to do, and go back and tell the one who asked.</p>
+  <p><b>Every valley has its troubles.</b> A hen that wandered over the hills, a quarrel over a fence, a pair of sweethearts too shy to speak, a light in the old stones at night, a name cut in a stone that belongs to a family somewhere else. Every valley grows its own from its seed, and what you choose changes what people say.</p>
+  <p><b>Talk and choose.</b> When it matters, people ask you things, and you answer with the buttons on the chat card. The journal (top of the screen) keeps what you were asked, every valley you have been to, and takes you back to any of them.</p>
+  <p><b>Story or Wander.</b> Story starts you at home: give yourself a name, say what your valley has plenty of, and wake by the gate of the keep your parents keep. Everyone there knows you. Wander drops you into any valley, as a stranger. Your story is saved on this device, and Continue picks it up where you left it.</p>
+  <p class="fsize">The whole game is one HTML file, plus a file for each 3D view. Right now: <b id="fsize">~541 KB</b>. Smaller than a single phone photo.</p>
   <p><b>Why I built it.</b> I build things on a phone, directing AI the way I would direct a camera. I saw a clip of a tiny 3D world made of nothing but text and wanted to see if I could grow one that was actually alive, and keep growing it in the open instead of ever calling it done.</p>
   <p><b>What I learned.</b> How far you can get with almost nothing. One idea, a ray walking a height map, turned into characters, with a small world of animals living on top. Every version taught me one concrete thing: how to make a wall read as solid, how to keep the wolves from starving the world empty, how to make a forest look like real woods.</p>
   <p style="color:var(--mb-dim);font-size:13px"><b style="color:var(--mb-soft)">Walk:</b> drag the left half of the screen (tilt to turn). <b style="color:var(--mb-soft)">Look:</b> drag the right half. Wade into the water to swim. Tap ☰ menu for a new world, the dials, and the time of day. Walk under the gate arch and find the door under the tower stair.</p>
@@ -202,6 +261,7 @@ html.fromshelf #inPage #inViews{padding-top:calc(58px + env(safe-area-inset-top)
  <div id="leave" class="hidden" style="position:absolute;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.55);pointer-events:auto"><div class="card" id="leaveCard"></div></div>
  <div id="seed" class="hidden" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);pointer-events:auto"><div class="card" id="seedCard"></div></div>
  <div id="log" class="hidden" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);pointer-events:auto"><div class="card" id="logCard"></div></div>
+ <div id="journal" class="hidden" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);pointer-events:auto"><div class="card jcard" id="jCard" role="dialog" aria-label="Journal"></div></div>
  <div id="dials" class="hidden" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);pointer-events:auto"><div class="card" id="dialsCard"></div></div>
 </div>
 <script>
@@ -1089,16 +1149,17 @@ function play(short){ SHORT=!!short&&!RM; PLAYSHORT=!!short; END=RM?4.6:(SHORT?1
   if(!raf) raf=requestAnimationFrame(frame); }
 var SKIPAT=-1e9;   // a tap that skips the scene must not also land on the page that appears under it
 function skip(){ if(done||!ACTIVE) return; SKIPAT=performance.now(); start=performance.now()-END*1000; }
-function fresh(){ return performance.now()-SKIPAT<350; }
+function fresh(){ var n=performance.now(); return n-SKIPAT<350||n-PANELAT<350; }   // a tap that changed the panel must not also land on the new one
 function pageLive(){ page.style.opacity='1'; page.classList.add('live'); page.setAttribute('aria-hidden','false'); skipEl.style.opacity=0;
-  setTimeout(function(){ var b=document.getElementById('inWander'); if(b&&ACTIVE&&curPanel==='main'){ try{ b.focus({preventScroll:true}); }catch(e){} } },60); }
+  paintMain(); setTimeout(function(){ var c=document.getElementById('inCont'), b=c&&!c.hidden?c:document.getElementById('inStory'); if(b&&ACTIVE&&curPanel==='main'){ try{ b.focus({preventScroll:true}); }catch(e){} } },60); }
 fxc.addEventListener('pointerdown',skip);
 // while the hearth is up it owns the keyboard: nothing reaches the world underneath
 function aboutUp(){ var a=document.getElementById('about'); return !!(a&&!a.classList.contains('hidden')); }
 function onKey(e){ if(!ACTIVE) return; if(document.activeElement&&document.activeElement.id==='shelfBtn'&&(e.key==='Enter'||e.key===' ')) return;
   if(aboutUp()){ if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); document.getElementById('about').classList.add('hidden'); var ab=document.getElementById('inAbout'); if(ab){ try{ ab.focus({preventScroll:true}); }catch(x){} } } return; }   // the about card has the keyboard while it is open
   if(!done){ if(e.key==='Enter'||e.key===' '||e.key==='Escape'){ e.preventDefault(); skip(); } e.stopPropagation(); return; }
-  if(e.key==='Escape'){ e.preventDefault(); if(curPanel==='views') showPanel('main'); }
+  if(e.key==='Escape'){ e.preventDefault(); if(curPanel==='views') { showPanel(PEND&&PEND.kind==='new'?'new':'main'); focusFor(curPanel); } else if(curPanel==='new'){ showPanel('main'); focusFor('main'); } }
+  if(e.key==='Enter'&&curPanel==='new'&&document.activeElement&&document.activeElement.id==='inName'){ e.preventDefault(); e.stopPropagation(); beginStory(); return; }
   if(e.key==='Tab'||e.key==='Enter'||e.key===' '||e.key==='Escape') { e.stopPropagation(); return; }
   e.stopPropagation(); }
 window.addEventListener('keydown',onKey,true); window.addEventListener('keyup',function(e){ if(ACTIVE) e.stopPropagation(); },true);
@@ -1112,23 +1173,57 @@ function recall(k){ var v=null; try{ v=localStorage.getItem(k); }catch(e){} if(v
 
 // panels: the opening page and the view cards
 var curPanel='main';
-function showPanel(p){ curPanel=p; document.getElementById('inMain').hidden=(p!=='main'); document.getElementById('inViews').hidden=(p!=='views'); }
+var PANELAT=-1e9; function showPanel(p){ if(p!==curPanel) PANELAT=performance.now(); curPanel=p; document.getElementById('inMain').hidden=(p!=='main'); document.getElementById('inViews').hidden=(p!=='views'); document.getElementById('inNew').hidden=(p!=='new'); if(p==='main') paintMain(); }
 var VIEWSEL=0;
 function paintViews(){ var cs=document.querySelectorAll('#inCards .vcard'); for(var i=0;i<cs.length;i++){ var on=(+cs[i].getAttribute('data-r')===VIEWSEL); cs[i].classList.toggle('on',on); cs[i].setAttribute('aria-checked',on?'true':'false'); } }
 function finishNow(){ if(done) return; if(raf){ cancelAnimationFrame(raf); raf=0; } render(END); done=true; pageLive(); }
-function wander(){ if(!done){ if(!page.classList.contains('live')) return; finishNow(); }
-  if(recall('keep_view_chosen')==='1'||SEEN_VIEWS){ close(); return; }
+var PEND=null, CHIPS=[0,0,0,0], NAMEV='', REPL=null, REPL_OK=false;
+function focusFor(p){ setTimeout(function(){ if(!ACTIVE||curPanel!==p) return; var b=null;
+  if(p==='main'){ var c=document.getElementById('inCont'); b=c&&!c.hidden?c:document.getElementById('inStory'); }
+  else if(p==='new') b=document.getElementById('inBegin'); else if(p==='views') b=document.querySelector('#inCards .vcard.on');
+  if(b){ try{ b.focus({preventScroll:true}); }catch(e){} } },40); }
+function paintMain(){ var info=null; try{ info=HOOKS.story?HOOKS.story():null; }catch(e){}
+  var c=document.getElementById('inCont'), st=document.getElementById('inStory');
+  c.hidden=!info; document.getElementById('inContWho').textContent=info?'as '+info.name:'';
+  st.classList.toggle('pri',!info); document.getElementById('inStoryT').textContent=info?'New story':'Story';
+  document.getElementById('inStoryS').textContent=info?'Start again somewhere new':'Start in your own home valley'; }
+function ready2go(){ if(!done){ if(!page.classList.contains('live')) return false; finishNow(); } return true; }
+function finish(){ if(!ACTIVE) return; var p=PEND; PEND=null; if(p&&p.kind!=='wander'&&HOOKS.begin){ try{ HOOKS.begin(p); }catch(e){} } close(); }
+function viewsOrGo(){ if(recall('keep_view_chosen')==='1'||SEEN_VIEWS){ finish(); return; }
+  VIEWSEL=HOOKS.render?HOOKS.render():0; paintViews(); showPanel('views');
+  setTimeout(function(){ var b=document.querySelector('#inCards .vcard.on'); if(b){ try{ b.focus({preventScroll:true}); }catch(e){} } },40); }
+function paintChips(){ var cs=document.querySelectorAll('#inNew .chip[data-c]'); for(var i=0;i<cs.length;i++) cs[i].setAttribute('aria-pressed',CHIPS[+cs[i].getAttribute('data-c')]?'true':'false'); }
+function openNew(){ if(!ready2go()) return; var info=null; try{ info=HOOKS.story?HOOKS.story():null; }catch(e){}
+  var nm=document.getElementById('inName'); if(!NAMEV) NAMEV='Traveler'; nm.value=NAMEV; paintChips();
+  var rp=document.getElementById('inReplace'); rp.hidden=!info; rp.textContent=info?'There is one story at a time. Beginning a new one ends '+info.name+'\'s.':'';
+  REPL=info; REPL_OK=false; document.getElementById('inBegin').textContent='Begin';
+  PEND={kind:'new'}; showPanel('new'); page.scrollTop=0;
+  setTimeout(function(){ var b=document.getElementById('inBegin'); if(b){ try{ b.focus({preventScroll:true}); }catch(e){} } },40); }
+function beginStory(){ var nm=document.getElementById('inName'); NAMEV=nm.value;
+  if(REPL&&!REPL_OK){ REPL_OK=true; var bb=document.getElementById('inBegin'); bb.textContent='Yes, start over'; page.scrollTop=0; try{ bb.focus({preventScroll:true}); }catch(e){} return; } PEND={kind:'new', name:nm.value, chips:CHIPS.slice()}; viewsOrGo(); }
+function contStory(){ if(!ready2go()) return; PEND={kind:'cont'}; finish(); }
+function wander(){ if(!ready2go()) return; PEND={kind:'wander'};
+  if(recall('keep_view_chosen')==='1'||SEEN_VIEWS){ finish(); return; }
   VIEWSEL=HOOKS.render?HOOKS.render():0; paintViews(); showPanel('views');
   setTimeout(function(){ var b=document.querySelector('#inCards .vcard.on'); if(b){ try{ b.focus({preventScroll:true}); }catch(e){} } },40); }
 var SEEN_VIEWS=false;
-function walkIn(){ store('keep_view_chosen','1'); SEEN_VIEWS=true; var r=VIEWSEL; if(HOOKS.setRender) HOOKS.setRender(r,true); close(); }
+function walkIn(){ store('keep_view_chosen','1'); SEEN_VIEWS=true; var r=VIEWSEL; if(HOOKS.setRender) HOOKS.setRender(r,true); finish(); }
 function toast(msg){ var t=document.getElementById('inToast'); t.textContent=msg; t.classList.add('on'); clearTimeout(toast.h); toast.h=setTimeout(function(){ t.classList.remove('on'); },1900); }
 function G(f){ return function(e){ if(fresh()) return; f(e); }; }
 document.getElementById('inWander').addEventListener('click',G(wander));
-document.getElementById('inStory').addEventListener('click',G(function(){ toast('Story is coming next: you will start in your own home valley.'); }));
+document.getElementById('inStory').addEventListener('click',G(openNew));
+document.getElementById('inCont').addEventListener('click',G(contStory));
+document.getElementById('inBegin').addEventListener('click',G(beginStory));
+document.getElementById('inNBack').addEventListener('click',G(function(){ NAMEV=document.getElementById('inName').value; PEND=null; showPanel('main'); focusFor('main'); }));
+document.getElementById('inRoll').addEventListener('click',G(function(){ var v='Wren'; try{ if(HOOKS.roll) v=HOOKS.roll(); }catch(e){} var nm=document.getElementById('inName'); if(v===nm.value){ try{ v=HOOKS.roll(); }catch(e){} } nm.value=v; NAMEV=v; }));
+document.getElementById('inName').addEventListener('input',function(){ NAMEV=this.value; });
+document.getElementById('inNew').addEventListener('click',function(e){ if(fresh()) return; var b=e.target.closest?e.target.closest('.chip'):null; if(!b) return;
+  if(b.id==='inSurprise'){ var any=0; for(var i=0;i<4;i++){ CHIPS[i]=Math.random()<0.45?1:0; any+=CHIPS[i]; } if(!any) CHIPS[(Math.random()*4)|0]=1; }
+  else { var k=+b.getAttribute('data-c'); CHIPS[k]=CHIPS[k]?0:1; }
+  paintChips(); });
 document.getElementById('inReplay').addEventListener('click',G(function(){ play(false); }));
 document.getElementById('inAbout').addEventListener('click',G(function(){ if(HOOKS.about) HOOKS.about(); }));
-document.getElementById('inBack').addEventListener('click',G(function(){ showPanel('main'); }));
+document.getElementById('inBack').addEventListener('click',G(function(){ showPanel(PEND&&PEND.kind==='new'?'new':'main'); focusFor(curPanel); }));
 document.getElementById('inWalk').addEventListener('click',G(walkIn));
 document.getElementById('inCards').addEventListener('click',function(e){ if(fresh()) return; var b=e.target.closest?e.target.closest('.vcard'):null; if(!b) return; VIEWSEL=+b.getAttribute('data-r'); paintViews(); });
 document.getElementById('inCards').addEventListener('dblclick',function(e){ var b=e.target.closest?e.target.closest('.vcard'):null; if(b) walkIn(); });
@@ -1210,9 +1305,14 @@ var SHELF={on:false,url:'https://motbuchanan.com/gameshelf/'};
   SHELF.place=place;
 })();
 
-const VERSION='The Keep v0.25.1 · Nov 3 2026';
-const VER_SHORT='v0.25.1 · Nov 3'; // what the badge shows; bump with VERSION
+const VERSION='The Keep v0.28.0 · Nov 3 2026';
+const VER_SHORT='v0.28.0 · Nov 3'; // what the badge shows; bump with VERSION
 const CHANGELOG=[
+ ['v0.28.0 · Nov 3 2026','Names, legend and lore. What you choose is counted: truths and fibs, kindnesses, secrets kept and promises broken, quarrels mended or stirred, lost things found. Enough of one kind earns a nickname (Hen-finder, Matchmaker, Fibber, Old Boots) and then a title (the Wayfinder, the Peacemaker, the Keeper of Secrets, and some less flattering). Away from home, people call you by the best of them; in Wander, until you earn one, by what you have done. In about one valley in four, someone tells a story about you, a little wrong, but never where it happened. And the land has its old lore: found at the ruins (circles, towers, arches, wells), from hermits and old folk, and on the road of the one who left. The Journal keeps it all.'],
+ ['v0.27.0 · Nov 3 2026','The one who left. Somebody at the keep has a brother, sister, son or daughter who walked away years ago, and they want to know they are all right. In Story it is someone at your home keep; in Wander about one valley in six has one. They live two or three valleys along the first road out, and the gatekeeper in a valley on the way has seen them pass. Find them, hear why they left, and choose: carry a message home, ask them to come home, or keep their secret. They ask you something back. Then tell the one who asked: the truth, a kind lie, or the message. If they agree to come home, they live at home from then on. Meet them before you are asked and they remember you.'],
+ ['v0.26.1 · Nov 3 2026','Every valley has its troubles. Any valley you reach, by road, by a random seed or by your journal, now grows one or two of its own from its seed: a farmer whose hen wandered over the hills or a shepherd whose lamb did, a farmer and a shepherd quarreling over their fence, a pair of sweethearts and one too shy to say so, a guard who sees a light in the old stones at night (go and look after dark), or a name cut in a stone that belongs to a family in the next valley. Some are done in one visit and some send you over the hills and back. Your choices change what people say afterward, and the journal keeps track of all of it.'],
+ ['v0.26.0 · Nov 3 2026','The journal and the first trip. People now ask you things that matter, and you answer with buttons on the chat card; walk away and the question waits for next time. A Journal button sits at the top: Threads (what you were asked, in your own words), Lore (empty for now), Valleys (every valley you have set foot in, who you met, and Travel there) and Me. Every road now leads to its own valley, and the road you came in by leads back. The leave card offers Over the hills to the next valley and Somewhere I have been. In Story the steward sends you on an errand, the gatekeeper explains the roads, and one of your parents asks you to carry a letter over the hills to an old friend. In Wander, stewards have errands too.'],
+ ['v0.25.2 · Nov 3 2026','Story. The opening page now offers Story beside Wander. Story asks your name (type one, or tap Another for a new one) and what your home valley has plenty of: forest, water, ruins, wildlife, or Surprise me. Then you wake by the gate of your home keep. Your name and your choices always grow the same valley. Your parents keep the keep there, two people who live only in your home valley, and everyone at home knows your name. Your story is saved on this device and Continue picks it up where you left it, in whatever valley you were in. Wander is unchanged and keeps its own place.'],
  ['v0.25.1 · Nov 3 2026','Back to the shelf. When you open The Keep from the Game Shelf, a Shelf button sits at the top left: over the opening scene, on the opening page and beside the menu in the game. It stays while you travel between valleys and takes you straight back to the shelf. Opened any other way, there is no button.'],
  ['v0.25.0 · Nov 1 2026','The hearth. The Keep now opens on a stone hearth in a keep hall at sunrise: the light comes through the window, finds the words The Keep in the dark, and the embers rise. It plays in full on your first visit and as a short fade after that, and a tap skips it. Then the opening page: Wander, or Story, which is coming next. The first time you wander you pick how to see the world from six cards: ASCII, the original letters, or Pixels, Mesh, Voxels, Rays or Iso. You can change it any time in the menu, where you can also replay the intro. The about card is rewritten for the game as it is now.'],
  ['v0.24.1 · Oct 31 2026','Every valley shaped by its own seed. When you travel, the valley you walk into now grows with settings that come from its seed: some are thick forest, some are lake country, some are full of old ruins, some are quiet and some are busy with wildlife. The same seed always grows the same valley for anyone who types it. A random valley is now fully random. A new choice at the end of a road, Choose a valley, lets you pick forest, water, ruins and wildlife, and finds a valley like that for you. Your own dials still shape the world you grow from the menu, and travelling never changes them.'],
@@ -1625,8 +1725,8 @@ function genWorld(seed){
   W.seed=seed; W.vday=0; W.live=[]; W.lastTod=null; W.events=null; W.taken={}; W.fishDay=null;
   PED.cyc=null; PED.gone=null; PED.phase=''; PED.route=null; PED.lastTod=null; PED.ways=null; PED.shelter=undefined; ROADS.sign=-1;
   { const vn=valleyNames(seed); W.valley=vn.valley; W.farmNames=[vn.farm1,vn.farm2]; }
-  W.cast=castValley(seed); W.castSig=seed+':'+W.cast.map(function(c){ return c.name; }).join(','); rebuildPeople();
-  W.arriveMsg='You arrive in '+W.valley+'.';
+  W.cast=castWithHome(seed); W.castSig=seed+':'+W.cast.map(function(c){ return c.name; }).join(','); rebuildPeople();
+  W.arriveMsg='You arrive in '+W.valley+'.'; W.loreMsg='';
   const h=W.h, st=W.st, tree=W.tree;
   st.fill(0); tree.fill(0); W.sb.fill(0); W.su.fill(0); W.rail.fill(0); W.floor.fill(0); W.ruin.fill(0); W.smat.fill(0); W.places.length=0; W.pens.length=0; W.keepBuilt=false;
   for(let y=0;y<N;y++)for(let x=0;x<N;x++){
@@ -2280,7 +2380,7 @@ function ruinCheck(){ if(!greetHook||!W.ruins.length) return;
   for(const o of W.ruins){ if(o.found) continue; if(Math.hypot(P.x-o.x,P.y-o.y)>o.dr) continue;
     let n=1; for(const q of W.ruins) if(q.found) n++;
     const msg='You found '+o.name+'.'+(n===W.ruins.length&&n>1?' That is every ruin in this world.':' ('+n+' of '+W.ruins.length+' ruins)');
-    if(greetHook(msg)!==false){ o.found=true;
+    if(greetHook(msg)!==false){ o.found=true; o.foundAt=Date.now(); { const li=loreFor(o.kind); if(li!=null&&loreTake(li)){ W.loreMsg=o.name.charAt(0).toUpperCase()+o.name.slice(1)+': '+LORE[li][1]; W.loreAt=Date.now()+3800; } }
       try{ localStorage.setItem('keep_found_'+W.seed,JSON.stringify(W.ruins.filter(function(q){ return q.found; }).map(function(q){ return q.name; }))); }catch(e){} }
     return; } }
 function carvePath(x0,y0,x1,y1,sd,wd){
@@ -3941,12 +4041,597 @@ function seedParse(v){ v=String(v==null?'':v).trim(); if(!/^\d{1,10}$/.test(v)) 
 // ---------------- the talk engine (v0.22): a short chat card, true lines only, new ones first ----------------
 // LINES is built once from TALK. A visit is one opening of the card: 3 to 5 lines, never the same line twice in a
 // visit, and lines already heard from this person in this valley only come back once every unheard one is used up.
+// ---------------- Story (v0.25.2): your name, your home valley and your parents ----------------
+// Story starts you in a home valley grown from your name and the things you asked it to have plenty of. Your parents keep
+// its modest keep: two extra people who exist only there, only in Story. Everyone at home knows your name. The save is one
+// key, keep_journal {v:1, story:{name, home, chips, started, at}|null, wander:{}}, and Wander never touches it.
+var MODE='wander';          // 'story' or 'wander'
+var STORY=null;             // the story being played: {name, home, chips, started, at}
+var JOURNAL=null, JOURNAL_OFF=false;
+const PARENT_IDS=[9,10];
+// lines for a stranger: never said to you in your own home valley
+const STRANGER_RE=/\bnew faces?\b|you're new|not from \{valley\}|walking through|travell?er|stranger|where are you headed|welcome to \{valley\}|welcome to the keep|visitors|walk like someone|what's in the pack|you're welcome here|seen @ruin yet|found any of the old places|whole kitchen up at the keep|you'll see why they built|you'll find \{valley\} small|learn a place|nobody hurries here|if you get lost|want the view from the tower/i;
+ROLEKEY[9]='home1'; ROLEKEY[10]='home2';
+// a name as the game will say it: letters, spaces and the odd mark, nothing the line slots could read as their own
+function cleanName(v){ let s=String(v==null?'':v).replace(/[\u0000-\u001f\u007f<>{}\[\]@$#\\|`]/g,'').replace(/\s+/g,' ').trim();
+  const cp=Array.from(s); if(cp.length>18) s=cp.slice(0,18).join('').trim();
+  if(s) s=s.charAt(0).toUpperCase()+s.slice(1); return s||'Traveler'; }
+function nameHash(name){ const t=cleanName(name).toLowerCase(); let h=0x811c9dc5; for(let i=0;i<t.length;i++){ h^=t.charCodeAt(i); h=Math.imul(h,0x01000193); } return h>>>0; }
+// a random name from the same tables the people are named from (the gender-free list most of the time)
+function randomName(rnd){ rnd=rnd||Math.random; const pool=rnd()<0.6?NAMES_X:(rnd()<0.5?NAMES_F:NAMES_M); return pool[(rnd()*pool.length)|0]; }
+// your home: the first seed after your name's hash whose valley has plenty of what you picked (chips: forest, water, ruins, wildlife)
+// and where nobody already living there shares your name
+function nameTaken(seed,name){ const n=cleanName(name).toLowerCase(); return castValley(seed).some(function(c){ return c.given.toLowerCase()===n||c.name.toLowerCase()===n; }); }
+function homeSeed(chips,name){ const want=[0,1,2,3].map(function(i){ return chips&&chips[i]?2:-1; }); let start=nameHash(name), s=null;
+  for(let k=0;k<40;k++){ const t=chooseSeed(want,start,60000); if(t==null) break; if(!nameTaken(t,name)){ s=t; break; } start=t; }
+  if(s==null){ start=nameHash(name); for(let k=0;k<40;k++){ const t=chooseSeed([-1,-1,-1,-1],start,10); start=t; if(!nameTaken(t,name)){ s=t; break; } } }
+  return (s==null?nameHash(name):s)>>>0; }
+function isHome(seed){ return MODE==='story'&&!!STORY&&(seed>>>0)===(STORY.home>>>0); }
+function inHome(){ return W.seed!=null&&isHome(W.seed); }
+function youName(){ return calledBy(); }
+// ---- the save ----
+function journalBlank(){ return {v:1, story:null, wander:{}}; }
+function journalLoad(){ let j=null, raw=null;
+  try{ raw=localStorage.getItem('keep_journal'); JOURNAL_OFF=false; }catch(e){ JOURNAL_OFF=true; }
+  if(raw){ try{ j=JSON.parse(raw); }catch(e){ j=null; } }
+  if(!j&&JOURNAL) return JOURNAL;   // storage blocked: this session's story lives on in memory
+  if(!j||typeof j!=='object'||j.v!==1) j=journalBlank();
+  const s=j.story;
+  if(s&&(typeof s!=='object'||typeof s.name!=='string'||!isFinite(+s.home))) j.story=null;
+  else if(s){ s.name=cleanName(s.name); s.home=(+s.home)>>>0; s.at=(typeof s.at==='number'&&isFinite(s.at)&&s.at>=0)?(s.at>>>0):s.home;
+    s.chips=Array.isArray(s.chips)?[0,1,2,3].map(function(i){ return s.chips[i]?1:0; }):[0,0,0,0]; s.started=typeof s.started==='string'?s.started.slice(0,40):''; }
+  if(!j.wander||typeof j.wander!=='object') j.wander={};
+  JOURNAL=j; return j; }
+function journalSave(){ if(!JOURNAL) JOURNAL=journalBlank(); if(MODE==='story'&&STORY) JOURNAL.story=STORY;
+  try{ localStorage.setItem('keep_journal',JSON.stringify(JOURNAL)); JOURNAL_OFF=false; return true; }catch(e){ JOURNAL_OFF=true; return false; } }
+function storyNew(name,chips,when){ STORY={name:cleanName(name), home:homeSeed(chips,name), chips:[0,1,2,3].map(function(i){ return chips&&chips[i]?1:0; }),
+    started:when||'', at:0}; STORY.at=STORY.home; MODE='story'; if(!JOURNAL) JOURNAL=journalBlank(); JOURNAL.story=STORY; return STORY; }
+function storyResume(){ const j=JOURNAL||journalLoad(); if(!j.story) return null; STORY=j.story; MODE='story'; return STORY; }
+function storyAt(seed){ if(MODE!=='story'||!STORY) return; STORY.at=seed>>>0; journalSave(); }
+// ---- your parents: two people in the home keep, from the home seed alone, drawn after everyone else so nobody changes ----
+const PARENT_TRAITW={kind:3,worrier:2,proud:2,cheerful:2,dry:2,nosy:1,tired:1,superstitious:1};
+function parentsFor(seed,cast,you){ const r=seedRng(seed>>>0,0x9A7E), used=new Set(cast.map(function(c){ return c.given; })), out=[];
+  const mine=you?cleanName(you).toLowerCase():'';
+  const worn=new Set(); for(let k=0;k<CLOTHES.length;k++) if(cast.some(function(c){ return c.cloak===CLOTHES[k].c; })) worn.add(k);
+  const usedBy=new Set(cast.map(function(c){ return c.by; })); let by=ipick(r,BYNAMES); for(let k=0;k<60&&usedBy.has(by);k++) by=ipick(r,BYNAMES);
+  const age0=r()<0.7?'adult':'old';
+  for(let i=0;i<2;i++){ const id=PARENT_IDS[i], pr=r()<0.5?'she':'he', age=(i===1&&r()<0.25)?(age0==='adult'?'old':'adult'):age0;
+    let given=null; for(let k=0;k<200&&!given;k++){ const pool=r()<0.3?NAMES_X:(pr==='she'?NAMES_F:NAMES_M), g=ipick(r,pool); if(!used.has(g)&&g.toLowerCase()!==mine) given=g; }
+    if(!given) given=pr==='she'?'Agnes':'Abel'; used.add(given);
+    const build=wpick(r,{stout:2,short:2,tall:2}), skin=SKINS[(r()*SKINS.length)|0];
+    const hair=(age==='old'&&r()<0.8)?HAIRS[8+((r()*2)|0)]:HAIRS[(r()*8)|0];
+    const hairStyle=pr==='she'?wpick(r,{long:2,bun:3,braid:2,tied:2,short:1}):wpick(r,{short:5,bald:age==='old'?3:1,tied:1.5,long:1});
+    const beard=pr==='he'?wpick(r,{none:2,short:2,full:3,long:age==='old'?3:1}):'none';
+    const head=wpick(r,{none:4,cap:1,kerchief:1.5,hat:1});
+    const fits=[]; for(let k=0;k<CLOTHES.length;k++) if(!worn.has(k)&&/steward|gatekeeper|farmer/.test(CLOTHES[k].r)) fits.push(k);
+    let ck=fits.length?fits[(r()*fits.length)|0]:-1; if(ck<0) for(let k=0;k<CLOTHES.length;k++) if(!worn.has(k)){ ck=k; break; } if(ck<0) ck=i;
+    worn.add(ck); const C=CLOTHES[ck];
+    const traits=[]; for(let k=0;k<60&&traits.length<2;k++){ const t=wpick(r,PARENT_TRAITW); if(traits.indexOf(t)>=0) continue;
+      if(TRAIT_CLASH.some(function(p){ return (p[0]===t&&traits.indexOf(p[1])>=0)||(p[1]===t&&traits.indexOf(p[0])>=0); })) continue; traits.push(t); }
+    out.push({id:id, role:'keeper', key:ROLEKEY[id], name:(age==='old'&&r()<0.3)?'Old '+given:given, given:given, by:by, pr:pr, age:age, build:build,
+      skin:skin, hair:hair, hairStyle:hairStyle, beard:beard, head:head, tool:i===0?'keys':'staff', robe:r()<0.5, cloak:C.c, tunic:C.t, legs:C.l,
+      accent:C.a, traits:traits, rel:[{to:PARENT_IDS[1-i], kind:'spouse'}], parent:true}); }
+  return out; }
+// the cast for a valley, with your parents at home
+function castWithHome(seed){ let c=castValley(seed); if(isHome(seed)) c=c.concat(parentsFor(seed,c,STORY.name));
+  for(const L of leftHere(seed)){ if(c.length>=15) break; c=c.concat([leftPerson(L,c.length,c)]); } return c; }
+// they walk the steward's round in the keep, starting from two places in the courtyard so the three of them never bunch up
+function addParents(){ if(!inHome()||!W.cast||!W.cast[9]||!KPATHS[3]) return; const a=KPATHS[3], n=a.length/3;
+  const flat=[]; for(let w=0;w<n;w++){ const x=a[w*3]-FORT.x, y=a[w*3+1]-FORT.y; if(Math.abs(Math.hypot(x,y)-12.9)<0.2) flat.push(w); }
+  const s1=flat.length?flat[(flat.length*0.35)|0]:1, s2=flat.length?flat[(flat.length*0.8)|0]:2;
+  addKeeper(3,s1,9,0); addKeeper(3,s2,10,0); }
+// ---- what people at home say. [home]: only in your home valley, in Story. {you}: your name. {home1} {home2}: your parents ----
+const TALKH={
+ home:{
+  0:["[first]{you}! You're up. There's bread in the kitchen if {steward} hasn't hidden it.","[first]Morning, {you}. Sleep well?",
+     "There you are, {you}. The whole keep's been up for an hour.","[first]Morning, {you}. Did you eat? Eat something."],
+  1:["[first]{you}. Where have you been all morning?","Go and see {steward}, {you}. There's always something wants doing.",
+     "{spouse} was looking for you. Something about the roof, I think.","[first]There you are, {you}. Lunch is long gone, I'm afraid."],
+  2:["[first]Home before dark, {you}? That makes a change.","Supper soon, {you}. Don't wander off.","[leaving]I'm off to see to the lamps. Stay out of trouble, {you}."],
+  3:["[first]{you}, it's late. What are you doing up?","Go to bed, {you}. The valley will still be there in the morning.","[first]Can't sleep either, {you}? Sit a while."],
+  a:["You've walked every inch of {valley}, {you}. I've watched you do it.","This keep isn't much, but it's ours. It'll be yours one day, {you}.",
+     "When you were small you tried to climb the wall to see over the hills. We had to carry you down, kicking.",
+     "I keep the keep. {spouse} keeps me. That's how it works.","The roads past the signposts go a long way. Further than I've ever been.",
+     "[worrier]You'd tell me if you were thinking of going somewhere, wouldn't you, {you}?","[worrier]Wrap up if you're going out. The wind comes off the hills.",
+     "[ruins]When you were little you'd hide in @ruin. Took us all afternoon to find you.","[farm1]{farmer} says you're welcome at @farm1 any time. I think {farmer.he} means it.",
+     "[proud]Our {valley} is a small valley, {you}, but it's a good one. Remember that, wherever you go.",
+     "[kind]Whatever you're looking for, {you}, you can always come home to look for it.",
+     "Your grandmother walked those hills every spring. Said she liked to see what the other side was up to.",
+     "[dry]{steward} thinks this keep would fall down without {steward.him}. {steward.He} might be right.","[cheerful]Look at you, {you}. Taller every week. Or I'm shrinking."]},
+ guard:{a:["[home]{you}! Don't tell {home1} you caught me sitting down.","[home]I taught you to whistle, {you}. I've regretted it ever since.",
+     "[home]{home1} was up on the wall looking for you earlier, {you}.","[home]You used to count the deer from up here with me, {you}. You always got more than I did."]},
+ guard1:{3:["[home]Can't sleep, {you}? Me neither. It's the job."]},
+ gatekeeper:{a:["[home]{you}. Off out again? Mind the road past the signpost.","[home]I've watched you go through this gate a thousand times, {you}. Never past the signpost, though.",
+     "[home]The road out goes over the hills. You'll go one day, {you}. Everyone does.","[home]{you}! Tell {home2} the arch wants pointing again. I've asked twice."]},
+ steward:{a:["[home]{you}, if you're looking for {home2}, try the hall.","[home]Wipe your feet, {you}. I don't care whose keep it is.",
+     "[home]{you}! Have you been at the honey? Don't answer that.","[home]Your {home1.par} wants the kitchen lists by supper, {you}. Tell {home1.him} they're nearly done."]},
+ farmer:{a:["[home]Morning, {you}! Tell {home1} the eggs are on their way.","[home]You used to chase my hens, {you}. They still remember.",
+     "[home]Take an egg up to the keep for me, {you}. Gently."]},
+ shepherd:{a:["[home]{you}! The dark-faced ewe's had twins. Come and see.","[home]You named one of my sheep once, {you}. Nobody calls it that but you."]},
+ woodcutter:{a:["[home]{you}. Stand back, I've seen you with an axe.","[home]Your {home1.par} wants more wood for the hall, {you}. Always more wood."]},
+ hermit:{a:["[home]{you}. You found me again. You always do.","[home]The fish don't care whose child you are, {you}. Sit quiet."]},
+ any:{a:["[home,notparent]Hello, {you}. Tell {home1} I said good morning.","[home,notparent]{you}! Haven't seen you down this way in a while.",
+     "[home]Everyone in {valley} knows you, {you}. Can't get away with anything here.","[home,notparent]Your {home2.par} was asking after you, {you}."]}};
+// ---------------- Story, part two (v0.26.0): replies, the journal, errands, the letter, fixed roads ----------------
+// A "beat" is one exchange that matters: a few lines, then two or three replies. Nothing is recorded until you pick, so
+// walking away keeps the question for next time. Tasks, valleys and roads are saved in your part of keep_journal
+// (your story, or Wander's own part), so neither mode ever touches the other.
+function part(){ if(MODE==='story'&&STORY) return fixPart(STORY); if(!JOURNAL) journalLoad(); return fixPart(JOURNAL.wander); }
+function fixPart(p){ if(!p.tasks||typeof p.tasks!=='object'||Array.isArray(p.tasks)) p.tasks={};
+  if(!p.valleys||typeof p.valleys!=='object'||Array.isArray(p.valleys)) p.valleys={};
+  if(!p.links||typeof p.links!=='object'||Array.isArray(p.links)) p.links={};
+  if(!Array.isArray(p.log)) p.log=[]; return p; }
+// ---- fixed roads: road i of a valley always leads to the same valley, and the road you came in by leads back ----
+function neighborSeed(seed,i){ return (seedRng(((seed>>>0)^(i|0))>>>0,0x4E1B)()*4294967296)>>>0; }
+function roadDest(seed,i){ const L=part().links, v=L[(seed>>>0)+':'+(i|0)]; return (typeof v==='number'&&v>=0)?v>>>0:neighborSeed(seed,i); }
+function roadLink(a,ia,b,ib){ const L=part().links, ka=(a>>>0)+':'+(ia|0); if(L[ka]==null) L[ka]=b>>>0; if(ib!=null){ const kb=(b>>>0)+':'+(ib|0); if(L[kb]==null) L[kb]=a>>>0; } }   // a road, once known, never changes
+// arriving by road: the road whose far end is where you came from, or else a road that leads nowhere known yet
+function arriveExit(from,ex){ const L=part().links, s=W.seed>>>0; let b=null;
+  for(const x of W.exits) if(L[s+':'+x.id]===(from>>>0)){ b=x; break; } if(b) return b;
+  if(ex&&L[s+':'+ex.id]==null) return ex; for(const x of W.exits) if(L[s+':'+x.id]==null) return x; return ex; }
+// ---- the valleys you have set foot in: {n name, f first day, l last time, m people met} ----
+let VN_LAST=null;
+function visitNote(seed){ seed=seed>>>0; const p=part(), k=String(seed), v=p.valleys[k]||(p.valleys[k]={n:valleyName(seed), f:Date.now(), m:[]});
+  v.n=valleyName(seed); v.l=Date.now(); if(!Array.isArray(v.m)) v.m=[]; const keys=Object.keys(p.valleys);
+  if(keys.length>120){ const keep={}; for(const k in p.tasks){ const e=p.tasks[k]; if(e&&typeof e==='object'&&e.s!=='done'){ if(e.v!=null) keep[e.v>>>0]=1; if(e.dest!=null) keep[e.dest>>>0]=1; } }   // a valley with something still to do is never dropped
+    keys.sort(function(a,b){ return (p.valleys[a].l||0)-(p.valleys[b].l||0); }); let drop=keys.length-120;
+    for(let i=0;i<keys.length&&drop>0;i++){ const k=keys[i]; if(isHome(+k)||keep[+k>>>0]||(+k>>>0)===seed) continue; delete p.valleys[k]; drop--; } } }
+function metNote(id){ const c=castOf(id); if(!c||W.seed==null) return; const v=part().valleys[String(W.seed>>>0)]; if(!v) return; const nm=c.name+' '+c.by+', '+roleName(c);
+  if(v.m.indexOf(nm)<0){ v.m.push(nm); if(v.m.length>12) v.m.shift(); } }
+function valleyCount(){ return Object.keys(part().valleys).length; }
+// ---- beats ----
+function nm(id){ const c=castOf(id); return c?c.name:'someone'; }
+function pr(id,f){ const c=castOf(id); return c?pform(c,f):(f==='He'?'They':'them'); }
+function T(id,text){ return fillLine(id,text,ALLHERE); }
+// the errand: the steward wants to know something, and someone else in the valley knows it
+const ERRANDS={4:{folk:'farm1', ask:'if the grain is in', said:"Tell {S} the grain's in. Every sack of it.", truth:"The grain's in. Every sack.", lie:"The rats got half.", fib:"Half?! ...You're joking. Your face says you're joking.", note:'the grain is in'},
+  5:{folk:'farm2', ask:"how many fleeces there'll be this year", said:"Tell {S} thirty fleeces, if the weather holds.", truth:'Thirty fleeces, if it stays dry.', lie:'None. The sheep went bald.', fib:"Bald? Sheep? ...Out. Go on, out of my kitchen.", note:'thirty fleeces, if the weather holds'},
+  6:{folk:'wood', ask:'when the winter wood is coming up', said:"Tell {S} the wood comes up on the first frosty morning. Same as every year.", truth:'On the first frosty morning.', lie:'Never. The trees said no.', fib:"The trees said no. Did they. Off with you.", note:'the wood comes on the first frosty morning'},
+  2:{folk:null, ask:"whether the road's clear", said:"Tell {S} the road's clear as far as the signpost. Further, I couldn't say.", truth:'Clear as far as the signpost.', lie:'Bandits. Hundreds of them.', fib:"Hundreds. Of course. I'll hide the spoons.", note:'the road is clear as far as the signpost'}};
+function errandTarget(){ for(const id of [4,5,6,2]){ const E=ERRANDS[id]; if(!castOf(id)) continue; if(E.folk&&!folkHere(E.folk)) continue; return id; } return -1; }
+function openErrand(){ const t=part().tasks; for(const k in t) if(k.indexOf('grain:')===0&&t[k].s!=='done') return k; return null; }
+function logChoice(kind,task){ const p=part(); p.log.push({k:kind,t:task,at:Date.now()}); if(p.log.length>200) p.log.shift(); }
+function beatErrand(id){ if(!W.keepBuilt||W.seed==null) return null; const p=part(), key='grain:'+(W.seed>>>0), o=openErrand(); let e=p.tasks[key];
+  const home=inHome(), S=3;
+  if(!e){ if(id!==S||!castOf(S)||o) return null; const tg=errandTarget(); if(tg<0) return null; const E=ERRANDS[tg];
+    const lines=home?["{you}! Just the one I wanted.","Run to "+nm(tg)+" and ask "+pr(tg,'him')+" "+E.ask+". I need to know before market day."]
+                    :["You there. You look like you have two good legs.","Ask "+nm(tg)+" "+E.ask+", would you? I'd go myself, but these keys don't carry themselves."];
+    return {key:key, lines:lines, options:[
+      {label:"I'll go now", reply:["Good. Don't let "+nm(tg)+" talk your ear off."], pick:function(){ p.tasks[key]={s:'asked', v:W.seed>>>0, vn:W.valley, t:tg, tn:nm(tg), sn:nm(S), sp:castOf(S).pr, tp:castOf(tg).pr, home:home?1:0}; }},
+      {label:'Not right now', reply:["It'll keep. Most things do."], pick:function(){}, snooze:true}]}; }
+  if(e.v!==(W.seed>>>0)) return null; const E=ERRANDS[e.t];
+  if(e.s==='asked'&&id===e.t) return {key:key, lines:[e.sn+" sent you? Of course "+(e.sp==='she'?'she':'he')+" did.", E.said.replace('{S}',e.sn)], options:[
+      {label:"I'll tell "+(e.sp==='she'?'her':'him'), reply:["Good. And tell "+(e.sp==='she'?'her':'him')+" I said hello."], pick:function(){ e.s='answered'; }},
+      {label:"Couldn't you send word?", reply:["I just did. You're the word."], pick:function(){ e.s='answered'; }}]};
+  if(e.s==='answered'&&id===S) return {key:key, lines:["Well? What did "+e.tn+" say?"], options:[
+      {label:E.truth, reply:["Good. That's one thing off my list."].concat(home?["You should keep a journal, {you}. Write things down. Saves asking twice."]:["Keep a journal, if you're staying. Saves asking twice."]), pick:function(){ e.s='done'; e.c='truth'; logChoice('truth','grain'); }},
+      {label:E.lie, reply:[E.fib], pick:function(){ e.s='done'; e.c='lie'; logChoice('lie','grain'); }}]};
+  return null; }
+// the gatekeeper's lesson about roads (home only, once)
+function beatGate(id){ if(!inHome()||id!==2) return null; const p=part(); if(p.tasks.gate) return null;
+  const done=function(){ p.tasks.gate={s:'done'}; };
+  return {key:'gate', lines:["Thinking about the road, {you}?","Every road out has a signpost at the top of the pass. Walk past it and you get a choice: stay, or go on over the hills.","Go on, and the road you came in by always takes you back. And your journal remembers every valley you've walked, for anyone who keeps one."], options:[
+    {label:'Where do the roads go?', reply:["Each one to its own valley. The same valley every time. That's roads for you."], pick:done},
+    {label:'Not today', reply:["The road's patient. More patient than me."], pick:done}]}; }
+// the letter: a parent's letter to an old friend, the steward of the valley along your home's first road
+function letterFacts(){ const home=STORY.home>>>0, ex=0, dest=roadDest(home,ex), rc=castValley(dest)[3];
+  return {dest:dest, dn:valleyName(dest), rn:rc.name+' '+rc.by, rg:rc.name, rp:rc.pr, road:(W.exits[ex]&&isHome(W.seed))?W.exits[ex].name:'the road over the hills', ex:ex}; }
+function beatLetter(id){ if(MODE!=='story'||!STORY) return null; const p=part(); let L=p.tasks.letter;
+  if(inHome()&&castOf(id)&&castOf(id).parent){ const gn=nm(id), par=pr(id,'par');
+    if(!L){ const ready=(p.tasks['grain:'+(STORY.home>>>0)]&&p.tasks['grain:'+(STORY.home>>>0)].s==='done')||valleyCount()>=2; if(!ready) return null;
+      const f=letterFacts();
+      return {key:'letter', lines:["{you}, a favour.","This letter needs to go to "+f.rn+", the steward at "+f.dn+". Over the hills by "+f.road+". An old friend of the family.","Will you take it?"], options:[
+        {label:"I'll take it", reply:["Thank you. Mind it doesn't get wet. And come home after."], pick:function(){ p.tasks.letter=Object.assign({s:'carry', g:id, gn:gn, gp:castOf(id).pr},f); }},
+        {label:'Not yet', reply:["It's waited this long. It can wait for you."], pick:function(){}, snooze:true}]}; }
+    if(L&&L.s==='replied'&&id===L.g) return {key:'letter', lines:["You're back! Did you find "+L.rg+"? What did "+(L.rp==='she'?'she':'he')+" say?"], options:[
+        {label:L.rg+' will come for the harvest.', reply:["The harvest! Then we'll need more chairs. And a bigger pie.","Thank you, {you}. That's the first trip over the hills. It won't be the last."], pick:function(){ L.s='done'; L.c='truth'; logChoice('truth','letter'); }},
+        {label:L.rg+' said no.', reply:["No? ...Oh. Well. Never mind, then.","It was a long time ago. Thank you for going, {you}."], pick:function(){ L.s='done'; L.c='lie'; logChoice('lie','letter'); }}]};
+    return null; }
+  if(L&&L.s==='carry'&&id===3&&(W.seed>>>0)===L.dest) return {key:'letter', lines:["A letter? For me? From "+valleyName(STORY.home)+"!","...That's "+L.gn+"'s hand. I'd know it anywhere.","Ha! Tell "+L.gn+" yes. I'll come for the harvest, knees willing."], options:[
+      {label:"I'll tell "+(L.gp==='she'?'her':'him'), reply:["And tell "+L.gn+" I still have the cup. "+(L.gp==='she'?'She':'He')+"'ll know."], pick:function(){ L.s='replied'; }},
+      {label:'What was in it?', reply:["Old business. Good business. Nothing for you to worry about.","Go on home. Safe roads."], pick:function(){ L.s='replied'; }}]};
+  return null; }
+const BEATS=[beatLetter,beatErrand,beatGate,beatLeft,beatLost,beatStone,beatFeud,beatSweet,beatLight];
+const SNOOZE={};   // "not now": the question rests a few minutes before it is asked again
+function fillBeat(id,b){ b.lines=b.lines.map(function(t,k){ return {id:'B'+b.key+k, text:T(id,t)}; });
+  for(const o of b.options){ o.label=T(id,o.label); o.reply=(o.reply||[]).map(function(t){ return T(id,t); }); } return b; }
+// two passes: a thread you have already started comes before a new question
+function beatGoing(b){ const t=part().tasks[b.key]; return !!(t&&typeof t==='object'&&t.s!=='none'&&t.s!=='early')||/^left(meet|rumor|report|back|q)$/.test(b.key); }
+function storyBeat(id){ if(id===ROLEPED) return null; let first=null;
+  for(const f of BEATS){ const b=f(id); if(!b||(SNOOZE[b.key]&&Date.now()-SNOOZE[b.key]<180000)) continue; if(beatGoing(b)) return fillBeat(id,b); if(!first) first=b; }
+  return first?fillBeat(id,first):null; }
+// ---- the journal's words: your own notes, from what each task knows ----
+function journalNotes(){ const p=part(), open=[], done=[];
+  for(const k in p.tasks){ const e=p.tasks[k]; if(!e||typeof e!=='object') continue;
+    if(k.indexOf('grain:')===0&&ERRANDS[e.t]){ const E=ERRANDS[e.t], at=e.home?'at home':'in '+e.vn;
+      if(e.s==='asked') open.push({t:e.sn+' wants to know '+E.ask+'. Ask '+e.tn+', '+at+'.', v:e.v});
+      else if(e.s==='answered') open.push({t:e.tn+' says '+E.note+'. Tell '+e.sn+', '+at+'.', v:e.v});
+      else if(e.s==='done') done.push({t:(e.c==='lie'?'Told '+e.sn+' a fib. '+(e.sp==='she'?'She':'He')+' saw through it.':'Told '+e.sn+' that '+E.note+'.'), v:e.v}); }
+    else if(k==='letter'){ if(e.s==='carry') open.push({t:'Take '+e.gn+"'s letter to "+e.rn+', the steward at '+e.dn+'. Over the hills by '+e.road+'.', v:e.dest});
+      else if(e.s==='replied') open.push({t:e.rg+' says yes, for the harvest. Tell '+e.gn+', at home.', v:STORY&&STORY.home});
+      else if(e.s==='done') done.push({t:e.c==='lie'?'Told '+e.gn+' that '+e.rg+' said no. It was not true.':'Took '+e.gn+"'s letter over the hills to "+e.rg+'. '+e.rg+' is coming for the harvest.', v:e.dest}); }
+    else if(k==='gate') done.push({t:'Every road leads to the same valley every time. The journal remembers the way home.'}); }
+  leftNotes(open,done); troubleNotes(open,done); return {open:open, done:done}; }
+// ---------------- valley troubles (v0.26.1): every valley has its own, from its own seed ----------------
+// Any valley you reach, by road, by a random seed or by your journal, grows one or two troubles from its seed: a lost
+// hen or lamb that turned up over the hills, a quarrel over a fence, a pair of sweethearts too shy to say so, a light
+// in the old stones at night, or a name cut in a stone that belongs to a family in the next valley. Some are done in
+// one visit; some send you over the hills and back. They are the same for everyone who visits that valley.
+const TROUBLES=['lost','feud','sweet','light','stone'];
+const LIGHTS=[{what:'a fox with a stolen candle stub in its mouth', short:'A fox with a candle.', tale:'A ghost. A tall one.', reply:"A fox! With a candle! Ha. I'll never live that down."},
+  {what:'fireflies, hundreds of them, drifting between the stones', short:'Fireflies. Hundreds.', tale:'A ghost. A tall one.', reply:"Fireflies. Of course it was. I feel daft now. Thank you."},
+  {what:'an old owl with a pale face, sitting on the tallest stone and staring back', short:'An owl. A big pale one.', tale:'A ghost. A tall one.', reply:"An owl. I've been jumping at an owl for a month. Don't tell anyone."}];
+function troublesFor(seed){ const r=seedRng(seed>>>0,0x7B0B), C=castFor(seed), out=[], pool=TROUBLES.slice();
+  for(let i=pool.length-1;i>0;i--){ const j=(r()*(i+1))|0; const t=pool[i]; pool[i]=pool[j]; pool[j]=t; }
+  const ruins=seedDials(seed).ruins>0, wd=weddingDay(seed);
+  for(const k of pool){ if(out.length>=2) break;
+    if(k==='sweet'&&(!pairOf(C,'sweetheart')||(wd&&wd.day<=0))) continue;   // married already: nothing to carry
+    if((k==='light'||k==='stone')&&!ruins) continue;                          // no old stones, no light in them
+    out.push(k); }
+  return {kinds:out, light:LIGHTS[(r()*LIGHTS.length)|0], road:r(), lostKind:r()<0.5?'hen':'lamb', who:r()}; }
+// what is open, and whether a kind can start here right now
+function trKey(k){ return k+':'+(W.seed>>>0); }
+function trHere(k){ if(W.seed==null) return false; return troublesFor(W.seed).kinds.indexOf(k)>=0; }
+function trGet(k,seed){ return part().tasks[k+':'+((seed==null?W.seed:seed)>>>0)]; }
+// the road a trouble leads along: one of this valley's roads, from the seed
+function trRoad(f){ if(!W.exits.length) return null; const e=W.exits[Math.min(W.exits.length-1,(f*W.exits.length)|0)], d=roadDest(W.seed,e.id);
+  return {dest:d, dn:valleyName(d), road:e.name, ex:e.id}; }
+function him(p){ return p==='she'?'her':'him'; } function he(p){ return p==='she'?'she':'he'; } function He(p){ return p==='she'?'She':'He'; } function his(p){ return p==='she'?'her':'his'; }
+// ---- 1. lost: a hen (the farmer's) or a lamb (the shepherd's) wandered over the hills to the next valley's gate ----
+function beatLost(id){ const p=part(); const TF=W.seed!=null?troublesFor(W.seed):null;
+  // the far end: any open lost trouble whose animal is at this gate
+  if(id===2) for(const k in p.tasks){ const e=p.tasks[k]; if(k.indexOf('lost:')!==0||!e||e.s!=='asked'||e.dest!==(W.seed>>>0)) continue;
+    const a=e.a; return {key:k, lines:[(a==='hen'?"A hen? Speckled? Walked in through my gate two days ago like she owned the place.":"A lamb? Little black-faced thing? It's been following me about since the rain."),
+        "I've grown fond of it, if I'm honest. But it's not mine. Is it yours?"], options:[
+      {label:'It belongs to '+e.on+' in '+e.vn+'. I\'ll take it back.', reply:["Go on, then. Mind it on the stony bits.","Tell "+e.on+" it ate well."], pick:function(){ e.s='found'; logChoice('found','lost'); }},
+      {label:'Keep it. I\'ll tell '+e.on+' it\'s happy here.', reply:["You will? That's kind. I'll look after it, I promise."], pick:function(){ e.s='left'; logChoice('kind','lost'); }}]}; }
+  if(!TF||TF.kinds.indexOf('lost')<0) return null; const k=trKey('lost'), owner=TF.lostKind==='hen'?4:5; if(id!==owner||!castOf(owner)) return null;
+  if(TF.lostKind==='hen'&&!folkHere('farm1')) return null; if(TF.lostKind==='lamb'&&!folkHere('farm2')) return null;
+  let e=p.tasks[k]; const A=TF.lostKind;
+  if(!e){ const R=trRoad(TF.road); if(!R) return null;
+    return {key:k, lines:[A==='hen'?"Have you seen a hen? Speckled. Bossy. She's been gone two days.":"Have you seen a lamb? Black face, white socks. Gone since the last rain.",
+        "Someone on "+R.road+" said a "+(A==='hen'?'hen':'lamb')+" went up over the pass. Over the hills, to "+R.dn+". I can't leave the "+(A==='hen'?'farm':'flock')+"."], options:[
+      {label:"I'll go and look", reply:["Would you? Ask at "+R.dn+"'s gate. Everything ends up at a gate, sooner or later."], pick:function(){ p.tasks[k]=Object.assign({s:'asked', a:A, o:owner, on:nm(owner), op:castOf(owner).pr, v:W.seed>>>0, vn:W.valley},R); }},
+      {label:"It'll come home by itself", reply:["Maybe. "+(A==='hen'?'She':'It')+"'s never been one for coming home."], pick:function(){}, snooze:true}]}; }
+  if(e.s==='found') return {key:k, lines:[A==='hen'?"Is that... it is! Look at her. Fatter than when she left.":"That's my lamb! Look at those socks. Not so white now."], options:[
+      {label:'Found at the gate in '+e.dn+'.', reply:["Over the hills! The cheek of it.","Thank you. I won't forget it. Neither will "+(A==='hen'?'she':'it')+", I expect."], pick:function(){ e.s='done'; e.c='found'; }}]};
+  if(e.s==='left') return {key:k, lines:["Any sign of my "+A+"?"], options:[
+      {label:"It's safe in "+e.dn+". Someone there loves it.", reply:["Safe? And loved? ...Well. That's more than some get. Thank you for looking."], pick:function(){ e.s='done'; e.c='kind'; logChoice('truth','lost'); }},
+      {label:'No sign. Sorry.', reply:["Ah well. Thanks for trying."], pick:function(){ e.s='done'; e.c='lie'; logChoice('lie','lost'); }}]};
+  return null; }
+// ---- 2. the fence feud: the farmer and the shepherd share a fence and an argument ----
+function beatFeud(id){ if(!trHere('feud')) return null; const p=part(), k=trKey('feud'); if(!castOf(4)||!castOf(5)||!folkHere('farm1')||!folkHere('farm2')) return null;
+  let e=p.tasks[k]; const A=e?e.a:id, Bn=function(x){ return x===4?5:4; };
+  if(!e){ if(id!==4&&id!==5) return null; const b=Bn(id);
+    return {key:k, lines:[id===4?"Those sheep were through my fence again. Third time this month. "+nm(b)+" says it's my fence that's the trouble.":"My sheep go where the fence lets them. "+nm(b)+"'s fence lets them everywhere. Then I'm the one shouted at.",
+        "We haven't spoken in a week. Not a word."], options:[
+      {label:"I'll talk to "+nm(b)+" for you", reply:["Would you? Tell "+him(castOf(b).pr)+"... tell "+him(castOf(b).pr)+" I'd like it sorted. That's all."], pick:function(){ p.tasks[k]={s:'carry', a:id, an:nm(id), ap:castOf(id).pr, b:b, bn:nm(b), bp:castOf(b).pr, v:W.seed>>>0, vn:W.valley}; }},
+      {label:"You're right. It's "+nm(b)+"'s fault.", reply:["Ha! Finally. Someone with sense."], pick:function(){ p.tasks[k]={s:'sided', a:id, an:nm(id), ap:castOf(id).pr, b:b, bn:nm(b), bp:castOf(b).pr, v:W.seed>>>0, vn:W.valley}; logChoice('side','feud'); }},
+      {label:'Not my business', reply:["No. It isn't. Fair enough."], pick:function(){}, snooze:true}]}; }
+  if(e.v!==(W.seed>>>0)) return null;
+  if(id===e.b&&(e.s==='carry'||e.s==='sided')) return {key:k, lines:[e.s==='sided'?"I hear you've been telling "+e.an+" it's all my fault. News travels.":"Did "+e.an+" send you? About the fence?",e.b===4?"It's a good fence. It's the sheep that are the trouble.":"It's not a fence, it's a row of sticks."], options:[
+      {label:e.an+" wants it sorted. That's all.", reply:["Does "+he(e.ap)+"? ...Well. I could mend the north end, if "+he(e.ap)+" did the south.","Tell "+him(e.ap)+" that."], pick:function(){ e.s='offer'; logChoice('mend','feud'); }},
+      {label:"You're both as stubborn as each other.", reply:["...Stubborn? Me?","...Maybe. A bit. We used to share our lunch on that fence, you know.","Tell "+e.an+" I'll mend the north end if "+he(e.ap)+" mends the south."], pick:function(){ e.s='offer'; e.hard=1; logChoice('hard','feud'); }},
+      {label:e.an+" says you're a cheat.", reply:["A cheat! Right. That's it. Not another word to "+him(e.ap)+", ever."], pick:function(){ e.s='done'; e.c='sour'; logChoice('stir','feud'); }}]};
+  if(id===e.a&&e.s==='offer') return {key:k, lines:["Well? What did "+e.bn+" say?"], options:[
+      {label:e.bn+" will mend the north end if you mend the south.", reply:["The south end? ...That's the bad end. Of course it is.","Fine. Fine! Tell "+him(e.bp)+" I'll bring the posts. And thank you."], pick:function(){ e.s='done'; e.c='mend'; }},
+      {label:'Nothing. Not a word.', reply:["Typical. Well, I tried."], pick:function(){ e.s='done'; e.c='sour'; logChoice('lie','feud'); }}]};
+  return null; }
+// ---- 3. the sweethearts: one of them is too shy to say it ----
+function beatSweet(id){ if(!trHere('sweet')) return null; const pr2=pairOf(castFor(W.seed),'sweetheart'); if(!pr2) return null; const p=part(), k=trKey('sweet');
+  const A=pr2[0], B=pr2[1]; if(!castOf(A)||!castOf(B)) return null; let e=p.tasks[k];
+  if(wedNow(A)>=0&&!e) return null;   // married already: nothing left to say
+  if(!e){ if(id!==A) return null;
+    return {key:k, lines:["Can I tell you something? You're not from round here, so it doesn't count.".replace("You're not from round here, so it doesn't count.",inHome()?"You won't laugh, will you?":"You're not from round here, so it doesn't count."),
+        "It's "+nm(B)+". I think about "+him(castOf(B).pr)+" all the time. And every time I try to say so, I talk about the weather."], options:[
+      {label:"I'll tell "+nm(B)+" for you", reply:["You would? Oh no. Oh, all right. Gently, though."], pick:function(){ p.tasks[k]={s:'carry', a:A, an:nm(A), ap:castOf(A).pr, b:B, bn:nm(B), bp:castOf(B).pr, v:W.seed>>>0, vn:W.valley}; }},
+      {label:'Tell '+him(castOf(B).pr)+' yourself. You can do it.', reply:["...Can I? Maybe I can. Tomorrow. Or the day after."], pick:function(){ p.tasks[k]={s:'done', c:'nudge', a:A, an:nm(A), b:B, bn:nm(B), v:W.seed>>>0, vn:W.valley}; logChoice('kind','sweet'); }},
+      {label:'Your secret is safe with me', reply:["Thank you. It feels better, just saying it out loud."], pick:function(){ p.tasks[k]={s:'done', c:'secret', a:A, an:nm(A), b:B, bn:nm(B), v:W.seed>>>0, vn:W.valley}; logChoice('secret','sweet'); }}]}; }
+  if(e.v!==(W.seed>>>0)) return null;
+  if(id===e.b&&e.s==='carry'&&wedNow(e.b)>=0) return {key:k, lines:["A message from "+e.an+"? You're a bit late, friend. We're married!","One of us said it in the end. I'm still not sure which."], options:[
+      {label:'Congratulations!', reply:["Thank you. Come to the next harvest dance. Everyone's invited."], pick:function(){ e.s='done'; e.c='told'; }}]};
+  if(id===e.b&&e.s==='carry') return {key:k, lines:["You look like someone with something to say.","..."+e.an+"? "+e.an+" said that? About me?"], options:[
+      {label:'Every word.', reply:["I've been talking about the weather at "+him(e.ap)+" for a year. A whole year!","I'm going to go and find "+him(e.ap)+". Right now. Before I lose my nerve."], pick:function(){ e.s='done'; e.c='told'; logChoice('mend','sweet'); }}]};
+  return null; }
+// ---- 4. the light in the old stones: a guard has seen it at night; go and look after dark ----
+function lightRuin(){ return W.ruins.length?W.ruins[0]:null; }
+function beatLight(id){ if(!trHere('light')||!lightRuin()) return null; const p=part(), k=trKey('light'), L=troublesFor(W.seed).light, rn=lightRuin().name; let e=p.tasks[k];
+  if(id!==0&&id!==1) return null;
+  if(!e) return {key:k, lines:["Don't laugh. There's a light in "+rn+" at night. Moving about. I've seen it from the wall three nights running.","Nobody else believes me."], options:[
+      {label:"I'll go and look, after dark", reply:["Would you? Take a lantern. Take two."], pick:function(){ p.tasks[k]={s:'look', g:id, gn:nm(id), gp:castOf(id).pr, rn:rn, v:W.seed>>>0, vn:W.valley}; }},
+      {label:'Probably nothing', reply:["Probably. Probably nothing. That's what I keep telling myself."], pick:function(){}, snooze:true}]};
+  if(e.s==='seen'&&id===e.g) return {key:k, lines:["Well? Did you see it? What was it?"], options:[
+      {label:L.short, reply:[L.reply], pick:function(){ e.s='done'; e.c='truth'; logChoice('truth','light'); }},
+      {label:L.tale, reply:["A ghost?! I knew it. I KNEW it. I'm not going near the place ever again.","...You're grinning. Is that a grin?"], pick:function(){ e.s='done'; e.c='tale'; logChoice('lie','light'); }}]};
+  return null; }
+// once a tick: at night, near the stones, with the light to look for
+function lightCheck(){ if(W.seed==null||!greetHook) return; const e=trGet('light'); if(!e||e.s!=='look') return; const o=lightRuin(); if(!o) return;
+  if(!(dayPart()===3||DAY.k<0.3)) return; if(Math.hypot(P.x-o.x,P.y-o.y)>o.dr+2) return;
+  if(!o.found||Date.now()-(o.foundAt||0)<3600) return;   // let "You found ..." be read first
+  const L=troublesFor(W.seed).light; if(greetHook('In '+o.name+', the light: it is '+L.what+'.')!==false){ e.s='seen'; journalSave(); } }
+// ---- 5. the name on the stone: a family name cut in the old stones belongs to someone over the hills ----
+function stoneFacts(){ const TF=troublesFor(W.seed), R=trRoad(TF.who); if(!R) return null; const C=castValley(R.dest), pid=[0,1,2,3][((TF.who*997)|0)%4], c=C[pid];
+  const given=NAMES_F[((TF.who*7919)|0)%NAMES_F.length];
+  return Object.assign({pid:pid, pn:c.name+' '+c.by, pg:c.name, pp:c.pr, by:c.by, carved:given+' '+c.by},R); }
+function beatStone(id){ const p=part();
+  // the far end: the family
+  for(const k in p.tasks){ const e=p.tasks[k]; if(k.indexOf('stone:')!==0||!e||e.s!=='asked'||e.dest!==(W.seed>>>0)||id!==e.pid) continue;
+    return {key:k, lines:["A name? On a stone? Which name?","..."+e.carved+". That was my great-grandmother's name. She came from over the hills, they always said. Nobody knew where."], options:[
+      {label:'It is in '+e.ru+', in '+e.vn+'.', reply:["Then I'll go. One day soon. I'll take her flowers, even if it's a hundred years late.","Thank you. You've given me back a bit of my family."], pick:function(){ e.s='done'; e.c='told'; logChoice('found','stone'); }},
+      {label:'Just a name. I wondered.', reply:["Well. If you ever find out more, come and tell me."], pick:function(){ e.s='done'; e.c='kept'; logChoice('secret','stone'); }}]}; }
+  if(!trHere('stone')||!W.ruins.length) return null; const k=trKey('stone'); if(p.tasks[k]) return null;
+  const teller=castOf(7)&&folkHere('hermit')?7:2; if(id!==teller) return null; const F=stoneFacts(); if(!F) return null; const ru=W.ruins[0].name;
+  return {key:k, lines:["There's a name cut in "+ru+". Not old-old. A hundred years, maybe. "+F.carved+".","Nobody here knows whose it was. Somebody, somewhere, has lost track of it."], options:[
+    {label:"I'll ask about it over the hills", reply:["Try "+F.dn+", by "+F.road+". Families wander. Names stay put."], pick:function(){ p.tasks[k]=Object.assign({s:'asked', t:teller, tn:nm(teller), ru:ru, v:W.seed>>>0, vn:W.valley},F); }},
+    {label:'Let it rest', reply:["Maybe that's best. Stones keep their own counsel."], pick:function(){ p.tasks[k]={s:'done', c:'rest', ru:ru, carved:F.carved, v:W.seed>>>0, vn:W.valley}; }}]}; }
+// the journal's words for each
+function troubleNotes(open,done){ const p=part();
+  for(const k in p.tasks){ const e=p.tasks[k]; if(!e||typeof e!=='object') continue; const kind=k.split(':')[0];
+    if(kind==='lost'){ if(e.s==='asked') open.push({t:e.on+"'s "+e.a+" went over the hills to "+e.dn+", by "+e.road+". Ask at the gate there.", v:e.dest});
+      else if(e.s==='found') open.push({t:"Take "+e.on+"'s "+e.a+" home to "+e.vn+".", v:e.v});
+      else if(e.s==='left') open.push({t:"Tell "+e.on+", in "+e.vn+", that the "+e.a+" is safe and loved in "+e.dn+".", v:e.v});
+      else if(e.s==='done') done.push({t:e.c==='found'?"Brought "+e.on+"'s "+e.a+" home from "+e.dn+".":(e.c==='kind'?"Left "+e.on+"'s "+e.a+" happy in "+e.dn+", and told "+e.on+" so.":"Told "+e.on+" there was no sign of the "+e.a+". There was."), v:e.v}); }
+    else if(kind==='feud'){ if(e.s==='carry'||e.s==='sided') open.push({t:e.an+" and "+e.bn+" are quarreling over their fence, in "+e.vn+". "+(e.s==='carry'?'Talk to '+e.bn+'.':'I took '+e.an+"'s side."), v:e.v});
+      else if(e.s==='offer') open.push({t:e.bn+" will mend the north end of the fence if "+e.an+" mends the south. Tell "+e.an+".", v:e.v});
+      else if(e.s==='done') done.push({t:e.c==='mend'?"Helped "+e.an+" and "+e.bn+" mend their fence, and their quarrel.":"Made "+e.an+" and "+e.bn+"'s quarrel worse. It was not my finest hour.", v:e.v}); }
+    else if(kind==='sweet'){ if(e.s==='carry') open.push({t:"Tell "+e.bn+", in "+e.vn+", how "+e.an+" feels. Gently.", v:e.v});
+      else if(e.s==='done') done.push({t:e.c==='told'?"Told "+e.bn+" how "+e.an+" feels. "+e.bn+" went straight to find "+e.an+".":(e.c==='secret'?"Kept "+e.an+"'s secret, in "+e.vn+".":"Told "+e.an+" to speak up for once."), v:e.v}); }
+    else if(kind==='light'){ if(e.s==='look') open.push({t:e.gn+" sees a light in "+e.rn+" at night, in "+e.vn+". Go and look after dark.", v:e.v});
+      else if(e.s==='seen') open.push({t:"Tell "+e.gn+" what the light in "+e.rn+" really is.", v:e.v});
+      else if(e.s==='done') done.push({t:e.c==='truth'?"Solved the light in "+e.rn+" for "+e.gn+".":"Told "+e.gn+" the light in "+e.rn+" was a ghost. It was not.", v:e.v}); }
+    else if(kind==='stone'){ if(e.s==='asked') open.push({t:"A name cut in "+e.ru+": "+e.carved+". Ask about it in "+e.dn+", by "+e.road+".", v:e.dest});
+      else if(e.s==='done') done.push({t:e.c==='told'?"Told "+e.pn+" in "+e.dn+" where "+his(e.pp)+" great-grandmother's name is cut.":(e.c==='kept'?"Found the family of the name in "+e.ru+", and said nothing.":"Let the name in "+e.ru+" rest."), v:e.v}); } } }
+// what people say once a trouble is settled: the choice shows in the talk
+function trTag(t,id){ const W2=W.seed; if(W2==null) return false;
+  if(t==='feudmend'||t==='feudsour'){ const e=trGet('feud'); return !!(e&&e.s==='done'&&e.c===(t==='feudmend'?'mend':'sour')&&(id===4||id===5)); }
+  if(t==='sweettold'){ const e=trGet('sweet'); return !!(e&&e.s==='done'&&e.c==='told'&&(id===e.a||id===e.b)); }
+  if(t==='sweetshy'){ const e=trGet('sweet'); return !!(e&&e.s==='done'&&e.c==='told'&&id===e.a); }
+  if(t==='lightdone'){ const e=trGet('light'); return !!(e&&e.s==='done'); }
+  if(t==='lostback'){ const e=trGet('lost'); return !!(e&&e.s==='done'&&e.c==='found'&&id===e.o); }
+  return false; }
+const TALKT={
+ farmer:{a:["[feudmend]{shepherd} and I mended the fence. Shared our lunch on it after, like we used to.","[feudsour]Don't say the word fence to me. Or sheep. Or {shepherd}.","[lostback]My hen walked over the hills and somebody carried her back. She's been impossible since."]},
+ shepherd:{a:["[feudmend]The fence is mended. The sheep are furious about it.","[feudsour]{farmer} and I don't speak. It's quieter. It's worse.","[lostback]My lamb came home from over the hills. Somebody carried it the whole way. Imagine that."]},
+ guard:{a:["[lightdone]That light in @ruin? We don't talk about the light in @ruin. Not any more."]},
+ any:{a:["[sweettold]{sweetheart} and I are walking out together now. Don't look so surprised.","[sweetshy]Somebody told {sweetheart} what I couldn't. I owe them a pie."]}};
+// ---------------- "The one who left" (v0.27.0) ----------------
+// Someone at the keep has a brother, sister, son or daughter who left years ago. They live now two or three valleys
+// along the first road out, helping at that valley's keep. In Story the asker is in your home valley; in Wander about one
+// valley in six has one. Somebody on the way has seen them. Find them, choose what to do, and go back and tell the asker.
+const LTRADES=['weaver','cooper','baker','ferry hand','scribe','tinker','candle-maker','boat-builder','drover','glass-blower'];
+const LMARKS=['a red scarf','a green coat with brass buttons','a heron feather in a hat','a fiddle in a battered case','a laugh like a goose'];
+const LREASONS={
+ quarrel:{home:true, tell:"We quarreled, {A} and me. Over the mill, of all things. I said things. So did {A}. I walked out before either of us could take them back.", short:"They quarreled over the mill, and neither would take it back."},
+ debt:{home:false, tell:"I owed money. Not much, but more than I had. I couldn't look anyone in the eye. So I left, and I've been paying it back from here, a little at a time.", short:"They owed money, and they're paying it back, bit by bit."},
+ life:{home:false, tell:"Nothing happened. That's the trouble. Every day the same. I wanted to see what was over the hills. I'm still looking.", short:"They wanted to see what was over the hills, and they're still looking."},
+ love:{home:true, tell:"There was someone {A} didn't approve of. So I went where nobody would approve or not. It didn't last. I stayed anyway. I was too proud to go back.", short:"There was someone you didn't approve of. It didn't last. Pride kept them away."},
+ mistake:{home:true, tell:"I left the sluice gate open one night. The low field flooded. Nobody was hurt, but the harvest was ruined, and it was my fault. I couldn't face anyone.", short:"They left a sluice gate open and ruined a harvest, and couldn't face anyone."}};
+const LREASONK=['quarrel','debt','life','love','mistake'];
+// who asks, and who left: from the origin valley's seed alone
+function leftFacts(origin){ const r=seedRng(origin>>>0,0x57A1), C=castValley(origin), order=[3,2,0,1];
+  const ai=order[(r()*order.length)|0], A=C[ai], kin=A.age==='young'?'sibling':(A.age==='old'?'child':(r()<0.5?'sibling':'child'));
+  const pr=r()<0.5?'she':'he', age=kin==='sibling'?A.age:(A.age==='old'?'adult':'young');
+  const used=new Set(C.map(function(c){ return c.given.toLowerCase(); })); if(STORY) used.add(STORY.name.toLowerCase());
+  let given=null; for(let k=0;k<200&&!given;k++){ const pool=r()<0.35?NAMES_X:(pr==='she'?NAMES_F:NAMES_M), g=ipick(r,pool); if(!used.has(g.toLowerCase())) given=g; } if(!given) given=pr==='she'?'Orla':'Rufus';
+  const reason=LREASONK[(r()*LREASONK.length)|0], steps=2+(r()<0.5?1:0), years=age==='young'?2+((r()*4)|0):2+((r()*9)|0);
+  return {origin:origin>>>0, on:valleyName(origin), a:ai, an:A.name, ag:A.given, ap:A.pr, ab:A.by, kin:kin, n:given, pr:pr, age:age, by:A.by,
+    trade:LTRADES[(r()*LTRADES.length)|0], mark:LMARKS[(r()*LMARKS.length)|0], reason:reason, steps:steps, years:years, look:(r()*4294967296)>>>0}; }
+// the way there: along each valley's first road, two or three valleys; the roads are pinned so they never change under you
+// every valley on the way has a second road, so the road you came in by can always lead back
+function leftPath(F){ const hops=[F.origin], ex=[]; let s=F.origin; const taken=new Set(leftThreads().map(function(t){ return t.dest>>>0; }).concat(leftThreads().map(function(t){ return t.origin>>>0; })));
+  for(let i=0;i<F.steps;i++){ const last=i===F.steps-1, n=Math.max(1,exitAngles(s).length); let pe=-1, d=0;
+    for(let k=0;k<n;k++){ const dd=roadDest(s,k); if(hops.indexOf(dd)>=0) continue; if(!last&&exitAngles(dd).length<2) continue; if(last&&taken.has(dd>>>0)) continue; pe=k; d=dd; break; }
+    if(pe<0) break; roadLink(s,pe,d); hops.push(d); ex.push(pe); s=d; }
+  if(hops.length<2){ const d=roadDest(F.origin,0); roadLink(F.origin,0,d); hops.push(d); ex.push(0); }
+  F.ex=ex; return hops; }
+function kinWord(F,who){ // what the person who left is to the asker
+  if(F.kin==='sibling') return F.pr==='she'?'sister':'brother'; return F.pr==='she'?'daughter':'son'; }
+function hasAsker(origin){ if(MODE==='story') return !!STORY&&(origin>>>0)===(STORY.home>>>0); return seedRng(origin>>>0,0x57A2)()<1/6; }
+function leftKey(origin){ return 'left:'+(origin>>>0); }
+// the thread for this origin, made the first time it matters (in Story, as soon as your story begins)
+function leftEnsure(origin){ const p=part(), k=leftKey(origin); let e=p.tasks[k]; if(e&&typeof e==='object'&&e.n) return e;
+  const F=leftFacts(origin); F.path=leftPath(F); F.dest=F.path[F.path.length-1]; F.dn=valleyName(F.dest); F.s='none'; p.tasks[k]=F; return F; }
+function leftThreads(){ const p=part(), o=[]; for(const k in p.tasks) if(k.indexOf('left:')===0&&p.tasks[k]&&p.tasks[k].n) o.push(p.tasks[k]); return o; }
+// is the one who left in this valley? Where they live, or back at home if they came home
+function leftHere(seed){ seed=seed>>>0; if(MODE==='story'&&STORY&&!leftThreads().length&&(STORY.home>>>0)) leftEnsure(STORY.home); const o=[];
+  for(const e of leftThreads()){ const home=e.c==='home'&&(e.s==='met'||e.s==='closed'); if(home?seed===e.origin:(seed===e.dest)) o.push(e); } return o; }
+function farWords(e){ return ['the next valley over','two valleys away','three valleys away'][Math.max(0,Math.min(2,e.path.length-2))]; }
+function leftPerson(e,id,cast){ const r=seedRng(e.look,0x1EF7), C=CLOTHES, worn=new Set(); for(let k=0;k<C.length;k++) if(cast.some(function(c){ return c&&c.cloak===C[k].c; })) worn.add(k);
+  let ck=-1; for(let k=0;k<60&&ck<0;k++){ const j=(r()*C.length)|0; if(!worn.has(j)) ck=j; } if(ck<0) ck=0; const K2=C[ck];
+  return {id:id, role:e.trade, key:'left', name:e.n, given:e.n, by:e.by, pr:e.pr, age:e.age, build:wpick(r,{tall:2,stout:2,short:2}), skin:SKINS[(r()*SKINS.length)|0],
+    hair:HAIRS[(r()*8)|0], hairStyle:e.pr==='she'?wpick(r,{long:2,bun:1,braid:2,tied:2,short:1}):wpick(r,{short:4,tied:2,long:1}), beard:e.pr==='he'&&e.age!=='young'?wpick(r,{none:2,short:2,full:1}):'none',
+    head:e.mark.indexOf('hat')>=0?'hat':wpick(r,{none:3,cap:1,hood:1}), tool:'staff', robe:false, cloak:K2.c, tunic:K2.t, legs:K2.l, accent:e.mark.indexOf('red')>=0?[190,50,44]:K2.a,
+    traits:[e.reason==='life'?'cheerful':'shy','kind'], rel:[], left:true, thread:leftKey(e.origin)}; }
+function addLeft(){ if(!W.cast||!W.keepBuilt||!KPATHS[3]) return; let j=0; for(let id=9;id<W.cast.length;id++){ const c=W.cast[id]; if(c&&c.left){ const n=KPATHS[3].length/3; addKeeper(3,Math.floor(n*(0.6+0.17*j))%n,id,0); j++; } } }
+function leftOf(id){ const c=castOf(id); if(!c||!c.left) return null; return part().tasks[c.thread]||null; }
+// ---- beats ----
+function A_(e){ return e.an; } function aHim(e){ return e.ap==='she'?'her':'him'; } function aHe(e){ return e.ap==='she'?'she':'he'; }
+function lHim(e){ return e.pr==='she'?'her':'him'; } function lHe(e){ return e.pr==='she'?'she':'he'; } function lHe2(e){ return e.pr==='she'?'She':'He'; }
+function beatLeft(id){ if(W.seed==null) return null; const seed=W.seed>>>0, p=part();
+  // the person who left
+  const me=leftOf(id);
+  if(me){ const e=me, why=LREASONS[e.reason].tell.replace(/\{A\}/g,e.an);
+    if(e.s==='none'&&MODE==='story') return {key:'leftearly', lines:["You've a look of "+e.on+" about you. Am I wrong?","I'm "+e.n+". I was born there. I haven't been back in "+e.years+" years.","Don't tell anyone you saw me. Or do. I haven't decided."], options:[
+        {label:"I won't. Not yet.", reply:["Thank you. Safe roads."], pick:function(){ e.s='early'; e.ev=W.valley; }}]};
+    if(e.s==='met'&&e.q==null) return leftAsks(e);   // the question they had for you, if you walked away before answering
+    if(e.s==='asked'||e.s==='heard') return {key:'leftmeet', lines:[(e.ag||e.an)+" sent you. Didn't "+aHe(e)+"? I can see it in your face.","I'll tell you why I left. You've walked far enough to hear it.",why], options:[
+        {label:"I'll carry a message home", reply:["Tell "+(e.ag||e.an)+" I'm sorry. Tell "+aHim(e)+" I think about home every day."], pick:function(){ e.s='met'; e.c='message'; logChoice('carry','left'); }, next:function(){ return leftAsks(e); }},
+        {label:"Come home with me", reply:LREASONS[e.reason].home?["...","Yes. Yes, I think I will. Give me a day to say my goodbyes here. I'll be home before you are."]:["Not yet. Maybe one day. Not yet."],
+          pick:function(){ e.s='met'; e.c=LREASONS[e.reason].home?'home':'stay'; logChoice(LREASONS[e.reason].home?'mend':'urge','left'); }, next:function(){ return leftAsks(e); }},
+        {label:"Your secret is safe with me", reply:["You'd do that? ...Thank you. Some things a person has to come to in their own time."], pick:function(){ e.s='met'; e.c='secret'; logChoice('secret','left'); }, next:function(){ return leftAsks(e); }}]};
+    return null; }
+  // somebody on the way has seen them: the gate of every valley between
+  if(id===2) for(const e of leftThreads()){ if(e.s!=='asked') continue; const i=e.path.indexOf(seed), L=e.path.length; if(!((L>2&&i>0&&i<L-1)||(L===2&&i===0))) continue;   // the gates between; or, when it is only next door, the gate at home
+    const next=valleyName(e.path[i+1]), rx=W.exits.find(function(x){ return x.id===(e.ex?e.ex[i]:0); }), road=(rx&&rx.name)||'the road over the hills';
+    return {key:'leftrumor', lines:["Asking after a "+e.trade+"? With "+e.mark+"?","Came through here a while back, "+e.n+" did. Stopped a night. Went on by "+road+", toward "+next+"."], options:[
+      {label:'Thank you', reply:["Good luck to you. And to "+lHim(e)+"."], pick:function(){ e.s='heard'; e.hv=W.valley; e.hn=next; }}]}; }
+  // the asker, at the keep of the valley they left
+  if(!hasAsker(seed)||!W.keepBuilt) return null; const F=MODE==='story'?leftEnsure(seed):(p.tasks[leftKey(seed)]||null), FF=F||leftFacts(seed); if(id!==FF.a||!castOf(id)) return null;
+  const e=F, kin=kinWord(FF);
+  if(!e||e.s==='none'||e.s==='early') return {key:'leftask', lines:[inHome()?"{you}. You're going over the hills one of these days. Don't deny it. I can see it.":"You travel, don't you? I can always tell.",
+      "My "+kin+", "+FF.n+", left "+FF.years+" years ago. A "+FF.trade+". You'd know "+(FF.pr==='she'?'her':'him')+" by "+FF.mark+". Not a word since.","If you ever hear of "+(FF.pr==='she'?'her':'him')+"... I'd want to know "+(FF.pr==='she'?'she':'he')+"'s all right. That's all."], options:[
+    {label:(e&&e.s==='early')?"I think I've met "+FF.n+" already. In "+e.ev+".":"I'll look for "+FF.n, reply:(e&&e.s==='early')?["You have? Then go back. Please. Tell "+(FF.pr==='she'?'her':'him')+" I'm not angry."]:["Thank you. I keep looking at the road. Daft, isn't it."],
+      pick:function(){ const t=leftEnsure(seed); t.s='asked'; }},
+    {label:'Not now', reply:["No. Of course. Forget I said anything."], pick:function(){}, snooze:true}]};
+  if(e.s==='met'){ const nb=e.n, opts=[];
+    if(e.c==='home') return {key:'leftback', lines:["Is it true? "+nb+" is home? "+lHe2(e)+" walked in through the gate an hour ago, bold as brass!","You found "+lHim(e)+". You brought "+lHim(e)+" home."], options:[
+        {label:lHe2(e)+' wanted to come.', reply:["Then I'll make up the bed. I never moved "+(e.pr==='she'?'her':'his')+" things, you know. Not once in "+e.years+" years."], pick:function(){ e.s='closed'; e.c2='home'; }}]};
+    if(e.c==='secret'){ opts.push({label:"I found "+nb+". I promised not to say where.", reply:["You promised? ...Then keep it. As long as "+lHe(e)+"'s well.","Is "+lHe(e)+" well?","...Good. That's enough. That's enough."], pick:function(){ e.s='closed'; e.c2='kept'; logChoice('secret','left'); }});
+      opts.push({label:nb+" is in "+e.dn+".", reply:["In "+e.dn+"! All this time, two valleys away.","...You look like someone who's just broken a promise. Never mind. I'll not tell "+lHim(e)+" it was you."], pick:function(){ e.s='closed'; e.c2='broke'; logChoice('broken','left'); }}); }
+    else { if(e.c==='message') opts.push({label:nb+" says sorry, and thinks of home every day.", reply:["Every day? ...So do I. Every single day.","Thank you. If you go that way again, tell "+lHim(e)+" the door's open."], pick:function(){ e.s='closed'; e.c2='message'; logChoice('mend','left'); }});
+      opts.push({label:'The truth: '+nb+' is in '+e.dn+'.', reply:["In "+e.dn+". "+farWords(e).charAt(0).toUpperCase()+farWords(e).slice(1)+", all this time.","...Did "+lHe(e)+" say why? No. Don't tell me. I think I know.","Thank you. Now I can stop looking at the road."], pick:function(){ e.s='closed'; e.c2='truth'; logChoice('truth','left'); }});
+      opts.push({label:'A kind lie: '+nb+' is doing well. Very well.', reply:["Is "+lHe(e)+"? Oh, that's good. That's all I wanted."], pick:function(){ e.s='closed'; e.c2='kind'; logChoice('lie','left'); }}); }
+    return {key:'leftreport', lines:["You found "+nb+"? Tell me. Tell me all of it."], options:opts}; }
+  return null; }
+// the question they ask you back
+function leftAsks(e){ const a=e.ag||e.an; return {key:'leftq', lines:["Before you go. Is "+a+" well? Tell me true."], options:[
+    {label:a+" misses you. Every day.", reply:["...Every day. Right. Thank you. I needed to hear that."], pick:function(){ e.q='truth'; logChoice('truth','left'); }},
+    {label:a+" is fine. Busy.", reply:["Busy. Good. That sounds like "+aHim(e)+"."], pick:function(){ e.q='kind'; logChoice('kind','left'); }},
+    {label:"I'd rather not say", reply:["Fair. That's fair. It's not your weight to carry."], pick:function(){ e.q='none'; }}]}; }
+function leftNotes(open,done){ for(const e of leftThreads()){ const at=e.on;
+  if(e.s==='early') open.push({t:'Met '+e.n+', a '+e.trade+' from '+at+', in '+e.ev+'. Asked me not to tell anyone. Yet.', v:e.dest});
+  else if(e.s==='asked') open.push({t:e.an+"'s "+kinWord(e)+", "+e.n+", left "+at+" "+e.years+" years ago. A "+e.trade+", with "+e.mark+(e.path.length>2?". Ask at the gates on the road to "+valleyName(e.path[1])+".":". Ask at the gate here, at home.")+"", v:e.path.length>2?e.path[1]:e.origin});
+  else if(e.s==='heard') open.push({t:'Someone in '+e.hv+' saw '+e.n+' go on toward '+(e.hn||e.dn)+'. Keep going.', v:e.dest});
+  else if(e.s==='met') open.push({t:e.c==='home'?e.n+' is coming home to '+at+'. Go and see '+e.an+'.':'Found '+e.n+' in '+e.dn+'. Go back to '+e.an+' in '+at+'.', v:e.origin});
+  else if(e.s==='closed') done.push({t:{home:'Brought '+e.n+' home to '+at+'.', kept:'Found '+e.n+' for '+e.an+', and kept '+e.n+"'s secret.", broke:'Found '+e.n+' for '+e.an+'. Broke my promise to '+e.n+'.', message:'Carried '+e.n+"'s sorry home to "+e.an+'.', truth:'Told '+e.an+' the truth about '+e.n+'.', kind:'Told '+e.an+' that '+e.n+' is doing well. Kinder than true.'}[e.c2]||('Found '+e.n+'.'), v:e.origin}); } }
+// once they're home: the talk changes
+function leftTag(t,id){ const c=castOf(id); if(t==='reunion') return !!(c&&c.left&&leftOf(id)&&leftOf(id).s==='closed'&&leftOf(id).c==='home');
+  if(t==='away') return !!(c&&c.left&&leftOf(id)&&leftOf(id).c!=='home');
+  if(t==='reunionasker'){ for(const e of leftThreads()) if(e.origin===(W.seed>>>0)&&e.a===id&&e.c==='home'&&(e.s==='met'||e.s==='closed')) return true; return false; } return false; }
+const TALKK={any:{a:["[known,first]Aren't you {you}? I've heard about you.","[known]{you}. They talk about you over the hills, you know.","[known,first]Well, well. {you}. Word gets about."]}};
+const TALKL={
+ left:{a:["[away]I came over the hills with one bag. The bag's still going strong.","[away]Folk here don't ask where I'm from. I like that about them.","[away]I help at the keep here. Carry this, fetch that. It's honest work.",
+   "[away]Some nights I walk up to the signpost and look back the way I came. Then I come down again.","[reunion]Home. It's smaller than I remember. Or I'm bigger.","[reunion]Everyone keeps staring at me. I don't blame them. I'd stare too.",
+   "[reunion]Thank you for coming to find me. I'd never have done it on my own."]},
+ any:{a:["[reunionasker]They came home. After all those years. I keep checking it's real.","[reunionasker]I set an extra place at supper. I'd forgotten how nice that is."]}};
+// ---------------- names, legend and lore (v0.28.0) ----------------
+// What you choose is counted (REP). Enough of one kind earns a nickname, then a title, and some are not flattering.
+// Away from home, people call you by the best of them; in Wander, before anything else, by what you have done.
+// In about one valley in four that you have never had a hand in, somebody tells a story about you, a little wrong.
+// The old lore of the land is found at ruins and from hermits and old folk, at most two pieces per valley.
+function REP(){ const r={truth:0,lie:0,kind:0,secret:0,broken:0,mend:0,stir:0,found:0,carry:0,side:0,hard:0,urge:0}; for(const x of part().log) if(r[x.k]!=null) r[x.k]++; return r; }
+function doneTask(fn){ const t=part().tasks; for(const k in t){ const e=t[k]; if(e&&typeof e==='object'&&fn(k,e)) return e; } return null; }
+const TITLES=[
+ {n:'the Promise-Breaker', ok:function(r){ return r.broken>=2; }},
+ {n:'the Troublemaker', ok:function(r){ return r.stir>=2||(r.lie>=5&&r.lie>r.truth); }},
+ {n:'the Wayfinder', ok:function(r){ return r.found>=3; }},
+ {n:'the Peacemaker', ok:function(r){ return r.mend>=3; }},
+ {n:'the Keeper of Secrets', ok:function(r){ return r.secret>=3; }},
+ {n:'the Kind', ok:function(r){ return r.kind>=4; }},
+ {n:'the Truthful', ok:function(r){ return r.truth>=6&&r.lie<=1; }},
+ {n:'the Long-Walker', ok:function(r,v){ return v>=15; }}];
+const NICKS=[
+ {n:'Fibber', ok:function(r){ return r.lie>=3&&r.lie>r.truth; }},
+ {n:'Busybody', ok:function(r){ return r.stir+r.side>=2; }},
+ {n:'Hen-finder', ok:function(){ return !!doneTask(function(k,e){ return k.indexOf('lost:')===0&&e.s==='done'&&e.c==='found'&&e.a==='hen'; }); }},
+ {n:'Lamb-carrier', ok:function(){ return !!doneTask(function(k,e){ return k.indexOf('lost:')===0&&e.s==='done'&&e.c==='found'&&e.a==='lamb'; }); }},
+ {n:'Fence-mender', ok:function(){ return !!doneTask(function(k,e){ return k.indexOf('feud:')===0&&e.c==='mend'; }); }},
+ {n:'Matchmaker', ok:function(){ return !!doneTask(function(k,e){ return k.indexOf('sweet:')===0&&e.c==='told'; }); }},
+ {n:'Ghost-chaser', ok:function(){ return !!doneTask(function(k,e){ return k.indexOf('light:')===0&&e.s==='done'&&e.c==='truth'; }); }},
+ {n:'Ghost-teller', ok:function(){ return !!doneTask(function(k,e){ return k.indexOf('light:')===0&&e.s==='done'&&e.c==='tale'; }); }},
+ {n:'Stone-reader', ok:function(){ return !!doneTask(function(k,e){ return k.indexOf('stone:')===0&&e.c==='told'; }); }},
+ {n:'Letter-carrier', ok:function(){ return !!doneTask(function(k,e){ return k==='letter'&&e.s==='done'; }); }},
+ {n:'Straight-talker', ok:function(r){ return r.hard>=1&&r.truth>=3; }},
+ {n:'Old Boots', ok:function(r,v){ return v>=6; }}];
+function earned(){ const r=REP(), v=valleyCount(); let t=null, n=null; for(const x of TITLES) if(x.ok(r,v)){ t=x.n; break; } for(const x of NICKS) if(x.ok(r,v)){ n=x.n; break; } return {title:t, nick:n, rep:r}; }
+// the deed you are known for, newest first (Wander's way of naming you)
+function deedName(){ const t=part().tasks; let best=null, bt=-1;
+  for(const k in t){ const e=t[k]; if(!e||typeof e!=='object') continue; let d=null, at=0;
+    if(k.indexOf('lost:')===0&&e.s==='done'&&e.c==='found') d="the one who found "+e.on+"'s "+e.a;
+    else if(k.indexOf('feud:')===0&&e.c==='mend') d="the one who mended "+e.an+"'s fence";
+    else if(k.indexOf('sweet:')===0&&e.c==='told') d="the one who spoke up for "+e.an;
+    else if(k.indexOf('left:')===0&&e.s==='closed') d="the one who found "+e.n;
+    else if(k.indexOf('light:')===0&&e.s==='done') d="the one who went out to "+e.rn+" at night";
+    else if(k.indexOf('stone:')===0&&e.c==='told') d="the one who read the name on the stone";
+    else if(k.indexOf('grain:')===0&&e.s==='done') d="the one who ran "+e.sn+"'s errand";
+    if(d){ const i=Object.keys(t).indexOf(k); if(i>bt){ bt=i; best=d; } } }
+  return best; }
+// what people call you here
+function calledBy(){ if(MODE==='story'&&STORY&&inHome()) return STORY.name; const E=earned();
+  if(E.title) return MODE==='story'&&STORY?STORY.name+' '+E.title:E.title.replace(/^the /,'the ');
+  if(E.nick) return E.nick; if(MODE==='story'&&STORY) return STORY.name; return deedName()||'the stranger'; }
+function calledSentence(){ const c=calledBy(); return c.charAt(0).toUpperCase()+c.slice(1); }
+// ---- the legend: a story about you, told where you have never been ----
+function legendFor(seed){ seed=seed>>>0; if(seedRng(seed,0x1E6E)()>=0.25) return null; const p=part(); p.told=p.told||{}; if(p.told['s'+seed]) return null;
+  const t=p.tasks, cands=[];
+  for(const k in t){ const e=t[k]; if(!e||typeof e!=='object') continue; const where=[e.v,e.dest,e.origin].filter(function(x){ return x!=null; }).map(function(x){ return x>>>0; });
+    if(where.indexOf(seed)>=0) continue;   // never told where it happened
+    const other=valleyName(seedRng(seed^0x5eed,0x1E6F)()*4294967296>>>0), vn=e.vn||e.on||'a valley over the hills';
+    if(k.indexOf('lost:')===0&&e.s==='done'&&e.c==='found') cands.push("There's a story going round about {who}. Walked over the hills to carry a "+e.a+" home. A "+e.a+"! In "+vn+", or was it "+other+"?");
+    if(k.indexOf('lost:')===0&&e.s==='done'&&e.c==='kind') cands.push("I heard {who} found a lost "+e.a+" in "+e.dn+" and left it with someone who loved it. Daft, or kind. I can't decide.");
+    if(k.indexOf('feud:')===0&&e.c==='mend') cands.push("They say {who} got a farmer and a shepherd sharing their lunch on a fence again. Over in "+vn+". Or "+other+". Somewhere with sheep.");
+    if(k.indexOf('feud:')===0&&e.c==='sour') cands.push("{Who} set a farmer and a shepherd at each other's throats over a fence, they say. Not a word between them since.");
+    if(k.indexOf('sweet:')===0&&e.c==='told') cands.push("{Who} carried a sweetheart's message, over in "+vn+". There's to be a wedding, they say. Or there was one already.");
+    if(k.indexOf('light:')===0&&e.s==='done'&&e.c==='truth') cands.push("{Who} walked into the old stones at night to see what the light was. Brave, or daft. Bit of both, I'd say.");
+    if(k.indexOf('light:')===0&&e.s==='done'&&e.c==='tale') cands.push("I heard {who} told a guard there was a ghost in the old stones. Had the poor soul hiding under a blanket for a week.");
+    if(k.indexOf('stone:')===0&&e.c==='told') cands.push("{Who} found a name cut in a stone and walked it home to the family it belonged to. A hundred years late, but home.");
+    if(k.indexOf('left:')===0&&e.s==='closed'&&e.c==='home') cands.push("Did you hear? {Who} found a "+e.trade+" who'd been gone "+e.years+" years and walked them home. "+(e.years>4?"Years! Can you imagine.":""));
+    if(k.indexOf('left:')===0&&e.s==='closed'&&e.c2==='kept') cands.push("There's a "+e.trade+" somewhere who trusts {who} with a secret. That's all I know. That's all anyone knows.");
+    if(k.indexOf('left:')===0&&e.s==='closed'&&e.c2==='broke') cands.push("{Who}? Made somebody a promise once and broke it, they say. Folk remember that sort of thing.");
+    if(k==='letter'&&e.s==='done') cands.push("{Who} carried a letter over the hills for their family. Simple thing. Folk remember simple things."); }
+  if(!cands.length) return null; const r=seedRng(seed,0x1E70), line=cands[(r()*cands.length)|0], who=legendName();
+  return line.replace(/\{who\}/g,who).replace(/\{Who\}/g,who.charAt(0).toUpperCase()+who.slice(1)).replace(/ {2,}/g,' ').trim(); }
+// in a story about you: your title, nickname or name; in Wander with none of those, just a traveler
+function legendName(){ const E=earned(); if(E.title) return MODE==='story'&&STORY?STORY.name+' '+E.title:E.title; if(E.nick) return E.nick; if(MODE==='story'&&STORY) return STORY.name; return 'a traveler'; }
+// has this valley seen you do something? Then they know you for that, not from stories
+function didHere(){ const s=W.seed>>>0, t=part().tasks; for(const k in t){ const e=t[k]; if(!e||typeof e!=='object') continue; if([e.v,e.dest,e.origin].some(function(x){ return x!=null&&(x>>>0)===s; })) return true; } return false; }
+function legendTold(seed){ const p=part(); p.told=p.told||{}; p.told['s'+(seed>>>0)]=1; const k=Object.keys(p.told); if(k.length>200) delete p.told[k[0]]; }
+// ---- lore ----
+const LORE=[
+ ['circle',"Count the stones. One is always shorter. It points over the hills, to the next ring."],
+ ['circle',"On the longest day, the sun comes up through the gap in the ring. Somebody meant that."],
+ ['circle,hermit',"The rings hum on the longest night. I've heard it. Low, like a cat that's too big."],
+ ['circle',"Older than the keep, older than the kings. The Ring-builders made these, and then they stopped."],
+ ['tower',"Queen Aldreda put a tower on every third pass. A fire on one, and the next lit theirs. News crossed the land in a night."],
+ ['tower',"A carving by the door: a crown, and a flame over it. The Hollow Kings' mark."],
+ ['tower,old',"My grandmother said the last fire on the towers was lit for the end of the Long Quarrel. Nobody's lit one since."],
+ ['arch',"King Osmund built an arch wherever two valleys made peace. Walk through one and you're meant to forgive somebody."],
+ ['arch',"Two names cut into the keystone, worn almost flat. Two valleys, maybe. Or two people."],
+ ['dolmen',"Under the big stone there's a room. Empty, except for rows of dots on the wall."],
+ ['dolmen,hermit',"The dots on the dolmen walls aren't writing. They're a count. Of what, nobody knows. Days, maybe. Or friends."],
+ ['cairn',"Don't take a stone from a cairn. The Hob builds it back by morning, and he's in a mood after."],
+ ['cairn',"Every traveler adds a stone. That's how a cairn grows. Nobody knows who put the first."],
+ ['temple',"White moths come to lamps here. The Moth Queen, they say. She loved candles too much."],
+ ['temple',"A temple to no god anyone remembers. Just a bowl in the floor, worn smooth by hands."],
+ ['farm',"The ruined farm still has its hearth. Somebody's grandmother's grandmother cooked here."],
+ ['farm,old',"They left in the hard winter. Followed a shepherd called Tamsin over the hills. Came back in spring, most of them."],
+ ['wall',"This wall was a border in the Long Quarrel. Now sheep use it to scratch on. Better use, if you ask me."],
+ ['wall',"Arrow slits, facing both ways. They didn't know which side the trouble would come from."],
+ ['well',"Corrie's well. Old Corrie wouldn't let either army drink until they agreed to share. They shared."],
+ ['well',"Drop a pebble. Count. If you get to seven, it's a Ring-builder's well. This one goes to nine."],
+ ['well,old',"The two sisters met at a well and talked all night. In the morning they broke the crown in half. Every valley says it was their well."],
+ ['menhir',"A standing stone, a day's walk from the next. The old roads used them like signposts."],
+ ['menhir',"Somebody has scratched an arrow on it. Fresh. Pointing over the hills."],
+ ['hermit',"Hollowmere, the old people called it. The valleys between the waters. Nobody says it now."],
+ ['hermit',"The Mere-lamb stands on the lake at dusk. Follow it and you'll get home safe. Chase it and you'll get wet."],
+ ['hermit',"The Long Hound walked beside me once, all the way from the pass. Never made a sound. I was glad of it."],
+ ['old',"As lost as the Seven Fords, we say. Both armies got lost in the fog and walked home. Best battle there ever was."],
+ ['old',"When I was small, a peddler told me the Ring-builders never died. Just walked into the hills and kept on."],
+ ['road',"Tamsin knew. That's what we say when someone finds the way. She followed the short stones."],
+ ['road',"The roads were built to join the rings. Everything else came later. Even us."],
+ ['hermit,circle',"Something sleeps under the hills. The Stone-Waker. It's never woken. The rings are there so it doesn't have to."],
+ ['old',"See a hare with a tail that glows like a coal, at dusk? That's the Lantern Hare. It leads lost children home. Grown-ups, it ignores."],
+ ['farm,old',"Leave a crust on the windowsill for the Thatch-Wife and she'll mend your roof by morning. Forget, and it drips on your pillow."],
+ ['hermit',"The Heron King stands in the shallows, taller than a door. He knows every fish in every lake. I trade him stories. He drives a hard bargain."],
+ ['well',"Hear a bell down a well before rain? That's the Bell Toad. Never seen one. Heard plenty."],
+ ['hermit,menhir',"There's a hill that moves. A hundred years here, a hundred years there. The Wandering Hill. The old stones were set to keep it still."],
+ ['tower',"Two crowns, they say. The sisters broke the Hollow Crown in half and each took a piece over the hills. Nobody knows where either ended up."],
+ ['old',"My granny swore half a crown was buried under a keep somewhere. Not a coin. Half a real crown. She never said which keep."]];
+function loreHas(i){ const p=part(); p.lore=Array.isArray(p.lore)?p.lore:[]; return p.lore.indexOf(i)>=0; }
+function loreCountHere(){ const p=part(); p.loreAt=p.loreAt||{}; return p.loreAt[W.seed>>>0]||0; }
+// the next fragment for a tag here, from the seed; null if none is left or this valley has given two
+function loreFor(tag){ if(W.seed==null||loreCountHere()>=2) return null; const ids=[]; for(let i=0;i<LORE.length;i++) if(LORE[i][0].split(',').indexOf(tag)>=0&&!loreHas(i)) ids.push(i);
+  if(!ids.length) return null; const r=seedRng((W.seed>>>0)^Math.imul(tag.length+3,0x9E37),0x10AE); return ids[(r()*ids.length)|0]; }
+function loreTake(i){ const p=part(); p.lore=Array.isArray(p.lore)?p.lore:[]; if(p.lore.indexOf(i)>=0) return false; p.lore.push(i); p.loreAt=p.loreAt||{}; p.loreAt[W.seed>>>0]=(p.loreAt[W.seed>>>0]||0)+1; journalSave(); return true; }
+// on the thread's road there is always one: the gate on the way says it with the rumor
+function loreOnRoad(){ for(const e of leftThreads()){ const i=e.path.indexOf(W.seed>>>0); if(i>0&&i<e.path.length) return true; } return false; }
+var WSAVE=null;   // in Story: the Wander seed as it was, so saving the dials never moves your Wander valley
 const LINES=[];
 function lineHash(t){ let h=0x811c9dc5; for(let i=0;i<t.length;i++){ h^=t.charCodeAt(i); h=Math.imul(h,0x01000193); } return 'L'+(h>>>0).toString(36); }
 (function(){
   const add=function(who,part,pose,text,extra){ const ch=text.split(' >> '), tg=(/^\[([\w,]+)\]/.exec(text)||['',''])[1].split(','); const e={id:lineHash(who+'|'+text), who:who, part:part, pose:pose, text:ch[0], chain:ch.slice(1), check:ch.join(' '), first:tg.indexOf('first')>=0, last:tg.indexOf('last')>=0};
     if(extra) for(const k in extra) e[k]=extra[k]; LINES.push(e); };
-  for(const T of [TALK,TALKX]) for(const who in T){ if(who==='trait'||who==='rel'||who==='pose') continue;
+  for(const T of [TALK,TALKX,TALKH,TALKT,TALKL,TALKK]) for(const who in T){ if(who==='trait'||who==='rel'||who==='pose') continue;
     for(const pt in T[who]) for(const t of T[who][pt]) add(who,pt==='a'?-1:+pt,0,t); }
   for(const tr in TALK.trait) for(const t of TALK.trait[tr]){ const m=/^\[([\w,]+)\]/.exec(t);   // the trait joins any tags the line already has
     add('any',-1,0,m?'['+tr+','+m[1]+']'+t.slice(m[0].length):'['+tr+']'+t,{trait:tr}); }
@@ -3997,6 +4682,11 @@ function lineOk(id,l,here,who){ const m=TAG_RE.exec(l), c=castOf(id);
     else if(t==='keepers'){ if(!W.keepBuilt||!(here[0]||here[1]||here[2]||here[3])) return false; }
     else if(t==='nothermit'){ if(id===7) return false; }
     else if(t==='first'||t==='last'||t==='leaving'){ }
+    else if(t==='home'){ if(!inHome()) return false; }
+    else if(t==='notparent'){ if(id>=9) return false; }
+    else if(t==='known'){ if(inHome()||didHere()) return false; const E=earned(); if(!E.title&&!E.nick) return false; }
+    else if(t==='reunion'||t==='reunionasker'||t==='away'){ if(!leftTag(t,id)) return false; }
+    else if(t==='feudmend'||t==='feudsour'||t==='sweettold'||t==='sweetshy'||t==='lightdone'||t==='lostback'){ if(!trTag(t,id)) return false; }
     else if(t.indexOf('ev_')===0||t==='evin'||t==='evfirst'||t==='evsecond'){ if(!LINE_EV) return false; }
     else if(t==='evnight'||t==='evday'){ if(!LINE_EV) return false; const nt=LINE_EV.hour>=20||LINE_EV.hour<5; if(nt!==(t==='evnight')) return false; if(nt&&!stormNightOver(LINE_EV)) return false; }
     else if(t==='stormnow'){ if(stormLevel()<0.25) return false; }
@@ -4015,10 +4705,10 @@ function lineOk(id,l,here,who){ const m=TAG_RE.exec(l), c=castOf(id);
     else if(TRAITS.indexOf(t)>=0){ if(!c||c.traits.indexOf(t)<0) return false; }
     else return false; }   // an unknown tag is never said (a typo shows up in the tests, not on screen)
   let ok=true; SLOT_RE.lastIndex=0;
-  l.replace(SLOT_RE,function(_,k){ if(k==='valley') return ''; const w=slotWho(id,k,here); if(w===-3) return ''; if(w<0||(w===id&&k!=='me'&&k!=='eva'&&k!=='evb')) ok=false; return ''; });   // nobody talks about themselves by role
+  l.replace(SLOT_RE,function(_,k){ if(k==='valley'||k==='you') return ''; const w=slotWho(id,k,here); if(w===-3) return ''; if(w<0||(w===id&&k!=='me'&&k!=='eva'&&k!=='evb')) ok=false; return ''; });   // nobody talks about themselves by role
   if(ok) l.replace(PLACE_RE,function(_,s,k){ if(!placeHere(k)) ok=false; return ''; });
   return ok; }
-function roleName(c){ return c.id===0?'the night guard':(c.id===1?'the day guard':'the '+c.role); }
+function roleName(c){ if(c.parent) return 'your '+pform(c,'par'); return c.id===0?'the night guard':(c.id===1?'the day guard':'the '+c.role); }
 function pform(c,f){ const he=c.pr==='he';
   switch(f){ case 'he': return he?'he':'she'; case 'He': return he?'He':'She'; case 'him': return he?'him':'her'; case 'his': return he?'his':'her';
     case 'His': return he?'His':'Her'; case 'role': return roleName(c); case 'full': return c.name+' '+c.by;
@@ -4026,14 +4716,14 @@ function pform(c,f){ const he=c.pr==='he';
   return c.name; }
 function fillLine(id,l,here){ here=here||ALLHERE;
   l=l.replace(TAG_RE,'');
-  l=l.replace(SLOT_RE,function(_,k,f){ if(k==='valley') return W.valley||'the valley';
+  l=l.replace(SLOT_RE,function(_,k,f){ if(k==='valley') return W.valley||'the valley'; if(k==='you') return youName();
     if(LINE_EV&&EVSLOT[k]){ const e=LINE_EV; if(k==='evwhen') return evWhen(e); if(k==='evkid') return e.kid||'baby'; if(k==='evname') return e.name||'';
       if(k==='evnote') return e.note||''; if(k==='evnotes') return e.note==='sheep'?'sheep':(e.note||'')+'s'; } const c=castOf(slotWho(id,k,here)); return c?(f?pform(c,f):c.name):'someone'; });
   l=l.replace(PLACE_RE,function(_,s,k){ return s==='$'?placeDir(k):placeName(k); });
   l=l.replace(/(^|[^.])([.!?] )([a-z])/g,function(_,z,a,b){ return z+a+b.toUpperCase(); });   // a filled-in phrase that starts a sentence
   return l.charAt(0).toUpperCase()+l.slice(1); }
 // which lists a person draws from
-function whoOk(id,who){ if(id===ROLEPED) return who==='peddler'; const k=ROLEKEY[id]; return who===k||who==='any'||(who==='guard'&&id<2)||(who==='keep'&&id<4)||(who==='folk'&&id>=4); }
+function whoOk(id,who){ if(id===ROLEPED) return who==='peddler'; if(id>=9){ const c=castOf(id); if(c&&c.left) return who==='left'||who==='any'; return who==='home'||who==='any'; } const k=ROLEKEY[id]; return who===k||who==='any'||(who==='guard'&&id<2)||(who==='keep'&&id<4)||(who==='folk'&&id>=4); }
 // what has been heard: per valley and person, line id -> the order it was heard in
 const HEARD={}, VISITS={}; let heardN=0;
 function heardKey(id){ return W.seed+':'+id; }
@@ -4047,7 +4737,7 @@ const TOPICS={ruin:/@ruin|old stones|old places/i, supper:/supper/i, bed:/\bbunk
 const STANCES=['invite','aloof','leaving'];
 (function(){ for(const e of LINES){ const tg=(/^\[([\w,]+)\]/.exec(e.text)||['',''])[1].split(',');
   e.topics=[]; for(const k in TOPICS) if(TOPICS[k].test(e.check)) e.topics.push(k);
-  e.stance=STANCES.filter(function(t){ return tg.indexOf(t)>=0; })[0]||'';
+  e.stance=STANCES.filter(function(t){ return tg.indexOf(t)>=0; })[0]||''; e.home=tg.indexOf('home')>=0||e.who==='home'; e.after=['feudmend','feudsour','sweettold','sweetshy','lightdone','lostback','reunion','reunionasker'].some(function(t){ return tg.indexOf(t)>=0; });
   const ek=tg.filter(function(t){ return t.indexOf('ev_')===0; })[0]; e.evkind=ek?ek.slice(3):'';
   e.evrole=tg.indexOf('evin')>=0?'in':(tg.indexOf('evfirst')>=0?'first':(tg.indexOf('evsecond')>=0?'second':''));
   // where it sits in a visit: their own world first, then places and people round about, then talk, then their nature, then their own people
@@ -4061,7 +4751,7 @@ function talkPick(id,pose,here,n){ here=here||peopleHere();
   const key=heardKey(id), visit=VISITS[key]||0, heard=HEARD[key]||new Map(), dp=dayPart();
   const r=seedRng(((W.seed>>>0)^Math.imul(id+1,0x9E37)^Math.imul(visit+1,0x85EB)^heardN)>>>0,0x7A1E);
   if(n==null) n=pose===4?1+((r()*2)|0):3+((r()*3)|0);
-  const picks=[], used=new Set(), topics=new Set(), relTo=new Set(); let stance='', traitN=0, anyN=0, count=0;
+  const picks=[], used=new Set(), topics=new Set(), relTo=new Set(); let stance='', traitN=0, anyN=0, count=0; const HOMEV=inHome()&&id!==ROLEPED;
   const stormy=stormLevel()>0.05, evOf=new Map(), hid=function(e){ const v=evOf.get(e.id); return v?e.id+'@'+evKey(v):e.id; };
   const fresh=function(e){ return !heard.has(hid(e)); };
   const fits=function(e){
@@ -4079,6 +4769,7 @@ function talkPick(id,pose,here,n){ here=here||peopleHere();
       let ev=null; if(e.evkind){ ev=evBind(e,id,here); if(!ev) continue; }
       if(/longer than I can count/.test(e.text)&&wedNow(id)>=0) continue;
       if(stormy&&CLEAR_RE.test(e.text)) continue;
+      if(HOMEV&&!e.home&&STRANGER_RE.test(e.check)) continue;   // at home you are nobody's stranger
       LINE_EV=ev; const ok=lineOk(id,e.check,here,e.who); LINE_EV=null; if(ok){ if(ev) evOf.set(e.id,ev); a.push(e); } } return a; };
   // newest-unheard first, then the ones heard longest ago; weighted by how much the line belongs to this person
   const choose=function(a){ if(!a.length) return null; const f=a.filter(fresh), src=f.length?f:a;
@@ -4092,8 +4783,15 @@ function talkPick(id,pose,here,n){ here=here||peopleHere();
   // caught in the middle of something (or asleep): that comes first
   if(pose>0){ const e=choose(pose===4?pool(function(e){ return e.pose===4; }):pool(function(e){ return e.pose===pose; }).filter(fresh)); if(e) take(e);   // a pose line already heard is not worth repeating
     if(pose===4){ while(count<n){ const e2=choose(pool(function(e){ return e.pose===4; })); if(!e2) break; take(e2); } return out(); } }
+  if(!count&&HOMEV){ const now=function(e){ return e.pose===0&&e.home&&(e.part===-1||e.part===dp); };
+    let a=pool(function(e){ return now(e)&&e.first; }); if(!a.filter(fresh).length) a=pool(function(e){ return now(e)&&!e.last; });
+    const f=a.filter(fresh); if(f.length) take(choose(f)); else if(id>=9&&a.length) take(choose(a)); }
   // otherwise open with a greeting or a line of their own for this time of day
   if(!count){ const a=pool(function(e){ return e.pose===0&&(e.first&&(e.part===-1||e.part===dp)||(e.part===dp&&e.who!=='any')); }); const e=choose(a.filter(fresh).length?a.filter(fresh):a); if(e) take(e); }
+  // at home in Story: something about you comes next, while there is something new to say
+  if(count<n&&inHome()&&!picks.some(function(e){ return e.home; })){ const a=pool(function(e){ return e.pose===0&&e.home&&(e.part===-1||e.part===dp)&&!e.first; }).filter(fresh); if(a.length) take(choose(a)); }
+  // a trouble you settled here: they tell you how it turned out
+  if(count<n){ const a=pool(function(e){ return e.pose===0&&e.after; }).filter(fresh); if(a.length) take(choose(a)); }
   // in a storm, the storm comes first
   if(count<n&&stormLevel()>=0.25){ const e=choose(pool(function(e){ return e.pose===0&&e.storm; })); if(e) take(e); }
   // the newest happening they can speak of comes next
@@ -4112,14 +4810,25 @@ function talk(c,id,pose){
   const key=heardKey(id), now=Date.now(), cl=COOL[key];
   if(now-CHAT.shut<1500) return;                                   // a breath after any card closes
   if(cl&&(!cl.away||now-cl.t<25000)) return;                       // not straight back to the same person
-  const here=peopleHere(), lines=talkPick(id,pose,here); if(!lines.length) return;
-  VISITS[key]=(VISITS[key]||0)+1;
-  const p=castOf(id); CHAT.id=id; CHAT.key=key; CHAT.lines=lines; CHAT.k=0;
+  const here=peopleHere(), beat=pose===4?null:storyBeat(id), lines=beat?beat.lines:talkPick(id,pose,here).slice(); if(!lines.length) return;
+  if(!beat&&pose===0&&lines.length){ const c0=castOf(id), plain=c0&&!c0.parent&&!c0.left&&id!==ROLEPED; let extra=null;
+    if(plain&&!inHome()){ const L=legendFor(W.seed); if(L){ extra={id:'LEG'+(W.seed>>>0), text:L}; legendTold(W.seed); } }
+    if(!extra&&c0&&(id===7||c0.age==='old')&&id!==ROLEPED){ const li=loreFor(id===7?'hermit':'old'); if(li!=null&&loreTake(li)) extra={id:'LORE'+li, text:LORE[li][1]}; }
+    if(extra) lines.splice(Math.min(1,lines.length),0,extra); }
+  if(beat&&beat.key==='leftrumor'){ const li=loreFor('road'); if(li!=null&&loreTake(li)) beat.lines.push({id:'LORE'+li, text:LORE[li][1]}); }
+  VISITS[key]=(VISITS[key]||0)+1; metNote(id); journalSave();
+  const p=castOf(id); CHAT.id=id; CHAT.key=key; CHAT.lines=lines; CHAT.k=0; CHAT.ask=beat; CHAT.picked=false;
   chatHook.open(p?p.name+' '+p.by:'Someone', p?(roleName(p)+(pose===4?' · asleep':'')):'');
   chatShow(); }
-function chatShow(){ const L=CHAT.lines[CHAT.k]; heardAdd(CHAT.key,L.id); if(chatHook) chatHook.line(L.text,CHAT.k>=CHAT.lines.length-1,CHAT.k,CHAT.lines.length); }
-function chatMore(){ if(CHAT.id<0) return; if(CHAT.k<CHAT.lines.length-1){ CHAT.k++; chatShow(); } else closeChat(); }
-function closeChat(){ if(CHAT.id<0) return; COOL[CHAT.key]={t:Date.now(),id:CHAT.id,away:false}; CHAT.shut=Date.now(); CHAT.id=-1; if(chatHook) chatHook.close(); }
+function chatShow(){ const L=CHAT.lines[CHAT.k]; heardAdd(CHAT.key,L.id); const asking=!!(CHAT.ask&&!CHAT.picked&&CHAT.k>=CHAT.lines.length-1);
+  if(chatHook) chatHook.line(L.text,CHAT.k>=CHAT.lines.length-1,CHAT.k,CHAT.lines.length); if(chatHook&&chatHook.ask) chatHook.ask(asking?CHAT.ask.options.map(function(o){ return o.label; }):null); }
+// a reply: recorded once, before the next line shows
+function chatPick(i){ if(CHAT.id<0||!CHAT.ask||CHAT.picked||CHAT.k<CHAT.lines.length-1) return false; const o=CHAT.ask.options[i]; if(!o) return false; CHAT.picked=true;
+  try{ o.pick(); }catch(e){} if(o.snooze) SNOOZE[CHAT.ask.key]=Date.now(); journalSave(); const add=o.reply.map(function(t,k){ return {id:'R'+CHAT.ask.key+i+'.'+k, text:t}; }); CHAT.ask=null;
+  if(o.next){ let nb=null; try{ nb=fillBeat(CHAT.id,o.next()); }catch(e){} if(nb){ for(const l of nb.lines) add.push(l); CHAT.ask=nb; CHAT.picked=false; } }   // they ask you something back
+  if(add.length){ CHAT.lines=CHAT.lines.concat(add); CHAT.k++; chatShow(); } else closeChat(); return true; }
+function chatMore(){ if(CHAT.id<0) return; if(CHAT.ask&&!CHAT.picked&&CHAT.k>=CHAT.lines.length-1) return; if(CHAT.k<CHAT.lines.length-1){ CHAT.k++; chatShow(); } else closeChat(); }
+function closeChat(){ if(CHAT.id<0) return; CHAT.ask=null; COOL[CHAT.key]={t:Date.now(),id:CHAT.id,away:false}; CHAT.shut=Date.now(); CHAT.id=-1; if(chatHook) chatHook.close(); }
 // every tick: close the card when you walk away (or a card covers it), and notice when you have left the last person
 function chatTick(){
   if(CHAT.id>=0){ const c=chatPerson(CHAT.id);
@@ -4129,7 +4838,8 @@ function chatTick(){
 // close enough to talk, or already talking (they wait while the card is open)
 function talkNear(c,qd){ return qd<2.6||(CHAT.id>=0&&CHAT.id===(CR_.ay[c]|0)&&qd<3.2); }
 // arriving in a valley: said once, as soon as nothing is in the way
-function arriveCheck(){ if(W.arriveMsg&&greetHook&&greetHook(W.arriveMsg)!==false) W.arriveMsg=''; }
+function arriveCheck(){ if(W.arriveMsg&&greetHook&&greetHook(W.arriveMsg)!==false) W.arriveMsg='';
+  if(W.loreMsg&&greetHook&&Date.now()>=(W.loreAt||0)&&greetHook(W.loreMsg+' (Journal, Lore)',Math.min(9000,2600+W.loreMsg.length*45))!==false) W.loreMsg=''; }
 // a brazier on a stone post (9 = the fire)
 defMask(SP.FIRE,7,10,[
  "..9.9..",".99999.","9999999",".99999.","1111111",
@@ -4504,7 +5214,7 @@ function addKeeper(path,start,variant,lift){
 function addPeople(){
   if(!DIALS.keep||!DIALS.people||!W.keepBuilt||CR_.n>CMAX-8) return;
   buildKeeperPaths();
-  addKeeper(0,0,0,KEEP.CURH); const tl=addKeeper(1,4,1,KEEP.CURH); addKeeper(2,0,2,0); addKeeper(3,0,3,0);   // Bram, Tilda, Old Wick, Maud
+  addKeeper(0,0,0,KEEP.CURH); const tl=addKeeper(1,4,1,KEEP.CURH); addKeeper(2,0,2,0); addKeeper(3,0,3,0); addParents(); addLeft();   // Bram, Tilda, Old Wick, Maud
   if(sleepHours()){ const a=KPATHS[4], n=a.length/3, bx=a[(n-1)*3], by=a[(n-1)*3+1];
     CR_.x[tl]=bx; CR_.y[tl]=by; CR_.z[tl]=floorAt(bx,by,terr(bx,by)); CR_.ax[tl]=4; CR_.ph[tl]=n-1; CR_.st[tl]=2; CR_.po[tl]=4; CR_.vx[tl]=0.01; CR_.vy[tl]=0; }
   const cx=FORT.x, cy=FORT.y;
@@ -4523,7 +5233,7 @@ function sidestep(c,ux,uy,dt){ const s=Math.min(0.7-CR_.ss[c],1.4*dt); if(s<=0) 
 }
 function tickKeeper(c,dt){
   const path=CR_.ax[c]|0, a=KPATHS[path]; if(!a) return;
-  const x=CR_.x[c], y=CR_.y[c], id=Math.min(3,CR_.ay[c]|0);
+  const x=CR_.x[c], y=CR_.y[c], id=(CR_.ay[c]|0)>=9?(CR_.ay[c]|0):Math.min(3,CR_.ay[c]|0);
   const qx=P.x-x, qy=P.y-y, qd=Math.hypot(qx,qy), near=talkNear(c,qd)&&qd>0.05&&Math.abs((P.z-EYE)-CR_.z[c])<1.6;
   // asleep: stays put till morning (you can tiptoe past); then back up to the wall
   if(CR_.st[c]===2){ if(near) talk(c,id,4);
@@ -4564,6 +5274,8 @@ function tickKeeper(c,dt){
   const g=floorAt(CR_.x[c],CR_.y[c],CR_.z[c]); CR_.z[c]+=(g-CR_.z[c])*Math.min(1,dt*16);
 }
 function tick(dt){
+  if(W.seed!=null&&W.seed!==VN_LAST){ VN_LAST=W.seed; visitNote(W.seed); journalSave(); }
+  lightCheck();
   dayTick(); pedTick(); chatTick(); arriveCheck(); ruinCheck(); placeCheck();
   if(CR_.n===0) return; buildSGrid(); const px=P.x, py=P.y;
   for(let c=0;c<CR_.n;c++){ if(CR_.al[c]===0)continue;
@@ -4757,15 +5469,19 @@ function boot(){
   function toast(msg,ms){ const t=$('toast'); t.textContent=msg; t.style.opacity=1; clearTimeout(toast.h); toast.h=setTimeout(function(){ t.style.opacity=0; },ms||1600); }
   // the chat card: name and role, one line at a time, more and goodbye
   chatHook={
-    blocked:function(){ return ['help','about','menu','seed','log','dials','leave'].some(function(id){ const e=$(id); return e&&!e.classList.contains('hidden'); }); },
+    blocked:function(){ return ['help','about','menu','seed','log','dials','leave','journal'].some(function(id){ const e=$(id); return e&&!e.classList.contains('hidden'); }); },
     open:function(name,role){ $('chName').textContent=name; $('chRole').textContent=role; $('chat').classList.remove('hidden'); },
     line:function(text,last,k,n){ $('chLine').textContent=text; $('chDots').textContent=n>1?Array.from({length:n},function(_,i){ return i<=k?'\u25cf':'\u25cb'; }).join(' '):'';
       $('chMore').style.display=last?'none':''; },
-    close:function(){ $('chat').classList.add('hidden'); } };
+    ask:function(opts){ const box=$('chOpts'); box.innerHTML=''; $('chat').classList.toggle('asking',!!opts); if(!opts){ $('chBye').textContent='goodbye'; return; } $('chBye').textContent='later';
+      opts.forEach(function(t,i){ const b=document.createElement('button'); b.className='btn'; b.type='button'; b.textContent=t; b.addEventListener('click',function(){ chatPick(i); }); box.appendChild(b); });
+      },
+    close:function(){ $('chat').classList.add('hidden'); $('chat').classList.remove('asking'); $('chOpts').innerHTML=''; $('chBye').textContent='goodbye'; } };
   $('chMore').addEventListener('click',function(){ chatMore(); });
   $('chBye').addEventListener('click',function(){ closeChat(); });
-  window.addEventListener('keydown',function(e){ if(CHAT.id<0) return; if(e.key==='Enter'){ chatMore(); e.preventDefault(); } else if(e.key==='Escape') closeChat(); });
-  greetHook=function(m){ if(['help','about','menu','seed','log','dials','leave'].some(function(id){ const e=$(id); return e&&!e.classList.contains('hidden'); })) return false; toast(m,3400); };
+  window.addEventListener('keydown',function(e){ if(CHAT.id<0) return; if(/^[1-4]$/.test(e.key)&&CHAT.ask&&!CHAT.picked){ if(chatPick(+e.key-1)) e.preventDefault(); return; }
+    if(e.key==='Enter'){ if(e.target&&e.target.tagName==='BUTTON'&&e.target.closest&&e.target.closest('#chat')) return; chatMore(); e.preventDefault(); } else if(e.key==='Escape') closeChat(); });
+  greetHook=function(m,ms){ if(['help','about','menu','seed','log','dials','leave','journal'].some(function(id){ const e=$(id); return e&&!e.classList.contains('hidden'); })) return false; toast(m,ms||3400); };
   function setupGrid(force){
     const cssW=window.innerWidth, cssH=window.innerHeight;
     if(!force && cssW===lastW && cssH===lastH && qCell===lastQ) return; // no real change: don't clear the canvas
@@ -4799,12 +5515,12 @@ function boot(){
   $('mbVer').textContent=VER_SHORT;
   $('mbVer').addEventListener('click',function(){ toast(VER_SHORT+' loaded · seed '+W.seed+' · '+RS.C+'x'+RS.R+(RS.letterbox?' · letterboxed':'')); });
   // one card at a time: every opener closes the rest first, so nothing paints dead behind another card
-  const OVERLAYS=['help','about','menu','seed','log','dials','leave'];
+  const OVERLAYS=['help','about','menu','seed','log','dials','leave','journal'];
   let skyHud=null;   // set by openDials: refreshes the sky dials' clock while the card is open
   var LEAVE=null;   // the road end the leave card is open for (cleared whenever cards close, so nothing holds you)
   function closeAll(){ LEAVE=null; for(let i=0;i<OVERLAYS.length;i++) $(OVERLAYS[i]).classList.add('hidden'); }
   // the dials remember both states across reloads (seed, species, predators, keep, landmarks, forest, water)
-  function saveDials(){ try{ const o=JSON.parse(JSON.stringify(DIALS)); if(DIALS.trav){ const w=PLAYER_LAND; for(const k of WORLD_KEYS) o[k]=w[k]; o.on=w.on.slice(); o.pop=w.pop.slice(); o.folk=w.folk.slice(); } localStorage.setItem('keep_dials',JSON.stringify(o)); }catch(e){} }
+  function saveDials(){ try{ const o=JSON.parse(JSON.stringify(DIALS)); if(DIALS.trav){ const w=PLAYER_LAND; for(const k of WORLD_KEYS) o[k]=w[k]; o.on=w.on.slice(); o.pop=w.pop.slice(); o.folk=w.folk.slice(); } if(MODE==='story'&&WSAVE){ o.seed=WSAVE.seed; o.trav=WSAVE.trav; o.home=WSAVE.home; } localStorage.setItem('keep_dials',JSON.stringify(o)); }catch(e){} }
   function saveSeedOnly(seed){ DIALS.seed=seed>>>0; saveDials(); }
   function saveSeedOnlyOld(seed){ try{ const d=JSON.parse(localStorage.getItem('keep_dials')||'null'); if(d&&typeof d==='object'){ d.seed=seed; localStorage.setItem('keep_dials',JSON.stringify(d)); } else saveDials(); }catch(e){} }
   function loadDials(){
@@ -4839,6 +5555,8 @@ function boot(){
     c.innerHTML='<h1>Leaving '+W.valley+'</h1><p class="lvp">'+road+' goes on over the hills to another valley. Every valley you travel to is shaped by its own seed: its forest, water, ruins and wildlife.</p>'+
       '<div class="fsize" style="display:flex;align-items:center;gap:8px;justify-content:space-between"><span>This valley is seed <b id="lvSeed">'+sd+'</b></span><button class="btn" id="lvCopy" style="padding:8px 12px">copy</button></div>'+
       '<button class="btn go" id="lvStay" style="width:100%;margin-top:4px">Stay in '+W.valley+'</button>'+
+      '<button class="btn" id="lvNext" style="width:100%;margin-top:8px;border-color:rgba(76,240,224,.5)">Over the hills to '+valleyName(roadDest(sd,e.id))+'</button>'+
+      (valleyCount()>1?'<button class="btn" id="lvBeen" style="width:100%;margin-top:8px">Somewhere I\'ve been</button>':'')+
       '<div id="lvWays" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px"><button class="btn" id="lvRnd" style="flex:1">A random valley</button><button class="btn" id="lvType" style="flex:1">Type a seed</button><button class="btn" id="lvChoose">Choose a valley</button></div>'+
       '<div id="lvTypeRow" style="display:none;gap:8px;margin-top:8px"><input id="lvIn" inputmode="numeric" placeholder="seed number" style="flex:1 1 auto;width:100%;min-width:0;padding:11px;font:600 16px var(--mb-mono);background:rgba(0,0,0,.5);color:var(--mb-ink);border:1px solid var(--mb-line);border-radius:13px"><button class="btn go" id="lvGo" style="flex:0 0 auto;width:auto;margin-top:0">go</button></div>';
     $('leave').classList.remove('hidden');
@@ -4848,10 +5566,20 @@ function boot(){
       try{ if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(String(sd)).then(function(){ toast('Seed '+sd+' copied',1800); },function(){ toast('Seed '+sd,2400); }); ok=true; } }catch(err){}
       if(!ok) toast('Seed '+sd,2400); });
     $('lvRnd').addEventListener('click',function(){ leaveGo((Math.random()*4294967296)>>>0); });
+    $('lvNext').addEventListener('click',function(){ leaveGo(roadDest(sd,e.id),true); });
+    if($('lvBeen')) $('lvBeen').addEventListener('click',function(){ openBeen(e); });
     $('lvChoose').addEventListener('click',function(){ openChoose(); });
     $('lvType').addEventListener('click',function(){ $('lvTypeRow').style.display='flex'; try{ $('lvIn').focus(); }catch(err){} });
     $('lvGo').addEventListener('click',function(){ const v=seedParse($('lvIn').value); if(v!=null) leaveGo(v); else toast('A seed is a whole number from 0 to 4294967295',2200); });
     $('lvIn').addEventListener('keydown',function(ev){ if(ev.key==='Enter'){ $('lvGo').click(); ev.preventDefault(); } else if(ev.key==='Escape'){ leaveStay(); ev.preventDefault(); } ev.stopPropagation(); }); }
+  // somewhere I've been: the journal's valleys, newest first
+  function openBeen(e){ const c=$('leaveCard'), P=part(); c.classList.add('choose');
+    const ks=Object.keys(P.valleys).filter(function(k){ return (+k>>>0)!==(W.seed>>>0); }).sort(function(a,b){ return (P.valleys[b].l||0)-(P.valleys[a].l||0); }).slice(0,30);
+    c.innerHTML='<h1>Somewhere I\'ve been</h1><p class="lvp">Back over the hills to a valley in your journal.</p>'+ks.map(function(k){ const v=P.valleys[k]; return '<button class="btn" data-sd="'+(+k>>>0)+'" style="width:100%;margin-top:8px;text-align:left">'+esc(v.n||valleyName(+k>>>0))+(isHome(+k)?' (home)':'')+'</button>'; }).join('')+
+      '<button class="btn go" id="lvBack2" style="width:100%;margin-top:12px">back</button>';
+    c.querySelectorAll('[data-sd]').forEach(function(b){ b.addEventListener('click',function(){ leaveGo(+b.getAttribute('data-sd')>>>0); }); });
+    $('lvBack2').addEventListener('click',function(){ openLeave(e); });
+    try{ (c.querySelector('[data-sd]')||$('lvBack2')).focus({preventScroll:true}); }catch(err){} }
   // choose a valley: pick what you want of each trait, and the nearest seed that has it is found (it is still an ordinary seed)
   let CHOOSE=[-1,-1,-1,-1];
   function openChoose(){ const c=$('leaveCard');
@@ -4871,10 +5599,10 @@ function boot(){
     try{ $('chGo').focus({preventScroll:true}); }catch(err){} }
   function leaveStay(){ if(LEAVING) return; const e=LEAVE; $('leave').classList.add('hidden'); LEAVE=null; if(e) roadStay(e,Date.now()); }
   let LEAVING=false;
-  function leaveGo(seed){ const e=LEAVE; if(!e||LEAVING) return; LEAVING=true;
+  function leaveGo(seed,byRoad){ const e=LEAVE; if(!e||LEAVING) return; LEAVING=true; const from=W.seed>>>0;
     $('leaveCard').classList.remove('choose'); $('leaveCard').innerHTML='<h1>Leaving '+W.valley+'</h1><p class="lvwalk">Walking over the hills...</p>';
     setTimeout(function(){ requestAnimationFrame(function(){ setTimeout(function(){
-      $('leave').classList.add('hidden'); LEAVE=null; LEAVING=false; travelTo(seed,e); saveSeedOnly(seed);
+      $('leave').classList.add('hidden'); LEAVE=null; LEAVING=false; let ex=travelTo(seed,e); if(byRoad){ const ax=arriveExit(from,ex); if(ax&&ax!==ex){ spawnAtExit(ax); ex=ax; } if(ex) roadLink(from,e.id,seed,ex.id); } if(MODE==='story') storyAt(seed); else saveSeedOnly(seed);
       if(folkMissing().length) W.arriveMsg+=' No room here for '+folkMissing().join(' or ')+'.'; },0); }); },30); }
   $('leave').addEventListener('click',function(ev){ if(ev.target===$('leave')) leaveStay(); });
   window.addEventListener('keydown',function(ev){ if(!LEAVE||$('leave').classList.contains('hidden')) return; if(ev.target&&ev.target.id==='lvIn') return;
@@ -5004,6 +5732,52 @@ function boot(){
     const m=RENDERS[i]; if(!m.file){ for(const k in GLR) glDrop(k); }   // back to letters or pixels: hand the 3D memory back
     if(m.file&&!(GLR[m.id]&&GLR[m.id].r&&GLR[m.id].r.ok)) loadGL(m); else toast('Drawn as '+m.name,1800);
   });
+  // ---- the journal ----
+  let JTAB='threads', JOPEN=null;
+  const esc=function(t){ return String(t).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
+  function openJournal(tab){ closeAll(); closeChat(); if(tab) JTAB=tab; paintJournal(); $('journal').classList.remove('hidden');
+    setTimeout(function(){ const b=document.querySelector('#jCard .jtabs button[aria-selected="true"]'); if(b){ try{ b.focus({preventScroll:true}); }catch(e){} } },30); }
+  function paintJournal(){ const P=part(), c=$('jCard'), story=MODE==='story'&&STORY;
+    const tabs=[['threads','Threads'],['lore','Lore'],['valleys','Valleys'],['me','Me']];
+    let h='<h1>'+(story?esc(STORY.name)+'\'s journal':'Journal')+'</h1><div class="jtabs" role="tablist">'+tabs.map(function(t){ return '<button type="button" role="tab" data-t="'+t[0]+'" aria-selected="'+(JTAB===t[0])+'">'+t[1]+'</button>'; }).join('')+'</div><div class="jbody" id="jBody">';
+    if(JTAB==='threads'){ const N=journalNotes();
+      if(!N.open.length&&!N.done.length) h+='<p class="jempty">Nothing written yet. People will ask things of you. Write them down here.</p>';
+      if(N.open.length) h+='<ul>'+N.open.map(function(n){ return '<li>'+esc(n.t)+'</li>'; }).join('')+'</ul>';
+      if(N.done.length) h+='<h3>Done</h3><ul>'+N.done.map(function(n){ return '<li class="done">'+esc(n.t)+'</li>'; }).join('')+'</ul>'; }
+    else if(JTAB==='lore'){ const got=Array.isArray(P.lore)?P.lore:[]; if(!got.length) h+='<p class="jempty">Nothing yet. Old places and old people know things.</p>';
+      else h+='<p class="jempty" style="margin-bottom:6px">'+got.length+' of '+LORE.length+' pieces of the old lore.</p><ul>'+got.map(function(i){ return LORE[i]?'<li>'+esc(LORE[i][1])+'</li>':''; }).join('')+'</ul>'; }
+    else if(JTAB==='valleys'){ const N=journalNotes(), busy={}; for(const n of N.open) if(n.v!=null) busy[n.v>>>0]=1;
+      const ks=Object.keys(P.valleys).sort(function(a,b){ const ba=busy[a]?1:0, bb=busy[b]?1:0; if(ba!==bb) return bb-ba; return (P.valleys[b].l||0)-(P.valleys[a].l||0); });
+      if(!ks.length) h+='<p class="jempty">No valleys yet.</p>';
+      for(const k of ks){ const v=P.valleys[k], sd=+k>>>0, here=(W.seed>>>0)===sd, home=isHome(sd);
+        h+='<button type="button" class="jv" data-v="'+sd+'">'+esc(v.n||valleyName(sd))+(home?'<span class="tag">home</span>':'')+(here?'<span class="tag">here</span>':'')+(busy[sd]?'<span class="tag">thread</span>':'')+
+           '<small>'+(v.m&&v.m.length?'Met '+v.m.length+(v.m.length===1?' person':' people'):'Met nobody yet')+'</small></button>';
+        if(JOPEN===sd){ h+='<div class="jvd">'+(v.m&&v.m.length?esc(v.m.join('; '))+'.':'You walked through without talking to anyone.')+
+            (here?'<p style="margin:8px 0 0">You are here.</p>':'<div class="row"><button type="button" class="btn go" data-go="'+sd+'">Travel there</button></div><p style="margin:6px 0 0;font-size:12px;color:var(--mb-dim)">You walk the roads in a moment and arrive at the end of one.</p>')+'</div>'; } } }
+    else { const v=Object.keys(P.valleys).length;
+      const E=earned(), R=E.rep, deeds=[['truth','truth told','truths told'],['lie','fib','fibs'],['kind','kindness','kindnesses'],['secret','secret kept','secrets kept'],['broken','promise broken','promises broken'],['mend','quarrel mended','quarrels mended'],['stir','quarrel stirred','quarrels stirred'],['found','lost thing found','lost things found']].filter(function(d){ return R[d[0]]>0; }).map(function(d){ return R[d[0]]+' '+(R[d[0]]===1?d[1]:d[2]); });
+      const away=E.title?(story?STORY.name+' '+E.title:E.title):(E.nick||(story?STORY.name:(deedName()||'the stranger')));
+      if(story) h+='<div class="jme"><p><b>'+esc(STORY.name)+'</b>'+(E.title?' <span class="tag" style="color:var(--mb-teal)">'+esc(E.title)+'</span>':'')+'</p><p>Home: <b>'+esc(valleyName(STORY.home))+'</b>, where your parents keep the keep.</p><p>At home they call you '+esc(STORY.name)+'.'+(away!==STORY.name?' Over the hills they call you <b>'+esc(away)+'</b>.':'')+'</p>'+(E.nick&&E.title?'<p>Some say <b>'+esc(E.nick)+'</b>.</p>':'')+'<p>Valleys you have set foot in: <b>'+v+'</b>.</p>'+(deeds.length?'<p>'+esc(deeds.join(', '))+'.</p>':'')+'</div>';
+      else h+='<div class="jme"><p>'+(away==='the stranger'?'<b>No name.</b> To the people you meet, you are a stranger.':'People call you <b>'+esc(away)+'</b>.')+'</p><p>Valleys you have set foot in: <b>'+v+'</b>.</p>'+(deeds.length?'<p>'+esc(deeds.join(', '))+'.</p>':'')+'</div>'; }
+    h+='</div>'+(JOURNAL_OFF?'<p class="jnote">Saving is off in this browser. The journal lasts until you close this tab.</p>':'')+'<button class="btn go" id="jClose" type="button" style="margin-top:10px">close</button>';
+    c.innerHTML=h;
+    c.querySelectorAll('.jtabs button').forEach(function(b){ b.addEventListener('click',function(){ JTAB=b.getAttribute('data-t'); JOPEN=null; paintJournal(); try{ c.querySelector('.jtabs button[data-t="'+JTAB+'"]').focus({preventScroll:true}); }catch(e){} }); });
+    c.querySelectorAll('.jv').forEach(function(b){ b.addEventListener('click',function(){ const sd=+b.getAttribute('data-v')>>>0; JOPEN=JOPEN===sd?null:sd; paintJournal(); }); });
+    if(JOPEN!=null){ const d=c.querySelector('.jvd'); if(d){ try{ d.scrollIntoView({block:'nearest'}); }catch(e){} } }
+    c.querySelectorAll('[data-go]').forEach(function(b){ b.addEventListener('click',function(){ journalTravel(+b.getAttribute('data-go')>>>0); }); });
+    $('jClose').addEventListener('click',function(){ $('journal').classList.add('hidden'); }); }
+  // quick travel: to a valley you have been to, arriving at the end of one of its roads (at home, by the keep gate)
+  let JTRAV=false;
+  function journalTravel(seed){ if(JTRAV) return; JTRAV=true; closeAll(); closeChat();
+    toast('Walking the roads to '+valleyName(seed)+'...',1600);
+    setTimeout(function(){ requestAnimationFrame(function(){ setTimeout(function(){ JTRAV=false;
+      const home=isHome(seed); travelTo(seed,null); if(home) spawn();
+      if(MODE==='story') storyAt(seed); else saveSeedOnly(seed);
+      W.arriveMsg=home?'Home again, in '+W.valley+'.':'You arrive in '+W.valley+'.';
+      if(folkMissing().length) W.arriveMsg+=' No room here for '+folkMissing().join(' or ')+'.'; },0); }); },30); }
+  $('bJournal').addEventListener('click',function(){ if(!$('journal').classList.contains('hidden')){ $('journal').classList.add('hidden'); return; } openJournal(); });
+  $('journal').addEventListener('click',function(ev){ if(ev.target===$('journal')) $('journal').classList.add('hidden'); });
+  window.addEventListener('keydown',function(ev){ if($('journal').classList.contains('hidden')) return; if(ev.key==='Escape'){ $('journal').classList.add('hidden'); ev.preventDefault(); ev.stopPropagation(); } },true);
   $('bMenu').addEventListener('click',function(){ closeAll(); paintRenderSeg(); $('menu').classList.remove('hidden'); });
   $('mClose').addEventListener('click',closeMenu);
   $('mSeed').addEventListener('click',function(){ closeMenu(); openSeed(); });
@@ -5043,13 +5817,25 @@ function boot(){
   });
   function end(e){ const p=ptr[e.pointerId]; if(!p) return; if(p.role==='move'){ IN.f=0; IN.s=0; IN.turn=0; IN.run=false; stick.style.display='none'; } else if(e.pointerType==='touch') IN.looking=Math.max(0,IN.looking-1); delete ptr[e.pointerId]; }
   canvas.addEventListener('pointerup',end); canvas.addEventListener('pointercancel',end);
+  // Story: grow the valley you are in, at home by the keep gate, elsewhere at the end of a road
+  function storyStart(p){
+    if(p.kind==='new'){ journalLoad(); const d=new Date(); storyNew(p.name,p.chips,d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')); }
+    else if(p.kind==='cont'){ journalLoad(); if(!storyResume()) return; }
+    else return;
+    if(!WSAVE) WSAVE={seed:DIALS.seed>>>0, trav:DIALS.trav?1:0, home:DIALS.home};
+    closeAll(); const home=isHome(STORY.at); travelTo(STORY.at,null); if(home) spawn();
+    W.arriveMsg=home?(p.kind==='new'?'Home. '+W.valley+', where you grew up.':'Home again, in '+W.valley+'.'):'Back in '+W.valley+'.';
+    if(folkMissing().length) W.arriveMsg+=' No room here for '+folkMissing().join(' or ')+'.';
+    for(const id of ['mSeed','mDials']){ const b=$(id); if(b) b.style.display='none'; }   // those grow Wander worlds
+    if(!journalSave()) setTimeout(function(){ toast('Saving is off in this browser. Your story lasts until you close this tab.',4200); },2600); }
   // go
   DIALS.seed=20260919; loadDials(); DAY.tzOff=tzOffsetHours(SITE.tz); DAY.tod=DIALS.tod; DAY.mode=DIALS.dayMode; updateDay(0);
   genWorld(DIALS.seed); populate(DIALS.seed); spawn(); setupGrid();
   // first visit ever: show the "about this build" card once, then it lives in the menu
   showSize();
   if(/[?&]nointro=1/.test(location.search)) KEEP_INTRO.close();
-  else { try{ KEEP_INTRO.start({ render:function(){ return DIALS.render|0; }, setRender:function(i){ DIALS.render=i; saveDials(); paintRenderSeg(); },
+  else { try{ KEEP_INTRO.start({ story:function(){ const j=journalLoad(); return j.story?{name:j.story.name}:null; }, begin:storyStart, roll:function(){ return randomName(); },
+      render:function(){ return DIALS.render|0; }, setRender:function(i){ DIALS.render=i; saveDials(); paintRenderSeg(); },
       about:function(){ openAbout(); $('about').style.zIndex='1100'; $('aGo').textContent='back'; },
       closed:function(){ $('about').style.zIndex=''; $('aGo').textContent='walk the keep';
         const m=glCur(); if(m){ loadGL(m); } else { for(const k in GLR) glDrop(k); } } }); }catch(e){ try{ KEEP_INTRO.close(); }catch(e2){} } }
@@ -5095,7 +5881,9 @@ function boot(){
   if(glCur()&&!KEEP_INTRO.active) setTimeout(function(){ const m=glCur(); if(m&&!KEEP_INTRO.active) loadGL(m); },400);
 }
 
-if(IS_NODE){ module.exports={genWorld,allocGrid,buildGlyphs,renderFrame,compose,spawn,populate,tick,ecology,simBin,updatePlayer,W,RS,FB,P,IN,CR_,SP,SPP,MASKS,RESERVE,RAMP,N,WATER,EYE,terr,groundAt,DIALS,growOf,isAdult,addCreature,WALLS,buildWalls,nearestWall,allWallHits,wallBlocked,setSkyTime:function(t){skyTime=t;},setUW:function(v){UW=v;},DAY,SUN,MOON,SKY,DAYMODES,sunAltAz,sunUpdate,updateDay,relightAll,relightStep,RELIGHT,dayDate,fmtTod,setTod:function(h){DAY.tod=h;sunUpdate();},floorAt,KPATHS,KEEP,FORT,eventsForDay,weddingDay,babyDay,valleyDay,logEvent,eventsRefresh,dayTick,restock,stockTakeable,stockOwner,evBind,evWhen,evKey,seedDials,valleyTraits,chooseSeed,applyWorld,worldOf,TRAITS37,WORLD_KEYS,getPlayerLand:function(){ return PLAYER_LAND; },seedParse,babyFor,pedWays,pedShelter,carveRoads,exitAngles,roadCheck,roadStay,travelTo,spawnAtExit,VISITED,ROADS,PED,pedTick,pedDay,pedFind,pedRouteIn,pedPitch,pedWay,TALKP,ROAD_DIALS,ROLEPED,stormLevel,stormWindows,stormOngoing,underCover,stormLight,TALKS,STORMC,evBase,keeperAbed,FISHSIZE,TALKE,EVTAG,EVKINDS,wedNow,relOf,TALK,TALKX,LINES,POSEWHO,talkPick,talk,chatMore,closeChat,chatTick,CHAT,HEARD,VISITS,heardKey,heardAdd,lineOk,whoOk,placeName,placeDir,setChat:function(h){chatHook=h;},castValley,valleyName,valleyNames,seedRng,rebuildPeople,KEEPERS,GREETN,lineOk,fillLine,peopleHere,ALLHERE,ROLEKEY,ROLES,NAMES_F,NAMES_M,NAMES_X,BYNAMES,CLOTHES,SKINS,HAIRS,TRAITS,TRAIT_CLASH,RELREV,dayPart,folkMissing,tickKeeper,KMASK,KL,keeperFrame,GREETT,setGreet:function(f){greetHook=f;},RENDERS}; }
+if(IS_NODE){ module.exports={genWorld,allocGrid,buildGlyphs,renderFrame,compose,spawn,populate,tick,ecology,simBin,updatePlayer,W,RS,FB,P,IN,CR_,SP,SPP,MASKS,RESERVE,RAMP,N,WATER,EYE,terr,groundAt,DIALS,growOf,isAdult,addCreature,WALLS,buildWalls,nearestWall,allWallHits,wallBlocked,setSkyTime:function(t){skyTime=t;},setUW:function(v){UW=v;},DAY,SUN,MOON,SKY,DAYMODES,sunAltAz,sunUpdate,updateDay,relightAll,relightStep,RELIGHT,dayDate,fmtTod,setTod:function(h){DAY.tod=h;sunUpdate();},floorAt,KPATHS,KEEP,FORT,eventsForDay,weddingDay,babyDay,valleyDay,logEvent,eventsRefresh,dayTick,restock,stockTakeable,stockOwner,evBind,evWhen,evKey,seedDials,valleyTraits,chooseSeed,applyWorld,worldOf,TRAITS37,WORLD_KEYS,getPlayerLand:function(){ return PLAYER_LAND; },seedParse,babyFor,pedWays,pedShelter,carveRoads,exitAngles,roadCheck,roadStay,travelTo,spawnAtExit,VISITED,ROADS,PED,pedTick,pedDay,pedFind,pedRouteIn,pedPitch,pedWay,TALKP,ROAD_DIALS,ROLEPED,stormLevel,stormWindows,stormOngoing,underCover,stormLight,TALKS,STORMC,evBase,keeperAbed,FISHSIZE,TALKE,EVTAG,EVKINDS,wedNow,relOf,TALK,TALKX,LINES,POSEWHO,talkPick,talk,chatMore,closeChat,chatTick,CHAT,HEARD,VISITS,heardKey,heardAdd,lineOk,whoOk,placeName,placeDir,setChat:function(h){chatHook=h;},castValley,valleyName,valleyNames,seedRng,rebuildPeople,KEEPERS,GREETN,lineOk,fillLine,peopleHere,ALLHERE,ROLEKEY,ROLES,NAMES_F,NAMES_M,NAMES_X,BYNAMES,CLOTHES,SKINS,HAIRS,TRAITS,TRAIT_CLASH,RELREV,dayPart,folkMissing,tickKeeper,KMASK,KL,keeperFrame,GREETT,setGreet:function(f){greetHook=f;},RENDERS};
+  Object.assign(module.exports,{REP,TITLES,NICKS,earned,deedName,calledBy,legendName,didHere,legendFor,legendTold,LORE,loreFor,loreTake,loreCountHere,TALKK,leftFacts,leftPath,leftEnsure,leftThreads,leftHere,leftOf,hasAsker,leftKey,LREASONS,TALKL,fillBeat,troublesFor,trGet,trTag,stoneFacts,lightCheck,LIGHTS,TALKT,arriveExit,SNOOZE,part,fixPart,neighborSeed,roadDest,roadLink,visitNote,metNote,valleyCount,storyBeat,journalNotes,chatPick,ERRANDS,errandTarget,letterFacts,CHATX:CHAT,cleanName,nameHash,randomName,homeSeed,isHome,inHome,youName,journalLoad,journalSave,journalBlank,storyNew,storyResume,storyAt,parentsFor,castWithHome,addParents,TALKH,PARENT_IDS,addKeeper,
+    setMode:function(m,st){ MODE=m; STORY=st; },getStory:function(){ return STORY; },getMode:function(){ return MODE; },setJournal:function(j){ JOURNAL=j; },getJournal:function(){ return JOURNAL; },journalOff:function(){ return JOURNAL_OFF; }}); }
 else boot();
 })();
 </script>
