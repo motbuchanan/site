@@ -1,6 +1,7 @@
 # Civic Compass (showcase) ROADMAP
 
-Current: CC 1.3 (November 3, 2026) - Phase 3 complete (live-ready).
+Current: CC 1.4 (November 3, 2026) - Phase 3 complete (live-ready).
+- CC 1.4: moved the fixed .mb-ver version pill up above the bottom nav bar (bottom 66px + safe-area); at bottom 10px it had been overlapping the "More" tab and blocking taps. Home-screen card status is now version-less ("Installable, works offline") so it never drifts from the app badge.
 Lives: motbuchanan.com/civic-compass/ (folder in the motbuchanan/site repo).
 What it is: a neutral, white-label fork of Empower Compass for the site. Full toolset (dates, reps, voter toolbox, voting plan, canvass sessions, action log, scripts, report-to, backup, FAQ, about), no candidate slate, no party or org identity.
 

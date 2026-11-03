@@ -1,4 +1,4 @@
-var CACHE = 'civic-compass-cc1.3';
+var CACHE = 'civic-compass-cc1.4';
 self.addEventListener('install', function(e){ self.skipWaiting(); });
 self.addEventListener('activate', function(e){
   e.waitUntil(caches.keys().then(function(ks){
