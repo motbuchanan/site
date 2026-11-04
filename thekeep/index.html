@@ -33,9 +33,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
 .seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px}.seg .btn{padding:11px 2px;min-height:44px;font-size:13px;min-width:0}.seg .btn.on{background:var(--mb-ink);color:#10151c;border-color:var(--mb-ink)}
 .btn{font:700 14px var(--mb-ui);color:var(--mb-ink);background:var(--mb-glass);border:1px solid var(--mb-line);padding:11px 16px;border-radius:13px;pointer-events:auto;cursor:pointer;backdrop-filter:blur(8px)}
 #fps{position:absolute;bottom:calc(10px + env(safe-area-inset-bottom));left:10px;max-width:calc(100% - 172px);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font:600 10px var(--mb-mono);letter-spacing:.04em;color:var(--mb-soft);background:var(--mb-glass);border:1px solid var(--mb-line);padding:4px 9px;border-radius:999px}
+#bkNudge{position:absolute;left:50%;top:104px;transform:translateX(-50%);z-index:4;display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;max-width:calc(100% - 32px);box-sizing:border-box;background:rgba(16,21,28,.94);border:1px solid var(--mb-line);color:var(--mb-ink);padding:8px 10px 8px 14px;border-radius:20px;font:600 12px var(--mb-ui);pointer-events:auto}
+#bkNudge[hidden]{display:none}
+#bkNudge .btn{min-height:40px;padding:0 14px;margin:0}
 #toast{position:absolute;left:50%;top:64px;transform:translateX(-50%);background:rgba(16,21,28,.92);border:1px solid var(--mb-line);color:var(--mb-ink);padding:9px 16px;border-radius:18px;font:600 11px var(--mb-mono);opacity:0;transition:opacity .25s;white-space:normal;text-align:center;max-width:calc(100vw - 32px);width:max-content;z-index:950}
 #help{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);pointer-events:auto}
-#help.hidden,#log.hidden,#seed.hidden,#dials.hidden,#menu.hidden,#about.hidden,#leave.hidden,#journal.hidden{display:none!important}
+#help.hidden,#log.hidden,#seed.hidden,#dials.hidden,#menu.hidden,#about.hidden,#leave.hidden,#journal.hidden,#backup.hidden{display:none!important}
 .btn.menu{font:700 12px var(--mb-mono);letter-spacing:.04em;padding:9px 14px;border-radius:8px}
 .shots{display:flex;gap:8px;overflow-x:auto;margin:10px 0;padding-bottom:4px;-webkit-overflow-scrolling:touch}
 .shots img{height:116px;border-radius:8px;flex:0 0 auto;border:1px solid var(--mb-line);background:#000}
@@ -182,7 +185,7 @@ html.fromshelf #inPage #inViews{padding-top:calc(58px + env(safe-area-inset-top)
     <button id="inStory" class="pri" type="button"><span id="inStoryT">Story</span><span class="soon" id="inStoryS">Start in your own home valley</span></button>
     <button id="inWander" type="button"><span>Wander</span><span class="soon">Any valley, no name</span></button>
    </div>
-   <div class="links"><button id="inReplay" type="button">Replay intro</button><button id="inAbout" type="button">About</button></div>
+   <div class="links"><button id="inReplay" type="button">Replay intro</button><button id="inLoad" type="button">Load a save</button><button id="inAbout" type="button">About</button></div>
   </section>
   <section id="inNew" hidden>
    <h2>Who are you?</h2>
@@ -213,8 +216,9 @@ html.fromshelf #inPage #inViews{padding-top:calc(58px + env(safe-area-inset-top)
  </div>
  <div id="stick"><div id="knob"></div></div>
  <div id="fps"></div>
- <button class="mb-ver" id="mbVer" type="button">v0.35.0 &middot; Nov 4</button>
+ <button class="mb-ver" id="mbVer" type="button">v0.36.0 &middot; Nov 4</button>
  <div id="toast"></div>
+ <div id="bkNudge" hidden role="status"><span>Big moment. Back up your progress?</span><button class="btn go" id="bkNudgeGo" type="button">back up</button><button class="btn" id="bkNudgeNo" type="button">later</button></div>
  <button class="btn" id="bTalk" type="button" hidden>Talk</button>
  <button class="btn" id="bJump" type="button" aria-label="Jump">jump</button>
  <button class="btn" id="bSound" type="button" aria-pressed="false">sound off</button>
@@ -253,7 +257,7 @@ html.fromshelf #inPage #inViews{padding-top:calc(58px + env(safe-area-inset-top)
   <p><b>Every valley has its troubles.</b> A hen that wandered over the hills, a quarrel over a fence, a pair of sweethearts too shy to speak, a light in the old stones at night, a name cut in a stone that belongs to a family somewhere else. Every valley grows its own from its seed, and what you choose changes what people say.</p>
   <p><b>Talk and choose.</b> Walk up to anyone and they talk, or tap the Talk button when you're close. Walk off mid-conversation and it waits for you. When it matters, people ask you things, and you answer with the buttons on the chat card. The journal (top of the screen) keeps what you were asked, every valley you have been to, and takes you back to any of them.</p>
   <p><b>Story or Wander.</b> Story starts you at home: give yourself a name, say what your valley has plenty of, and wake by the gate of the keep your parents keep. Everyone there knows you. Wander drops you into any valley, as a stranger. Your story is saved on this device, and Continue picks it up where you left it.</p>
-  <p class="fsize">The whole game is one HTML file, plus a file for each 3D view. Right now: <b id="fsize">~667 KB</b>. Smaller than a single phone photo.</p>
+  <p class="fsize">The whole game is one HTML file, plus a file for each 3D view. Right now: <b id="fsize">~686 KB</b>. Smaller than a single phone photo.</p>
   <p><b>Why I built it.</b> I build things on a phone, directing AI the way I would direct a camera. I saw a clip of a tiny 3D world made of nothing but text and wanted to see if I could grow one that was actually alive, and keep growing it in the open instead of ever calling it done.</p>
   <p><b>What I learned.</b> How far you can get with almost nothing. One idea, a ray walking a height map, turned into characters, with a small world of animals living on top. Every version taught me one concrete thing: how to make a wall read as solid, how to keep the wolves from starving the world empty, how to make a forest look like real woods.</p>
   <p style="color:var(--mb-dim);font-size:13px"><b style="color:var(--mb-soft)">Walk:</b> drag the left half of the screen (tilt to turn). <b style="color:var(--mb-soft)">Look:</b> drag the right half. Tap <b style="color:var(--mb-soft)">jump</b> (or the space bar) to hop up onto low things. Tap <b style="color:var(--mb-soft)">sound</b> to hear the valley; it stays off until you do. (No sound on an iPad or iPhone? Check the silent switch.) Wade into the water to swim. Tap ☰ menu for a new world, the dials, and the time of day. Walk under the gate arch and find the door under the tower stair.</p>
@@ -266,6 +270,7 @@ html.fromshelf #inPage #inViews{padding-top:calc(58px + env(safe-area-inset-top)
   <div class="dial-sec" style="margin-top:14px">DRAW THE WORLD AS</div>
   <div id="mRender" class="seg"></div>
   <p id="mRenderNote" style="margin:6px 0 2px;font-size:12px;opacity:.75"></p>
+  <button class="btn" id="mBackup" style="width:100%;margin-top:8px">backup your progress</button>
   <button class="btn" id="mDials" style="width:100%;margin-top:8px">dials</button>
   <button class="btn" id="mAbout" style="width:100%;margin-top:8px">about this build</button>
   <button class="btn" id="mLog" style="width:100%;margin-top:8px">changelog</button>
@@ -277,6 +282,7 @@ html.fromshelf #inPage #inViews{padding-top:calc(58px + env(safe-area-inset-top)
  <div id="seed" class="hidden" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);pointer-events:auto"><div class="card" id="seedCard"></div></div>
  <div id="log" class="hidden" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);pointer-events:auto"><div class="card" id="logCard"></div></div>
  <div id="journal" class="hidden" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);pointer-events:auto"><div class="card jcard" id="jCard" role="dialog" aria-label="Journal"></div></div>
+ <div id="backup" class="hidden" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);pointer-events:auto"><div class="card" id="backupCard" role="dialog" aria-label="Backup"></div></div>
  <div id="dials" class="hidden" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);pointer-events:auto"><div class="card" id="dialsCard"></div></div>
 </div>
 <script>
@@ -1238,6 +1244,7 @@ document.getElementById('inNew').addEventListener('click',function(e){ if(fresh(
   paintChips(); });
 document.getElementById('inReplay').addEventListener('click',G(function(){ play(false); }));
 document.getElementById('inAbout').addEventListener('click',G(function(){ if(HOOKS.about) HOOKS.about(); }));
+document.getElementById('inLoad').addEventListener('click',G(function(){ if(HOOKS.load) HOOKS.load(); }));
 document.getElementById('inBack').addEventListener('click',G(function(){ showPanel(PEND&&PEND.kind==='new'?'new':'main'); focusFor(curPanel); }));
 document.getElementById('inWalk').addEventListener('click',G(walkIn));
 document.getElementById('inCards').addEventListener('click',function(e){ if(fresh()) return; var b=e.target.closest?e.target.closest('.vcard'):null; if(!b) return; VIEWSEL=+b.getAttribute('data-r'); paintViews(); });
@@ -1247,7 +1254,7 @@ var INERT=[];
 function setInert(on){
   if(on){ INERT=[]; var hud=document.getElementById('hud');
     Array.prototype.forEach.call(document.body.children,function(el){ if(el===root||el.tagName==='SCRIPT'||el===hud||el.id==='shelfBtn') return; el.inert=true; INERT.push(el); });
-    if(hud) Array.prototype.forEach.call(hud.children,function(el){ if(el.id==='about') return; el.inert=true; INERT.push(el); }); }
+    if(hud) Array.prototype.forEach.call(hud.children,function(el){ if(el.id==='about'||el.id==='backup') return; el.inert=true; INERT.push(el); }); }
   else { INERT.forEach(function(el){ try{ el.inert=false; }catch(e){} }); INERT=[]; } }
 // close: give back the graphics context and the canvases, and let the world run
 function close(){ var was=ACTIVE; ACTIVE=false; if(raf){ cancelAnimationFrame(raf); raf=0; } setInert(false);
@@ -1320,9 +1327,10 @@ var SHELF={on:false,url:'https://motbuchanan.com/gameshelf/'};
   SHELF.place=place;
 })();
 
-const VERSION='The Keep v0.35.0 · Nov 4 2026';
-const VER_SHORT='v0.35.0 · Nov 4'; // what the badge shows; bump with VERSION
+const VERSION='The Keep v0.36.0 · Nov 4 2026';
+const VER_SHORT='v0.36.0 · Nov 4'; // what the badge shows; bump with VERSION
 const CHANGELOG=[
+ ['v0.36.0 · Nov 4 2026','Backups. Your progress lives only in this browser, so now you can keep a copy: menu, backup your progress. Save it as a small file, or copy a save code into your notes, and bring it back on any phone or browser. After a big moment, a quest done or a new stretch of valleys, the game offers a backup now and then. Load a save from the menu or the opening page.'],
  ['v0.35.0 · Nov 4 2026','New people. Everyone is drawn with more than twice the detail: faces with eyes, brows, noses and cheeks; beards short, full or long; hair short, long, braided, in a bun, tied back or bald; helmets, hoods, wide hats, soft caps and kerchiefs; tall, short and stout builds; and a vest, apron, sash or collar picked from each name, so no two folk look alike. They stay the same height in the world.'],
  ['v0.34.1 · Nov 4 2026','Sound, tuned by ear. The gate arch no longer muffles everything as you walk under it (the slow-down sound). Wind is quieter so the animals come through: sheep, cows and hens speak up soon after you come near, with fuller voices, and a wolf pack howls within seconds of night when it is close. New voices: the axe now bites instead of bouncing, the sheep bleat lower, and the wolves howl with breath and a valley echo. Pressing Space after the sound button now jumps instead of turning sound off.'],
  ['v0.34.0 · Nov 4 2026','Sound. Tap the new sound button and the valley has a voice, all of it made in code as you walk, with no sound files. Wind that rises on high ground and in storms; birds by day, crickets and an owl at night; water when you are near it; rain, and thunder rolling in after the lightning; fires that crackle as you pass; a wolf howling from where the pack really is; sheep, cows and hens at the farms; the woodcutter at work; your own footsteps on grass, paths, stone, wood or in the shallows, and a thud when you land a jump. Go indoors and the outside goes muffled. The old stone rings hum at night, the Heart Ring loudest. A soft chime when your journal gains something. Nothing plays until you tap the button; after that it is remembered, and starts again on your first tap.'],
@@ -4308,7 +4316,8 @@ function journalLoad(){ let j=null, raw=null;
   if(!j.wander||typeof j.wander!=='object') j.wander={};
   JOURNAL=j; return j; }
 function journalSave(){ if(!JOURNAL) JOURNAL=journalBlank(); if(MODE==='story'&&STORY) JOURNAL.story=STORY;
-  try{ localStorage.setItem('keep_journal',JSON.stringify(JOURNAL)); JOURNAL_OFF=false; return true; }catch(e){ JOURNAL_OFF=true; return false; } }
+  try{ if(BK.frozen) return false; }catch(e){}   // a save was just loaded: nothing from before may write over it
+  try{ localStorage.setItem('keep_journal',JSON.stringify(JOURNAL)); JOURNAL_OFF=false; }catch(e){ JOURNAL_OFF=true; return false; } try{ backupNote(); }catch(e){} return true; }
 function storyNew(name,chips,when){ STORY={name:cleanName(name), home:homeSeed(chips,name), chips:[0,1,2,3].map(function(i){ return chips&&chips[i]?1:0; }),
     started:when||'', at:0, sid:Date.now().toString(36)+'.'+((Math.random()*1e6)|0)}; STORY.at=STORY.home; MODE='story'; if(!JOURNAL) JOURNAL=journalBlank(); JOURNAL.story=STORY; return STORY; }
 function storyResume(){ const j=JOURNAL||journalLoad(); if(!j.story) return null; STORY=j.story; MODE='story'; return STORY; }
@@ -5516,6 +5525,62 @@ function soundOn(){ const S=SOUND; S.want=true; soundSave(); if(!S.ctx&&!soundBu
   if(S.ctx.state!=='running') S.ctx.resume(); S.master.gain.setTargetAtTime(S.vol,S.ctx.currentTime,0.3); return true; }
 function soundOff(){ const S=SOUND; S.want=false; soundSave(); S.on=false; if(S.ctx){ S.master.gain.setTargetAtTime(0,S.ctx.currentTime,0.15); setTimeout(function(){ if(!SOUND.on&&SOUND.ctx) SOUNDS_suspend(); },400); } }
 function SOUNDS_suspend(){ try{ SOUND.ctx.suspend(); }catch(e){} }
+// ---- backups (v0.36.0): everything the game keeps in this browser, as a save file or a save code ----
+// Progress lives only in this browser's storage. Clearing site data, a new phone, or (on an iPhone) weeks away from the site can wipe it.
+// A backup is every 'keep_' key, packed into one line of text: KEEP1: + base64 of the deflated JSON (KEEP0: when the browser cannot deflate).
+const BK={ by:null, PREFIX:'keep_', frozen:false, SKIP:{keep_backup_nudge:1, keep_sound:1, keep_view_chosen:1} };   // SKIP: this device's own settings and timers stay put
+function bkStore(){ try{ return (typeof localStorage!=='undefined')?localStorage:null; }catch(e){ return null; } }
+function backupCollect(){ const ls=bkStore(), data={}; if(!ls) return null;
+  try{ for(let i=0;i<ls.length;i++){ const k=ls.key(i); if(k&&k.indexOf(BK.PREFIX)===0&&!BK.SKIP[k]) data[k]=ls.getItem(k); } }catch(e){ return null; }
+  return { game:'thekeep', v:1, ver:(typeof VER_SHORT!=='undefined'?VER_SHORT:''), at:new Date().toISOString(), data:data }; }
+function bkB64(bytes){ let s=''; for(let i=0;i<bytes.length;i+=0x8000) s+=String.fromCharCode.apply(null,bytes.subarray(i,i+0x8000)); return btoa(s); }
+function bkUnB64(str){ const b=atob(str), u=new Uint8Array(b.length); for(let i=0;i<b.length;i++) u[i]=b.charCodeAt(i); return u; }
+// a broken code makes the write and close reject too; the reader reports it, so those are quietly caught
+function bkPipe(bytes,stream){ const w=stream.writable.getWriter(), no=function(){}; w.write(bytes).catch(no); w.close().catch(no); return new Response(stream.readable).arrayBuffer().then(function(ab){ return new Uint8Array(ab); }); }
+function backupPack(obj){ const raw=new TextEncoder().encode(JSON.stringify(obj));
+  if(typeof CompressionStream==='undefined') return Promise.resolve('KEEP0:'+bkB64(raw));
+  return bkPipe(raw,new CompressionStream('deflate')).then(function(z){ return 'KEEP1:'+bkB64(z)+'!'; }, function(){ return 'KEEP0:'+bkB64(raw)+'!'; }); }   // '!' marks the end, so words after it never count
+// text pasted back may have lost its line breaks or gained spaces, quotes, a note before it or a signature after it: find the code inside.
+// A code ends at its '!'. Without one (cut off, or typed by hand), words are dropped from the end until what is left opens.
+function bkOpen(kind,b64){ return new Promise(function(res,rej){ let bytes; try{ bytes=bkUnB64(b64); }catch(e){ return rej(0); }
+  const done=function(u){ let o; try{ o=JSON.parse(new TextDecoder('utf-8',{fatal:false}).decode(u)); }catch(e){ return rej(0); } if(!o||typeof o!=='object') return rej(0); res(o); };
+  if(kind==='0') return done(bytes); if(typeof DecompressionStream==='undefined') return rej(1);
+  bkPipe(bytes,new DecompressionStream('deflate')).then(done,function(){ rej(0); }); }); }
+function backupUnpack(text){ const CUT='The save code is cut short or changed. Copy all of it.', NOT='That is not a save from The Keep.';
+  const s=String(text||''), m=s.match(/KEEP([01]):([\s\S]*)/); if(!m) return Promise.reject(new Error(NOT));
+  const fix=function(t){ return t.replace(/-/g,'+').replace(/_/g,'/').replace(/[^A-Za-z0-9+\/=]/g,''); };
+  const end=m[2].indexOf('!'), tries=[];
+  if(end>=0) tries.push(fix(m[2].slice(0,end)));
+  else { const words=m[2].split(/\s+/).filter(Boolean); for(let k=words.length;k>=1&&tries.length<40;k--){ const t=fix(words.slice(0,k).join('')); if(t) tries.push(t); } }
+  const ok=function(o){ if(o.game!=='thekeep'||typeof o.data!=='object'||!o.data) throw new Error(NOT); return o; };
+  let p=Promise.reject(0);
+  tries.forEach(function(t){ p=p.catch(function(e){ if(e===1) throw e; return bkOpen(m[1],t); }); });
+  return p.then(ok,function(e){ if(e instanceof Error) throw e; throw new Error(e===1?'This browser cannot open packed saves. Try another browser, or update this one.':CUT); }); }
+// a few words about what a save holds, so you know which one you are loading
+function backupSummary(o){ const d=(o&&o.data)||{}; let j=null; try{ j=JSON.parse(d.keep_journal||'null'); }catch(e){}
+  const count=function(p){ if(!p||typeof p!=='object') return {v:0,t:0}; const v=Object.keys(p.valleys||{}).length; let t=0; const ts=p.tasks||{}; for(const k in ts){ if(ts[k]&&ts[k].s==='done') t++; } return {v:v,t:t}; };
+  const st=j&&j.story, w=count(j&&j.wander), s=count(st), places=Object.keys(d).filter(function(k){ return k.indexOf('keep_places_')===0||k.indexOf('keep_found_')===0; }).length;
+  const when=o&&o.at?new Date(o.at):null, day=when&&!isNaN(when)?when.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}):'';
+  return { name:st&&st.name?st.name:'', story:!!st, sv:s.v, st:s.t, wv:w.v, wt:w.t, places:places, day:day, ver:o&&o.ver||'' }; }
+function backupLine(sm){ const a=[];
+  if(sm.story) a.push(sm.name+"'s story: "+sm.sv+' valley'+(sm.sv===1?'':'s')+', '+sm.st+' task'+(sm.st===1?'':'s')+' done');
+  if(sm.wv||sm.wt) a.push('Wander: '+sm.wv+' valley'+(sm.wv===1?'':'s')+', '+sm.wt+' task'+(sm.wt===1?'':'s')+' done');
+  if(!a.length) a.push('No story or travels yet');
+  return a.join('. ')+'.'; }
+// put a save back: every 'keep_' key is replaced by the save's, and keys the save does not have are cleared (this device's own settings stay).
+// The old values are kept until the new ones are all written; if storage refuses partway, everything goes back as it was.
+function backupApply(o){ const ls=bkStore(); if(!ls||!o||!o.data) return false; const old={};
+  try{ for(let i=0;i<ls.length;i++){ const k=ls.key(i); if(k&&k.indexOf(BK.PREFIX)===0&&!BK.SKIP[k]) old[k]=ls.getItem(k); } }catch(e){ return false; }
+  try{ for(const k in o.data){ if(k.indexOf(BK.PREFIX)===0&&!BK.SKIP[k]&&typeof o.data[k]==='string') ls.setItem(k,o.data[k]); }
+    for(const k in old){ if(!(k in o.data)) ls.removeItem(k); }
+    const t=Date.parse(o.at); ls.setItem('keep_backup_at',String(isFinite(t)?t:Date.now())); BK.frozen=true; return true; }
+  catch(e){ try{ for(const k in o.data){ if(!(k in old)&&k.indexOf(BK.PREFIX)===0&&!BK.SKIP[k]) ls.removeItem(k); } for(const k in old) ls.setItem(k,old[k]); }catch(e2){} return false; } }
+// big moments: a task done, or every tenth valley you reach. The count only ever goes up within a story.
+function backupMilestones(){ try{ const p=part(); let t=0; const ts=p.tasks||{}; for(const k in ts){ if(ts[k]&&ts[k].s==='done') t++; }
+  return t+Math.floor(Object.keys(p.valleys||{}).length/10); }catch(e){ return 0; } }
+function backupNote(){ const key=(MODE==='story'&&STORY)?('s'+STORY.sid):'w', n=backupMilestones(), was=BK.by?BK.by[key]:undefined;
+  if(!BK.by) BK.by={}; BK.by[key]=n; if(was===undefined||n<=was) return;   // the first look at a story only learns where it stands
+  if(typeof BK.nudge==='function') BK.nudge(); }
 var WSAVE=null;   // in Story: the Wander seed as it was, so saving the dials never moves your Wander valley
 const LINES=[];
 function lineHash(t){ let h=0x811c9dc5; for(let i=0;i<t.length;i++){ h^=t.charCodeAt(i); h=Math.imul(h,0x01000193); } return 'L'+(h>>>0).toString(36); }
@@ -6426,7 +6491,7 @@ function boot(){
   $('mbVer').textContent=VER_SHORT;
   $('mbVer').addEventListener('click',function(){ toast(VER_SHORT+' loaded · seed '+W.seed+' · '+RS.C+'x'+RS.R+(RS.letterbox?' · letterboxed':'')); });
   // one card at a time: every opener closes the rest first, so nothing paints dead behind another card
-  const OVERLAYS=['help','about','menu','seed','log','dials','leave','journal'];
+  const OVERLAYS=['help','about','menu','seed','log','dials','leave','journal','backup'];
   let skyHud=null;   // set by openDials: refreshes the sky dials' clock while the card is open
   var LEAVE=null;   // the road end the leave card is open for (cleared whenever cards close, so nothing holds you)
   function closeAll(){ LEAVE=null; for(let i=0;i<OVERLAYS.length;i++) $(OVERLAYS[i]).classList.add('hidden'); }
@@ -6589,6 +6654,77 @@ function boot(){
     $('dClose').addEventListener('click',function(){ $('dials').classList.add('hidden'); });
   }
   function openLog(){ closeAll(); const c=$('logCard'); c.innerHTML='<h1>Changelog</h1>'+CHANGELOG.map(function(e){ return '<p><b>'+e[0]+'</b><br>'+e[1]+'</p>'; }).join('')+'<button class="btn go" id="bLogClose">close</button>'; $('log').classList.remove('hidden'); $('bLogClose').addEventListener('click',function(){ $('log').classList.add('hidden'); }); }
+  // ---- backups: the card, the save file, the save code, and the nudge after a big moment ----
+  const BKUI={ code:'', pending:null, fromIntro:false };
+  const bkDay=function(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); };
+  const bkEsc=function(t){ return String(t).replace(/[&<>"]/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
+  const bkMark=function(){ try{ localStorage.setItem('keep_backup_at',String(Date.now())); }catch(e){} };
+  const bkWhen=function(){ let t=0; try{ t=+localStorage.getItem('keep_backup_at')||0; }catch(e){} if(!t) return 'You have not made a backup yet.';
+    const d=new Date(t); return 'Last backup: '+d.toLocaleDateString(undefined,{month:'short',day:'numeric'})+', '+d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'})+'.'; };
+  function openBackup(fromIntro){ closeAll(); try{ $('toast').style.opacity=0; $('bkNudge').hidden=true; }catch(e){} BKUI.pending=null; BKUI.fromIntro=!!fromIntro; const c=$('backupCard');
+    const now=fromIntro?null:backupCollect(), sm=now?backupSummary(now):null;   // from the opening page: only bringing a save back
+    c.innerHTML='<h1>Backup</h1>'+
+      (fromIntro?'<p style="font-size:14px;opacity:.85">Open a save file, or paste a save code, to pick up where you left off.</p>':'<p style="font-size:14px;opacity:.85">Your progress lives only in this browser. Clearing its data, a new phone, or weeks away can wipe it. Keep a copy somewhere safe: a save file, or a save code pasted into your notes.</p>')+
+      (now?'<p style="font-size:14px"><b>'+bkEsc(backupLine(sm))+'</b><br><span style="opacity:.75">'+bkWhen()+'</span></p>'+
+        '<button class="btn go" id="bkFile" style="width:100%">save file</button>'+
+        '<button class="btn" id="bkCopy" style="width:100%;margin-top:8px">copy save code</button>'+
+        '<textarea id="bkCode" readonly rows="3" aria-label="Save code" style="width:100%;margin-top:8px;font:12px/1.3 ui-monospace,monospace;background:rgba(0,0,0,.35);color:inherit;border:1px solid rgba(255,255,255,.18);border-radius:8px;padding:8px;box-sizing:border-box;word-break:break-all">making the code...</textarea>'
+        :(fromIntro?'':'<p style="font-size:14px">This browser is not letting the game save anything, so there is nothing to back up.</p>'))+
+      '<div class="dial-sec" style="margin-top:16px">BRING BACK A SAVE</div>'+
+      '<button class="btn" id="bkOpen" style="width:100%;margin-top:6px">open a save file</button>'+
+      '<input type="file" id="bkPick" style="display:none">'+
+      '<textarea id="bkPaste" rows="3" placeholder="or paste a save code here" aria-label="Paste a save code" style="width:100%;margin-top:8px;font:12px/1.3 ui-monospace,monospace;background:rgba(0,0,0,.35);color:inherit;border:1px solid rgba(255,255,255,.18);border-radius:8px;padding:8px;box-sizing:border-box"></textarea>'+
+      '<button class="btn" id="bkLoad" style="width:100%;margin-top:6px">load this code</button>'+
+      '<p id="bkMsg" role="status" style="font-size:13px;min-height:1.2em;margin:8px 0 0"></p>'+
+      '<button class="btn" id="bkClose" style="width:100%;margin-top:10px">'+(fromIntro?'back':'close')+'</button>';
+    $('backup').classList.remove('hidden');
+    const msg=function(t,bad){ const m=$('bkMsg'); m.textContent=t; m.style.color=bad?'#ff9a8a':''; };
+    const shut=function(){ $('backup').classList.add('hidden'); $('backup').style.zIndex=''; };
+    $('bkClose').addEventListener('click',shut);
+    $('backup').onkeydown=function(e){ if(e.key==='Escape'){ e.stopPropagation(); shut(); } };
+    try{ c.querySelector('button').focus({preventScroll:true}); }catch(e){}
+    if(now){ backupPack(now).then(function(code){ BKUI.code=code; const ta=$('bkCode'); if(ta) ta.value=code; });
+      $('bkFile').addEventListener('click',function(){ const name='the-keep-save-'+bkDay()+'.keep';
+        const go=function(code){ const body=code+'\n';
+          let file=null; try{ file=new File([body],name,{type:'text/plain'}); }catch(e){}
+          if(file&&navigator.canShare&&navigator.share&&navigator.canShare({files:[file]})){
+            navigator.share({files:[file],title:'The Keep save'}).then(function(){ bkMark(); msg('Saved. Keep it in Files, Notes or an email to yourself.'); },
+              function(e){ if(e&&e.name==='AbortError') msg('Not saved. Tap save file again, or copy the save code.'); else msg('That did not save. Copy the save code instead.',true); });
+            return; }
+          try{ const b=new Blob([body],{type:'application/octet-stream'}), a=document.createElement('a');
+            a.href=URL.createObjectURL(b); a.download=name; document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); },60000);
+            bkMark(); msg('Look for '+name+' in your Downloads or Files. If it is not there, copy the save code instead.'); }catch(e){ msg('This browser would not save the file. Copy the save code instead.',true); } };
+        if(BKUI.code) go(BKUI.code); else backupPack(backupCollect()).then(go); });
+      $('bkCopy').addEventListener('click',function(){ const code=BKUI.code; if(!code){ msg('Still making the code. Try again in a moment.'); return; }
+        const ok=function(){ bkMark(); msg('Copied. Paste it into your notes, an email to yourself, or a message.'); };
+        const fall=function(){ const ta=$('bkCode'); ta.focus(); ta.select(); try{ ta.setSelectionRange(0,ta.value.length); }catch(e){} try{ if(document.execCommand('copy')){ ok(); return; } }catch(e){} msg('Select the code above and copy it.',true); };
+        if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(code).then(ok,fall); else fall(); });
+      $('bkCode').addEventListener('focus',function(){ this.select(); try{ this.setSelectionRange(0,this.value.length); }catch(e){} }); }
+    const check=function(text){ backupUnpack(text).then(function(o){ BKUI.pending=o; const sm2=backupSummary(o);
+        const cur=backupCollect(), smc=cur?backupSummary(cur):null, has=smc&&(smc.story||smc.wv||smc.wt);
+        const box=$('bkMsg'); box.style.color=''; box.innerHTML='This save'+(sm2.day?' from <b>'+bkEsc(sm2.day)+'</b>':'')+': '+bkEsc(backupLine(sm2))+(has?'<br>Now: '+bkEsc(backupLine(smc)):'')+'<br>Loading it replaces everything this browser has now.'+
+          '<button class="btn go" id="bkYes" style="width:100%;margin-top:8px">replace my progress with this save</button><button class="btn" id="bkNo" style="width:100%;margin-top:6px">cancel</button>';
+        $('bkNo').addEventListener('click',function(){ BKUI.pending=null; msg(''); });
+        const yes=$('bkYes'); try{ yes.scrollIntoView({block:'nearest'}); yes.focus({preventScroll:true}); }catch(e){}
+        $('bkYes').addEventListener('click',function(){ if(!BKUI.pending) return; if(backupApply(BKUI.pending)){ msg('Loaded. Starting again from your save...'); location.reload(); }
+          else msg('This browser would not take the save. It may be blocking storage, or be in a private window.',true); }); },
+      function(e){ msg(e.message||'That save would not open.',true); }); };
+    $('bkOpen').addEventListener('click',function(){ $('bkPick').click(); });
+    $('bkPick').addEventListener('change',function(){ const f=this.files&&this.files[0]; if(!f) return; if(f.size>4e6){ msg('That file is too big to be a save.',true); return; }
+      const r=new FileReader(); r.onload=function(){ check(r.result); }; r.onerror=function(){ msg('That file would not open.',true); }; r.readAsText(f); this.value=''; });
+    $('bkLoad').addEventListener('click',function(){ const t=$('bkPaste').value; if(!t.trim()){ msg('Paste a save code first.',true); return; } check(t); });
+  }
+  // after a big moment, now and then: a small offer to back up (never more than once every half hour, never over a card)
+  BK.nudge=function(tries){ tries=tries||0; let t0=0, tb=0; try{ t0=+localStorage.getItem('keep_backup_nudge')||0; tb=+localStorage.getItem('keep_backup_at')||0; }catch(e){ return; }
+    const now=Date.now(); if(now-t0<1800000||now-tb<1800000) return;
+    let busy=(typeof CHAT!=='undefined'&&CHAT.id>=0); const ie=document.getElementById('intro'); if(ie&&ie.getAttribute('aria-hidden')==='false'&&!ie.classList.contains('gone')) busy=true;
+    for(let i=0;i<OVERLAYS.length&&!busy;i++){ if(!$(OVERLAYS[i]).classList.contains('hidden')) busy=true; }
+    if(busy){ if(tries<60) setTimeout(function(){ BK.nudge(tries+1); },3000); return; }   // after the chat or card closes (up to three minutes)
+    if(!backupCollect()) return; try{ localStorage.setItem('keep_backup_nudge',String(now)); }catch(e){}
+    const n=$('bkNudge'); n.hidden=false; clearTimeout(BK.nh); BK.nh=setTimeout(function(){ n.hidden=true; },12000); };
+  $('bkNudgeGo').addEventListener('click',function(){ $('bkNudge').hidden=true; openBackup(false); });
+  $('bkNudgeNo').addEventListener('click',function(){ $('bkNudge').hidden=true; });
+  try{ if(navigator.storage&&navigator.storage.persist) navigator.storage.persisted().then(function(p){ if(!p) return navigator.storage.persist(); }).catch(function(){}); }catch(e){}
   // top-right menu: one button that reaches everything, so nothing is off-screen in portrait
   const closeMenu=function(){ $('menu').classList.add('hidden'); };
   // ---- the 3D renderers (Mesh, Voxels): each in its own file, fetched only when someone picks it ----
@@ -6694,6 +6830,7 @@ function boot(){
   $('mSeed').addEventListener('click',function(){ closeMenu(); openSeed(); });
   $('mDials').addEventListener('click',function(){ closeMenu(); openDials(); });
   $('mLog').addEventListener('click',function(){ closeMenu(); openLog(); });
+  $('mBackup').addEventListener('click',function(){ closeMenu(); openBackup(false); });
   $('mAbout').addEventListener('click',function(){ closeMenu(); openAbout(); });
   $('mHelp').addEventListener('click',function(){ closeMenu(); openHelp(); });
   $('mIntro').addEventListener('click',function(){ closeMenu(); location.href=location.pathname+'?replay=1'+location.hash; });
@@ -6748,6 +6885,7 @@ function boot(){
   else { try{ KEEP_INTRO.start({ story:function(){ const j=journalLoad(); return j.story?{name:j.story.name}:null; }, begin:storyStart, roll:function(){ return randomName(); },
       render:function(){ return DIALS.render|0; }, setRender:function(i){ DIALS.render=i; saveDials(); paintRenderSeg(); },
       about:function(){ openAbout(); $('about').style.zIndex='1100'; $('aGo').textContent='back'; },
+      load:function(){ openBackup(true); $('backup').style.zIndex='1100'; },
       closed:function(){ $('about').style.zIndex=''; $('aGo').textContent='walk the keep';
         const m=glCur(); if(m){ loadGL(m); } else { for(const k in GLR) glDrop(k); } } }); }catch(e){ try{ KEEP_INTRO.close(); }catch(e2){} } }
   let last=performance.now(), fAcc=0, fN=0, fT=0, acc=0, ecoAcc=0, slowAt=0, hudT=0, fpsTxt='';
