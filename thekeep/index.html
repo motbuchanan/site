@@ -210,7 +210,7 @@ html.fromshelf #inPage #inViews{padding-top:calc(58px + env(safe-area-inset-top)
  </div>
  <div id="stick"><div id="knob"></div></div>
  <div id="fps"></div>
- <button class="mb-ver" id="mbVer" type="button">v0.32.0 &middot; Nov 4</button>
+ <button class="mb-ver" id="mbVer" type="button">v0.33.0 &middot; Nov 4</button>
  <div id="toast"></div>
  <button class="btn" id="bTalk" type="button" hidden>Talk</button>
  <button class="btn" id="bJump" type="button" aria-label="Jump">jump</button>
@@ -242,12 +242,13 @@ html.fromshelf #inPage #inViews{padding-top:calc(58px + env(safe-area-inset-top)
   <p><b>The Hollow Crown.</b> Long ago two sisters broke the Hollow Crown in half and walked away in opposite directions. Their families still keep the halves, without ever having met. Learn enough of the old lore and someone will give you half a map. In Story, one of your parents has an old friend over the hills, too.</p>
   <p><b>More troubles.</b> Every valley now has three or four things wrong with it: a leaking roof (and the Thatch-Wife), an axe at the bottom of the lake, two guards betting on the Heron King, a honey cake recipe two valleys away, and an old song missing its last verse. In Story, help enough people over the hills and your home holds a harvest festival, with the people you helped as guests.</p>
   <p><b>The ring road.</b> Every stone ring has one stone shorter than the rest, and it points along a road to the next ring. Hear a piece of the old lore, then stand in a ring and you will see it. Follow the short stones far enough and they lead to the Heart Ring. Go after dark.</p>
+  <p><b>Keeps that differ.</b> No two keeps are quite alike now. Some are rich, flying the old crown-and-flame. Some are falling in, and need a mason. Some stand empty, their keepers sleeping in the gatehouse because of something pale in the great hall. A few have bandits. Very polite ones. Walls run low, middling or tall.</p>
   <p><b>What they call you.</b> What you choose is remembered. Enough of one kind earns you a nickname, then a title, and not all of them are kind. Over the hills, people you have never met tell stories about you, a little wrong. And the old stones and the old folk remember the land as it was: the Ring-builders, the Hollow Kings, the Long Quarrel. Your journal keeps every piece you find.</p>
   <p><b>The one who left.</b> Somebody at the keep has a brother, sister, son or daughter who walked away years ago. In Story it is someone at your home keep. Somebody on the road has seen them. Find them, decide what to do, and go back and tell the one who asked.</p>
   <p><b>Every valley has its troubles.</b> A hen that wandered over the hills, a quarrel over a fence, a pair of sweethearts too shy to speak, a light in the old stones at night, a name cut in a stone that belongs to a family somewhere else. Every valley grows its own from its seed, and what you choose changes what people say.</p>
   <p><b>Talk and choose.</b> Walk up to anyone and they talk, or tap the Talk button when you're close. Walk off mid-conversation and it waits for you. When it matters, people ask you things, and you answer with the buttons on the chat card. The journal (top of the screen) keeps what you were asked, every valley you have been to, and takes you back to any of them.</p>
   <p><b>Story or Wander.</b> Story starts you at home: give yourself a name, say what your valley has plenty of, and wake by the gate of the keep your parents keep. Everyone there knows you. Wander drops you into any valley, as a stranger. Your story is saved on this device, and Continue picks it up where you left it.</p>
-  <p class="fsize">The whole game is one HTML file, plus a file for each 3D view. Right now: <b id="fsize">~602 KB</b>. Smaller than a single phone photo.</p>
+  <p class="fsize">The whole game is one HTML file, plus a file for each 3D view. Right now: <b id="fsize">~626 KB</b>. Smaller than a single phone photo.</p>
   <p><b>Why I built it.</b> I build things on a phone, directing AI the way I would direct a camera. I saw a clip of a tiny 3D world made of nothing but text and wanted to see if I could grow one that was actually alive, and keep growing it in the open instead of ever calling it done.</p>
   <p><b>What I learned.</b> How far you can get with almost nothing. One idea, a ray walking a height map, turned into characters, with a small world of animals living on top. Every version taught me one concrete thing: how to make a wall read as solid, how to keep the wolves from starving the world empty, how to make a forest look like real woods.</p>
   <p style="color:var(--mb-dim);font-size:13px"><b style="color:var(--mb-soft)">Walk:</b> drag the left half of the screen (tilt to turn). <b style="color:var(--mb-soft)">Look:</b> drag the right half. Tap <b style="color:var(--mb-soft)">jump</b> (or the space bar) to hop up onto low things. Wade into the water to swim. Tap ☰ menu for a new world, the dials, and the time of day. Walk under the gate arch and find the door under the tower stair.</p>
@@ -1314,9 +1315,10 @@ var SHELF={on:false,url:'https://motbuchanan.com/gameshelf/'};
   SHELF.place=place;
 })();
 
-const VERSION='The Keep v0.32.0 · Nov 4 2026';
-const VER_SHORT='v0.32.0 · Nov 4'; // what the badge shows; bump with VERSION
+const VERSION='The Keep v0.33.0 · Nov 4 2026';
+const VER_SHORT='v0.33.0 · Nov 4'; // what the badge shows; bump with VERSION
 const CHANGELOG=[
+ ['v0.33.0 · Nov 4 2026','Keeps that differ. Every keep now has a look of its own: plain; rich, in pale stone with the old crown-and-flame banners; falling in, mossy, with battlements in the ditch and a tower top gone; empty, its keepers sleeping in the gatehouse; or taken over by a band of very polite bandits. Walls are low, middling or tall. Three come with a trouble: fetch a mason from over the hills, find out what haunts the great hall after dark, or talk the bandits round. Set it right and the keep changes. The keepers always stay, so every errand still works. Also: the journal says what kind of keep each valley has, four pieces of lore, three legends and a new nickname.'],
  ['v0.32.0 · Nov 4 2026','A bigger keep. The courtyard is half as wide again, and every room is bigger, with more on the walls: the great hall, the kitchen, the barracks and the chapel. There is now at least 4 m of open ground between any two things in the courtyard, and the gate is wider. Also, for Garrett: a jump button (or the space bar) to hop onto low things, and trees you walk round instead of through.'],
  ['v0.31.0 · Nov 3 2026','The ring road. Once you know a piece of the old lore, stand in any stone ring and you will notice one stone is shorter than the rest. It points along one of the roads, over the hills, to the next ring. Follow five short stones (a standing stone by the road shows the way where there is no ring) and the sixth valley holds the Heart Ring. Go back after dark and listen, then ask the oldest person there what you heard. Three endings, a new title (the Ring-Walker), a legend, four pieces of lore, and a black dog on the passes at night.'],
  ['v0.30.0 · Nov 3 2026','More valley troubles. A leaking roof and the Thatch-Wife; a woodcutter whose axe went into the lake; two guards with a bet about the Heron King; a steward who wants the honey cake recipe from the next valley over; a shepherd who has forgotten the last verse of an old song. Every valley keeps its old troubles and grows one or two of the new ones. In Story, once you have helped three people over the hills, your parents start planning the harvest festival: invite up to three of the people you helped, and they walk over and come to your keep. Four more pieces of lore (one of them a song), six new legends and a new nickname.'],
@@ -1620,6 +1622,7 @@ function stampKeepMass(){
   KDECO.length=0;
   if(!DIALS.keep) return;
   W.keepBuilt=true;
+  KLOOK=keepLook(W.seed); KEEP.CURH=KLOOK.wall; KEEP.TOWH=KLOOK.wall+1.5;
   const st=W.st, cx=FORT.x, cy=FORT.y;
   const IN=KEEP.IN, OUT=KEEP.H, CURH=KEEP.CURH, DONH=KEEP.DONH, DONR=KEEP.DONR, SPR=KEEP.SPR, TWO_PI=Math.PI*2, MER=KEEP.MER;
   const RX0=KEEP.RX0, RY0=KEEP.RY0, RY1=KEEP.RY1, RLEN=RY1-RY0;
@@ -1643,7 +1646,7 @@ function stampKeepMass(){
         if((tx===4*sx && tooth(dy)) || (ty===4*sy && tooth(dx))) h+=MER;
         s=h; } }   // the tower owns its footprint (no curtain teeth poking through its top)
     // gatehouse towers: two solid blocks standing forward of the wall either side of the arch
-    if(dy>=OUT-1 && dy<=OUT+5 && ((dx>=6&&dx<=11)||(dx>=-11&&dx<=-6))){ let h=13;
+    if(dy>=OUT-1 && dy<=OUT+5 && ((dx>=6&&dx<=11)||(dx>=-11&&dx<=-6))){ let h=CURH+2;
       if((dy===OUT+5 && tooth(dx)) || ((dx===11||dx===-11) && tooth(dy))) h+=MER;
       s=Math.max(s,h); }
     // donjon: a round shaft. Its top is an open lookout: a low parapet you can see over, with a wide opening
@@ -1684,6 +1687,7 @@ function stampKeepMass(){
     else if(side==='W'){ axis='x'; pl=cx+Q.x0+1+0.04; nx=1; } else { axis='x'; pl=cx+Q.x1-0.04; nx=-1; }
     const off=axis==='y'?cx:cy;
     KDECO.push({axis:axis, p:pl, a:off+a0, b:off+a1, h:0, z0Abs:z0+D[3], z1Abs:z0+D[4], doorA:0, doorB:-1, mat:'deco', img:img, nx:nx, ny:ny, open:true}); }
+  keepDress();
 }
 function allWallHits(px,py,dx,dy){
   const hits=[];
@@ -1742,7 +1746,7 @@ function genWorld(seed){
   PED.cyc=null; PED.gone=null; PED.phase=''; PED.route=null; PED.lastTod=null; PED.ways=null; PED.shelter=undefined; ROADS.sign=-1;
   { const vn=valleyNames(seed); W.valley=vn.valley; W.farmNames=[vn.farm1,vn.farm2]; }
   W.cast=castWithHome(seed); W.castSig=seed+':'+W.cast.map(function(c){ return c.name; }).join(','); rebuildPeople();
-  W.arriveMsg='You arrive in '+W.valley+'.'; W.loreMsg='';
+  W.arriveMsg='You arrive in '+W.valley+'.'; W.loreMsg=''; W.keepSay=''; W.banditsOut=false;
   const h=W.h, st=W.st, tree=W.tree;
   st.fill(0); tree.fill(0); W.sb.fill(0); W.su.fill(0); W.rail.fill(0); W.floor.fill(0); W.ruin.fill(0); W.smat.fill(0); W.places.length=0; W.pens.length=0; W.keepBuilt=false;
   for(let y=0;y<N;y++)for(let x=0;x<N;x++){
@@ -3461,7 +3465,7 @@ function rebuildPeople(){ const cast=W.cast; if(!cast||!cast.length) return;
   for(const c of cast){
     const K={name:c.name, role:c.role, build:c.build, age:c.age, tall:c.build==='tall', head:c.head, beard:c.beard, hairStyle:c.hairStyle,
       braid:c.hairStyle==='braid', tool:c.tool, robe:c.robe, skin:c.skin, hair:c.hair, cloak:c.cloak, tunic:c.tunic, legs:c.legs, accent:c.accent};
-    KEEPERS.push(K); KMASK.push(buildPerson(K)); GREETN[c.id]=c.name+', '+(c.guest?roleName(c):'the '+c.role); }
+    KEEPERS.push(K); KMASK.push(buildPerson(K)); GREETN[c.id]=c.name+', '+(c.guest||c.bandit?roleName(c):'the '+c.role); }
   GREETT.fill(-1e9); GLAST.fill(''); }
 // ---------------- talk (v0.22): the line library ----------------
 // Each list holds lines one person might say. A line may start with [tags] that must all hold:
@@ -4134,7 +4138,7 @@ function parentsFor(seed,cast,you){ const r=seedRng(seed>>>0,0x9A7E), used=new S
   return out; }
 // the cast for a valley, with your parents at home
 function castWithHome(seed){ let c=castValley(seed); if(isHome(seed)) c=c.concat(parentsFor(seed,c,STORY.name));
-  for(const L of leftHere(seed)){ if(c.length>=15) break; c=c.concat([leftPerson(L,c.length,c)]); } return c.concat(festGuests(seed,c)); }
+  for(const L of leftHere(seed)){ if(c.length>=15) break; c=c.concat([leftPerson(L,c.length,c)]); } c=c.concat(festGuests(seed,c)); return c.concat(banditCast(seed,c)); }
 // they walk the steward's round in the keep, starting from two places in the courtyard so the three of them never bunch up
 function addParents(){ if(!inHome()||!W.cast||!W.cast[9]||!KPATHS[3]) return; const a=KPATHS[3], n=a.length/3;
   const flat=[]; for(let w=0;w<n;w++){ const x=a[w*3]-FORT.x, y=a[w*3+1]-FORT.y; if(Math.abs(Math.hypot(x,y)-KEEP.RA)<0.2) flat.push(w); }
@@ -4251,7 +4255,7 @@ function beatLetter(id){ if(MODE!=='story'||!STORY) return null; const p=part();
       {label:"I'll tell "+(L.gp==='she'?'her':'him'), reply:["And tell "+L.gn+" I still have the cup. "+(L.gp==='she'?'She':'He')+"'ll know."], pick:function(){ L.s='replied'; }},
       {label:'What was in it?', reply:["Old business. Good business. Nothing for you to worry about.","Go on home. Safe roads."], pick:function(){ L.s='replied'; }}]};
   return null; }
-const BEATS=[beatLetter,beatErrand,beatGate,beatLeft,beatLost,beatStone,beatFeud,beatSweet,beatLight,beatRoof,beatRoofW,beatAxe,beatBet,beatCake,beatSong,beatFest,beatRing,beatCrown,beatFriend];
+const BEATS=[beatLetter,beatErrand,beatGate,beatLeft,beatLost,beatStone,beatFeud,beatSweet,beatLight,beatRoof,beatRoofW,beatAxe,beatBet,beatCake,beatSong,beatFest,beatRing,beatMend,beatMoths,beatBandit,beatCrown,beatFriend];
 const SNOOZE={};   // "not now": the question rests a few minutes before it is asked again
 function fillBeat(id,b){ b.lines=b.lines.map(function(t,k){ return {id:'B'+b.key+k, text:T(id,t)}; });
   for(const o of b.options){ o.label=T(id,o.label); o.reply=(o.reply||[]).map(function(t){ return T(id,t); }); } return b; }
@@ -4271,7 +4275,7 @@ function journalNotes(){ const p=part(), open=[], done=[];
       else if(e.s==='replied') open.push({t:e.rg+' says yes, for the harvest. Tell '+e.gn+', at home.', v:STORY&&STORY.home});
       else if(e.s==='done') done.push({t:e.c==='lie'?'Told '+e.gn+' that '+e.rg+' said no. It was not true.':'Took '+e.gn+"'s letter over the hills to "+e.rg+'. '+e.rg+' is coming for the harvest.', v:e.dest}); }
     else if(k==='gate') done.push({t:'Every road leads to the same valley every time. The journal remembers the way home.'}); }
-  crownNotes(open,done); leftNotes(open,done); troubleNotes(open,done); trouble2Notes(open,done); festNotes(open,done); ringNotes(open,done); return {open:open, done:done}; }
+  crownNotes(open,done); leftNotes(open,done); troubleNotes(open,done); trouble2Notes(open,done); festNotes(open,done); ringNotes(open,done); keepNotes(open,done); return {open:open, done:done}; }
 // ---------------- valley troubles (v0.26.1): every valley has its own, from its own seed ----------------
 // Any valley you reach, by road, by a random seed or by your journal, grows one or two troubles from its seed: a lost
 // hen or lamb that turned up over the hills, a quarrel over a fence, a pair of sweethearts too shy to say so, a light
@@ -4557,6 +4561,7 @@ const NICKS=[
  {n:'Letter-carrier', ok:function(){ return !!doneTask(function(k,e){ return k==='letter'&&e.s==='done'; }); }},
  {n:'Straight-talker', ok:function(r){ return r.hard>=1&&r.truth>=3; }},
  {n:'Song-catcher', ok:function(){ return !!doneTask(function(k,e){ return k.indexOf('song:')===0&&e.s==='done'; }); }},
+ {n:'Bandit-talker', ok:function(){ return !!doneTask(function(k,e){ return k.indexOf('bandit:')===0&&e.s==='done'&&(e.c==='home'||e.c==='work'); }); }},
  {n:'Half-Crown', ok:function(){ const e=part().tasks.crown; return !!(e&&e.s==='done'&&e.c!=='whole'); }},
  {n:'Old Boots', ok:function(r,v){ return v>=6; }}];
 function earned(){ const r=REP(), v=valleyCount(); let t=null, n=null; for(const x of TITLES) if(x.ok(r,v)){ t=x.n; break; } for(const x of NICKS) if(x.ok(r,v)){ n=x.n; break; } return {title:t, nick:n, rep:r}; }
@@ -4605,6 +4610,9 @@ function legendFor(seed){ seed=seed>>>0; if(seedRng(seed,0x1E6E)()>=0.25) return
     if(k.indexOf('song:')===0&&e.s==='done') cands.push("{Who} found the last verse of an old song, over in "+vn+". Something about short stones. The sheep there sleep better for it.");
     if(k==='fest'&&e.s==='done'&&e.g&&!festList(e).some(function(g){ return g.v===seed; })){ const nv=new Set(festList(e).map(function(g){ return g.v; })).size; cands.push("They say {who} had a harvest festival, and folk walked over the hills for it. "+(nv>1?"From "+['','one','two','three','four'][Math.min(4,nv)]+" different valleys! ":"")+"I wasn't asked. Not that I'd have gone."); }
     if(k==='ring'&&e.s==='done'&&e.path.indexOf(seed)<0) cands.push("They say {who} followed the short stones from ring to ring, all the way to the Heart Ring. "+(e.c==='sing'?"And sang to it! To the stones! I'd have paid to see that.":"Heard the stones hum, too, they say."));
+    if(k.indexOf('bandit:')===0&&e.s==='done'&&e.c==='home') cands.push("They say {who} told a band of lost soldiers the war was over. Two hundred years over! They went home, crying, the lot of them.");
+    if(k.indexOf('moths:')===0&&e.s==='done'&&e.c==='truth') cands.push("{Who} walked into a haunted hall at night and found the ghost was moths. A whole keep moved back in, they say.");
+    if(k.indexOf('mend:')===0&&e.s==='done') cands.push("{Who} fetched a mason over the hills for a keep that was falling down. Paid in cake, I heard.");
     if(k==='letter'&&e.s==='done') cands.push("{Who} carried a letter over the hills for their family. Simple thing. Folk remember simple things."); }
   { const e=part().tasks.crown; if(e&&e.s==='done'&&seed!==e.c1&&seed!==e.c2&&seed!==e.gv&&seed!==e.pg){ if(e.c==='whole') cands.push("They say {who} found both halves of the Hollow Crown. Both! And then, instead of keeping them, brought two families together at a well. Who does that?"); else cands.push("There's talk that {who} has seen the Hollow Crown. Half of it, anyway. Some say both halves. Nobody can get a straight answer."); } }
   if(!cands.length) return null; const r=seedRng(seed,0x1E70), line=cands[(r()*cands.length)|0], who=legendName();
@@ -5011,13 +5019,156 @@ const LORE4=[
  ['old',"When I was small, the stones hummed every midsummer. Now it's every few years. Either it's sleeping deeper, or we've stopped listening."],
  ['road',"A black dog walked me down from the pass once, at night. Never made a sound. I've never been afraid of the dark since."]];
 LORE.push.apply(LORE,LORE4);
+// ---------------- keeps that differ (v0.33.0) ----------------
+// Every valley's keep has a look of its own, from its seed: plain, rich (pale dressed stone and the old crown-and-flame
+// banners), falling in (moss, missing battlements, rubble, a crumbling corner tower), empty (the keepers sleep in the
+// gatehouse; something pale haunts the great hall at night), or taken over by a band of very polite bandits. Walls run
+// short, middling or tall. The keepers always stay, so every errand and quest still works. Three of the looks come with a
+// trouble, and setting it right changes the keep the next time you arrive.
+const KLOOKS={plain:{say:'', word:''}, rich:{say:'Banners fly from the keep here.', word:'a rich keep'},
+  old:{say:'The keep here is falling in.', word:'a keep falling in'}, empty:{say:'The keep looks half empty.', word:'an empty keep'},
+  bandit:{say:'Strange banners hang over the keep gate.', word:'bandits in the keep'}};
+function keepLook(seed){ seed=seed>>>0; const r=seedRng(seed,0x4EE9), a=r(), b=r();
+  let kind=a<0.42?'plain':(a<0.60?'rich':(a<0.79?'old':(a<0.90?'empty':'bandit')));
+  if(isHome(seed)&&(kind==='empty'||kind==='bandit')) kind='plain';   // your own home is lived in, and nobody squats in it
+  const wall=b<0.25?9:(b<0.75?11:13);
+  // what you have set right changes the keep
+  const T=part().tasks;
+  const fix=kind==='old'&&T['mend:'+seed]&&T['mend:'+seed].s==='done', lit=kind==='empty'&&T['moths:'+seed]&&T['moths:'+seed].s==='done'&&T['moths:'+seed].c==='truth',
+    gone=kind==='bandit'&&T['bandit:'+seed]&&T['bandit:'+seed].s==='done'&&T['bandit:'+seed].c!=='work', hired=kind==='bandit'&&T['bandit:'+seed]&&T['bandit:'+seed].s==='done'&&T['bandit:'+seed].c==='work';
+  return {kind:kind, wall:wall, mended:!!fix, lit:!!lit, gone:!!gone, hired:!!hired, r:seedRng(seed,0x4EEA)}; }
+var KLOOK={kind:'plain', wall:11};
+function keepWord(seed){ if(!DIALS.keep) return ''; const L=keepLook(seed);
+  const w=L.kind==='old'&&L.mended?'a keep mended':(L.kind==='bandit'&&L.gone?'':(L.kind==='bandit'&&L.hired?'hired hands in the keep':(L.kind==='empty'&&L.lit?'a keep lived in again':KLOOKS[L.kind].word))); return [w,L.wall===13?'tall walls':(L.wall===9?'low walls':'')].filter(Boolean).join(', '); }
+// the banners: the old crown-and-flame of the Hollow Kings, a fox on black (the bandits), and a torn grey rag
+(function(){ const B=function(name,field,shade,mark,torn){ decoImg(name,10,26,[[70,52,30],[214,176,70],field,shade,[236,226,200]],function(set,w,h){
+    for(let x=0;x<w;x++){ set(x,0,1); if(!torn) set(x,1,2); }
+    for(let y=2;y<h;y++)for(let x=0;x<w;x++){ const tail=y>h-5&&Math.abs(x-4.5)<(y-(h-5))*1.2; const rag=torn&&((y>h-9&&((x*7+y*3)%5<2))||(y>12&&x>6&&(x+y)%4===0)); if(!tail&&!rag) set(x,y,(x===0||x===w-1)&&!torn?2:(x>=w-3?4:3)); }
+    if(mark==='crown'){ for(let x=2;x<=7;x++){ set(x,12,5); set(x,13,5); } [2,4,5,7].forEach(function(x){ set(x,11,5); }); set(2,10,5); set(7,10,5); set(4,10,5); set(5,10,5);
+      set(4,6,2); set(5,6,2); set(4,7,2); set(5,7,2); set(5,5,2); set(4,8,2); set(5,8,2); }
+    if(mark==='fox'){ set(2,7,5); set(7,7,5); for(let y=8;y<=11;y++) for(let x=2;x<=7;x++) if(Math.abs(x-4.5)<=4-(y-8)) set(x,y,5); set(4,12,5); set(5,12,5); set(3,9,3); set(6,9,3); } }); };
+  B('bannerCrown',[92,40,110],[70,30,86],'crown',false);
+  B('bannerFox',[34,32,34],[22,20,22],'fox',false);
+  B('bannerTorn',[120,116,108],[96,92,86],'',true); })();
+// a few changes to the stamped keep, after it is built: called from stampKeepMass
+function keepDress(){ const L=KLOOK, st=W.st, cx=FORT.x, cy=FORT.y, OUT=KEEP.H, IN=KEEP.IN, r=L.r, z0=FORT.padH;
+  const look=L.kind==='old'&&L.mended?'plain':(L.kind==='bandit'&&(L.gone||L.hired)?'plain':L.kind);
+  const wallCell=function(dx,dy){ const ch=Math.max(Math.abs(dx),Math.abs(dy)); return ch>=IN&&ch<=OUT+5; };
+  // stone: rich keeps are pale dressed stone; old and empty ones are mossy
+  const mat=look==='rich'?3:((look==='old'||look==='empty')?2:0);
+  if(mat) for(let dy=-OUT-6;dy<=OUT+6;dy++)for(let dx=-OUT-6;dx<=OUT+6;dx++){ if(!wallCell(dx,dy)) continue; const i=(cy+dy)*N+cx+dx; if(st[i]>0||W.su[i]>0){ if(mat===2&&r()<0.35) continue; W.ruin[i]=mat; } }
+  if(look==='old'||look==='empty'){
+    // missing battlements: some merlons gone, and notches knocked out of the outer row (never the wall-walk itself)
+    const gone=look==='old'?0.45:0.25;
+    for(let dy=-OUT-5;dy<=OUT+5;dy++)for(let dx=-OUT-5;dx<=OUT+5;dx++){ const i=(cy+dy)*N+cx+dx; if(Math.max(Math.abs(dx),Math.abs(dy))===OUT&&Math.min(Math.abs(dx),Math.abs(dy))<=OUT-5&&!(dy>0&&Math.abs(dx)<=12)&&st[i]>KEEP.CURH+0.5&&st[i]<=KEEP.CURH+KEEP.MER+0.01&&r()<gone) st[i]=KEEP.CURH; }
+    if(look==='old'){ for(let k=0;k<5;k++){ const side=(r()*4)|0, at=Math.round((r()*2-1)*(OUT-9)), len=2+((r()*3)|0);
+        for(let j=0;j<len;j++){ const a=at+j, dx=side===0?a:(side===1?OUT:(side===2?a:-OUT)), dy=side===0?-OUT:(side===1?a:(side===2?OUT:a)); if(dy>0&&Math.abs(dx)<12&&side===2) continue;
+          const i=(cy+dy)*N+cx+dx; if(st[i]>0) st[i]=KEEP.CURH-1.4; } }
+      // one corner tower has lost its top
+      { const t=(r()*4)|0, ox=(t&1?OUT:-OUT), oy=(t&2?OUT:-OUT); for(let y=-4;y<=4;y++)for(let x=-4;x<=4;x++){ const i=(cy+oy+y)*N+cx+ox+x; if(st[i]>KEEP.CURH) st[i]=KEEP.CURH+(Math.abs(x)===4||Math.abs(y)===4?0.6:0); } } }
+    // rubble: low stones you can walk over, against the foot of the curtain and round the courtyard edges
+    const n=look==='old'?60:30;
+    for(let k=0;k<n;k++){ const side=(r()*4)|0, a=Math.round((r()*2-1)*(IN-3)), d=IN-1-((r()*3)|0), dx=side===0?a:(side===1?d:(side===2?a:-d)), dy=side===0?-d:(side===1?a:(side===2?d:a));
+      if(Math.abs(dx)<9&&dy>0) continue; if(dx>=KEEP.RX0-1&&dy>=KEEP.RY0-2) continue;   // keep the gate and the rampart stair clear
+      const i=(cy+dy)*N+cx+dx; if(st[i]>0||W.su[i]>0||W.floor[i]) continue; if(KROOMS.some(function(Q){ return dx>=Q.x0-1&&dx<=Q.x1+1&&dy>=Q.y0-1&&dy<=Q.y1+1; })) continue;
+      st[i]=0.25+r()*0.3; W.ruin[i]=2; } }
+  // banners on the outside: on the gatehouse fronts and along the curtain
+  const img=look==='rich'?'bannerCrown':(look==='bandit'?'bannerFox':(look==='empty'&&!L.lit?'bannerTorn':null));
+  if(img){ const ban=function(axis,p,a,ny,nx,zA,zB){ KDECO.push({axis:axis, p:p, a:a, b:a+1.5, h:0, z0Abs:z0+zA, z1Abs:z0+zB, doorA:0, doorB:-1, mat:'deco', img:img, nx:nx, ny:ny, open:true}); };
+    const gh=KEEP.CURH+2;
+    for(const sx of [-1,1]) ban('y',cy+OUT+6+0.04,cx+(sx>0?9:-8)-0.75,1,0,gh-7.5,gh-1.5);
+    if(look==='rich') for(const a of [-26,-16,16,26]){ ban('y',cy+OUT+1+0.04,cx+a,1,0,KEEP.CURH-6.5,KEEP.CURH-0.6); ban('x',cx+OUT+1+0.04,cy+a,0,1,KEEP.CURH-6.5,KEEP.CURH-0.6); ban('x',cx-OUT-0.04,cy+a,0,-1,KEEP.CURH-6.5,KEEP.CURH-0.6); } }
+  W.keepSay=(KLOOKS[look].say&&!(look==='empty'&&L.lit))?KLOOKS[look].say:''; }
+// cold hearths in an empty keep, until the moths are explained
+function keepFires(Q){ const L=KLOOK; return !(Q===KROOMS[0]&&L.kind==='empty'&&!L.lit); }
+// ---- the bandits: a chief and two more, in the great hall, walking round the long table ----
+const BANDIT_PATH=[-32.5,-32,6, -24,-32,0, -14,-32,4, -14,-24.5,0, -24,-24.5,5, -32,-24.5,0];
+function banditsHere(seed){ if(!DIALS.keep||!DIALS.people) return false; const L=keepLook(seed); return L.kind==='bandit'&&!L.gone; }
+function banditCast(seed,cast){ if(!banditsHere(seed)) return []; const o=[], src=castValley((seed^0xBA4D17)>>>0), used=new Set(cast.map(function(c){ return c.given; }));
+  for(let k=0;k<src.length&&o.length<3;k++){ if(cast.length+o.length>=15) break; const b=src[k]; if(!b||used.has(b.given)||k===ROLEPED) continue; used.add(b.given);
+    const c=Object.assign({},b); c.id=cast.length+o.length; c.key='bandit'; c.role='bandit'; c.rel=[]; c.bandit=true; c.chief=o.length===0; c.parent=false; c.left=false; c.guest=false;
+    c.tool='staff'; c.head=c.chief?'hat':(c.head==='none'||c.head==='hat'?'hood':c.head); c.cloak=[40,38,40]; c.accent=[160,40,36]; o.push(c); }
+  return o; }
+function addBandits(){ if(!W.cast||!W.keepBuilt) return; let j=0; for(let id=9;id<W.cast.length;id++){ const c=W.cast[id]; if(c&&c.bandit){ addKeeper(6,(j*2)%6,id,0); j++; } } }
+function banditsLeave(){ for(let c=0;c<CR_.n;c++){ if(!CR_.al[c]||CR_.sp[c]!==SP.KEEPER) continue; const id=CR_.ay[c]|0, p=castOf(id); if(p&&p.bandit) CR_.al[c]=0; } W.banditsOut=true; }
+function chiefId(){ if(!W.cast) return -1; for(let i=9;i<W.cast.length;i++) if(W.cast[i]&&W.cast[i].chief) return i; return -1; }
+// ---- three troubles that come with a keep ----
+function KT(k){ return part().tasks[k+':'+(W.seed>>>0)]; }
+function KTset(k,o){ return part().tasks[k+':'+(W.seed>>>0)]=Object.assign({v:W.seed>>>0, vn:W.valley},o); }
+function kfar(k){ for(const key in part().tasks){ const e=part().tasks[key]; if(key.indexOf(k+':')===0&&e&&e.dest===(W.seed>>>0)&&e.s==='go') return e; } return null; }
+// falling in: the keep's mason died, and there is a mason over the hills
+function mendRoad(){ const s=W.seed>>>0, n=Math.max(1,exitAngles(s).length); let any=null;
+  for(let k=0;k<n;k++){ const d=roadDest(s,k)>>>0; if(d===s) continue; const R={ex:k, dest:d, hops:[s,d]}; if(keepLook(d).kind!=='old') return R; if(!any) any=R; }
+  // every road out leads to another crumbling keep: the mason is one valley further on
+  for(let k=0;k<n;k++){ const d=roadDest(s,k)>>>0; if(d===s) continue; const m=Math.max(1,exitAngles(d).length);
+    for(let k2=0;k2<m;k2++){ const d2=roadDest(d,k2)>>>0; if(d2===s||d2===d) continue; if(keepLook(d2).kind!=='old') return {ex:k, dest:d2, hops:[s,d,d2], ex2:k2}; } }
+  return any; }
+function beatMend(id){ const far=kfar('mend'); if(far&&id===2) return {key:'mend:'+far.v, lines:["A mason? That's me, on my days off. "+far.vn+"'s keep, is it? I've heard. The north wall's been leaning since my grandmother's day.","Tell "+far.sn+" I'll come and look. Bring cake, I'll say. Masons work on cake."], options:[
+      {label:"I'll tell "+(far.sp==='she'?'her':'him'), reply:["And tell "+(far.sp==='she'?'her':'him')+" not to touch anything until I get there. Walls know when you're nervous."], pick:function(){ far.s='back'; }}]};
+  if(W.seed==null||keepLook(W.seed).kind!=='old'||id!==3) return null; let e=KT('mend');
+  if(!e){ if(sentHere('mend')) return null; const R=mendRoad(); if(!R) return null;
+    return {key:'mend:'+(W.seed>>>0), lines:["You see the walls? Coming down a stone at a time. Our mason died last winter, and nobody here knows which end of a trowel is which.","There's a mason over in "+valleyName(R.dest)+", they say. Works the gate there, when there's no wall to build."], options:[
+      {label:"I'll ask the mason", reply:["Would you? Tell them we'll pay in cake. And a bed. Mostly cake."], pick:function(){ roadLink(W.seed>>>0,R.ex,R.hops[1]); if(R.ex2!=null) roadLink(R.hops[1],R.ex2,R.dest); KTset('mend',{s:'go', dest:R.dest, dn:valleyName(R.dest), r:R.hops, sn:nm(3), sp:castOf(3).pr}); }},
+      {label:'Not now', reply:["The wall's waited a hundred years. It'll wait a week."], pick:function(){}, snooze:true}]}; }
+  if(e.s==='back') return {key:'mend:'+e.v, lines:["Well? Will the mason come?"], options:[
+      {label:'The mason is coming. Bring cake.', reply:["Cake! I can do cake. Oh, this is good news. Next time you come by, look at the north wall."], pick:function(){ e.s='done'; e.c='mend'; logChoice('kind','mend'); }}]};
+  return null; }
+// empty: the keepers sleep in the gatehouse, because something pale moves in the great hall at night
+function beatMoths(id){ if(W.seed==null||keepLook(W.seed).kind!=='empty'||(id!==2&&id!==3)) return null; let e=KT('moths');
+  if(!e) return {key:'moths:'+(W.seed>>>0), lines:["Most of us sleep in the gatehouse now. Don't laugh.","There's something in the great hall at night. Pale. All wings. It floats over the high table and it does not like us."], options:[
+      {label:"I'll look, after dark", reply:["Take a lamp. Then don't, maybe. It likes lamps."], pick:function(){ KTset('moths',{s:'look', g:id, gn:nm(id), gp:castOf(id).pr}); }},
+      {label:'A ghost? Really?', reply:["I didn't say ghost. I said pale, and wings. You said ghost."], pick:function(){}, snooze:true}]};
+  if(e.s==='seen'&&id===e.g) return {key:'moths:'+e.v, lines:["You went in? At night? Well? What is it?"], options:[
+      {label:'Moths. Hundreds, round an old candle.', reply:["Moths. MOTHS. We've been sleeping on the gatehouse floor for a year because of moths.","...We're moving back in. Tonight. Somebody blow that candle out."], pick:function(){ e.s='done'; e.c='truth'; logChoice('truth','moths'); }},
+      {label:'The Moth Queen herself.', reply:["The Moth Queen. I knew it. The gatehouse is very comfortable, really. We like it here."], pick:function(){ e.s='done'; e.c='tale'; logChoice('lie','moths'); }}]};
+  return null; }
+function hallNow(){ const Q=KROOMS[0]; const dx=P.x-FORT.x, dy=P.y-FORT.y; return dx>Q.x0&&dx<Q.x1&&dy>Q.y0&&dy<Q.y1&&P.gz<FORT.padH+Q.h-2; }
+function mothCheck(){ if(W.seed==null||!greetHook) return; const e=KT('moths'); if(!e||e.s!=='look') return; if(!(dayPart()===3||DAY.k<0.3)||!hallNow()) return;
+  if(typeof ringSay==='function'?ringSay('Over the high table: moths. Hundreds of white moths, turning round a candle stub that has somehow kept burning. From the door, in the dark, they look like a lady made of wings.'):greetHook('Over the high table: moths, round an old candle.')!==false){ e.s='seen'; journalSave(); } }
+// bandits: the steward asks; the chief has a story; you choose
+function beatBandit(id){ if(W.seed==null||!banditsHere(W.seed)) return null; let e=KT('bandit'); const ch=chiefId(); const c=castOf(id);
+  if(!e&&id===3&&ch>=0) return {key:'bandit:'+(W.seed>>>0), lines:["There are... guests in the great hall. A whole band of them. Fox on their flag. They won't leave.","They're very polite about it. They say please. They wash up. They will not leave."], options:[
+      {label:"I'll talk to them", reply:["Would you? Their chief is the one in the hat. There's always one in a hat."], pick:function(){ KTset('bandit',{s:'talk', sn:nm(3), sp:castOf(3).pr, cn:ch>=0?nm(ch):'the chief'}); }},
+      {label:'Not my business', reply:["No. Nor mine, apparently. It's only my keep."], pick:function(){}, snooze:true}]};
+  if(e&&e.s==='talk'&&c&&c.chief) return {key:'bandit:'+e.v, lines:["Evening. We're the Free Company of the Seven Fords. Bandits, technically. We've never actually robbed anyone. We ask first.","Our great-great-grandparents got lost in the fog at the Seven Fords and never heard how the war came out. So we've been holding this keep for the Queen. Which queen, we were never told."], options:[
+      {label:'The Long Quarrel ended a hundred years ago and more.', reply:["...Ended? Who won?","Nobody? NOBODY? A hundred years of night watches for nobody?","Right. Lads, pack up. We're going home. Wherever that is."], pick:function(){ e.s='report'; e.c='home'; logChoice('truth','bandit'); banditsLeave(); }},
+      {label:'Stay, and work for your supper.', reply:["Work? Honest work? ...We could do honest work. Nobody's ever asked.","Tell the steward we can mend, dig and carry. And sing. Badly."], pick:function(){ e.s='report'; e.c='work'; logChoice('kind','bandit'); }},
+      {label:'The Queen is coming with her army!', reply:["The Queen! Now? We haven't even polished anything!","Lads! Out! Out the back! Thank you, stranger. We won't forget this."], pick:function(){ e.s='report'; e.c='lie'; logChoice('lie','bandit'); banditsLeave(); }}]};
+  if(e&&e.s==='report'&&id===3) return {key:'bandit:'+e.v, lines:["Well? What did they say?"], options:[
+      e.c==='work'?{label:'They will work for their supper.', reply:["Work! Well. The roof does need doing. And the wall. And everything. Fine. They can stay."], pick:function(){ e.s='done'; }}:
+      {label:e.c==='home'?'They are going home. The war is over.':'They have gone. In a hurry.', reply:[e.c==='home'?"Over? They didn't know? ...Poor souls. I'll pack them a lunch.":"Gone! In a hurry? What did you tell them? ...No. Don't tell me."], pick:function(){ e.s='done'; }}]};
+  return null; }
+function keepTag(t,id){ if(W.seed==null||!W.keepBuilt) return false; const L=KLOOK, c=castOf(id);
+  if(t==='krich') return L.kind==='rich'; if(t==='kold') return L.kind==='old'&&!L.mended; if(t==='kmended') return L.kind==='old'&&L.mended;
+  if(t==='kempty') return L.kind==='empty'&&!L.lit; if(t==='klit') return L.kind==='empty'&&L.lit;
+  const band=L.kind==='bandit'&&!L.gone&&!W.banditsOut&&W.cast&&W.cast.some(function(p){ return p&&p.bandit; });
+  if(t==='kbandit') return band; if(t==='kwork') return band&&!!KT('bandit')&&KT('bandit').s==='done'&&KT('bandit').c==='work';
+  if(t==='kbanditnow') return band&&!L.hired&&!(KT('bandit')&&KT('bandit').s==='done');
+  if(t==='ktall') return L.wall===13; if(t==='klow') return L.wall===9; return false; }
+const TALKK3={
+ bandit:{a:["[kbanditnow]Evening. Don't mind us. We're holding the keep. For whom, we're not sure.","[kbanditnow]We wash up after ourselves. Bandits get a bad name, but we wash up.","[kbanditnow]The chief says we're waiting for orders. The orders are a hundred years late.",
+   "[kwork]Mended the roof this morning. Honest work. My hands don't know what's happened to them.","[kwork]{steward} says we're not bandits any more. We're staff. Staff! Wait till I tell my mum.","Nice keep, this. Draughty. All the good ones are draughty."]},
+ keep:{a:["[krich]Have you seen the banners? The old crown and flame. We had them cleaned for nobody in particular.","[krich]{steward} had the walls washed. Washed! Stone doesn't need washing.","[kold]Mind the battlements. Half of them are in the ditch.","[kold]A stone fell off the north wall last night. Missed me by a hand.",
+   "[kmended]The mason came, from over the hills. Ate four cakes and rebuilt the north wall. In that order.","[kempty]Most of us sleep in the gatehouse now. It's cosy. It's very cosy. Stop looking at me like that.","[kempty]Nobody goes in the great hall after dark. Nobody.","[klit]Moths! A year of sleeping on the floor, for moths. We don't talk about it.",
+   "[kbanditnow]There are bandits in the great hall. Polite ones. I don't know what to do with polite bandits.","[ktall]Tall walls, these. The tallest for three valleys, {steward} says. {steward} says a lot of things.","[klow]Low walls here. A determined goat could get over them. One did, once."]},
+ any:{a:["[kbanditnow,notparent]Have you met the bandits at the keep? Lovely manners. Terrible singers.","[kold,notparent]The keep's falling down a stone at a time. Somebody ought to fetch a mason.","[kempty,notparent]The keepers sleep in the gatehouse these days. Ask them why. Go on. Ask."]}};
+function keepNotes(open,done){ const p=part(); for(const k in p.tasks){ const e=p.tasks[k]; if(!e||typeof e!=='object') continue; const kind=k.split(':')[0];
+  if(kind==='mend'){ if(e.s==='go') open.push({t:'Ask at the gate in '+e.dn+' for a mason, for '+e.sn+' in '+e.vn+'. The keep there is falling in.', v:e.dest}); else if(e.s==='back') open.push({t:'The mason in '+e.dn+' will come. Tell '+e.sn+', in '+e.vn+'.', v:e.v}); else if(e.s==='done') done.push({t:'Found a mason for the falling keep in '+e.vn+'.', v:e.v}); }
+  else if(kind==='moths'){ if(e.s==='look') open.push({t:'Something pale haunts the great hall in '+e.vn+'. Go in after dark.', v:e.v}); else if(e.s==='seen') open.push({t:'The ghost in '+e.vn+' is moths, round an old candle. Tell '+e.gn+'.', v:e.v}); else if(e.s==='done') done.push({t:e.c==='truth'?'Told the keepers in '+e.vn+' their ghost is moths. They moved back in.':'Told the keepers in '+e.vn+' it was the Moth Queen. They still sleep in the gatehouse.', v:e.v}); }
+  else if(kind==='bandit'){ if(e.s==='talk') open.push({t:'Bandits in the great hall in '+e.vn+'. Talk to their chief, the one in the hat.', v:e.v}); else if(e.s==='report') open.push({t:'Tell '+e.sn+', in '+e.vn+', what the bandits will do.', v:e.v}); else if(e.s==='done') done.push({t:{home:'Told the bandits in '+e.vn+' the war ended a hundred years ago. They went home.', work:'Talked the bandits in '+e.vn+' into honest work.', lie:'Scared the bandits out of '+e.vn+' with a story about the Queen.'}[e.c], v:e.v}); } } }
+const LORE5=[
+ ['tower',"The crown and the flame: the old banner of the Hollow Kings. A few keeps still fly it. Out of habit, mostly."],
+ ['old',"The Free Company of the Seven Fords. Lost in the fog, the story goes, and never found again. Some say they're still out there, waiting for orders."],
+ ['wall',"A good wall needs a good mason. A bad wall needs a mason faster."],
+ ['temple',"The Moth Queen came to the candles in the old halls. Leave one burning and she'll come to yours."]];
+LORE.push.apply(LORE,LORE5);
 var WSAVE=null;   // in Story: the Wander seed as it was, so saving the dials never moves your Wander valley
 const LINES=[];
 function lineHash(t){ let h=0x811c9dc5; for(let i=0;i<t.length;i++){ h^=t.charCodeAt(i); h=Math.imul(h,0x01000193); } return 'L'+(h>>>0).toString(36); }
 (function(){
   const add=function(who,part,pose,text,extra){ const ch=text.split(' >> '), tg=(/^\[([\w,]+)\]/.exec(text)||['',''])[1].split(','); const e={id:lineHash(who+'|'+text), who:who, part:part, pose:pose, text:ch[0], chain:ch.slice(1), check:ch.join(' '), first:tg.indexOf('first')>=0, last:tg.indexOf('last')>=0};
     if(extra) for(const k in extra) e[k]=extra[k]; LINES.push(e); };
-  for(const T of [TALK,TALKX,TALKH,TALKT,TALKL,TALKK,TALKC,TALKT2,TALKF,TALKR]) for(const who in T){ if(who==='trait'||who==='rel'||who==='pose') continue;
+  for(const T of [TALK,TALKX,TALKH,TALKT,TALKL,TALKK,TALKC,TALKT2,TALKF,TALKR,TALKK3]) for(const who in T){ if(who==='trait'||who==='rel'||who==='pose') continue;
     for(const pt in T[who]) for(const t of T[who][pt]) add(who,pt==='a'?-1:+pt,0,t); }
   for(const tr in TALK.trait) for(const t of TALK.trait[tr]){ const m=/^\[([\w,]+)\]/.exec(t);   // the trait joins any tags the line already has
     add('any',-1,0,m?'['+tr+','+m[1]+']'+t.slice(m[0].length):'['+tr+']'+t,{trait:tr}); }
@@ -5075,6 +5226,7 @@ function lineOk(id,l,here,who){ const m=TAG_RE.exec(l), c=castOf(id);
     else if(t==='roofcrust'||t==='rooffix'||t==='axeback'||t==='betwon'||t==='cakegot'||t==='songback'){ if(!trouble2Tag(t,id)) return false; }
     else if(t==='festnow'||t==='festafter'){ if(!festTag(t,id)) return false; }
     else if(t==='ringwalk'||t==='ringdone'){ if(!ringTag(t,id)) return false; }
+    else if(t.charAt(0)==='k'&&/^k(rich|old|mended|empty|lit|bandit|work|banditnow|tall|low)$/.test(t)){ if(!keepTag(t,id)) return false; }
     else if(t==='known'){ if(inHome()||didHere()) return false; const E=earned(); if(!E.title&&!E.nick) return false; }
     else if(t==='reunion'||t==='reunionasker'||t==='away'){ if(!leftTag(t,id)) return false; }
     else if(t==='feudmend'||t==='feudsour'||t==='sweettold'||t==='sweetshy'||t==='lightdone'||t==='lostback'){ if(!trTag(t,id)) return false; }
@@ -5099,7 +5251,7 @@ function lineOk(id,l,here,who){ const m=TAG_RE.exec(l), c=castOf(id);
   l.replace(SLOT_RE,function(_,k){ if(k==='valley'||k==='you') return ''; const w=slotWho(id,k,here); if(w===-3) return ''; if(w<0||(w===id&&k!=='me'&&k!=='eva'&&k!=='evb')) ok=false; return ''; });   // nobody talks about themselves by role
   if(ok) l.replace(PLACE_RE,function(_,s,k){ if(!placeHere(k)) ok=false; return ''; });
   return ok; }
-function roleName(c){ if(c.parent) return 'your '+pform(c,'par'); if(c.guest) return 'a '+(c.id0===0||c.id0===1?'guard':c.role)+' from '+c.fromv; return c.id===0?'the night guard':(c.id===1?'the day guard':'the '+c.role); }
+function roleName(c){ if(c.parent) return 'your '+pform(c,'par'); if(c.bandit){ const e=part().tasks['bandit:'+(W.seed>>>0)]; return c.chief?(e&&e.c==='work'&&e.s==='done'?'the foreman':'the bandit chief'):(e&&e.c==='work'&&e.s==='done'?'a hired hand':'a bandit'); } if(c.guest) return 'a '+(c.id0===0||c.id0===1?'guard':c.role)+' from '+c.fromv; return c.id===0?'the night guard':(c.id===1?'the day guard':'the '+c.role); }
 function pform(c,f){ const he=c.pr==='he';
   switch(f){ case 'he': return he?'he':'she'; case 'He': return he?'He':'She'; case 'him': return he?'him':'her'; case 'his': return he?'his':'her';
     case 'His': return he?'His':'Her'; case 'role': return roleName(c); case 'full': return c.name+' '+c.by;
@@ -5114,7 +5266,7 @@ function fillLine(id,l,here){ here=here||ALLHERE;
   l=l.replace(/(^|[^.])([.!?] )([a-z])/g,function(_,z,a,b){ return z+a+b.toUpperCase(); });   // a filled-in phrase that starts a sentence
   return l.charAt(0).toUpperCase()+l.slice(1); }
 // which lists a person draws from
-function whoOk(id,who){ if(id===ROLEPED) return who==='peddler'; if(id>=9){ const c=castOf(id); if(c&&c.guest) return who==='guest'; if(c&&c.left) return who==='left'||who==='any'; return who==='home'||who==='any'; } const k=ROLEKEY[id]; return who===k||who==='any'||(who==='guard'&&id<2)||(who==='keep'&&id<4)||(who==='folk'&&id>=4); }
+function whoOk(id,who){ if(id===ROLEPED) return who==='peddler'; if(id>=9){ const c=castOf(id); if(c&&c.guest) return who==='guest'; if(c&&c.bandit) return who==='bandit'; if(c&&c.left) return who==='left'||who==='any'; return who==='home'||who==='any'; } const k=ROLEKEY[id]; return who===k||who==='any'||(who==='guard'&&id<2)||(who==='keep'&&id<4)||(who==='folk'&&id>=4); }
 // what has been heard: per valley and person, line id -> the order it was heard in
 const HEARD={}, VISITS={}; let heardN=0;
 function heardKey(id){ return W.seed+':'+id; }
@@ -5230,7 +5382,7 @@ function chatTick(){
 // close enough to talk, or already talking (they wait while the card is open)
 function talkNear(c,qd){ return qd<2.6||(CHAT.id>=0&&CHAT.id===(CR_.ay[c]|0)&&qd<3.2); }
 // arriving in a valley: said once, as soon as nothing is in the way
-function arriveCheck(){ if(W.arriveMsg&&greetHook&&greetHook(W.arriveMsg)!==false){ W.arriveMsg=''; TBUSY=Date.now()+3400; }
+function arriveCheck(){ if(W.arriveMsg&&W.keepSay&&W.arriveMsg.indexOf(W.keepSay)<0) W.arriveMsg+=' '+W.keepSay; if(W.arriveMsg&&greetHook&&greetHook(W.arriveMsg)!==false){ W.arriveMsg=''; TBUSY=Date.now()+3400; }
   if(W.loreMsg&&greetHook&&Date.now()>=(W.loreAt||0)&&greetHook(W.loreMsg+' (Journal, Lore)',Math.min(9000,2600+W.loreMsg.length*45))!==false){ TBUSY=Date.now()+Math.min(9000,2600+W.loreMsg.length*45); W.loreMsg=''; } }
 // a brazier on a stone post (9 = the fire)
 defMask(SP.FIRE,7,10,[
@@ -5586,6 +5738,7 @@ function buildKeeperPaths(){
   // 5: and back up in the morning, ending where she left her round
   const back=[]; for(let k=bed.length/3-1;k>=0;k--) back.push(bed[k*3],bed[k*3+1],0); back.push(0,Wk,0);
   KPATHS.push(back);
+  KPATHS.push(BANDIT_PATH.slice());                                        // 6: the bandits, round the great hall table
   // what a keeper does at a pause: [pose, face x, face y]; 1 look out, 2 lean on the staff, 3 check the door, 4 asleep
   KACT.length=0;
   for(let p=0;p<KPATHS.length;p++){ const a=KPATHS[p], n=a.length/3, acts=new Array(n).fill(null);
@@ -5606,12 +5759,12 @@ function addKeeper(path,start,variant,lift){
 function addPeople(){
   if(!DIALS.keep||!DIALS.people||!W.keepBuilt||CR_.n>CMAX-8) return;
   buildKeeperPaths();
-  addKeeper(0,0,0,KEEP.CURH); const tl=addKeeper(1,4,1,KEEP.CURH); addKeeper(2,0,2,0); addKeeper(3,0,3,0); addParents(); addLeft(); addGuests();   // Bram, Tilda, Old Wick, Maud
+  addKeeper(0,0,0,KEEP.CURH); const tl=addKeeper(1,4,1,KEEP.CURH); addKeeper(2,0,2,0); addKeeper(3,0,3,0); addParents(); addLeft(); addGuests(); addBandits();   // Bram, Tilda, Old Wick, Maud
   if(sleepHours()){ const a=KPATHS[4], n=a.length/3, bx=a[(n-1)*3], by=a[(n-1)*3+1];
     CR_.x[tl]=bx; CR_.y[tl]=by; CR_.z[tl]=floorAt(bx,by,terr(bx,by)); CR_.ax[tl]=4; CR_.ph[tl]=n-1; CR_.st[tl]=2; CR_.po[tl]=4; CR_.vx[tl]=0.01; CR_.vy[tl]=0; }
   const cx=FORT.x, cy=FORT.y;
   for(const ox of [-6.5,6.5]){ const c=addCreature(SP.FIRE, cx+ox+0.5, cy+KEEP.IN-1.2, 0, 0, 1, -1); CR_.z[c]=terr(cx+ox+0.5,cy+KEEP.IN-1.2); }
-  for(const Q of KROOMS) for(const F of Q.fire){ const fx=cx+F[0]+0.5, fy=cy+F[1]+0.5, c=addCreature(SP.FIRE, fx, fy, 0, 1, 1, -1); CR_.z[c]=groundAt(fx,fy); }
+  for(const Q of KROOMS) if(keepFires(Q)) for(const F of Q.fire){ const fx=cx+F[0]+0.5, fy=cy+F[1]+0.5, c=addCreature(SP.FIRE, fx, fy, 0, 1, 1, -1); CR_.z[c]=groundAt(fx,fy); }
 }
 // step aside for someone coming the other way: sideways, only onto floor at the same height, never onto a rail or ledge
 function sidestep(c,ux,uy,dt){ const s=Math.min(0.7-CR_.ss[c],1.4*dt); if(s<=0) return;
@@ -5668,7 +5821,7 @@ function tickKeeper(c,dt){
 function tick(dt){
   if(W.seed!=null&&W.seed!==VN_LAST){ VN_LAST=W.seed; visitNote(W.seed); journalSave(); }
   lightCheck();
-  dayTick(); pedTick(); chatTick(); arriveCheck(); ruinCheck(); placeCheck(); ringCheck();
+  dayTick(); pedTick(); chatTick(); arriveCheck(); ruinCheck(); placeCheck(); ringCheck(); mothCheck();
   if(CR_.n===0) return; buildSGrid(); const px=P.x, py=P.y;
   for(let c=0;c<CR_.n;c++){ if(CR_.al[c]===0)continue;
     if(CR_.age[c]<1){ CR_.age[c]+=dt/matureTime(CR_.sp[c]); if(CR_.age[c]>=1){ CR_.age[c]=1; CR_.par[c]=-1; } }
@@ -6155,7 +6308,7 @@ function boot(){
       if(!ks.length) h+='<p class="jempty">No valleys yet.</p>';
       for(const k of ks){ const v=P.valleys[k], sd=+k>>>0, here=(W.seed>>>0)===sd, home=isHome(sd);
         h+='<button type="button" class="jv" data-v="'+sd+'">'+esc(v.n||valleyName(sd))+(home?'<span class="tag">home</span>':'')+(here?'<span class="tag">here</span>':'')+(busy[sd]?'<span class="tag">thread</span>':'')+
-           '<small>'+(v.m&&v.m.length?'Met '+v.m.length+(v.m.length===1?' person':' people'):'Met nobody yet')+'</small></button>';
+           '<small>'+(v.m&&v.m.length?'Met '+v.m.length+(v.m.length===1?' person':' people'):'Met nobody yet')+(keepWord(sd)?' &middot; '+esc(keepWord(sd)):'')+'</small></button>';
         if(JOPEN===sd){ h+='<div class="jvd">'+(v.m&&v.m.length?esc(v.m.join('; '))+'.':'You walked through without talking to anyone.')+
             (here?'<p style="margin:8px 0 0">You are here.</p>':'<div class="row"><button type="button" class="btn go" data-go="'+sd+'">Travel there</button></div><p style="margin:6px 0 0;font-size:12px;color:var(--mb-dim)">You walk the roads in a moment and arrive at the end of one.</p>')+'</div>'; } } }
     else { const v=Object.keys(P.valleys).length;
@@ -6295,7 +6448,7 @@ function boot(){
 }
 
 if(IS_NODE){ module.exports={genWorld,allocGrid,buildGlyphs,renderFrame,compose,spawn,populate,tick,ecology,simBin,updatePlayer,W,RS,FB,P,IN,CR_,SP,SPP,MASKS,RESERVE,RAMP,N,WATER,EYE,terr,groundAt,DIALS,growOf,isAdult,addCreature,WALLS,buildWalls,nearestWall,allWallHits,wallBlocked,setSkyTime:function(t){skyTime=t;},setUW:function(v){UW=v;},DAY,SUN,MOON,SKY,DAYMODES,sunAltAz,sunUpdate,updateDay,relightAll,relightStep,RELIGHT,dayDate,fmtTod,setTod:function(h){DAY.tod=h;sunUpdate();},floorAt,KPATHS,KEEP,FORT,eventsForDay,weddingDay,babyDay,valleyDay,logEvent,eventsRefresh,dayTick,restock,stockTakeable,stockOwner,evBind,evWhen,evKey,seedDials,valleyTraits,chooseSeed,applyWorld,worldOf,TRAITS37,WORLD_KEYS,getPlayerLand:function(){ return PLAYER_LAND; },seedParse,babyFor,pedWays,pedShelter,carveRoads,exitAngles,roadCheck,roadStay,travelTo,spawnAtExit,VISITED,ROADS,PED,pedTick,pedDay,pedFind,pedRouteIn,pedPitch,pedWay,TALKP,ROAD_DIALS,ROLEPED,stormLevel,stormWindows,stormOngoing,underCover,stormLight,TALKS,STORMC,evBase,keeperAbed,FISHSIZE,TALKE,EVTAG,EVKINDS,wedNow,relOf,TALK,TALKX,LINES,POSEWHO,talkPick,talk,chatMore,closeChat,chatTick,CHAT,HEARD,VISITS,heardKey,heardAdd,lineOk,whoOk,placeName,placeDir,setChat:function(h){chatHook=h;},castValley,valleyName,valleyNames,seedRng,rebuildPeople,KEEPERS,GREETN,lineOk,fillLine,peopleHere,ALLHERE,ROLEKEY,ROLES,NAMES_F,NAMES_M,NAMES_X,BYNAMES,CLOTHES,SKINS,HAIRS,TRAITS,TRAIT_CLASH,RELREV,dayPart,folkMissing,tickKeeper,KMASK,KL,keeperFrame,GREETT,setGreet:function(f){greetHook=f;},RENDERS};
-  Object.assign(module.exports,{SONGLORE,songWho,RING_N,RING,ringBusy,ringSpot,ringPlan,ringRead,exitAngles,ringCheck,beatRing,ringTag,ringNotes,TALKR,LORE4,ringNight,roleName,festAway,festList,nearRoad,sentHere,GREETN,TROUBLES2,beatRoof,beatRoofW,beatAxe,beatBet,beatCake,beatSong,beatFest,trouble2Tag,trouble2Notes,festNotes,festGuests,festEnd,festTag,helpedAway,FEST,TALKT2,TALKF,LORE3,SONG,SONGLORE,songWho,farFor,roadPath,beatCrown,beatFriend,CROWN,crownTag,friendTag,TALKC,LORE2,FRIENDWHAT,PAUSED,chatPause,chatResume,nearPerson,talkTo,REP,TITLES,NICKS,earned,deedName,calledBy,legendName,didHere,legendFor,legendTold,LORE,loreFor,loreTake,loreCountHere,TALKK,leftFacts,leftPath,leftEnsure,leftThreads,leftHere,leftOf,hasAsker,leftKey,LREASONS,TALKL,fillBeat,troublesFor,trGet,trTag,stoneFacts,lightCheck,LIGHTS,TALKT,arriveExit,SNOOZE,part,fixPart,neighborSeed,roadDest,roadLink,visitNote,metNote,valleyCount,storyBeat,journalNotes,chatPick,ERRANDS,errandTarget,letterFacts,CHATX:CHAT,cleanName,nameHash,randomName,homeSeed,isHome,inHome,youName,journalLoad,journalSave,journalBlank,storyNew,storyResume,storyAt,parentsFor,castWithHome,addParents,TALKH,PARENT_IDS,addKeeper,
+  Object.assign(module.exports,{banditsLeave,mendRoad,ringBusy,setGreet:function(f){ greetHook=f; },keepLook,keepWord,KLOOK_:function(){ return KLOOK; },keepDress,keepFires,banditsHere,banditCast,chiefId,beatMend,beatMoths,beatBandit,mothCheck,hallNow,keepTag,TALKK3,keepNotes,LORE5,BANDIT_PATH,SONGLORE,songWho,RING_N,RING,ringBusy,ringSpot,ringPlan,ringRead,exitAngles,ringCheck,beatRing,ringTag,ringNotes,TALKR,LORE4,ringNight,roleName,festAway,festList,nearRoad,sentHere,GREETN,TROUBLES2,beatRoof,beatRoofW,beatAxe,beatBet,beatCake,beatSong,beatFest,trouble2Tag,trouble2Notes,festNotes,festGuests,festEnd,festTag,helpedAway,FEST,TALKT2,TALKF,LORE3,SONG,SONGLORE,songWho,farFor,roadPath,beatCrown,beatFriend,CROWN,crownTag,friendTag,TALKC,LORE2,FRIENDWHAT,PAUSED,chatPause,chatResume,nearPerson,talkTo,REP,TITLES,NICKS,earned,deedName,calledBy,legendName,didHere,legendFor,legendTold,LORE,loreFor,loreTake,loreCountHere,TALKK,leftFacts,leftPath,leftEnsure,leftThreads,leftHere,leftOf,hasAsker,leftKey,LREASONS,TALKL,fillBeat,troublesFor,trGet,trTag,stoneFacts,lightCheck,LIGHTS,TALKT,arriveExit,SNOOZE,part,fixPart,neighborSeed,roadDest,roadLink,visitNote,metNote,valleyCount,storyBeat,journalNotes,chatPick,ERRANDS,errandTarget,letterFacts,CHATX:CHAT,cleanName,nameHash,randomName,homeSeed,isHome,inHome,youName,journalLoad,journalSave,journalBlank,storyNew,storyResume,storyAt,parentsFor,castWithHome,addParents,TALKH,PARENT_IDS,addKeeper,
     setMode:function(m,st){ MODE=m; STORY=st; },getStory:function(){ return STORY; },getMode:function(){ return MODE; },setJournal:function(j){ JOURNAL=j; },getJournal:function(){ return JOURNAL; },journalOff:function(){ return JOURNAL_OFF; }}); }
 else boot();
 })();
