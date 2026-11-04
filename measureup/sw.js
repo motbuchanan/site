@@ -1,8 +1,9 @@
-const CACHE='mupub-v2-1';
+const CACHE='mupub-v2-2';
 // Measure Up public edition (motbuchanan.com/measureup/). Deletes ONLY its own mupub-* caches.
-const CORE=['./','./index.html','./manifest.json','./apple-touch-icon.png','./icon-192.png','./icon-512.png','./voice.js','./voice2.js'];
+const CORE=['./','./index.html','./manifest.json','./apple-touch-icon.png','./icon-192.png','./icon-512.png','./voice.js'];
+const LATER=['./voice2.js']; // big (all the later lines): cached after install, never blocks it
 self.addEventListener('install',e=>{
-  e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));
+  e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE).then(()=>{ c.addAll(LATER).catch(()=>{}); })).then(()=>self.skipWaiting()));
 });
 self.addEventListener('activate',e=>{
   e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k.startsWith('mupub-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));
