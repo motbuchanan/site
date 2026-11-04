@@ -53,6 +53,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
 .card .go{margin-top:12px;width:100%;padding:13px 18px;font:800 15px var(--mb-ui);background:var(--mb-teal);color:#06110f;border:0}
 #chat{position:absolute;right:10px;bottom:calc(46px + env(safe-area-inset-bottom));width:min(360px,calc(50% - 16px));max-height:min(60vh,max(34vh,210px));overflow:hidden;display:flex;flex-direction:column;background:rgba(16,21,28,.92);border:1px solid var(--mb-line);border-radius:16px;padding:12px 14px 12px;pointer-events:auto;z-index:4;color:var(--mb-ink);backdrop-filter:blur(8px);transition:opacity .18s;touch-action:manipulation}
 #chat.hidden{display:none}
+#bJump{position:absolute;right:16px;bottom:calc(52px + env(safe-area-inset-bottom));z-index:4;width:64px;height:64px;border-radius:32px;font:700 14px var(--mb-ui);background:rgba(16,21,28,.78);border:1px solid var(--mb-teal);color:#e9fffc;padding:0;touch-action:none}
+#bJump[hidden]{display:none}
 #bTalk{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(52px + env(safe-area-inset-bottom));z-index:4;pointer-events:auto;min-height:46px;padding:10px 18px;border-radius:23px;font:700 15px var(--mb-ui);background:rgba(16,21,28,.92);border:1px solid var(--mb-teal);color:#e9fffc;max-width:calc(100vw - 32px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #bTalk[hidden]{display:none}
 .jcard{width:min(420px,calc(100vw - 24px));max-width:none!important;display:flex;flex-direction:column;padding:16px 16px 14px!important}
@@ -208,9 +210,10 @@ html.fromshelf #inPage #inViews{padding-top:calc(58px + env(safe-area-inset-top)
  </div>
  <div id="stick"><div id="knob"></div></div>
  <div id="fps"></div>
- <button class="mb-ver" id="mbVer" type="button">v0.30.0 &middot; Nov 3</button>
+ <button class="mb-ver" id="mbVer" type="button">v0.32.0 &middot; Nov 4</button>
  <div id="toast"></div>
  <button class="btn" id="bTalk" type="button" hidden>Talk</button>
+ <button class="btn" id="bJump" type="button" aria-label="Jump">jump</button>
  <div id="chat" class="hidden" role="dialog" aria-live="polite"><div class="ch-who"><b id="chName"></b><span id="chRole"></span></div><p id="chLine"></p><div class="ch-dots" id="chDots"></div><div class="ch-opts" id="chOpts"></div><div class="ch-btns"><button class="btn" id="chMore" type="button">more</button><button class="btn" id="chBye" type="button">goodbye</button></div></div>
  <div id="help" class="hidden"><div class="card">
   <h1>How to play</h1>
@@ -238,15 +241,16 @@ html.fromshelf #inPage #inViews{padding-top:calc(58px + env(safe-area-inset-top)
   </div>
   <p><b>The Hollow Crown.</b> Long ago two sisters broke the Hollow Crown in half and walked away in opposite directions. Their families still keep the halves, without ever having met. Learn enough of the old lore and someone will give you half a map. In Story, one of your parents has an old friend over the hills, too.</p>
   <p><b>More troubles.</b> Every valley now has three or four things wrong with it: a leaking roof (and the Thatch-Wife), an axe at the bottom of the lake, two guards betting on the Heron King, a honey cake recipe two valleys away, and an old song missing its last verse. In Story, help enough people over the hills and your home holds a harvest festival, with the people you helped as guests.</p>
+  <p><b>The ring road.</b> Every stone ring has one stone shorter than the rest, and it points along a road to the next ring. Hear a piece of the old lore, then stand in a ring and you will see it. Follow the short stones far enough and they lead to the Heart Ring. Go after dark.</p>
   <p><b>What they call you.</b> What you choose is remembered. Enough of one kind earns you a nickname, then a title, and not all of them are kind. Over the hills, people you have never met tell stories about you, a little wrong. And the old stones and the old folk remember the land as it was: the Ring-builders, the Hollow Kings, the Long Quarrel. Your journal keeps every piece you find.</p>
   <p><b>The one who left.</b> Somebody at the keep has a brother, sister, son or daughter who walked away years ago. In Story it is someone at your home keep. Somebody on the road has seen them. Find them, decide what to do, and go back and tell the one who asked.</p>
   <p><b>Every valley has its troubles.</b> A hen that wandered over the hills, a quarrel over a fence, a pair of sweethearts too shy to speak, a light in the old stones at night, a name cut in a stone that belongs to a family somewhere else. Every valley grows its own from its seed, and what you choose changes what people say.</p>
   <p><b>Talk and choose.</b> Walk up to anyone and they talk, or tap the Talk button when you're close. Walk off mid-conversation and it waits for you. When it matters, people ask you things, and you answer with the buttons on the chat card. The journal (top of the screen) keeps what you were asked, every valley you have been to, and takes you back to any of them.</p>
   <p><b>Story or Wander.</b> Story starts you at home: give yourself a name, say what your valley has plenty of, and wake by the gate of the keep your parents keep. Everyone there knows you. Wander drops you into any valley, as a stranger. Your story is saved on this device, and Continue picks it up where you left it.</p>
-  <p class="fsize">The whole game is one HTML file, plus a file for each 3D view. Right now: <b id="fsize">~582 KB</b>. Smaller than a single phone photo.</p>
+  <p class="fsize">The whole game is one HTML file, plus a file for each 3D view. Right now: <b id="fsize">~602 KB</b>. Smaller than a single phone photo.</p>
   <p><b>Why I built it.</b> I build things on a phone, directing AI the way I would direct a camera. I saw a clip of a tiny 3D world made of nothing but text and wanted to see if I could grow one that was actually alive, and keep growing it in the open instead of ever calling it done.</p>
   <p><b>What I learned.</b> How far you can get with almost nothing. One idea, a ray walking a height map, turned into characters, with a small world of animals living on top. Every version taught me one concrete thing: how to make a wall read as solid, how to keep the wolves from starving the world empty, how to make a forest look like real woods.</p>
-  <p style="color:var(--mb-dim);font-size:13px"><b style="color:var(--mb-soft)">Walk:</b> drag the left half of the screen (tilt to turn). <b style="color:var(--mb-soft)">Look:</b> drag the right half. Wade into the water to swim. Tap ☰ menu for a new world, the dials, and the time of day. Walk under the gate arch and find the door under the tower stair.</p>
+  <p style="color:var(--mb-dim);font-size:13px"><b style="color:var(--mb-soft)">Walk:</b> drag the left half of the screen (tilt to turn). <b style="color:var(--mb-soft)">Look:</b> drag the right half. Tap <b style="color:var(--mb-soft)">jump</b> (or the space bar) to hop up onto low things. Wade into the water to swim. Tap ☰ menu for a new world, the dials, and the time of day. Walk under the gate arch and find the door under the tower stair.</p>
   <button class="btn go" id="aGo">walk the keep</button>
   <button class="btn" id="aFull" style="width:100%;margin-top:8px">see every version →</button>
  </div></div>
@@ -1310,9 +1314,11 @@ var SHELF={on:false,url:'https://motbuchanan.com/gameshelf/'};
   SHELF.place=place;
 })();
 
-const VERSION='The Keep v0.30.0 · Nov 3 2026';
-const VER_SHORT='v0.30.0 · Nov 3'; // what the badge shows; bump with VERSION
+const VERSION='The Keep v0.32.0 · Nov 4 2026';
+const VER_SHORT='v0.32.0 · Nov 4'; // what the badge shows; bump with VERSION
 const CHANGELOG=[
+ ['v0.32.0 · Nov 4 2026','A bigger keep. The courtyard is half as wide again, and every room is bigger, with more on the walls: the great hall, the kitchen, the barracks and the chapel. There is now at least 4 m of open ground between any two things in the courtyard, and the gate is wider. Also, for Garrett: a jump button (or the space bar) to hop onto low things, and trees you walk round instead of through.'],
+ ['v0.31.0 · Nov 3 2026','The ring road. Once you know a piece of the old lore, stand in any stone ring and you will notice one stone is shorter than the rest. It points along one of the roads, over the hills, to the next ring. Follow five short stones (a standing stone by the road shows the way where there is no ring) and the sixth valley holds the Heart Ring. Go back after dark and listen, then ask the oldest person there what you heard. Three endings, a new title (the Ring-Walker), a legend, four pieces of lore, and a black dog on the passes at night.'],
  ['v0.30.0 · Nov 3 2026','More valley troubles. A leaking roof and the Thatch-Wife; a woodcutter whose axe went into the lake; two guards with a bet about the Heron King; a steward who wants the honey cake recipe from the next valley over; a shepherd who has forgotten the last verse of an old song. Every valley keeps its old troubles and grows one or two of the new ones. In Story, once you have helped three people over the hills, your parents start planning the harvest festival: invite up to three of the people you helped, and they walk over and come to your keep. Four more pieces of lore (one of them a song), six new legends and a new nickname.'],
  ['v0.29.0 · Nov 3 2026','The Hollow Crown. Learn a few pieces of the old lore and a hermit (or an old gatekeeper) gives you half a map. It leads to the last of the line of Ysolde, the elder sister, who keeps one half of the crown in a candle chest. A peddler lost a ledger page about the other half at a gate somewhere; find it, and it names the valley where the line of Maud keeps theirs. Then choose: bring the two families together at the well, keep the secret from each, or call it just a story. In Story, after the letter, your other parent asks you to find their oldest friend, three valleys out (there was a goose). Eight more pieces of lore, two new legends, a new title and a new nickname.'],
  ['v0.28.1 · Nov 3 2026','Talk when you want to. When someone is close, a Talk button appears at the bottom of the screen (or press T), so you can talk to anyone, any time, even right after the last chat. Walk off in the middle of a conversation, or past someone mid-question, and it waits for you for a few minutes: come back or tap Carry on, and it picks up where it left off, question and all.'],
@@ -1475,7 +1481,7 @@ function updateDay(dt){
   sunUpdate();
 }
 function fmtTod(t){ const hh=Math.floor(t)%24, mm=Math.floor((t%1)*60); return ((hh%12)||12)+':'+(mm<10?'0':'')+mm+(hh>=12?' pm':' am'); }
-const FORT={x:200,y:210,half:28,padH:null};
+const FORT={x:200,y:210,half:40,padH:null};
 const WALLS=[];
 function boxWalls(x0,y0,x1,y1,h,doorFace,doorA,doorB,roof){
   const dS=doorFace==='s', dN=doorFace==='n', dW=doorFace==='w', dE=doorFace==='e';
@@ -1500,8 +1506,8 @@ function absWall(axis,p,a,b,z0,z1,gapA,gapB){
   WALLS.push({axis:axis, p:p, a:a, b:b, h:0, z0Abs:z0, z1Abs:z1, doorA:(gapB>gapA?gapA:0), doorB:(gapB>gapA?gapB:-1)});
 }
 // keep geometry (shared by the plane builder and the st[] mass stamper)
-const KEEP={ H:28, IN:24, CURH:11, GATE:3.2, DONH:26, DONR:7.0, SPR:10.5, LIP:0.7, LR:4.6, TOWH:12.5, ARCH:3.6, ROOM:5.8, ROOMH:4.4, DOORH:3.2, MER:2.0,
-  RX0:20, RY0:-14, RY1:23 };   // RX0..RX0+3: the rampart stair against the inner east wall, rising from RY0 (ground) to RY1 (the south wall-walk)
+const KEEP={ H:40, IN:36, CURH:11, GATE:4.2, RA:15, DONH:26, DONR:7.0, SPR:10.5, LIP:0.7, LR:4.6, TOWH:12.5, ARCH:3.6, ROOM:5.8, ROOMH:4.4, DOORH:3.2, MER:2.0,
+  RX0:32, RY0:-2, RY1:35 };   // RX0..RX0+3: the rampart stair against the inner east wall, rising from RY0 (ground) to RY1 (the south wall-walk)
 function buildWalls(){ WALLS.length=0; for(let k=0;k<KDECO.length;k++) WALLS.push(KDECO[k]); }   // only the decorations are planes now
 // ---- the rooms of the keep (v0.19): bigger rooms against the walls, furnished, with banners and paintings ----
 // every coordinate is in cells from the keep's centre (x east, y south). Walls are the outer ring of the rectangle.
@@ -1509,26 +1515,27 @@ function buildWalls(){ WALLS.length=0; for(let k=0;k<KDECO.length;k++) WALLS.pus
 // furn: [x0,y0,x1,y1, height, RMAT]   deco: [wall N|S|E|W, from, to, z0, z1, image]   fire: [x,y] a hearth or candles
 const KROOMS=[
   // furniture, decorations and fires are given from the room's inside corner (rx east, ry south from the NW floor cell);
-  // decorations run along the wall: rx for the N and S walls, ry for the W and E walls
-  { name:'the great hall', x0:-23,y0:-23,x1:-5,y1:-14, h:7, mat:0, floor:1, door:['S',10,11],
-    furn:[[3,3,13,3,0.8,8],[3,2,13,2,0.45,8],[3,4,13,4,0.45,8],[7,0,8,0,1.3,4],[0,0,0,0,1.0,8],[16,0,16,0,1.0,8],[0,7,1,7,0.9,8]],
-    deco:[['N',2.0,3.5,1.4,5.2,'bannerRed'],['N',12.6,14.1,1.4,5.2,'bannerRed'],['N',5.4,10.6,3.2,5.0,'shields'],
-          ['W',1.0,7.0,1.4,4.4,'tapestry'],['E',0.6,3.4,2.2,4.0,'paintLand'],['E',4.6,6.4,1.8,4.0,'paintPortrait'],
-          ['S',1.2,5.2,1.8,4.6,'map']],
-    fire:[[8.0,0.6]] },
-  { name:'the kitchen', x0:4,y0:-23,x1:18,y1:-14, h:6, mat:7, floor:2, door:['S',5,6],
-    furn:[[3,3,6,3,0.85,8],[0,0,1,0,1.0,8],[0,1,0,1,1.0,8],[12,1,12,1,0.9,8],[12,0,12,0,0.9,8],[8,0,11,0,2.2,8],[3,0,4,0,1.5,4],[12,6,12,7,1.0,8]],
-    deco:[['N',2.6,5.4,2.4,3.6,'pots'],['W',2.0,5.2,1.6,3.8,'paintStill'],['E',2.9,4.1,1.2,4.4,'bannerGreen']],
-    fire:[[4.0,0.6]] },
-  { name:'the barracks', x0:-23,y0:5,x1:-14,y1:22, h:6, mat:0, floor:1, door:['E',6,7],
-    furn:[[0,1,1,1,0.55,9],[0,3,1,3,0.55,9],[0,9,1,9,0.55,9],[0,11,1,11,0.55,9],[0,13,1,13,0.55,9],[0,15,1,15,0.55,9],
-          [2,1,2,1,0.6,8],[2,15,2,15,0.6,8],[5,10,6,11,0.8,8]],
-    deco:[['N',3.2,6.3,1.8,4.4,'weapons'],['S',2.2,6.4,2.2,3.8,'shields'],['W',5.4,6.6,1.4,4.4,'bannerBlue']],
+  // decorations run along the wall: rx for the N and S walls, ry for the W and E walls.
+  // v0.32: every room is bigger, with at least 4 m of open courtyard between it and anything else.
+  { name:'the great hall', x0:-35,y0:-35,x1:-11,y1:-21, h:8, mat:0, floor:1, door:['S',16,17],
+    furn:[[3,5,18,6,0.8,8],[3,4,18,4,0.45,8],[3,7,18,7,0.45,8],[9,0,12,0,1.3,4],[0,0,0,0,1.0,8],[22,0,22,0,1.0,8],[0,12,1,12,0.9,8],[21,12,22,12,0.9,8]],
+    deco:[['N',1.5,3.0,1.6,6.0,'bannerRed'],['N',19.5,21.0,1.6,6.0,'bannerRed'],['N',4.6,8.4,3.4,5.6,'shields'],['N',13.6,17.4,3.4,5.6,'shields'],
+          ['W',1.5,9.5,1.4,5.0,'tapestry'],['E',1.0,4.0,2.2,4.2,'paintLand'],['E',5.4,7.4,1.8,4.2,'paintPortrait'],['E',9.4,10.9,1.6,6.0,'bannerRed'],
+          ['S',1.5,5.5,1.8,4.6,'map'],['S',8.5,12.5,2.0,4.2,'paintShip']],
+    fire:[[11.0,0.6]] },
+  { name:'the kitchen', x0:10,y0:-35,x1:35,y1:-21, h:7, mat:7, floor:2, door:['S',5,6],
+    furn:[[3,4,8,5,0.85,8],[14,7,19,8,0.85,8],[0,0,1,0,1.0,8],[0,1,0,1,1.0,8],[22,1,22,1,0.9,8],[22,0,22,0,0.9,8],[23,0,23,1,0.9,8],[10,0,14,0,2.2,8],[2,0,3,0,1.5,4],[23,11,23,12,1.0,8]],
+    deco:[['N',6.6,9.4,2.4,3.6,'pots'],['N',15.6,18.4,2.6,3.8,'pots'],['W',3.0,6.2,1.6,3.8,'paintStill'],['E',5.0,6.2,1.2,4.6,'bannerGreen'],['S',10.0,14.0,1.8,4.0,'paintLand']],
+    fire:[[3.0,0.6]] },
+  { name:'the barracks', x0:-35,y0:8,x1:-22,y1:35, h:6, mat:0, floor:1, door:['E',11,12],
+    furn:[[0,1,1,1,0.55,9],[0,3,1,3,0.55,9],[0,5,1,5,0.55,9],[0,7,1,7,0.55,9],[0,9,1,9,0.55,9],[0,15,1,15,0.55,9],[0,17,1,17,0.55,9],[0,19,1,19,0.55,9],[0,21,1,21,0.55,9],[0,23,1,23,0.55,9],
+          [2,1,2,1,0.6,8],[2,23,2,23,0.6,8],[6,14,7,16,0.8,8],[10,25,11,25,0.9,8]],
+    deco:[['N',3.2,6.3,1.8,4.4,'weapons'],['S',2.5,6.5,2.2,3.8,'shields'],['W',11.0,12.2,1.4,4.4,'bannerBlue'],['E',3.0,6.1,1.8,4.4,'weapons'],['E',16.0,20.0,2.2,3.8,'shields']],
     fire:[] },
-  { name:'the chapel', x0:6,y0:12,x1:18,y1:22, h:6, mat:3, floor:2, door:['W',3,4],
-    furn:[[9,3,9,5,1.0,3],[4,1,7,1,0.45,8],[4,2,7,2,0.45,8],[4,6,7,6,0.45,8],[4,7,7,7,0.45,8]],
-    deco:[['E',1.8,3.4,0.9,4.3,'glass'],['E',5.6,7.2,0.9,4.3,'glass'],['N',2.8,3.9,1.6,4.4,'bannerBlue'],['N',8.2,9.3,1.6,4.4,'bannerBlue'],['S',3.0,5.6,1.8,4.0,'paintShip']],
-    fire:[[9.5,2.4],[9.5,6.6]] }
+  { name:'the chapel', x0:9,y0:18,x1:27,y1:35, h:8, mat:3, floor:2, door:['W',3,4],
+    furn:[[16,6,16,9,1.0,3],[4,2,11,2,0.45,8],[4,3,11,3,0.45,8],[4,7,11,7,0.45,8],[4,8,11,8,0.45,8],[4,12,11,12,0.45,8],[4,13,11,13,0.45,8]],
+    deco:[['E',1.8,3.6,0.9,5.6,'glass'],['E',12.4,14.2,0.9,5.6,'glass'],['N',3.0,4.1,1.6,5.4,'bannerBlue'],['N',12.0,13.1,1.6,5.4,'bannerBlue'],['S',6.0,8.6,1.8,4.0,'paintShip'],['W',9.0,12.0,1.8,4.4,'paintPortrait']],
+    fire:[[16.5,5.4],[16.5,10.6]] }
 ];
 // turn the room-relative numbers into keep coordinates once
 (function(){ for(const Q of KROOMS){ const ox=Q.x0+1, oy=Q.y0+1;
@@ -1636,8 +1643,8 @@ function stampKeepMass(){
         if((tx===4*sx && tooth(dy)) || (ty===4*sy && tooth(dx))) h+=MER;
         s=h; } }   // the tower owns its footprint (no curtain teeth poking through its top)
     // gatehouse towers: two solid blocks standing forward of the wall either side of the arch
-    if(dy>=OUT-1 && dy<=OUT+5 && ((dx>=4&&dx<=8)||(dx>=-8&&dx<=-4))){ let h=13;
-      if((dy===OUT+5 && tooth(dx)) || ((dx===8||dx===-8) && tooth(dy))) h+=MER;
+    if(dy>=OUT-1 && dy<=OUT+5 && ((dx>=6&&dx<=11)||(dx>=-11&&dx<=-6))){ let h=13;
+      if((dy===OUT+5 && tooth(dx)) || ((dx===11||dx===-11) && tooth(dy))) h+=MER;
       s=Math.max(s,h); }
     // donjon: a round shaft. Its top is an open lookout: a low parapet you can see over, with a wide opening
     // facing each way (north, east, south, west) and a few merlons between them; a gap where the stair lands.
@@ -1728,8 +1735,9 @@ const W={
   cloud:new Uint8Array(256*256), cloud2:new Uint8Array(256*256), detail:new Uint8Array(64*64), path:new Uint8Array(N*N), ttype:new Uint8Array(N*N), shad:new Float32Array(N*N), shadRaw:new Float32Array(N*N), shadTop:new Float32Array(N*N), keepBuilt:false, sb:new Float32Array(N*N), su:new Float32Array(N*N), rail:new Uint8Array(N*N), ruin:new Uint8Array(N*N), floor:new Uint8Array(N*N), smat:new Uint8Array(N*N), ruins:[], places:[], pens:[], ar:new Uint8Array(N*N), ag:new Uint8Array(N*N), ab:new Uint8Array(N*N), seed:1, shadowCells:0
 };
 
+const KEEPT=new Set();   // the woodcutter's two trees: trails go round them
 function genWorld(seed){
-  closeChat();
+  closeChat(); KEEPT.clear();
   W.seed=seed; W.vday=0; W.live=[]; W.lastTod=null; W.events=null; W.taken={}; W.fishDay=null;
   PED.cyc=null; PED.gone=null; PED.phase=''; PED.route=null; PED.lastTod=null; PED.ways=null; PED.shelter=undefined; ROADS.sign=-1;
   { const vn=valleyNames(seed); W.valley=vn.valley; W.farmNames=[vn.farm1,vn.farm2]; }
@@ -1754,14 +1762,14 @@ function genWorld(seed){
   // fort plateau + walls
   {
     let sum=0,cnt=0;
-    for(let y=FORT.y-30;y<=FORT.y+30;y++)for(let x=FORT.x-30;x<=FORT.x+30;x++){ sum+=h[y*N+x]; cnt++; }
+    for(let y=FORT.y-42;y<=FORT.y+42;y++)for(let x=FORT.x-42;x<=FORT.x+42;x++){ sum+=h[y*N+x]; cnt++; }
     const ph=Math.max(WATER+6,sum/cnt);
     FORT.padH=ph;
-    for(let y=FORT.y-56;y<=FORT.y+56;y++)for(let x=FORT.x-56;x<=FORT.x+56;x++){
+    for(let y=FORT.y-68;y<=FORT.y+68;y++)for(let x=FORT.x-68;x<=FORT.x+68;x++){
       const d=Math.max(Math.abs(x-FORT.x),Math.abs(y-FORT.y));
-      const k=1-sm(36,56,d);
+      const k=1-sm(48,68,d);
       h[y*N+x]+=(ph-h[y*N+x])*k;
-      if(d<=36) h[y*N+x]=ph; // perfectly flat pad under the walls
+      if(d<=48) h[y*N+x]=ph; // perfectly flat pad under the walls
     }
     stampKeepMass();
     buildWalls();
@@ -1779,7 +1787,7 @@ function genWorld(seed){
   for(let y=2;y<N-2;y++)for(let x=2;x<N-2;x++){
     const i=y*N+x; const hh=h[i];
     if(st[i]>0) continue;
-    if(Math.max(Math.abs(x-FORT.x),Math.abs(y-FORT.y))<46) continue;
+    if(Math.max(Math.abs(x-FORT.x),Math.abs(y-FORT.y))<58) continue;
     if(hh<WATER+2.5||hh>42) continue;
     const sx=(h[i+1]-h[i-1])*0.5, sy=(h[i+N]-h[i-N])*0.5;
     if(sx*sx+sy*sy>0.55) continue;
@@ -1900,7 +1908,7 @@ function carveRiver(x0,y0,dx0,dy0,len,s2){
     ang+=(fbm(k*0.05,s2*0.001,s2,2)-0.5)*0.14;
     x+=Math.cos(ang); y+=Math.sin(ang);
     if(x<8||y<8||x>N-9||y>N-9) break;
-    if(Math.max(Math.abs(x-FORT.x),Math.abs(y-FORT.y))<64) break;
+    if(Math.max(Math.abs(x-FORT.x),Math.abs(y-FORT.y))<76) break;
     const xi=Math.round(x), yi=Math.round(y);
     for(let oy=-7;oy<=7;oy++)for(let ox=-7;ox<=7;ox++){
       const d=Math.hypot(ox,oy); if(d>7) continue;
@@ -1954,7 +1962,7 @@ function ruinSpot(R,rnd,kind){
   const h=W.h, flat=(kind==='temple'||kind==='farm'||kind==='tower'||kind==='circle')?2.4:3.4, fMin=0.58-0.24*DIALS.forest;
   for(let a=0;a<3000;a++){
     const x=(30+rnd()*(N-60))|0, y=(30+rnd()*(N-60))|0;
-    if(Math.max(Math.abs(x-FORT.x),Math.abs(y-FORT.y))<60+R) continue;
+    if(Math.max(Math.abs(x-FORT.x),Math.abs(y-FORT.y))<72+R) continue;
     if(a<2200&&fbm(x*0.03,y*0.03,W.seed+21,3)>fMin+0.02) continue;   // open meadow first; only then the woods
     let lo=1e9, hi=-1e9, ok=true;
     // level enough inside the footprint; and nothing in the way a little past it, since arch stubs, wall corners and
@@ -2175,7 +2183,7 @@ const FOLK_BUILD={
       const cx=tx+0.5, cy=ty+0.5, dx=hub[0]-cx, dy=hub[1]-cy, dl=Math.hypot(dx,dy)||1, sx=cx+dx/dl*1.3, sy=cy+dy/dl*1.3;
       if(picks.length){ let da=Math.atan2(sy-hub[1],sx-hub[0])-Math.atan2(picks[0][1]-hub[1],picks[0][0]-hub[0]); da=Math.abs(Math.atan2(Math.sin(da),Math.cos(da))); if(da<0.9) continue; }
       if(!segClear(hub[0],hub[1],sx,sy,0.5)) continue;
-      picks.push([sx,sy,-dx/dl,-dy/dl]); p.keepTrees.push([i,W.tree[i]]); }
+      picks.push([sx,sy,-dx/dl,-dy/dl]); p.keepTrees.push([i,W.tree[i]]); KEEPT.add(i); }
     const W_=function(q){ const cs=[1,0,-1,0][T.rot], sn=[0,1,0,-1][T.rot], ex=q[0]-T.x, ey=q[1]-T.y;   // back from the world to the place's grid
       return [ex*cs+ey*sn, -ex*sn+ey*cs, 16, 5, q[2]*cs+q[3]*sn, -q[2]*sn+q[3]*cs]; };
     const trees=picks.map(W_);
@@ -2216,7 +2224,7 @@ function folkSpot(R,rnd,want){
   const h=W.h, fMin=0.58-0.24*DIALS.forest;
   for(let a=0;a<4000;a++){
     const x=(40+rnd()*(N-80))|0, y=(40+rnd()*(N-80))|0;
-    const dk=Math.max(Math.abs(x-FORT.x),Math.abs(y-FORT.y)); if(dk<62+R||dk>210) continue;
+    const dk=Math.max(Math.abs(x-FORT.x),Math.abs(y-FORT.y)); if(dk<74+R||dk>210) continue;
     const fo=fbm(x*0.03,y*0.03,W.seed+21,3);
     if(a<2400&&(want==='forest'?fo<fMin+0.06:fo>fMin-0.02)) continue;   // the woodcutter wants the trees, a farm the open meadow
     let lo=1e9,hi=-1e9,bad=false;
@@ -2233,7 +2241,7 @@ function hermitSpot(rnd){ const h=W.h, dirs=[[0,1,0],[-1,0,1],[0,-1,2],[1,0,3]];
   for(let a=0;a<9000;a++){ const easy=a>=6000;   // a last, easier pass so a small lake still gets its hermit
     const an=rnd()*6.2832, rr=LAKE.r*(0.4+1.4*rnd()), x=Math.round(LAKE.x+Math.cos(an)*rr), y=Math.round(LAKE.y+Math.sin(an)*rr);
     if(x<24||y<24||x>N-24||y>N-24) continue;
-    if(Math.max(Math.abs(x-FORT.x),Math.abs(y-FORT.y))<(easy?62:72)) continue;
+    if(Math.max(Math.abs(x-FORT.x),Math.abs(y-FORT.y))<(easy?74:84)) continue;
     const g0=h[y*N+x]; if(g0<WATER+0.7||g0>WATER+6) continue;
     for(const d of dirs){
       let sh=-1; for(let k=2;k<=9;k++){ if(h[(y+d[1]*k)*N+x+d[0]*k]<WATER+0.2){ sh=k; break; } } if(sh<3) continue;
@@ -2273,6 +2281,7 @@ function placeFolk(seed){
     if(p.trail){ const q=nearestPath(p.trail[0],p.trail[1],180); if(q) carvePath(p.trail[0],p.trail[1],q[0],q[1],seed+500+k,1.0); }
     for(const t of p.keepTrees) W.tree[t[0]]=t[1]; }
   // a trail is for the land between places: lift it off floors, fields, yards, pens and anything built
+  for(const p of W.places) for(const t of p.keepTrees){ W.tree[t[0]]=t[1]; W.path[t[0]]=0; }
   for(let i=0;i<N*N;i++){ if(W.path[i]&&(W.st[i]>0||W.floor[i]||W.su[i]>0)) W.path[i]=0; }
   for(const pn of W.pens) for(let y=Math.floor(pn.y0);y<Math.ceil(pn.y1);y++)for(let x=Math.floor(pn.x0);x<Math.ceil(pn.x1);x++) W.path[y*N+x]=0;
   try{ const f=JSON.parse(localStorage.getItem('keep_places_'+seed)||'[]'); if(Array.isArray(f)) for(const o of W.places) if(f.indexOf(o.key)>=0) o.found=true; }catch(e){}
@@ -2388,7 +2397,7 @@ function ruinCheck(){ if(!greetHook||!W.ruins.length) return;
   for(const o of W.ruins){ if(o.found) continue; if(Math.hypot(P.x-o.x,P.y-o.y)>o.dr) continue;
     let n=1; for(const q of W.ruins) if(q.found) n++;
     const msg='You found '+o.name+'.'+(n===W.ruins.length&&n>1?' That is every ruin in this world.':' ('+n+' of '+W.ruins.length+' ruins)');
-    if(greetHook(msg)!==false){ o.found=true; o.foundAt=Date.now(); { const li=loreFor(o.kind); if(li!=null&&loreTake(li)){ W.loreMsg=o.name.charAt(0).toUpperCase()+o.name.slice(1)+': '+LORE[li][1]; W.loreAt=Date.now()+3800; } }
+    if(greetHook(msg)!==false){ TBUSY=Date.now()+3400; o.found=true; o.foundAt=Date.now(); { const li=loreFor(o.kind); if(li!=null&&loreTake(li)){ W.loreMsg=o.name.charAt(0).toUpperCase()+o.name.slice(1)+': '+LORE[li][1]; W.loreAt=Date.now()+3800; } }
       try{ localStorage.setItem('keep_found_'+W.seed,JSON.stringify(W.ruins.filter(function(q){ return q.found; }).map(function(q){ return q.name; }))); }catch(e){} }
     return; } }
 function carvePath(x0,y0,x1,y1,sd,wd){
@@ -2400,7 +2409,7 @@ function carvePath(x0,y0,x1,y1,sd,wd){
     if(x<5||y<5||x>N-6||y>N-6) break;
     const xi=Math.round(x), yi=Math.round(y);
     for(let oy=-2;oy<=2;oy++)for(let ox=-2;ox<=2;ox++){ const dd=Math.hypot(ox,oy); if(dd>wd+0.4)continue;
-      const j=(yi+oy)*N+xi+ox; if(j<0||j>=N*N)continue; W.path[j]=1; W.tree[j]=0; }
+      const j=(yi+oy)*N+xi+ox; if(j<0||j>=N*N)continue; if(KEEPT.has(j)) continue; W.path[j]=1; W.tree[j]=0; }
   }
 }
 function terr(x,y){
@@ -3851,13 +3860,13 @@ function exitAngles(seed){ const r=seedRng(seed,0x40AD), n=1+((r()*3)|0), a=[];
 // a road from the trail network out to the map edge, with a pass cut through the rim so it stays an easy walk
 function carveRoads(seed){
   W.road.fill(0); W.exits.length=0;
-  const h=W.h, C=N/2, lim=N/2-7, keepClear=function(x,y){ return Math.abs(x-FORT.x)<46&&Math.abs(y-FORT.y)<46; };
+  const h=W.h, C=N/2, lim=N/2-7, keepClear=function(x,y){ return Math.abs(x-FORT.x)<58&&Math.abs(y-FORT.y)<58; };
   const angles=exitAngles(seed);
   // the land you can walk to from the gate without swimming: a road only joins trails inside it
   const reach=new Uint8Array(N*N), q0=(FORT.y+FORT.half+6)*N+FORT.x, fq=[q0]; reach[q0]=1;
   for(let qi=0;qi<fq.length;qi++){ const i=fq[qi], x=i%N, y=(i/N)|0;
     for(let oy=-1;oy<=1;oy++)for(let ox=-1;ox<=1;ox++){ const nx=x+ox, ny=y+oy; if(nx<3||ny<3||nx>N-4||ny>N-4) continue; const j=ny*N+nx; if(reach[j]) continue;
-      if(Math.abs(nx-FORT.x)<30&&Math.abs(ny-FORT.y)<30) continue; if(W.st[j]>0.3||(W.su[j]>0&&W.sb[j]<2.2)||h[j]<WATER+0.2||Math.abs(h[j]-h[i])>1.2) continue;
+      if(Math.abs(nx-FORT.x)<42&&Math.abs(ny-FORT.y)<42) continue; if(W.st[j]>0.3||(W.su[j]>0&&W.sb[j]<2.2)||h[j]<WATER+0.2||Math.abs(h[j]-h[i])>1.2) continue;
       reach[j]=1; fq.push(j); } }
   const done=[];
   const apart=function(t){ return done.every(function(q){ return Math.abs(Math.atan2(Math.sin(t-q),Math.cos(t-q)))>=Math.PI/2-1e-6; }); };
@@ -3865,7 +3874,7 @@ function carveRoads(seed){
     const ca=Math.cos(ang), sa=Math.sin(ang), t=lim/Math.max(Math.abs(ca),Math.abs(sa)), ex=C+ca*t, ey=C+sa*t;
     // where it leaves the trails: the nearest trail that can see the road's end without crossing the keep or the lake
     let J=null, best=1e18;
-    for(let y=6;y<N-6;y+=2)for(let x=6;x<N-6;x+=2){ if(!W.path[y*N+x]||!reach[y*N+x]) continue; const d=(x-ex)*(x-ex)+(y-ey)*(y-ey); if(d>=best) continue;
+    for(let pass=0;pass<2&&!J;pass++) for(let y=6;y<N-6;y+=2)for(let x=6;x<N-6;x+=2){ if(!W.path[y*N+x]||!reach[y*N+x]||(pass===0&&W.road[y*N+x])) continue; const d=(x-ex)*(x-ex)+(y-ey)*(y-ey); if(d>=best) continue;
       let ok=true; const L=Math.sqrt(d); for(let s=0;s<=L&&ok;s+=2){ const px=x+(ex-x)*s/L, py=y+(ey-y)*s/L;
         if(keepClear(px,py)||(!relax&&Math.hypot(px-LAKE.x,py-LAKE.y)<LAKE.r*(0.55+0.70*DIALS.water)+8)) ok=false; }
       if(ok){ best=d; J=[x+0.5,y+0.5]; } }
@@ -3876,12 +3885,15 @@ function carveRoads(seed){
       const ang=Math.atan2(dy,dx)+(fbm(st*0.04,(seed+k*97)*0.001,seed+211+k,2)-0.5)*0.5*Math.min(1,d/40);
       x+=Math.cos(ang); y+=Math.sin(ang); }
     pts.push([ex,ey]);
+    while(pts.length>2&&W.road[(pts[1][1]|0)*N+(pts[1][0]|0)]){ pts.shift(); J=[pts[0][0],pts[0][1]]; }
     if(pts.length<16) return false;   // a trail already runs almost to the edge here: try another way
     // the height along it: nowhere steeper than 0.45 a cell, cut down through the rim, never under the water
     const S=0.24, n=pts.length, tz=new Float32Array(n);
     for(let i=0;i<n;i++){ const q=pts[i]; tz[i]=h[(q[1]|0)*N+(q[0]|0)]; }
+    const z0=tz[0];
     for(let i=1;i<n;i++) tz[i]=Math.min(tz[i],tz[i-1]+S);
     for(let i=n-2;i>=0;i--) tz[i]=Math.min(tz[i],tz[i+1]+S);
+    if(W.road[(pts[0][1]|0)*N+(pts[0][0]|0)]) tz[0]=z0;
     for(let i=0;i<n;i++) tz[i]=Math.max(tz[i],WATER+0.9);
     for(let i=1;i<n;i++) tz[i]=Math.max(tz[i],tz[i-1]-S);
     for(let i=n-2;i>=0;i--) tz[i]=Math.max(tz[i],tz[i+1]-S);
@@ -3895,7 +3907,7 @@ function carveRoads(seed){
       for(let oy=-R;oy<=R;oy++)for(let ox=-R;ox<=R;ox++){ const gx=(cx|0)+ox, gy=(cy|0)+oy, lx=gx-bx0, ly=gy-by0; if(lx<0||ly<0||lx>=bw||ly>=bh) continue;
         const d=Math.hypot(gx+0.5-cx,gy+0.5-cy); if(d>R) continue; const j=ly*bw+lx; if(d<D[j]){ D[j]=d; T[j]=tz[i]; } } }
     for(let ly=0;ly<bh;ly++)for(let lx=0;lx<bw;lx++){ const j=ly*bw+lx, d=D[j]; if(d>R) continue; const gx=bx0+lx, gy=by0+ly;
-      if(gx<1||gy<1||gx>N-2||gy>N-2||(Math.abs(gx-FORT.x)<37&&Math.abs(gy-FORT.y)<37)) continue; const i=gy*N+gx, tv=T[j], h0=h[i];
+      if(gx<1||gy<1||gx>N-2||gy>N-2||(Math.abs(gx-FORT.x)<49&&Math.abs(gy-FORT.y)<49)) continue; const i=gy*N+gx, tv=T[j], h0=h[i];
       if(W.road[i]&&!mine[i]) continue;   // an earlier road keeps its own shape where two meet
       if(d<=3.5) h[i]=tv; else { const w=(d-3.5)*1.2; h[i]=Math.min(Math.max(h0,tv-w),tv+w); }
       if(d<=4.5||Math.abs(h[i]-h0)>0.8) W.tree[i]=0;
@@ -3933,7 +3945,7 @@ function roadCheck(now){ if(!W.exits.length) return null;
 // Stay: back down the road a little (7 m from its end), and the card leaves you alone for 20 seconds
 function roadStay(e,now){ P.hand=null; P.x=e.x-e.dx*7; P.y=e.y-e.dy*7; P.yaw=Math.atan2(-e.dy,-e.dx); P.gz=Math.max(groundAt(P.x,P.y),WATER-0.6); P.z=P.gz+EYE; ROADS.cool=(now||Date.now())+20000; }
 function spawnAtExit(e){ const L=e.pts.length, q=e.pts[Math.max(0,L-1-7)];
-  P.hand=null; P.rampDir=0; P.lastDir=0; P.x=q[0]; P.y=q[1]; P.yaw=Math.atan2(-e.dy,-e.dx); P.pitch=0.04;
+  P.jz=0; P.jv=0; P.hand=null; P.rampDir=0; P.lastDir=0; P.x=q[0]; P.y=q[1]; P.yaw=Math.atan2(-e.dy,-e.dx); P.pitch=0.04;
   P.gz=Math.max(groundAt(P.x,P.y),WATER-0.6); P.z=P.gz+EYE; }
 // the one way between valleys: grow the new one (with the usual dials), arrive on the road that faces the way you came
 function travelTo(seed,from){ seed=seed>>>0; closeChat();
@@ -3951,7 +3963,7 @@ var PED={cyc:null, gone:null, phase:'', route:null, k:0, lastTod:null};
 function pedDay(seed,d){ const off=(seedRng(seed,0x9ED1)()*3)|0; return (((d+off)%3)+3)%3===0; }
 function pedFind(){ for(let c=0;c<CR_.n;c++) if(CR_.al[c]&&CR_.sp[c]===SP.KEEPER&&CR_.ax[c]===300) return c; return -1; }
 // where the peddler sets up: inside the gate by the braziers, or at the gate when there is no keep
-function pedPitch(){ return W.keepBuilt?[FORT.x+7.5,FORT.y+KEEP.IN-3.5]:[FORT.x+3.5,FORT.y+FORT.half+6]; }
+function pedPitch(){ return W.keepBuilt?[FORT.x+4.5,FORT.y+30.5]:[FORT.x+3.5,FORT.y+FORT.half+6]; }
 // the way in from a road's end: the road, the trails to the gate, through the gate to the pitch
 function pedWays(){ if(!PED.ways||PED.ways.seed!==W.seed){ const gx=FORT.x, gy=FORT.y+FORT.half+6;
     PED.ways=W.exits.map(function(e){ return pedWay(e.join[0]|0,e.join[1]|0,gx,gy); }); PED.ways.seed=W.seed; } return PED.ways; }
@@ -3969,7 +3981,7 @@ function pedWay(x0,y0,x1,y1,wet){ const h=W.h, dist=new Float64Array(N*N).fill(1
   dist[s]=0; push(s,H(s)); let n=0;
   while(hp.length&&n++<1500000){ const [f,i]=pop(); if(f-H(i)>dist[i]+1e-6) continue; if(i===goal) break; const d=dist[i], x=i%N, y=(i/N)|0;
     for(let oy=-1;oy<=1;oy++)for(let ox=-1;ox<=1;ox++){ if(!ox&&!oy) continue; const nx=x+ox, ny=y+oy; if(nx<3||ny<3||nx>N-4||ny>N-4) continue; const j=ny*N+nx;
-      if(Math.abs(nx-FORT.x)<30&&Math.abs(ny-FORT.y)<30) continue; if(W.st[j]>0.3||(W.su[j]>0&&W.sb[j]<2.2)||(!wet&&h[j]<WATER-0.3)) continue;
+      if(Math.abs(nx-FORT.x)<42&&Math.abs(ny-FORT.y)<42) continue; if(W.tree[j]>0&&j!==goal) continue; if(W.st[j]>0.3||(W.su[j]>0&&W.sb[j]<2.2)||(!wet&&h[j]<WATER-0.3)) continue;
       const dh=Math.abs(Math.max(h[j],WATER)-Math.max(h[i],WATER)); if(dh>(wet?1.5:1.2)) continue;
       { const hj=Math.max(h[j],WATER); if(Math.abs(Math.max(h[j+1],WATER)-hj)>1.6||Math.abs(Math.max(h[j-1],WATER)-hj)>1.6||Math.abs(Math.max(h[j+N],WATER)-hj)>1.6||Math.abs(Math.max(h[j-N],WATER)-hj)>1.6) continue; }   // not along the lip of a drop
       const c=(ox&&oy?1.414:1)*(W.path[j]?1:(h[j]<WATER?12:3))+dh*2, nd=d+c; if(nd<dist[j]){ dist[j]=nd; prev[j]=i; push(j,nd+H(j)); } } }
@@ -4125,7 +4137,7 @@ function castWithHome(seed){ let c=castValley(seed); if(isHome(seed)) c=c.concat
   for(const L of leftHere(seed)){ if(c.length>=15) break; c=c.concat([leftPerson(L,c.length,c)]); } return c.concat(festGuests(seed,c)); }
 // they walk the steward's round in the keep, starting from two places in the courtyard so the three of them never bunch up
 function addParents(){ if(!inHome()||!W.cast||!W.cast[9]||!KPATHS[3]) return; const a=KPATHS[3], n=a.length/3;
-  const flat=[]; for(let w=0;w<n;w++){ const x=a[w*3]-FORT.x, y=a[w*3+1]-FORT.y; if(Math.abs(Math.hypot(x,y)-12.9)<0.2) flat.push(w); }
+  const flat=[]; for(let w=0;w<n;w++){ const x=a[w*3]-FORT.x, y=a[w*3+1]-FORT.y; if(Math.abs(Math.hypot(x,y)-KEEP.RA)<0.2) flat.push(w); }
   const s1=flat.length?flat[(flat.length*0.35)|0]:1, s2=flat.length?flat[(flat.length*0.8)|0]:2;
   addKeeper(3,s1,9,0); addKeeper(3,s2,10,0); }
 // ---- what people at home say. [home]: only in your home valley, in Story. {you}: your name. {home1} {home2}: your parents ----
@@ -4239,7 +4251,7 @@ function beatLetter(id){ if(MODE!=='story'||!STORY) return null; const p=part();
       {label:"I'll tell "+(L.gp==='she'?'her':'him'), reply:["And tell "+L.gn+" I still have the cup. "+(L.gp==='she'?'She':'He')+"'ll know."], pick:function(){ L.s='replied'; }},
       {label:'What was in it?', reply:["Old business. Good business. Nothing for you to worry about.","Go on home. Safe roads."], pick:function(){ L.s='replied'; }}]};
   return null; }
-const BEATS=[beatLetter,beatErrand,beatGate,beatLeft,beatLost,beatStone,beatFeud,beatSweet,beatLight,beatRoof,beatRoofW,beatAxe,beatBet,beatCake,beatSong,beatFest,beatCrown,beatFriend];
+const BEATS=[beatLetter,beatErrand,beatGate,beatLeft,beatLost,beatStone,beatFeud,beatSweet,beatLight,beatRoof,beatRoofW,beatAxe,beatBet,beatCake,beatSong,beatFest,beatRing,beatCrown,beatFriend];
 const SNOOZE={};   // "not now": the question rests a few minutes before it is asked again
 function fillBeat(id,b){ b.lines=b.lines.map(function(t,k){ return {id:'B'+b.key+k, text:T(id,t)}; });
   for(const o of b.options){ o.label=T(id,o.label); o.reply=(o.reply||[]).map(function(t){ return T(id,t); }); } return b; }
@@ -4259,7 +4271,7 @@ function journalNotes(){ const p=part(), open=[], done=[];
       else if(e.s==='replied') open.push({t:e.rg+' says yes, for the harvest. Tell '+e.gn+', at home.', v:STORY&&STORY.home});
       else if(e.s==='done') done.push({t:e.c==='lie'?'Told '+e.gn+' that '+e.rg+' said no. It was not true.':'Took '+e.gn+"'s letter over the hills to "+e.rg+'. '+e.rg+' is coming for the harvest.', v:e.dest}); }
     else if(k==='gate') done.push({t:'Every road leads to the same valley every time. The journal remembers the way home.'}); }
-  crownNotes(open,done); leftNotes(open,done); troubleNotes(open,done); trouble2Notes(open,done); festNotes(open,done); return {open:open, done:done}; }
+  crownNotes(open,done); leftNotes(open,done); troubleNotes(open,done); trouble2Notes(open,done); festNotes(open,done); ringNotes(open,done); return {open:open, done:done}; }
 // ---------------- valley troubles (v0.26.1): every valley has its own, from its own seed ----------------
 // Any valley you reach, by road, by a random seed or by your journal, grows one or two troubles from its seed: a lost
 // hen or lamb that turned up over the hills, a quarrel over a fence, a pair of sweethearts too shy to say so, a light
@@ -4525,6 +4537,7 @@ const TITLES=[
  {n:'the Promise-Breaker', ok:function(r){ return r.broken>=2; }},
  {n:'the Troublemaker', ok:function(r){ return r.stir>=2||(r.lie>=5&&r.lie>r.truth); }},
  {n:'the Crown-Finder', ok:function(){ const e=part().tasks.crown; return !!(e&&e.s==='done'&&e.c==='whole'); }},
+ {n:'the Ring-Walker', ok:function(){ const e=part().tasks.ring; return !!(e&&e.s==='done'); }},
  {n:'the Wayfinder', ok:function(r){ return r.found>=3; }},
  {n:'the Peacemaker', ok:function(r){ return r.mend>=3; }},
  {n:'the Keeper of Secrets', ok:function(r){ return r.secret>=3; }},
@@ -4556,6 +4569,7 @@ function deedName(){ const t=part().tasks; let best=null, bt=-1;
     else if(k.indexOf('left:')===0&&e.s==='closed') d="the one who found "+e.n;
     else if(k.indexOf('light:')===0&&e.s==='done') d="the one who went out to "+e.rn+" at night";
     else if(k.indexOf('stone:')===0&&e.c==='told') d="the one who read the name on the stone";
+    else if(k==='ring'&&e.s==='done') d="the one who walked the ring road";
     else if(k.indexOf('song:')===0&&e.s==='done') d="the one who found the last verse";
     else if(k.indexOf('axe:')===0&&e.s==='done') d="the one who got "+(e.wn||'the woodcutter')+"'s axe back";
     else if(k.indexOf('cake:')===0&&e.s==='done') d="the one who carried the honey cake recipe";
@@ -4590,6 +4604,7 @@ function legendFor(seed){ seed=seed>>>0; if(seedRng(seed,0x1E6E)()>=0.25) return
     if(k.indexOf('cake:')===0&&e.s==='done'&&e.c==='truth') cands.push("{Who} carried a honey cake recipe over the hills, they say. Walked two valleys for a cake! I'd have done the same.");
     if(k.indexOf('song:')===0&&e.s==='done') cands.push("{Who} found the last verse of an old song, over in "+vn+". Something about short stones. The sheep there sleep better for it.");
     if(k==='fest'&&e.s==='done'&&e.g&&!festList(e).some(function(g){ return g.v===seed; })){ const nv=new Set(festList(e).map(function(g){ return g.v; })).size; cands.push("They say {who} had a harvest festival, and folk walked over the hills for it. "+(nv>1?"From "+['','one','two','three','four'][Math.min(4,nv)]+" different valleys! ":"")+"I wasn't asked. Not that I'd have gone."); }
+    if(k==='ring'&&e.s==='done'&&e.path.indexOf(seed)<0) cands.push("They say {who} followed the short stones from ring to ring, all the way to the Heart Ring. "+(e.c==='sing'?"And sang to it! To the stones! I'd have paid to see that.":"Heard the stones hum, too, they say."));
     if(k==='letter'&&e.s==='done') cands.push("{Who} carried a letter over the hills for their family. Simple thing. Folk remember simple things."); }
   { const e=part().tasks.crown; if(e&&e.s==='done'&&seed!==e.c1&&seed!==e.c2&&seed!==e.gv&&seed!==e.pg){ if(e.c==='whole') cands.push("They say {who} found both halves of the Hollow Crown. Both! And then, instead of keeping them, brought two families together at a well. Who does that?"); else cands.push("There's talk that {who} has seen the Hollow Crown. Half of it, anyway. Some say both halves. Nobody can get a straight answer."); } }
   if(!cands.length) return null; const r=seedRng(seed,0x1E70), line=cands[(r()*cands.length)|0], who=legendName();
@@ -4907,13 +4922,102 @@ const LORE3=[
  ['hermit',"The Heron King has never once paid for a fish. He has an arrangement, he says. With whom, he won't say."],
  ['old',"In the old days the harvest festival lasted a week. Then somebody counted the pies and it went down to a day."]];
 LORE.push.apply(LORE,LORE3);
+// ---------------- the ring road (v0.31.0) ----------------
+// Every stone ring has one stone shorter than the rest, and it points along one of the valley's roads to the next ring.
+// Once you have heard any of the old lore, standing in a ring shows you the short stone. Follow five of them and the
+// sixth valley holds the Heart Ring, which has no short stone at all. Come back after dark and it hums. The oldest
+// person there knows what that means, and you choose what to do about the thing asleep under the hills.
+const RING_N=5;   // short stones to follow; the valley the fifth one points to holds the Heart Ring
+function RING(){ return part().tasks.ring||null; }
+function ringNight(){ return dayPart()===3||DAY.k<0.3; }
+// the ring in this valley: the stone circle, or (where none stands) the old stones built into the keep wall
+function ringSpot(){ for(const o of W.ruins) if(o.kind==='circle') return o;
+  if(W.keepBuilt) return {x:FORT.x, y:FORT.y, dr:13, name:'the old stones in the keep wall', keep:true, found:true};
+  return null; }
+// the whole road is laid out when you first notice a short stone, and every road on it is pinned then: a valley's road
+// onward is taken before you arrive, so the road you come in by can never be the one the next short stone points along.
+// Each valley on the way (but the last) needs a second road for the way back.
+function ringPlan(s,steps,prefix,nHere){ s=s>>>0; steps=steps==null?RING_N:steps; const hops=(prefix||[]).concat([s]), ex=[];
+  function go(cur,left,first){ if(!left) return true; const last=left===1, n=Math.max(1,first&&nHere!=null?nHere:exitAngles(cur).length), c=[];
+    for(let k=0;k<n;k++){ const d=roadDest(cur,k)>>>0; if(d===cur||hops.indexOf(d)>=0) continue; if(!last&&exitAngles(d).length<2) continue;
+      c.push({k:k, d:d, sc:(seedDials(d).ruins>0?2:0)+(exitAngles(d).length>=3?1:0)}); }
+    c.sort(function(a,b){ return b.sc-a.sc||a.k-b.k; });
+    for(const x of c){ hops.push(x.d); ex.push(x.k); if(go(x.d,left-1,false)) return true; hops.pop(); ex.pop(); }
+    return false; }
+  return go(s,steps,true)?{hops:hops.slice((prefix||[]).length), ex:ex}:null; }
+// the road's name as the valley's signpost says it, when you are standing in that valley
+function ringRoadHere(k){ const e=W.exits[k]; return e?e.name:'one of the roads'; }
+function ringBusy(t){ TBUSY=t; }
+var TBUSY=0;   // the screen is showing another message until then (set by the arrival, ruin and lore toasts too)
+function ringSay(msg,ms){ if(!greetHook||W.arriveMsg||W.loreMsg||Date.now()<TBUSY) return false; ms=ms||Math.min(9000,2600+msg.length*45);
+  if(greetHook(msg,ms)===false) return false; TBUSY=Date.now()+ms; return true; }
+const HEART_KEEP='The short stones led here, to the keep. The old stones in its wall are the Heart Ring. None of them is short. Come back after dark.';
+const HEART_MSG='This ring is bigger than the others, and none of its stones is short. This is the Heart Ring, where the short stones lead. Come back after dark.';
+// read the short stone here: the k-th on the way
+function ringRead(e,how){ const s=W.seed>>>0, k=e.k, sp=ringSpot();
+  if(!W.exits[e.ex[k]]){ const R=ringPlan(s,RING_N-k,e.path.slice(0,k),W.exits.length); if(!R){ e.k=RING_N; e.s='heart'; e.heart=s; e.hn=W.valley; journalSave(); return true; }
+    e.path=e.path.slice(0,k).concat(R.hops); e.ex=e.ex.slice(0,k).concat(R.ex); for(let i=0;i<R.ex.length;i++) roadLink(R.hops[i],R.ex[i],R.hops[i+1]); e.heart=e.path[RING_N]; e.hn=valleyName(e.heart); }
+  const road=ringRoadHere(e.ex[k]);
+  const msg=how==='first'?'Count the stones in '+sp.name+'. One is shorter than the rest, and it points along '+road+', over the hills. The short stones lead from ring to ring: the oldest road in the land. (Journal)'
+    :(how==='menhir'?'No ring here. But a standing stone by the road has an arrow cut in it, pointing along '+road+'. ('+(k+1)+' of '+RING_N+')'
+    :'Another short stone, in '+sp.name+'. This one points along '+road+'. ('+(k+1)+' of '+RING_N+')');
+  if(!ringSay(msg)) return false;
+  e.from=s; e.fn=W.valley; e.road=road; e.by=how==='menhir'?'menhir':(sp&&sp.keep?'keep':'ring'); e.k=k+1; e.at=e.path[k+1]; journalSave(); return true; }
+// once a tick
+function ringCheck(){ if(W.seed==null||!greetHook) return; const s=W.seed>>>0, p=part(); let e=RING();
+  const o=ringSpot(), near=o&&Math.hypot(P.x-o.x,P.y-o.y)<=o.dr+1, ready=o&&near&&o.found&&Date.now()-(o.foundAt||0)>=4000;
+  if(e&&e.s==='walk'&&e.at===s){
+    // on the way in, after dark, the Long Hound walks with you once
+    if(!e.hound&&ringNight()&&e.k>=2){ if(ringSay('A black dog as long as a cart pads along beside you for a while. It never makes a sound. Then it is gone.')){ e.hound=true; journalSave(); } return; }
+    if(e.k>=RING_N){ if(!o||ready){ if(ringNight()){ e.s='heart'; journalSave(); return; }   // after dark the hum comes first
+      if(ringSay(o?(o.keep?HEART_KEEP:HEART_MSG):'The short stones led here, but there is no ring. Only a hollow in the grass where one stood, a long time ago. It hums, at night, they say.')){ e.s='heart'; e.told=true; journalSave(); } } return; }
+    if(!o){ ringRead(e,'menhir'); return; }   // no ring and no keep: a standing stone by the road shows the way
+    if(ready) ringRead(e,'ring'); return; }
+  const hz=o||{x:FORT.x,y:FORT.y,dr:13}, atHeart=e&&e.heart===s&&Math.hypot(P.x-hz.x,P.y-hz.y)<=hz.dr+1&&(!o||o.found)&&(!o||Date.now()-(o.foundAt||0)>=4000);
+  if(e&&e.s==='heart'&&atHeart&&ringNight()){
+    const w=songWho(); if(ringSay('The stones hum. Low, like a cat that is too big. Under your feet, deep under the hills, something turns over in its sleep. Then it is still. (Ask '+nm(w)+' about it, come morning)',9000)){ e.s='hum'; e.wn=nm(w); journalSave(); } return; }
+  if(e&&e.s==='heart'&&atHeart&&!ringNight()&&!e.told){ if(ringSay('The Heart Ring. Nothing stirs in daylight. Come back after dark.')){ e.told=true; journalSave(); } return; }
+  if(e&&e.s==='done'&&atHeart&&ringNight()&&!e.after){ const t={sing:'The stones hum, softly, and very nearly in tune.', stone:'Your stone is still there, on top of the ring. The stones hum, just once, as if to say they noticed.', sleep:'The stones are silent. Whatever is under the hills is sleeping well.'}[e.c];
+    if(t&&ringSay(t)){ e.after=true; journalSave(); } return; }
+  // the start: a real stone ring, once you have heard a piece of the old lore
+  if(!e&&ready&&!o.keep&&loreN()>=1){ const plan=ringPlan(s,RING_N,null,W.exits.length);
+    if(!plan){ const nk='ringno:'+s; if(!p.tasks[nk]&&ringSay('Count the stones in '+o.name+'. One is shorter than the rest, but it points at a hill with no road over it. Another ring, somewhere else, might lead further.')) p.tasks[nk]={v:s}; return; }
+    e={s:'walk', k:0, path:plan.hops, ex:plan.ex, start:s, sn:W.valley, heart:plan.hops[RING_N], hn:valleyName(plan.hops[RING_N])};
+    if(ringRead(e,'first')){ for(let i=0;i<RING_N;i++) roadLink(plan.hops[i],plan.ex[i],plan.hops[i+1]); p.tasks.ring=e; journalSave(); } } }
+// the oldest person in the heart valley, once you have heard the hum
+function beatRing(id){ const e=RING(); if(!e||W.seed==null||(W.seed>>>0)!==e.heart) return null;
+  if(e.s!=='hum'||id!==songWho()) return null; const song=part().lore.indexOf(SONGLORE())>=0;
+  return {key:'ring', lines:["You heard it. The hum. I can see it on your face.","That's the Stone-Waker, turning over. It's never woken. The rings were built so it never has to. Every short stone, every ring, all the way out: a lullaby you walk.","Folk who get this far leave something. What will you do?"], options:[
+    song?{label:'Sing it the last verse', reply:["(you sing, to the stones) "+SONG.join(' '),"...Somewhere under the hills, very low, something hums along. Nobody has ever sung to it before. I think it liked that."], pick:function(){ e.s='done'; e.c='sing'; logChoice('kind','ring'); }}:null,
+    {label:'Leave a stone on the ring', reply:["Every traveler adds a stone. That's how it's always been. Go on.","...There. Nothing happened. Which is exactly right."], pick:function(){ e.s='done'; e.c='stone'; logChoice('kind','ring'); }},
+    {label:'Let it sleep', reply:["Wise. Let it sleep. The rings are there so it doesn't have to wake.","You walked the oldest road in the land to get here. Not many have. The first, they say, was a shepherd."], pick:function(){ e.s='done'; e.c='sleep'; logChoice('truth','ring'); }}].filter(Boolean)}; }
+function ringTag(t,id){ const e=RING(); if(!e) return false;
+  if(t==='ringwalk') return e.s==='walk'&&e.path.slice(0,e.k+1).indexOf(W.seed>>>0)>=0;
+  if(t==='ringdone') return e.s==='done';
+  return false; }
+const TALKR={
+ hermit:{a:["[ringwalk]Following the short stones? Tamsin knew. So will you. Mind the passes at night.","[ringwalk]The ring here points on. They always point on. Except one.","[ringdone]You walked the whole ring road. I can tell. You've got that look. Like you heard something."]},
+ any:{a:["[ringwalk,old]Short stones? My gran followed them two valleys and came home with a cold. She said it was worth it.","[ringdone,notparent]They say somebody walked the whole ring road lately. All the way to the Heart Ring. Was that you?"]},
+ home:{a:["[ringdone]You've been walking the old roads, {you}. All the way to the Heart Ring? Your grandmother would have been so proud. And so cross."]}};
+function ringHeartKeep(e){ return W.seed!=null&&(W.seed>>>0)===e.heart&&!!ringSpot()&&!!ringSpot().keep; }
+function ringNotes(open,done){ const e=RING(); if(!e) return;
+  if(e.s==='walk') open.push({t:'The ring road. '+(e.by==='menhir'?'A standing stone by the road in '+e.fn:(e.by==='keep'?'The old stones in the keep wall in '+e.fn:'The short stone in '+e.fn))+' points along '+e.road+', to the next ring. Where a valley has no ring, look at the old stones in its keep wall. ('+e.k+' of '+RING_N+' short stones)', v:e.from});
+  else if(e.s==='heart') open.push({t:'The Heart Ring, in '+e.hn+(ringHeartKeep(e)?' (the old stones in the keep wall)':'')+'. Go back after dark.', v:e.heart});
+  else if(e.s==='hum') open.push({t:'The Heart Ring hummed, in '+e.hn+'. Ask '+e.wn+' what it means.', v:e.heart});
+  else if(e.s==='done') done.push({t:'Walked the ring road from '+e.sn+' to the Heart Ring in '+e.hn+', and '+{sing:'sang the Stone-Waker the last verse.', stone:'left a stone on the ring.', sleep:'let the Stone-Waker sleep.'}[e.c], v:e.heart}); }
+const LORE4=[
+ ['circle',"The Heart Ring has no short stone. Every other ring points to it, one way or another. It points nowhere. It is where you were going."],
+ ['hermit',"The Ring-builders didn't build the rings to keep something out. They built them to keep something asleep. There's a difference, and it matters."],
+ ['old',"When I was small, the stones hummed every midsummer. Now it's every few years. Either it's sleeping deeper, or we've stopped listening."],
+ ['road',"A black dog walked me down from the pass once, at night. Never made a sound. I've never been afraid of the dark since."]];
+LORE.push.apply(LORE,LORE4);
 var WSAVE=null;   // in Story: the Wander seed as it was, so saving the dials never moves your Wander valley
 const LINES=[];
 function lineHash(t){ let h=0x811c9dc5; for(let i=0;i<t.length;i++){ h^=t.charCodeAt(i); h=Math.imul(h,0x01000193); } return 'L'+(h>>>0).toString(36); }
 (function(){
   const add=function(who,part,pose,text,extra){ const ch=text.split(' >> '), tg=(/^\[([\w,]+)\]/.exec(text)||['',''])[1].split(','); const e={id:lineHash(who+'|'+text), who:who, part:part, pose:pose, text:ch[0], chain:ch.slice(1), check:ch.join(' '), first:tg.indexOf('first')>=0, last:tg.indexOf('last')>=0};
     if(extra) for(const k in extra) e[k]=extra[k]; LINES.push(e); };
-  for(const T of [TALK,TALKX,TALKH,TALKT,TALKL,TALKK,TALKC,TALKT2,TALKF]) for(const who in T){ if(who==='trait'||who==='rel'||who==='pose') continue;
+  for(const T of [TALK,TALKX,TALKH,TALKT,TALKL,TALKK,TALKC,TALKT2,TALKF,TALKR]) for(const who in T){ if(who==='trait'||who==='rel'||who==='pose') continue;
     for(const pt in T[who]) for(const t of T[who][pt]) add(who,pt==='a'?-1:+pt,0,t); }
   for(const tr in TALK.trait) for(const t of TALK.trait[tr]){ const m=/^\[([\w,]+)\]/.exec(t);   // the trait joins any tags the line already has
     add('any',-1,0,m?'['+tr+','+m[1]+']'+t.slice(m[0].length):'['+tr+']'+t,{trait:tr}); }
@@ -4970,6 +5074,7 @@ function lineOk(id,l,here,who){ const m=TAG_RE.exec(l), c=castOf(id);
     else if(t==='oldfriend'){ if(!friendTag(t,id)) return false; }
     else if(t==='roofcrust'||t==='rooffix'||t==='axeback'||t==='betwon'||t==='cakegot'||t==='songback'){ if(!trouble2Tag(t,id)) return false; }
     else if(t==='festnow'||t==='festafter'){ if(!festTag(t,id)) return false; }
+    else if(t==='ringwalk'||t==='ringdone'){ if(!ringTag(t,id)) return false; }
     else if(t==='known'){ if(inHome()||didHere()) return false; const E=earned(); if(!E.title&&!E.nick) return false; }
     else if(t==='reunion'||t==='reunionasker'||t==='away'){ if(!leftTag(t,id)) return false; }
     else if(t==='feudmend'||t==='feudsour'||t==='sweettold'||t==='sweetshy'||t==='lightdone'||t==='lostback'){ if(!trTag(t,id)) return false; }
@@ -5023,7 +5128,7 @@ const TOPICS={ruin:/@ruin|old stones|old places/i, supper:/supper/i, bed:/\bbunk
 const STANCES=['invite','aloof','leaving'];
 (function(){ for(const e of LINES){ const tg=(/^\[([\w,]+)\]/.exec(e.text)||['',''])[1].split(',');
   e.topics=[]; for(const k in TOPICS) if(TOPICS[k].test(e.check)) e.topics.push(k);
-  e.stance=STANCES.filter(function(t){ return tg.indexOf(t)>=0; })[0]||''; e.home=tg.indexOf('home')>=0||e.who==='home'; e.after=['feudmend','feudsour','sweettold','sweetshy','lightdone','lostback','reunion','reunionasker','crownwhole','crownapart','oldfriend','roofcrust','rooffix','axeback','betwon','cakegot','songback','festnow','festafter'].some(function(t){ return tg.indexOf(t)>=0; });
+  e.stance=STANCES.filter(function(t){ return tg.indexOf(t)>=0; })[0]||''; e.home=tg.indexOf('home')>=0||e.who==='home'; e.after=['feudmend','feudsour','sweettold','sweetshy','lightdone','lostback','reunion','reunionasker','crownwhole','crownapart','oldfriend','roofcrust','rooffix','axeback','betwon','cakegot','songback','festnow','festafter','ringdone'].some(function(t){ return tg.indexOf(t)>=0; });
   const ek=tg.filter(function(t){ return t.indexOf('ev_')===0; })[0]; e.evkind=ek?ek.slice(3):'';
   e.evrole=tg.indexOf('evin')>=0?'in':(tg.indexOf('evfirst')>=0?'first':(tg.indexOf('evsecond')>=0?'second':''));
   // where it sits in a visit: their own world first, then places and people round about, then talk, then their nature, then their own people
@@ -5125,8 +5230,8 @@ function chatTick(){
 // close enough to talk, or already talking (they wait while the card is open)
 function talkNear(c,qd){ return qd<2.6||(CHAT.id>=0&&CHAT.id===(CR_.ay[c]|0)&&qd<3.2); }
 // arriving in a valley: said once, as soon as nothing is in the way
-function arriveCheck(){ if(W.arriveMsg&&greetHook&&greetHook(W.arriveMsg)!==false) W.arriveMsg='';
-  if(W.loreMsg&&greetHook&&Date.now()>=(W.loreAt||0)&&greetHook(W.loreMsg+' (Journal, Lore)',Math.min(9000,2600+W.loreMsg.length*45))!==false) W.loreMsg=''; }
+function arriveCheck(){ if(W.arriveMsg&&greetHook&&greetHook(W.arriveMsg)!==false){ W.arriveMsg=''; TBUSY=Date.now()+3400; }
+  if(W.loreMsg&&greetHook&&Date.now()>=(W.loreAt||0)&&greetHook(W.loreMsg+' (Journal, Lore)',Math.min(9000,2600+W.loreMsg.length*45))!==false){ TBUSY=Date.now()+Math.min(9000,2600+W.loreMsg.length*45); W.loreMsg=''; } }
 // a brazier on a stone post (9 = the fire)
 defMask(SP.FIRE,7,10,[
  "..9.9..",".99999.","9999999",".99999.","1111111",
@@ -5152,7 +5257,7 @@ function populateLife(seed){
   while(burrows<Math.max(nBur,4) && tries<7000){ tries++;
     const x=10+rnd()*(N-20), y=10+rnd()*(N-20); const g=terr(x,y);
     if(g<WATER+2||g>34) continue;
-    if(Math.max(Math.abs(x-FORT.x),Math.abs(y-FORT.y))<42) continue;
+    if(Math.max(Math.abs(x-FORT.x),Math.abs(y-FORT.y))<54) continue;
     if(W.tree[(y|0)*N+(x|0)]>0) continue;
     if(fbm(x*0.03,y*0.03,seed+21,3)>0.42) continue;
     burrows++; RESERVE.burrows.push(x,y);
@@ -5172,7 +5277,7 @@ function populateLife(seed){
   while(herds<Math.max(nHerd,3) && tries<7000){ tries++;
     const x=16+rnd()*(N-32), y=16+rnd()*(N-32); const g=terr(x,y);
     if(g<WATER+2||g>32) continue;
-    if(Math.max(Math.abs(x-FORT.x),Math.abs(y-FORT.y))<48) continue;
+    if(Math.max(Math.abs(x-FORT.x),Math.abs(y-FORT.y))<60) continue;
     const fo=fbm(x*0.03,y*0.03,seed+21,3); if(fo>0.5) continue;
     herds++; RESERVE.meadows.push(x,y);
     if(!wantD||herds>nHerd) continue;
@@ -5460,23 +5565,23 @@ function buildKeeperPaths(){
   KPATHS.push([].concat.apply([],ring));                                    // 0: guard, one way round
   KPATHS.push([].concat.apply([],ring.slice().reverse()));                  // 1: guard, the other way
   // 2: the gatekeeper: the barracks, out through the arch, watch the road, back
-  KPATHS.push([-17,13,6, -15.4,13,0, -13.3,13,0, -10.5,14.5,0, -3,21,0, 0,22.6,0, 0,KEEP.H+1.5,0, 0,KEEP.H+9,9, 0,KEEP.H+1.5,0, 0,22.6,0, -3.5,20.5,0, -10.5,14,0, -13.3,13,0, -15.4,13,0]);
+  KPATHS.push([-27,20.5,6, -23.6,20.5,0, -21.2,20.5,0, -17,22,0, -6,30,0, 0,33,0, 0,KEEP.H+1.5,0, 0,KEEP.H+9,9, 0,KEEP.H+1.5,0, 0,33,0, -6.5,29.5,0, -17,21.5,0, -21.2,20.5,0, -23.6,20.5,0]);
   // 3: the steward: the great hall, out to check its door, round to the donjon's east door, into the round room, out,
   //    round to the stair foot, up the spiral to the lookout, look north, back down, home
-  const RA=12.9;   // clear of the stair and its handrail
+  const RA=KEEP.RA;   // well clear of the stair and its handrail
   const arc=function(degs){ const o=[];   // walk the circle in steps of 15 degrees or less, so no chord cuts across the stair
     for(let k=0;k<degs.length;k++){ const d0=k?degs[k-1]:degs[0], d1=degs[k], n=k?Math.max(1,Math.ceil(Math.abs(d1-d0)/15)):1;
       for(let j=k?1:0;j<=n;j++){ const a=(d0+(d1-d0)*j/n)*Math.PI/180; o.push(RA*Math.cos(a),RA*Math.sin(a),0); if(!k) break; } } return o; };
   const RM=(KEEP.DONR+KEEP.SPR)*0.5, foot=[-RM,-0.9,0];
-  const st=[-7.5,-16,5, -11,-16,0, -11,-12.4,3.5].concat(arc([215,190,165,135,100,65,30,5]),[KEEP.SPR+1.6,-0.1,0, 3.2,-0.1,7, KEEP.SPR+1.6,-0.1,0],arc([-10,-45,-80,-115,-150,-172]),foot);
+  const st=[-17,-25,5, -17.5,-22,0, -17.5,-18.4,3.5].concat(arc([215,190,165,135,100,65,30,5]),[KEEP.SPR+1.6,-0.1,0, 3.2,-0.1,7, KEEP.SPR+1.6,-0.1,0],arc([-10,-45,-80,-115,-150,-172]),foot);
   const climb=[];
   for(let k=0;k<=20;k++){ const a=-Math.PI+0.12+(2*Math.PI-0.30)*k/20; climb.push(RM*Math.cos(a),RM*Math.sin(a),0); }
   const top=[-2.7,0.7,0, -0.5,-3.4,10, -2.7,0.7,0];
   const down=[]; for(let k=climb.length/3-1;k>=0;k--) down.push(climb[k*3],climb[k*3+1],0);
-  KPATHS.push(st.concat(climb,top,down,foot,arc([-172,-150,-130]),[-11,-12.4,0, -11,-16,0]));
+  KPATHS.push(st.concat(climb,top,down,foot,arc([-172,-150,-130]),[-17.5,-18.4,0, -17.5,-22,0]));
   // 4: Tilda's way to bed: along the south wall-walk, down the rampart stair, round the donjon, into the barracks
   const RC=KEEP.RX0+2.0;
-  const bed=[6,Wk,0, RC,Wk-0.5,0, RC,KEEP.RY1-1,0, RC,KEEP.RY0+1.4,0, KEEP.RX0-1.2,KEEP.RY0+1.4,0, 15,-10,0].concat(arc([-30,0,30,60,90,120,145]),[-11.5,13,0, -13.3,13,0, -15.6,13,0, -19.0,10.6,0, -21.0,9.5,1]);
+  const bed=[6,Wk,0, RC,Wk-0.5,0, RC,KEEP.RY1-1,0, RC,KEEP.RY0+1.4,0, KEEP.RX0-1.2,KEEP.RY0+1.4,0, 20,-4,0].concat(arc([-30,0,30,60,90,120,145]),[-17,21.5,0, -21.2,20.5,0, -23.6,20.5,0, -29,19.6,0, -33.0,18.5,1]);
   KPATHS.push(bed);
   // 5: and back up in the morning, ending where she left her round
   const back=[]; for(let k=bed.length/3-1;k>=0;k--) back.push(bed[k*3],bed[k*3+1],0); back.push(0,Wk,0);
@@ -5487,7 +5592,7 @@ function buildKeeperPaths(){
     for(let w=0;w<n;w++){ const x=a[w*3], y=a[w*3+1], ps=a[w*3+2]; if(ps<=0) continue;
       if(p<=1){ acts[w]=Math.abs(x)>Math.abs(y)?[1,Math.sign(x),0]:[1,0,Math.sign(y)]; }   // guards look out over the wall
       else if(p===2){ acts[w]=y>KEEP.H?[2,0,1]:[2,1,0]; }                                   // Wick leans: on the road, in the barracks
-      else if(p===3){ if(Math.abs(x+11)<0.01&&Math.abs(y+12.4)<0.01) acts[w]=[3,0,-1];     // Maud checks the hall door
+      else if(p===3){ if(Math.abs(x+17.5)<0.01&&Math.abs(y+18.4)<0.01) acts[w]=[3,0,-1];     // Maud checks the hall door
                       else if(Math.abs(x+0.5)<0.01&&Math.abs(y+3.4)<0.01) acts[w]=[1,0,-1]; } // and looks out north from the lookout
       else if(p===4&&w===n-1) acts[w]=[4,1,0]; }
     KACT.push(acts); }
@@ -5505,7 +5610,7 @@ function addPeople(){
   if(sleepHours()){ const a=KPATHS[4], n=a.length/3, bx=a[(n-1)*3], by=a[(n-1)*3+1];
     CR_.x[tl]=bx; CR_.y[tl]=by; CR_.z[tl]=floorAt(bx,by,terr(bx,by)); CR_.ax[tl]=4; CR_.ph[tl]=n-1; CR_.st[tl]=2; CR_.po[tl]=4; CR_.vx[tl]=0.01; CR_.vy[tl]=0; }
   const cx=FORT.x, cy=FORT.y;
-  for(const ox of [-4.5,4.5]){ const c=addCreature(SP.FIRE, cx+ox+0.5, cy+KEEP.IN-1.2, 0, 0, 1, -1); CR_.z[c]=terr(cx+ox+0.5,cy+KEEP.IN-1.2); }
+  for(const ox of [-6.5,6.5]){ const c=addCreature(SP.FIRE, cx+ox+0.5, cy+KEEP.IN-1.2, 0, 0, 1, -1); CR_.z[c]=terr(cx+ox+0.5,cy+KEEP.IN-1.2); }
   for(const Q of KROOMS) for(const F of Q.fire){ const fx=cx+F[0]+0.5, fy=cy+F[1]+0.5, c=addCreature(SP.FIRE, fx, fy, 0, 1, 1, -1); CR_.z[c]=groundAt(fx,fy); }
 }
 // step aside for someone coming the other way: sideways, only onto floor at the same height, never onto a rail or ledge
@@ -5563,7 +5668,7 @@ function tickKeeper(c,dt){
 function tick(dt){
   if(W.seed!=null&&W.seed!==VN_LAST){ VN_LAST=W.seed; visitNote(W.seed); journalSave(); }
   lightCheck();
-  dayTick(); pedTick(); chatTick(); arriveCheck(); ruinCheck(); placeCheck();
+  dayTick(); pedTick(); chatTick(); arriveCheck(); ruinCheck(); placeCheck(); ringCheck();
   if(CR_.n===0) return; buildSGrid(); const px=P.x, py=P.y;
   for(let c=0;c<CR_.n;c++){ if(CR_.al[c]===0)continue;
     if(CR_.age[c]<1){ CR_.age[c]+=dt/matureTime(CR_.sp[c]); if(CR_.age[c]>=1){ CR_.age[c]=1; CR_.par[c]=-1; } }
@@ -5636,8 +5741,8 @@ function simBin(px,py){
 
 // ---------------- player ----------------
 const P={x:200,y:250,z:0,gz:0,yaw:-Math.PI/2,pitch:0.08};
-const IN={f:0,s:0,turn:0,run:false,looking:0,keys:{}};
-function spawn(){ P.hand=null; P.rampDir=0; P.lastDir=0; P.x=200; P.y=FORT.y+KEEP.H+15; P.yaw=-Math.PI/2; P.pitch=0.08; P.gz=Math.max(groundAt(P.x,P.y),WATER-0.6); P.z=P.gz+EYE; }
+const IN={f:0,s:0,turn:0,run:false,looking:0,keys:{},jump:false};
+function spawn(){ P.jz=0; P.jv=0; P.hand=null; P.rampDir=0; P.lastDir=0; P.x=200; P.y=FORT.y+KEEP.H+15; P.yaw=-Math.PI/2; P.pitch=0.08; P.gz=Math.max(groundAt(P.x,P.y),WATER-0.6); P.z=P.gz+EYE; }
 function updatePlayer(dt){
   // thumb-stick steering: tilt left or right to turn (deadzone, then a gentle curve up to about 140 degrees a second)
   if(IN.turn){ const a=Math.abs(IN.turn); if(a>0.12){ const k=(a-0.12)/0.88; P.yaw+=Math.sign(IN.turn)*2.4*Math.pow(k,1.5)*dt; if(a>0.25) P.noLook=0; } }
@@ -5659,7 +5764,7 @@ function updatePlayer(dt){
     let nz=P.z + mf*Math.sin(P.pitch)*sp*1.5;
     const bedEye=terr(P.x,P.y)+0.55, surfEye=WATER+1.05;
     if(nz<bedEye)nz=bedEye; if(nz>surfEye)nz=surfEye;
-    P.z=nz; P.gz=P.z-EYE;
+    P.z=nz; P.gz=P.z-EYE; P.jz=0; P.jv=0; IN.jump=false;
   } else {
     // walking with the view left alone: it eases back toward level, so a stray drag doesn't leave you staring at the ground
     if(Math.abs(mf)>0.2 && P.lookT>1.5 && !IN.looking && !P.noAssist && terr(P.x+fx*4,P.y+fy*4)>WATER+0.3 && bottom>WATER+0.3){ P.pitch+=(0.04-P.pitch)*Math.min(1,dt*1.3); }
@@ -5719,8 +5824,13 @@ function updatePlayer(dt){
         const low=standH<2, ok=low?(d>0.85||(P.lastDir>0&&d>0.5)):(Math.abs(d)>0.5);                                      // the low steps only help you up, never into the wall at the foot
         if(ok){ const sg=d>0?1:-1, corr=clamp(((KEEP.DONR+KEEP.SPR)*0.5-kr)*0.7,-0.6,0.6); mvx=(tUx*sg+ukx*corr)*ml; mvy=(tUy*sg+uky*corr)*ml; P.lastDir=sg;   // follow the curve, drawn toward the middle of the stair
           if(mf>0.3 && Math.abs(ms)<0.5*mf && P.noLook>0.6) easeYaw(run>1?3.2:1.6); } } }
+    // a jump: up about a metre, so you can hop onto something low (never over a wall or a rail), and down off it again
+    P.jz=P.jz||0; P.jv=P.jv||0;
+    if((IN.jump||k.Space)&&P.jz<=0.001&&!P.jumpHeld&&bottom>WATER-0.2&&CHAT.id<0){ P.jv=6.6; P.jumpHeld=true; }
+    if(!(IN.jump||k.Space)) P.jumpHeld=false; IN.jump=false;
+    const lift=P.jz;
     const nx=P.x+mvx*sp, ny=P.y+mvy*sp;
-    const zf=P.gz, F=function(x,y){ return floorAt(x,y,zf); };
+    const zf=P.gz, F=function(x,y){ return floorAt(x,y,zf+lift); };
     const g0=Math.max(F(P.x,P.y),WATER-0.6);
     const bvx=mvx, bvy=mvy, bl=Math.hypot(bvx,bvy)||1;
     const pbx=nx+bvx/bl*0.45, pby=ny+bvy/bl*0.45;
@@ -5728,10 +5838,13 @@ function updatePlayer(dt){
     // the rampart, the stairs, or the tower top. Natural slopes never drop this much in one step.
     const LEDGE=1.8;
     const RL=function(x,y){ return W.rail[clamp(y|0,0,N-1)*N+clamp(x|0,0,N-1)]&&F(x,y)>g0+0.3; };
-    const DROP=function(x,y){ const f=F(x,y); return g0-f<LEDGE||f<WATER-0.4; };
-    const okX=nx>1.5&&nx<N-2.5&&!RL(nx,P.y)&&!RL(pbx,P.y)&&F(nx,P.y)-g0<1.6&&F(pbx,P.y)-g0<1.9&&DROP(nx,P.y)&&DROP(pbx,P.y)&&!wallBlocked(nx,P.y,zf)&&!wallBlocked(pbx,P.y,zf);
+    const DROP=function(x,y){ const f=F(x,y); return g0-f<(lift>0.2?2.6:LEDGE)||f<WATER-0.4; };
+    // a tree trunk stands in the middle of its cell: you walk round it, not through it
+    const TRUNK=function(x,y){ const cx=x|0, cy=y|0; for(let oy=-1;oy<=1;oy++)for(let ox=-1;ox<=1;ox++){ const tx=cx+ox, ty=cy+oy; if(tx<0||ty<0||tx>=N||ty>=N||!(W.tree[ty*N+tx]>0)) continue;
+      const d=Math.hypot(x-tx-0.5,y-ty-0.5); if(d<0.42&&d<Math.hypot(P.x-tx-0.5,P.y-ty-0.5)) return true; } return false; };
+    const okX=nx>1.5&&nx<N-2.5&&!RL(nx,P.y)&&!RL(pbx,P.y)&&F(nx,P.y)-g0<1.6+lift&&F(pbx,P.y)-g0<1.9+lift&&DROP(nx,P.y)&&DROP(pbx,P.y)&&!wallBlocked(nx,P.y,zf)&&!wallBlocked(pbx,P.y,zf)&&!TRUNK(nx,P.y);
     if(okX) P.x=nx;
-    const okY=ny>1.5&&ny<N-2.5&&!RL(P.x,ny)&&!RL(P.x,pby)&&F(P.x,ny)-g0<1.6&&F(P.x,pby)-g0<1.9&&DROP(P.x,ny)&&DROP(P.x,pby)&&!wallBlocked(P.x,ny,zf)&&!wallBlocked(P.x,pby,zf);
+    const okY=ny>1.5&&ny<N-2.5&&!RL(P.x,ny)&&!RL(P.x,pby)&&F(P.x,ny)-g0<1.6+lift&&F(P.x,pby)-g0<1.9+lift&&DROP(P.x,ny)&&DROP(P.x,pby)&&!wallBlocked(P.x,ny,zf)&&!wallBlocked(P.x,pby,zf)&&!TRUNK(P.x,ny);
     if(okY) P.y=ny;
     // on the spiral, if you drift toward the outer edge, ease back toward the middle of the stair
     // (only while standing on the stamped stair itself, never across a step, so it can never lift
@@ -5739,9 +5852,13 @@ function updatePlayer(dt){
     if(onSpiral && kr>0.01 && W.st[(P.y|0)*N+(P.x|0)]>0){ const tr=(KEEP.DONR+KEEP.SPR)*0.5; if(kr>tr){ const k=Math.min(1,dt*1.5);
       const sx=P.x+(kdx/kr)*(tr-kr)*k, sy=P.y+(kdy/kr)*(tr-kr)*k;
       if(Math.abs(F(sx,sy)-F(P.x,P.y))<1.6 && !wallBlocked(sx,sy,zf)){ P.x=sx; P.y=sy; } } }
-    const g=Math.max(F(P.x,P.y),WATER-0.6);
-    P.gz+=(g-P.gz)*Math.min(1,dt*12);
-    P.z=P.gz+EYE;
+    const g=Math.max(F(P.x,P.y),WATER-0.6), top=P.gz+P.jz;
+    P.gz+=(g-P.gz)*Math.min(1,dt*(P.jz>0?30:12));
+    if(P.jz>0||P.jv>0){ P.jv-=20*dt; let jz=top-P.gz+P.jv*dt;
+      const ci=clamp(P.y|0,0,N-1)*N+clamp(P.x|0,0,N-1), ceil=W.su[ci]>0&&W.h[ci]+W.sb[ci]>P.gz+0.5?W.h[ci]+W.sb[ci]-EYE-0.25-P.gz:99;   // never through a ceiling
+      if(jz>ceil){ jz=Math.max(0,ceil); P.jv=Math.min(P.jv,0); }
+      if(jz<=0){ jz=0; P.jv=0; } P.jz=jz; }
+    P.z=P.gz+P.jz+EYE;
   }
   UW=clamp((WATER-P.z)/2.5,0,1);
 }
@@ -6131,10 +6248,11 @@ function boot(){
   const anyCard=function(){ for(let i=0;i<OVERLAYS.length;i++){ if(!$(OVERLAYS[i]).classList.contains('hidden')) return true; } return false; };
   let talkT=0, talkWho='';
   // the Talk button: whenever someone is close enough and nothing else is open
-  function paintTalk(){ const b=$('bTalk'); const n=(CHAT.id<0&&!anyCard()&&!LEAVE)?nearPerson():null;
+  function paintTalk(){ { const j=$('bJump'), hide=CHAT.id>=0||anyCard()||!!LEAVE; if(j.hidden!==hide) j.hidden=hide; } const b=$('bTalk'); const n=(CHAT.id<0&&!anyCard()&&!LEAVE)?nearPerson():null;
     if(!n){ if(!b.hidden){ b.hidden=true; talkWho=''; } return; } const p=castOf(n.id), nmx=p?p.name:'them', z=PAUSED[heardKey(n.id)];
     const t=(z&&Date.now()-z.t<180000?'Carry on with ':'Talk to ')+nmx; if(t!==talkWho){ b.textContent=t; talkWho=t; } if(b.hidden) b.hidden=false; }
   $('bTalk').addEventListener('click',function(ev){ ev.preventDefault(); ev.stopPropagation(); if(talkTo()) $('bTalk').hidden=true; });
+  $('bJump').addEventListener('pointerdown',function(ev){ ev.preventDefault(); ev.stopPropagation(); IN.jump=true; });
   window.addEventListener('keydown',function(ev){ if(ev.key==='t'||ev.key==='T'){ if(ev.target&&/INPUT|TEXTAREA/.test(ev.target.tagName)) return; if(CHAT.id<0&&!anyCard()&&talkTo()) ev.preventDefault(); } });
   function frame(now){
     requestAnimationFrame(frame);
@@ -6177,7 +6295,7 @@ function boot(){
 }
 
 if(IS_NODE){ module.exports={genWorld,allocGrid,buildGlyphs,renderFrame,compose,spawn,populate,tick,ecology,simBin,updatePlayer,W,RS,FB,P,IN,CR_,SP,SPP,MASKS,RESERVE,RAMP,N,WATER,EYE,terr,groundAt,DIALS,growOf,isAdult,addCreature,WALLS,buildWalls,nearestWall,allWallHits,wallBlocked,setSkyTime:function(t){skyTime=t;},setUW:function(v){UW=v;},DAY,SUN,MOON,SKY,DAYMODES,sunAltAz,sunUpdate,updateDay,relightAll,relightStep,RELIGHT,dayDate,fmtTod,setTod:function(h){DAY.tod=h;sunUpdate();},floorAt,KPATHS,KEEP,FORT,eventsForDay,weddingDay,babyDay,valleyDay,logEvent,eventsRefresh,dayTick,restock,stockTakeable,stockOwner,evBind,evWhen,evKey,seedDials,valleyTraits,chooseSeed,applyWorld,worldOf,TRAITS37,WORLD_KEYS,getPlayerLand:function(){ return PLAYER_LAND; },seedParse,babyFor,pedWays,pedShelter,carveRoads,exitAngles,roadCheck,roadStay,travelTo,spawnAtExit,VISITED,ROADS,PED,pedTick,pedDay,pedFind,pedRouteIn,pedPitch,pedWay,TALKP,ROAD_DIALS,ROLEPED,stormLevel,stormWindows,stormOngoing,underCover,stormLight,TALKS,STORMC,evBase,keeperAbed,FISHSIZE,TALKE,EVTAG,EVKINDS,wedNow,relOf,TALK,TALKX,LINES,POSEWHO,talkPick,talk,chatMore,closeChat,chatTick,CHAT,HEARD,VISITS,heardKey,heardAdd,lineOk,whoOk,placeName,placeDir,setChat:function(h){chatHook=h;},castValley,valleyName,valleyNames,seedRng,rebuildPeople,KEEPERS,GREETN,lineOk,fillLine,peopleHere,ALLHERE,ROLEKEY,ROLES,NAMES_F,NAMES_M,NAMES_X,BYNAMES,CLOTHES,SKINS,HAIRS,TRAITS,TRAIT_CLASH,RELREV,dayPart,folkMissing,tickKeeper,KMASK,KL,keeperFrame,GREETT,setGreet:function(f){greetHook=f;},RENDERS};
-  Object.assign(module.exports,{roleName,festAway,festList,nearRoad,sentHere,GREETN,TROUBLES2,beatRoof,beatRoofW,beatAxe,beatBet,beatCake,beatSong,beatFest,trouble2Tag,trouble2Notes,festNotes,festGuests,festEnd,festTag,helpedAway,FEST,TALKT2,TALKF,LORE3,SONG,SONGLORE,songWho,farFor,roadPath,beatCrown,beatFriend,CROWN,crownTag,friendTag,TALKC,LORE2,FRIENDWHAT,PAUSED,chatPause,chatResume,nearPerson,talkTo,REP,TITLES,NICKS,earned,deedName,calledBy,legendName,didHere,legendFor,legendTold,LORE,loreFor,loreTake,loreCountHere,TALKK,leftFacts,leftPath,leftEnsure,leftThreads,leftHere,leftOf,hasAsker,leftKey,LREASONS,TALKL,fillBeat,troublesFor,trGet,trTag,stoneFacts,lightCheck,LIGHTS,TALKT,arriveExit,SNOOZE,part,fixPart,neighborSeed,roadDest,roadLink,visitNote,metNote,valleyCount,storyBeat,journalNotes,chatPick,ERRANDS,errandTarget,letterFacts,CHATX:CHAT,cleanName,nameHash,randomName,homeSeed,isHome,inHome,youName,journalLoad,journalSave,journalBlank,storyNew,storyResume,storyAt,parentsFor,castWithHome,addParents,TALKH,PARENT_IDS,addKeeper,
+  Object.assign(module.exports,{SONGLORE,songWho,RING_N,RING,ringBusy,ringSpot,ringPlan,ringRead,exitAngles,ringCheck,beatRing,ringTag,ringNotes,TALKR,LORE4,ringNight,roleName,festAway,festList,nearRoad,sentHere,GREETN,TROUBLES2,beatRoof,beatRoofW,beatAxe,beatBet,beatCake,beatSong,beatFest,trouble2Tag,trouble2Notes,festNotes,festGuests,festEnd,festTag,helpedAway,FEST,TALKT2,TALKF,LORE3,SONG,SONGLORE,songWho,farFor,roadPath,beatCrown,beatFriend,CROWN,crownTag,friendTag,TALKC,LORE2,FRIENDWHAT,PAUSED,chatPause,chatResume,nearPerson,talkTo,REP,TITLES,NICKS,earned,deedName,calledBy,legendName,didHere,legendFor,legendTold,LORE,loreFor,loreTake,loreCountHere,TALKK,leftFacts,leftPath,leftEnsure,leftThreads,leftHere,leftOf,hasAsker,leftKey,LREASONS,TALKL,fillBeat,troublesFor,trGet,trTag,stoneFacts,lightCheck,LIGHTS,TALKT,arriveExit,SNOOZE,part,fixPart,neighborSeed,roadDest,roadLink,visitNote,metNote,valleyCount,storyBeat,journalNotes,chatPick,ERRANDS,errandTarget,letterFacts,CHATX:CHAT,cleanName,nameHash,randomName,homeSeed,isHome,inHome,youName,journalLoad,journalSave,journalBlank,storyNew,storyResume,storyAt,parentsFor,castWithHome,addParents,TALKH,PARENT_IDS,addKeeper,
     setMode:function(m,st){ MODE=m; STORY=st; },getStory:function(){ return STORY; },getMode:function(){ return MODE; },setJournal:function(j){ JOURNAL=j; },getJournal:function(){ return JOURNAL; },journalOff:function(){ return JOURNAL_OFF; }}); }
 else boot();
 })();
