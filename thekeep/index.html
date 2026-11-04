@@ -216,7 +216,7 @@ html.fromshelf #inPage #inViews{padding-top:calc(58px + env(safe-area-inset-top)
  </div>
  <div id="stick"><div id="knob"></div></div>
  <div id="fps"></div>
- <button class="mb-ver" id="mbVer" type="button">v0.36.0 &middot; Nov 4</button>
+ <button class="mb-ver" id="mbVer" type="button">v0.37.0 &middot; Nov 4</button>
  <div id="toast"></div>
  <div id="bkNudge" hidden role="status"><span>Big moment. Back up your progress?</span><button class="btn go" id="bkNudgeGo" type="button">back up</button><button class="btn" id="bkNudgeNo" type="button">later</button></div>
  <button class="btn" id="bTalk" type="button" hidden>Talk</button>
@@ -257,7 +257,7 @@ html.fromshelf #inPage #inViews{padding-top:calc(58px + env(safe-area-inset-top)
   <p><b>Every valley has its troubles.</b> A hen that wandered over the hills, a quarrel over a fence, a pair of sweethearts too shy to speak, a light in the old stones at night, a name cut in a stone that belongs to a family somewhere else. Every valley grows its own from its seed, and what you choose changes what people say.</p>
   <p><b>Talk and choose.</b> Walk up to anyone and they talk, or tap the Talk button when you're close. Walk off mid-conversation and it waits for you. When it matters, people ask you things, and you answer with the buttons on the chat card. The journal (top of the screen) keeps what you were asked, every valley you have been to, and takes you back to any of them.</p>
   <p><b>Story or Wander.</b> Story starts you at home: give yourself a name, say what your valley has plenty of, and wake by the gate of the keep your parents keep. Everyone there knows you. Wander drops you into any valley, as a stranger. Your story is saved on this device, and Continue picks it up where you left it.</p>
-  <p class="fsize">The whole game is one HTML file, plus a file for each 3D view. Right now: <b id="fsize">~686 KB</b>. Smaller than a single phone photo.</p>
+  <p class="fsize">The whole game is one HTML file, plus a file for each 3D view. Right now: <b id="fsize">~712 KB</b>. Smaller than a single phone photo.</p>
   <p><b>Why I built it.</b> I build things on a phone, directing AI the way I would direct a camera. I saw a clip of a tiny 3D world made of nothing but text and wanted to see if I could grow one that was actually alive, and keep growing it in the open instead of ever calling it done.</p>
   <p><b>What I learned.</b> How far you can get with almost nothing. One idea, a ray walking a height map, turned into characters, with a small world of animals living on top. Every version taught me one concrete thing: how to make a wall read as solid, how to keep the wolves from starving the world empty, how to make a forest look like real woods.</p>
   <p style="color:var(--mb-dim);font-size:13px"><b style="color:var(--mb-soft)">Walk:</b> drag the left half of the screen (tilt to turn). <b style="color:var(--mb-soft)">Look:</b> drag the right half. Tap <b style="color:var(--mb-soft)">jump</b> (or the space bar) to hop up onto low things. Tap <b style="color:var(--mb-soft)">sound</b> to hear the valley; it stays off until you do. (No sound on an iPad or iPhone? Check the silent switch.) Wade into the water to swim. Tap ☰ menu for a new world, the dials, and the time of day. Walk under the gate arch and find the door under the tower stair.</p>
@@ -1327,9 +1327,10 @@ var SHELF={on:false,url:'https://motbuchanan.com/gameshelf/'};
   SHELF.place=place;
 })();
 
-const VERSION='The Keep v0.36.0 · Nov 4 2026';
-const VER_SHORT='v0.36.0 · Nov 4'; // what the badge shows; bump with VERSION
+const VERSION='The Keep v0.37.0 · Nov 4 2026';
+const VER_SHORT='v0.37.0 · Nov 4'; // what the badge shows; bump with VERSION
 const CHANGELOG=[
+ ['v0.37.0 · Nov 4 2026','New animals. Every creature is drawn again, bigger, shaded and outlined, and they move: deer walk, run and graze, some with antlers; wolves trot, wag and lift their heads to howl at night; sheep and cows graze and the cow swishes its tail; rabbits sit, nibble and hop; hens peck; squirrels sit up and bound; trout sweep their tails; birds flap and glide. Deer, wolves, sheep and cows now face you when they come your way. The Mesh, Voxels, Rays and Iso views draw the new people and animals too (people there were garbled since v0.35.0).'],
  ['v0.36.0 · Nov 4 2026','Backups. Your progress lives only in this browser, so now you can keep a copy: menu, backup your progress. Save it as a small file, or copy a save code into your notes, and bring it back on any phone or browser. After a big moment, a quest done or a new stretch of valleys, the game offers a backup now and then. Load a save from the menu or the opening page.'],
  ['v0.35.0 · Nov 4 2026','New people. Everyone is drawn with more than twice the detail: faces with eyes, brows, noses and cheeks; beards short, full or long; hair short, long, braided, in a bun, tied back or bald; helmets, hoods, wide hats, soft caps and kerchiefs; tall, short and stout builds; and a vest, apron, sash or collar picked from each name, so no two folk look alike. They stay the same height in the world.'],
  ['v0.34.1 · Nov 4 2026','Sound, tuned by ear. The gate arch no longer muffles everything as you walk under it (the slow-down sound). Wind is quieter so the animals come through: sheep, cows and hens speak up soon after you come near, with fuller voices, and a wolf pack howls within seconds of night when it is close. New voices: the axe now bites instead of bouncing, the sheep bleat lower, and the wolves howl with breath and a valley echo. Pressing Space after the sound button now jumps instead of turning sound off.'],
@@ -2676,7 +2677,7 @@ function renderFrame(px,py,pz,yaw,pitch){
   const pz2=2*WATER-pz;
   const uw=pz<WATER;   // eye below the surface: no reflective surface, see through to the bed
   const keepOn=!!DIALS.keep&&W.keepBuilt, RND2=(KEEP.SPR+KEEP.LIP+0.4)*(KEEP.SPR+KEEP.LIP+0.4);
-  keeperFrame(px,py,fx,fy,rx,ry);
+  keeperFrame(px,py,fx,fy,rx,ry); animalFrame(px,py,yaw);
   for(let i=0;i<C;i++){
     const u=((i+0.5)/C-0.5)*2*tanH;
     const dx=fx+rx*u, dy=fy+ry*u;
@@ -2835,20 +2836,24 @@ function renderFrame(px,py,pz,yaw,pitch){
           }
         }
       }
-      for(let cj=CBIN.head[ci]; cj>=0; cj=CBIN.next[cj]){
+      for(let ce=CBIN.head[ci]; ce>=0; ce=CBIN.nx[ce]){ const cj=CBIN.ent[ce];
         const wx=CR_.x[cj]-px, wy=CR_.y[cj]-py; const sdep=(wx*dx+wy*dy)/dd;
         if(sdep<0.3) continue;
         const ssig=(wx*dy-wy*dx)*invLen; const spc=CR_.sp[cj]; const P_=SPP[spc]; const gsz=growOf(cj); const ww=P_.wsize*gsz;
         const q=ssig/ww; if(q<=-1||q>=1) continue;
+        if(ww>0.3&&spc!==SP.BIRD&&(((px+dx*sdep)|0)!==cx||((py+dy*sdep)|0)!==cy)) continue;   // listed in several cells: drawn only where the ray passes closest
         const f2=fogLUT[(sdep*4)|0]; const cbase=CR_.z[cj];
-        if(spc===0){
-          const aq=q<0?-q:q; const flap=Math.sin(skyTime*7+cj*1.7)*0.42;
-          const wing=0.5+(0.34+flap)*aq-0.28*aq*aq;
-          const bump=aq<0.16?0.42:0, cen=wing+bump-0.55, th=(aq<0.16?0.55:0.26);
-          const ctopc=cbase+P_.hsize*gsz*(cen+th*0.5), cbotc=cbase+P_.hsize*gsz*(cen-th*0.5);
-          let rTc=Math.floor(horizon-(ctopc-pz)*K/sdep), rBc=Math.floor(horizon-(cbotc-pz)*K/sdep);
-          if(rTc<0)rTc=0; if(rBc>ybuf-1)rBc=ybuf-1;
-          for(let r=rTc;r<=rBc;r++){ if(flag[r])continue; fb[r*C+i]=pack(46,44,54,f2); flag[r]=1; }
+        const A2=AM2[spc];
+        if(A2){ const bk=A2.banks[(A2.banks.length>1&&(ANI.vr[cj]%3)===0&&isAdult(cj))?1:0], vw=bk[ANI.v[cj]], qq=ssig/(ww*vw.wf); if(qq<=-1||qq>=1) continue;
+          let u=qq*0.5+0.5; if(ANI.m[cj]) u=1-u; const VW=vw.w, VH=vw.h; let mx=(u*VW)|0; if(mx<0)mx=0; if(mx>=VW)mx=VW-1;
+          const fr=vw.frames[ANI.f[cj]]||vw.frames[0], H=P_.hsize*gsz, apal=A2.pal;
+          let rTc=Math.floor(horizon-(cbase+H-pz)*K/sdep), rBc=Math.floor(horizon-(cbase-pz)*K/sdep);
+          if(rTc<0)rTc=0; if(rBc>ybuf-1)rBc=ybuf-1; const top0=horizon-(cbase+H-pz)*K/sdep, spf=(horizon-(cbase-pz)*K/sdep)-top0||1;
+          for(let r=rTc;r<=rBc;r++){ if(flag[r])continue;
+            let my=(((r+0.5-top0)/spf)*VH)|0; if(my<0)my=0; if(my>=VH)my=VH-1;
+            const pi=fr[my*VW+mx]; if(pi===0) continue;
+            const cc=apal[pi]; const lt=pi===1?0.9:(0.84+0.18*(1-my/VH));
+            fb[r*C+i]=pack(cc[0]*lt,cc[1]*lt,cc[2]*lt,f2); flag[r]=1; }
         } else {
           const M=MASKS[spc]; let u=(q*0.5+0.5); if(CR_.vx[cj]*(-Math.sin(yaw))+CR_.vy[cj]*Math.cos(yaw)<0) u=1-u; let mx=(u*M.w)|0; if(mx<0)mx=0; if(mx>=M.w)mx=M.w-1;
           const H=P_.hsize*gsz;
@@ -3064,18 +3069,18 @@ function compose(){
 // ---------------- creatures (simulation layer) ----------------
 const SP={BIRD:0,RABBIT:1,DEER:2,SQUIRREL:3,FISH:4,WOLF:5,CARCASS:6,KEEPER:7,FIRE:8,SHEEP:9,COW:10,HEN:11};
 const SPP=[
-  { speed:8.0, turn:3.2, sight:16, sep:2.4, wsize:0.86, hsize:0.38, r:52,g:50,b:60 },
-  { speed:3.0, turn:5.0, sight:9,  sep:1.0, wsize:0.70, hsize:0.78, r:168,g:132,b:98 },
-  { speed:4.4, turn:3.4, sight:18, sep:3.2, wsize:1.28, hsize:1.95, r:158,g:118,b:78 },
-  { speed:5.0, turn:6.5, sight:8,  sep:0.8, wsize:0.52, hsize:0.68, r:156,g:92,b:52 },
-  { speed:3.6, turn:5.0, sight:6,  sep:0.9, wsize:0.70, hsize:0.42, r:88,g:138,b:162 },
-  { speed:6.7, turn:4.4, sight:30, sep:2.2, wsize:1.18, hsize:1.22, r:96,g:92,b:88 },
-  { speed:0, turn:0, sight:0, sep:0, wsize:1.20, hsize:0.52, r:110,g:70,b:46 },
+  { speed:8.0, turn:3.2, sight:16, sep:2.4, wsize:0.95, hsize:0.78, r:52,g:50,b:60 },
+  { speed:3.0, turn:5.0, sight:9,  sep:1.0, wsize:0.64, hsize:1.10, r:168,g:132,b:98 },
+  { speed:4.4, turn:3.4, sight:18, sep:3.2, wsize:1.17, hsize:2.50, r:158,g:118,b:78 },
+  { speed:5.0, turn:6.5, sight:8,  sep:0.8, wsize:0.47, hsize:0.89, r:156,g:92,b:52 },
+  { speed:3.6, turn:5.0, sight:6,  sep:0.9, wsize:0.62, hsize:0.62, r:88,g:138,b:162 },
+  { speed:6.7, turn:4.4, sight:30, sep:2.2, wsize:1.18, hsize:1.69, r:96,g:92,b:88 },
+  { speed:0, turn:0, sight:0, sep:0, wsize:1.02, hsize:0.98, r:110,g:70,b:46 },
   { speed:1.5, turn:0, sight:0, sep:0, wsize:0.50, hsize:2.00, r:98,g:84,b:70 },
   { speed:0, turn:0, sight:0, sep:0, wsize:0.42, hsize:1.15, r:80,g:72,b:64 },
-  { speed:1.1, turn:0, sight:0, sep:0, wsize:1.15, hsize:0.95, r:226,g:222,b:208 },
-  { speed:0.8, turn:0, sight:0, sep:0, wsize:2.00, hsize:1.55, r:200,g:190,b:180 },
-  { speed:1.9, turn:0, sight:0, sep:0, wsize:0.46, hsize:0.46, r:220,g:200,b:166 }
+  { speed:1.1, turn:0, sight:0, sep:0, wsize:0.98, hsize:1.36, r:226,g:222,b:208 },
+  { speed:0.8, turn:0, sight:0, sep:0, wsize:1.46, hsize:2.0, r:200,g:190,b:180 },
+  { speed:1.9, turn:0, sight:0, sep:0, wsize:0.36, hsize:0.72, r:220,g:200,b:166 }
 ];
 const CMAX=1600, CDRAW=130;
 const CR_={ n:0,
@@ -3085,7 +3090,7 @@ const CR_={ n:0,
   energy:new Float32Array(CMAX), al:new Uint8Array(CMAX), tgt:new Int32Array(CMAX),
   age:new Float32Array(CMAX), par:new Int32Array(CMAX), po:new Uint8Array(CMAX), ss:new Float32Array(CMAX), rx:new Float32Array(CMAX), ry:new Float32Array(CMAX) };
 const SGRID={ cell:6, w:0, head:null, next:new Int32Array(CMAX) };
-const CBIN={ head:null, next:new Int32Array(CMAX), touched:new Int32Array(CMAX), tn:0 };
+const CBIN={ head:null, touched:null, ent:null, nx:null, tn:0, en:0 };
 const RESERVE={ burrows:[], meadows:[], dens:[] };
 const ECO={ capR:80, minR:14, capD:38, minD:8, capW:11, minW:3 };
 
@@ -3147,6 +3152,230 @@ defMask(SP.WOLF,14,10,[
  ".2.2....2.2...",".2......2....."],
  {1:[92,88,84],2:[52,48,44],3:[150,144,136],4:[232,196,64]});
 
+// ---- animals, drawn again (v0.37.0): bigger, shaded and outlined, with frames for walking, running, grazing and flying ----
+// Each animal has views (side, and for the big four front and back) and named frames. The side view faces right and is mirrored for left.
+// palette per animal: 1 outline, 2 coat, 3 coat shade (belly, far legs), 4 coat light (back, highlights), 5 eye, 6 nose, hooves and dark parts,
+//                     7 pale parts (muzzle, tail, belly patch), 8 extra (antler, comb, beak), 9 extra 2 (pink, inner ear)
+function amCanvas(w,h,ox,oy){ ox=ox||0; oy=oy||0; const px=new Uint8Array(w*h);   // ox, oy: room left and above, so ears, antlers and tails are not cut off
+  const set=function(x,y,c){ x=Math.round(x+ox); y=Math.round(y+oy); if(x>=0&&x<w&&y>=0&&y<h) px[y*w+x]=c; };
+  const get=function(x,y){ x=Math.round(x+ox); y=Math.round(y+oy); return (x>=0&&x<w&&y>=0&&y<h)?px[y*w+x]:0; };
+  const rect=function(x0,y0,x1,y1,c){ for(let y=Math.round(y0);y<=Math.round(y1);y++)for(let x=Math.round(x0);x<=Math.round(x1);x++) set(x,y,c); };
+  const ell=function(cx,cy,rx,ry,c,shade,light){ for(let y=Math.floor(cy-ry);y<=Math.ceil(cy+ry);y++)for(let x=Math.floor(cx-rx);x<=Math.ceil(cx+rx);x++){
+      const dx=(x+0.5-cx)/rx, dy=(y+0.5-cy)/ry; if(dx*dx+dy*dy<=1){ let k=c; if(shade&&dy>0.45) k=shade; else if(light&&dy<-0.5&&dx<0.6) k=light; set(x,y,k); } } };
+  const line=function(x0,y0,x1,y1,c,wd){ const n=Math.max(Math.abs(x1-x0),Math.abs(y1-y0),1)*2; for(let s=0;s<=n;s++){ const x=x0+(x1-x0)*s/n, y=y0+(y1-y0)*s/n;
+      if(!wd||wd<=1) set(x,y,c); else for(let a=0;a<wd;a++) for(let b=0;b<wd;b++) set(x-((wd-1)/2)+a,y-((wd-1)/2)+b,c); } };
+  // a leg: from the hip down to the hoof, bent by a swing (-1 back .. 1 forward), with a hoof or paw at the end
+  const leg=function(x,y0,y1,swing,c,foot,wd){ const len=y1-y0, kx=x+swing*len*0.25, fx=x+swing*len*0.55, ky=y0+len*0.5, fy=y1-Math.abs(swing)*0.6;
+    line(x,y0,kx,ky,c,wd||2); line(kx,ky,fx,fy,c,wd||2); rect(fx-((wd||2)>1?0.5:0),fy,fx+((wd||2)>1?0.5:0),fy,foot); return [fx,fy]; };
+  const outline=function(oc){ const out=px.slice(); for(let y=0;y<h;y++)for(let x=0;x<w;x++){ if(px[y*w+x]) continue;
+      const a=x>0?px[y*w+x-1]:0, b=x<w-1?px[y*w+x+1]:0, c=y>0?px[(y-1)*w+x]:0, d=y<h-1?px[(y+1)*w+x]:0; if(a||b||c||d) out[y*w+x]=oc||1; } return out; };
+  return {px,set,get,rect,ell,line,leg,outline,w,h}; }
+function amPal(o){ const P=new Array(12); for(const k in o) P[+k]=o[k]; return P; }
+// one animal = {w,h, views:{side:{wf:1, frames:{name:px}}, front:{wf,..}, back:{..}}, pal, alt?:{...same for a variant}}
+function amMake(w,h,fn,pad){ pad=pad||[0,0,0,0]; const C=amCanvas(w+pad[1]+pad[3],h+pad[0]+pad[2],pad[3],pad[0]); fn(C); return C.outline(1); }
+function amPadded(w,h,pad){ return {w:w+pad[1]+pad[3], h:h+pad[0]+pad[2]}; }
+const AMASK={};
+// ---- rabbit: sits, nibbles, hops ----
+(function(){ const PAD=[3, 0, 0, 0], mk=function(w,h,fn){ return amMake(w,h,fn,PAD); }, PW_=PAD[1]+PAD[3], PH_=PAD[0]+PAD[2]; const W=22,H=16, pal=amPal({1:[52,38,30],2:[176,140,108],3:[132,100,76],4:[202,170,138],5:[22,16,14],6:[96,70,54],7:[236,228,216],9:[222,160,150]});
+  const body=function(C,pose){ const up=pose==='hop2'?-1.5:0, st=pose==='hop1'?1.6:(pose==='hop2'?0.6:0);
+    // hind leg and foot (long), body, haunch
+    if(pose==='hop1'){ C.line(6,12,1,14,3,2); C.rect(0,14,3,14,6); } else C.rect(5-st,13.5+up,10,14.5+up,3);
+    C.ell(11+st*0.6,9.6+up,6.4+st,4.2,2,3,4); C.ell(8,10.2+up,4.6,4.2,2,3,4);
+    // front paw
+    if(pose==='hop1') C.line(16,12,20,13,2,2); else if(pose==='hop2') C.line(15,12+up,17,14+up,2,2); else C.rect(15,13,16,14,2);
+    const hx=pose==='nibble'?18:16.8+st*0.6, hy=pose==='nibble'?10:6.6+up;
+    C.ell(hx,hy,3.3,2.9,2,3,4);                          // head
+    const ear=pose==='nibble'||pose==='hop1'?1:0;          // ears laid back when nibbling or stretching
+    if(ear){ C.line(hx-1.5,hy-2,hx-6,hy-3.4,2,2); C.line(hx-1.5,hy-2.4,hx-5,hy-4.4,4,1); C.line(hx-1,hy-2.6,hx-5,hy-4.2,9,1); }
+    else { C.line(hx-1.2,hy-2.4,hx-1.8,hy-7.4,2,2); C.line(hx+0.6,hy-2.4,hx+0.8,hy-7.2,2,2); C.line(hx+0.6,hy-3.4,hx+0.7,hy-6.6,9,1); C.set(hx-1.6,hy-6.6,4); }
+    C.set(hx+1.2,hy-0.6,5); C.set(hx+3,hy+0.4,9);           // eye, nose
+    C.ell(3.6,8.8+up,1.8,1.7,7);                             // the white tail
+  };
+  const side={}; ['sit','nibble','hop1','hop2'].forEach(function(n){ side[n]=mk(W,H,function(C){ body(C,n); }); });
+  AMASK.rabbit={w:W+PW_,h:H+PH_,pal:pal,views:{side:{wf:1,frames:side}},walk:['hop1','hop2'],idle:['sit','sit','nibble'],run:['hop1','hop2']}; })();
+// ---- deer: doe and buck; stands, walks, grazes, runs; front and back views ----
+(function(){ const PAD=[2, 0, 0, 0], mk=function(w,h,fn){ return amMake(w,h,fn,PAD); }, PW_=PAD[1]+PAD[3], PH_=PAD[0]+PAD[2]; const W=30,H=30;
+  const pal=amPal({1:[46,30,20],2:[164,116,74],3:[120,84,52],4:[190,146,100],5:[18,12,10],6:[40,28,20],7:[238,228,208],8:[206,186,150],9:[200,150,140]});
+  const legs=function(C,ph,run){ // four legs: near pair coat, far pair shade; ph -1..1 swings them in opposite pairs
+    const y0=18, y1=27, s=run?1.6:0.9;
+    C.leg(8,y0,y1,-ph*s,3,6); C.leg(19,y0,y1,ph*s,3,6);       // far legs first
+    C.leg(10,y0,y1,ph*s,2,6); C.leg(21,y0,y1,-ph*s,2,6); };
+  const side=function(C,o){ legs(C,o.ph,o.run);
+    C.ell(14.5,14.5,8.6,4.6,2,3,4); C.ell(15,17,6,1.6,7);              // body, pale belly
+    C.ell(6.6,12,1.6,2.2,7); C.set(6,10.4,2);                          // white tail flag, raised
+    const hd=o.graze?[23.5,22]:[23,6.2];
+    if(o.graze){ C.line(20,13,23,20,2,3); } else { C.line(20,13,22.4,7.6,2,3); C.line(21.6,12,23,8,7,1); }   // neck, white throat
+    C.ell(hd[0],hd[1],2.8,2.2,2,3,4); C.line(hd[0]+1,hd[1]+0.4,hd[0]+4.2,hd[1]+(o.graze?2:1.2),2,2); C.set(hd[0]+4.6,hd[1]+(o.graze?2:1.2),6);   // head, snout, nose
+    C.set(hd[0]+0.8,hd[1]-0.6,5);
+    C.line(hd[0]-1,hd[1]-1.6,hd[0]-2.6,hd[1]-4,2,2); C.set(hd[0]-2,hd[1]-3,9);   // ear
+    if(o.buck){ const ax=hd[0]-0.2, ay=hd[1]-2.2, up=o.graze?1:-1;
+      C.line(ax,ay,ax-2,ay+up*5,8,1); C.line(ax-1,ay+up*2.5,ax+1.4,ay+up*4.2,8,1); C.line(ax-1.6,ay+up*4,ax-3.6,ay+up*5.6,8,1);
+      C.line(ax+1,ay,ax+1.6,ay+up*4.6,8,1); C.line(ax+1.3,ay+up*2.6,ax+3.4,ay+up*3.6,8,1); }
+    if(o.run){ C.set(4.6,11,7); } };
+  const front=function(C,o){ const cx=7.5; // a deer coming at you: chest, two front legs, head high, ears out
+    C.leg(cx-2.4,18,27,o.ph*0.3,3,6,2); C.leg(cx+2.4,18,27,-o.ph*0.3,3,6,2);
+    C.ell(cx,14.5,4.6,5,2,3,4); C.ell(cx,16,2.2,2.6,7);
+    const hy=o.graze?20:6;
+    C.line(cx,12,cx,hy+2,2,3); C.ell(cx,hy,2.6,2.8,2,3,4); C.rect(cx-1,hy+2,cx+1,hy+3,7); C.set(cx,hy+3,6); C.set(cx-1.3,hy-0.4,5); C.set(cx+1.3,hy-0.4,5);
+    C.line(cx-2,hy-1.6,cx-5,hy-3,2,2); C.line(cx+2,hy-1.6,cx+5,hy-3,2,2);
+    if(o.buck){ const up=o.graze?1:-1; C.line(cx-1,hy-2.4,cx-3,hy+up*7,8,1); C.line(cx-2.4,hy+up*4.4,cx-4.6,hy+up*5.4,8,1); C.line(cx+1,hy-2.4,cx+3,hy+up*7,8,1); C.line(cx+2.4,hy+up*4.4,cx+4.6,hy+up*5.4,8,1); } };
+  const back=function(C,o){ const cx=7.5; // walking away: the rump and white tail, legs, ears over the back
+    C.leg(cx-2.6,18,27,o.ph*0.3,3,6,2); C.leg(cx+2.6,18,27,-o.ph*0.3,3,6,2);
+    C.ell(cx,14,5,5.2,2,3,4); C.ell(cx,15.6,2.6,2.6,7); C.ell(cx,12.6,1.2,1.8,7);
+    if(!o.graze){ C.ell(cx,6.6,2.3,2.2,2,3,4); C.line(cx-1.6,5.6,cx-4.4,4,2,2); C.line(cx+1.6,5.6,cx+4.4,4,2,2);
+      if(o.buck){ C.line(cx-1,4.6,cx-3,-0.4,8,1); C.line(cx+1,4.6,cx+3,-0.4,8,1); C.line(cx-2,2,cx-4,2.6,8,1); C.line(cx+2,2,cx+4,2.6,8,1); } } };
+  const build=function(buck){ const S={}, F={}, B={};
+    const poses={stand:{ph:0},walk1:{ph:1},walk2:{ph:-1},graze:{ph:0,graze:1},run1:{ph:1,run:1},run2:{ph:-1,run:1}};
+    for(const n in poses){ const o=Object.assign({buck:buck},poses[n]); S[n]=mk(W,H,function(C){ side(C,o); }); F[n]=mk(15,H,function(C){ front(C,o); }); B[n]=mk(15,H,function(C){ back(C,o); }); }
+    return {side:{wf:1,frames:S},front:{wf:0.5,frames:F,w:15+PW_},back:{wf:0.5,frames:B,w:15+PW_}}; };
+  AMASK.deer={w:W+PW_,h:H+PH_,pal:pal,views:build(false),alt:build(true),walk:['walk1','stand','walk2','stand'],idle:['stand','graze','graze','stand','graze'],run:['run1','run2']}; })();
+// ---- wolf: stands, trots, runs, tail wags, howls at night; front and back ----
+(function(){ const PAD=[2, 0, 0, 0], mk=function(w,h,fn){ return amMake(w,h,fn,PAD); }, PW_=PAD[1]+PAD[3], PH_=PAD[0]+PAD[2]; const W=28,H=18, pal=amPal({1:[30,28,28],2:[112,108,104],3:[80,76,74],4:[150,146,140],5:[232,196,64],6:[26,24,24],7:[206,200,190],9:[170,120,116]});
+  const side=function(C,o){ const s=o.run?1.5:0.8, ph=o.ph;
+    C.leg(7,11,16,-ph*s,3,6); C.leg(18,11,16,ph*s,3,6); C.leg(9,11,16,ph*s,2,6); C.leg(20,11,16,-ph*s,2,6);
+    // tail: low and bushy, up when wagging
+    const ty=o.wag?(o.wag>0?2.6:4.6):(o.run?7:10);
+    C.line(5,8,2,ty,2,3); C.line(3,ty+0.6,1.4,ty+1.6,7,2);
+    C.ell(13,8.4,8,3.6,2,3,4); C.ell(18,9.2,3.6,3.4,2,3,4); C.ell(13,10.6,5,1,7);    // body, deep chest, pale belly
+    for(let x=9;x<=15;x++) C.set(x,5.4,4);                                            // the light saddle along the back
+    const hx=o.howl?21.6:22, hy=o.howl?2.6:6, sx=o.howl?2.6:4.2, sy=o.howl?-1.8:1.2;
+    C.line(19,7,hx,hy+1,2,3); C.ell(hx,hy,2.8,2.4,2,3,4);
+    C.line(hx+1,hy+0.4,hx+sx,hy+sy,2,2); C.line(hx+1,hy+1.2,hx+sx-0.6,hy+sy+0.8,7,1); C.set(hx+sx+0.4,hy+sy,6);   // snout, pale jaw, nose
+    C.set(hx+0.6,hy-0.6,5);
+    C.line(hx-1,hy-1.8,hx-1.6,hy-4.4,2,2); C.line(hx+0.6,hy-1.8,hx+0.8,hy-4.6,2,2); C.set(hx-1.4,hy-3.4,9); };
+  const front=function(C,o){ const cx=7;
+    C.leg(cx-2.4,11,16,o.ph*0.3,3,6,2); C.leg(cx+2.4,11,16,-o.ph*0.3,3,6,2);
+    C.ell(cx,9.6,4.4,3.8,2,3,4); C.ell(cx,10.6,2,2,7);
+    C.ell(cx,5.4,3.2,2.8,2,3,4); C.rect(cx-1,6.4,cx+1,8,7); C.set(cx,8,6); C.set(cx-1.4,4.8,5); C.set(cx+1.4,4.8,5);
+    C.line(cx-2.2,3.6,cx-3,0.6,2,2); C.line(cx+2.2,3.6,cx+3,0.6,2,2); C.set(cx-2.6,1.6,9); C.set(cx+2.6,1.6,9); };
+  const back=function(C,o){ const cx=7;
+    C.leg(cx-2.6,11,16,o.ph*0.3,3,6,2); C.leg(cx+2.6,11,16,-o.ph*0.3,3,6,2);
+    C.ell(cx,9,4.6,4,2,3,4); const tw=o.wag?(o.wag>0?2:-2):0; C.line(cx,8,cx+tw,13,2,3); C.line(cx+tw,12,cx+tw,14,7,2);
+    C.ell(cx,4.6,2.8,2.4,2,3,4); C.line(cx-2,3.4,cx-2.8,0.6,2,2); C.line(cx+2,3.4,cx+2.8,0.6,2,2); };
+  const poses={stand:{ph:0},walk1:{ph:1},walk2:{ph:-1},run1:{ph:1,run:1},run2:{ph:-1,run:1},wag1:{ph:0,wag:1},wag2:{ph:0,wag:-1},howl:{ph:0,howl:1}};
+  const S={},F={},B={}; for(const n in poses){ const o=poses[n]; S[n]=mk(W,H,function(C){ side(C,o); }); F[n]=mk(14,H,function(C){ front(C,o); }); B[n]=mk(14,H,function(C){ back(C,o); }); }
+  AMASK.wolf={w:W+PW_,h:H+PH_,pal:pal,views:{side:{wf:1,frames:S},front:{wf:0.5,frames:F,w:14+PW_},back:{wf:0.5,frames:B,w:14+PW_}},walk:['walk1','stand','walk2','stand'],idle:['stand','wag1','wag2','stand','stand'],run:['run1','run2'],night:'howl'}; })();
+// ---- sheep: a cloud of wool on dark legs, a black face; grazes ----
+(function(){ const PAD=[0, 0, 0, 0], mk=function(w,h,fn){ return amMake(w,h,fn,PAD); }, PW_=PAD[1]+PAD[3], PH_=PAD[0]+PAD[2]; const W=26,H=18, pal=amPal({1:[60,56,52],2:[236,232,220],3:[200,194,180],4:[250,248,240],5:[230,226,210],6:[44,40,42],7:[214,208,194],8:[70,64,66],9:[190,150,140]});
+  const wool=function(C,cx,cy,rx,ry){ C.ell(cx,cy,rx,ry,2,3,4); for(let a=0;a<12;a++){ const t=a/12*Math.PI*2, bx=cx+Math.cos(t)*rx*0.92, by=cy+Math.sin(t)*ry*0.9; if(by<cy+ry*0.6) C.ell(bx,by,1.7,1.5,by<cy?4:2); } };
+  const side=function(C,o){ const ph=o.ph;
+    C.leg(7,12,16,-ph*0.7,6,6,2); C.leg(17,12,16,ph*0.7,6,6,2); C.leg(9,12,16,ph*0.7,8,6,2); C.leg(19,12,16,-ph*0.7,8,6,2);
+    wool(C,12.5,8.6,8.6,4.8);
+    const hx=o.graze?21:21.4, hy=o.graze?12.6:7;
+    C.ell(hx,hy,2.6,2.4,8); C.ell(hx+1.2,hy+0.8,1.8,1.4,8); C.set(hx+0.8,hy-0.6,5); C.set(hx+2.6,hy+1,1);
+    C.line(hx-1.2,hy-1.2,hx-3.2,hy-0.4,8,2); C.set(hx-2.6,hy-0.6,9);
+    if(!o.graze) C.ell(18.4,5.6,2.4,2,4); };
+  const front=function(C,o){ const cx=7; C.leg(cx-2.6,12,16,o.ph*0.3,6,6,2); C.leg(cx+2.6,12,16,-o.ph*0.3,6,6,2); wool(C,cx,8.4,5.2,4.6);
+    const hy=o.graze?12:6; C.ell(cx,hy,2.3,2.6,8); C.set(cx-1,hy-0.6,5); C.set(cx+1,hy-0.6,5); C.line(cx-2,hy-1,cx-4.4,hy-0.4,8,2); C.line(cx+2,hy-1,cx+4.4,hy-0.4,8,2); C.ell(cx,hy-2.6,2,1.2,4); };
+  const back=function(C,o){ const cx=7; C.leg(cx-2.6,12,16,o.ph*0.3,6,6,2); C.leg(cx+2.6,12,16,-o.ph*0.3,6,6,2); wool(C,cx,8.4,5.2,4.8); C.ell(cx,10.4,1.4,1.6,3);
+    if(!o.graze){ C.line(cx-2,3.6,cx-4,3.4,8,2); C.line(cx+2,3.6,cx+4,3.4,8,2); } };
+  const poses={stand:{ph:0},walk1:{ph:1},walk2:{ph:-1},graze:{ph:0,graze:1}};
+  const S={},F={},B={}; for(const n in poses){ const o=poses[n]; S[n]=mk(W,H,function(C){ side(C,o); }); F[n]=mk(14,H,function(C){ front(C,o); }); B[n]=mk(14,H,function(C){ back(C,o); }); }
+  AMASK.sheep={w:W+PW_,h:H+PH_,pal:pal,views:{side:{wf:1,frames:S},front:{wf:0.55,frames:F,w:14+PW_},back:{wf:0.55,frames:B,w:14+PW_}},walk:['walk1','stand','walk2','stand'],idle:['stand','graze','graze','graze','stand'],run:['walk1','walk2']}; })();
+// ---- cow: patched, horned, a swinging tail; grazes ----
+(function(){ const PAD=[0, 0, 0, 1], mk=function(w,h,fn){ return amMake(w,h,fn,PAD); }, PW_=PAD[1]+PAD[3], PH_=PAD[0]+PAD[2]; const W=34,H=24, pal=amPal({1:[40,32,28],2:[238,234,226],3:[200,194,184],4:[250,248,244],5:[20,16,14],6:[44,36,32],7:[226,170,160],8:[232,222,196],9:[88,64,50]});
+  const PAT=[[8,8,3.2],[14,11,2.6],[19,7,2.8],[11,13,1.8]];
+  const side=function(C,o){ const ph=o.ph;
+    C.leg(7,15,22,-ph*0.6,3,6,3); C.leg(22,15,22,ph*0.6,3,6,3); C.leg(9,15,22,ph*0.6,2,6,3); C.leg(24,15,22,-ph*0.6,2,6,3);
+    for(let y=6;y<=16;y++)for(let x=4;x<=26;x++){ const r=(x===4||x===26)&&(y===6||y===16); if(!r) C.set(x,y,y>=14?3:(y<=7?4:2)); }
+    PAT.forEach(function(q){ for(let y=6;y<=16;y++)for(let x=4;x<=26;x++){ if(Math.hypot(x+0.5-q[0],y+0.5-q[1])<=q[2]&&C.get(x,y)) C.set(x,y,9); } });
+    C.ell(13,17,2,1.2,7);                                                          // udder
+    const sw=o.swish?2:0; C.line(4,7,2-sw,14,9,1); C.rect(1-sw,14,3-sw,16,6);      // tail and tuft
+    const hx=o.graze?29:29, hy=o.graze?17:7;
+    if(o.graze) C.line(26,9,28,15,2,4); else C.rect(26,6,28,11,2);
+    C.rect(hx-2,hy-2.4,hx+2,hy+1.6,2); C.rect(hx+1,hy-1,hx+4,hy+2.6,7); C.set(hx+3,hy+1,1); C.set(hx+0.4,hy-1.2,5); C.rect(hx-2,hy-2.4,hx-1,hy-1,9);
+    C.line(hx-1,hy-3,hx-2,hy-5,8,1); C.line(hx+1,hy-3,hx+1.6,hy-5,8,1); C.line(hx-3,hy-1.6,hx-4.6,hy-0.6,2,2); };
+  const front=function(C,o){ const cx=8.5; C.leg(cx-3.4,15,22,o.ph*0.3,3,6,3); C.leg(cx+3.4,15,22,-o.ph*0.3,3,6,3);
+    C.ell(cx,11,6,5.6,2,3,4); C.ell(cx-2,9,2,2.4,9);
+    const hy=o.graze?16:7; C.rect(cx-2.4,hy-3,cx+2.4,hy+3,2); C.rect(cx-1.8,hy+1,cx+1.8,hy+4,7); C.set(cx-1,hy+3,1); C.set(cx+1,hy+3,1); C.set(cx-1.6,hy-1,5); C.set(cx+1.6,hy-1,5);
+    C.line(cx-2.4,hy-3,cx-4.4,hy-5,8,1); C.line(cx+2.4,hy-3,cx+4.4,hy-5,8,1); C.line(cx-2.6,hy-1.4,cx-5,hy-0.6,2,2); C.line(cx+2.6,hy-1.4,cx+5,hy-0.6,2,2); };
+  const back=function(C,o){ const cx=8.5; C.leg(cx-3.4,15,22,o.ph*0.3,3,6,3); C.leg(cx+3.4,15,22,-o.ph*0.3,3,6,3);
+    C.ell(cx,11,6.2,5.8,2,3,4); C.ell(cx+2,8.4,2.4,2,9); const sw=o.swish?2:0; C.line(cx,7,cx+sw,16,9,1); C.rect(cx-1+sw,16,cx+1+sw,18,6); C.ell(cx,16.6,1.6,1,7); };
+  const poses={stand:{ph:0},walk1:{ph:1},walk2:{ph:-1},graze:{ph:0,graze:1},swish:{ph:0,swish:1}};
+  const S={},F={},B={}; for(const n in poses){ const o=poses[n]; S[n]=mk(W,H,function(C){ side(C,o); }); F[n]=mk(17,H,function(C){ front(C,o); }); B[n]=mk(17,H,function(C){ back(C,o); }); }
+  AMASK.cow={w:W+PW_,h:H+PH_,pal:pal,views:{side:{wf:1,frames:S},front:{wf:0.5,frames:F,w:17+PW_},back:{wf:0.5,frames:B,w:17+PW_}},walk:['walk1','stand','walk2','stand'],idle:['stand','graze','swish','graze','graze'],run:['walk1','walk2']}; })();
+// ---- hen: plump, red comb, pecks and struts ----
+(function(){ const PAD=[0, 0, 0, 0], mk=function(w,h,fn){ return amMake(w,h,fn,PAD); }, PW_=PAD[1]+PAD[3], PH_=PAD[0]+PAD[2]; const W=14,H=14, pal=amPal({1:[60,40,28],2:[230,206,168],3:[190,154,110],4:[246,232,204],5:[16,12,10],6:[230,160,50],7:[160,120,80],8:[214,48,40],9:[244,190,70]});
+  const side=function(C,o){ const ph=o.ph||0;
+    C.line(6,10,6-ph,13,6,1); C.line(8,10,8+ph,13,6,1); C.set(5-ph,13,6); C.set(9+ph,13,6);
+    C.ell(6,8.4,4.6,3.4,2,3,4); C.ell(5,8.6,2.4,1.6,7);                                   // body, wing
+    C.line(2,7,1,3,2,2); C.line(2.6,7,2.6,3.4,3,1);                                       // tail feathers
+    const hx=o.peck?10.6:9.6, hy=o.peck?10.6:4.4;
+    if(!o.peck) C.line(8.6,6.4,hx,hy+1,2,2); C.ell(hx,hy,1.9,1.9,2);
+    C.set(hx,hy-2,8); C.set(hx+1,hy-2.4,8); C.set(hx-1,hy-2.2,8); C.set(hx+1,hy+1.6,8);      // comb, wattle
+    C.set(hx+2.2,hy+0.2,6); C.set(hx+2.8,hy+0.4,6); C.set(hx+0.6,hy-0.4,5); };
+  const poses={stand:{},peck:{peck:1},walk1:{ph:1},walk2:{ph:-1}};
+  const S={}; for(const n in poses){ const o=poses[n]; S[n]=mk(W,H,function(C){ side(C,o); }); }
+  AMASK.hen={w:W+PW_,h:H+PH_,pal:pal,views:{side:{wf:1,frames:S}},walk:['walk1','walk2'],idle:['stand','peck','stand','peck','peck'],run:['walk1','walk2']}; })();
+// ---- squirrel: sits up with its tail curled, then bounds ----
+(function(){ const PAD=[1, 0, 0, 0], mk=function(w,h,fn){ return amMake(w,h,fn,PAD); }, PW_=PAD[1]+PAD[3], PH_=PAD[0]+PAD[2]; const W=18,H=16, pal=amPal({1:[56,30,16],2:[168,96,52],3:[124,68,36],4:[198,128,76],5:[18,12,10],6:[60,36,22],7:[232,214,188],9:[204,140,110]});
+  const side=function(C,o){
+    if(o.sit){ C.ell(8,10,3,3.8,2,3,4); C.ell(8.8,11,1.4,2.4,7); C.ell(9.4,5.4,2.4,2.2,2,3,4); C.set(10.4,5,5); C.set(11.8,5.8,6); C.line(8.4,3.6,8,1.6,2,2);
+      C.rect(9.6,8.4,10.6,9.4,2); C.set(11,8.6,6); C.rect(6,13.6,10,14,3);
+      C.line(5.4,12,2.6,10,2,3); C.line(2.6,10,2.4,4,2,3); C.line(2.4,4,4.6,1.6,2,3); C.line(2.8,9,2.6,4.6,4,1); }
+    else { const up=o.hop===2?-1.6:0, st=o.hop===1?1.4:0;
+      C.ell(9,10+up,4+st,2.8,2,3,4); C.ell(13.6+st*0.4,7.8+up,2.3,2.1,2,3,4); C.set(14.6+st*0.4,7.4+up,5); C.set(15.8+st*0.4,8.2+up,6); C.line(13,6+up,12.6,4+up,2,2);
+      if(o.hop===1){ C.line(6,12,2,13.6,3,2); C.line(12,12,16,13,2,2); } else { C.rect(6,12.4+up,8,13.4+up,3); C.rect(11,12.4+up,12,13.4+up,2); }
+      C.line(5.4,9+up,2,6+up,2,3); C.line(2,6+up,3,1.6+up,2,3); C.line(2.6,6+up,3.2,2.4+up,4,1); } };
+  const poses={sit:{sit:1},hop1:{hop:1},hop2:{hop:2}};
+  const S={}; for(const n in poses){ const o=poses[n]; S[n]=mk(W,H,function(C){ side(C,o); }); }
+  AMASK.squirrel={w:W+PW_,h:H+PH_,pal:pal,views:{side:{wf:1,frames:S}},walk:['hop1','hop2'],idle:['sit'],run:['hop1','hop2']}; })();
+// ---- fish: a trout, the tail sweeping as it swims ----
+(function(){ const PAD=[0, 0, 1, 0], mk=function(w,h,fn){ return amMake(w,h,fn,PAD); }, PW_=PAD[1]+PAD[3], PH_=PAD[0]+PAD[2]; const W=22,H=10, pal=amPal({1:[22,40,52],2:[88,150,166],3:[58,108,126],4:[150,196,204],5:[12,16,20],6:[48,86,104],7:[226,232,220],9:[214,120,110]});
+  const side=function(C,o){ const t=o.tail;
+    for(let x=4;x<=19;x++){ const u=(x-4)/15, hh=3.1*Math.sin(Math.PI*Math.min(1,0.18+u*0.9)); for(let y=Math.round(5-hh);y<=Math.round(5+hh*0.9);y++) C.set(x,y,y>=6?(y>=5+hh*0.5?7:3):(y<=5-hh*0.6?4:2)); }   // a tapered body
+    C.line(5,5,18,5,9,1);                                                                      // the pink band
+    C.line(4.4,5,1.2,1.6+t*1.4,2,2); C.line(4.4,5,1.2,8.4+t*1.4,2,2); C.set(2.6,5+t*0.6,2);     // a forked tail
+    C.line(9,2.2,12,1,3,1); C.line(12,1,13,2.2,3,1);                                          // back fin
+    C.set(16.6,4.2,5); C.line(18.4,5.6,19.4,5.4,1,1); C.line(15,3.2,15.6,6.6,3,1); C.line(11,8.2,12.6,9,3,1); };
+  const S={swim1:mk(W,H,function(C){ side(C,{tail:-1}); }),swim2:mk(W,H,function(C){ side(C,{tail:1}); }),glide:mk(W,H,function(C){ side(C,{tail:0}); })};
+  AMASK.fish={w:W+PW_,h:H+PH_,pal:pal,views:{side:{wf:1,frames:S}},walk:['swim1','glide','swim2','glide'],idle:['glide','swim1','glide','swim2'],run:['swim1','swim2']}; })();
+// ---- a deer lying where it fell: legs folded, eyes shut (what the wolves leave) ----
+(function(){ const PAD=[0, 1, 1, 0], mk=function(w,h,fn){ return amMake(w,h,fn,PAD); }, PW_=PAD[1]+PAD[3], PH_=PAD[0]+PAD[2]; const W=26,H=12, pal=amPal({1:[40,26,18],2:[122,84,56],3:[92,62,42],4:[146,104,72],5:[30,20,14],6:[40,28,20],7:[196,180,156]});
+  const S={rest:mk(W,H,function(C){ C.ell(12,7,8.6,3.4,2,3,4); C.ell(12.6,8.6,5,1,7); C.line(4,9,1,10.6,3,2); C.line(7,10,9,11,3,2); C.line(16,10,19,11,3,2);
+    C.ell(21.4,7.4,2.6,2,2,3,4); C.line(22,8,25,9,2,2); C.line(20.6,6.6,21.8,6.6,5,1); C.line(20,5.6,18.6,3.6,2,2); })};
+  AMASK.carcass={w:W+PW_,h:H+PH_,pal:pal,views:{side:{wf:1,frames:S}},walk:['rest'],idle:['rest'],run:['rest']}; })();
+// ---- a bird in flight, seen from below: wings up, level, down, and a glide ----
+(function(){ const PAD=[0, 1, 0, 1], mk=function(w,h,fn){ return amMake(w,h,fn,PAD); }, PW_=PAD[1]+PAD[3], PH_=PAD[0]+PAD[2]; const W=20,H=9, pal=amPal({1:[26,24,30],2:[70,64,72],3:[50,46,54],4:[110,102,104],5:[12,10,12],6:[200,150,60],7:[150,140,132]});
+  const fly=function(C,tip,bend){ const bx=10;
+    C.ell(bx,4.4,1.6,2.6,2,3,4); C.set(bx,1.6,6);                                     // body, beak
+    C.line(bx-1.4,3.6,bx-5,3.6+bend,2,2); C.line(bx-5,3.6+bend,1,tip,2,2); C.line(bx+1.4,3.6,bx+5,3.6+bend,2,2); C.line(bx+5,3.6+bend,19,tip,2,2);
+    C.line(bx-4,4.4+bend*0.6,2,tip+1,7,1); C.line(bx+4,4.4+bend*0.6,18,tip+1,7,1);   // pale wing bar
+    C.rect(bx-1,6.8,bx+1,7.4,3); };
+  const S={up:mk(W,H,function(C){ fly(C,0.6,-1.4); }),level:mk(W,H,function(C){ fly(C,3.4,0); }),down:mk(W,H,function(C){ fly(C,6.4,1.2); }),glide:mk(W,H,function(C){ fly(C,3,0.6); })};
+  AMASK.bird={w:W+PW_,h:H+PH_,pal:pal,views:{side:{wf:1,frames:S}},walk:['up','level','down','level'],idle:['glide'],run:['up','level','down','level']}; })();
+// ---- the animals at run time: which view and frame each one shows this frame ----
+const AMAP={}; AMAP[SP.BIRD]='bird'; AMAP[SP.RABBIT]='rabbit'; AMAP[SP.DEER]='deer'; AMAP[SP.SQUIRREL]='squirrel'; AMAP[SP.FISH]='fish';
+AMAP[SP.WOLF]='wolf'; AMAP[SP.CARCASS]='carcass'; AMAP[SP.SHEEP]='sheep'; AMAP[SP.COW]='cow'; AMAP[SP.HEN]='hen';
+// per animal: frames advance with distance walked (fpm: frames per metre); idle frames change slowly; run when faster than runAt
+const ATUNE={bird:{fpm:0,idle:0.25,runAt:99}, rabbit:{fpm:2.2,idle:0.18,runAt:2.0}, deer:{fpm:1.3,idle:0.12,runAt:2.6}, squirrel:{fpm:3,idle:0.2,runAt:2.4},
+  fish:{fpm:2.4,idle:0.8,runAt:2.2}, wolf:{fpm:1.4,idle:0.3,runAt:3.2}, carcass:{fpm:0,idle:0,runAt:99}, sheep:{fpm:1.8,idle:0.1,runAt:99}, cow:{fpm:1.2,idle:0.09,runAt:99}, hen:{fpm:3.4,idle:0.35,runAt:99}};
+const AM2=[];
+(function(){ const bank=function(a,vs){ const order=['side','front','back'], out=[];
+    for(let i=0;i<3;i++){ const v=vs[order[i]]||vs.side, names=Object.keys(v.frames); out.push({w:v.w||a.w, h:a.h, wf:v.wf, names:names, frames:names.map(function(n){ return v.frames[n]; }), has:!!vs[order[i]]}); }
+    return out; };
+  for(const sp in AMAP){ const a=AMASK[AMAP[sp]], t=ATUNE[AMAP[sp]], b=[bank(a,a.views)]; if(a.alt) b.push(bank(a,a.alt));
+    const idx=function(list){ return list.map(function(n){ return b[0][0].names.indexOf(n); }); };
+    AM2[sp]={key:AMAP[sp], pal:a.pal, banks:b, walk:idx(a.walk), idle:idx(a.idle), run:idx(a.run), night:a.night?b[0][0].names.indexOf(a.night):-1, fpm:t.fpm, idleRate:t.idle, runAt:t.runAt, views:!!a.views.front}; } })();
+const ANI={vr:new Uint8Array(CMAX), px:new Float32Array(CMAX), py:new Float32Array(CMAX), d:new Float32Array(CMAX), v:new Uint8Array(CMAX), f:new Uint8Array(CMAX), m:new Uint8Array(CMAX), seen:new Uint32Array(CMAX), tick:1, last:0};
+// a frame name's index is the same in every view of an animal (all views draw the same poses)
+function animalFrame(px,py,yaw){ const now=skyTime, dt=Math.min(0.25,Math.max(0.001,now-ANI.last)); ANI.last=now; const tk=++ANI.tick;
+  const R2=CDRAW*CDRAW, night=DAY.k<0.3, sx=-Math.sin(yaw), sy=Math.cos(yaw);
+  for(let c=0;c<CR_.n;c++){ if(CR_.al[c]===0) continue; const A=AM2[CR_.sp[c]]; if(!A) continue;
+    const x=CR_.x[c], y=CR_.y[c], ex=px-x, ey=py-y; if(ex*ex+ey*ey>R2) continue;
+    let d=Math.hypot(x-ANI.px[c],y-ANI.py[c]); if(d>1.5||ANI.seen[c]!==tk-1) d=0; ANI.seen[c]=tk; ANI.px[c]=x; ANI.py[c]=y; ANI.d[c]+=d;   // back in range: no leap
+    const spd=d/dt, moving=spd>0.15, list=moving?(spd>A.runAt?A.run:A.walk):A.idle;
+    let f; const ph=ANI.vr[c]/256;   // each animal's own phase: it stays with the animal when the list is packed
+    if(A.key==='bird'){ f=((now*0.3+ph*7)%1)<0.28?A.idle[0]:A.walk[(((now*7+ph*40)/1.5708)|0)%4]; }
+    else if(moving) f=list[((ANI.d[c]*A.fpm)|0)%list.length];
+    else if(night&&A.night>=0&&((now*0.07+ph*3.7)%1)<0.1) f=A.night;
+    else f=list[((now*A.idleRate+ph*9.7)|0)%list.length];
+    ANI.f[c]=f<0?0:f;
+    let v=0; const hx=CR_.vx[c], hy=CR_.vy[c], hl=Math.hypot(hx,hy);
+    if(A.views&&hl>1e-4){ const el=Math.hypot(ex,ey)||1, dot=(hx*ex+hy*ey)/(hl*el), was=ANI.v[c];   // a little give, so a jittery heading does not flicker views
+      v=was===1?(dot>0.38?1:(dot<-0.5?2:0)):(was===2?(dot<-0.38?2:(dot>0.5?1:0)):(dot>0.55?1:(dot<-0.55?2:0))); }
+    ANI.v[c]=v; ANI.m[c]=(v===0&&(hx*sx+hy*sy)<0)?1:0; }
+}
 // keepers: a hooded cloak, a lantern held out at the side (9 = the lantern glass)
 // ---- people: procedural "paper doll" sprites for the keepers (16 x 32, bold outline, two-tone shading) ----
 // views: 0 front (facing you), 1 side (facing right; mirror for left), 2 back.
@@ -5809,7 +6038,7 @@ defMask(SP.FIRE,7,10,[
  ".11111.","..222..","..222..","..222..",".22222."],
  {1:[84,76,70],2:[120,114,104],9:[200,96,40]});
 function mul32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
-function addCreature(sp,x,y,ax,ay,age,par){ const c=CR_.n++; CR_.sp[c]=sp; CR_.x[c]=x; CR_.y[c]=y; CR_.ax[c]=ax; CR_.ay[c]=ay;
+function addCreature(sp,x,y,ax,ay,age,par){ const c=CR_.n++; ANI.vr[c]=(Math.random()*256)|0; ANI.px[c]=x; ANI.py[c]=y; ANI.d[c]=Math.random()*4; CR_.sp[c]=sp; CR_.x[c]=x; CR_.y[c]=y; CR_.ax[c]=ax; CR_.ay[c]=ay;
   CR_.vx[c]=0; CR_.vy[c]=0; CR_.st[c]=0; CR_.tm[c]=Math.random()*4; CR_.ph[c]=Math.random()*6.283;
   CR_.z[c]=Math.max(terr(x,y),WATER)+0.3; CR_.al[c]=1; CR_.tgt[c]=-1; CR_.po[c]=0; CR_.ss[c]=0;
   CR_.age[c]=age==null?1:age; CR_.par[c]=par==null?-1:par;
@@ -6256,7 +6485,7 @@ function tick(dt){
     else tickWolf(c,dt); }
 }
 
-function copyC(d,src){ CR_.sp[d]=CR_.sp[src]; CR_.x[d]=CR_.x[src]; CR_.y[d]=CR_.y[src]; CR_.z[d]=CR_.z[src];
+function copyC(d,src){ ANI.vr[d]=ANI.vr[src]; ANI.px[d]=ANI.px[src]; ANI.py[d]=ANI.py[src]; ANI.d[d]=ANI.d[src]; CR_.sp[d]=CR_.sp[src]; CR_.x[d]=CR_.x[src]; CR_.y[d]=CR_.y[src]; CR_.z[d]=CR_.z[src];
   CR_.vx[d]=CR_.vx[src]; CR_.vy[d]=CR_.vy[src]; CR_.ax[d]=CR_.ax[src]; CR_.ay[d]=CR_.ay[src];
   CR_.st[d]=CR_.st[src]; CR_.tm[d]=CR_.tm[src]; CR_.ph[d]=CR_.ph[src];
   CR_.energy[d]=CR_.energy[src]; CR_.al[d]=CR_.al[src]; CR_.tgt[d]=CR_.tgt[src];
@@ -6302,13 +6531,14 @@ function ecology(){
 }
 
 function simBin(px,py){
-  if(!CBIN.head){ CBIN.head=new Int32Array(N*N).fill(-1); }
+  if(!CBIN.head){ CBIN.head=new Int32Array(N*N).fill(-1); CBIN.touched=new Int32Array(CMAX*9); CBIN.ent=new Int32Array(CMAX*9); CBIN.nx=new Int32Array(CMAX*9); }
   for(let k=0;k<CBIN.tn;k++) CBIN.head[CBIN.touched[k]]=-1;
-  CBIN.tn=0; const R2=CDRAW*CDRAW;
+  CBIN.tn=0; CBIN.en=0; const R2=CDRAW*CDRAW;
+  const put=function(cell,c){ if(CBIN.en>=CBIN.ent.length) return; if(CBIN.head[cell]<0) CBIN.touched[CBIN.tn++]=cell; const e=CBIN.en++; CBIN.ent[e]=c; CBIN.nx[e]=CBIN.head[cell]; CBIN.head[cell]=e; };
   for(let c=0;c<CR_.n;c++){ if(CR_.al[c]===0||CR_.sp[c]===SP.KEEPER)continue; const dx=CR_.x[c]-px, dy=CR_.y[c]-py; if(dx*dx+dy*dy>R2) continue;
-    const cell=(CR_.y[c]|0)*N+(CR_.x[c]|0);
-    if(CBIN.head[cell]<0) CBIN.touched[CBIN.tn++]=cell;
-    CBIN.next[c]=CBIN.head[cell]; CBIN.head[cell]=c; }
+    const x=CR_.x[c], y=CR_.y[c], cx=x|0, cy=y|0; put(cy*N+cx,c);
+    const r=SPP[CR_.sp[c]].wsize*growOf(c); if(r<=0.3||CR_.sp[c]===SP.BIRD) continue;
+    for(let yy=Math.floor(y-r);yy<=Math.floor(y+r);yy++) for(let xx=Math.floor(x-r);xx<=Math.floor(x+r);xx++){ if((xx===cx&&yy===cy)||xx<0||yy<0||xx>=N||yy>=N) continue; put(yy*N+xx,c); } }
 }
 
 // ---------------- player ----------------
@@ -6731,7 +6961,7 @@ function boot(){
   const GLR={};   // id -> {r: the renderer, loading, lost, t0}
   const glCur=function(){ const m=RENDERS[DIALS.render|0]||RENDERS[0]; return m.file?m:null; };
   const glApi={ N:N, W:W, WATER:WATER, CLOUDH:CLOUDH, DAY:DAY, SUN:SUN, MOON:MOON, SKY:SKY, RS:RS, RMAT:RMAT, CR_:CR_, SP:SP, SPP:SPP,
-    MASKS:MASKS, KMASK:KMASK, P:P, IN:IN, DIALS:DIALS, DECO:KDECO, DECO_IMG:DECO_IMG, FORT:FORT, KEEP:KEEP, RELIGHT:RELIGHT, hash2:hash2, growOf:growOf, keeperPoseFrame:keeperPoseFrame,
+    MASKS:MASKS, KMASK:KMASK, P:P, IN:IN, DIALS:DIALS, DECO:KDECO, DECO_IMG:DECO_IMG, FORT:FORT, KEEP:KEEP, RELIGHT:RELIGHT, hash2:hash2, growOf:growOf, keeperPoseFrame:keeperPoseFrame, AM2:AM2, ANI:ANI, animalFrame:animalFrame, isAdult:isAdult,
     fog:function(){ return [FOG_R,FOG_G,FOG_B]; }, uw:function(){ return UW; }, skyTime:function(){ return skyTime; } };
   const glSlot=function(id){ return GLR[id]||(GLR[id]={r:null,loading:false,lost:0,t0:0}); };
   function glDrop(id){ const g=GLR[id]; if(!g||!g.r) return; g.r.onLost=null; try{ g.r.destroy(); }catch(e){} g.r=null; }

@@ -99,7 +99,7 @@ void main(){ vec4 t=texture(uA,vUV); if(t.a<0.2) discard;
   if(t.a<0.75&&uNight>0.02&&vX.w>0.5){ float fl=0.86+0.14*sin(uTime*9.0+vW.z*7.0);
     o=vec4(vec3(1.0,0.84,0.47)*fl,1.0); return; }
   vec3 c=t.rgb*vS.w; float w=0.0;
-  if(vX.w>0.5&&uNight>0.02&&vX.x>=0.0){ vec2 px=vLoc*vec2(16.0,32.0); w=uNight*max(0.0,1.0-length(px-vX.xy)/12.0)*1.1; }
+  if(vX.w>0.5&&uNight>0.02&&vX.x>=0.0){ vec2 px=vLoc*vec2(24.0,48.0); w=uNight*max(0.0,1.0-length(px-vX.xy)/18.0)*1.1; }
   o=vec4(finish(c,vec3(0.0),vW,w),1.0); }`;
 
 // the sky: the same palette, sun, moon, stars and two cloud layers as the raycaster's sky(), per pixel
@@ -327,13 +327,14 @@ function create(A){
   const matF=new Float32Array(42), matT=new Float32Array(42), matCH=new Float32Array(14);
   for(let m=0;m<14;m++){ const M=A.RMAT[m]||A.RMAT[0]; for(let k=0;k<3;k++){ matF[m*3+k]=M.f[k]/255; matT[m*3+k]=M.t[k]/255; } matCH[m]=M.ch; }
   // ---- sprites: an atlas of every creature and keeper frame, built from the same pixel masks ----
-  const SLOT_W=16, SLOT_H=32, ACOLS=16; const slots=[]; const atlasMap={}; const slotUV=[]; let texA=null, atlasSig='';
+  const SLOT_W=34, SLOT_H=48, ACOLS=16; const slots=[]; const atlasMap={}; const slotUV=[]; let texA=null, atlasSig='';
   function addSlot(key,w,h,px,pal,glowIdx){ slots.push({key:key,w:w,h:h,px:px,pal:pal,glow:glowIdx}); atlasMap[key]=slots.length-1; }
   // the atlas: every person in this valley (they are recast with each valley), the animals, the birds
   function castKey(){ return (W.castSig||'')+'|'+A.KMASK.length; }
   function buildAtlas(){ slots.length=0; slotUV.length=0; for(const k in atlasMap) delete atlasMap[k];
-  for(let id=0;id<A.KMASK.length;id++){ const M=A.KMASK[id]; for(let v=0;v<M.views.length;v++) for(let f=0;f<M.views[v].length;f++) addSlot('k'+id+'_'+v+'_'+f,16,32,M.views[v][f],M.pal,9); }
+  for(let id=0;id<A.KMASK.length;id++){ const M=A.KMASK[id]; for(let v=0;v<M.views.length;v++) for(let f=0;f<M.views[v].length;f++) addSlot('k'+id+'_'+v+'_'+f,M.w||16,M.h||32,M.views[v][f],M.pal,9); }
   for(const sp in A.MASKS){ const M=A.MASKS[sp]; addSlot('m'+sp,M.w,M.h,M.px,M.pal,9); }
+  if(A.AM2) A.AM2.forEach(function(Q,sp){ if(!Q) return; Q.banks.forEach(function(b,bi){ b.forEach(function(v,vi){ if(vi>0&&!v.has) return; v.frames.forEach(function(px,fi){ addSlot('a'+sp+'_'+bi+'_'+vi+'_'+fi,v.w,v.h,px,Q.pal,-1); }); }); }); });
   { const BW=16,BH=8; for(let fr=0;fr<2;fr++){ const px=new Uint8Array(BW*BH);   // birds: a small dark wing-beat V
       for(let x=0;x<BW;x++){ const ax=Math.abs(x-7.5)/7.5; const y=Math.round(fr?(2+3.5*ax):(5-3*ax+2*ax*ax)); for(let d=0;d<2;d++){ const yy=Math.min(BH-1,Math.max(0,y+d)); px[yy*BW+x]=1; } }
       px[4*BW+7]=1; px[4*BW+8]=1; addSlot('b'+fr,BW,BH,px,[null,[46,44,54]],-1); } }
@@ -441,6 +442,7 @@ function create(A){
   const lp=new Float32Array(64), lc=new Float32Array(64);
   function gather(px,py,pz,yaw,rx,ry,night){
     const C=A.CR_, SP=A.SP, SPP=A.SPP, R2=130*130; let k=0, nl=0; const DK=A.DAY.k<0.6;
+    if(A.animalFrame) A.animalFrame(px,py,yaw);
     for(let c=0;c<C.n;c++){ if(C.al[c]===0) continue; const sp=C.sp[c], x=C.x[c], y=C.y[c], z=C.z[c], ex=x-px, ey=y-py;
       if(ex*ex+ey*ey>R2) continue;
       if((sp===SP.KEEPER||sp===SP.FIRE)&&nl<16&&night>0.02){ const low=C.po[c]===4;
@@ -455,6 +457,10 @@ function create(A){
         const P_=SPP[SP.KEEPER];
         spData.set([x,y,z,0, P_.wsize,P_.hsize,0,amb, uv[0],uv[1],uv[2],uv[3], ln[0],ln[1],mir,1],o); k++; continue; }
       const P_=SPP[sp], g=A.growOf(c);
+      const Q2=A.AM2&&A.AM2[sp];
+      if(Q2&&A.ANI){ const AN=A.ANI, bi=(Q2.banks.length>1&&(AN.vr[c]%3)===0&&(!A.isAdult||A.isAdult(c)))?1:0, vi=AN.v[c], vw=Q2.banks[bi][vi]||Q2.banks[bi][0];
+        const key='a'+sp+'_'+bi+'_'+(vw.has||vi===0?vi:0)+'_'+AN.f[c]; if(atlasMap[key]==null) continue; const uv=slotUV[atlasMap[key]];
+        spData.set([x,y,z,0, P_.wsize*g*vw.wf,P_.hsize*g,0,sp===SP.BIRD?1:amb, uv[0],uv[1],uv[2],uv[3], -1,0,AN.m[c],0],o); k++; continue; }
       if(sp===SP.BIRD){ const fr=Math.sin(A.skyTime()*7+c*1.7)>0?1:0, uv=slotUV[atlasMap['b'+fr]];
         spData.set([x,y,z+P_.hsize*g*0.2,0, P_.wsize*g,P_.hsize*g*0.55,0,1, uv[0],uv[1],uv[2],uv[3], -1,0,0,0],o); k++; continue; }
       const key='m'+sp; if(atlasMap[key]==null) continue; const uv=slotUV[atlasMap[key]];
