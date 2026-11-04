@@ -55,6 +55,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
 #chat.hidden{display:none}
 #bJump{position:absolute;right:16px;bottom:calc(52px + env(safe-area-inset-bottom));z-index:4;width:64px;height:64px;border-radius:32px;font:700 14px var(--mb-ui);background:rgba(16,21,28,.78);border:1px solid var(--mb-teal);color:#e9fffc;padding:0;touch-action:none}
 #bJump[hidden]{display:none}
+#bSound{position:absolute;right:calc(16px + env(safe-area-inset-right));bottom:calc(128px + env(safe-area-inset-bottom));z-index:4;min-width:64px;height:44px;border-radius:22px;font:700 13px var(--mb-ui);background:rgba(16,21,28,.78);border:1px solid rgba(160,180,190,.45);color:#b8c4ca;padding:0 10px;touch-action:none}
+#bSound.on{border-color:var(--mb-teal);color:#e9fffc}
+#bSound[hidden]{display:none}
 #bTalk{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(52px + env(safe-area-inset-bottom));z-index:4;pointer-events:auto;min-height:46px;padding:10px 18px;border-radius:23px;font:700 15px var(--mb-ui);background:rgba(16,21,28,.92);border:1px solid var(--mb-teal);color:#e9fffc;max-width:calc(100vw - 32px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #bTalk[hidden]{display:none}
 .jcard{width:min(420px,calc(100vw - 24px));max-width:none!important;display:flex;flex-direction:column;padding:16px 16px 14px!important}
@@ -210,10 +213,11 @@ html.fromshelf #inPage #inViews{padding-top:calc(58px + env(safe-area-inset-top)
  </div>
  <div id="stick"><div id="knob"></div></div>
  <div id="fps"></div>
- <button class="mb-ver" id="mbVer" type="button">v0.33.0 &middot; Nov 4</button>
+ <button class="mb-ver" id="mbVer" type="button">v0.35.0 &middot; Nov 4</button>
  <div id="toast"></div>
  <button class="btn" id="bTalk" type="button" hidden>Talk</button>
  <button class="btn" id="bJump" type="button" aria-label="Jump">jump</button>
+ <button class="btn" id="bSound" type="button" aria-pressed="false">sound off</button>
  <div id="chat" class="hidden" role="dialog" aria-live="polite"><div class="ch-who"><b id="chName"></b><span id="chRole"></span></div><p id="chLine"></p><div class="ch-dots" id="chDots"></div><div class="ch-opts" id="chOpts"></div><div class="ch-btns"><button class="btn" id="chMore" type="button">more</button><button class="btn" id="chBye" type="button">goodbye</button></div></div>
  <div id="help" class="hidden"><div class="card">
   <h1>How to play</h1>
@@ -243,15 +247,16 @@ html.fromshelf #inPage #inViews{padding-top:calc(58px + env(safe-area-inset-top)
   <p><b>More troubles.</b> Every valley now has three or four things wrong with it: a leaking roof (and the Thatch-Wife), an axe at the bottom of the lake, two guards betting on the Heron King, a honey cake recipe two valleys away, and an old song missing its last verse. In Story, help enough people over the hills and your home holds a harvest festival, with the people you helped as guests.</p>
   <p><b>The ring road.</b> Every stone ring has one stone shorter than the rest, and it points along a road to the next ring. Hear a piece of the old lore, then stand in a ring and you will see it. Follow the short stones far enough and they lead to the Heart Ring. Go after dark.</p>
   <p><b>Keeps that differ.</b> No two keeps are quite alike now. Some are rich, flying the old crown-and-flame. Some are falling in, and need a mason. Some stand empty, their keepers sleeping in the gatehouse because of something pale in the great hall. A few have bandits. Very polite ones. Walls run low, middling or tall.</p>
+  <p><b>Sound.</b> Tap the sound button and the valley has a voice: wind, birds, crickets, water, rain and thunder, fires as you pass, a wolf far off from where the pack really is, the farms, the woodcutter, your own footsteps, and the old stones humming at night. All of it is made in code as you walk; there are no sound files, and nothing plays until you ask.</p>
   <p><b>What they call you.</b> What you choose is remembered. Enough of one kind earns you a nickname, then a title, and not all of them are kind. Over the hills, people you have never met tell stories about you, a little wrong. And the old stones and the old folk remember the land as it was: the Ring-builders, the Hollow Kings, the Long Quarrel. Your journal keeps every piece you find.</p>
   <p><b>The one who left.</b> Somebody at the keep has a brother, sister, son or daughter who walked away years ago. In Story it is someone at your home keep. Somebody on the road has seen them. Find them, decide what to do, and go back and tell the one who asked.</p>
   <p><b>Every valley has its troubles.</b> A hen that wandered over the hills, a quarrel over a fence, a pair of sweethearts too shy to speak, a light in the old stones at night, a name cut in a stone that belongs to a family somewhere else. Every valley grows its own from its seed, and what you choose changes what people say.</p>
   <p><b>Talk and choose.</b> Walk up to anyone and they talk, or tap the Talk button when you're close. Walk off mid-conversation and it waits for you. When it matters, people ask you things, and you answer with the buttons on the chat card. The journal (top of the screen) keeps what you were asked, every valley you have been to, and takes you back to any of them.</p>
   <p><b>Story or Wander.</b> Story starts you at home: give yourself a name, say what your valley has plenty of, and wake by the gate of the keep your parents keep. Everyone there knows you. Wander drops you into any valley, as a stranger. Your story is saved on this device, and Continue picks it up where you left it.</p>
-  <p class="fsize">The whole game is one HTML file, plus a file for each 3D view. Right now: <b id="fsize">~626 KB</b>. Smaller than a single phone photo.</p>
+  <p class="fsize">The whole game is one HTML file, plus a file for each 3D view. Right now: <b id="fsize">~667 KB</b>. Smaller than a single phone photo.</p>
   <p><b>Why I built it.</b> I build things on a phone, directing AI the way I would direct a camera. I saw a clip of a tiny 3D world made of nothing but text and wanted to see if I could grow one that was actually alive, and keep growing it in the open instead of ever calling it done.</p>
   <p><b>What I learned.</b> How far you can get with almost nothing. One idea, a ray walking a height map, turned into characters, with a small world of animals living on top. Every version taught me one concrete thing: how to make a wall read as solid, how to keep the wolves from starving the world empty, how to make a forest look like real woods.</p>
-  <p style="color:var(--mb-dim);font-size:13px"><b style="color:var(--mb-soft)">Walk:</b> drag the left half of the screen (tilt to turn). <b style="color:var(--mb-soft)">Look:</b> drag the right half. Tap <b style="color:var(--mb-soft)">jump</b> (or the space bar) to hop up onto low things. Wade into the water to swim. Tap ☰ menu for a new world, the dials, and the time of day. Walk under the gate arch and find the door under the tower stair.</p>
+  <p style="color:var(--mb-dim);font-size:13px"><b style="color:var(--mb-soft)">Walk:</b> drag the left half of the screen (tilt to turn). <b style="color:var(--mb-soft)">Look:</b> drag the right half. Tap <b style="color:var(--mb-soft)">jump</b> (or the space bar) to hop up onto low things. Tap <b style="color:var(--mb-soft)">sound</b> to hear the valley; it stays off until you do. (No sound on an iPad or iPhone? Check the silent switch.) Wade into the water to swim. Tap ☰ menu for a new world, the dials, and the time of day. Walk under the gate arch and find the door under the tower stair.</p>
   <button class="btn go" id="aGo">walk the keep</button>
   <button class="btn" id="aFull" style="width:100%;margin-top:8px">see every version →</button>
  </div></div>
@@ -1315,9 +1320,12 @@ var SHELF={on:false,url:'https://motbuchanan.com/gameshelf/'};
   SHELF.place=place;
 })();
 
-const VERSION='The Keep v0.33.0 · Nov 4 2026';
-const VER_SHORT='v0.33.0 · Nov 4'; // what the badge shows; bump with VERSION
+const VERSION='The Keep v0.35.0 · Nov 4 2026';
+const VER_SHORT='v0.35.0 · Nov 4'; // what the badge shows; bump with VERSION
 const CHANGELOG=[
+ ['v0.35.0 · Nov 4 2026','New people. Everyone is drawn with more than twice the detail: faces with eyes, brows, noses and cheeks; beards short, full or long; hair short, long, braided, in a bun, tied back or bald; helmets, hoods, wide hats, soft caps and kerchiefs; tall, short and stout builds; and a vest, apron, sash or collar picked from each name, so no two folk look alike. They stay the same height in the world.'],
+ ['v0.34.1 · Nov 4 2026','Sound, tuned by ear. The gate arch no longer muffles everything as you walk under it (the slow-down sound). Wind is quieter so the animals come through: sheep, cows and hens speak up soon after you come near, with fuller voices, and a wolf pack howls within seconds of night when it is close. New voices: the axe now bites instead of bouncing, the sheep bleat lower, and the wolves howl with breath and a valley echo. Pressing Space after the sound button now jumps instead of turning sound off.'],
+ ['v0.34.0 · Nov 4 2026','Sound. Tap the new sound button and the valley has a voice, all of it made in code as you walk, with no sound files. Wind that rises on high ground and in storms; birds by day, crickets and an owl at night; water when you are near it; rain, and thunder rolling in after the lightning; fires that crackle as you pass; a wolf howling from where the pack really is; sheep, cows and hens at the farms; the woodcutter at work; your own footsteps on grass, paths, stone, wood or in the shallows, and a thud when you land a jump. Go indoors and the outside goes muffled. The old stone rings hum at night, the Heart Ring loudest. A soft chime when your journal gains something. Nothing plays until you tap the button; after that it is remembered, and starts again on your first tap.'],
  ['v0.33.0 · Nov 4 2026','Keeps that differ. Every keep now has a look of its own: plain; rich, in pale stone with the old crown-and-flame banners; falling in, mossy, with battlements in the ditch and a tower top gone; empty, its keepers sleeping in the gatehouse; or taken over by a band of very polite bandits. Walls are low, middling or tall. Three come with a trouble: fetch a mason from over the hills, find out what haunts the great hall after dark, or talk the bandits round. Set it right and the keep changes. The keepers always stay, so every errand still works. Also: the journal says what kind of keep each valley has, four pieces of lore, three legends and a new nickname.'],
  ['v0.32.0 · Nov 4 2026','A bigger keep. The courtyard is half as wide again, and every room is bigger, with more on the walls: the great hall, the kitchen, the barracks and the chapel. There is now at least 4 m of open ground between any two things in the courtyard, and the gate is wider. Also, for Garrett: a jump button (or the space bar) to hop onto low things, and trees you walk round instead of through.'],
  ['v0.31.0 · Nov 3 2026','The ring road. Once you know a piece of the old lore, stand in any stone ring and you will notice one stone is shorter than the rest. It points along one of the roads, over the hills, to the next ring. Follow five short stones (a standing stone by the road shows the way where there is no ring) and the sixth valley holds the Heart Ring. Go back after dark and listen, then ask the oldest person there what you heard. Three endings, a new title (the Ring-Walker), a legend, four pieces of lore, and a black dog on the passes at night.'],
@@ -2564,19 +2572,19 @@ function keeperFrame(px,py,fx,fy,rx,ry){
 function keeperSprite(i,j,horizon,pz,ybuf,K,C){
   const k=KC.k[j], sd=KC.sd[j], sg=KC.sg[j], q=sg/SPP[SP.KEEPER].wsize; if(q<=-1||q>=1) return;
   const fb=FB.col, flag=TMP.flag, kflag=TMP.kflag, M=KMASK[KL.id[k]], px_=M.views[KL.view[k]][KL.frame[k]];
-  const us=q*0.5+0.5, u=KL.mir[k]?1-us:us; let mx=(u*16)|0; if(mx<0)mx=0; if(mx>15)mx=15;
+  const MW=M.w, MH=M.h, us=q*0.5+0.5, u=KL.mir[k]?1-us:us; let mx=(u*MW)|0; if(mx<0)mx=0; if(mx>MW-1)mx=MW-1;
   const z0=KL.z[k], H=SPP[SP.KEEPER].hsize, f2=fogLUT[(sd*4)|0];
   const topF=horizon-(z0+H-pz)*K/sd, botF=horizon-(z0-pz)*K/sd, span=(botF-topF)||1;
   let rT=Math.floor(topF), rB=Math.floor(botF); if(rT<0)rT=0; if(rB>ybuf-1)rB=ybuf-1;
   const night=KL.night, amb=KL.amb[k], lat=KL.lat[k]*(2*us-1), xr=DAY.tr, xg=DAY.tg, xb=DAY.tb;
   for(let r=rT;r<=rB;r++){ if(flag[r]) continue;
-    let my=(((r+0.5-topF)/span)*32)|0; if(my<0)my=0; if(my>31)my=31;
-    const pi=px_[my*16+mx]; if(pi===0) continue;
+    let my=(((r+0.5-topF)/span)*MH)|0; if(my<0)my=0; if(my>MH-1)my=MH-1;
+    const pi=px_[my*MW+mx]; if(pi===0) continue;
     if(pi===9&&night>0.02){ const fl=0.86+0.14*Math.sin(skyTime*9+k*2.3+r);
       fb[r*C+i]=pack(255*fl,214*fl,120*fl,f2*0.4)|SKYBIT; flag[r]=1; kflag[r]=1; continue; }
-    const cc=M.pal[pi]; const lt=pi===1?0.92:amb*(1+lat)*(0.96+0.08*(1-my/32));
+    const cc=M.pal[pi]; const lt=pi===1?0.92:amb*(1+lat)*(0.96+0.08*(1-my/MH));
     let rr=cc[0]*lt, gg=cc[1]*lt, bb=cc[2]*lt;
-    let w=0; if(night>0.02){ const ax=mx-KL.lx[k], ay=my-KL.ly[k]; w=night*Math.max(0,1-Math.sqrt(ax*ax+ay*ay)/12)*1.1; }
+    let w=0; if(night>0.02){ const ax=mx-KL.lx[k], ay=my-KL.ly[k]; w=night*Math.max(0,1-Math.sqrt(ax*ax+ay*ay)/(MW*0.75))*1.1; }
     if(w>0.03){ // lit by the keeper's own lantern: warm, and it survives the night exposure
       rr=rr*xr+rr*w*1.0+18*w; gg=gg*xg+gg*w*0.74+8*w; bb=bb*xb+bb*w*0.40;
       fb[r*C+i]=pack(rr>255?255:rr,gg>255?255:gg,bb>255?255:bb,f2)|SKYBIT; }
@@ -3323,7 +3331,200 @@ function buildPerson(K){
   const lan=views.map(function(fr){ return fr.map(function(px){ let sx=0,sy=0,n=0; for(let i=0;i<px.length;i++) if(px[i]===9){ sx+=i%16; sy+=(i/16)|0; n++; } return n?[sx/n,sy/n]:[8,20]; }); });
   return { w:16, h:32, views:views, pal:pal, lan:lan, K:K };
 }
-const KMASK=KEEPERS.map(buildPerson);
+// ---- people, drawn bigger: 24 x 48 "paper doll" sprites with room for faces, hair, hats, beards and clothes ----
+// views: 0 front, 1 side (facing right; mirrored for left), 2 back.
+// frames: 0..3 walk, 4 look out (hand to the brow), 5 lean on the staff, 6 lean + nod, 7 knock (hand up), 8 knock (hand down),
+//         9 asleep, 10 asleep (breath), 11 at work, 12 at work (the other half of the swing)
+// palette: 1 outline, 2 skin, 3 skin shade, 4 cloak, 5 cloak shade, 6 tunic, 7 metal, 8 hair, 9 lantern glass, 10 boots and belt,
+//          11 wood, 12 legs, 13 accent (hat, kerchief, trim), 14 the sleeper's z, 15 apron or vest, 16 hair shade, 17 tunic shade,
+//          18 eye whites, 19 lips and cheeks
+const PSW=24, PSH=48;
+function personHash(s){ let h=2166136261; s=String(s||''); for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return h>>>0; }
+// a few things the old 16 x 32 sprite had no room for, chosen from the name so they stay the same every visit
+function personExtras(K){ const h=personHash((K.name||'')+'|'+(K.role||''));
+  const over=K.robe?['none','none','sash','apron'][h%4]:['none','vest','apron','sash','none'][h%5];
+  return { over:over, collar:((h>>3)&1)===1, patch:((h>>4)%5)===0, brows:((h>>6)&1)===1, freckles:((h>>7)%6)===0 && K.age!=='old',
+           sleeve:((h>>8)&1)===1, hood:((h>>9)%3)===0 }; }
+function poutline(px){ const out=px.slice(), solid=function(v){ return v&&v!==9&&v!==14; };
+  for(let y=0;y<PSH;y++)for(let x=0;x<PSW;x++){ if(px[y*PSW+x]) continue;
+    const a=x>0?px[y*PSW+x-1]:0, b=x<PSW-1?px[y*PSW+x+1]:0, c=y>0?px[(y-1)*PSW+x]:0, d=y<PSH-1?px[(y+1)*PSW+x]:0;
+    if(solid(a)||solid(b)||solid(c)||solid(d)) out[y*PSW+x]=1; }
+  return out; }
+function pmirror(px){ const out=new Uint8Array(PSW*PSH); for(let y=0;y<PSH;y++)for(let x=0;x<PSW;x++) out[y*PSW+x]=px[y*PSW+(PSW-1-x)]; return out; }
+function buildPerson2(K){
+  const X=personExtras(K), views=[];
+  const SPECS=[[0,''],[1,''],[2,''],[3,''],[0,'look'],[0,'lean'],[0,'lean',1],[0,'knock'],[0,'knock',1],[0,'sleep'],[0,'sleep',1],[0,'work'],[0,'work',1]];
+  const bd=K.beard===true?'full':(K.beard||'none'), hs=K.hairStyle||(K.braid?'braid':'short'), head=K.head||'none';
+  for(let view=0;view<3;view++){ const frames=[];
+    for(let si=0;si<SPECS.length;si++){ const fr=SPECS[si][0], pose=SPECS[si][1], alt=SPECS[si][2]||0;
+      const px=new Uint8Array(PSW*PSH);
+      const set=function(x,y,c){ x=Math.round(x); y=Math.round(y); if(x>=0&&x<PSW&&y>=0&&y<PSH) px[y*PSW+x]=c; };
+      const get=function(x,y){ return (x>=0&&x<PSW&&y>=0&&y<PSH)?px[y*PSW+x]:0; };
+      const rect=function(x0,y0,x1,y1,c){ for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++) set(x,y,c); };
+      const line=function(x0,y0,x1,y1,c,w){ const n=Math.max(Math.abs(x1-x0),Math.abs(y1-y0))||1; for(let s=0;s<=n;s++){ const x=x0+(x1-x0)*s/n, y=y0+(y1-y0)*s/n; set(x,y,c); if(w) set(x+1,y,c); } };
+      const ell=function(cx,cy,rx,ry,c,y0,y1){ for(let y=Math.floor(cy-ry);y<=Math.ceil(cy+ry);y++){ if(y0!=null&&(y<y0||y>y1)) continue; for(let x=Math.floor(cx-rx);x<=Math.ceil(cx+rx);x++){ const dx=(x+0.5-cx)/rx, dy=(y+0.5-cy)/ry; if(dx*dx+dy*dy<=1) set(x,y,c); } } };
+      if(pose==='sleep'){ drawSleeper2(K,X,set,rect,ell,line,alt); frames.push(poutline(px)); continue; }
+      const side=view===1, back=view===2;
+      const bob=(fr===1||fr===3)?-1:((pose==='lean'&&alt)?1:0);
+      const tall=K.build==='tall'||(!K.build&&K.tall), top=(tall?3:(K.build==='stout'?4:5))+(K.age==='young'?5:(K.age==='old'?1:0))+bob;
+      const stout=K.build==='stout', hw=side?(stout?6:5):(tall?7:(stout?8.5:7.5));
+      const C=12, hc=top+6, sh=top+13-(stout?1:0), waist=Math.min(34,sh+(tall?12:11)), hem=K.robe?42:waist+6;
+      const so=(side&&K.age==='old')?1:0, fx=side?1+so:0;   // fx: a side head sits a pixel forward (two, stooped with age)
+      const L=Math.round(C-hw), R=Math.round(C+hw)-1;    // the body's outer columns
+      const lean=(pose==='lean'&&K.tool==='staff'), work=(pose==='work'), look=(pose==='look'), knock=(pose==='knock');
+      const walkA=fr===1?1:(fr===3?-1:0), late=[];   // late: hands and tools drawn over the head
+      // ---- the long tool behind the body (front and back views: in the screen-left hand)
+      const toolX=side?C+5:L-2;
+      const longTool=K.tool==='spear'||K.tool==='staff'||K.tool==='hoe'||K.tool==='rod';
+      const drawTool=function(){ const tx=toolX;
+        if(K.tool==='spear'){ for(let y=4;y<=46;y++) set(tx,y,11); set(tx,0,7); rect(tx-1,1,tx+1,3,7); set(tx,4,20); }
+        else if(K.tool==='staff'){ const t2=Math.max(top,3); for(let y=t2-2;y<=46;y++) set(tx,y,11); set(tx+1,t2-3,11); set(tx+2,t2-2,11); set(tx+2,t2-1,11); }
+        else if(K.tool==='hoe'){ for(let y=top-1;y<=46;y++) set(tx,y,11); rect(tx-2,top-2,tx+1,top-2,7); set(tx-2,top-1,7); }
+        else if(K.tool==='rod'){ for(let y=1;y<=46;y++) set(tx,y,11); set(tx,0,14); for(let y=3;y<=40;y+=3) set(tx+1,y,14); }
+        else if(K.tool==='axe'){ if(side){ for(let y=waist+3;y<=waist+13;y++) set(tx-3,y,11); rect(tx-2,waist+10,tx,waist+13,7); set(tx,waist+13,20); }   // carried low in the hand
+          else { for(let y=sh-4;y<=sh+12;y++) set(tx,y,11); rect(tx-2,sh-6,tx,sh-3,7); set(tx-2,sh-2,20); } } };
+      if(!lean&&!work&&!side) drawTool();
+      // ---- legs and boots
+      const legW=stout?4:3, gap=side?0:2;
+      const legsTop=K.robe?hem-2:waist+1;
+      if(side){ const sp=walkA*3;
+        const leg=function(off,c){ for(let y=legsTop;y<=43;y++){ const t=(y-legsTop)/(43-legsTop); const x=Math.round(C-1+off*t); rect(x,y,x+legW-1,y,c); }
+          const bx=Math.round(C-1+off); rect(bx,44,bx+legW,46,10); set(bx+legW+1,46,10); };
+        leg(-sp,12); leg(sp,12); }
+      else { const lx=Math.round(C-gap/2-legW), rx=Math.round(C+gap/2);
+        const lUp=walkA>0?1:0, rUp=walkA<0?1:0;
+        rect(lx,legsTop,lx+legW-1,43-lUp,12); rect(rx,legsTop,rx+legW-1,43-rUp,12);
+        rect(lx-1,44-lUp,lx+legW-1,46-lUp,10); rect(rx,44-rUp,rx+legW,46-rUp,10);
+        if(!back){ set(lx-1,44-lUp,22); set(rx+legW,44-rUp,22); } }
+      // ---- skirt, robe or tunic tail, flaring as it falls
+      const skirtC=K.robe?4:6, skirtS=K.robe?5:17;
+      for(let y=waist;y<=hem;y++){ const f=Math.floor((y-waist)/4); const a=Math.max(1,L-f+(side?1:0)), b=Math.min(22,R+f-(side?1:0));
+        for(let x=a;x<=b;x++) set(x,y,(x>=C+2&&!side)?skirtS:skirtC); if(!K.robe&&!side&&!back){ set(a,y,4); set(b,y,5); } }
+      if(K.robe&&!back&&!side){ for(let y=waist+1;y<=hem;y++) set(C-1,y,6); }   // the robe's front seam shows the tunic
+      // ---- body: tunic, and the cloak over the shoulders
+      for(let y=sh;y<waist;y++){ const inset=(y===sh)?1:0;
+        for(let x=L+inset;x<=R-inset;x++) set(x,y,back?4:6);
+        if(!back&&!side){ for(let x=L+inset;x<=R-inset;x++){ if(x<C-2) set(x,y,4); else if(x>C+1) set(x,y,5); }   // the cloak's open front
+          if(X.over==='vest'){ set(C-2,y,15); set(C+1,y,15); } }
+        if(side){ for(let x=L;x<=R-2;x++) set(x,y,4); set(R-1,y,6); set(R,y,6); } }
+      if(!back&&!side){
+        if(X.collar){ rect(C-2,sh,C+1,sh,13); set(C-2,sh+1,13); set(C+1,sh+1,13); }
+        if(X.over==='apron'){ rect(C-3,sh+4,C+2,Math.min(hem,waist+7),15); rect(C-2,sh+3,C+1,sh+3,15); }
+        if(X.over==='sash'){ for(let i=0;i<waist-sh;i++){ const x=L+2+Math.round(i*(R-L-4)/(waist-sh)); set(x,sh+i,13); set(x+1,sh+i,13); } }
+        if(X.patch) rect(R-3,waist+2,R-2,waist+3,13); }
+      // belt
+      for(let x=L;x<=R;x++) if(get(x,waist)) set(x,waist,10);
+      if(!back&&!side){ set(C-1,waist,7); set(C,waist,7); }
+      if(K.tool==='keys'&&!back){ const kx=side?C+1:C+3; set(kx,waist+1,7); set(kx+1,waist+2,7); set(kx,waist+3,7); set(kx-1,waist+2,7); }
+      // ---- neck
+      rect(C-2+fx,top+10,C+1+fx,sh,2); if(!back) set(C+1+fx,top+10,3);
+      // ---- arms, hands and the lantern
+      const lanternAt=function(x,y){ set(x,y,1); set(x-1,y+1,1); set(x+1,y+1,1); rect(x-1,y+2,x+1,y+4,9); rect(x-1,y+5,x+1,y+5,1); };
+      const sleeveL=back?5:4, sleeveR=back?4:5;
+      const armDown=function(x,c,lift,hand){ const d=x<C?1:-1;   // x: the arm's outer column
+        for(let y=sh+1;y<=waist+1-lift;y++){ set(x,y,c); set(x+d,y,c); set(x+2*d,y,y>sh+1?(c===4?5:17):c); }
+        rect(Math.min(x,x+2*d),waist+2-lift,Math.max(x,x+2*d),waist+3-lift,2); set(x+d,waist+4-lift,2); return waist+4-lift; };
+      if(side){
+        const sw=work||lean?0:walkA*2;
+        if(lean){ for(let y=sh+4;y<=46;y++) set(C+5,y,11); line(C,sh+1,C+4,sh+4,5,1); rect(C+4,sh+4,C+5,sh+5,2); lanternAt(C+7,sh+5); }
+        else if(work) drawWork(K,true,alt,set,rect,line,C,top,sh,waist,lanternAt,late);
+        else if(look){ line(C,sh+1,C+3,top+7,5,1); late.push(function(){ rect(C+4+fx,top+3,C+6+fx,top+4,2); }); lanternAt(L-1,waist+1); if(longTool) drawTool(); }
+        else if(knock){ const hy=alt?sh+3:top+8; line(C,sh+1,C+5,hy+1,5,1); rect(C+6,hy,C+7,hy+1,2); lanternAt(L-1,waist+1); if(longTool) drawTool(); }
+        else { for(let y=sh+1;y<=waist+2;y++){ const t=(y-sh-1)/(waist+1-sh); const x=Math.round(C+sw*t); set(x,y,5); set(x+1,y,5); }
+          const hx=Math.round(C+sw); rect(hx,waist+3,hx+1,waist+4,2);
+          if(longTool||K.tool==='axe') drawTool();
+          if(K.tool==='axe') lanternAt(L-1,waist+1); else lanternAt(hx+1,waist+5); } }
+      else if(work){ drawWork(K,false,alt,set,rect,line,C,top,sh,waist,lanternAt,late); if(K.tool!=='axe') armDown(L-1,sleeveL,0); }
+      else if(lean){ line(L,sh+1,C-1,sh+5,4,1); line(R,sh+1,C,sh+5,5,1); rect(C-1,sh+5,C,sh+6,2);
+        for(let y=sh+7;y<=46;y++) set(C-1,y,11); set(C-1,sh+4,11);
+        lanternAt(C+1,sh+8); }
+      else {
+        const lUp=walkA>0?1:0, rUp=walkA<0?1:0;
+        const lh=armDown(L-1,sleeveL,lUp);
+        if(look){ line(R+1,sh+1,R+2,sh-3,5,0); line(R,sh+1,R+1,sh-3,5,0); late.push(function(){ line(R+1,sh-3,C+5,top+5,5,1); rect(C+2,top+3,C+5,top+4,2); }); lanternAt(L,lh); }
+        else if(knock){ const hy=alt?sh+2:top+6; line(R,sh+1,R+2,hy+2,5,1); rect(R+2,hy,R+3,hy+1,2); lanternAt(L,lh); }
+        else { const hy=armDown(R+1,sleeveR,rUp); lanternAt(R+1,hy); } }
+      // ---- the head
+      ell(C+0.5+fx,hc,5.4,6.0,2);
+      if(!back){ // face
+        if(side){ set(C+5+fx,top+6,2); set(C+5+fx,top+7,3); set(C+3+fx,top+4,1); set(C+3+fx,top+8,19); if(X.brows) set(C+3+fx,top+3,8); set(C+2+fx,top+6,19); }
+        else { set(C-2,top+5,1); set(C+2,top+5,1); set(C-2,top+4,18); set(C+2,top+4,18);
+          if(X.brows){ set(C-3,top+3,8); set(C-2,top+3,8); set(C+2,top+3,8); set(C+3,top+3,8); }
+          set(C,top+6,3); set(C,top+7,3); rect(C-1,top+8,C+1,top+8,19);
+          set(C-3,top+7,19); set(C+3,top+7,19);
+          if(X.freckles){ set(C-3,top+6,3); set(C+3,top+6,3); }
+          for(let y=top+2;y<=top+9;y++) if(get(C+4,y)===2) set(C+4,y,3); } }   // the far cheek in shade
+      // ---- hair
+      const hairCap=function(rows){ for(let y=top-1;y<=top+rows;y++) for(let x=0;x<PSW;x++){ const dx=(x+0.5-(C+0.5+fx))/5.8, dy=(y+0.5-hc)/6.4; if(dx*dx+dy*dy<=1) set(x,y,8); } };
+      const hairSides=function(y1){ for(let y=top+2;y<=y1;y++){ if(side){ set(C-4+fx,y,8); set(C-3+fx,y,8); if(y<top+6) set(C-2+fx,y,8); } else { set(C-4,y,8); set(C+5,y,8); if(y<top+4){ set(C-3,y,8); set(C+4,y,8); } } } };
+      if(back){ hairCap(11); if(hs==='bald'){ ell(C+0.5,hc-1,3.6,3.4,2); } }
+      else if(hs==='bald'){ hairSides(top+6); for(let y=top+3;y<=top+6;y++){ if(!side){ set(C-3,y,8); set(C+4,y,8); } } }
+      else { hairCap(side?2:1); if(side) for(let y=top;y<=top+7;y++) for(let x=C-4+fx;x<=C+fx;x++) if(get(x,y)===2) set(x,y,8);
+        hairSides(hs==='long'?top+9:top+5); if(!side) set(C+1,top+1,16); }
+      if(hs==='long'){ for(let y=top+6;y<=sh+5;y++){ if(side){ set(C-4+fx,y,8); set(C-3+fx,y,8); } else if(!back){ set(C-5,y,8); set(C+5,y,8); } else { for(let x=C-4;x<=C+5;x++) set(x,y,8); } } }
+      if(hs==='braid'){ const bx=side?C-4:(back?C:C-5); for(let y=top+6;y<=sh+8;y++){ set(bx,y,8); if(y%2===0) set(bx+1,y,16); } set(bx,sh+9,13); }
+      if(hs==='bun'&&(head==='none'||head==='kerchief')){ ell(C+0.5+(side?-3:0),top-1,2.2,1.8,8); set(C+(side?-3:0),top-1,16); }
+      if(hs==='tied'&&(side||back)){ const tx=side?C-5:C; for(let y=top+3;y<=top+10;y++) set(tx,y,8); set(tx,top+3,13); }
+      // ---- beard
+      if(!back&&bd!=='none'){
+        if(side){ const y1=bd==='long'?sh+4:(bd==='full'?top+11:top+9); for(let y=top+7;y<=y1;y++) for(let x=C+fx;x<=C+4+fx-(y>top+10?1:0);x++) set(x,y,8); set(C+3+fx,top+8,19); }
+        else { const y1=bd==='long'?sh+5:(bd==='full'?top+11:top+9);
+          for(let y=top+6;y<=y1;y++) for(let x=C-4;x<=C+5;x++){ const w=bd==='long'&&y>top+9?Math.max(1,4-(y-top-9)):5; if(Math.abs(x+0.5-(C+0.5))<=w&&get(x,y)&&(y>top+7||x<=C-3||x>=C+4)) set(x,y,8); }
+          if(bd==='short'){ rect(C-2,top+7,C+2,top+7,8); }
+          rect(C-1,top+8,C+1,top+8,19); set(C+3,top+9,16); } }
+      // ---- hats
+      if(head==='helmet'){ for(let y=top-1;y<=top+3;y++) for(let x=0;x<PSW;x++){ const dx=(x+0.5-(C+0.5+fx))/5.2, dy=(y+0.5-(top+3.2))/4.3; if(dx*dx+dy*dy<=1&&y<=top+3) set(x,y,7); }
+        for(let x=C-5+fx;x<=C+5+fx;x++) set(x,top+3,13); if(!back&&!side){ set(C,top+4,7); set(C,top+5,7); set(C,top+6,7); } if(side) set(C+4+fx,top+4,7);
+        set(C-2+fx,top,21); set(C-1+fx,top,21); set(C+3+fx,top+1,20); }
+      else if(head==='hood'){
+        for(let y=top-2;y<=sh+1;y++) for(let x=0;x<PSW;x++){ const dx=(x+0.5-(C+0.5+fx-(side?1:0)))/6.0, dy=(y+0.5-(hc+0.5))/7.2; if(dx*dx+dy*dy<=1){ const face=!back&&(side?(x>=C+1+fx&&y>=top+2&&y<=top+9):(Math.pow((x+0.5-(C+0.5))/3.9,2)+Math.pow((y+0.5-(hc+0.8))/4.6,2)<=1)); if(!face) set(x,y,(x>C+2&&!side)?5:4); } }
+        if(!back&&!side) set(C,top-1,5); }
+      else if(head==='hat'){ for(let x=C-7+fx;x<=C+8+fx;x++) set(x,top+2,13); for(let x=C-6+fx;x<=C+7+fx;x++) set(x,top+1,13);
+        rect(C-3+fx,top-3,C+4+fx,top,13); rect(C-3+fx,top,C+4+fx,top,10); set(C+3+fx,top-2,23); }
+      else if(head==='cap'){ ell(C+0.5+fx,top+1,5.0,2.6,13,top-2,top+2); rect(C-4+fx,top+2,C+5+fx,top+2,13); if(!side){ set(C+5,top+3,13); set(C+6,top+4,13); } else { set(C+6+fx,top+2,13); set(C+7+fx,top+2,13); } }
+      else if(head==='kerchief'){ ell(C+0.5+fx,top+2,5.2,3.4,13,top-1,top+3); if(back||side){ const kx=side?C-5+fx:C; set(kx,top+4,13); set(kx-1,top+5,13); set(kx+1,top+5,13); } }
+      for(const f of late) f();
+      let out=poutline(px); if(back) out=pmirror(out);
+      frames.push(out); }
+    views.push(frames); }
+  const sh=function(c,k){ return [c[0]*k|0,c[1]*k|0,c[2]*k|0]; };
+  const pal=[null,[34,26,24],K.skin,sh(K.skin,0.84),K.cloak,sh(K.cloak,0.68),K.tunic,[176,180,188],K.hair,[156,132,84],[74,52,36],[124,88,54],K.legs,K.accent,[214,220,236],
+    [Math.min(255,K.tunic[0]*0.55+120),Math.min(255,K.tunic[1]*0.55+112),Math.min(255,K.tunic[2]*0.55+98)], sh(K.hair,0.72), sh(K.tunic,0.78), [246,242,236], [Math.min(255,K.skin[0]*0.95+20),K.skin[1]*0.7|0,K.skin[2]*0.68|0], [120,124,134], [226,230,238], [110,84,62], sh(K.accent,0.8)];
+  const lan=views.map(function(fr){ return fr.map(function(px){ let sx=0,sy=0,n=0; for(let i=0;i<px.length;i++) if(px[i]===9){ sx+=i%PSW; sy+=(i/PSW)|0; n++; } return n?[sx/n,sy/n]:[12,30]; }); });
+  return { w:PSW, h:PSH, views:views, pal:pal, lan:lan, K:K };
+}
+// the tool at work, both hands on it; the lantern set down on the ground
+function drawWork(K,side,alt,set,rect,line,C,top,sh,waist,lanternAt,late){
+  if(side) lanternAt(2,39); else lanternAt(C+9,39);
+  if(K.tool==='axe'){
+    if(!alt){ if(side){ line(C+1,sh+1,C-2,sh-1,5,1); rect(C-3,sh-2,C-2,sh-1,2); line(C-3,sh-3,C-7,sh-8,11); rect(C-10,sh-11,C-7,sh-8,7); set(C-10,sh-8,20); }   // drawn back over the shoulder
+              else { line(C-3,sh+1,C+5,sh-2,4,1); line(C+3,sh+1,C+6,sh-2,5,1); late.push(function(){ rect(C+5,sh-3,C+7,sh-2,2); }); line(C+7,sh-4,C+8,sh-9,11); rect(C+7,sh-12,C+10,sh-9,7); set(C+10,sh-9,20); } }
+    else { if(side){ line(C+1,sh+1,C+5,sh+7,5,1); rect(C+5,sh+7,C+6,sh+8,2); line(C+6,sh+9,C+9,sh+14,11); rect(C+8,sh+14,C+10,sh+17,7); }
+           else { line(C-3,sh+1,C-1,sh+8,4,1); line(C+3,sh+1,C+1,sh+8,5,1); rect(C-1,sh+8,C+1,sh+9,2); line(C,sh+10,C+4,42,11); rect(C+3,42,C+6,44,7); } } }
+  else if(K.tool==='hoe'){ line(C+1,sh+1,C+4,sh+6,5,1); rect(C+4,sh+6,C+5,sh+7,2);
+    if(!alt){ line(C+5,sh+8,C+8,44,11); rect(C+6,45,C+10,45,7); } else { line(C+5,sh+5,C+8,Math.max(2,top-2),11); rect(C+8,Math.max(1,top-3),C+10,Math.max(3,top-1),7); } }
+  else if(K.tool==='rod'){ line(C+1,sh+1,C+4,sh+7,5,1); rect(C+4,sh+7,C+5,sh+8,2);
+    const tipY=Math.max(1,alt?top+4:top-4); line(C+5,sh+6,C+10,tipY,11); for(let y=tipY+1;y<=44;y+=2) set(C+10,y,14); }
+  else { line(C+1,sh+1,C+3,sh+8,5,1); rect(C+3,sh+8,C+4,sh+9,2); for(let y=Math.max(1,top-2);y<=46;y++) set(C+4,y,11); }
+}
+// asleep: sitting against the wall, knees up, cloak wrapped round, head bowed on the knees; helmet off, tool leaning, lantern turned low
+function drawSleeper2(K,X,set,rect,ell,line,alt){
+  const b=alt?0:1, C=12;
+  for(let y=28+b;y<=45;y++) for(let x=0;x<PSW;x++){ const dx=(x+0.5-11.5)/8.2, dy=(y+0.5-38.5)/(9.4-b*0.5); if(dx*dx+dy*dy<=1) set(x,y,(x>=15)?5:4); }
+  rect(6,44,9,46,10); rect(13,44,16,46,10);
+  for(let y=24+b;y<=32+b;y++) for(let x=0;x<PSW;x++){ const dx=(x+0.5-11.5)/4.3, dy=(y+0.5-(28+b))/4.0; if(dx*dx+dy*dy<=1) set(x,y,y<=27+b?8:2); }
+  if(K.head==='hood') for(let y=23+b;y<=31+b;y++) for(let x=0;x<PSW;x++){ const dx=(x+0.5-11.5)/5.0, dy=(y+0.5-(27.5+b))/4.6; if(dx*dx+dy*dy<=1&&y<=29+b) set(x,y,4); }
+  if(K.hairStyle==='braid'){ for(let y=30+b;y<=37;y++) set(6,y,8); set(6,38,13); }
+  rect(9,34,14,35,2);
+  if(K.tool==='axe'){ for(let y=27;y<=46;y++) set(22,y,11); rect(20,25,22,27,7); }
+  if(K.tool==='hoe'||K.tool==='rod'){ for(let y=6;y<=46;y++) set(22,y,11); if(K.tool==='hoe') rect(20,6,22,6,7); }
+  if(K.tool==='spear'||K.tool==='staff'){ for(let y=9;y<=46;y++) set(22,y,11); if(K.tool==='spear'){ set(22,3,7); rect(21,4,23,6,7); set(22,7,7); set(22,8,7); } }
+  if(K.head==='helmet'){ ell(2.5,44,2.6,2.2,7,42,45); rect(0,45,4,45,13); }
+  set(19,38,1); rect(18,39,20,42,9); rect(18,43,20,43,1);
+  const zx=alt?15:12, zy=alt?11:15;
+  rect(zx,zy,zx+4,zy,14); set(zx+3,zy+1,14); set(zx+2,zy+2,14); set(zx+1,zy+3,14); rect(zx,zy+4,zx+4,zy+4,14);
+}
+const KMASK=KEEPERS.map(buildPerson2);
 // ---------------- the cast (v0.21): every valley grows its own people, from its seed alone ----------------
 // Nothing here reads the ground, the dials or the places, so a seed always gives the same people, and anything said
 // about a seed can be checked by going there. Roles, in a fixed order: the two wall guards, the gatekeeper, the steward,
@@ -3465,7 +3666,7 @@ function rebuildPeople(){ const cast=W.cast; if(!cast||!cast.length) return;
   for(const c of cast){
     const K={name:c.name, role:c.role, build:c.build, age:c.age, tall:c.build==='tall', head:c.head, beard:c.beard, hairStyle:c.hairStyle,
       braid:c.hairStyle==='braid', tool:c.tool, robe:c.robe, skin:c.skin, hair:c.hair, cloak:c.cloak, tunic:c.tunic, legs:c.legs, accent:c.accent};
-    KEEPERS.push(K); KMASK.push(buildPerson(K)); GREETN[c.id]=c.name+', '+(c.guest||c.bandit?roleName(c):'the '+c.role); }
+    KEEPERS.push(K); KMASK.push(buildPerson2(K)); GREETN[c.id]=c.name+', '+(c.guest||c.bandit?roleName(c):'the '+c.role); }
   GREETT.fill(-1e9); GLAST.fill(''); }
 // ---------------- talk (v0.22): the line library ----------------
 // Each list holds lines one person might say. A line may start with [tags] that must all hold:
@@ -3762,7 +3963,7 @@ function stormSky(){ const st=DAY.storm||0, f=DAY.flash||0; if(st<=0&&f<=0) retu
   SKY.sr=mix(SKY.sr,SKY.hr); SKY.sg=mix(SKY.sg,SKY.hg); SKY.sb=mix(SKY.sb,SKY.hb);   // the sun and moon go behind it
   SKY.du*=1-st;
   if(f>0){ const q=0.75*f; SKY.tr+=(225-SKY.tr)*q; SKY.tg+=(230-SKY.tg)*q; SKY.tb+=(245-SKY.tb)*q; SKY.hr+=(235-SKY.hr)*q; SKY.hg+=(238-SKY.hg)*q; SKY.hb+=(250-SKY.hb)*q; } }
-// rain and lightning, drawn over whichever view is on (no sound: nothing here plays on its own)
+// rain and lightning, drawn over whichever view is on (the thunder is in the sound, which only plays once you turn it on)
 var RAIN={cv:null,cx:null,d:null,on:false,flash:0,f2:0,next:6,w:0,h:0};
 function rainFrame(dt,paused){ if(!RAIN.cv){ const cv=document.createElement('canvas'), ref=document.getElementById('c'); if(!ref) return;
     cv.id='rain'; cv.style.cssText='position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;display:none';
@@ -3770,7 +3971,7 @@ function rainFrame(dt,paused){ if(!RAIN.cv){ const cv=document.createElement('ca
     for(let i=0;i<420;i++){ RAIN.d[i*3]=Math.random(); RAIN.d[i*3+1]=Math.random(); RAIN.d[i*3+2]=0.8+Math.random()*0.5; } }
   const lv=DAY.storm||0;
   // lightning: now and then in the thick of it, often with a second flicker
-  if(lv>0.45&&!paused){ RAIN.next-=dt; if(RAIN.next<=0){ RAIN.flash=1; RAIN.f2=Math.random()<0.6?0.12+Math.random()*0.12:0; RAIN.next=3+Math.random()*12/lv; } }
+  if(lv>0.45&&!paused){ RAIN.next-=dt; if(RAIN.next<=0){ RAIN.flash=1; RAIN.bolt=(RAIN.bolt||0)+1; RAIN.f2=Math.random()<0.6?0.12+Math.random()*0.12:0; RAIN.next=3+Math.random()*12/lv; } }
   if(RAIN.f2>0){ RAIN.f2-=dt; if(RAIN.f2<=0){ RAIN.flash=Math.max(RAIN.flash,0.7); RAIN.f2=0; } }
   RAIN.flash=Math.max(0,RAIN.flash-dt*4.5); DAY.flash=RAIN.flash*Math.min(1,lv*2);
   if(lv<=0.02&&RAIN.flash<=0){ if(RAIN.on){ RAIN.cx.clearRect(0,0,RAIN.w,RAIN.h); RAIN.cv.style.display='none'; RAIN.on=false; } return; }
@@ -5162,6 +5363,159 @@ const LORE5=[
  ['wall',"A good wall needs a good mason. A bad wall needs a mason faster."],
  ['temple',"The Moth Queen came to the candles in the old halls. Leave one burning and she'll come to yours."]];
 LORE.push.apply(LORE,LORE5);
+// ---------------- sound (v0.34.0) ----------------
+// Everything you hear is made here, in code, with the browser's own audio: no sound files, nothing downloaded, nothing
+// sent anywhere. It is off until you tap the sound button, and remembered after that (it starts again on your first tap,
+// because browsers never let a page make a noise by itself).
+// What plays follows the world: wind that rises on high ground, birds by day and crickets and an owl by night, water
+// when you are near it, rain and thunder in a storm, fires that crackle as you pass, a wolf howling from where the pack
+// really is, sheep, cows and hens near the farms, the woodcutter's axe, your own footsteps on grass, stone, wood or in the
+// shallows, the outside muffled when you go indoors, and the old stones humming at night.
+const SOUND={on:false, want:false, ctx:null, out:null, n:{}, t:{}, fired:{}, prevFlash:0, stepAcc:0, lastX:0, lastY:0, wasJ:0, vol:0.7, bolt:null, peakJ:0, duck:1};
+function soundPan(x,y){ const a=Math.atan2(y-P.y,x-P.x)-P.yaw; return Math.max(-1,Math.min(1,Math.sin(a))); }
+function soundNear(sp,R){ let best=null, bd=R; for(let c=0;c<CR_.n;c++){ if(!CR_.al[c]||CR_.sp[c]!==sp) continue; const d=Math.hypot(CR_.x[c]-P.x,CR_.y[c]-P.y); if(d<bd){ bd=d; best={x:CR_.x[c],y:CR_.y[c],d:d}; } } return best; }
+function soundCount(sp,R){ let n=0; for(let c=0;c<CR_.n;c++) if(CR_.al[c]&&CR_.sp[c]===sp&&Math.hypot(CR_.x[c]-P.x,CR_.y[c]-P.y)<R) n++; return n; }
+// what the world sounds like here and now: plain numbers, worked out without any audio, so it can be tested
+function soundScene(){ if(W.seed==null) return null; const night=dayPart()===3||DAY.k<0.3, storm=stormLevel?stormLevel():0;
+  const ci=(P.y|0)*N+(P.x|0), inside=underCover(P.x,P.y,P.z+0.2)&&W.floor[ci]>0, ground=groundAt(P.x,P.y), high=clamp((P.gz-WATER-8)/30,0,1);   // indoors means a room with a floor, not a passage like the gate arch
+  let wd=99; for(let oy=-12;oy<=12;oy+=2)for(let ox=-12;ox<=12;ox+=2){ const x=(P.x|0)+ox, y=(P.y|0)+oy; if(x<1||y<1||x>=N-1||y>=N-1) continue; if(W.h[y*N+x]<WATER-0.1){ const d=Math.hypot(ox,oy); if(d<wd) wd=d; } }
+  let trees=0; for(let oy=-6;oy<=6;oy+=2)for(let ox=-6;ox<=6;ox+=2){ const x=(P.x|0)+ox, y=(P.y|0)+oy; if(x>0&&y>0&&x<N&&y<N&&W.tree[y*N+x]>0) trees++; }
+  const fires=[]; for(let c=0;c<CR_.n;c++){ if(!CR_.al[c]||CR_.sp[c]!==SP.FIRE) continue; const d=Math.hypot(CR_.x[c]-P.x,CR_.y[c]-P.y); if(d<14) fires.push({x:CR_.x[c], y:CR_.y[c], d:d}); }
+  const wolf=night?soundNear(SP.WOLF,170):null, bird=!night?soundNear(SP.BIRD,45):null;
+  const sheep=soundNear(SP.SHEEP,40), cow=soundNear(SP.COW,40), hen=soundNear(SP.HEN,30);
+  const wood=folkHere('wood'), hermit=folkHere('hermit');
+  const chop=!night&&storm<0.3&&wood&&Math.hypot(wood.x-P.x,wood.y-P.y)<40?{x:wood.x, y:wood.y, d:Math.hypot(wood.x-P.x,wood.y-P.y)}:null;
+  const fish=hermit&&Math.hypot(hermit.x-P.x,hermit.y-P.y)<30?{x:hermit.x, y:hermit.y, d:Math.hypot(hermit.x-P.x,hermit.y-P.y)}:null;
+  let hum=0; if(night&&typeof ringSpot==='function'){ const o=ringSpot(); if(o&&!o.keep){ const d=Math.hypot(o.x-P.x,o.y-P.y); if(d<o.dr+14){ const e=RING(); const heart=e&&e.heart===(W.seed>>>0)&&e.s!=='walk', hushed=heart&&e.s==='done'&&e.c==='sleep'; hum=(hushed?0:(heart?0.22:0.07))*clamp(1-(d-o.dr)/14,0,1); } } }
+  return {night:night, inside:inside, storm:storm,
+    wind:inside?0.05:clamp(0.12+0.32*high+0.45*storm-0.02*trees,0.04,0.9),
+    leaves:inside?0:clamp(trees*0.012,0,0.18)*(1+storm),
+    water:wd<99?clamp(1-wd/12,0,1)*0.35:0,
+    rain:storm>0.05?clamp(storm,0,1)*(inside?0.25:0.6):0,
+    crickets:night&&!inside&&storm<0.2&&P.gz>WATER?0.06:0,
+    owl:night&&trees>3&&!inside, birds:bird, wolf:wolf, fires:fires, sheep:sheep, cow:cow, hen:hen, chop:chop, fish:fish, hum:hum,
+    floor:soundFloor(), wet:P.gz<WATER-0.1, swim:terr(P.x,P.y)<WATER-1.2&&P.gz<WATER}; }
+function soundFloor(){ const i=(P.y|0)*N+(P.x|0); if(i<0||i>=N*N) return 'grass'; if(W.floor[i]===1) return 'wood'; if(W.floor[i]===2) return 'stone';
+  if(W.st[i]>0.6&&P.gz>terr(P.x,P.y)+0.3) return 'stone'; if(W.su[i]>0&&P.gz>terr(P.x,P.y)+W.sb[i]) return 'stone'; if(W.path[i]||W.road[i]) return 'dirt'; return 'grass'; }
+// ---- the audio itself (browser only) ----
+function soundBuild(){ const AC=typeof window!=='undefined'&&(window.AudioContext||window.webkitAudioContext); if(!AC) return false;
+  const ctx=new AC(), S=SOUND; S.ctx=ctx;
+  const len=ctx.sampleRate*2, nb=ctx.createBuffer(1,len,ctx.sampleRate), d=nb.getChannelData(0); let b=0;
+  for(let i=0;i<len;i++){ const w=Math.random()*2-1; b=0.97*b+0.03*w; d[i]=w*0.5+b*2.5; }   // white with a little brown in it: softer
+  S.noise=nb;
+  const master=ctx.createGain(); master.gain.value=S.vol; const comp=ctx.createDynamicsCompressor(); master.connect(comp); comp.connect(ctx.destination);
+  const muffle=ctx.createBiquadFilter(); muffle.type='lowpass'; muffle.frequency.value=16000; muffle.connect(master);   // indoors, the outside goes dull
+  S.master=master; S.muffle=muffle; S.dry=master;
+  // the valley's echo: a three-second tail of fading noise, for far calls
+  if(ctx.createConvolver){ const L=Math.floor(ctx.sampleRate*3.2), ir=ctx.createBuffer(2,L,ctx.sampleRate);
+    for(let c=0;c<2;c++){ const d2=ir.getChannelData(c); let lp=0; for(let i=0;i<L;i++){ lp=0.6*lp+0.4*(Math.random()*2-1); d2[i]=lp*Math.pow(1-i/L,2.6)*(i<ctx.sampleRate*0.03?i/(ctx.sampleRate*0.03):1); } }
+    const cv=ctx.createConvolver(); cv.buffer=ir; const vg=ctx.createGain(); vg.gain.value=0.9; cv.connect(vg); vg.connect(muffle); S.verb=cv; }
+  const loop=function(type,f,q,dest){ const s=ctx.createBufferSource(); s.buffer=nb; s.loop=true; s.loopStart=Math.random(); const fl=ctx.createBiquadFilter(); fl.type=type; fl.frequency.value=f; fl.Q.value=q; const g=ctx.createGain(); g.gain.value=0; s.connect(fl); fl.connect(g); g.connect(dest); s.start(0,Math.random()*1.5); return {g:g, f:fl}; };
+  S.n.wind=loop('lowpass',700,0.7,muffle); S.n.leaves=loop('highpass',3200,0.4,muffle); S.n.water=loop('lowpass',650,0.8,muffle); S.n.rain=loop('highpass',2200,0.3,master);
+  // the stones' hum: two low notes, a fifth apart
+  { const g=ctx.createGain(); g.gain.value=0; for(const f of [55,82.4,165,247]){ const o=ctx.createOscillator(); o.frequency.value=f; const og=ctx.createGain(); og.gain.value=f<60?1:(f<100?0.5:(f<200?0.35:0.2)); o.connect(og); og.connect(g); o.start(); } g.connect(master); S.n.hum={g:g}; }
+  return true; }
+function soundSet(node,v,tc){ if(!node||!SOUND.ctx) return; if(node.last!=null&&Math.abs(node.last-v)<0.004) return; node.last=v; node.g.gain.setTargetAtTime(v,SOUND.ctx.currentTime,tc||0.4); }
+// a short sound from somewhere: a burst of filtered noise, or a pitched glide
+function soundShot(o){ const S=SOUND, ctx=S.ctx; if(!ctx) return; const v=o.v*(o.dist!=null?clamp(1-o.dist/(o.range||30),0,1):1); if(v<0.003) return;
+  const t=ctx.currentTime+(o.delay||0), g=ctx.createGain(); let last=g;
+  if(ctx.createStereoPanner&&o.pan!=null){ const p=ctx.createStereoPanner(); p.pan.value=o.pan; g.connect(p); last=p; }
+  last.connect(o.inside===false?S.master:S.muffle);
+  const a=o.a||0.005, dur=o.dur||0.2, done=function(){ try{ g.disconnect(); if(last!==g) last.disconnect(); }catch(e){} };
+  g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(v,t+a); g.gain.exponentialRampToValueAtTime(0.0008,t+dur);
+  if(o.noise){ const s=ctx.createBufferSource(); s.buffer=S.noise; const f=ctx.createBiquadFilter(); f.type=o.ft||'bandpass'; f.frequency.value=o.f||1000; f.Q.value=o.q||1; s.connect(f); f.connect(g); s.onended=done; s.start(t,Math.random()*1.5); s.stop(t+dur+0.05); }
+  else { const os=ctx.createOscillator(); os.type=o.type||'sine'; os.frequency.setValueAtTime(o.f0,t); if(o.f1) os.frequency.exponentialRampToValueAtTime(o.f1,t+(o.glide||dur)); if(o.f2) os.frequency.exponentialRampToValueAtTime(o.f2,t+dur);
+    if(o.vib){ const l=ctx.createOscillator(); l.frequency.value=o.vib; const lg=ctx.createGain(); lg.gain.value=o.vibd||8; l.connect(lg); lg.connect(os.frequency); l.start(t); l.stop(t+dur+0.05); }
+    let src=os; if(o.formant){ const f=ctx.createBiquadFilter(); f.type='bandpass'; f.frequency.value=o.formant; f.Q.value=2; os.connect(f); src=f; } src.connect(g); os.onended=done; os.start(t); os.stop(t+dur+0.05); }
+  S.fired[o.k]=(S.fired[o.k]||0)+1; }
+// a voice: a buzzing source shaped by the mouth (two or three formants), a pitch path and a loudness path, for animals
+function soundVoice(o){ const S=SOUND, ctx=S.ctx; if(!ctx) return; const v=o.v*(o.dist!=null?clamp(1-o.dist/(o.range||30),0,1):1); if(v<0.003) return;
+  const t=ctx.currentTime+(o.delay||0), dur=o.dur, NN=[], mk=function(n){ NN.push(n); return n; }, g=mk(ctx.createGain()); let last=g;
+  if(ctx.createStereoPanner&&o.pan!=null){ const p=mk(ctx.createStereoPanner()); p.pan.value=o.pan; g.connect(p); last=p; }
+  last.connect(o.inside===false?S.master:S.muffle);
+  if(o.wet&&S.verb){ const w=mk(ctx.createGain()); w.gain.value=o.wet; last.connect(w); w.connect(S.verb); }
+  g.gain.setValueAtTime(0,t); for(const e of o.env) g.gain.linearRampToValueAtTime(v*e[1],t+e[0]*dur); g.gain.linearRampToValueAtTime(0,t+dur);
+  const os=mk(ctx.createOscillator()); os.type=o.src||'sawtooth'; os.frequency.setValueAtTime(o.pts[0][1],t); for(let i=1;i<o.pts.length;i++){ if(o.smooth) os.frequency.setTargetAtTime(o.pts[i][1],t+o.pts[i-1][0]*dur,(o.pts[i][0]-o.pts[i-1][0])*dur*0.35); else os.frequency.linearRampToValueAtTime(o.pts[i][1],t+o.pts[i][0]*dur); }
+  const stops=[os];
+  if(o.vib){ const l=mk(ctx.createOscillator()); l.frequency.value=o.vib[0]; const lg=mk(ctx.createGain()); lg.gain.value=o.vib[1]; l.connect(lg); lg.connect(os.frequency); stops.push(l); }
+  if(o.drift){ const dn=mk(ctx.createBufferSource()); dn.buffer=S.noise; dn.loop=true; const dl=mk(ctx.createBiquadFilter()); dl.type='lowpass'; dl.frequency.value=o.drift[0]; const dg=mk(ctx.createGain()); dg.gain.value=o.drift[1]; dn.connect(dl); dl.connect(dg); dg.connect(os.frequency); dn.start(t,Math.random()*1.5); dn.stop(t+dur+0.05); }
+  const body=mk(ctx.createGain()); body.gain.value=1;
+  if(o.trem){ const l=mk(ctx.createOscillator()); l.frequency.value=o.trem[0]; const lg=mk(ctx.createGain()); lg.gain.value=o.trem[1]; body.gain.value=1-o.trem[1]; l.connect(lg); lg.connect(body.gain); stops.push(l); }
+  const lip=mk(ctx.createBiquadFilter()); lip.type='lowpass'; lip.Q.value=0.7; lip.frequency.setValueAtTime(o.open?o.open[0]:4000,t); if(o.open) lip.frequency.exponentialRampToValueAtTime(o.open[1],t+o.open[2]);
+  os.connect(body); body.connect(lip);
+  for(const f of o.form){ const bp=mk(ctx.createBiquadFilter()); bp.type='bandpass'; bp.frequency.value=f[0]; bp.Q.value=f[1]; if(o.fpath){ bp.frequency.setValueAtTime(f[0]*o.fpath[0][1],t); for(let i=1;i<o.fpath.length;i++) bp.frequency.linearRampToValueAtTime(f[0]*o.fpath[i][1],t+o.fpath[i][0]*dur); } const fg=mk(ctx.createGain()); fg.gain.value=f[2]; lip.connect(bp); bp.connect(fg); fg.connect(g); }
+  if(o.breath){ const n=mk(ctx.createBufferSource()); n.buffer=S.noise; const bf=mk(ctx.createBiquadFilter()); bf.type='bandpass'; bf.frequency.value=o.breath[1]; bf.Q.value=0.8; const bg=mk(ctx.createGain()); bg.gain.value=o.breath[0]; n.connect(bf); bf.connect(bg); bg.connect(g); n.start(t,Math.random()*1.5); n.stop(t+dur+0.05); }
+  for(const x of stops){ x.start(t); x.stop(t+dur+0.05); } os.onended=function(){ for(const x of NN){ try{ x.disconnect(); }catch(e){} } };
+  S.fired[o.k]=(S.fired[o.k]||0)+1; }
+const SOUNDS={
+  chirp:function(x,y,d){ const f=2600+Math.random()*1800; for(let i=0;i<2+((Math.random()*3)|0);i++) soundShot({k:'chirp', f0:f, f1:f*(1.2+Math.random()*0.4), glide:0.06, dur:0.09, v:0.05, delay:i*0.12, pan:soundPan(x,y), dist:d, range:45}); },
+  owl:function(){ for(let i=0;i<2;i++) soundShot({k:'owl', f0:420, f1:380, dur:i?0.55:0.28, v:0.06, delay:i*0.45, a:0.05, pan:(Math.random()*2-1)*0.7}); },
+  howl:function(x,y,d){ const pan=soundPan(x,y), R=function(a,b){ return a+Math.random()*(b-a); }, far=clamp(d/200,0,1);
+    // a howl is one long held call, not a tune: a soft "hoo" that opens to "ow" as it rises, holds with an unsteady throat, and closes to "ooo" as it sinks.
+    // breath runs through it, the pitch drifts rather than wobbles, and the valley throws it back as a long echo. Others in the pack join at their own pitch.
+    const n=1+((Math.random()*3)|0);
+    for(let i=0;i<n;i++){ const b=(i===0?R(380,470):(i===1?R(480,580):R(320,370))), L=R(3.0,4.2);
+      const pts=[[0,b*R(0.68,0.75)],[R(0.14,0.22),b*R(0.97,1.02)],[R(0.4,0.55),b*R(1.01,1.06)],[R(0.7,0.8),b*R(0.95,1.0)],[1,b*R(0.66,0.76)]];
+      soundVoice({k:i?'howl2':'howl', src:'sawtooth', smooth:true, pts:pts, env:[[0.12,0.65],[0.35,1],[0.78,0.85],[0.94,0.35]], dur:L,
+        form:[[b*1.0,1.6,1.4],[b*2.0,2.5,0.32],[b*3.0,3,0.08]], fpath:[[0,0.85],[0.35,1.05],[0.8,1.0],[1,0.85]],
+        drift:[3.5,b*0.035], breath:[0.13,b*1.6], wet:0.35+0.65*far, v:(i?0.11:0.15), delay:i?R(0.8,1.6)+i*R(0.6,1.2):0, pan:clamp(pan+(i?(Math.random()-0.5)*0.5:0),-1,1), dist:d, range:200, inside:true}); } },
+  crackle:function(x,y,d){ soundShot({k:'crackle', noise:true, ft:'highpass', f:1800+Math.random()*2400, q:0.7, dur:0.03+Math.random()*0.05, a:0.002, v:0.12+Math.random()*0.15, pan:soundPan(x,y), dist:d, range:14}); },
+  baa:function(x,y,d){ const f=170+Math.random()*60, L=0.75+Math.random()*0.35;   // a low nasal "mbaaa-a-a", the bleat shaking in its throat
+    soundVoice({k:'baa', pts:[[0,f*0.9],[0.15,f*1.08],[0.8,f],[1,f*0.9]], env:[[0.08,0.6],[0.2,1],[0.75,0.8]], dur:L, form:[[650,4,2.6],[1750,6,1.1],[2600,7,0.35],[f*1.0,3,0.8]],
+      open:[300,3500,0.1], trem:[8+Math.random()*3,0.45], vib:[8,f*0.03], v:0.16, pan:soundPan(x,y), dist:d, range:42}); },
+  moo:function(x,y,d){ soundShot({k:'moo', type:'sawtooth', formant:420, f0:120, f1:150, glide:0.4, f2:95, dur:1.5, a:0.15, v:0.12, pan:soundPan(x,y), dist:d, range:42}); },
+  cluck:function(x,y,d){ const n=2+((Math.random()*3)|0); for(let i=0;i<n;i++) soundShot({k:'cluck', type:'square', formant:1500, f0:620+Math.random()*80, f1:480, dur:0.09, a:0.004, v:0.22, delay:i*0.16, pan:soundPan(x,y), dist:d, range:34}); },
+  chop:function(x,y,d){ const pan=soundPan(x,y);   // an axe biting wood: a sharp crack, then the knock of the log ringing, no pitch slide
+    soundShot({k:'chop', noise:true, ft:'highpass', f:2500, q:0.7, dur:0.018, a:0.0005, v:0.35, pan:pan, dist:d, range:45});
+    soundShot({k:'chop2', noise:true, ft:'bandpass', f:560+Math.random()*80, q:9, dur:0.11, a:0.001, v:0.9, pan:pan, dist:d, range:45});
+    soundShot({k:'chop4', noise:true, ft:'lowpass', f:200, q:0.7, dur:0.06, a:0.001, v:0.5, pan:pan, dist:d, range:45});
+    soundShot({k:'chop3', noise:true, ft:'bandpass', f:1250+Math.random()*150, q:10, dur:0.07, a:0.001, v:0.45, pan:pan, dist:d, range:45}); },
+  splash:function(x,y,d){ soundShot({k:'splash', noise:true, ft:'bandpass', f:1300, q:0.6, dur:0.35, a:0.01, v:0.12, pan:soundPan(x,y), dist:d, range:30}); },
+  thunder:function(delay){ soundShot({k:'thunder', noise:true, ft:'lowpass', f:120, q:0.5, dur:3.5, a:0.15, v:0.7, delay:delay, inside:true}); soundShot({k:'thunder2', noise:true, ft:'lowpass', f:300, q:0.5, dur:0.6, a:0.01, v:0.35, delay:delay}); },
+  step:function(kind){ const m={grass:{f:600,ft:'lowpass',v:0.05,d:0.08}, dirt:{f:900,ft:'lowpass',v:0.06,d:0.07}, stone:{f:2600,ft:'bandpass',v:0.05,d:0.04}, wood:{f:320,ft:'bandpass',v:0.09,d:0.07}, wet:{f:1200,ft:'bandpass',v:0.08,d:0.18}}[kind]||{f:600,ft:'lowpass',v:0.05,d:0.08};
+    soundShot({k:'step', noise:true, ft:m.ft, f:m.f*(0.9+Math.random()*0.2), q:1.2, dur:m.d, a:0.003, v:m.v, inside:false}); if(kind==='wood') soundShot({k:'step', f0:180, f1:120, dur:0.06, v:0.04, inside:false}); },
+  land:function(){ soundShot({k:'land', noise:true, ft:'lowpass', f:400, q:1, dur:0.12, v:0.14, inside:false}); },
+  cricket:function(){ const f=3900+Math.random()*700, pan=Math.random()*2-1, n=2+((Math.random()*3)|0), v=0.012+Math.random()*0.012;
+    for(let i=0;i<n;i++) soundShot({k:'cricket', f0:f, dur:0.022, a:0.006, v:v, delay:i*0.055, pan:pan}); },
+  chime:function(){ [880,1320].forEach(function(f,i){ soundShot({k:'chime', f0:f, dur:0.9, a:0.01, v:0.05, delay:i*0.09, inside:false}); }); } };
+// once a frame: follow the world
+function soundTick(dt,card){ const S=SOUND; if(!S.on||!S.ctx||S.ctx.state!=='running') return; const now=S.ctx.currentTime;
+  { const duck=card?0.3:1; if(duck!==S.duck){ S.duck=duck; S.master.gain.setTargetAtTime(S.vol*duck,now,0.25); } }
+  S.acc=(S.acc||0)+dt; if(S.acc>=0.1){ S.acc=0; const sc=soundScene(); S.sc=sc; if(sc){
+    const gust=1+0.35*Math.sin(now*0.23)+0.2*Math.sin(now*0.71);
+    soundSet(S.n.wind,sc.wind*0.16*gust,0.8); soundSet(S.n.leaves,sc.leaves*0.4*gust,0.8); soundSet(S.n.water,sc.water*0.6,0.6); soundSet(S.n.rain,sc.rain*0.35,1.0);
+    soundSet(S.n.hum,sc.hum*0.5,2.0);
+    if(sc.inside!==S.wasIn){ S.wasIn=sc.inside; S.muffle.frequency.cancelScheduledValues(now); S.muffle.frequency.setValueAtTime(S.muffle.frequency.value,now); S.muffle.frequency.exponentialRampToValueAtTime(sc.inside?900:16000,now+0.9); } } }
+  const sc=S.sc; if(!sc) return; const T=S.t, due=function(k,min,max){ T[k]=(T[k]==null?now+min+Math.random()*(max-min):T[k]); if(now>=T[k]){ T[k]=now+min+Math.random()*(max-min); return true; } return false; };
+  // an animal just come into earshot speaks up soon, not after a long wait
+  { const H=S.had||(S.had={}); for(const q of [['sheep','baa',1,4],['cow','moo',2,6],['hen','cluck',0.5,2],['wolf','wolf',3,9]]){ const here=!!sc[q[0]]; if(here&&!H[q[0]]) T[q[1]]=Math.min(T[q[1]]==null?Infinity:T[q[1]], now+q[2]+Math.random()*(q[3]-q[2])); H[q[0]]=here; } }
+  if(sc.birds&&due('bird',1.5,6)) SOUNDS.chirp(sc.birds.x,sc.birds.y,sc.birds.d);
+  if(sc.crickets>0&&due('cricket',0.18,0.7)) SOUNDS.cricket();
+  if(sc.owl&&due('owl',25,70)) SOUNDS.owl();
+  if(sc.wolf&&due('wolf',35,90)) SOUNDS.howl(sc.wolf.x,sc.wolf.y,sc.wolf.d);
+  for(let i=0;i<sc.fires.length;i++){ const f=sc.fires[i]; if(due('fire'+i,0.15,0.45)) SOUNDS.crackle(f.x,f.y,f.d); }
+  if(sc.sheep&&due('baa',6,18)) SOUNDS.baa(sc.sheep.x,sc.sheep.y,sc.sheep.d);
+  if(sc.cow&&due('moo',10,30)) SOUNDS.moo(sc.cow.x,sc.cow.y,sc.cow.d);
+  if(sc.hen&&due('cluck',3,9)) SOUNDS.cluck(sc.hen.x,sc.hen.y,sc.hen.d);
+  if(sc.chop&&due('chop',1.4,2.2)) SOUNDS.chop(sc.chop.x,sc.chop.y,sc.chop.d);
+  if(sc.fish&&due('fish',12,30)) SOUNDS.splash(sc.fish.x,sc.fish.y,sc.fish.d);
+  // thunder: after the flash, later the further the storm
+  const bolt=typeof RAIN!=='undefined'?(RAIN.bolt||0):0; if(S.bolt!=null&&bolt!==S.bolt) SOUNDS.thunder(0.6+Math.random()*2.6); S.bolt=bolt;
+  // footsteps: one every stride you actually walk; a thud when a jump lands
+  const moved=Math.hypot(P.x-S.lastX,P.y-S.lastY); S.lastX=P.x; S.lastY=P.y;
+  if(moved<2&&(P.jz||0)<=0.01&&!sc.swim){ S.stepAcc+=moved; const stride=moved/Math.max(dt,0.001)>8?3.2:2.2; if(S.stepAcc>=stride){ S.stepAcc=0; SOUNDS.step(sc.wet?'wet':sc.floor); } }
+  S.peakJ=Math.max(S.peakJ,P.jz||0); if((P.jz||0)<=0.01){ if(S.peakJ>0.2) SOUNDS.land(); S.peakJ=0; } }
+// a message that adds to the journal rings a small chime
+function soundToast(m){ if(SOUND.on&&SOUND.ctx&&/\(Journal/.test(m)) SOUNDS.chime(); }
+function soundSave(){ try{ localStorage.setItem('keep_sound',SOUND.want?'1':'0'); }catch(e){} }
+function soundWanted(){ try{ return localStorage.getItem('keep_sound')==='1'; }catch(e){ return false; } }
+// on: always from a tap. Off: everything goes quiet and the audio sleeps
+function soundOn(){ const S=SOUND; S.want=true; soundSave(); if(!S.ctx&&!soundBuild()) return false; S.on=true; S.duck=1;
+  try{ if(navigator.audioSession) navigator.audioSession.type='playback'; }catch(e){}   // so the iPhone silent switch does not swallow it
+  S.lastX=P.x; S.lastY=P.y; S.t={}; S.had={};
+  if(S.ctx.state!=='running') S.ctx.resume(); S.master.gain.setTargetAtTime(S.vol,S.ctx.currentTime,0.3); return true; }
+function soundOff(){ const S=SOUND; S.want=false; soundSave(); S.on=false; if(S.ctx){ S.master.gain.setTargetAtTime(0,S.ctx.currentTime,0.15); setTimeout(function(){ if(!SOUND.on&&SOUND.ctx) SOUNDS_suspend(); },400); } }
+function SOUNDS_suspend(){ try{ SOUND.ctx.suspend(); }catch(e){} }
 var WSAVE=null;   // in Story: the Wander seed as it was, so saving the dials never moves your Wander valley
 const LINES=[];
 function lineHash(t){ let h=0x811c9dc5; for(let i=0;i<t.length;i++){ h^=t.charCodeAt(i); h=Math.imul(h,0x01000193); } return 'L'+(h>>>0).toString(36); }
@@ -6038,7 +6392,7 @@ function boot(){
   $('chBye').addEventListener('click',function(){ if(Date.now()-CHATOPEN<350) return; closeChat(); });
   window.addEventListener('keydown',function(e){ if(CHAT.id<0) return; if(/^[1-4]$/.test(e.key)&&CHAT.ask&&!CHAT.picked){ if(chatPick(+e.key-1)) e.preventDefault(); return; }
     if(e.key==='Enter'){ if(e.target&&e.target.tagName==='BUTTON'&&e.target.closest&&e.target.closest('#chat')) return; chatMore(); e.preventDefault(); } else if(e.key==='Escape') closeChat(); });
-  greetHook=function(m,ms){ if(['help','about','menu','seed','log','dials','leave','journal'].some(function(id){ const e=$(id); return e&&!e.classList.contains('hidden'); })) return false; toast(m,ms||3400); };
+  greetHook=function(m,ms){ if(['help','about','menu','seed','log','dials','leave','journal'].some(function(id){ const e=$(id); return e&&!e.classList.contains('hidden'); })) return false; toast(m,ms||3400); soundToast(m); };
   function setupGrid(force){
     const cssW=window.innerWidth, cssH=window.innerHeight;
     if(!force && cssW===lastW && cssH===lastH && qCell===lastQ) return; // no real change: don't clear the canvas
@@ -6401,11 +6755,24 @@ function boot(){
   const anyCard=function(){ for(let i=0;i<OVERLAYS.length;i++){ if(!$(OVERLAYS[i]).classList.contains('hidden')) return true; } return false; };
   let talkT=0, talkWho='';
   // the Talk button: whenever someone is close enough and nothing else is open
-  function paintTalk(){ { const j=$('bJump'), hide=CHAT.id>=0||anyCard()||!!LEAVE; if(j.hidden!==hide) j.hidden=hide; } const b=$('bTalk'); const n=(CHAT.id<0&&!anyCard()&&!LEAVE)?nearPerson():null;
+  function paintTalk(){ { const j=$('bJump'), hide=CHAT.id>=0||anyCard()||!!LEAVE; if(j.hidden!==hide) j.hidden=hide; const sb=$('bSound'); if(sb.hidden!==hide) sb.hidden=hide; } const b=$('bTalk'); const n=(CHAT.id<0&&!anyCard()&&!LEAVE)?nearPerson():null;
     if(!n){ if(!b.hidden){ b.hidden=true; talkWho=''; } return; } const p=castOf(n.id), nmx=p?p.name:'them', z=PAUSED[heardKey(n.id)];
     const t=(z&&Date.now()-z.t<180000?'Carry on with ':'Talk to ')+nmx; if(t!==talkWho){ b.textContent=t; talkWho=t; } if(b.hidden) b.hidden=false; }
   $('bTalk').addEventListener('click',function(ev){ ev.preventDefault(); ev.stopPropagation(); if(talkTo()) $('bTalk').hidden=true; });
   $('bJump').addEventListener('pointerdown',function(ev){ ev.preventDefault(); ev.stopPropagation(); IN.jump=true; });
+  // sound: off until tapped. If you turned it on last time, it starts again on your first tap anywhere
+  const paintSound=function(){ const b=$('bSound'); b.textContent=SOUND.on?'sound on':(SOUND.want?'tap for sound':'sound off'); b.classList.toggle('on',SOUND.on); b.setAttribute('aria-pressed',SOUND.on?'true':'false'); };
+  $('bSound').addEventListener('click',function(ev){ ev.preventDefault(); ev.stopPropagation();
+    if(SOUND.on&&SOUND.ctx&&SOUND.ctx.state!=='running'){ SOUND.ctx.resume(); paintSound(); return; }   // on, but the phone paused it: this tap wakes it
+    if(SOUND.on) soundOff(); else soundOn(); paintSound(); if(SOUND.ctx&&!SOUND.ctx.onstatechange) SOUND.ctx.onstatechange=paintSound; try{ this.blur(); }catch(e){} });   // so Space (jump) does not press it again
+  SOUND.want=soundWanted(); paintSound();
+  // remembered on: any tap (or key) brings it back. iPads only let a lifted finger start sound, so listen to every kind of tap,
+  // and keep listening until it is really playing. A tap on the sound button itself is left to the button.
+  { const kinds=['pointerdown','pointerup','touchend','click','keydown'];
+    const wake=function(ev){ if(ev&&ev.target&&ev.target.id==='bSound') return; if(!SOUND.want) return;
+      if(!SOUND.on){ soundOn(); if(SOUND.ctx) SOUND.ctx.onstatechange=paintSound; paintSound(); } else if(SOUND.ctx&&SOUND.ctx.state!=='running'){ try{ SOUND.ctx.resume(); }catch(e){} } };
+    kinds.forEach(function(k){ window.addEventListener(k,wake,true); }); }
+  document.addEventListener('visibilitychange',function(){ if(!SOUND.ctx) return; try{ if(document.hidden) SOUND.ctx.suspend(); else if(SOUND.on) SOUND.ctx.resume(); }catch(e){} });
   window.addEventListener('keydown',function(ev){ if(ev.key==='t'||ev.key==='T'){ if(ev.target&&/INPUT|TEXTAREA/.test(ev.target.tagName)) return; if(CHAT.id<0&&!anyCard()&&talkTo()) ev.preventDefault(); } });
   function frame(now){
     requestAnimationFrame(frame);
@@ -6413,6 +6780,7 @@ function boot(){
     const dt=Math.min(0.05,(now-last)/1000); last=now; skyTime=now/1000;
     updateDay(dt);
     if(!LEAVE) updatePlayer(dt);   // the leave card holds you at the end of the road
+    soundTick(dt,anyCard()||CHAT.id>=0||!!LEAVE);
     { const ex=roadCheck(Date.now()); if(ex&&!anyCard()) openLeave(ex); }   // the end of a road
     acc+=dt; let guard=0; while(acc>=STEP&&guard++<4){ tick(STEP); acc-=STEP; }
     ecoAcc+=dt; if(ecoAcc>=ECOSTEP){ ecology(); ecoAcc-=ECOSTEP; }
@@ -6448,7 +6816,7 @@ function boot(){
 }
 
 if(IS_NODE){ module.exports={genWorld,allocGrid,buildGlyphs,renderFrame,compose,spawn,populate,tick,ecology,simBin,updatePlayer,W,RS,FB,P,IN,CR_,SP,SPP,MASKS,RESERVE,RAMP,N,WATER,EYE,terr,groundAt,DIALS,growOf,isAdult,addCreature,WALLS,buildWalls,nearestWall,allWallHits,wallBlocked,setSkyTime:function(t){skyTime=t;},setUW:function(v){UW=v;},DAY,SUN,MOON,SKY,DAYMODES,sunAltAz,sunUpdate,updateDay,relightAll,relightStep,RELIGHT,dayDate,fmtTod,setTod:function(h){DAY.tod=h;sunUpdate();},floorAt,KPATHS,KEEP,FORT,eventsForDay,weddingDay,babyDay,valleyDay,logEvent,eventsRefresh,dayTick,restock,stockTakeable,stockOwner,evBind,evWhen,evKey,seedDials,valleyTraits,chooseSeed,applyWorld,worldOf,TRAITS37,WORLD_KEYS,getPlayerLand:function(){ return PLAYER_LAND; },seedParse,babyFor,pedWays,pedShelter,carveRoads,exitAngles,roadCheck,roadStay,travelTo,spawnAtExit,VISITED,ROADS,PED,pedTick,pedDay,pedFind,pedRouteIn,pedPitch,pedWay,TALKP,ROAD_DIALS,ROLEPED,stormLevel,stormWindows,stormOngoing,underCover,stormLight,TALKS,STORMC,evBase,keeperAbed,FISHSIZE,TALKE,EVTAG,EVKINDS,wedNow,relOf,TALK,TALKX,LINES,POSEWHO,talkPick,talk,chatMore,closeChat,chatTick,CHAT,HEARD,VISITS,heardKey,heardAdd,lineOk,whoOk,placeName,placeDir,setChat:function(h){chatHook=h;},castValley,valleyName,valleyNames,seedRng,rebuildPeople,KEEPERS,GREETN,lineOk,fillLine,peopleHere,ALLHERE,ROLEKEY,ROLES,NAMES_F,NAMES_M,NAMES_X,BYNAMES,CLOTHES,SKINS,HAIRS,TRAITS,TRAIT_CLASH,RELREV,dayPart,folkMissing,tickKeeper,KMASK,KL,keeperFrame,GREETT,setGreet:function(f){greetHook=f;},RENDERS};
-  Object.assign(module.exports,{banditsLeave,mendRoad,ringBusy,setGreet:function(f){ greetHook=f; },keepLook,keepWord,KLOOK_:function(){ return KLOOK; },keepDress,keepFires,banditsHere,banditCast,chiefId,beatMend,beatMoths,beatBandit,mothCheck,hallNow,keepTag,TALKK3,keepNotes,LORE5,BANDIT_PATH,SONGLORE,songWho,RING_N,RING,ringBusy,ringSpot,ringPlan,ringRead,exitAngles,ringCheck,beatRing,ringTag,ringNotes,TALKR,LORE4,ringNight,roleName,festAway,festList,nearRoad,sentHere,GREETN,TROUBLES2,beatRoof,beatRoofW,beatAxe,beatBet,beatCake,beatSong,beatFest,trouble2Tag,trouble2Notes,festNotes,festGuests,festEnd,festTag,helpedAway,FEST,TALKT2,TALKF,LORE3,SONG,SONGLORE,songWho,farFor,roadPath,beatCrown,beatFriend,CROWN,crownTag,friendTag,TALKC,LORE2,FRIENDWHAT,PAUSED,chatPause,chatResume,nearPerson,talkTo,REP,TITLES,NICKS,earned,deedName,calledBy,legendName,didHere,legendFor,legendTold,LORE,loreFor,loreTake,loreCountHere,TALKK,leftFacts,leftPath,leftEnsure,leftThreads,leftHere,leftOf,hasAsker,leftKey,LREASONS,TALKL,fillBeat,troublesFor,trGet,trTag,stoneFacts,lightCheck,LIGHTS,TALKT,arriveExit,SNOOZE,part,fixPart,neighborSeed,roadDest,roadLink,visitNote,metNote,valleyCount,storyBeat,journalNotes,chatPick,ERRANDS,errandTarget,letterFacts,CHATX:CHAT,cleanName,nameHash,randomName,homeSeed,isHome,inHome,youName,journalLoad,journalSave,journalBlank,storyNew,storyResume,storyAt,parentsFor,castWithHome,addParents,TALKH,PARENT_IDS,addKeeper,
+  Object.assign(module.exports,{SOUND,soundScene,soundFloor,soundPan,soundTick,soundToast,soundOn,soundOff,soundWanted,SOUNDS,banditsLeave,mendRoad,ringBusy,setGreet:function(f){ greetHook=f; },keepLook,keepWord,KLOOK_:function(){ return KLOOK; },keepDress,keepFires,banditsHere,banditCast,chiefId,beatMend,beatMoths,beatBandit,mothCheck,hallNow,keepTag,TALKK3,keepNotes,LORE5,BANDIT_PATH,SONGLORE,songWho,RING_N,RING,ringBusy,ringSpot,ringPlan,ringRead,exitAngles,ringCheck,beatRing,ringTag,ringNotes,TALKR,LORE4,ringNight,roleName,festAway,festList,nearRoad,sentHere,GREETN,TROUBLES2,beatRoof,beatRoofW,beatAxe,beatBet,beatCake,beatSong,beatFest,trouble2Tag,trouble2Notes,festNotes,festGuests,festEnd,festTag,helpedAway,FEST,TALKT2,TALKF,LORE3,SONG,SONGLORE,songWho,farFor,roadPath,beatCrown,beatFriend,CROWN,crownTag,friendTag,TALKC,LORE2,FRIENDWHAT,PAUSED,chatPause,chatResume,nearPerson,talkTo,REP,TITLES,NICKS,earned,deedName,calledBy,legendName,didHere,legendFor,legendTold,LORE,loreFor,loreTake,loreCountHere,TALKK,leftFacts,leftPath,leftEnsure,leftThreads,leftHere,leftOf,hasAsker,leftKey,LREASONS,TALKL,fillBeat,troublesFor,trGet,trTag,stoneFacts,lightCheck,LIGHTS,TALKT,arriveExit,SNOOZE,part,fixPart,neighborSeed,roadDest,roadLink,visitNote,metNote,valleyCount,storyBeat,journalNotes,chatPick,ERRANDS,errandTarget,letterFacts,CHATX:CHAT,cleanName,nameHash,randomName,homeSeed,isHome,inHome,youName,journalLoad,journalSave,journalBlank,storyNew,storyResume,storyAt,parentsFor,castWithHome,addParents,TALKH,PARENT_IDS,addKeeper,
     setMode:function(m,st){ MODE=m; STORY=st; },getStory:function(){ return STORY; },getMode:function(){ return MODE; },setJournal:function(j){ JOURNAL=j; },getJournal:function(){ return JOURNAL; },journalOff:function(){ return JOURNAL_OFF; }}); }
 else boot();
 })();
