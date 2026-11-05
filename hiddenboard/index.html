@@ -103,7 +103,7 @@ header{padding-block:44px 54px;display:flex;flex-direction:column;gap:26px}
 .rules{max-width:58ch;margin:40px auto 0;font-size:.98rem;color:var(--graphite)}
 
 /* tactics */
-.legend{font-family:var(--type);font-size:.85rem;color:var(--graphite);margin-top:12px}
+.key{margin-top:28px;border:2px solid var(--ink);background:#fff;padding:18px 18px 8px}.key h3{font-size:1.5rem;margin-bottom:4px}.key .how{font-size:.95rem;color:var(--graphite);margin-bottom:10px;max-width:52ch}.key dl{margin:0;display:grid;grid-template-columns:64px minmax(0,1fr);border-top:1px solid var(--rule)}.key dt,.key dd{margin:0;padding-block:10px;border-bottom:1px solid var(--rule)}.key dt{font-family:var(--sign);font-weight:800;font-size:2rem;line-height:1;color:var(--green)}.key dd{display:flex;flex-direction:column;gap:2px;min-width:0}.key dd b{font-weight:600}.key dd span{font-family:var(--type);font-size:.82rem;color:var(--graphite)}.key dl>:nth-last-child(-n+2){border-bottom:0}.grade{font-family:var(--type);font-size:.85rem;color:var(--green);font-weight:700}
 .tactic{display:grid;grid-template-columns:72px minmax(0,1fr);gap:6px 16px;margin-top:40px}
 .tactic .mark{font-family:var(--sign);font-weight:800;font-size:3.4rem;line-height:.8;color:var(--green)}
 .tactic .body{display:flex;flex-direction:column;gap:10px;min-width:0}
@@ -197,8 +197,18 @@ footer{border-top:2px solid var(--ink);padding-block:22px 40px;display:flex;just
 <section id="tactics">
   <p class="phase">III. Tactics</p>
   <h2>More shots</h2>
-  <p class="intro">Other ways the board can live inside a frame, graded the way chess writers grade moves.</p>
-  <p class="legend">! good &nbsp; !! brilliant &nbsp; ?! dubious &nbsp; &#177; an edge &nbsp; &#9633; the only move</p>
+  <p class="intro">Five more ways the board can live inside a frame. Each one is graded the way chess writers grade moves, and one of them puts those same marks on screen.</p>
+  <div class="key">
+    <h3>How to read the marks</h3>
+    <p class="how">In written chess, a symbol after a move tells you what the annotator thought of it. A reader sees Nf3! and knows it was a strong move before reading another word.</p>
+    <dl>
+      <dt>!</dt><dd><b>A good move</b><span>Bxf7! &middot; strong, and it works</span></dd>
+      <dt>!!</dt><dd><b>A brilliant move</b><span>Qb8+!! &middot; the one people talk about afterward</span></dd>
+      <dt>?!</dt><dd><b>A dubious move</b><span>Ke2?! &middot; risky, and it might backfire</span></dd>
+      <dt>&#177;</dt><dd><b>An edge</b><span>White is slightly better, and it adds up</span></dd>
+      <dt>&#9633;</dt><dd><b>The only move</b><span>Anything else loses</span></dd>
+    </dl>
+  </div>
 
   <div class="tactic wide">
     <div class="body">
@@ -207,24 +217,24 @@ footer{border-top:2px solid var(--ink);padding-block:22px 40px;display:flex;just
       </svg>
     </div>
   </div>
-  <div class="tactic"><div class="mark">!</div><div class="body"><span class="sslug">SH 4C · MED · LOCKED OFF</span><p>A lamppost blocks the B on a Brooks Bakery truck, so the side of the truck reads ROOKS.</p></div></div>
+  <div class="tactic"><div class="mark">!</div><div class="body"><span class="grade">Good move. One prop, one frame, and it reads instantly.</span><span class="sslug">SH 4C · MED · LOCKED OFF</span><p>A lamppost blocks the B on a Brooks Bakery truck, so the side of the truck reads ROOKS.</p></div></div>
 
   <div class="tactic wide">
     <div class="body">
       <svg class="panel" viewBox="0 0 320 180" role="img" aria-label="Storyboard: overhead view of a tiled floor with two people a knight's move apart"><g id="tiles"></g><circle class="fi" cx="129" cy="125" r="10"/><circle class="wh" cx="163" cy="57" r="10"/><path class="cm" d="M129 113V57H140"/><path class="ch" d="M140 51l10 6-10 6z"/><text class="tag" x="10" y="174">OVERHEAD</text></svg>
     </div>
   </div>
-  <div class="tactic"><div class="mark">!!</div><div class="body"><span class="sslug">SH 9A · OVERHEAD · STATIC</span><p>From above, a tiled floor turns into a board. Two people stand a knight's move apart, and their blocking can follow the pieces they stand for.</p></div></div>
+  <div class="tactic"><div class="mark">!!</div><div class="body"><span class="grade">Brilliant. The whole location turns into the board.</span><span class="sslug">SH 9A · OVERHEAD · STATIC</span><p>From above, a tiled floor turns into a board. Two people stand a knight's move apart, and their blocking can follow the pieces they stand for.</p></div></div>
 
   <div class="tactic wide">
     <div class="body">
       <svg class="panel" viewBox="0 0 320 180" role="img" aria-label="Storyboard: freeze frame of a man at a chess table with ?! in the corner"><rect class="tn" x="0" y="0" width="320" height="180"/><path class="k" d="M40 150H280"/><path class="wh" d="M110 132h100l14 18H96z"/><circle class="fi" cx="160" cy="66" r="20"/><path class="fi" d="M118 132c0-34 18-46 42-46s42 12 42 46z"/><path class="k" d="M196 112l26 18"/><text class="sg" x="296" y="46" text-anchor="end" font-size="40" style="fill:#2f6a4c">?!</text><text class="tag" x="10" y="174">FREEZE</text></svg>
     </div>
   </div>
-  <div class="tactic"><div class="mark">?!</div><div class="body"><span class="sslug">SH 32 · MCU · FREEZE ON THE DECISION</span><p>An episode ends frozen on a choice, with one annotation mark in the corner. The audience knows how the show grades it before anyone says a word.</p></div></div>
+  <div class="tactic"><div class="mark">?!</div><div class="body"><span class="grade">The mark goes on screen. This is the character's move, graded.</span><span class="sslug">SH 32 · MCU · FREEZE ON THE DECISION</span><p>An episode ends frozen on a character's choice, with one of these marks in the corner. A ?! says the move is risky; a !! says he got it right; a ?? would mean he just blew it. Players read the verdict instantly, and everyone else learns the code over a few episodes.</p></div></div>
 
-  <div class="tactic short"><div class="mark">&#177;</div><div class="body"><p>Cut each episode to the speed of its game. A blitz episode cuts fast and tight, a slow game gets room to breathe, and a chess-clock tap works as the transition sound.</p></div></div>
-  <div class="tactic short"><div class="mark">&#9633;</div><div class="body"><p>Players will freeze-frame every board on screen. A chess consultant who checks each position keeps the show honest with the exact audience it's built to reward.</p></div></div>
+  <div class="tactic short"><div class="mark">&#177;</div><div class="body"><span class="grade">An edge. Viewers feel it without noticing it.</span><p>Cut each episode to the speed of its game. A blitz episode cuts fast and tight, a slow game gets room to breathe, and a chess-clock tap works as the transition sound.</p></div></div>
+  <div class="tactic short"><div class="mark">&#9633;</div><div class="body"><span class="grade">The only move. Get a board wrong and players will catch it.</span><p>Players will freeze-frame every board on screen. A chess consultant who checks each position keeps the show honest with the exact audience it's built to reward.</p></div></div>
 </section>
 
 <section id="endgame">
@@ -257,7 +267,7 @@ footer{border-top:2px solid var(--ink);padding-block:22px 40px;display:flex;just
 
 <footer>
   <span>The Hidden Board · a pitch by Mot Buchanan</span>
-  <button class="badge" id="badge" type="button">v1.4 · Nov 5 2026</button>
+  <button class="badge" id="badge" type="button">v1.5 · Nov 5 2026</button>
 </footer>
 </div>
 <div class="toast" id="toast" role="status"></div>
@@ -356,7 +366,7 @@ footer{border-top:2px solid var(--ink);padding-block:22px 40px;display:flex;just
   show(0);
 
   var t=document.getElementById("toast"),tt;
-  document.getElementById("badge").addEventListener("click",function(){t.textContent="The Hidden Board v1.4 · Nov 5 2026";t.classList.add("on");clearTimeout(tt);tt=setTimeout(function(){t.classList.remove("on")},2200)});
+  document.getElementById("badge").addEventListener("click",function(){t.textContent="The Hidden Board v1.5 · Nov 5 2026";t.classList.add("on");clearTimeout(tt);tt=setTimeout(function(){t.classList.remove("on")},2200)});
 })();
 </script>
 
