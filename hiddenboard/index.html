@@ -121,6 +121,31 @@ header{padding-block:44px 54px;display:flex;flex-direction:column;gap:26px}
 .game h3{font-size:2rem}
 .game .who{font-family:var(--type);font-size:.85rem;color:var(--graphite)}
 .after{margin-top:22px;font-size:.98rem;color:var(--graphite);max-width:58ch}
+.map{margin-top:56px}
+.map h3{font-size:clamp(2rem,8vw,2.8rem)}
+.map .lede{max-width:58ch;margin-top:12px}
+.mat{margin:26px 0 0;max-width:600px}
+.mat svg{display:block;width:100%;height:auto}
+.mat figcaption{font-size:.95rem;color:var(--graphite);margin-top:8px;max-width:58ch}
+.mx{font-family:var(--type);font-size:11px;fill:var(--graphite)}
+.mgrid{stroke:var(--rule);stroke-width:1}
+.mzero{stroke:var(--ink);stroke-width:1.5}
+.mline{fill:none;stroke:var(--green);stroke-width:3;stroke-linejoin:round}
+.mdot{fill:var(--green)}
+.mend{fill:var(--ink)}
+.mlab{font-family:var(--type);font-size:12px;font-weight:700;fill:var(--ink)}
+.acts{margin-top:30px;display:flex;flex-direction:column}
+.act{font-family:var(--type);font-weight:700;font-size:.9rem;color:#fff;background:var(--ink);padding:6px 10px;margin-top:22px;display:flex;justify-content:space-between;gap:10px}
+.act span{font-weight:400;color:#c9cbc5}
+.beat{display:grid;grid-template-columns:minmax(0,120px) minmax(0,1fr);gap:16px;padding-block:18px;border-bottom:1px solid var(--rule);align-items:start}
+.beat svg{display:block;width:100%;height:auto;border:2px solid var(--ink)}
+.beat .bt{display:flex;flex-direction:column;gap:6px;min-width:0}
+.beat .be{font-family:var(--type);font-size:.85rem;color:var(--graphite)}
+.beat h4{font-family:var(--sign);font-weight:800;text-transform:uppercase;font-size:1.7rem;line-height:.95;margin:0}
+.beat .mv{font-family:var(--type);font-size:.95rem;font-weight:700}
+.beat .mv b{color:var(--green)}
+.beat.turn h4{color:var(--green)}
+@media (min-width:640px){.beat{grid-template-columns:minmax(0,150px) minmax(0,1fr);gap:22px}}
 
 /* your move */
 .about{display:flex;flex-direction:column;gap:14px;max-width:60ch;margin-top:20px}
@@ -246,6 +271,15 @@ footer{border-top:2px solid var(--ink);padding-block:22px 40px;display:flex;just
     <div class="game"><div class="count">23<small>moves</small></div><h3>The Immortal Game</h3><div class="who">Adolf Anderssen vs. Lionel Kieseritzky · London, 1851</div><p>Anderssen sacrifices a bishop, both rooks and his queen; then he mates with the small pieces he has left.</p></div>
     <div class="game"><div class="count">44<small>moves</small></div><h3>Kasparov's Immortal</h3><div class="who">Garry Kasparov vs. Veselin Topalov · Wijk aan Zee, 1999</div><p>Kasparov gives up a rook and chases the enemy king out of its corner, across the board and deep into his own side. It starts slow and turns into a long chase.</p></div>
   </div>
+  <div class="map" id="map">
+    <h3>The Opera Game, episode by episode</h3>
+    <p class="lede">Here is one of the three laid across a 13-episode season. The beats describe what each stretch does for the structure, so they fit whatever story goes on top. The moves marked ! and !! are Morphy's sacrifices, and they land where a season needs its turns: the midpoint, the run-up to the end, and the finale.</p>
+    <figure class="mat">
+      <svg id="matChart" viewBox="0 0 360 230" role="img" aria-label="Material balance by episode: White falls behind after the midpoint sacrifice and ends ten points down at checkmate"></svg>
+      <figcaption>Material count after each episode, White minus Black (pawn 1, knight and bishop 3, rook 5, queen 9). Morphy spends the back half of the season behind, finishes 10 points down, and wins anyway. That shape is the season's argument.</figcaption>
+    </figure>
+    <div class="acts" id="acts"></div>
+  </div>
   <p class="after">Off screen, a companion page could let viewers log the moves they spot and watch the game build as the season airs. I build that kind of thing.</p>
 </section>
 
@@ -267,7 +301,7 @@ footer{border-top:2px solid var(--ink);padding-block:22px 40px;display:flex;just
 
 <footer>
   <span>The Hidden Board · a pitch by Mot Buchanan</span>
-  <button class="badge" id="badge" type="button">v1.5 · Nov 5 2026</button>
+  <button class="badge" id="badge" type="button">v1.6 · Nov 5 2026</button>
 </footer>
 </div>
 <div class="toast" id="toast" role="status"></div>
@@ -277,7 +311,7 @@ footer{border-top:2px solid var(--ink);padding-block:22px 40px;display:flex;just
   function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;")}
   var FILES="abcdefgh",G={k:"♚",q:"♛",r:"♜",b:"♝",n:"♞",p:"♟"};
   function startPos(){var p={},b="rnbqkbnr";for(var f=0;f<8;f++){p[FILES[f]+"1"]="w"+b[f];p[FILES[f]+"2"]="wp";p[FILES[f]+"7"]="bp";p[FILES[f]+"8"]="b"+b[f]}return p}
-  function play(moves){var p=startPos();moves.forEach(function(m){var a=m.slice(0,2),b=m.slice(2,4);p[b]=p[a];delete p[a]});return p}
+  function play(moves){var p=startPos();moves.forEach(function(m){var a=m.slice(0,2),b=m.slice(2,4);if(p[a]==="wk"&&a==="e1"&&b==="c1"){p.d1=p.a1;delete p.a1}p[b]=p[a];delete p[a]});return p}
   function parse(s){var p={};s.split(" ").forEach(function(t){p[t.slice(2,4)]=t[0]+t[1].toLowerCase()});return p}
   function xy(sq){return [(FILES.indexOf(sq[0]))*20+10,(8-(+sq[1]))*20+10]}
 
@@ -365,8 +399,56 @@ footer{border-top:2px solid var(--ink);padding-block:22px 40px;display:flex;just
   document.getElementById("next").addEventListener("click",function(){show(cur+1)});
   show(0);
 
+
+  // beat map
+  var BEATS=[
+    {act:"Opening",moves:"1. e4 e5",plies:["e2e4","e7e5"],h:"Both sides commit",d:"The center gets claimed. The world and the stakes get set."},
+    {moves:"2. Nf3 d6",plies:["g1f3","d7d6"],h:"Playing it safe",d:"White develops. Black picks the cautious move, and that caution is the first sign of how this goes."},
+    {moves:"3. d4 Bg4",plies:["d2d4","c8g4"],h:"First confrontation",d:"Black pins the knight. It's a real threat, and it costs him later."},
+    {moves:"4. dxe5 Bxf3 5. Qxf3",plies:["d4e5","g4f3","d1f3"],h:"The first trade",d:"Black gives up his bishop to stop the pressure, and White's queen comes out to take it."},
+    {act:"Middlegame",moves:"5... dxe5 6. Bc4 Nf6",plies:["d6e5","f1c4","g8f6"],h:"A false calm",d:"Things settle. White's bishop is now aimed at f7, the weakest square on Black's side."},
+    {moves:"7. Qb3 Qe7",plies:["f3b3","d8e7"],h:"Two threats at once",d:"The queen hits f7 and b7 together. Black has to block with his own queen, which jams his pieces in."},
+    {moves:"8. Nc3 c6 9. Bg5 b5",plies:["b1c3","c7c6","c1g5","b7b5"],h:"Pressure builds",d:"White brings in more pieces. Black finally pushes back."},
+    {moves:"10. Nxb5! cxb5",plies:["c3b5","c6b5"],h:"The midpoint sacrifice",d:"White gives up a knight to break the position open. After this, nothing goes back to how it was.",turn:1},
+    {moves:"11. Bxb5+ Nbd7",plies:["c4b5","b8d7"],h:"Pinned",d:"Check. Black blocks with the knight, and now it can't move."},
+    {act:"Endgame",moves:"12. O-O-O Rd8",plies:["e1c1","a8d8"],h:"Everyone's in",d:"White castles and every piece joins the fight. Half of Black's army still hasn't moved."},
+    {moves:"13. Rxd7! Rxd7 14. Rd1 Qe6",plies:["d1d7","d8d7","h1d1","e7e6"],h:"The second sacrifice",d:"A rook for a knight. The reinforcements line up behind it on the same file.",turn:1},
+    {moves:"15. Bxd7+ Nxd7",plies:["b5d7","f6d7"],h:"The last defender",d:"The knight that guards the back rank gets pulled away. One move left."},
+    {moves:"16. Qb8+!! Nxb8 17. Rd8#",plies:["b3b8","d7b8","d1d8"],h:"Checkmate",d:"White gives up the queen, and the rook ends it. The last image of the season.",turn:1}
+  ];
+  var VAL={p:1,n:3,b:3,r:5,q:9,k:0};
+  function material(pos){var m=0;for(var q in pos){var v=VAL[pos[q][1]];m+=pos[q][0]==="w"?v:-v}return m}
+  var all=[],mats=[],ah="",ACT={"Opening":"Episodes 1 to 4","Middlegame":"Episodes 5 to 9","Endgame":"Episodes 10 to 13"};
+  BEATS.forEach(function(b,i){
+    all=all.concat(b.plies);
+    var pos=play(all);mats.push(material(pos));
+    var last=b.plies[b.plies.length-1];
+    if(b.act)ah+='<div class="act">'+b.act+'<span>'+ACT[b.act]+'</span></div>';
+    var mv=esc(b.moves).replace(/(!!|!)/g,"<b>$1</b>");
+    ah+='<div class="beat'+(b.turn?' turn':'')+'"><div>'+diagram({moves:all.slice(),arrows:[last],ring:i===12?["e8"]:[],label:"Position after "+b.moves})+'</div><div class="bt"><span class="be">Episode '+(i+1)+'</span><h4>'+esc(b.h)+'</h4><span class="mv">'+mv+'</span><p>'+esc(b.d)+'</p></div></div>';
+  });
+  document.getElementById("acts").innerHTML=ah;
+
+  // material chart
+  (function(){
+    var W=360,H=230,L=34,R=14,T=18,B=40,min=-10,max=2,n=mats.length;
+    function X(i){return L+(i)*(W-L-R)/(n-1)}
+    function Y(v){return T+(max-v)*(H-T-B)/(max-min)}
+    var g="";
+    [2,0,-2,-4,-6,-8,-10].forEach(function(v){g+='<line class="'+(v===0?'mzero':'mgrid')+'" x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(v)+'" y2="'+Y(v)+'"/><text class="mx" x="'+(L-8)+'" y="'+(Y(v)+4)+'" text-anchor="end">'+(v>0?'+'+v:v)+'</text>'});
+    for(var i=0;i<n;i++)g+='<text class="mx" x="'+X(i)+'" y="'+(H-B+18)+'" text-anchor="middle">'+(i+1)+'</text>';
+    g+='<text class="mx" x="'+((L+W-R)/2)+'" y="'+(H-4)+'" text-anchor="middle">episode</text>';
+    var d="";for(i=0;i<n;i++){d+=(i?"H"+X(i)+"V":"M"+X(i)+" ")+Y(mats[i])}
+    g+='<path class="mline" d="'+d+'"/>';
+    [7,10,12].forEach(function(k){g+='<circle class="'+(k===12?'mend':'mdot')+'" cx="'+X(k)+'" cy="'+Y(mats[k])+'" r="'+(k===12?6:5)+'"/>'});
+    g+='<text class="mlab" x="'+(X(7)-8)+'" y="'+(Y(mats[7])+20)+'" text-anchor="end">Nxb5!</text>';
+    g+='<text class="mlab" x="'+(X(10)-8)+'" y="'+(Y(mats[10])+20)+'" text-anchor="end">Rxd7!</text>';
+    g+='<text class="mlab" x="'+(X(12)-12)+'" y="'+(Y(mats[12])-8)+'" text-anchor="end">Mate at '+mats[12]+'</text>';
+    document.getElementById("matChart").innerHTML=g;
+  })();
+
   var t=document.getElementById("toast"),tt;
-  document.getElementById("badge").addEventListener("click",function(){t.textContent="The Hidden Board v1.5 · Nov 5 2026";t.classList.add("on");clearTimeout(tt);tt=setTimeout(function(){t.classList.remove("on")},2200)});
+  document.getElementById("badge").addEventListener("click",function(){t.textContent="The Hidden Board v1.6 · Nov 5 2026";t.classList.add("on");clearTimeout(tt);tt=setTimeout(function(){t.classList.remove("on")},2200)});
 })();
 </script>
 
