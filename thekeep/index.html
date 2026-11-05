@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="keep-version" content="v0.39.1">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#000">
 <title>The Keep</title>
@@ -35,6 +36,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
 #fps{position:absolute;bottom:calc(10px + env(safe-area-inset-bottom));left:10px;max-width:calc(100% - 172px);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font:600 10px var(--mb-mono);letter-spacing:.04em;color:var(--mb-soft);background:var(--mb-glass);border:1px solid var(--mb-line);padding:4px 9px;border-radius:999px}
 #bkNudge{position:absolute;left:50%;top:104px;transform:translateX(-50%);z-index:4;display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;max-width:calc(100% - 32px);box-sizing:border-box;background:rgba(16,21,28,.94);border:1px solid var(--mb-line);color:var(--mb-ink);padding:8px 10px 8px 14px;border-radius:20px;font:600 12px var(--mb-ui);pointer-events:auto}
 #bkNudge[hidden]{display:none}
+#updNudge{position:absolute;left:50%;top:104px;transform:translateX(-50%);width:max-content;z-index:5;display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;max-width:calc(100% - 32px);box-sizing:border-box;background:rgba(16,21,28,.96);border:1px solid var(--mb-line);color:var(--mb-ink);padding:8px 10px 8px 14px;border-radius:20px;font:600 12px var(--mb-ui);pointer-events:auto}
+#updNudge[hidden]{display:none}
+#updNudge .btn{min-height:40px;padding:0 14px;margin:0}
 #bkNudge .btn{min-height:40px;padding:0 14px;margin:0}
 #toast{position:absolute;left:50%;top:64px;transform:translateX(-50%);background:rgba(16,21,28,.92);border:1px solid var(--mb-line);color:var(--mb-ink);padding:9px 16px;border-radius:18px;font:600 11px var(--mb-mono);opacity:0;transition:opacity .25s;white-space:normal;text-align:center;max-width:calc(100vw - 32px);width:max-content;z-index:950}
 #help{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);pointer-events:auto}
@@ -216,8 +220,9 @@ html.fromshelf #inPage #inViews{padding-top:calc(58px + env(safe-area-inset-top)
  </div>
  <div id="stick"><div id="knob"></div></div>
  <div id="fps"></div>
- <button class="mb-ver" id="mbVer" type="button">v0.39.0 &middot; Nov 4</button>
+ <button class="mb-ver" id="mbVer" type="button">v0.39.1 &middot; Nov 5</button>
  <div id="toast"></div>
+ <div id="updNudge" hidden role="status"><span>A new version of The Keep is here (<b id="updVer"></b>).<span id="updMsg" style="display:block;font-weight:400"></span></span><button class="btn go" id="updGo" type="button">refresh</button><button class="btn" id="updNo" type="button">later</button></div>
  <div id="bkNudge" hidden role="status"><span>Big moment. Back up your progress?</span><button class="btn go" id="bkNudgeGo" type="button">back up</button><button class="btn" id="bkNudgeNo" type="button">later</button></div>
  <button class="btn" id="bTalk" type="button" hidden>Talk</button>
  <button class="btn" id="bJump" type="button" aria-label="Jump">jump</button>
@@ -257,7 +262,7 @@ html.fromshelf #inPage #inViews{padding-top:calc(58px + env(safe-area-inset-top)
   <p><b>Every valley has its troubles.</b> A hen that wandered over the hills, a quarrel over a fence, a pair of sweethearts too shy to speak, a light in the old stones at night, a name cut in a stone that belongs to a family somewhere else. Every valley grows its own from its seed, and what you choose changes what people say.</p>
   <p><b>Talk and choose.</b> Walk up to anyone and they talk, or tap the Talk button when you're close. Walk off mid-conversation and it waits for you. When it matters, people ask you things, and you answer with the buttons on the chat card. The journal (top of the screen) keeps what you were asked, every valley you have been to, and takes you back to any of them.</p>
   <p><b>Story or Wander.</b> Story starts you at home: give yourself a name, say what your valley has plenty of, and wake by the gate of the keep your parents keep. Everyone there knows you. Wander drops you into any valley, as a stranger. Your story is saved on this device, and Continue picks it up where you left it.</p>
-  <p class="fsize">The whole game is one HTML file, plus a file for each 3D view. Right now: <b id="fsize">~768 KB</b>. Smaller than a single phone photo.</p>
+  <p class="fsize">The whole game is one HTML file, plus a file for each 3D view. Right now: <b id="fsize">~774 KB</b>. Smaller than a single phone photo.</p>
   <p><b>Why I built it.</b> I build things on a phone, directing AI the way I would direct a camera. I saw a clip of a tiny 3D world made of nothing but text and wanted to see if I could grow one that was actually alive, and keep growing it in the open instead of ever calling it done.</p>
   <p><b>What I learned.</b> How far you can get with almost nothing. One idea, a ray walking a height map, turned into characters, with a small world of animals living on top. Every version taught me one concrete thing: how to make a wall read as solid, how to keep the wolves from starving the world empty, how to make a forest look like real woods.</p>
   <p style="color:var(--mb-dim);font-size:13px"><b style="color:var(--mb-soft)">Walk:</b> drag the left half of the screen (tilt to turn). <b style="color:var(--mb-soft)">Look:</b> drag the right half. Tap <b style="color:var(--mb-soft)">jump</b> (or the space bar) to hop up onto low things. Tap <b style="color:var(--mb-soft)">sound</b> to hear the valley; it stays off until you do. (No sound on an iPad or iPhone? Check the silent switch.) Wade into the water to swim. Tap ☰ menu for a new world, the dials, and the time of day. Walk under the gate arch and find the door under the tower stair.</p>
@@ -1327,9 +1332,10 @@ var SHELF={on:false,url:'https://motbuchanan.com/gameshelf/'};
   SHELF.place=place;
 })();
 
-const VERSION='The Keep v0.39.0 · Nov 4 2026';
-const VER_SHORT='v0.39.0 · Nov 4'; // what the badge shows; bump with VERSION
+const VERSION='The Keep v0.39.1 · Nov 5 2026';
+const VER_SHORT='v0.39.1 · Nov 5'; // what the badge shows; bump with VERSION
 const CHANGELOG=[
+ ['v0.39.1 · Nov 5 2026','The game now notices when a newer version has been put up. A small note offers a refresh (your progress is saved first), so you are never playing an old copy without knowing. It checks quietly every ten minutes and whenever you come back to the tab.'],
  ['v0.39.0 · Nov 4 2026','More to do in every valley. Six new kinds of trouble: a well bucket at the bottom of the well, an owl in the gate arch, a letter too shy to send, a guard whose boots have worn through, crows in the corn and a scarecrow to build, and a light on the hill at night. Some things only happen because of what you did before: once you have a name, people bring you their quarrels; a hen you brought home raises chicks; bandits you sent home write to you. And twelve more old stories, some only told once you have walked the ring road or brought the two halves of the crown together.'],
  ['v0.38.0 · Nov 4 2026','Talk that does not repeat. Over three hundred new things for people to say: every role has more of its own, and everyone has more about the weather, the valley, the road, old sayings and small kindnesses. Two people in one valley never tell you the same thing, what you have heard is remembered between visits, and someone with nothing new to tell you says so instead of going round again.'],
  ['v0.37.0 · Nov 4 2026','New animals. Every creature is drawn again, bigger, shaded and outlined, and they move: deer walk, run and graze, some with antlers; wolves trot, wag and lift their heads to howl at night; sheep and cows graze and the cow swishes its tail; rabbits sit, nibble and hop; hens peck; squirrels sit up and bound; trout sweep their tails; birds flap and glide. Deer, wolves, sheep and cows now face you when they come your way. The Mesh, Voxels, Rays and Iso views draw the new people and animals too (people there were garbled since v0.35.0).'],
@@ -7340,10 +7346,50 @@ function boot(){
     let busy=(typeof CHAT!=='undefined'&&CHAT.id>=0); const ie=document.getElementById('intro'); if(ie&&ie.getAttribute('aria-hidden')==='false'&&!ie.classList.contains('gone')) busy=true;
     for(let i=0;i<OVERLAYS.length&&!busy;i++){ if(!$(OVERLAYS[i]).classList.contains('hidden')) busy=true; }
     if(busy){ if(tries<60) setTimeout(function(){ BK.nudge(tries+1); },3000); return; }   // after the chat or card closes (up to three minutes)
+    if(!$('updNudge').hidden) return;   // the refresh offer is up: this nudge waits for the next big moment
     if(!backupCollect()) return; try{ localStorage.setItem('keep_backup_nudge',String(now)); }catch(e){}
     const n=$('bkNudge'); n.hidden=false; clearTimeout(BK.nh); BK.nh=setTimeout(function(){ n.hidden=true; },12000); };
   $('bkNudgeGo').addEventListener('click',function(){ $('bkNudge').hidden=true; openBackup(false); });
   $('bkNudgeNo').addEventListener('click',function(){ $('bkNudge').hidden=true; });
+  // ---- new version (v0.39.1): now and then, ask the site which version it has; if it is newer, offer a refresh ----
+  // Only the top of the page is read (the version sits in a tag in the first lines); the rest is never downloaded.
+  // Nothing reloads without a tap, and your progress is saved first.
+  const UPD={last:0, open:false, snooze:0, ver:'', waiting:false, tick:0};
+  const verNum=function(s){ const m=/v(\d+)\.(\d+)\.(\d+)/.exec(String(s||'')); return m?(+m[1])*1e6+(+m[2])*1e3+(+m[3]):0; };
+  const updURL=function(extra){ const q=location.search.replace(/([?&])(upd|check)=[^&]*(&|$)/g,function(m,a,b,c){ return c?a:''; }).replace(/[?&]$/,'');
+    return location.pathname+q+(q?'&':'?')+extra; };
+  // a refresh that came back still old (a slow server somewhere along the way) is not offered again this visit
+  const updTried=function(){ try{ return sessionStorage.getItem('keep_upd_tried')||''; }catch(e){ return ''; } };
+  try{ if(/[?&]upd=/.test(location.search)) history.replaceState(null,'',updURL('').replace(/[?&]$/,'')); }catch(e){}
+  const updBusy=function(){ if(typeof CHAT!=='undefined'&&CHAT.id>=0) return true; const ie=document.getElementById('intro'); if(ie&&ie.getAttribute('aria-hidden')==='false'&&!ie.classList.contains('gone')) return true;
+    for(let i=0;i<OVERLAYS.length;i++){ if(!$(OVERLAYS[i]).classList.contains('hidden')) return true; } return false; };
+  // while the offer stands it steps aside for a chat or a card, and comes back after
+  const updShow=function(){ if(UPD.open||UPD.waiting||Date.now()<UPD.snooze) return; UPD.open=true; $('updVer').textContent=UPD.ver; $('updMsg').textContent='';
+    clearInterval(UPD.tick); UPD.tick=setInterval(function(){ if(!UPD.open){ clearInterval(UPD.tick); return; } const b=updBusy(), n=$('updNudge');
+      if(b!==n.hidden){ n.hidden=b; if(!b) $('bkNudge').hidden=true; } },1000);
+    if(!updBusy()){ $('bkNudge').hidden=true; $('updNudge').hidden=false; } };
+  // read the page from the top only as far as the version tag, then stop
+  const updPeek=function(url){ return fetch(url,{cache:'no-store',headers:{Range:'bytes=0-2047'}}).then(function(r){ if(!r.ok) throw 0;
+      if(!r.body||!r.body.getReader) return r.text().then(function(t){ return t.slice(0,8192); });
+      const rd=r.body.getReader(), dec=new TextDecoder(); let t='';
+      const step=function(){ return rd.read().then(function(x){ if(!x.done) t+=dec.decode(x.value,{stream:true});
+        if(x.done||t.length>=8192||/<meta name="keep-version" content="[^"]+">/.test(t)){ if(!x.done) rd.cancel().catch(function(){}); return t; } return step(); }); };
+      return step(); }).then(function(t){ const m=/<meta name="keep-version" content="([^"]+)"/.exec(t); return m?m[1]:''; }); };
+  const updCheck=function(force){ if(UPD.open||typeof fetch!=='function'||!/^https?:$/.test(location.protocol)) return Promise.resolve(false);
+    const now=Date.now(); if(!force&&now-UPD.last<120000) return Promise.resolve(false); UPD.last=now;
+    return updPeek(updURL('check='+now)).then(function(v){ if(!v||verNum(v)<=verNum(VER_SHORT)||v===updTried()) return false; UPD.ver=v; updShow(); return true; })
+      .catch(function(){ return false; }); };
+  $('updGo').addEventListener('click',function(){ const b=$('updGo'); b.disabled=true; b.textContent='refreshing';
+    try{ if(!BK.frozen) journalSave(); }catch(e){}
+    // a never-before-asked address, so no copy kept anywhere along the way can answer it with the old game
+    const url=updURL('upd='+encodeURIComponent(UPD.ver.replace(/\s.*$/,'')));
+    updPeek(url).then(function(v){ if(!v) throw 0; try{ sessionStorage.setItem('keep_upd_tried',UPD.ver); }catch(e){} location.replace(url); },
+      function(){ b.disabled=false; b.textContent='refresh'; $('updMsg').textContent='No connection. Try again in a bit.'; }); });
+  $('updNo').addEventListener('click',function(){ $('updNudge').hidden=true; UPD.open=false; clearInterval(UPD.tick); UPD.snooze=Date.now()+1800000; });
+  window.KeepUpdate={check:function(){ UPD.last=0; UPD.snooze=0; return updCheck(true); }, state:UPD};
+  setTimeout(function(){ updCheck(true); },30000);
+  setInterval(function(){ if(document.visibilityState==='visible') updCheck(false); },600000);
+  document.addEventListener('visibilitychange',function(){ if(document.visibilityState==='visible') updCheck(false); });
   try{ if(navigator.storage&&navigator.storage.persist) navigator.storage.persisted().then(function(p){ if(!p) return navigator.storage.persist(); }).catch(function(){}); }catch(e){}
   // top-right menu: one button that reaches everything, so nothing is off-screen in portrait
   const closeMenu=function(){ $('menu').classList.add('hidden'); };
