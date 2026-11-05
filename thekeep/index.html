@@ -216,7 +216,7 @@ html.fromshelf #inPage #inViews{padding-top:calc(58px + env(safe-area-inset-top)
  </div>
  <div id="stick"><div id="knob"></div></div>
  <div id="fps"></div>
- <button class="mb-ver" id="mbVer" type="button">v0.37.0 &middot; Nov 4</button>
+ <button class="mb-ver" id="mbVer" type="button">v0.39.0 &middot; Nov 4</button>
  <div id="toast"></div>
  <div id="bkNudge" hidden role="status"><span>Big moment. Back up your progress?</span><button class="btn go" id="bkNudgeGo" type="button">back up</button><button class="btn" id="bkNudgeNo" type="button">later</button></div>
  <button class="btn" id="bTalk" type="button" hidden>Talk</button>
@@ -257,7 +257,7 @@ html.fromshelf #inPage #inViews{padding-top:calc(58px + env(safe-area-inset-top)
   <p><b>Every valley has its troubles.</b> A hen that wandered over the hills, a quarrel over a fence, a pair of sweethearts too shy to speak, a light in the old stones at night, a name cut in a stone that belongs to a family somewhere else. Every valley grows its own from its seed, and what you choose changes what people say.</p>
   <p><b>Talk and choose.</b> Walk up to anyone and they talk, or tap the Talk button when you're close. Walk off mid-conversation and it waits for you. When it matters, people ask you things, and you answer with the buttons on the chat card. The journal (top of the screen) keeps what you were asked, every valley you have been to, and takes you back to any of them.</p>
   <p><b>Story or Wander.</b> Story starts you at home: give yourself a name, say what your valley has plenty of, and wake by the gate of the keep your parents keep. Everyone there knows you. Wander drops you into any valley, as a stranger. Your story is saved on this device, and Continue picks it up where you left it.</p>
-  <p class="fsize">The whole game is one HTML file, plus a file for each 3D view. Right now: <b id="fsize">~712 KB</b>. Smaller than a single phone photo.</p>
+  <p class="fsize">The whole game is one HTML file, plus a file for each 3D view. Right now: <b id="fsize">~768 KB</b>. Smaller than a single phone photo.</p>
   <p><b>Why I built it.</b> I build things on a phone, directing AI the way I would direct a camera. I saw a clip of a tiny 3D world made of nothing but text and wanted to see if I could grow one that was actually alive, and keep growing it in the open instead of ever calling it done.</p>
   <p><b>What I learned.</b> How far you can get with almost nothing. One idea, a ray walking a height map, turned into characters, with a small world of animals living on top. Every version taught me one concrete thing: how to make a wall read as solid, how to keep the wolves from starving the world empty, how to make a forest look like real woods.</p>
   <p style="color:var(--mb-dim);font-size:13px"><b style="color:var(--mb-soft)">Walk:</b> drag the left half of the screen (tilt to turn). <b style="color:var(--mb-soft)">Look:</b> drag the right half. Tap <b style="color:var(--mb-soft)">jump</b> (or the space bar) to hop up onto low things. Tap <b style="color:var(--mb-soft)">sound</b> to hear the valley; it stays off until you do. (No sound on an iPad or iPhone? Check the silent switch.) Wade into the water to swim. Tap ☰ menu for a new world, the dials, and the time of day. Walk under the gate arch and find the door under the tower stair.</p>
@@ -1327,9 +1327,11 @@ var SHELF={on:false,url:'https://motbuchanan.com/gameshelf/'};
   SHELF.place=place;
 })();
 
-const VERSION='The Keep v0.37.0 · Nov 4 2026';
-const VER_SHORT='v0.37.0 · Nov 4'; // what the badge shows; bump with VERSION
+const VERSION='The Keep v0.39.0 · Nov 4 2026';
+const VER_SHORT='v0.39.0 · Nov 4'; // what the badge shows; bump with VERSION
 const CHANGELOG=[
+ ['v0.39.0 · Nov 4 2026','More to do in every valley. Six new kinds of trouble: a well bucket at the bottom of the well, an owl in the gate arch, a letter too shy to send, a guard whose boots have worn through, crows in the corn and a scarecrow to build, and a light on the hill at night. Some things only happen because of what you did before: once you have a name, people bring you their quarrels; a hen you brought home raises chicks; bandits you sent home write to you. And twelve more old stories, some only told once you have walked the ring road or brought the two halves of the crown together.'],
+ ['v0.38.0 · Nov 4 2026','Talk that does not repeat. Over three hundred new things for people to say: every role has more of its own, and everyone has more about the weather, the valley, the road, old sayings and small kindnesses. Two people in one valley never tell you the same thing, what you have heard is remembered between visits, and someone with nothing new to tell you says so instead of going round again.'],
  ['v0.37.0 · Nov 4 2026','New animals. Every creature is drawn again, bigger, shaded and outlined, and they move: deer walk, run and graze, some with antlers; wolves trot, wag and lift their heads to howl at night; sheep and cows graze and the cow swishes its tail; rabbits sit, nibble and hop; hens peck; squirrels sit up and bound; trout sweep their tails; birds flap and glide. Deer, wolves, sheep and cows now face you when they come your way. The Mesh, Voxels, Rays and Iso views draw the new people and animals too (people there were garbled since v0.35.0).'],
  ['v0.36.0 · Nov 4 2026','Backups. Your progress lives only in this browser, so now you can keep a copy: menu, backup your progress. Save it as a small file, or copy a save code into your notes, and bring it back on any phone or browser. After a big moment, a quest done or a new stretch of valleys, the game offers a backup now and then. Load a save from the menu or the opening page.'],
  ['v0.35.0 · Nov 4 2026','New people. Everyone is drawn with more than twice the detail: faces with eyes, brows, noses and cheeks; beards short, full or long; hair short, long, braided, in a bun, tied back or bald; helmets, hoods, wide hats, soft caps and kerchiefs; tall, short and stout builds; and a vest, apron, sash or collar picked from each name, so no two folk look alike. They stay the same height in the world.'],
@@ -4533,6 +4535,7 @@ function inHome(){ return W.seed!=null&&isHome(W.seed); }
 function youName(){ return calledBy(); }
 // ---- the save ----
 function journalBlank(){ return {v:1, story:null, wander:{}}; }
+let HEARDLOADED=false;
 function journalLoad(){ let j=null, raw=null;
   try{ raw=localStorage.getItem('keep_journal'); JOURNAL_OFF=false; }catch(e){ JOURNAL_OFF=true; }
   if(raw){ try{ j=JSON.parse(raw); }catch(e){ j=null; } }
@@ -4543,9 +4546,11 @@ function journalLoad(){ let j=null, raw=null;
   else if(s){ s.name=cleanName(s.name); s.home=(+s.home)>>>0; s.at=(typeof s.at==='number'&&isFinite(s.at)&&s.at>=0)?(s.at>>>0):s.home;
     s.chips=Array.isArray(s.chips)?[0,1,2,3].map(function(i){ return s.chips[i]?1:0; }):[0,0,0,0]; s.started=typeof s.started==='string'?s.started.slice(0,40):''; }
   if(!j.wander||typeof j.wander!=='object') j.wander={};
+  if(!HEARDLOADED){ HEARDLOADED=true; heardLoad(); }
   JOURNAL=j; return j; }
 function journalSave(){ if(!JOURNAL) JOURNAL=journalBlank(); if(MODE==='story'&&STORY) JOURNAL.story=STORY;
   try{ if(BK.frozen) return false; }catch(e){}   // a save was just loaded: nothing from before may write over it
+  heardSave();
   try{ localStorage.setItem('keep_journal',JSON.stringify(JOURNAL)); JOURNAL_OFF=false; }catch(e){ JOURNAL_OFF=true; return false; } try{ backupNote(); }catch(e){} return true; }
 function storyNew(name,chips,when){ STORY={name:cleanName(name), home:homeSeed(chips,name), chips:[0,1,2,3].map(function(i){ return chips&&chips[i]?1:0; }),
     started:when||'', at:0, sid:Date.now().toString(36)+'.'+((Math.random()*1e6)|0)}; STORY.at=STORY.home; MODE='story'; if(!JOURNAL) JOURNAL=journalBlank(); JOURNAL.story=STORY; return STORY; }
@@ -4694,13 +4699,13 @@ function beatLetter(id){ if(MODE!=='story'||!STORY) return null; const p=part();
       {label:"I'll tell "+(L.gp==='she'?'her':'him'), reply:["And tell "+L.gn+" I still have the cup. "+(L.gp==='she'?'She':'He')+"'ll know."], pick:function(){ L.s='replied'; }},
       {label:'What was in it?', reply:["Old business. Good business. Nothing for you to worry about.","Go on home. Safe roads."], pick:function(){ L.s='replied'; }}]};
   return null; }
-const BEATS=[beatLetter,beatErrand,beatGate,beatLeft,beatLost,beatStone,beatFeud,beatSweet,beatLight,beatRoof,beatRoofW,beatAxe,beatBet,beatCake,beatSong,beatFest,beatRing,beatMend,beatMoths,beatBandit,beatCrown,beatFriend];
+const BEATS=[beatLetter,beatErrand,beatGate,beatLeft,beatLost,beatStone,beatFeud,beatSweet,beatLight,beatRoof,beatRoofW,beatAxe,beatBet,beatCake,beatSong,beatWell,beatWellW,beatOwl,beatLetterG,beatBoots,beatCrows,beatWisp,beatJudge,beatChicks,beatFest,beatRing,beatMend,beatMoths,beatBandit,beatCrown,beatFriend];
 const SNOOZE={};   // "not now": the question rests a few minutes before it is asked again
 function fillBeat(id,b){ b.lines=b.lines.map(function(t,k){ return {id:'B'+b.key+k, text:T(id,t)}; });
   for(const o of b.options){ o.label=T(id,o.label); o.reply=(o.reply||[]).map(function(t){ return T(id,t); }); } return b; }
 // two passes: a thread you have already started comes before a new question
 function beatGoing(b){ const t=part().tasks[b.key]; return !!(t&&typeof t==='object'&&t.s!=='none'&&t.s!=='early')||/^left(meet|rumor|report|back|q)$/.test(b.key); }
-function storyBeat(id){ if(id===ROLEPED){ const b=beatCrown(id); return b?fillBeat(id,b):null; } let first=null;
+function storyBeat(id){ if(id===ROLEPED){ const b=beatCrown(id)||beatFoxLetter(id); return b?fillBeat(id,b):null; } let first=null;
   for(const f of BEATS){ const b=f(id); if(!b||(SNOOZE[b.key]&&Date.now()-SNOOZE[b.key]<180000)) continue; if(beatGoing(b)) return fillBeat(id,b); if(!first) first=b; }
   return first?fillBeat(id,first):null; }
 // ---- the journal's words: your own notes, from what each task knows ----
@@ -4714,7 +4719,7 @@ function journalNotes(){ const p=part(), open=[], done=[];
       else if(e.s==='replied') open.push({t:e.rg+' says yes, for the harvest. Tell '+e.gn+', at home.', v:STORY&&STORY.home});
       else if(e.s==='done') done.push({t:e.c==='lie'?'Told '+e.gn+' that '+e.rg+' said no. It was not true.':'Took '+e.gn+"'s letter over the hills to "+e.rg+'. '+e.rg+' is coming for the harvest.', v:e.dest}); }
     else if(k==='gate') done.push({t:'Every road leads to the same valley every time. The journal remembers the way home.'}); }
-  crownNotes(open,done); leftNotes(open,done); troubleNotes(open,done); trouble2Notes(open,done); festNotes(open,done); ringNotes(open,done); keepNotes(open,done); return {open:open, done:done}; }
+  crownNotes(open,done); leftNotes(open,done); troubleNotes(open,done); trouble2Notes(open,done); trouble3Notes(open,done); festNotes(open,done); ringNotes(open,done); keepNotes(open,done); return {open:open, done:done}; }
 // ---------------- valley troubles (v0.26.1): every valley has its own, from its own seed ----------------
 // Any valley you reach, by road, by a random seed or by your journal, grows one or two troubles from its seed: a lost
 // hen or lamb that turned up over the hills, a quarrel over a fence, a pair of sweethearts too shy to say so, a light
@@ -4732,7 +4737,9 @@ function troublesFor(seed){ const r=seedRng(seed>>>0,0x7B0B), C=castFor(seed), o
     if((k==='light'||k==='stone')&&!ruins) continue;                          // no old stones, no light in them
     out.push(k); }
   { const r2=seedRng(seed>>>0,0x7B0C), p2=TROUBLES2.slice(); for(let i=p2.length-1;i>0;i--){ const j=(r2()*(i+1))|0; const t=p2[i]; p2[i]=p2[j]; p2[j]=t; }
-    out.push(p2[0]); if(r2()<0.3) out.push(p2[1]); }   // v0.30: one or two of the newer kinds as well, from their own draw, so older valleys keep theirs
+    out.push(p2[0]); if(r2()<0.3) out.push(p2[1]); }
+  { const r3=seedRng(seed>>>0,0x7B0D), p3=TROUBLES3.slice(); for(let i=p3.length-1;i>0;i--){ const j=(r3()*(i+1))|0; const t=p3[i]; p3[i]=p3[j]; p3[j]=t; }
+    out.push(p3[0]); if(r3()<0.35) out.push(p3[1]); }   // v0.30: one or two of the newer kinds as well, from their own draw, so older valleys keep theirs
   return {kinds:out, light:LIGHTS[(r()*LIGHTS.length)|0], road:r(), lostKind:r()<0.5?'hen':'lamb', who:r()}; }
 // what is open, and whether a kind can start here right now
 function trKey(k){ return k+':'+(W.seed>>>0); }
@@ -5105,7 +5112,7 @@ const LORE=[
 function loreHas(i){ const p=part(); p.lore=Array.isArray(p.lore)?p.lore:[]; return p.lore.indexOf(i)>=0; }
 function loreCountHere(){ const p=part(); p.loreAt=p.loreAt||{}; return p.loreAt[W.seed>>>0]||0; }
 // the next fragment for a tag here, from the seed; null if none is left or this valley has given two
-function loreFor(tag){ if(W.seed==null||loreCountHere()>=2) return null; const ids=[]; for(let i=0;i<LORE.length;i++) if(LORE[i][0].split(',').indexOf(tag)>=0&&!loreHas(i)) ids.push(i);
+function loreFor(tag){ if(W.seed==null||loreCountHere()>=2) return null; const ids=[]; for(let i=0;i<LORE.length;i++) if(LORE[i][0].split(',').indexOf(tag)>=0&&!loreHas(i)&&loreGateOk(i)) ids.push(i);
   if(!ids.length) return null; const r=seedRng((W.seed>>>0)^Math.imul(tag.length+3,0x9E37),0x10AE); return ids[(r()*ids.length)|0]; }
 function loreTake(i){ const p=part(); p.lore=Array.isArray(p.lore)?p.lore:[]; if(p.lore.indexOf(i)>=0) return false; p.lore.push(i); p.loreAt=p.loreAt||{}; p.loreAt[W.seed>>>0]=(p.loreAt[W.seed>>>0]||0)+1; journalSave(); return true; }
 // on the thread's road there is always one: the gate on the way says it with the rumor
@@ -5319,7 +5326,7 @@ function trouble2Notes(open,done){ const p=part(); for(const k in p.tasks){ cons
 // ---- the harvest festival at home (Story) ----
 function FEST(){ return part().tasks.fest||null; }
 function helpedAway(){ const p=part(), o=[]; if(MODE!=='story'||!STORY) return o; for(const k in p.tasks){ const e=p.tasks[k]; if(!e||typeof e!=='object'||e.v==null||(e.v>>>0)===(STORY.home>>>0)) continue;
-    const kind=k.split(':')[0], done=e.s==='done'||e.s==='closed'; if(!done||['hard','sour','rest','lie','tale'].indexOf(e.c)>=0) continue; const who={lost:e.o, feud:e.a, sweet:e.a, light:e.g, roof:4, axe:6, bet:e.g, cake:3, song:5, grain:3}[kind];
+    const kind=k.split(':')[0], done=e.s==='done'||e.s==='closed'; if(!done||['hard','sour','rest','lie','tale'].indexOf(e.c)>=0) continue; const who={lost:e.o, feud:e.a, sweet:e.a, light:e.g, roof:4, axe:6, bet:e.g, cake:3, song:5, grain:3, well:3, owl:2, gletter:0, boots:(e.c==='clog'?6:4), crows:4, wisp:5, judge:(e.for!=null?e.for:4)}[kind];
     if(who!=null&&castValley(e.v)[who]&&!o.some(function(h){ return h.v===(e.v>>>0)&&h.id===who; })) o.push({v:e.v>>>0, id:who, name:castValley(e.v)[who].name}); } return o; }
 function beatFest(id){ if(MODE!=='story'||!STORY) return null; const p=part(); let f=FEST(); const c=castOf(id);
   if(inHome()&&c&&c.parent){ if(!f){ if(helpedAway().length<3) return null;
@@ -5347,7 +5354,9 @@ function addGuests(){ if(!W.cast||!W.keepBuilt||!KPATHS[3]) return; let j=0; for
 // leaving home ends the festival
 // a guest away at your festival is not at home in their own valley; and a roof mends once you have been away
 function festAway(seed){ seed=seed>>>0; const p=part();
-  for(const k in p.tasks){ const e=p.tasks[k]; if(k.indexOf('roof:')===0&&e&&(e.s==='crust'||e.s==='coming')&&(e.v>>>0)!==seed) e.away=true; }
+  for(const k in p.tasks){ const e=p.tasks[k]; if(k.indexOf('roof:')===0&&e&&(e.s==='crust'||e.s==='coming')&&(e.v>>>0)!==seed) e.away=true;
+    else if(k.indexOf('well:')===0&&e&&e.s==='coming'&&(e.v>>>0)!==seed) e.away=true;
+    else if(k.indexOf('lost:')===0&&e&&e.s==='done'&&e.c==='found'&&(e.v>>>0)!==seed) e.away=true; }
   const f=FEST(); if(!f||!(f.s==='invite'||f.s==='held')||isHome(seed)) return;
   for(const g of festList(f)){ if(g.v!==seed) continue; for(let c=0;c<CR_.n;c++) if(CR_.al[c]&&CR_.sp[c]===SP.KEEPER&&(CR_.ay[c]|0)===g.id) CR_.al[c]=0; } }
 function festEnd(seed){ const f=FEST(); if(f&&f.s==='held'&&STORY&&(seed>>>0)!==(STORY.home>>>0)) f.s='done'; }
@@ -5601,6 +5610,162 @@ const LORE5=[
  ['wall',"A good wall needs a good mason. A bad wall needs a mason faster."],
  ['temple',"The Moth Queen came to the candles in the old halls. Leave one burning and she'll come to yours."]];
 LORE.push.apply(LORE,LORE5);
+// ---------------- deeper valleys (v0.39.0): more troubles, troubles that grow out of earlier ones, and folklore that waits for you ----------------
+// Six more kinds of trouble (one in every valley, sometimes two, from their own draw so older valleys keep what they had):
+// the well bucket, the owl in the gate, a letter too shy to send, a guard's worn-out boots, a scarecrow for the crows, and
+// lights on the hill at night. Three that only happen because of something you did before: people bring you their quarrels
+// once you have a name for yourself, a hen you brought home raises chicks, and bandits you sent home write to you.
+// And old folk know more stories once you have walked the ring road or seen the crown made whole.
+const TROUBLES3=['well','owl','letter','boots','crows','wisp'];
+function tr3Here(k){ return W.seed!=null&&troublesFor(W.seed).kinds.indexOf(k)>=0; }
+function T3(k,seed){ return part().tasks[k+':'+((seed==null?W.seed:seed)>>>0)]; }
+function T3set(k,o){ part().tasks[k+':'+(W.seed>>>0)]=Object.assign({v:W.seed>>>0, vn:W.valley},o); return part().tasks[k+':'+(W.seed>>>0)]; }
+function later3(e){ return e.away||(W.vday|0)>(e.day|0); }
+function anyDone(kind,c){ const t=part().tasks; for(const k in t){ const e=t[k]; if(k.indexOf(kind+':')===0&&e&&e.s==='done'&&(c==null||e.c===c)) return e; } return null; }
+// 10. the well bucket at the bottom of the well (the steward; the woodcutter has rope; or climb down yourself)
+function beatWell(id){ if(!tr3Here('well')||!castOf(3)) return null; let e=T3('well');
+  if(!e){ if(id!==3) return null;
+    return {key:'well:'+(W.seed>>>0), lines:["The well rope's snapped. The bucket's at the bottom with half the morning's water.","No water, no tea. No tea, no steward. You see the problem."], options:[
+      castOf(6)&&folkHere('wood')?{label:"I'll ask "+nm(6)+" for rope", reply:[nm(6)+" keeps good rope. Says it's for felling. I think it's for swinging off branches."], pick:function(){ T3set('well',{s:'rope', w:nm(6), sn:nm(3)}); }}:null,
+      {label:"I'll climb down for it", reply:["Down the well? On the old ladder? ...Mind the third rung. And the fourth. Mind all the rungs."], pick:function(){ T3set('well',{s:'climb', sn:nm(3)}); }},
+      {label:'Drink the rain instead', reply:["Rain tea. My grandmother drank rain tea. She was a very damp woman."], pick:function(){}, snooze:true}].filter(Boolean)}; }
+  if(e.s==='climb'&&id===3) return {key:'well:'+e.v, lines:["Down you go, then. Careful.","...","You found the bucket! And what's that, at the bottom of it? A ring? A little green ring?","My gran said the Green Lady of the well keeps what's dropped and gives back what's needed. I always thought she meant buckets."], options:[
+      {label:'Give the ring to '+pr(3,'him'), reply:["For me? ...I'll keep it on the well post. For her. Thank you, {you}."], pick:function(){ e.s='done'; e.c='ring'; logChoice('kind','well'); }},
+      {label:'Put it back in the well', reply:["Back to her. Quite right. You don't keep what the Green Lady keeps."], pick:function(){ e.s='done'; e.c='back'; logChoice('kind','well'); const li=loreIndexOf('well'); if(li>=0) loreTake(li); }}]};
+  if(e.s==='coming'&&id===3&&later3(e)) return {key:'well:'+e.v, lines:[e.w+" came with a coil of rope and had the bucket up in a minute. Then sat and drank my tea for an hour."], options:[
+      {label:'Fair trade', reply:["Fair trade. The well works and the woodcutter's happy. Two good things in one morning."], pick:function(){ e.s='done'; e.c='rope'; logChoice('mend','well'); }}]};
+  return null; }
+function beatWellW(id){ const e=T3('well'); if(!e||e.s!=='rope'||id!==6) return null;
+  return {key:'well:'+e.v, lines:["The well rope? Snapped? I told "+e.sn+" that rope was older than the well.","I'll bring some over. Good rope, this. Tell "+e.sn+" to put the kettle on."], options:[
+    {label:"I'll tell "+pr(3,'him'), reply:["And tell "+pr(3,'him')+" I take three sugars. "+pr(3,'He')+" knows. "+pr(3,'He')+" pretends not to."], pick:function(){ e.s='coming'; e.day=W.vday|0; e.away=false; }}]}; }
+// 11. the owl in the gate arch (the gatekeeper wants it gone; the hermit knows owls)
+function beatOwl(id){ if(!tr3Here('owl')||!castOf(2)) return null; let e=T3('owl');
+  if(!e){ if(id!==2) return null;
+    return {key:'owl:'+(W.seed>>>0), lines:["There's an owl living in the gate arch. Hoots all night, right over my head.","Some say an owl at the gate is lucky. Some say it's not. I say it's loud."], options:[
+      castOf(7)&&folkHere('hermit')?{label:'Ask '+nm(7)+' about owls', reply:[nm(7)+"? "+pr(7,'He')+" talks to birds more than people. Fine. Ask."], pick:function(){ T3set('owl',{s:'ask', gn:nm(2)}); }}:null,
+      {label:'Lucky, surely', reply:["Lucky. Hm. I'll try to feel lucky at three in the morning."], pick:function(){ T3set('owl',{s:'done', c:'luck'}); logChoice('kind','owl'); }},
+      {label:'Shoo it off', reply:["Shoo it? You try shooing an owl. It looks at you like you owe it money."], pick:function(){}, snooze:true}].filter(Boolean)}; }
+  if(e.s==='ask'&&id===7) return {key:'owl:'+e.v, lines:["An owl in the gate? Good. She'll have every mouse out of the grain store by midsummer.","Tell the gatekeeper she was there first. Owls always are."], options:[
+      {label:"I'll tell "+e.gn, reply:["And tell "+e.gn+" to stop hooting back at her. I can hear it from here."], pick:function(){ e.s='told'; }}]};
+  if(e.s==='told'&&id===2) return {key:'owl:'+e.v, lines:["Well? What did the hermit say about my owl?"], options:[
+      {label:"She eats the mice. Let her stay.", reply:["Eats the mice. ...The grain store has been quieter. Fine. She can stay. I'm naming her Hilda."], pick:function(){ e.s='done'; e.c='stay'; logChoice('truth','owl'); }},
+      {label:"The hermit says owls bring bad luck.", reply:["I knew it! ...Still. She was here first. I'll keep her, bad luck and all."], pick:function(){ e.s='done'; e.c='lie'; logChoice('lie','owl'); }}]};
+  return null; }
+// 12. a letter too shy to send (the night guard and an old friend on the wall of a valley down the road)
+function beatLetterG(id){ const far=farFor('gletter'); if(far&&id===0){ const e=far;
+    return {key:'gletter:'+e.v, lines:["A letter? From "+e.an+"? We stood the night watch together, years back, before "+(e.ap==='she'?'she':'he')+" went over the hills.","...Tell "+(e.ap==='she'?'her':'him')+" I still have the dice. And I still win. Here, take this back. I wrote quick."], options:[
+      {label:"I'll take it back", reply:["Go carefully. And tell "+(e.ap==='she'?'her':'him')+" the wall's colder without the bad jokes."], pick:function(){ e.s='back'; }}]}; }
+  if(!tr3Here('letter')||id!==0||!castOf(0)) return null; let e=T3('gletter'); if(!e&&sentHere('gletter')) return null;
+  if(!e){ const R=nearRoad('letter'); if(!R) return null; const G=castValley(R.dest)[0];
+    return {key:'gletter:'+(W.seed>>>0), lines:["I wrote a letter to "+G.name+", the night guard over in "+valleyName(R.dest)+". We were on the same wall once. Best friend I had.","Been carrying it a year. Can't make myself send it. What if "+(G.pr==='she'?'she':'he')+"'s forgotten me?"], options:[
+      {label:"I'll take it", reply:["...You will? Here. Don't read it. It's mostly about dice."], pick:function(){ roadLink(W.seed>>>0,R.ex,R.dest); T3set('gletter',{s:'go', dest:R.dest, dn:valleyName(R.dest), gn:G.name, an:nm(0), ap:castOf(0).pr}); }},
+      {label:'Send it yourself, someday', reply:["Someday. Yes. Someday is a good day. It's never come yet, but it's a good one."], pick:function(){}, snooze:true}]}; }
+  if(e.s==='back') return {key:'gletter:'+e.v, lines:["You came back! Did "+e.gn+"... did "+(castValley(e.dest)[0].pr==='she'?'she':'he')+" read it?"], options:[
+      {label:'Give the reply', reply:["(reads) ...Still has the dice. Still thinks "+(castValley(e.dest)[0].pr==='she'?'she':'he')+" wins. Ha! Liar. ...Thank you, {you}. I'll write back. Tonight."], pick:function(){ e.s='done'; e.c='sent'; logChoice('kind','gletter'); }}]};
+  return null; }
+// 13. the day guard's boots, worn right through (the farmer has old ones, or the woodcutter carves clogs)
+function beatBoots(id){ if(!tr3Here('boots')||!castOf(1)) return null; if(!T3('boots')&&!(castOf(4)&&folkHere('farm1'))&&!(castOf(6)&&folkHere('wood'))) return null; let e=T3('boots');
+  if(!e){ if(id!==1) return null;
+    return {key:'boots:'+(W.seed>>>0), lines:["Look at these boots. Look at them. There's more hole than boot. I can feel every stone on the wall.","Can't leave my post to see about new ones. Somebody in {valley} must have an old pair."], options:[
+      castOf(4)&&folkHere('farm1')?{label:"I'll ask "+nm(4), reply:[nm(4)+" has feet like boats. That's good. Boats are roomy."], pick:function(){ T3set('boots',{s:'ask', who:4, wn:nm(4), gn:nm(1)}); }}:null,
+      castOf(6)&&folkHere('wood')?{label:"I'll ask "+nm(6)+" to carve some", reply:["Carve some? Wooden boots? ...Well. They'd last."], pick:function(){ T3set('boots',{s:'ask', who:6, wn:nm(6), gn:nm(1)}); }}:null,
+      {label:'Walk softer', reply:["Walk softer. On a wall. All day. Thank you. Very useful."], pick:function(){}, snooze:true}].filter(Boolean)}; }
+  if(e.s==='ask'&&id===e.who) return e.who===4?{key:'boots:'+e.v, lines:["Boots for "+e.gn+"? I've my old pair by the door. Good soles still. Bit of mud. Bit of hen.","Take them. If they don't fit, stuff the toes with straw. That's what I did."], options:[
+      {label:'Thank you', reply:["Tell "+e.gn+" not to wear them in the hen house. The hens know those boots."], pick:function(){ e.s='carry'; e.c='farm'; }}]}
+    :{key:'boots:'+e.v, lines:["Wooden boots? For "+e.gn+"? ...I've always wanted to make wooden boots.","Here. Willow, smoothed inside. They'll clop a bit. That's how you'll know "+(castOf(1).pr==='she'?'she':'he')+"'s coming."], options:[
+      {label:'They look sturdy', reply:["Sturdy as the keep. And twice as loud."], pick:function(){ e.s='carry'; e.c='clog'; }}]};
+  if(e.s==='carry'&&id===1) return {key:'boots:'+e.v, lines:[e.c==='farm'?"Boots! Real boots! ...They smell a bit of hen. I don't care. I don't care at all.":"Wooden boots? ...Oh, they fit. They fit! Listen. Clop. Clop. Nobody's sneaking up on this wall again."], options:[
+      {label:'Mind the stair', reply:["I'll mind the stair. Thank you, {you}. My feet thank you too."], pick:function(){ e.s='done'; logChoice('kind','boots'); }}]};
+  return null; }
+// 14. crows in the corn: a scarecrow needs the gatekeeper's old hat and the shepherd's straw
+function beatCrows(id){ if(!tr3Here('crows')||!castOf(4)||!folkHere('farm1')||!castOf(2)||!castOf(5)||!folkHere('farm2')) return null; let e=T3('crows');
+  if(!e){ if(id!==4) return null;
+    return {key:'crows:'+(W.seed>>>0), lines:["Crows in the corn again. Dozens. They sit on the fence and laugh at me.","I need a scarecrow. A good one. With a hat. A scarecrow without a hat is just a stick having a bad day."], options:[
+      {label:"I'll find a hat and straw", reply:[nm(2)+" has a terrible old hat. And "+nm(5)+" has straw to spare. Off you go."], pick:function(){ T3set('crows',{s:'gather', hat:0, straw:0, fn:nm(4)}); }},
+      {label:'Crows are clever. Talk to them.', reply:["Talk to them? ...I did, once. They talked back. Never again."], pick:function(){}, snooze:true}].filter(Boolean)}; }
+  if(e.s==='gather'&&id===2&&!e.hat) return {key:'crows:'+e.v, lines:["My hat? For a scarecrow? This hat has seen three kings and a flood.","...Fine. Take it. It's never suited me. Tell nobody I said that."], options:[
+      {label:'Take the hat', reply:["Mind the feather. The feather's the best bit."], pick:function(){ e.hat=1; }}]};
+  if(e.s==='gather'&&id===5&&!e.straw) return {key:'crows:'+e.v, lines:["Straw for "+e.fn+"'s scarecrow? Take an armful. Take two. The sheep sleep on less than they think."], options:[
+      {label:'Take the straw', reply:["Make it look fierce. Crows don't respect a cheerful scarecrow."], pick:function(){ e.straw=1; }}]};
+  if(e.s==='gather'&&id===4&&e.hat&&e.straw) return {key:'crows:'+e.v, lines:["A hat AND straw! Help me stuff him. ...There. Look at him. Isn't he terrible?","What shall we call him?"], options:[
+      {label:'Old Hat', reply:["Old Hat it is. The crows are already nervous."], pick:function(){ e.s='done'; e.c='Old Hat'; logChoice('kind','crows'); }},
+      {label:'Sir Stuffington', reply:["Sir Stuffington! Look at the crows. They can't take him seriously, but they won't land near him either."], pick:function(){ e.s='done'; e.c='Sir Stuffington'; logChoice('kind','crows'); }},
+      {label:'Name him after '+nm(2), reply:["Ha! "+nm(2)+" the scarecrow. Same hat. Same face, nearly. Don't tell "+pr(2,'him')+"."], pick:function(){ e.s='done'; e.c=nm(2); logChoice('stir','crows'); }}]};
+  return null; }
+// 15. lights on the hill at night (the shepherd is frightened; it is the hermit, night fishing with a lantern)
+function beatWisp(id){ if(!tr3Here('wisp')||!castOf(5)||!folkHere('farm2')||!castOf(7)||!folkHere('hermit')) return null; let e=T3('wisp');
+  if(!e){ if(id!==5) return null;
+    return {key:'wisp:'+(W.seed>>>0), lines:["There's a light on the hill at night. Bobbing about. Going nowhere.","The old folk say it's a will-o-the-wisp, leading travellers astray. The sheep won't settle."], options:[
+      {label:"I'll go and look, after dark", reply:["After dark? ...Rather you than me. Take a stick. Not that a stick helps with wisps."], pick:function(){ T3set('wisp',{s:'look', sn:nm(5)}); }},
+      {label:"Wisps aren't real", reply:["Then what's the light? ...Don't answer. I'd rather not know."], pick:function(){}, snooze:true}].filter(Boolean)}; }
+  if(e.s==='look'&&id===7&&ringNight()) return {key:'wisp:'+e.v, lines:["What? Oh. You. Shh. The night fish bite best when it's quiet.","The light? That's my lantern. I walk the lake shore with it. Why?"], options:[
+      {label:'The shepherd thinks you are a wisp', reply:["A wisp! Ha. I've been called worse. I've been called a heron. ...Tell the shepherd I'll keep the lantern low."], pick:function(){ e.s='found'; }}]};
+  if(e.s==='found'&&id===5) return {key:'wisp:'+e.v, lines:["Well? Did you see it? Was it a wisp?"], options:[
+      {label:"It was "+nm(7)+", night fishing", reply:["The HERMIT? Walking about at night with a lantern? ...Of course it was. The sheep and I feel very silly."], pick:function(){ e.s='done'; e.c='truth'; logChoice('truth','wisp'); }},
+      {label:'It was a wisp. I asked it to move on.', reply:["You... spoke to it? And it listened? ...Thank you. I'll never doubt the old stories again. The sheep won't either."], pick:function(){ e.s='done'; e.c='tale'; logChoice('lie','wisp'); }}]};
+  return null; }
+// 16. once you have a name for yourself, people bring you their quarrels (the farmer and the shepherd and a shared ladder)
+function beatJudge(id){ if(inHome()||!castOf(4)||!castOf(5)||!folkHere('farm1')||!folkHere('farm2')) return null; const E=earned(), BADN=['the Promise-Breaker','the Troublemaker','Fibber','Busybody'], who=(E.title&&BADN.indexOf(E.title)<0)?E.title:((E.nick&&BADN.indexOf(E.nick)<0)?E.nick:null); if(!who) return null;
+  const k='judge:'+(W.seed>>>0), t=part().tasks; if(t[k]) return null; if(id!==4&&id!==5) return null;
+  if(troublesFor(W.seed).who>0.45) return null;   // only some valleys have this quarrel waiting for you
+  const o=id===4?5:4;
+  return {key:k, lines:["They call you "+who+", don't they? They say you're fair. Settle something for us.",nm(o)+" and I share a ladder. "+nm(o)+" says it's "+pr(o,'his')+" week. I say it's mine. It's been in the ditch three days while we argue."], options:[
+    {label:"It's "+nm(id)+"'s week", reply:["Ha! Hear that? The fair one says so."], pick:function(){ t[k]={v:W.seed>>>0, vn:W.valley, s:'done', c:'side', for:id}; logChoice('side','judge'); }},
+    {label:"It's "+nm(o)+"'s week", reply:["...Is it? Well. I asked, didn't I. Fine. Fair's fair."], pick:function(){ t[k]={v:W.seed>>>0, vn:W.valley, s:'done', c:'side', for:o}; logChoice('side','judge'); }},
+    {label:'Cut it in half', reply:["Cut the ladder in... oh. Oh, I see. A joke. ...We'll share it. Alternate days. That's what you meant."], pick:function(){ t[k]={v:W.seed>>>0, vn:W.valley, s:'done', c:'mend'}; logChoice('mend','judge'); }}]}; }
+// 17. a hen you brought home raises chicks, and you name one
+function beatChicks(id){ const k='lost:'+(W.seed>>>0), L=part().tasks[k]; if(!L||L.s!=='done'||L.c!=='found'||L.a!=='hen') return null;
+  const ck='chick:'+(W.seed>>>0), t=part().tasks; if(t[ck]||id!==L.o||!L.away) return null;   // only after you have been away a while
+  return {key:ck, lines:["The hen you brought back, {you}? She's had chicks. Six of them. Little yellow things, everywhere.","The biggest one follows me about. Give it a name, would you? For luck."], options:[
+    {label:'Pip', reply:["Pip. Yes. Look at it. It's a Pip."], pick:function(){ t[ck]={v:W.seed>>>0, vn:W.valley, s:'done', c:'Pip'}; logChoice('kind','chick'); }},
+    {label:'Wanderer', reply:["Wanderer! Like its mother. Like you. I'll keep a closer eye on this one."], pick:function(){ t[ck]={v:W.seed>>>0, vn:W.valley, s:'done', c:'Wanderer'}; logChoice('kind','chick'); }},
+    (MODE==='story'&&STORY&&STORY.name)?{label:STORY.name, reply:["Named after you! Ha! It's already trying to leave the valley."], pick:function(){ t[ck]={v:W.seed>>>0, vn:W.valley, s:'done', c:STORY.name}; logChoice('kind','chick'); }}:null].filter(Boolean)}; }
+// 18. bandits you sent home write to you (a letter waits with the peddler)
+function beatFoxLetter(id){ if(id!==ROLEPED) return null; const t=part().tasks; let sent=null; for(const q in t){ const e=t[q]; if(q.indexOf('bandit:')===0&&e&&e.s==='done'&&e.c==='home'&&!t['fox:'+(e.v>>>0)]&&(e.v>>>0)!==(W.seed>>>0)){ sent=e; break; } } if(!sent) return null; const k='fox:'+(sent.v>>>0);
+  return {key:k, lines:["Oh! You're {you}? I've a letter for you. Been carrying it three valleys. Sealed with a fox.","From the Free Company of the Seven Fords, it says. 'With thanks, from home.' There's a feather in it, too."], options:[
+    {label:'Read it', reply:["(it says) We found the fords. All seven. Our mothers cried. The chief has taken up beekeeping. Thank you, friend of the fox."], pick:function(){ t[k]={v:sent.v>>>0, vn:sent.vn, s:'done', c:'letter'}; }}]}; }
+// folklore that waits until you have walked the ring road or seen the crown whole
+const LORE6=[
+ ['old',"The Green Lady of the wells keeps whatever is dropped, and gives back what is needed. Never what is wanted. What is needed."],
+ ['old',"Owls nest where the old roads crossed. That's why there's always one in a gate."],
+ ['hermit',"Will-o-the-wisps are lanterns somebody forgot to carry home. They're still looking for the house."],
+ ['old',"Rooks hold a parliament every autumn, on the tallest tree in the valley. Whoever sits highest rules the winter."],
+ ['road',"Leave a stone on every signpost you pass and you'll always find your way home. That's why the posts have little cairns."],
+ ['old',"Never count the swallows. If you count them, they count you back, and then they know you."],
+ ['hermit',"The first keepers didn't build the keeps. They found them, already standing, warm, with bread on the table. Nobody knows who baked it."],
+ ['old',"Bees must be told the news. A wedding, a birth, a death. Tell the bees, or they'll leave to find out for themselves."],
+ ['ringafter,hermit',"The Heart Ring was raised by Tamsin and the first keepers, one stone for each valley. There are more stones than valleys now. Nobody likes to say why."],
+ ['ringafter,old',"When the stones hum, the old ones say, Tamsin is counting. When they stop, she's lost count and starts again."],
+ ['crownafter,old',"The crown was cut in two by the sisters so neither would rule alone. Lay the halves side by side and they look less like a crown and more like a lantern. Odd, that."],
+ ['crownafter,hermit',"Ysolde's line kept the crown, and the other line kept the road. That's why the peddlers know every valley. They were the other half."]];
+LORE.push.apply(LORE,LORE6);
+function loreIndexOf(word){ for(let i=0;i<LORE.length;i++) if(LORE[i][1].indexOf('Green Lady')>=0&&word==='well') return i; return -1; }
+// a gated piece of lore is only told once its gate is open
+function loreGateOk(i){ const tg=LORE[i][0].split(','); if(tg.indexOf('ringafter')>=0&&!ringTag('ringdone')) return false;
+  if(tg.indexOf('crownafter')>=0){ const c=CROWN(); if(!c||c.s!=='done'||c.c!=='whole') return false; } return true; }
+// what has changed because of you: said after
+const TALKT3={
+ steward:{a:["[wellring]The little green ring's on the well post now. The water tastes better. Don't laugh.","[wellrope]New rope on the well. The woodcutter's. It's the best thing in the keep, frankly."]},
+ gatekeeper:{a:["[owlstay]Hilda the owl had owlets. Four. They sit in a row and judge me.","[owlstay]Not a mouse in the grain store since Hilda moved in. I've stopped complaining. Mostly."]},
+ guard1:{a:["[letterdone]Got another letter from over the hills. Still about dice. Still lying about who wins."]},
+ guard2:{a:["[bootsdone]New boots. Well. Newish. I can walk the whole wall without counting stones now."]},
+ farmer:{a:["[crowsdone]The scarecrow's working. The crows sit in the next field and sulk.","[chicknamed]That chick you named follows me everywhere. Into the house, even. Bold as anything."]},
+ shepherd:{a:["[wisptruth]The light on the hill is only the hermit, fishing. The sheep sleep fine now. So do I.","[wisptale]No wisp on the hill since you spoke to it. I leave a lantern in the window for it, just in case."]},
+ any:{a:["[judged]People still talk about how you settled that ladder business. Fair as a scale, they say."]}};
+const T3TAGS=['wellring','wellrope','owlstay','letterdone','bootsdone','crowsdone','wisptruth','wisptale','chicknamed','judged'];
+function trouble3Tag(t,id){ const m={wellring:['well','ring',3],wellrope:['well','rope',3],owlstay:['owl','stay',2],letterdone:['gletter','sent',0],bootsdone:['boots',null,1],crowsdone:['crows',null,4],wisptruth:['wisp','truth',5],wisptale:['wisp','tale',5],chicknamed:['chick',null,-2],judged:['judge',null,-1]}[t]; if(!m) return false;
+  const e=T3(m[0]); if(!e||e.s!=='done'||(m[1]&&e.c!==m[1])) return false;
+  if(m[2]===-2){ const L=T3('lost'); return !!L&&id===L.o; } return m[2]<0?true:id===m[2]; }
+function trouble3Notes(open,done){ const p=part(); for(const k in p.tasks){ const e=p.tasks[k]; if(!e||typeof e!=='object') continue; const kind=k.split(':')[0];
+  if(kind==='well'){ if(e.s==='rope') open.push({t:'Ask '+e.w+' for rope for the well, in '+e.vn+'.', v:e.v}); else if(e.s==='climb') open.push({t:'Climb down the well for the bucket. Tell '+e.sn+', in '+e.vn+'.', v:e.v}); else if(e.s==='coming') open.push({t:e.w+' is bringing rope for the well, in '+e.vn+'.', v:e.v}); else if(e.s==='done') done.push({t:e.c==='rope'?'Got the well working again, in '+e.vn+'.':'Brought the bucket up from the well, in '+e.vn+'. There was a little green ring in it.', v:e.v}); }
+  else if(kind==='owl'){ if(e.s==='ask') open.push({t:'Ask the hermit about the owl in the gate, in '+e.vn+'.', v:e.v}); else if(e.s==='told') open.push({t:'Tell '+e.gn+' what the hermit said about the owl, in '+e.vn+'.', v:e.v}); else if(e.s==='done') done.push({t:'Settled the owl in the gate, in '+e.vn+'.', v:e.v}); }
+  else if(kind==='gletter'){ if(e.s==='go') open.push({t:'Take '+e.an+'\'s letter to '+e.gn+', the night guard in '+e.dn+'.', v:e.dest}); else if(e.s==='back') open.push({t:'Take the reply back to '+e.an+', in '+e.vn+'.', v:e.v}); else if(e.s==='done') done.push({t:'Carried a letter between two old friends, '+e.an+' and '+e.gn+'.', v:e.v}); }
+  else if(kind==='boots'){ if(e.s==='ask') open.push({t:'Ask '+e.wn+' about boots for '+e.gn+', in '+e.vn+'.', v:e.v}); else if(e.s==='carry') open.push({t:'Take the boots to '+e.gn+', in '+e.vn+'.', v:e.v}); else if(e.s==='done') done.push({t:'Found boots for '+e.gn+', in '+e.vn+'.', v:e.v}); }
+  else if(kind==='crows'){ if(e.s==='gather') open.push({t:'For '+e.fn+'\'s scarecrow in '+e.vn+': '+(e.hat?'got':'get')+' the gatekeeper\'s old hat, '+(e.straw?'got':'get')+' straw from the shepherd.', v:e.v}); else if(e.s==='done') done.push({t:'Built a scarecrow called '+e.c+', in '+e.vn+'.', v:e.v}); }
+  else if(kind==='wisp'){ if(e.s==='look') open.push({t:'See what the light on the hill is, after dark, in '+e.vn+'.', v:e.v}); else if(e.s==='found') open.push({t:'Tell '+e.sn+' what the light on the hill is, in '+e.vn+'.', v:e.v}); else if(e.s==='done') done.push({t:'Found out about the light on the hill, in '+e.vn+'.', v:e.v}); }
+  else if(kind==='judge'&&e.s==='done') done.push({t:'Settled a quarrel about a ladder, in '+e.vn+'.', v:e.v});
+  else if(kind==='chick'&&e.s==='done') done.push({t:'Named a chick '+e.c+', in '+e.vn+'.', v:e.v});
+  else if(kind==='fox'&&e.s==='done') done.push({t:'A letter from the Free Company, with a fox feather: they found the Seven Fords.', v:e.v}); } }
 // ---------------- sound (v0.34.0) ----------------
 // Everything you hear is made here, in code, with the browser's own audio: no sound files, nothing downloaded, nothing
 // sent anywhere. It is off until you tap the sound button, and remembered after that (it starts again on your first tap,
@@ -5757,7 +5922,7 @@ function SOUNDS_suspend(){ try{ SOUND.ctx.suspend(); }catch(e){} }
 // ---- backups (v0.36.0): everything the game keeps in this browser, as a save file or a save code ----
 // Progress lives only in this browser's storage. Clearing site data, a new phone, or (on an iPhone) weeks away from the site can wipe it.
 // A backup is every 'keep_' key, packed into one line of text: KEEP1: + base64 of the deflated JSON (KEEP0: when the browser cannot deflate).
-const BK={ by:null, PREFIX:'keep_', frozen:false, SKIP:{keep_backup_nudge:1, keep_sound:1, keep_view_chosen:1} };   // SKIP: this device's own settings and timers stay put
+const BK={ by:null, PREFIX:'keep_', frozen:false, SKIP:{keep_backup_nudge:1, keep_sound:1, keep_view_chosen:1, keep_heard:1} };   // SKIP: this device's own settings and timers stay put
 function bkStore(){ try{ return (typeof localStorage!=='undefined')?localStorage:null; }catch(e){ return null; } }
 function backupCollect(){ const ls=bkStore(), data={}; if(!ls) return null;
   try{ for(let i=0;i<ls.length;i++){ const k=ls.key(i); if(k&&k.indexOf(BK.PREFIX)===0&&!BK.SKIP[k]) data[k]=ls.getItem(k); } }catch(e){ return null; }
@@ -5816,7 +5981,7 @@ function lineHash(t){ let h=0x811c9dc5; for(let i=0;i<t.length;i++){ h^=t.charCo
 (function(){
   const add=function(who,part,pose,text,extra){ const ch=text.split(' >> '), tg=(/^\[([\w,]+)\]/.exec(text)||['',''])[1].split(','); const e={id:lineHash(who+'|'+text), who:who, part:part, pose:pose, text:ch[0], chain:ch.slice(1), check:ch.join(' '), first:tg.indexOf('first')>=0, last:tg.indexOf('last')>=0};
     if(extra) for(const k in extra) e[k]=extra[k]; LINES.push(e); };
-  for(const T of [TALK,TALKX,TALKH,TALKT,TALKL,TALKK,TALKC,TALKT2,TALKF,TALKR,TALKK3]) for(const who in T){ if(who==='trait'||who==='rel'||who==='pose') continue;
+  for(const T of [TALK,TALKX,TALKH,TALKT,TALKL,TALKK,TALKC,TALKT2,TALKF,TALKR,TALKK3,TALKT3]) for(const who in T){ if(who==='trait'||who==='rel'||who==='pose') continue;
     for(const pt in T[who]) for(const t of T[who][pt]) add(who,pt==='a'?-1:+pt,0,t); }
   for(const tr in TALK.trait) for(const t of TALK.trait[tr]){ const m=/^\[([\w,]+)\]/.exec(t);   // the trait joins any tags the line already has
     add('any',-1,0,m?'['+tr+','+m[1]+']'+t.slice(m[0].length):'['+tr+']'+t,{trait:tr}); }
@@ -5827,6 +5992,199 @@ function lineHash(t){ let h=0x811c9dc5; for(let i=0;i<t.length;i++){ h^=t.charCo
   for(const who in TALKP) for(const t of TALKP[who]) add(who,-1,0,t);
   for(const t of TALKP4) add('peddler',-1,4,t);
 })();
+const TALKV={
+ guard1:{
+  0:["[day]Dawn's the hardest hour. The night's done and nobody's told my eyes.","Morning already? I was just getting good at the dark.","{guard2} comes up the stair humming. Every morning. I've asked nicely.","[day]Dew on my cloak again. I'll hang it by the kitchen fire and {steward} will sigh."],
+  1:["[tired]You woke me. No, it's fine. I was dreaming about bread anyway.","I sleep in the day with a sack over my eyes. It's not handsome but it works.","Afternoons are for sleeping. The afternoon doesn't always agree."],
+  2:["Here's my day starting. Most folk are winding down and I'm lacing my boots.","[day]I like the hour the lamps go on. The keep looks like it's thinking.","{gatekeeper} hands me the lantern every evening like it's a crown."],
+  3:["[birds]There's an owl in the north tower. We've an arrangement. It does the mice, I do the rest.","Every noise at night is a wolf until it turns out to be a hedgehog.","[wolves]Wolves sing out past the trees. Not bad singers. Bad hours, though.","Cold up here at night. I keep a hot stone from the kitchen in my pocket.","If you're up, say something every so often. Silence makes me jumpy."],
+  a:["I've a song I hum on watch. Four notes. I made it up. It's not good.","People think the night watch is lonely. It is. That's what I like about it.","[young]First thing I learned on nights: don't sit down. Second thing: really, don't sit down.","[old]Thirty winters of nights. My eyes are better in the dark than in the day now."]},
+ guard2:{
+  0:["[first]Morning. You're up before the porridge. That's keen.","I take the watch off {guard1} at first light. {guard1} gives me a grunt. It's a handover.","Cold hands in the morning. I warm them on a loaf on the way up.","[day,farm1]First cart of the day is usually {farmer} with the eggs. You can set a day by it."],
+  1:["Noon sun's hard on the eyes. I squint so much {steward} thinks I'm cross.","[nosy]Who've you seen today? I see everyone come in, but I never hear the news.","Somebody has to watch the road in the day. Mostly it watches me back.","[farm2]{shepherd} waves from the hill every noon. I wave back. That's our whole friendship."],
+  2:["[leaving]I hand the keep over to {guard1} soon. Like passing a warm cup.","[day]Light's turning. Good. My feet have had enough of stone.","Evenings I sit with my boots off by the kitchen door. Nobody's allowed to comment."],
+  3:["[tired]Should be asleep. My head's still on watch.","[leaving]Off to bed. If the wolves come, tell {guard1}. Not me."],
+  a:["I keep a pebble for every traveller I see in a month. It's a light pocket most months.","[young]I'll get a proper helmet one day. This one was somebody's cooking pot.","Day watch means I see the weather coming a mile off. Doesn't help. It still comes.","{gatekeeper} tells me to stand up straight. I'm on a wall. I'm already higher than anybody.","[cheerful]Sunny days on the wall are the best job in {valley}. Rainy days, ask me later."]},
+ guard:{
+  a:["A guard's best friend is a dry pair of socks. Second best is the other guard.","The spear's got my initials scratched on it. Somebody else's too. We share.","[keep]Every guard who's stood here carved a mark in the north tower. Mine's the crooked one.","Rain comes over the hills like a grey curtain. Up here you get a little warning.","[birds]They say a good guard sees trouble before it starts. Mostly I see geese.","[wolves]Wolves test the edge of the trees at dusk. Just looking. Same as me.","I've had this cloak since I started. It's mostly patches now. Good patches.","I practise my stern face every morning. Nobody's ever been scared of it."]},
+ gatekeeper:{
+  0:["[old]Morning. I've been sitting here since before the rooster. The rooster's late again.","The road's still wet with dew. No footprints yet. You'll be the first.","[farm1]{farmer}'s cart comes through about now. Listen for the squeak.","I sweep the arch every morning. The leaves come back by noon. We both keep at it."],
+  1:["[old]My knees say rain. My knees are wrong half the time. The other half, bring a hood.","Travellers ask me the way. I point. They go. It's a simple trade.","[wood]{woodcutter} owes me a new stool. This one's got a lean.","A tinker came through once with a goat in a hat. Best day this gate ever had.","Folk get grumpy on the road when they're hungry. Have an apple before you go on."],
+  2:["[day]Sun's going down the road ahead of you. Follow it and you'll not get lost.","Evening's when folk come home. I like counting them back in.","[last]Mind the dip past the arch in the dark. It's had my ankle twice."],
+  3:["Night. Gate's open. I'm awake. That's the arrangement.","[old]I doze in this chair. I still hear every footstep. Try me."],
+  a:["There's a nail in the arch my grandad drove. I tap it for luck every morning.","The road knows who's walking it. Fast feet, slow feet, sore feet. I know them too.","[notold]Folk expect a gatekeeper to be old. I'm working on it.","{steward} wants the gate oiled. It never opens or shuts. I oil it anyway.","Wouldn't swap this chair for the great hall. You see more from a chair."]},
+ steward:{
+  0:["Bread's in, fire's up, keys on the hook. Now the day can start.","Somebody's had the honey. There's a spoon in it and nobody's name on the spoon.","I write the day's list before anyone else is up. Then the day ignores it.","[farm1]{farmer}'s eggs are late. Not a complaint. A note."],
+  1:["Butter's turned in the warm. I'll make it into something and nobody will know.","Linens out to air today. If it rains, I'll be taking that personally.","[wood]Tell {woodcutter} the kitchen wants beech, not oak. Oak sulks in my oven.","The cellar's cool as a well. I go down there sometimes just to think."],
+  2:["Lamp oil's down a jug. I'll find out who's been reading late.","[leaving]Keys, doors, lamps. Then I can sit for the first time since dawn.","{guard1} takes a heel of bread up the wall each night. I pretend I don't count it."],
+  3:["[last]Doors are barred, fires banked. Off you go and rest.","Can't sleep till the hall's swept. It's swept. I'll sweep it again."],
+  a:["Every jar in the stores has a label. A few have two, in case.","A keep runs on salt, candles and patience. We're short of patience.","[hermit,fish]{hermit} sends a fish up now and then. No note. That's {hermit.his} note.","The mice and I have an understanding. They don't know about it yet.","Lost things turn up in the stores eventually. I found a boot from before my time last week."]},
+ farmer:{
+  0:["Rooster's got a cough. Still crows. Sounds like a gate hinge.","[day]Mist on the furrows. Looks like the field's breathing.","Up and out. The weeds have been working all night.","[keepers]Basket's ready for the keep. Tell {steward} the brown eggs are the good ones."],
+  1:["[invite]Hot work in the furrows today. Sit in the shade by the haystack if you like.","[squirrels]Squirrels got into the seed sack. I've decided to admire their cleverness.","[farm2]{shepherd} came over to borrow my rake. Third time. It's practically {shepherd.his} rake."],
+  2:["[day]Field looks gold at this hour. Makes the backache worth it, nearly.","[leaving]Hens in, gate latched, then my feet up.","[rabbits]Rabbits come out at dusk to see what I've left them. Not much, if I'm lucky."],
+  3:["[tired]Late. My bones went to bed an hour ago. I'm catching them up.","Hear that? That's the hens grumbling in their sleep. Every night."],
+  a:["Plant on a damp day, harvest on a dry one. That's all the farming I know. Nearly.","Mud on my boots, mud on my hands. Clean mud, though. Field mud.","[wood]{woodcutter} fixed my gate post. I've paid in bread and a lot of thanks.","Soil's like bread dough. You can feel when it's ready.","One of the hens follows me round like a dog. Thinks it's helping."]},
+ shepherd:{
+  0:["Sheep want out the moment the light's up. They don't care if I've had my porridge.","[day]Frost on their backs this morning. They don't mind. Wool's a fine coat.","Milked the cows already. The big one kicked the pail. It's a morning custom.","[first]Morning. Mind the gate, it swings back."],
+  1:["Sheep lie down before rain. Half of them are lying down. Make of that what you will.","Shearing time, the whole barn smells of wool and grumbling.","[farm1]{farmer} says my sheep eat the cabbages. My sheep say nothing. Very suspicious.","I whistle and they come. Mostly. Some days I whistle and they just look at me."],
+  2:["[leaving]Time to walk them in. They know the way. I just walk behind looking important.","[day]Evening grass is the sweetest, they say. The sheep agree.","[wolves]Dusk's when I count them twice. Can't be too careful with wolves about."],
+  3:["Lambs in the straw sound like a kettle when they sleep.","[wolves,worrier]I sleep in my boots when the wolves are near. Just in case."],
+  a:["Wool's a good thing to have on your back. Ask a sheep.","Spun a scarf from the black ewe's fleece. Itches. Warm, though.","[keep]{steward} wants wool by the stone. I weigh it by the armful. We argue.","My old dog used to do the herding. Now it's me, and I'm slower.","Cows are easier than sheep. Cows don't have opinions. Well. One does."]},
+ woodcutter:{
+  0:["Frost on the axe head. Wait till the sun's on it or it'll bite back.","[birds]Woodpecker started before me today. Shown up by a bird.","Mornings are for the big trees. Afternoons are for the small ones and the excuses.","Breakfast was a crust and a sit on the chopping block. Nothing better."],
+  1:["Sap's running. The whole wood smells of honey and rain.","[squirrels]A squirrel's been stealing my wedges. No idea what it wants them for.","Mind the brambles on the path. They've had my sleeve twice today.","[farm1]{farmer} wants a new hen house. I said yes before I thought about it."],
+  2:["[leaving]Axe to the stone, then the stone to the shelf, then me to my chair.","The trees creak more at dusk. Settling in, like old folk.","[deer]Deer come to the edge of the clearing in the evening. They know I'm done chopping."],
+  3:["[birds]Owls in the wood all night. Talking about me, I expect.","[tired]Arms are done. Head's done. Only my feet are still arguing."],
+  a:["An axe is only as good as the hand. And the stone. And the morning.","Never fell a tree on a windy day. The wind always has the last word.","Kept every axe handle I've broken. There's a pile. I'm not proud of it. I'm a bit proud of it.","[keepers]Somebody up at the keep thinks firewood grows in stacks.","Ash for handles, alder for smoke, willow for nothing much."]},
+ hermit:{
+  0:["[fish]Early. The fish are hungry and I'm not sharing.","Mist's on the water. Don't splash. It's thinking.","You again. Or someone like you. Everyone looks the same from the dock."],
+  1:["[fish]Everybody owes me a fish. You too. I've not decided which one yet.","[keepers]{steward} sent a blanket. Didn't ask for it. Using it. Don't say anything.","[birds]Heron's been on my side of the lake all day. Cheek.","Line's slack. Like me. Go on, go away."],
+  2:["[fish]{woodcutter} owes me a fish. {farmer} owes me two. Nobody pays.","[aloof]Evening's for sitting. Not for visitors. You're a visitor.","Fire's smoking. Wet wood. {woodcutter} would laugh."],
+  3:["[fish]Night lines are out. Don't trip on them on your way off my dock.","Hear the water lapping? That's the lake telling you to go home."],
+  a:["People come down here to talk. Then they see the lake and stop. Good lake.","Worms in a pot, hooks in a tin, peace in a hut. I had all three till you came.","[aloof]You can stay if you're a stone. Stones don't talk.","[gruff,birds]I don't need company. The ducks are company. Bad company.","[keepers]{guard1} waves a lantern at me some nights. I don't wave back. I notice, though.","[fish]A fish a visit. That's the rent for my dock. You're behind."]},
+ peddler:{
+  a:["Ribbons, buttons, needles, news. The news is free. The ribbons are not.","Two valleys over they're all mad for blue thread this year. Don't ask me why.","I've walked every road between here and the hills. Some of them twice, by mistake.","My mule's called Patience. Named in hope.","[first]A customer! Or a browser. I like browsers too. They come back.","Fine pins, good laces, a spoon that's nearly silver. Look, don't lick.","I sell a bit of everything and a lot of nothing. Keeps the pack light.","Every valley says it's the friendliest. {valley} might be right, mind.","Haggle if you like. I enjoy it. I always win, but I enjoy it.","Rain's bad for trade and good for boots. I sell boots, so I'm fine.","[keepers]{steward} bought six spools last time and complained about all six.","The best thing I carry is a needle that never bends. The worst is this hat.","Folk say a peddler's a gossip with a pack. That's unkind. Accurate, but unkind.","Next valley along has a bell nobody's rung in years. I keep meaning to ask why."]},
+ keep:{
+  a:["[farm1]Bread's best on the day {farmer} sends the new flour up.","The well in the courtyard is the coldest water in {valley}. Bring a cup.","Somebody's cat has moved into the chapel. Nobody admits to owning it.","[farm1]{farmer}'s eggs come up the hill in a basket that's older than the stair.","Hear that bell? That's the kitchen, not the chapel. Different bell. Same hurry.","[wood]{woodcutter} stacks the wood by the gate so neat you'd think it was a wall.","The keep creaks in the wind. You stop hearing it after a week.","[hermit]{hermit} came up to the keep once. Stood in the courtyard, said it was too loud, went home.","If you get lost inside, follow the smell of bread. Always works.","[farm2]{shepherd} brings the wool up in spring and the whole courtyard sneezes.","Washdays everything flaps on lines across the courtyard. Mind your head.","There's a step on the tower stair taller than the rest. Everyone trips on it once.","Somebody chalked a face on the cellar door. It's been there so long it's got a name."]},
+ folk:{
+  a:["[keepers]Up at the keep they have a bell for everything. Out here we have the sun.","Out here the work tells you when to stop. Usually after dark.","[keep]{steward} sends down a list of what the keep wants. I send back what I've got.","[ruins,superstitious]Don't take stones from @ruin for walls. They walk back. That's what they say.","Mud in spring, dust in summer, leaves in autumn, snow in winter. Something's always on my boots.","[keepers]{gatekeeper} waves at everyone. Even the crows. Good soul.","Folk at the keep think it's quiet out here. They've not heard a hen in a temper.","[wolves]A wolf howled close last night. I sang back. It went quiet. Make of that what you like.","Any rain's good rain, out here. Except too much. Or on the wrong day.","[keepers]{guard2} came out to help once. Lasted till noon. Kept the hat, though.","Best thing about living out here: nobody hears you talk to yourself.","[nothermit]Neighbours out here are far apart. Close enough to borrow, far enough to forget to return.","[keep]The keep bell carries all the way out here on a still day. Sounds like someone calling.","[invite]Sit a minute if your legs want it. Nobody's in a hurry out here.","[birds]Crows know your face out here. Be nice to them and they'll be nice back.","[keepers]{guard1} lights the braziers and I can see them from my door. Feels like company."]},
+ any:{
+  a:[
+   "Rain's coming. You can smell it on the wind. Like wet stone.",
+   "First frost turns every cobweb into lace. Worth getting up for.",
+   "[day]Wind's from the hills today. That means cold by nightfall.",
+   "Snow in {valley} comes all at once and leaves the same way.",
+   "Spring's the season of mud and lambs. Both get everywhere.",
+   "[nothermit]Summer here lasts about three good days. We make the most of them.",
+   "Autumn's my favourite. Everything's busy getting ready to sleep.",
+   "When the lake goes still and grey, there's thunder by evening.",
+   "Fog came in so thick last week I said good morning to a post.",
+   "[nothermit]Hail in summer. Once. We still talk about it.",
+   "A warm wind in winter means a cold one is right behind it.",
+   
+   "Puddles freeze at the edges first. Then the middles. Then my toes.",
+   
+   "[keep]Rainbow over the keep yesterday. Both ends. Nobody went looking for gold. Too far.",
+   "[farm1]{farmer}'s hens got out again. Half of {valley} spent the morning chasing feathers.",
+   "Somebody left a basket of plums by the gate. No name. Best kind of gift.",
+   "[wood]You can hear {woodcutter}'s axe from most places in {valley}. Like a clock with a temper.",
+   "My boots need mending. My boots have needed mending for two winters.",
+   "There's a bench by the well that's the best seat in the valley. Don't tell anyone.",
+   "[farm2]{shepherd} lost a sheep for a whole day. It was behind the barn. Eating.",
+   "[nothermit]Wash day. Every hedge in {valley} has a shirt drying on it.",
+   "[keep]{steward} had the whole keep scrubbing floors last week. Still smells of soap.",
+   "Lost my good knife. Found it in the bread. Don't ask.",
+   "Mended the roof yesterday. Today it's raining. We'll see.",
+   "[fish,nothermit]{hermit} came up the path with a fish this long. Wouldn't say where. Never does.",
+   "[nothermit]We used to race bark boats down the stream as children. Some of us still do.",
+   "The cart track's got a new hole in it. Nobody knows who to blame, so we blame the rain.",
+   "[keep]{gatekeeper} has a new chair. It's the old chair with a new cushion. Still news.",
+   "[nothermit]Bees are in the old wall again. We leave them be. Honey's worth a few stings.",
+   "Most evenings there's singing in the woods at dusk. Not badly. Just somebody.",
+   
+   "A good broom is worth more than a fine coat. I've had both. I kept the broom.",
+   "[birds]There's a goose that walks the road every morning. Nobody owns it. It owns the road.",
+   "I spent the morning looking for my hat. It was on my head.",
+   "The crows by the well got fed once. Now they wait for everyone.",
+   "[wood,keep]{woodcutter} carved a little wooden bird for the gate. You'll see it if you look up.",
+   "[nothermit]Every fence in {valley} has been mended by somebody who didn't build it.",
+   "Everybody steps round the same puddle on the road. It's been there since I was small.",
+   "[keep]There's a scarf being knitted in {valley} long enough to go round the whole keep. It's getting there.",
+   "[nothermit]Take an apple for the road. Go on. There's plenty.",
+   
+   "Your bootlace is undone. There. Now you won't trip on the stair.",
+   "[nothermit]Here, a heel of bread. Walking's hungry work.",
+   "Drink from the stream above the stones, not below. Trust me on that.",
+   "Sore feet? Soak them in cold water, then warm. Old trick. Works.",
+   "Keep to the high path after rain. The low one turns to soup.",
+   "There's a spring in the trees, cold and clean. Follow the ferns and you'll find it.",
+   
+   "[nothermit]Take my spare scarf. No, go on. I've got three and only the one neck.",
+   "Caught in the rain? Any door in {valley} will have you. Just knock first.",
+   
+   "[nothermit]A bit of honey for your pack. Good for a sore throat, better for a sore mood.",
+   "Wet boots? Stuff them with dry grass overnight. Sounds daft. Works.",
+   "There's a stile past the bend with a loose top step. Step over it, not on it.",
+   "If you're lost, walk downhill till you find water, then follow it. It always goes somewhere.",
+   "[nothermit]Here, have a handful of hazelnuts. They're better than they look.",
+   "[invite]Sit a moment and rest your legs. The road will still be there.",
+   
+   "Rub a bit of fat on your boots tonight. They'll thank you tomorrow.",
+   "Over the hills they say there's a valley where it rains upwards. I don't believe it. I'd like to see it.",
+   "They say the next valley along has a keep with two gates. Showing off, if you ask me.",
+   "A drover told me there's a lake beyond the ridge so clear you can see the bottom from a boat.",
+   "I heard the far road washed out in the spring. Folk are going round by the hill.",
+   "They say over the hills the sheep are black and the people are cheerful. Or the other way round.",
+   "Apparently there's a valley where pears grow the size of your head. Somebody exaggerates.",
+   "Word is a new bridge went up two valleys over. Folk walked a day just to stand on it.",
+   "[keep]{gatekeeper} heard from a carter there's a fair past the hills come autumn. Music and all.",
+   "They say there's a valley with no wind at all. Sounds lovely. Sounds stuffy.",
+   "Past the ridge, folk say, there's an inn that serves a pie so big it has a door.",
+   "Heard the miller in the next valley married the baker. Now the bread's gone very good.",
+   "A peddler swore there's a valley where the cats keep the mice as pets.",
+   "They say the far road goes on till it reaches the sea. Never seen the sea. Seems a lot of water.",
+   "Folk over the hills say our valley's famous for its quiet. Famous. Imagine.",
+   "Rumour has it there's a fox over the hills that follows travellers home and sits by the door. Just sits.",
+   "They say the old road north is paved the whole way. Somebody had a lot of time.",
+   "Heard there's a valley where everyone has the same name. Must make calling folk in tricky.",
+   "A traveller said the hills past the lake are hollow and you can hear singing in them. Travellers say things.",
+   "Down the road there's a keep where everybody gets honey on feast days. I don't believe a word.",
+   "The far pass gets busier every year, they say. Two carts a week now. Madness.",
+   "A slow walker sees twice as much. That's what I tell myself, anyway.",
+   "Never trust a hen that's quiet.",
+   "A borrowed tool comes back blunt. That's a law of the world.",
+   "You can't hurry bread, sheep or old folk. Don't try.",
+   "Little jobs done now save big jobs later. I never listen to me either.",
+   "Good neighbours mend your fence before you notice it's broken.",
+   "Worry's a rocking chair. Gives you something to do, gets you nowhere.",
+   "If it's not raining, it's about to. Plan for that and you'll be fine.",
+   "Talk less, listen more. Then talk. People like that best.",
+   "There's no such thing as bad weather, only a bad coat.",
+   "A full woodpile gives the best sleep you'll ever get.",
+   "Everybody's somebody's odd neighbour.",
+   "A thing worth doing is worth doing twice, because the first time's always wrong.",
+   "Kindness is cheap and nobody's got enough of it. Funny, that.",
+   "Count your blessings before your troubles. The troubles can wait.",
+   "Old roads are old because they go somewhere worth going.",
+   "Want to know someone? Watch how they treat a dog. Or a hen.",
+   "Half of being clever is knowing when to keep it to yourself.",
+   "Some days you're the hammer, some days the nail. Most days you're the shelf.",
+   "Never argue with a goose. You won't win and it'll tell everyone.",
+   "[superstitious,birds]If a heron lands on your roof, the Heron King is watching. Best manners for a week.",
+   "[superstitious]On misty mornings you only see the Heron King if you're not looking for him.",
+   "[superstitious]Leave a crust on the windowsill in autumn. That's for the Thatch-Wife. Keeps the roof dry.",
+   "The Thatch-Wife mends any roof you're kind about. Speak ill of your thatch and it'll leak by spring.",
+   "[superstitious]Drop a bright pebble in a well and the Green Lady will keep the water sweet a year.",
+   "My gran swore the Green Lady of the wells once handed back a ring somebody dropped. Dry as a bone.",
+   "[ruins,superstitious]Never walk round a stone ring the wrong way. Sunwise only. Or you come out somewhere else.",
+   "[ruins]Folk say the stone rings were dancers who wouldn't stop for the bell. They're still waiting for it.",
+   "Will-o-wisps on the marsh are lost lanterns looking for their owners. Don't lend them yours.",
+   "[superstitious]See a will-o-wisp, turn your coat inside out and walk home backwards. Looks daft. Works.",
+   "[superstitious]Never start a journey on the third day after a full moon. Ask anyone. Well. Ask me.",
+   "The first warm day of spring is lucky for planting, mending and making up with people.",
+   "[superstitious]Sneeze on a doorstep and you'll have a visitor before dark. Bless you, by the way.",
+   "[birds]Three crows on a fence means news. Four means somebody's dropped bread.",
+   "[superstitious]If the kettle sings on its own, somebody's thinking of you. Usually to borrow something.",
+   "Old folk say the hills were giants who lay down for a nap. Walk quiet or you'll wake one.",
+   "[superstitious]Never cut your hair on a windy day. The wind takes it and keeps your secrets.",
+   
+   "A loaf baked on a rainy day never goes stale, my gran said. None's ever lasted long enough to test it.",
+   "[superstitious]Say goodnight to the hearth before bed, or the fire sulks in the morning.",
+   "[ruins,superstitious]Leave a crust at @ruin if you go. Whatever lives there likes being remembered.",
+   "Mist that sits in the hollows is the valley dreaming. Walk soft through it.",
+   "[superstitious]Find a feather on your path and keep it. Lose it, and you'll find two.",
+   "On midsummer night the Green Lady walks from well to well. Leave the buckets up so there's room.",
+   "[superstitious]Sow on a wet day, mend on a dry one. Never the other way round.",
+   "[nothermit]The Thatch-Wife can't abide a cold hearth. That's why we never let ours go out.",
+   "[deer]A white deer in the trees means a good harvest. Nobody's seen one in years. Harvests have been all right.",
+   "[superstitious]Spill salt, throw a pinch at the door. Spill it twice, just sweep up. Luck has limits.",
+   "[ruins]My grandad said the stone rings keep count of the years. Every hundred, one sinks a finger deep.",
+   "[superstitious]A spider in your boot means money. A spider in both means move the boots."]}
+};
+
+(function(){ for(const who in TALKV) for(const pt in TALKV[who]) for(const t of TALKV[who][pt]){ const ch=t.split(' >> '), tg=(/^\[([\w,]+)\]/.exec(t)||['',''])[1].split(',');
+  LINES.push({id:lineHash(who+'|'+t), who:who, part:pt==='a'?-1:+pt, pose:0, text:ch[0], chain:ch.slice(1), check:ch.join(' '), first:tg.indexOf('first')>=0, last:tg.indexOf('last')>=0, v38:true}); } })();
 const GREETN=["","","","","","","",""];   // "name, the role", filled from the cast when a valley grows
 let greetHook=null, chatHook=null; const GREETT=[-1e9,-1e9,-1e9,-1e9,-1e9,-1e9,-1e9,-1e9,-1e9], GLAST=["","","","","","","","",""];
 function dayPart(){ const t=DAY.tod; return t>=5.5&&t<11?0:(t>=11&&t<17?1:(t>=17&&t<21.5?2:3)); }
@@ -5872,6 +6230,7 @@ function lineOk(id,l,here,who){ const m=TAG_RE.exec(l), c=castOf(id);
     else if(t==='crownwhole'||t==='crownapart'){ if(!crownTag(t,id)) return false; }
     else if(t==='oldfriend'){ if(!friendTag(t,id)) return false; }
     else if(t==='roofcrust'||t==='rooffix'||t==='axeback'||t==='betwon'||t==='cakegot'||t==='songback'){ if(!trouble2Tag(t,id)) return false; }
+    else if(T3TAGS.indexOf(t)>=0){ if(!trouble3Tag(t,id)) return false; }
     else if(t==='festnow'||t==='festafter'){ if(!festTag(t,id)) return false; }
     else if(t==='ringwalk'||t==='ringdone'){ if(!ringTag(t,id)) return false; }
     else if(t.charAt(0)==='k'&&/^k(rich|old|mended|empty|lit|bandit|work|banditnow|tall|low)$/.test(t)){ if(!keepTag(t,id)) return false; }
@@ -5918,7 +6277,37 @@ function whoOk(id,who){ if(id===ROLEPED) return who==='peddler'; if(id>=9){ cons
 // what has been heard: per valley and person, line id -> the order it was heard in
 const HEARD={}, VISITS={}; let heardN=0;
 function heardKey(id){ return W.seed+':'+id; }
-function heardAdd(key,lid){ const m=HEARD[key]||(HEARD[key]=new Map()); m.delete(lid); m.set(lid,++heardN); }
+function heardAdd(key,lid){ const m=HEARD[key]||(HEARD[key]=new Map()); m.delete(lid); m.set(lid,++heardN); vheardAdd(lid); }
+// ---- talk that does not repeat (v0.38.0) ----
+// What has been heard is kept per valley as well as per person, so two people in one valley never tell you the same thing,
+// and it is remembered between visits (a small 'keep_heard' store, so backups carry it too). When someone has nothing new
+// to tell you, they say so in a line instead of going round again.
+const VHEARD={}, EMPTYMAP=new Map();
+const HEARDCAP={person:60, valley:200, valleys:24}; let HEARDSAVED=-1;
+function heardSave(){ if(heardN===HEARDSAVED) return; HEARDSAVED=heardN;   // only when something new was heard
+  try{ const o={v:1, n:heardN, p:{}, s:{}, r:[]}; const seeds=Object.keys(VHEARD).sort(function(a,b){ return (VHEARD[b].t||0)-(VHEARD[a].t||0); }).slice(0,HEARDCAP.valleys), keep={};
+    for(const sd of seeds){ keep[sd]=1; const m=VHEARD[sd].m; o.s[sd]=Array.from(m.keys()).slice(-HEARDCAP.valley); o.r.push(sd); }   // r: most recent first
+    for(const k in HEARD){ const sd=k.split(':')[0]; if(!keep[sd]) continue; o.p[k]=Array.from(HEARD[k].keys()).slice(-HEARDCAP.person); }
+    localStorage.setItem('keep_heard',JSON.stringify(o)); }catch(e){} }
+function heardLoad(){ let o=null; try{ o=JSON.parse(localStorage.getItem('keep_heard')||'null'); }catch(e){ o=null; } if(!o||o.v!==1) return;
+  try{ let n=0; const order=Array.isArray(o.r)?o.r.slice().reverse():Object.keys(o.s||{});   // oldest first, so the newest ends up newest
+    for(const sd of order){ const a=o.s&&o.s[sd]; if(!Array.isArray(a)) continue; const m=new Map(); for(const id of a) if(typeof id==='string') m.set(id,++n); VHEARD[sd]={m:m, t:n}; }
+    for(const k in (o.p||{})){ const a=o.p[k]; if(!Array.isArray(a)) continue; const m=HEARD[k]||(HEARD[k]=new Map()); for(const id of a) if(typeof id==='string'&&!m.has(id)) m.set(id,++n); }
+    heardN=Math.max(heardN,n,(+o.n)||0); HEARDSAVED=heardN; }catch(e){} }
+// the last conversation is kept when the card closes and when the page is put away
+if(typeof document!=='undefined') document.addEventListener('visibilitychange',function(){ if(document.hidden){ try{ if(!BK.frozen) heardSave(); }catch(e){} } });
+function vheardOf(seed){ const sd=String(seed>>>0); return VHEARD[sd]?VHEARD[sd].m:EMPTYMAP; }
+function vheardAdd(lid){ if(W.seed==null) return; const sd=String(W.seed>>>0); const v=VHEARD[sd]||(VHEARD[sd]={m:new Map(),t:0}); v.m.delete(lid); v.m.set(lid,heardN); v.t=heardN; }
+// when someone has run out of new things to say
+const NOTHINGNEW=["Nothing new since we last spoke, {you}. Same wind, same {valley}.","You've had all my news, {you}. Come back when something happens.",
+  "I've told you everything I know. Twice, nearly.","[gruff]Nothing to tell. Off you go.","[cheerful]Nothing new! Which is a sort of good news, isn't it?",
+  "Still here. Still the same. Ask me again tomorrow.","[dry]If anything happens, you'll be the first to know. Nothing has.","[gossip]Nothing new. I'm as disappointed as you are.",
+  "[worrier]Nothing new. That's what worries me.","[tired]Mm. Nothing new. Just tired.","Not a thing has changed since you asked, {you}.","[kind]Nothing new, love. Mind how you go."];
+function nothingNewLine(id,here){ const c=castOf(id), r=seedRng(((W.seed>>>0)^Math.imul(id+3,0x51ED)^heardN)>>>0,0x2E1);
+  const away=!!(c&&(c.guest||c.bandit));   // a guest or a bandit is not from here: nothing about 'same valley'
+  const ok=NOTHINGNEW.filter(function(t){ const m=/^\[(\w+)\]/.exec(t); if(away&&t.indexOf('{valley}')>=0) return false; return !m||(c&&c.traits&&c.traits.indexOf(m[1])>=0); });
+  const t=ok[(r()*ok.length)|0]; return {id:'NN'+lineHash(t), text:fillLine(id,t,here)}; }
+
 // the lines for one visit: up to n (3 to 5), the first suited to the moment, the rest new ones first, stories kept in order
 // what a line is about, so one visit never says the same kind of thing twice
 const TOPICS={ruin:/@ruin|old stones|old places/i, supper:/supper/i, bed:/\bbunk\b|\bbed\b|bedtime/i, woodpile:/woodpile|eaves/i,
@@ -5928,7 +6317,7 @@ const TOPICS={ruin:/@ruin|old stones|old places/i, supper:/supper/i, bed:/\bbunk
 const STANCES=['invite','aloof','leaving'];
 (function(){ for(const e of LINES){ const tg=(/^\[([\w,]+)\]/.exec(e.text)||['',''])[1].split(',');
   e.topics=[]; for(const k in TOPICS) if(TOPICS[k].test(e.check)) e.topics.push(k);
-  e.stance=STANCES.filter(function(t){ return tg.indexOf(t)>=0; })[0]||''; e.home=tg.indexOf('home')>=0||e.who==='home'; e.after=['feudmend','feudsour','sweettold','sweetshy','lightdone','lostback','reunion','reunionasker','crownwhole','crownapart','oldfriend','roofcrust','rooffix','axeback','betwon','cakegot','songback','festnow','festafter','ringdone'].some(function(t){ return tg.indexOf(t)>=0; });
+  e.stance=STANCES.filter(function(t){ return tg.indexOf(t)>=0; })[0]||''; e.home=tg.indexOf('home')>=0||e.who==='home'; e.after=['feudmend','feudsour','sweettold','sweetshy','lightdone','lostback','reunion','reunionasker','crownwhole','crownapart','oldfriend','roofcrust','rooffix','axeback','betwon','cakegot','songback','festnow','festafter','ringdone'].concat(T3TAGS).some(function(t){ return tg.indexOf(t)>=0; });
   const ek=tg.filter(function(t){ return t.indexOf('ev_')===0; })[0]; e.evkind=ek?ek.slice(3):'';
   e.evrole=tg.indexOf('evin')>=0?'in':(tg.indexOf('evfirst')>=0?'first':(tg.indexOf('evsecond')>=0?'second':''));
   // where it sits in a visit: their own world first, then places and people round about, then talk, then their nature, then their own people
@@ -5944,7 +6333,7 @@ function talkPick(id,pose,here,n){ here=here||peopleHere();
   if(n==null) n=pose===4?1+((r()*2)|0):3+((r()*3)|0);
   const picks=[], used=new Set(), topics=new Set(), relTo=new Set(); let stance='', traitN=0, anyN=0, count=0; const HOMEV=inHome()&&id!==ROLEPED;
   const stormy=stormLevel()>0.05, evOf=new Map(), hid=function(e){ const v=evOf.get(e.id); return v?e.id+'@'+evKey(v):e.id; };
-  const fresh=function(e){ return !heard.has(hid(e)); };
+  const vh=vheardOf(W.seed), fresh=function(e){ const h=hid(e); return !heard.has(h)&&(!vh.has(h)||(HOMEV&&(e.home||e.check.indexOf('{you}')>=0))); }, freshP=function(e){ return !heard.has(hid(e)); };
   const fits=function(e){
     if(used.has(e.id)||1+e.chain.length>5-count) return false;               // a story only starts if all of it fits
     if(e.first&&count>0) return false; if(e.last&&count!==n-1) return false;  // greetings open, goodbyes close
@@ -5963,7 +6352,7 @@ function talkPick(id,pose,here,n){ here=here||peopleHere();
       if(HOMEV&&!e.home&&STRANGER_RE.test(e.check)) continue;   // at home you are nobody's stranger
       LINE_EV=ev; const ok=lineOk(id,e.check,here,e.who); LINE_EV=null; if(ok){ if(ev) evOf.set(e.id,ev); a.push(e); } } return a; };
   // newest-unheard first, then the ones heard longest ago; weighted by how much the line belongs to this person
-  const choose=function(a){ if(!a.length) return null; const f=a.filter(fresh), src=f.length?f:a;
+  const choose=function(a){ if(!a.length) return null; let f=a.filter(fresh); if(!f.length) f=a.filter(freshP); const src=f.length?f:a;
     if(!f.length){ let best=null, bt=1e18; for(const e of src){ const t=heard.get(hid(e))||0; if(t<bt){ bt=t; best=e; } } return best; }
     let tot=0; const w=src.map(function(e){ const v=(e.who==='any'?(e.trait||e.rel?2:1):3); tot+=v; return v; });
     let x=r()*tot; for(let i=0;i<src.length;i++){ x-=w[i]; if(x<0) return src[i]; } return src[src.length-1]; };
@@ -5992,6 +6381,7 @@ function talkPick(id,pose,here,n){ here=here||peopleHere();
   // at least one more line from their own world
   if(count<n){ const e=choose(pool(function(e){ return e.pose===0&&e.who!=='any'&&(e.part===-1||e.part===dp); })); if(e) take(e); }
   while(count<n){ const e=choose(pool(function(e){ return e.pose===0&&(e.part===-1||e.part===dp); })); if(!e) break; take(e); }
+  if(pose===0&&!HOMEV&&picks.length&&!picks.some(freshP)) return [nothingNewLine(id,here)];   // all of it heard before: say so, once
   return out(); }
 // ---- the chat card: opened by walking up to someone, closed by goodbye or walking away ----
 const CHAT={id:-1,key:'',lines:[],k:0,shut:-1e12}, COOL={};   // COOL[key] = {t: when the card closed, id, away: you have stepped away since}
@@ -6003,7 +6393,7 @@ function talk(c,id,pose,force){
   if(PAUSED[key]&&(force||!cl||cl.away)&&chatResume(key)) return;            // a conversation you walked out of carries on
   if(!force&&cl&&(!cl.away||now-cl.t<25000)) return;                       // not straight back to the same person
   const here=peopleHere(), beat=pose===4?null:storyBeat(id), lines=beat?beat.lines:talkPick(id,pose,here).slice(); if(!lines.length) return;
-  if(!beat&&pose===0&&lines.length){ const c0=castOf(id), plain=c0&&!c0.parent&&!c0.left&&id!==ROLEPED; let extra=null;
+  if(!beat&&pose===0&&lines.length&&lines[0].id.indexOf('NN')!==0){ const c0=castOf(id), plain=c0&&!c0.parent&&!c0.left&&id!==ROLEPED; let extra=null;
     if(plain&&!inHome()){ const L=legendFor(W.seed); if(L){ extra={id:'LEG'+(W.seed>>>0), text:L}; legendTold(W.seed); } }
     if(!extra&&c0&&(id===7||c0.age==='old')&&id!==ROLEPED){ const li=loreFor(id===7?'hermit':'old'); if(li!=null&&loreTake(li)) extra={id:'LORE'+li, text:LORE[li][1]}; }
     if(extra) lines.splice(Math.min(1,lines.length),0,extra); }
@@ -6020,7 +6410,7 @@ function chatPick(i){ if(CHAT.id<0||!CHAT.ask||CHAT.picked||CHAT.k<CHAT.lines.le
   if(o.next){ let nb=null; try{ nb=fillBeat(CHAT.id,o.next()); }catch(e){} if(nb){ for(const l of nb.lines) add.push(l); CHAT.ask=nb; CHAT.picked=false; } }   // they ask you something back
   if(add.length){ CHAT.lines=CHAT.lines.concat(add); CHAT.k++; chatShow(); } else closeChat(); return true; }
 function chatMore(){ if(CHAT.id<0) return; if(CHAT.ask&&!CHAT.picked&&CHAT.k>=CHAT.lines.length-1) return; if(CHAT.k<CHAT.lines.length-1){ CHAT.k++; chatShow(); } else closeChat(); }
-function closeChat(){ if(CHAT.id<0) return; chatPause(); CHAT.ask=null; COOL[CHAT.key]={t:Date.now(),id:CHAT.id,away:false}; CHAT.shut=Date.now(); CHAT.id=-1; if(chatHook) chatHook.close(); }
+function closeChat(){ if(CHAT.id<0) return; chatPause(); try{ if(!BK.frozen) heardSave(); }catch(e){} CHAT.ask=null; COOL[CHAT.key]={t:Date.now(),id:CHAT.id,away:false}; CHAT.shut=Date.now(); CHAT.id=-1; if(chatHook) chatHook.close(); }
 // every tick: close the card when you walk away (or a card covers it), and notice when you have left the last person
 function chatTick(){
   if(CHAT.id>=0){ const c=chatPerson(CHAT.id);
