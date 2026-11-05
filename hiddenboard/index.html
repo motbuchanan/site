@@ -82,24 +82,24 @@ header{padding-block:44px 54px;display:flex;flex-direction:column;gap:26px}
 .alts{margin-top:26px;font-size:.98rem;color:var(--graphite);max-width:58ch}
 
 /* viewer */
-.viewer{margin:34px auto 0;max-width:560px;display:flex;flex-direction:column;align-items:center;gap:16px}
-.tabs{display:flex;flex-wrap:wrap;justify-content:center;gap:6px}
-.tab{font:700 .88rem var(--type);background:#fff;color:var(--ink);border:2px solid var(--ink);border-radius:2px;padding:8px 10px;min-height:44px;cursor:pointer}
+.viewer{margin:28px auto 0;max-width:560px;display:flex;flex-direction:column;gap:10px}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;font:700 .85rem var(--type);background:#fff;color:var(--ink);border:2px solid var(--ink);border-radius:2px;padding:8px 9px;min-height:44px;cursor:pointer;white-space:nowrap}
 .tab[aria-pressed="true"]{background:var(--ink);color:#fff}
-.frame-wrap{width:100%;display:flex;flex-direction:column;gap:8px}
+.frame-wrap{width:100%;display:flex;flex-direction:column;gap:6px}
 .slug{font-family:var(--type);font-size:.82rem;color:var(--graphite);display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px 12px}
 .slug b{color:var(--ink)}
-.note{font-size:1.02rem;text-align:center;max-width:44ch;min-height:3.2em}
-.chess{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));grid-template-rows:repeat(8,minmax(0,1fr));aspect-ratio:1/1;width:min(100%,320px);border:2px solid var(--ink)}
-.sq{display:flex;align-items:center;justify-content:center;overflow:hidden;min-width:0;min-height:0;font-family:var(--glyph);font-size:clamp(22px,7vw,30px);line-height:1}
+.lower{display:grid;grid-template-columns:minmax(0,46%) minmax(0,1fr);gap:14px;align-items:start}.side{display:flex;flex-direction:column;justify-content:space-between;gap:12px;min-width:0;height:100%}.note{font-size:.98rem;line-height:1.45}
+.chess{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));grid-template-rows:repeat(8,minmax(0,1fr));aspect-ratio:1/1;width:100%;border:2px solid var(--ink)}
+.sq{display:flex;align-items:center;justify-content:center;overflow:hidden;min-width:0;min-height:0;font-family:var(--glyph);font-size:clamp(15px,4.4vw,28px);line-height:1}
 .sq.l{background:var(--sq-l)} .sq.d{background:var(--sq-d)}
 .sq.hl{box-shadow:inset 0 0 0 3px var(--green)}
 .pc.w{color:#fff;-webkit-text-stroke:1px #111;paint-order:stroke fill}
 .pc.b{color:#111}
-.stepper{display:flex;gap:10px;align-items:center}
-.stepper button{font:700 1rem var(--type);background:#fff;border:2px solid var(--ink);border-radius:2px;min-width:52px;min-height:44px;cursor:pointer;color:var(--ink)}
+.stepper{display:flex;gap:8px;align-items:center}
+.stepper button{font:700 1rem var(--type);background:#fff;border:2px solid var(--ink);border-radius:2px;min-width:46px;min-height:44px;cursor:pointer;color:var(--ink)}
 .stepper button:disabled{opacity:.3;cursor:default}
-.stepper span{font-family:var(--type);font-size:.85rem;color:var(--graphite);min-width:7ch;text-align:center}
+.stepper span{font-family:var(--type);font-size:.8rem;color:var(--graphite);text-align:center;flex:1}
 .rules{max-width:58ch;margin:40px auto 0;font-size:.98rem;color:var(--graphite)}
 
 /* tactics */
@@ -183,9 +183,13 @@ footer{border-top:2px solid var(--ink);padding-block:22px 40px;display:flex;just
       <svg class="panel" id="frame" viewBox="0 0 320 180" role="img"></svg>
       <div class="slug"><b id="slugMove"></b><span id="slugShot"></span></div>
     </div>
-    <p class="note" id="note"></p>
-    <div class="chess" id="chess" role="img" aria-label="Board after the selected move"></div>
-    <div class="stepper"><button id="prev" type="button" aria-label="Previous move">&lt;</button><span id="count"></span><button id="next" type="button" aria-label="Next move">&gt;</button></div>
+    <div class="lower">
+      <div class="chess" id="chess" role="img" aria-label="Board after the selected move"></div>
+      <div class="side">
+        <p class="note" id="note"></p>
+        <div class="stepper"><button id="prev" type="button" aria-label="Previous move">&lt;</button><span id="count"></span><button id="next" type="button" aria-label="Next move">&gt;</button></div>
+      </div>
+    </div>
   </div>
   <p class="rules">The rules stay simple so a viewer can learn them. White's moves go on white signs and Black's go on black ones; squares are written as text (door numbers, plates, routes) while pieces show up as images, so a horse logo is a knight. A capture gets an X, like tape or a crossed-out sign. Every move has to read on a single freeze frame, and they always land in order.</p>
 </section>
@@ -253,7 +257,7 @@ footer{border-top:2px solid var(--ink);padding-block:22px 40px;display:flex;just
 
 <footer>
   <span>The Hidden Board · a pitch by Mot Buchanan</span>
-  <button class="badge" id="badge" type="button">v1.3 · Nov 5 2026</button>
+  <button class="badge" id="badge" type="button">v1.4 · Nov 5 2026</button>
 </footer>
 </div>
 <div class="toast" id="toast" role="status"></div>
@@ -341,7 +345,7 @@ footer{border-top:2px solid var(--ink);padding-block:22px 40px;display:flex;just
     document.getElementById("slugShot").textContent=f.slug;
     document.getElementById("note").textContent=f.note;
     for(var k in sq){var pc=p[k];sq[k].innerHTML=pc?'<span class="pc '+pc[0]+'">'+G[pc[1]]+'︎</span>':"";sq[k].classList.toggle("hl",!!hl[k])}
-    tabs.querySelectorAll(".tab").forEach(function(b){b.setAttribute("aria-pressed",String(+b.dataset.i===cur))});
+    tabs.querySelectorAll(".tab").forEach(function(b){var on=+b.dataset.i===cur;b.setAttribute("aria-pressed",String(on));if(on)tabs.scrollLeft=Math.max(0,b.offsetLeft-tabs.offsetLeft-40)});
     document.getElementById("count").textContent=(cur+1)+" of "+FRAMES.length;
     document.getElementById("prev").disabled=cur===0;
     document.getElementById("next").disabled=cur===FRAMES.length-1;
@@ -352,7 +356,7 @@ footer{border-top:2px solid var(--ink);padding-block:22px 40px;display:flex;just
   show(0);
 
   var t=document.getElementById("toast"),tt;
-  document.getElementById("badge").addEventListener("click",function(){t.textContent="The Hidden Board v1.3 · Nov 5 2026";t.classList.add("on");clearTimeout(tt);tt=setTimeout(function(){t.classList.remove("on")},2200)});
+  document.getElementById("badge").addEventListener("click",function(){t.textContent="The Hidden Board v1.4 · Nov 5 2026";t.classList.add("on");clearTimeout(tt);tt=setTimeout(function(){t.classList.remove("on")},2200)});
 })();
 </script>
 
