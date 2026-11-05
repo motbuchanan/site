@@ -1,1 +1,368 @@
+<title>The Hidden Board</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="robots" content="noindex">
+<meta name="description" content="Mot Buchanan's pitch for Todd's chess series: episode titles named for moves, storyboarded hidden-move sequences, and a famous game played across a season.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=Libre+Franklin:ital,wght@0,400;0,600;1,400&family=Courier+Prime:wght@400;700&family=Noto+Sans+Symbols+2&display=swap">
+<style>
+/* Layout: a storyboard binder. Paper page, ink drawings, one green from the tournament board. The reel (tap a frame, the board moves) is the page's one interaction. */
+:root{
+  --paper:#f4f4f1;   /* cool newsprint, not cream */
+  --ink:#18191b;     /* drawing + text */
+  --graphite:#55585e;/* secondary text */
+  --rule:#d4d4ce;    /* hairlines */
+  --tone:#e2e2dc;    /* storyboard shading */
+  --green:#2f6a4c;   /* tournament vinyl green, the one accent */
+  --sq-l:#e8e2cf; --sq-d:#6f9479;
+  --sign:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  --body:"Libre Franklin","Helvetica Neue",Arial,sans-serif;
+  --type:"Courier Prime","Courier New",Courier,monospace;
+  --glyph:"Noto Sans Symbols 2","Segoe UI Symbol","Apple Symbols",serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:400 17px/1.6 var(--body);margin:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));-webkit-text-size-adjust:100%}
+.page{max-width:1040px;margin:0 auto}
+a{color:var(--green);text-underline-offset:3px;text-decoration-thickness:1.5px}
+a:focus-visible,button:focus-visible,.frame:focus-visible{outline:2px solid var(--green);outline-offset:3px}
+h1,h2,h3{font-family:var(--sign);text-transform:uppercase;margin:0;line-height:.92;text-wrap:balance}
+h2{font-size:clamp(2.6rem,9vw,4.6rem);font-weight:800}
+p{margin:0}
+.prose{max-width:60ch;display:flex;flex-direction:column;gap:14px}
+.small{font-size:.92rem;color:var(--graphite)}
+.code{font-family:var(--type);font-size:.85rem}
 
+/* storyboard panel */
+.panel{display:block;width:100%;height:auto;background:#fff;border:2px solid var(--ink)}
+.k{fill:none;stroke:var(--ink);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.k1{fill:none;stroke:var(--ink);stroke-width:1.2;stroke-linecap:round}
+.fi{fill:var(--ink)} .wh{fill:#fff;stroke:var(--ink);stroke-width:2} .tn{fill:var(--tone)}
+.cm{fill:none;stroke:var(--green);stroke-width:2.5;stroke-dasharray:7 5;stroke-linecap:round}
+.ch{fill:var(--green)}
+.sg{font-family:var(--sign);font-weight:800;fill:var(--ink)}
+.sgw{font-family:var(--sign);font-weight:800;fill:#fff}
+.gl{font-family:var(--glyph)}
+.tag{font-family:var(--type);font-size:11px;fill:var(--green);font-weight:700}
+
+/* hero */
+header{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:36px;align-items:end;padding-block:48px 56px}
+.hero-title{font-size:clamp(3.4rem,12vw,6.6rem);font-weight:800}
+.hero-title em{font-style:normal;color:var(--green)}
+.hero-copy{display:flex;flex-direction:column;gap:22px}
+.hero-lead{font-size:1.12rem;max-width:52ch}
+.by{font-family:var(--type);font-size:.9rem;color:var(--graphite)}
+.hero-panel{margin:0 -8px 0 0;transform:translateY(18px)}
+.hero-panel figcaption{font-family:var(--type);font-size:.82rem;margin-top:8px;color:var(--graphite)}
+
+section{padding-block:64px;border-top:2px solid var(--ink)}
+.sec-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:12px 28px;margin-bottom:28px}
+.sec-head .prose{flex:1 1 360px}
+
+/* episode rundown */
+.rundown{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:44px}
+.ep{display:grid;grid-template-columns:44px minmax(0,1fr);gap:4px 12px;padding-block:16px;border-bottom:1px solid var(--rule)}
+.ep .n{font-family:var(--type);font-size:.9rem;color:var(--graphite);padding-top:6px;grid-row:span 3}
+.ep h3{font-size:1.75rem;font-weight:800}
+.ep .story{font-size:1rem}
+.ep .board{font-size:.86rem;color:var(--graphite);line-height:1.45}
+.ep.finale{grid-column:1/-1;border-bottom:2px solid var(--green)}
+.ep.finale h3{font-size:2.6rem;color:var(--green)}
+.aside{margin-top:22px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px 44px;font-size:.95rem;color:var(--graphite)}
+
+/* reel */
+.reel-wrap{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:28px;align-items:start}
+.reel{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:14px;-webkit-overflow-scrolling:touch}
+.frame{flex:0 0 min(78%,380px);scroll-snap-align:start;background:none;border:0;padding:0;text-align:left;cursor:pointer;color:inherit;font:inherit;display:flex;flex-direction:column;gap:8px}
+.frame .panel{transition:border-color .15s}
+.frame[aria-pressed="true"] .panel{border-color:var(--green);box-shadow:0 0 0 2px var(--green)}
+.frame .slug{font-family:var(--type);font-size:.8rem;color:var(--graphite);display:flex;justify-content:space-between;gap:8px}
+.frame .slug b{color:var(--ink)}
+.frame .note{font-size:.95rem;line-height:1.45}
+.boardbox{position:sticky;top:calc(16px + env(safe-area-inset-top,0px));display:flex;flex-direction:column;gap:10px}
+.chess{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));grid-template-rows:repeat(8,minmax(0,1fr));aspect-ratio:1/1;width:100%;border:2px solid var(--ink)}
+.sq{position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;min-width:0;min-height:0;font-family:var(--glyph);font-size:clamp(18px,5.4vw,28px);line-height:1}
+.sq.l{background:var(--sq-l)} .sq.d{background:var(--sq-d)}
+.sq.hl{box-shadow:inset 0 0 0 3px var(--green)}
+.pc.w{color:#fff;-webkit-text-stroke:1px #111;paint-order:stroke fill;text-shadow:0 1px 0 #111}
+.pc.b{color:#111}
+.movebar{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.movebar .now{font-family:var(--type);font-size:1rem;font-weight:700}
+.nav{display:flex;gap:6px}
+button.nb{font:700 .9rem var(--type);background:#fff;color:var(--ink);border:2px solid var(--ink);border-radius:3px;min-width:44px;min-height:44px;cursor:pointer}
+button.nb:disabled{opacity:.35;cursor:default}
+.rules{margin-top:26px}
+
+/* more shots */
+.shots{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:34px 28px}
+.shot{display:flex;flex-direction:column;gap:8px;margin:0}
+.shot figcaption{display:flex;flex-direction:column;gap:4px}
+.shot .slug{font-family:var(--type);font-size:.8rem;color:var(--graphite)}
+.s1{grid-column:1/8}
+.s2{grid-column:8/13;margin-top:70px}
+.s3{grid-column:3/10}
+.kit-text{grid-column:1/-1}
+
+/* season */
+.games{display:flex;flex-direction:column}
+.game{display:grid;grid-template-columns:120px minmax(0,1fr);gap:4px 22px;padding-block:22px;border-bottom:1px solid var(--rule)}
+.game .count{font-family:var(--sign);font-weight:800;font-size:4.2rem;line-height:.85;color:var(--green);grid-row:span 3}
+.game .count small{display:block;font-family:var(--type);font-size:.75rem;color:var(--graphite);font-weight:400;margin-top:6px}
+.game h3{font-size:2rem}
+.game .who{font-family:var(--type);font-size:.85rem;color:var(--graphite)}
+
+/* about */
+.about{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.8fr);gap:40px}
+.offer{background:var(--ink);color:var(--paper);padding:26px;display:flex;flex-direction:column;gap:14px;align-self:start}
+.offer h3{font-size:2.3rem;color:#fff}
+.offer a{color:#9fd3b4}
+.sig{font-family:var(--type);font-size:.95rem;margin-top:6px}
+footer{border-top:2px solid var(--ink);padding-block:22px 40px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;font-family:var(--type);font-size:.8rem;color:var(--graphite)}
+.badge{font:400 .8rem var(--type);background:none;border:1px solid var(--rule);color:var(--graphite);padding:6px 10px;cursor:pointer}
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:#fff;font:400 .85rem var(--type);padding:10px 14px;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:1}
+
+@media (max-width:800px){
+  header{grid-template-columns:1fr;gap:28px}
+  .hero-panel{transform:none;margin:0}
+  .rundown{grid-template-columns:1fr}
+  .aside{grid-template-columns:1fr}
+  .reel-wrap{grid-template-columns:1fr}
+  .boardbox{position:static;order:-1;max-width:340px}
+  .shots{grid-template-columns:1fr}
+  .s1,.s2,.s3,.kit-text{grid-column:1}
+  .s2{margin-top:0}
+  .game{grid-template-columns:84px minmax(0,1fr)}
+  .game .count{font-size:3.2rem}
+  .about{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){.reel{scroll-behavior:auto}}
+</style>
+
+<div class="page">
+
+<header>
+  <div class="hero-copy">
+    <h1 class="hero-title">Your story. <em>I'll build the board</em> it plays on.</h1>
+    <p class="hero-lead">Todd, I don't know the story yet, and I won't guess at it. The setting, the people and what the show is saying belong to you. I can bring structure, shot design and editing, plus a hidden layer that pays off for anyone who actually plays chess (while everyone else just watches a good story).</p>
+  </div>
+  <figure class="hero-panel">
+    <svg class="panel" viewBox="0 0 320 180" role="img" aria-label="Storyboard: parking garage with a white level sign reading E4">
+      <rect class="tn" x="0" y="0" width="320" height="28"/>
+      <path class="k" d="M0 28H320M0 150H320M20 28V150M290 28V150"/>
+      <rect class="tn" x="34" y="28" width="22" height="122"/><rect class="tn" x="256" y="28" width="22" height="122"/>
+      <path class="k" d="M34 28V150M56 28V150M256 28V150M278 28V150"/>
+      <path class="k1" d="M128 28V52M192 28V52"/>
+      <rect class="wh" x="112" y="52" width="96" height="54"/>
+      <text class="sg" x="160" y="66" text-anchor="middle" font-size="11">LEVEL</text>
+      <text class="sg" x="160" y="100" text-anchor="middle" font-size="36">E4</text>
+      <path class="k" d="M196 150c0-16 8-22 22-24h40c12 0 20 8 22 24"/><circle class="k" cx="214" cy="150" r="8"/><circle class="k" cx="266" cy="150" r="8"/>
+      <path class="cm" d="M14 10L54 40M306 10L266 40M14 170L54 140M306 170L266 140"/>
+      <text class="tag" x="10" y="174">PUSH IN</text>
+    </svg>
+    <figcaption>SC 1 · SH 1A · WIDE · The first move of the episode, hanging in plain sight.</figcaption>
+  </figure>
+</header>
+
+<section id="episodes">
+  <div class="sec-head">
+    <h2>13 moves</h2>
+    <div class="prose"><p>Each episode is named for a real opening or chess idea, and its story lives out what that idea does on the board. A player reads the title and knows what's coming; everyone else gets it by the credits.</p></div>
+  </div>
+  <div class="rundown" id="rundown"></div>
+  <div class="aside">
+    <p>Two alternates if the story wants them. The Bongcloud is a joke opening where you walk your king out on move two (good for a comedy episode about winning while showing off). Stalemate means nobody has a legal move, so nobody wins.</p>
+    <p>The order follows the story, whatever it turns out to be.</p>
+  </div>
+</section>
+
+<section id="hidden">
+  <div class="sec-head">
+    <h2>The hidden board</h2>
+    <div class="prose"><p>Every episode secretly plays the opening it's named for, one move at a time, hidden in the set dressing. Nobody says it out loud. It's there for whoever hits pause. Here's how The Scotch Game could play out across one episode. Tap a frame and the board follows.</p></div>
+  </div>
+  <div class="reel-wrap">
+    <div class="reel" id="reel"></div>
+    <div class="boardbox">
+      <div class="chess" id="chess" role="img" aria-label="Chess board showing the Scotch Game"></div>
+      <div class="movebar">
+        <span class="now" id="now">Start position</span>
+        <span class="nav"><button class="nb" id="prev" type="button" aria-label="Previous move">&lt;</button><button class="nb" id="next" type="button" aria-label="Next move">&gt;</button></span>
+      </div>
+    </div>
+  </div>
+  <div class="prose rules small">
+    <p>The rules stay simple so a viewer can learn them. White's moves go on white signs and Black's go on black ones; squares are written as text (door numbers, plates, routes) while pieces show up as images, so a horse logo is a knight. A capture gets an X, like tape or a crossed-out sign. Every move has to read on a single freeze frame, and they always land in order.</p>
+  </div>
+</section>
+
+<section id="shots">
+  <div class="sec-head">
+    <h2>More shots</h2>
+    <div class="prose"><p>A few other ways the board can live inside a frame.</p></div>
+  </div>
+  <div class="shots">
+    <figure class="shot s1">
+      <svg class="panel" viewBox="0 0 320 180" role="img" aria-label="Storyboard: Brooks Bakery truck with a lamppost covering the letter B so it reads ROOKS">
+        <path class="k" d="M0 156H320"/>
+        <rect class="wh" x="30" y="40" width="200" height="100"/>
+        <path class="k" d="M230 70h44l24 30v40h-68z"/><path class="k" d="M240 78h30l16 22h-46z"/>
+        <circle class="wh" cx="80" cy="146" r="14"/><circle class="wh" cx="256" cy="146" r="14"/>
+        <text class="sg" x="48" y="94" font-size="40">BROOKS</text>
+        <text class="sg" x="104" y="124" font-size="18">BAKERY</text>
+        <rect class="fi" x="44" y="10" width="20" height="146"/>
+        <path class="k" d="M54 14c0-8 18-8 26 0"/><rect class="fi" x="74" y="12" width="16" height="8"/>
+        <text class="tag" x="236" y="174">LOCKED OFF</text>
+      </svg>
+      <figcaption><span class="slug">SH 4C · MED · LOCKED OFF</span><span>The rook trick. A lamppost blocks the B on a Brooks Bakery truck, so the side of the truck reads ROOKS.</span></figcaption>
+    </figure>
+    <figure class="shot s2">
+      <svg class="panel" viewBox="0 0 320 180" role="img" aria-label="Storyboard: overhead shot of a tiled floor with two people standing a knight's move apart">
+        <g id="tiles"></g>
+        <circle class="fi" cx="130" cy="112" r="9"/><circle class="wh" cx="190" cy="68" r="9"/>
+        <path class="cm" d="M130 112V68H178"/><path class="ch" d="M178 62l10 6-10 6z"/>
+        <text class="tag" x="10" y="174">OVERHEAD</text>
+      </svg>
+      <figcaption><span class="slug">SH 9A · OVERHEAD · STATIC</span><span>The board in the world. From above, a tiled floor becomes a grid, and two people end up a knight's move apart.</span></figcaption>
+    </figure>
+    <figure class="shot s3">
+      <svg class="panel" viewBox="0 0 320 180" role="img" aria-label="Storyboard: freeze frame of a man at a chess table with the annotation mark ?! in the corner">
+        <rect class="tn" x="0" y="0" width="320" height="180"/>
+        <path class="k" d="M40 150H280"/><path class="wh" d="M110 132h100l14 18H96z"/>
+        <circle class="fi" cx="160" cy="66" r="20"/><path class="fi" d="M118 132c0-34 18-46 42-46s42 12 42 46z"/>
+        <path class="k" d="M196 112l26 18"/>
+        <text class="sg" x="296" y="46" text-anchor="end" font-size="40" style="fill:#2f6a4c">?!</text>
+        <text class="tag" x="10" y="174">FREEZE</text>
+      </svg>
+      <figcaption><span class="slug">SH 32 · MCU · FREEZE ON THE DECISION</span><span>Chess writers grade moves with marks; ! is good, ?! is dubious, ?? is a blunder. An episode can end frozen on a choice with one mark in the corner, and no line of dialogue has to explain it.</span></figcaption>
+    </figure>
+    <div class="prose kit-text">
+      <p>Two more ideas that don't need a drawing. Each episode's edit can match the speed of the game inside it, so a blitz episode cuts fast and tight while a slow game gets room to breathe (with a chess-clock tap as the transition sound). And players will freeze-frame every board on screen, so a chess consultant checking positions keeps the show honest with the exact audience it's built to reward.</p>
+    </div>
+  </div>
+</section>
+
+<section id="season">
+  <div class="sec-head">
+    <h2>One game, 13 episodes</h2>
+    <div class="prose"><p>Under the episode openings, a second hidden layer plays a single famous game across the whole season, a few moves per episode. The last image of the finale is the final move. Any of these three would carry a season, and each one says something different.</p></div>
+  </div>
+  <div class="games">
+    <div class="game"><div class="count">17<small>moves</small></div><h3>The Opera Game</h3><div class="who">Paul Morphy vs. two noblemen · Paris, 1858</div><p>Two rich men team up against one player in their private box at the opera. He keeps giving up material to get his pieces working, then finishes it fast.</p></div>
+    <div class="game"><div class="count">23<small>moves</small></div><h3>The Immortal Game</h3><div class="who">Adolf Anderssen vs. Lionel Kieseritzky · London, 1851</div><p>Anderssen sacrifices a bishop, both rooks and his queen; then he mates with the small pieces he has left.</p></div>
+    <div class="game"><div class="count">44<small>moves</small></div><h3>Kasparov's Immortal</h3><div class="who">Garry Kasparov vs. Veselin Topalov · Wijk aan Zee, 1999</div><p>Kasparov gives up a rook and chases the enemy king out of its corner, across the board and deep into his own side. It starts slow and turns into a long chase.</p></div>
+  </div>
+  <p class="small" style="margin-top:20px;max-width:60ch">Off screen, a companion page could let viewers log the moves they spot and watch the game build as the season airs. I build that kind of thing.</p>
+</section>
+
+<section id="me">
+  <div class="about">
+    <div class="prose">
+      <h2>Who's pitching</h2>
+      <p>I'm the Director of Communications and Media Production at Yanke Bionics, and I've run video, print, web and brand for their 10 offices on my own since 2021. Fast turnaround is the normal pace there.</p>
+      <p>I studied fine arts and illustration at Kent State with a minor in creative writing. At the campus TV station I helped students write and plan sketches for a Daily Show-style program about current events and campus life. Before all that I worked for years as a family entertainer doing magic and balloon twisting, which is where the hidden board comes from; magic is misdirection, and the audience looks wherever you point.</p>
+      <p>My son and I are learning chess together, so I built us <a href="https://motbuchanan.com/knightschool" target="_blank" rel="noopener">Knight School</a>, a full chess game with a coach and lessons for new players. I've already made a custom-branded version of it as a downloadable app for the owner of my company. A branded app for the show could teach viewers the game and let them follow the season's hidden moves. More of what I build is at <a href="https://motbuchanan.com" target="_blank" rel="noopener">motbuchanan.com</a>.</p>
+    </div>
+    <div class="offer">
+      <h3>Send me something rough</h3>
+      <p>A logline, a few characters or one episode idea is enough. Within a week I'll send back an opening and title matched to it, that episode's hidden moves placed shot by shot, and a short test edit or animatic so you can see it play.</p>
+      <p>If it adds something, we talk about more. If it doesn't, no harm done.</p>
+      <p class="sig">Mot Buchanan<br><a href="https://motbuchanan.com" target="_blank" rel="noopener">motbuchanan.com</a></p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>The Hidden Board · a pitch by Mot Buchanan</span>
+  <button class="badge" id="badge" type="button">v1.2 · Nov 5 2026</button>
+</footer>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+  var EPISODES=[
+    ["The Scotch Game","A drinking bet over a game with something real on the line. Whoever keeps their head wins.","White breaks open the center by move three and forces an early fight."],
+    ["The Stonewall","He holds his silence under pressure, and the silence is what leaves him exposed.","A wall of pawns nothing gets through, with a permanent weak square in front of it."],
+    ["Sicilian Defense","Refusing to fight on someone else's terms.","The most common answer to 1.e4; it won't mirror the attacker."],
+    ["Poisoned Pawn","Easy money with a hook in it.","A free pawn that traps the queen that grabs it."],
+    ["Fried Liver Attack","An all-in gamble (and the name of a dinner that goes very wrong).","A knight sacrificed on f7 to drag the king into the open."],
+    ["The Fork","He has to choose between two things he loves.","One piece attacks two at once, and you can only save one."],
+    ["The Pin","Stuck in place to protect someone.","A piece can't move without exposing something worth more behind it."],
+    ["Touch-Move","A commitment he can't take back.","Touch a piece and you have to move it."],
+    ["Discovered Check","The reveal episode.","Moving one piece uncovers the real attack behind it."],
+    ["En Passant","The chance you only see once.","A capture that exists for one move and then it's gone."],
+    ["Smothered Mate","Done in by his own people.","The king is trapped by his own pieces and can't get out."],
+    ["Zugzwang","The cornered episode.","Every legal move makes things worse, and you still have to move."],
+    ["Promotion","The finale.","A pawn that reaches the far side becomes any piece it chooses."]
+  ];
+  function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;")}
+  var h="";
+  EPISODES.forEach(function(e,i){
+    h+='<div class="ep'+(i===12?' finale':'')+'"><span class="n">'+(i+1)+'</span><h3>'+esc(e[0])+'</h3><p class="story">'+esc(e[1])+'</p><p class="board">'+esc(e[2])+'</p></div>';
+  });
+  document.getElementById("rundown").innerHTML=h;
+
+  // overhead tiles
+  var tiles="";
+  for(var r=0;r<5;r++)for(var c=0;c<9;c++){
+    var x=10+c*34,y=6+r*34; if(x>300)continue;
+    tiles+='<rect x="'+x+'" y="'+y+'" width="34" height="34" class="'+((r+c)%2?'tn':'wh')+'" style="stroke:#18191b;stroke-width:1"/>';
+  }
+  document.getElementById("tiles").innerHTML=tiles;
+
+  // Scotch Game reel
+  var KN='<text class="gl" font-size="SZ" x="X" y="Y" text-anchor="middle" style="fill:FILL">♞︎</text>';
+  function kn(x,y,s,f){return KN.replace("SZ",s).replace("X",x).replace("Y",y).replace("FILL",f)}
+  var FRAMES=[
+    {san:"1. e4",from:"e2",to:"e4",slug:"SH 1A · WIDE · PUSH IN",note:"Establishing shot. A white level sign in the parking garage reads E4.",svg:
+      '<rect class="tn" x="0" y="0" width="320" height="28"/><path class="k" d="M0 28H320M0 150H320"/><rect class="tn" x="34" y="28" width="22" height="122"/><rect class="tn" x="256" y="28" width="22" height="122"/><path class="k" d="M34 28V150M56 28V150M256 28V150M278 28V150M128 28V52M192 28V52"/><rect class="wh" x="112" y="52" width="96" height="54"/><text class="sg" x="160" y="66" text-anchor="middle" font-size="11">LEVEL</text><text class="sg" x="160" y="100" text-anchor="middle" font-size="36">E4</text><path class="cm" d="M14 10L54 40M306 10L266 40"/>'},
+    {san:"1... e5",from:"e7",to:"e5",slug:"SH 3B · MED · DOLLY WITH",note:"Hallway walk-and-talk. They pass a door with a black plate, apartment E5.",svg:
+      '<path class="k" d="M0 0L130 70H190L320 0M0 180L130 115H190L320 180M130 70V115M190 70V115"/><path class="k" d="M222 46l40-20v136l-40-20z"/><rect class="fi" x="230" y="64" width="26" height="16"/><text class="sgw" x="243" y="77" text-anchor="middle" font-size="13">E5</text><path class="k" d="M58 40l30 14v84l-30 14z"/><circle class="fi" cx="148" cy="88" r="5"/><path class="fi" d="M142 112c0-12 3-17 6-17s6 5 6 17z"/><circle class="k" cx="170" cy="88" r="5"/><path class="k" d="M164 112c0-12 3-17 6-17s6 5 6 17z"/><path class="cm" d="M60 168L120 128"/><path class="ch" d="M122 120l2 12-12-2z"/>'},
+    {san:"2. Nf3",from:"g1",to:"f3",slug:"SH 6A · MED · PAN WITH",note:"A white delivery van rolls through with a horse logo on the side. The plate ends in F3.",svg:
+      '<path class="k" d="M0 162H320"/><rect class="wh" x="30" y="50" width="200" height="92" rx="4"/><path class="k" d="M230 74h40l24 30v38h-64z"/><path class="k" d="M238 82h28l16 22h-44z"/><circle class="wh" cx="82" cy="146" r="15"/><circle class="wh" cx="252" cy="146" r="15"/><circle class="k" cx="130" cy="94" r="30"/>'+kn(130,110,44,"#18191b")+'<rect class="wh" x="38" y="118" width="54" height="16"/><text class="sg" x="65" y="131" text-anchor="middle" font-size="12">KTW F3</text><path class="cm" d="M30 28H270"/><path class="ch" d="M272 22l12 6-12 6z"/>'},
+    {san:"2... Nc6",from:"b8",to:"c6",slug:"SH 6C · MED · STATIC",note:"In the background, an extra in a black hoodie with a horse on the back leans by parking spot C6.",svg:
+      '<path class="k" d="M0 160L320 140M40 180L70 120M150 180L170 116M260 180L268 112"/><text class="sg" x="104" y="150" font-size="22">C6</text><path class="k" d="M220 30V140"/><path class="fi" d="M170 150c0-40 4-70 34-82 6-2 10-12 18-12s14 8 14 18c0 6-4 10-8 12 10 18 12 40 12 64z"/>'+kn(204,124,40,"#ffffff")},
+    {san:"3. d4",from:"d2",to:"d4",slug:"SH 11 · CU · RACK FOCUS",note:"A white bus stop sign, Route D4, comes into focus behind a conversation.",svg:
+      '<path class="k" d="M160 180V112"/><rect class="wh" x="96" y="16" width="128" height="96"/><text class="sg" x="160" y="40" text-anchor="middle" font-size="14">ROUTE</text><text class="sg" x="160" y="96" text-anchor="middle" font-size="58">D4</text><circle class="tn" cx="44" cy="120" r="40"/><circle class="tn" cx="280" cy="128" r="36"/>'},
+    {san:"3... exd4",from:"e5",to:"d4",slug:"SH 24 · CU · MATCH CUT",note:"Later, the same sign has black tape across it in an X. The capture.",svg:
+      '<path class="k" d="M160 180V112"/><rect class="wh" x="96" y="16" width="128" height="96"/><text class="sg" x="160" y="40" text-anchor="middle" font-size="14">ROUTE</text><text class="sg" x="160" y="96" text-anchor="middle" font-size="58">D4</text><path d="M100 20L220 108M220 20L100 108" style="stroke:#18191b;stroke-width:12;stroke-linecap:square"/>'},
+    {san:"4. Nxd4",from:"f3",to:"d4",slug:"SH 40 · WIDE · LAST SHOT",note:"Final scene. The white horse van is parked at that taped-up stop.",svg:
+      '<path class="k" d="M0 150H320M0 40h70v110M90 60h60v90"/><path class="k" d="M260 150V92"/><rect class="wh" x="236" y="54" width="48" height="38"/><path d="M238 56L282 90M282 56L238 90" style="stroke:#18191b;stroke-width:5"/><rect class="wh" x="150" y="104" width="86" height="40" rx="3"/><path class="k" d="M236 114h18l12 14v16h-30z"/><circle class="wh" cx="172" cy="146" r="8"/><circle class="wh" cx="244" cy="146" r="8"/>'+kn(190,134,26,"#18191b")}
+  ];
+  var reel=document.getElementById("reel"); h="";
+  FRAMES.forEach(function(f,i){
+    h+='<button class="frame" type="button" data-i="'+(i+1)+'" aria-pressed="false"><svg class="panel" viewBox="0 0 320 180" role="img" aria-label="'+esc(f.note)+'">'+f.svg+'<text class="tag" x="10" y="174">'+esc(f.san)+'</text></svg><span class="slug"><b>'+esc(f.san)+'</b><span>'+esc(f.slug)+'</span></span><span class="note">'+esc(f.note)+'</span></button>';
+  });
+  reel.innerHTML=h;
+
+  var FILES="abcdefgh",G={k:"♚",q:"♛",r:"♜",b:"♝",n:"♞",p:"♟"};
+  var pos={},back="rnbqkbnr";
+  for(var f=0;f<8;f++){pos[FILES[f]+"1"]="w"+back[f];pos[FILES[f]+"2"]="wp";pos[FILES[f]+"7"]="bp";pos[FILES[f]+"8"]="b"+back[f]}
+  var P=[pos];
+  FRAMES.forEach(function(fr,i){var n=Object.assign({},P[i]);n[fr.to]=n[fr.from];delete n[fr.from];P.push(n)});
+  var chess=document.getElementById("chess"),sq={};
+  for(var r=8;r>=1;r--)for(var c=0;c<8;c++){var id=FILES[c]+r,d=document.createElement("div");d.className="sq "+((c+r)%2?"l":"d");sq[id]=d;chess.appendChild(d)}
+  var cur=0;
+  function show(n,scroll){
+    cur=Math.max(0,Math.min(FRAMES.length,n));
+    var p=P[cur],hl={};
+    if(cur){hl[FRAMES[cur-1].from]=1;hl[FRAMES[cur-1].to]=1}
+    for(var k in sq){var pc=p[k];sq[k].innerHTML=pc?'<span class="pc '+pc[0]+'">'+G[pc[1]]+'︎</span>':"";sq[k].classList.toggle("hl",!!hl[k])}
+    document.getElementById("now").textContent=cur?FRAMES[cur-1].san:"Start position";
+    document.getElementById("prev").disabled=cur===0;
+    document.getElementById("next").disabled=cur===FRAMES.length;
+    var btns=reel.querySelectorAll(".frame");
+    btns.forEach(function(b){b.setAttribute("aria-pressed",String(+b.dataset.i===cur))});
+    if(scroll&&cur){var b=btns[cur-1];reel.scrollTo({left:b.offsetLeft-reel.offsetLeft,behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"})}
+  }
+  reel.addEventListener("click",function(e){var b=e.target.closest(".frame");if(b)show(+b.dataset.i,false)});
+  document.getElementById("prev").addEventListener("click",function(){show(cur-1,true)});
+  document.getElementById("next").addEventListener("click",function(){show(cur+1,true)});
+  show(1,false);
+
+  var t=document.getElementById("toast"),tt;
+  document.getElementById("badge").addEventListener("click",function(){t.textContent="The Hidden Board v1.2 · Nov 5 2026";t.classList.add("on");clearTimeout(tt);tt=setTimeout(function(){t.classList.remove("on")},2200)});
+})();
+</script>
