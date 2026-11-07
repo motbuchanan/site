@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="build" content="0.5.1">
+<meta name="build" content="0.5.2">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0d1116">
 <meta name="description" content="Light Scout shows where the sun will be at any spot, any day, any time: direction, height, shadows, golden hour. Plan a shot by lining the sun up with a gap or a landmark and get the dates to be there.">
@@ -18,7 +18,7 @@
 <title>Light Scout</title>
 <script>try{if(window.self!==window.top)document.documentElement.classList.add("embed");}catch(e){document.documentElement.classList.add("embed");}</script>
 <link href="../fonts/fonts.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous">
+<link rel="stylesheet" href="leaflet.css">
 <style>
 :root{
   --mb-ink:#ebedef; --mb-soft:#c2c9d1; --mb-dim:#7d8794;
@@ -438,7 +438,7 @@ turn = angle from the spin step</div></li>
   </section>
 </main>
 
-<button class="mb-ver" id="mbVer" type="button">v0.5.1 &middot; Nov 6</button>
+<button class="mb-ver" id="mbVer" type="button">v0.5.2 &middot; Nov 6</button>
 <div id="toast" role="status"><span id="toastT"></span><button id="toastB" hidden type="button">Undo</button></div>
 
 <div class="sheet" id="linkSheet" hidden>
@@ -477,7 +477,7 @@ turn = angle from the spin step</div></li>
       <summary>About this build</summary>
       <p id="aboutSize">This whole tool is one file.</p>
       <p>I shoot a lot of photos and kept guessing where the sun would be. So I built a map I can tap. The sun math runs on the phone from the date, the clock, and the spot. There is no account and no tracking.</p>
-      <p><b>What leaves your phone:</b> the map pictures come from OpenStreetMap and Esri, the map drawing library (Leaflet) comes from the jsDelivr CDN, and a place search asks OpenStreetMap for matches. Your location, if you share it, is only used on the phone to place the pin.</p>
+      <p><b>What leaves your phone:</b> the map pictures come from OpenStreetMap and Esri, and a place search asks OpenStreetMap for matches. Your location, if you share it, is only used on the phone to place the pin.</p>
       <p><b>Tested against</b> a professional astronomy library: sun direction within 0.06 degrees and sunrise and sunset within a few seconds.</p>
       <p><b>Map wrong?</b> The street map is drawn by volunteers. You can report a missing building or a wrong road at <a href="https://www.openstreetmap.org/fixthemap" target="_blank" rel="noopener">openstreetmap.org/fixthemap</a>.</p>
     </details>
@@ -485,7 +485,7 @@ turn = angle from the spin step</div></li>
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
+<script src="leaflet.js"></script>
 
 <script id="sunmath">
 /* Light Scout sun math. Pure functions, no page access, so it can be tested on its own. */
