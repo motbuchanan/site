@@ -1,1 +1,1550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="build" content="0.5.1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0d1116">
+<meta name="description" content="Light Scout shows where the sun will be at any spot, any day, any time: direction, height, shadows, golden hour. Plan a shot by lining the sun up with a gap or a landmark and get the dates to be there.">
+<meta property="og:title" content="Light Scout">
+<meta property="og:description" content="Where will the sun be? Pick a spot on the map and a time. Line the sun up with a gap between buildings and get the dates to be there.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://motbuchanan.com/lightscout/">
+<meta property="og:image" content="https://motbuchanan.com/lightscout/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://motbuchanan.com/lightscout/">
+<link rel="icon" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
+<title>Light Scout</title>
+<script>try{if(window.self!==window.top)document.documentElement.classList.add("embed");}catch(e){document.documentElement.classList.add("embed");}</script>
+<link href="../fonts/fonts.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous">
+<style>
+:root{
+  --mb-ink:#ebedef; --mb-soft:#c2c9d1; --mb-dim:#7d8794;
+  --mb-teal:#4cf0e0; --mb-orange:#f59847;
+  --mb-glass:rgba(14,18,23,.62); --mb-line:rgba(255,255,255,.12);
+  --mb-ui:'Archivo',system-ui,-apple-system,sans-serif;
+  --mb-mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  --ground:#0d1116; --panel:rgba(16,21,28,.92); --panel-solid:#131920; --panel2:#1a222c;
+  --sun:#ffd76a; --gold:#f4a93b; --ember:#ee6a2c; --blue:#3f86e0; --day:#9cc7e3;
+  --teal-ink:#06110f; --teal-dim:rgba(76,240,224,.35);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html{color-scheme:dark;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--ground);color:var(--mb-ink);font-family:var(--mb-ui);font-size:17px;line-height:1.5;overflow-wrap:anywhere}
+button,input,select{font-family:inherit;font-size:inherit;color:inherit}
+h1,h2,h3,p,ul,ol{margin:0;padding:0}
+ul,ol{list-style:none}
+a{color:var(--mb-teal)}
+button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visible,.strip:focus-visible,a:focus-visible{outline:3px solid #9ff5ea;outline-offset:2px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 
+/* ---- shared chrome ---- */
+.mb-home{display:inline-flex;align-items:center;gap:6px;background:transparent;color:var(--mb-teal);border:1px solid rgba(76,240,224,.4);border-radius:8px;font:700 12px var(--mb-mono);padding:7px 13px;text-decoration:none;cursor:pointer;white-space:nowrap;flex:none}
+html.embed .mb-home{display:none}
+.mb-ver{position:fixed;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:900;font:600 10px var(--mb-mono);letter-spacing:.04em;color:var(--mb-teal);background:var(--mb-glass);border:1px solid rgba(76,240,224,.25);border-radius:999px;padding:4px 9px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);cursor:pointer;user-select:none;opacity:.85}
+.btn{min-height:48px;padding:11px 16px;border-radius:13px;border:1px solid var(--mb-line);background:var(--mb-glass);color:var(--mb-ink);font:700 15px var(--mb-ui);cursor:pointer;max-width:100%}
+.btn:active{background:var(--panel2)}
+.btn.go{background:var(--mb-teal);border-color:var(--mb-teal);color:var(--teal-ink);font-weight:800}
+.btn[disabled]{opacity:.45;cursor:default}
+.pills{display:flex;border:1px solid var(--mb-line);border-radius:999px;overflow:hidden;background:var(--mb-glass)}
+.pills button{border:0;background:transparent;padding:0 14px;min-height:40px;font:700 13px var(--mb-ui);color:var(--mb-soft);cursor:pointer}
+.pills button.on{background:var(--mb-teal);color:var(--teal-ink)}
+.block{padding:18px 0 4px;border-top:1px solid var(--mb-line);margin-top:14px}
+.block:first-of-type{border-top:0}
+.lbl{font-size:14px;font-weight:600;color:var(--mb-dim)}
+.intro{margin-top:14px;padding:14px 16px 16px;border-radius:4px;background:#13201f;border-left:4px solid var(--mb-teal)}
+.intro h2{font-size:18px;font-weight:800;line-height:1.25}
+.intro ol{margin-top:8px;list-style:decimal;padding-left:22px;color:var(--mb-soft);font-size:16px}
+.intro li{padding:3px 0}
+.intro li b{color:var(--mb-ink)}
+.intro .btn{margin-top:12px;min-height:44px}
+.best li{display:grid;grid-template-columns:18px 1fr;gap:12px;align-items:start;padding:10px 0;border-top:1px solid var(--mb-line)}
+.best li:first-child{border-top:0}
+.best button{display:block;width:100%;text-align:left;background:transparent;border:0;padding:0;cursor:pointer;line-height:1.35;color:inherit}
+.best .sw{width:16px;height:16px;border-radius:50%;margin-top:4px}
+.best b{display:block;font-size:17px;font-weight:800}
+.best .when{display:block;font-size:19px;font-weight:700;font-variant-numeric:tabular-nums;color:#ffe3a1}
+.best small{display:block;font-size:14.5px;color:var(--mb-dim);margin-top:2px}
+.best .empty{padding:8px 0;color:var(--mb-soft)}
+.more{margin-top:12px;border-top:1px solid var(--mb-line)}
+.more summary{padding:12px 0 6px;font-weight:700;font-size:15px;color:var(--mb-soft);cursor:pointer}
+
+/* ---- top ---- */
+.top{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 12px;border-bottom:1px solid var(--mb-line);background:var(--ground);position:sticky;top:0;z-index:1200}
+.top .l,.top .r{display:flex;align-items:center;gap:8px;min-width:0}
+.brand{display:flex;align-items:center;gap:8px;min-width:0}
+.brand svg{display:block;flex:none}
+.brand h1{font:800 clamp(17px,5.2vw,21px) var(--mb-ui);letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tbtn{min-height:42px;padding:0 13px;border-radius:999px;border:1px solid var(--mb-line);background:var(--mb-glass);font:700 14px var(--mb-ui);cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
+.tbtn:active{background:var(--panel2)}
+.tbtn svg{flex:none}
+#warn{background:#3a2410;color:#ffd9a8;border-bottom:1px solid #6b4318;padding:10px 14px;font-size:15px}
+
+/* ---- the two jobs ---- */
+.jobs{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:10px 12px 0;padding:4px;border:1px solid var(--mb-line);border-radius:10px;background:var(--panel-solid)}
+.jobs button{border:0;background:transparent;border-radius:7px;min-height:44px;padding:0 10px;font:800 16px var(--mb-ui);color:var(--mb-soft);cursor:pointer;line-height:1.2}
+.jobs button.on{background:var(--mb-teal);color:var(--teal-ink)}
+
+/* ---- search ---- */
+.search{padding:10px 12px}
+.search form{display:flex;gap:8px}
+.search input{flex:1;min-width:0;height:46px;border:1px solid var(--mb-line);background:var(--panel-solid);color:var(--mb-ink);border-radius:12px;padding:0 12px;font-size:16px}
+.search input::placeholder{color:var(--mb-dim)}
+.search .btn{min-height:46px;padding:0 16px;flex:none}
+.hits{margin-top:8px;border:1px solid var(--mb-line);border-radius:12px;overflow:hidden;background:var(--panel-solid)}
+.hits li{border-top:1px solid var(--mb-line)}
+.hits li:first-child{border-top:0}
+.hits button{display:block;width:100%;text-align:left;padding:11px 12px;background:transparent;border:0;cursor:pointer;font-size:15px;line-height:1.3}
+.hits button:active{background:var(--panel2)}
+.hits .msg{padding:11px 12px;font-size:15px;color:var(--mb-soft)}
+.hits .cred{padding:6px 12px 8px;font-size:12px;color:var(--mb-dim)}
+
+/* ---- map ---- */
+.mapbox{position:relative;overflow:hidden}
+#map{height:42vh;min-height:290px;background:#0a0e12}
+#dial{position:absolute;top:0;left:0;right:0;bottom:0;inset:0;width:100%;height:100%;pointer-events:none;z-index:650;overflow:hidden}
+#dial text{font-family:var(--mb-ui);font-weight:600;paint-order:stroke;stroke:#0a0e12;stroke-width:3.6px;stroke-linejoin:round}
+.mapctl{position:absolute;right:10px;top:10px;z-index:900}
+#locate{position:absolute;left:10px;bottom:12px;z-index:900;display:flex;align-items:center;gap:7px;border:1px solid var(--mb-line);background:rgba(14,18,23,.88);border-radius:999px;padding:10px 14px;min-height:44px;font:700 14px var(--mb-ui);cursor:pointer}
+#locate:active{background:var(--panel2)}
+#mapmsg{position:absolute;left:12px;right:12px;bottom:64px;z-index:880;text-align:center;color:var(--mb-soft);font-size:14px;pointer-events:none;background:rgba(14,18,23,.8);border-radius:12px;padding:8px 10px}
+.underbar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid var(--mb-line);font-size:15px;color:var(--mb-soft);line-height:1.3}
+.underbar .tbtn{min-height:40px;font-size:13px;padding:0 12px;flex:none}
+.key{padding:6px 12px 12px;border-bottom:1px solid var(--mb-line);background:#0f151b}
+.key li{display:grid;grid-template-columns:46px 1fr;gap:10px;align-items:center;padding:7px 0;font-size:15px;color:var(--mb-soft);line-height:1.35}
+.key svg{display:block}
+
+.leaflet-container{background:#0a0e12;font-family:var(--mb-ui)}
+.ls-dim{filter:brightness(.78) saturate(.7) contrast(.96)}
+.leaflet-control-attribution{background:rgba(14,18,23,.78)!important;color:#9fb0b1!important;font-size:10px}
+.leaflet-control-attribution a{color:#c9d6d5!important}
+.leaflet-bar a{background:#131920!important;color:#ebedef!important;border-bottom-color:#263036!important;width:40px!important;height:40px!important;line-height:40px!important}
+.leaflet-bar{border:1px solid #263036!important}
+
+/* ---- panels ---- */
+.side{padding:0 12px 110px}
+.ask{font-size:15px;color:var(--mb-dim);margin-bottom:6px}
+.datebar{display:flex;align-items:center;gap:6px}
+.datebar button{width:44px;height:44px;border:1px solid var(--mb-line);background:var(--ground);border-radius:12px;display:grid;place-items:center;cursor:pointer;flex:none}
+.datebar button:active{background:var(--panel2)}
+.datebar input{height:44px;border:1px solid var(--mb-line);background:var(--ground);color:var(--mb-ink);border-radius:12px;padding:0 10px;font-size:16px;min-width:0;flex:1;width:100%}
+.dayword{margin-top:6px;font-size:15px;color:var(--mb-soft)}
+.zone{margin-top:8px;font-size:14px;color:var(--mb-dim);line-height:1.4}
+.zone.warn{color:#ffd9a8}
+.zone button{background:none;border:0;padding:6px 8px;margin:-10px 0 -10px -8px;min-height:40px;color:var(--mb-teal);font:700 14px var(--mb-ui);text-decoration:underline;cursor:pointer}
+.zone select{display:block;width:100%;margin-top:8px;height:44px;border:1px solid var(--mb-line);background:var(--ground);color:var(--mb-ink);border-radius:12px;padding:0 10px;font-size:15px}
+.readout{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px}
+.clock{font-size:clamp(30px,9.6vw,42px);font-weight:800;letter-spacing:-.02em;line-height:1;font-variant-numeric:tabular-nums;white-space:nowrap}
+.phase{font-size:15px;font-weight:700;padding:6px 12px;border-radius:999px;border:1px solid var(--mb-line);white-space:nowrap}
+.strip{position:relative;height:56px;margin-top:12px;border-radius:4px;overflow:hidden;border:1px solid var(--mb-line);touch-action:none;cursor:ew-resize}
+.strip canvas{display:block;width:100%;height:100%;pointer-events:none}
+.handle{position:absolute;top:0;bottom:0;width:0;border-left:2px solid #ffffff;pointer-events:none;box-shadow:0 0 0 1px rgba(0,0,0,.55)}
+.handle::after{content:"";position:absolute;left:-10px;top:-1px;width:18px;height:18px;border-radius:50%;background:#ffffff;box-shadow:0 0 0 2px rgba(0,0,0,.55)}
+.ticks{position:relative;height:20px;margin-top:4px;font-size:12.5px;color:var(--mb-dim)}
+.ticks span{position:absolute;top:0;transform:translateX(-50%);white-space:nowrap}
+.ticks span:first-child{transform:none}
+.ticks span:last-child{transform:translateX(-100%)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font-size:14px;color:var(--mb-soft)}
+.legend span{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.legend i{width:13px;height:13px;border-radius:3px;display:inline-block;border:1px solid rgba(255,255,255,.18)}
+.nudges{display:grid;grid-template-columns:1fr 1.2fr 1fr;gap:8px;margin-top:12px}
+.nudges button{min-height:46px;border-radius:12px;border:1px solid var(--mb-line);background:var(--ground);font:700 15px var(--mb-ui);cursor:pointer;padding:4px}
+.nudges button:active{background:var(--panel2)}
+.nudges #tNow{background:var(--mb-teal);border-color:var(--mb-teal);color:var(--teal-ink);font-weight:800}
+
+.lightblock h2{font-size:21px;font-weight:800;line-height:1.2;letter-spacing:-.01em;margin-top:4px}
+.lightblock .desc{margin-top:6px;color:var(--mb-soft)}
+#side{display:block;width:100%;max-width:460px;height:auto;margin:12px auto 4px;border-radius:12px;background:#0f161e}
+#side text{font-family:var(--mb-ui)}
+.say{margin-top:10px;font-size:18px;line-height:1.4}
+.say b{color:#ffe3a1;font-weight:700}
+.tips{margin-top:2px}
+.tips li{display:grid;grid-template-columns:92px 1fr;gap:10px;padding:6px 0;font-size:15px;color:var(--mb-soft);line-height:1.4}
+.tips li b{color:var(--mb-ink);font-weight:700}
+.fine{margin-top:10px;font-size:14px;color:var(--mb-dim);display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px}
+.units{display:inline-flex;border:1px solid var(--mb-line);border-radius:999px;overflow:hidden}
+.units button{border:0;background:transparent;padding:0 13px;font:700 13px var(--mb-ui);color:var(--mb-soft);cursor:pointer;min-height:40px}
+.units button.on{background:var(--mb-ink);color:var(--ground)}
+
+.head{font-size:20px;font-weight:800;margin:4px 0 4px;line-height:1.25;letter-spacing:-.01em}
+#dayWrap .head{margin-top:26px}
+.sub{color:var(--mb-dim);font-size:15px;margin-bottom:10px}
+.rows{border:1px solid var(--mb-line);border-radius:16px;overflow:hidden}
+.rows li{border-top:1px solid var(--mb-line)}
+.rows li:first-child{border-top:0}
+.rows button{display:grid;grid-template-columns:16px 1fr;gap:12px;align-items:start;width:100%;padding:12px 14px;background:var(--panel);border:0;text-align:left;cursor:pointer;line-height:1.35}
+.rows button:active{background:var(--panel2)}
+.rows .sw{width:14px;height:14px;border-radius:4px;margin-top:5px;border:1px solid rgba(255,255,255,.18)}
+.rows b{display:block;font-size:17px;font-weight:700}
+.rows .when{display:block;font-size:16px;font-variant-numeric:tabular-nums}
+.rows small{display:block;font-size:14.5px;color:var(--mb-dim);margin-top:2px}
+.rows .empty{padding:14px;background:var(--panel);color:var(--mb-soft)}
+.note{margin-top:10px;color:var(--mb-dim);font-size:15px}
+
+/* ---- plan a shot ---- */
+.plan{margin-top:14px;border:1px solid var(--teal-dim);border-radius:16px;background:rgba(76,240,224,.05);padding:14px}
+.stepno{font:600 11px var(--mb-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mb-teal)}
+.plan h2{font-size:22px;font-weight:800;line-height:1.2;margin-top:4px;letter-spacing:-.01em}
+.plan p{margin-top:8px;color:var(--mb-soft)}
+.plan .got{margin-top:12px;padding:10px 12px;border-radius:12px;background:var(--ground);border:1px solid var(--mb-line);color:var(--mb-ink)}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.btnrow .go{flex:1 1 180px}
+.linkbtn{background:none;border:0;padding:12px 0;margin-top:4px;min-height:44px;color:var(--mb-teal);font:700 15px var(--mb-ui);text-decoration:underline;cursor:pointer}
+.asklabel{margin-top:16px;font-weight:800;font-size:17px;color:var(--mb-ink)}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.choices button{display:grid;grid-template-columns:44px 1fr;gap:10px;align-items:center;text-align:left;min-height:64px;padding:8px 10px;border-radius:12px;border:1px solid var(--mb-line);background:var(--mb-glass);cursor:pointer;line-height:1.2;color:inherit}
+.choices button svg{display:block}
+.choices b{display:block;font-size:15px;font-weight:800}
+.choices small{display:block;font-size:12.5px;color:var(--mb-dim);margin-top:2px}
+.choices button.on{background:var(--mb-teal);border-color:var(--mb-teal);color:var(--teal-ink)}
+.choices button.on small{color:#0b3d39}
+.choices button.wide{grid-column:1 / -1;min-height:52px}
+.plan .choicenote{margin-top:8px;font-size:15px;color:var(--mb-dim)}
+.roof{margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.roof .stp{display:inline-flex;align-items:center;border:1px solid var(--mb-line);border-radius:12px;overflow:hidden;background:var(--ground)}
+.roof .stp button{width:44px;height:44px;border:0;background:transparent;font-size:22px;cursor:pointer}
+.roof .stp output{min-width:112px;text-align:center;font-weight:700;font-size:15px}
+.roof .lbl{font-size:15px;color:var(--mb-soft)}
+.next{margin-top:18px;padding-top:14px;border-top:2px solid var(--mb-teal)}
+.next .lbl{color:#bff3ee;font-size:15px;font-weight:700}
+.next .big{font-size:clamp(21px,6.8vw,27px);font-weight:800;line-height:1.15;margin-top:2px;letter-spacing:-.01em}
+.next p{color:var(--mb-soft)}
+.next .btnrow{margin-top:12px}
+.runs details{border:1px solid var(--mb-line);border-radius:14px;overflow:hidden;margin-top:10px;background:var(--panel)}
+.runs summary{padding:12px 14px;cursor:pointer;font-weight:700;font-size:17px;line-height:1.3}
+.runs summary small{display:block;font-weight:400;font-size:14.5px;color:var(--mb-dim)}
+.runs .rows{border:0;border-top:1px solid var(--mb-line);border-radius:0}
+.runs .rows button{grid-template-columns:1fr auto;gap:10px;align-items:center;padding:10px 14px}
+.runs .rows .d1{font-size:16px;font-weight:700}
+.runs .rows .d2{font-size:16px;font-variant-numeric:tabular-nums;text-align:right}
+.runs .rows .d2 small{font-size:13.5px}
+
+/* ---- the math ---- */
+.math{margin-top:26px;border-top:1px solid var(--mb-line)}
+.math>summary{padding:14px 0;font-weight:800;font-size:18px;cursor:pointer}
+.math .lede{color:var(--mb-soft);max-width:38em}
+.chain{margin-top:14px}
+.chain li{padding:14px 0;border-top:1px solid var(--mb-line)}
+.chain h3{font-size:17px;font-weight:800}
+.chain p{margin-top:5px;color:var(--mb-soft);max-width:38em}
+.chain b{color:var(--gold);font-weight:700;white-space:nowrap}
+.formula{margin-top:10px;font-family:var(--mb-mono);font-size:clamp(10px,3.4vw,12px);line-height:1.7;color:#b9c8c7;background:#0a0e12;border:1px solid var(--mb-line);border-radius:4px;padding:10px 12px;overflow-x:auto;white-space:pre}
+
+/* ---- toast + sheet ---- */
+#toast{position:fixed;left:50%;bottom:calc(54px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:1400;background:#eef4f2;color:#0d1116;border-radius:16px;padding:10px 16px;font-size:15px;font-weight:700;display:none;align-items:center;gap:12px;max-width:92vw;box-shadow:0 6px 22px rgba(0,0,0,.45)}
+#toast.show{display:flex}
+#toast span{white-space:normal;line-height:1.3}
+#toast button{border:0;background:#0d1116;color:#eef4f2;border-radius:999px;padding:7px 13px;font-weight:800;font-size:14px;cursor:pointer;flex:none}
+.sheet{position:fixed;top:0;left:0;right:0;bottom:0;inset:0;z-index:1500;background:rgba(5,9,10,.8);display:flex;align-items:flex-end;justify-content:center}
+.sheet .in{width:100%;max-width:560px;max-height:94vh;overflow:auto;background:var(--panel-solid);border:1px solid var(--mb-line);border-bottom:0;border-radius:20px 20px 0 0;padding:20px 16px calc(22px + env(safe-area-inset-bottom))}
+.sheet h2{font-size:clamp(23px,7.4vw,28px);line-height:1.15;font-weight:800;letter-spacing:-.02em}
+.sheet .lead{margin-top:8px;color:var(--mb-soft);font-size:17px}
+.sheet .q{margin-top:18px;font-weight:800;font-size:18px}
+.sheet .three{margin-top:12px;list-style:decimal;padding-left:22px;font-size:16px;color:var(--mb-soft)}
+.sheet .three li{padding:4px 0}
+.sheet .three b{color:var(--mb-ink)}
+.sheet .jobsay{margin-top:14px;font-size:15.5px;color:var(--mb-soft)}
+.sheet .jobsay b{color:var(--mb-ink)}
+.gloss{margin-top:4px}
+.gloss dt{font-weight:800;font-size:16px;margin-top:12px}
+.gloss dd{margin:3px 0 0;color:var(--mb-soft);font-size:15px}
+.about{margin-top:16px;border-top:1px solid var(--mb-line)}
+.about summary{padding:12px 0;font-weight:800;font-size:16px;cursor:pointer}
+.about p{color:var(--mb-soft);font-size:15px;margin-top:8px}
+.about p b{color:var(--mb-ink)}
+.sheet .closer{margin-top:14px;width:100%}
+.linkin{display:block;width:100%;margin-top:14px;height:46px;border:1px solid var(--mb-line);background:var(--ground);color:var(--mb-ink);border-radius:12px;padding:0 12px;font-size:15px;font-family:var(--mb-mono)}
+
+@media (max-width:480px){
+  #share span{display:none}
+  #share{padding:0 12px}
+}
+@media (max-width:380px){
+  html:not(.embed) .brand svg{display:none}
+  html:not(.embed) #help span{display:none}
+  html:not(.embed) #help{width:42px;padding:0;justify-content:center;font-size:18px}
+  html:not(.embed) #help::after{content:"?"}
+  .mb-home{padding:7px 9px}
+}
+@media (max-width:390px){
+  body{font-size:16px}
+  .jobs button{font-size:15px}
+  .say{font-size:17px}
+  .tips li{grid-template-columns:84px 1fr}
+}
+@media (min-width:900px){
+  .grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(380px,1fr);align-items:start}
+  .mapwrap{position:sticky;top:63px}
+  #map{height:calc(100vh - 230px)}
+  .side{padding:0 22px 110px}
+  .jobs,.search{max-width:640px}
+  .sheet{align-items:center}
+  .sheet .in{border-radius:20px;border-bottom:1px solid var(--mb-line)}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="l">
+    <a class="mb-home" href="../">&larr; home</a>
+    <div class="brand">
+      <svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><path d="M3 22h26" stroke="#4cf0e0" stroke-width="2.4" stroke-linecap="round"/><path d="M8.5 22a7.5 7.5 0 0 1 15 0z" fill="#f4a93b"/><path d="M16 9V5M7 13l-3-3M25 13l3-3" stroke="#f4a93b" stroke-width="2.2" stroke-linecap="round"/></svg>
+      <h1>Light Scout</h1>
+    </div>
+  </div>
+  <div class="r">
+    <button class="tbtn" id="share" aria-label="Share a link to this plan" type="button"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5v8M4.8 4.6 8 1.4l3.2 3.2M3 8.5v4.3a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V8.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Share</span></button>
+    <button class="tbtn" id="help" aria-label="Help and about" type="button"><span>Help</span></button>
+  </div>
+</header>
+
+<div id="warn" hidden></div>
+
+<nav class="jobs" id="modes" aria-label="What do you want to do">
+  <button data-mode="see" class="on" type="button">See the light</button>
+  <button data-mode="plan" type="button">Plan a shot</button>
+</nav>
+
+<section class="search" role="search" aria-label="Find a place">
+  <form id="sform" autocomplete="off">
+    <input type="search" id="q" placeholder="Search a place" aria-label="Search a place or paste coordinates" enterkeyhint="search">
+    <button class="btn" type="submit" id="qGo">Find</button>
+  </form>
+  <ol class="hits" id="hits" hidden></ol>
+</section>
+
+<main class="grid">
+  <section class="mapwrap">
+    <div class="mapbox">
+      <div id="map"></div>
+      <svg id="dial" aria-hidden="true"><g id="dialG"></g></svg>
+      <div class="mapctl">
+        <div class="pills" id="layers">
+          <button data-layer="street" class="on" type="button">Map</button>
+          <button data-layer="sat" type="button">Satellite</button>
+        </div>
+      </div>
+      <button id="locate" type="button"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="4.2" fill="none" stroke="#4cf0e0" stroke-width="1.8"/><path d="M8 0v3M8 13v3M0 8h3M13 8h3" stroke="#4cf0e0" stroke-width="1.8"/></svg>Use my location</button>
+      <div id="mapmsg" hidden>The map pictures did not load. Search a place above, or use your location. Everything else still works.</div>
+    </div>
+    <div class="underbar"><span id="hint"></span><button class="tbtn" id="keyBtn" aria-expanded="false" type="button">Map key</button></div>
+    <ul class="key" id="key" hidden></ul>
+  </section>
+
+  <section class="side">
+    <div class="plan" id="plan" hidden></div>
+
+    <div class="intro" id="intro" hidden>
+      <h2>New here? Three things.</h2>
+      <ol>
+        <li><b>The teal dot is where you stand.</b> Tap the map to move it, or search a place.</li>
+        <li><b>The yellow sun shows which way the sun is</b> at the time on the time bar further down. Shadows fall the other way.</li>
+        <li><b>Orange on the bar is golden hour,</b> the warm, low light photographers chase.</li>
+      </ol>
+      <button class="btn go" id="introOk" type="button">Got it</button>
+    </div>
+
+    <section class="block" id="bestWrap">
+      <h2 class="head" id="bestHead">Best light today</h2>
+      <ol class="best" id="best"></ol>
+      <button class="linkbtn" id="wordsBtn" type="button">What do golden hour and blue hour mean?</button>
+    </section>
+
+    <section class="block" id="whenBlock">
+      <div class="lbl">Time</div>
+      <div class="readout">
+        <div class="clock" id="clock">0:00</div>
+        <div class="phase" id="phase"></div>
+      </div>
+      <div class="ask" style="margin:10px 0 0">Slide the bar to change the time</div>
+      <div class="strip" id="strip" role="slider" aria-label="Time of day" aria-valuemin="0" aria-valuemax="1440" aria-valuenow="0" tabindex="0"><canvas id="stripC"></canvas><div class="handle" id="handle"></div></div>
+      <div class="ticks" id="ticks" aria-hidden="true"></div>
+      <div class="legend" aria-hidden="true">
+        <span><i style="background:#0a1013"></i>Night</span>
+        <span><i style="background:#14293f"></i>Twilight</span>
+        <span><i style="background:#2f74d0"></i>Blue hour</span>
+        <span><i style="background:#f4a93b"></i>Golden hour</span>
+        <span><i style="background:#9cc7e3"></i>Daylight</span>
+      </div>
+      <div class="nudges">
+        <button id="tMinus" type="button">5 min earlier</button>
+        <button id="tNow" type="button">Right now</button>
+        <button id="tPlus" type="button">5 min later</button>
+      </div>
+      <div class="lbl" style="margin-top:18px">Day</div>
+      <div class="datebar" style="margin-top:6px">
+        <button id="dPrev" aria-label="Previous day" type="button"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M11 3 5 9l6 6" fill="none" stroke="#ebedef" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <input type="date" id="dPick" aria-label="Date" min="1900-01-01" max="2100-12-31">
+        <button id="dNext" aria-label="Next day" type="button"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="m7 3 6 6-6 6" fill="none" stroke="#ebedef" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
+      <div class="dayword" id="dWord"></div>
+      <div class="zone" id="zone"><span id="zoneT"></span> <button id="zoneBtn" type="button">Change</button><select id="zoneSel" aria-label="Time zone for the times shown" hidden></select></div>
+    </section>
+
+    <section class="block lightblock" id="lightBlock">
+      <div class="lbl">What the light is like</div>
+      <h2 id="lightName">The light right now</h2>
+      <p class="desc" id="lightDesc"></p>
+      <svg id="side" viewBox="0 0 340 182" role="img" aria-label="Side view of the sun and a person's shadow"></svg>
+      <p class="say" id="sunSay"></p>
+      <p class="say" id="shadowSay"></p>
+      <details class="more" id="more">
+        <summary>For the camera: buildings, portraits, numbers</summary>
+        <ul class="tips" id="tips"></ul>
+        <div class="fine"><span id="numSay"></span><span class="units" id="units" role="group" aria-label="Units"><button data-u="ft" type="button">ft</button><button data-u="m" type="button">m</button></span></div>
+      </details>
+    </section>
+
+    <div id="dayWrap">
+      <h2 class="head" id="dayHead">The whole day</h2>
+      <p class="sub">Every stretch of light, in order. Tap one to jump to it.</p>
+      <ol class="rows" id="segs"></ol>
+      <p class="note" id="daylen"></p>
+    </div>
+
+    <details class="math" id="math">
+      <summary>How does it know? The math, step by step</summary>
+      <p class="lede">There is no sun service behind this and nothing gets looked up. Your phone works it out from three things: the date, the clock, and where your spot is. Here is the chain, with live numbers for the moment you have picked.</p>
+      <ul class="chain">
+        <li><h3>Count the days</h3><p>It is <b id="hD"></b> days since noon on January 1, 2000 (UTC). Astronomers use that moment as a starting line, so everything else is measured from it.</p></li>
+        <li><h3>Find the sun on its yearly circle</h3><p>Seen from Earth, the sun drifts once around the sky each year, about one degree a day. Right now it is <b id="hL"></b> around that circle.</p></li>
+        <li><h3>Apply the tilt</h3><p>Earth leans 23.44&deg;. Because of the lean, the sun is straight overhead at latitude <b id="hDec"></b> at this moment. That number swings from 23.44&deg; north in June to 23.44&deg; south in December. That swing is the seasons, and it is why the sunset slides along the horizon through the year.</p></li>
+        <li><h3>Spin the Earth</h3><p>Earth turns 15&deg; every hour. At your spot the sun is <b id="hH"></b> its highest point of the day, which is <b id="hHm"></b> solar noon.</p></li>
+        <li><h3>Stand at your spot</h3><p>Your latitude (<b id="hLat"></b>) plus those two numbers gives the answer: the sun is <b id="hEl"></b> the horizon, toward <b id="hAz"></b>.</p>
+<div class="formula">height = asin(
+  sin(lat) * sin(dec)
+  + cos(lat) * cos(dec)
+    * cos(turn) )
+
+bearing = 180 + atan2(
+  sin(turn),
+  cos(turn) * sin(lat)
+  - tan(dec) * cos(lat) )
+
+dec  = overhead latitude
+       (the tilt step)
+turn = angle from the spin step</div></li>
+        <li><h3>Golden hour is measured by height</h3><p>Here, golden hour means the sun is between 4&deg; below and 6&deg; above the horizon. Blue hour is 6&deg; to 4&deg; below. Those cutoffs are a convention among photographers, so treat the edges as soft. To build the day list, the tool checks the sun's height at every minute of the day and notes each time it crosses one of those lines. Sunrise and sunset are counted when the sun's center is 0.83&deg; below the horizon, which is when its top edge shows, because air bends the light a little.</p></li>
+        <li><h3>Shadows are one more line</h3><p>Shadow length is the height of the thing divided by tan(sun height). At 45&deg; a shadow matches the thing that casts it. At 5&deg; it is more than 11 times longer. The shadow always points directly away from the sun.</p></li>
+        <li><h3>Lining up a shot</h3><p>Two taps on the map make a compass direction, from where you stand to where the sun should sit. The tool then walks through the next 365 days. On each day it finds the minute the sun crosses that direction and reads its height at that moment. Days where the height fits what you asked for go in the list. How high the sun appears above the ground at your second tap is the distance to it times tan(sun height).</p></li>
+        <li><h3>Time zones</h3><p>The sun math runs on the exact instant, so it never cares about clocks. Only the labels do. Times are shown in the zone you pick above the clock, and the day runs from midnight to midnight in that zone, even on the two days a year the clocks change.</p></li>
+      </ul>
+      <p class="note">What it cannot see: hills, trees, and buildings. It assumes a flat, open horizon, so the real sun can drop behind something earlier than the times say. Compass directions are true north, the way the map is drawn. A phone compass points at magnetic north, which can be several degrees different, so trust the map lines over the needle.</p>
+    </details>
+  </section>
+</main>
+
+<button class="mb-ver" id="mbVer" type="button">v0.5.1 &middot; Nov 6</button>
+<div id="toast" role="status"><span id="toastT"></span><button id="toastB" hidden type="button">Undo</button></div>
+
+<div class="sheet" id="linkSheet" hidden>
+  <div class="in" role="dialog" aria-modal="true" aria-labelledby="linkT">
+    <h2 id="linkT">Your link</h2>
+    <p class="lead">Copying was blocked here, so here is the link. Press and hold it to copy.</p>
+    <input type="text" id="linkIn" class="linkin" readonly aria-label="Link to this plan">
+    <button class="btn closer" id="linkClose" type="button">Close</button>
+  </div>
+</div>
+
+<div class="sheet" id="sheet" hidden>
+  <div class="in" role="dialog" aria-modal="true" aria-labelledby="shT">
+    <h2 id="shT">How Light Scout works</h2>
+    <p class="lead">Tap a spot on the map, pick a day and a time, and it shows where the sun will be from there. Made for planning photos around the light.</p>
+    <ol class="three">
+      <li><b>The teal dot is where you stand.</b> Tap the map to move it, or search a place.</li>
+      <li><b>The yellow sun shows which way the sun is</b> at the time on the time bar. Shadows fall the other way. The curve is its path for the whole day.</li>
+      <li><b>Orange on the bar is golden hour,</b> the warm, low light photographers chase. Blue is blue hour, the soft glow before sunrise and after sunset.</li>
+    </ol>
+    <p class="jobsay"><b>See the light</b> answers "where is the sun at this place and time?" <b>Plan a shot</b> answers "when will the sun sit behind that building, in that gap, over that tree?" You tap where you will stand and where the sun should be, and it lists the days.</p>
+    <p class="jobsay">It cannot see hills, trees, or buildings that might block the sun. It works from the date, the clock, and the map.</p>
+    <details class="about" id="words">
+      <summary>Words it uses</summary>
+      <dl class="gloss">
+        <dt>Golden hour</dt><dd>The stretch after sunrise and before sunset when the sun is low. The light is warm and soft and shadows are long. Here it means the sun is between 4 degrees below and 6 degrees above the horizon, so it can be longer or shorter than an hour.</dd>
+        <dt>Blue hour</dt><dd>Just before sunrise and just after sunset, when the sun is under the horizon and the sky glows deep blue. Soft light with no shadows. Good for city lights and calm water.</dd>
+        <dt>Sunrise and sunset</dt><dd>When the top edge of the sun meets a flat horizon. A hill or a building in the way makes the real sunrise later and the real sunset earlier where you stand.</dd>
+        <dt>Backlit and front lit</dt><dd>Backlit: the sun is behind your subject, facing you. Glowing edges, soft faces. Front lit: the sun is behind you, on your subject. Side light shows texture.</dd>
+        <dt>Shadows</dt><dd>Always point directly away from the sun. The lower the sun, the longer they are.</dd>
+        <dt>Time zone</dt><dd>The clock the times are shown in. Light Scout uses your phone's clock unless you change it, which matters when you plan a spot far from home.</dd>
+        <dt>True north</dt><dd>The top of the map. A phone compass points at magnetic north instead, which can be a few degrees off, so trust the map lines over the needle.</dd>
+      </dl>
+    </details>
+    <details class="about" id="about">
+      <summary>About this build</summary>
+      <p id="aboutSize">This whole tool is one file.</p>
+      <p>I shoot a lot of photos and kept guessing where the sun would be. So I built a map I can tap. The sun math runs on the phone from the date, the clock, and the spot. There is no account and no tracking.</p>
+      <p><b>What leaves your phone:</b> the map pictures come from OpenStreetMap and Esri, the map drawing library (Leaflet) comes from the jsDelivr CDN, and a place search asks OpenStreetMap for matches. Your location, if you share it, is only used on the phone to place the pin.</p>
+      <p><b>Tested against</b> a professional astronomy library: sun direction within 0.06 degrees and sunrise and sunset within a few seconds.</p>
+      <p><b>Map wrong?</b> The street map is drawn by volunteers. You can report a missing building or a wrong road at <a href="https://www.openstreetmap.org/fixthemap" target="_blank" rel="noopener">openstreetmap.org/fixthemap</a>.</p>
+    </details>
+    <button class="btn closer" id="shClose" type="button">Close</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
+
+<script id="sunmath">
+/* Light Scout sun math. Pure functions, no page access, so it can be tested on its own. */
+var SUN = (function () {
+  var rad = Math.PI / 180, deg = 180 / Math.PI;
+  function n360(a) { a = a % 360; return a < 0 ? a + 360 : a; }
+  function n180(a) { a = n360(a); return a > 180 ? a - 360 : a; }
+
+  /* Where is the sun, seen from lat/lng, at this instant? */
+  function position(date, lat, lng) { return at(date.getTime(), lat, lng); }
+  function at(ms, lat, lng) {
+    var d = ms / 86400000 + 2440587.5 - 2451545;                       /* days since J2000 */
+    var M = rad * (357.528 + 0.9856003 * d);                           /* how far along the orbit */
+    var C = 1.915 * Math.sin(M) + 0.020 * Math.sin(2 * M);             /* the orbit is an ellipse, so speed varies */
+    var L = rad * (280.460 + 0.9856474 * d + C);                       /* sun on its yearly circle */
+    var TILT = rad * (23.439 - 0.0000004 * d);                         /* Earth's lean */
+    var dec = Math.asin(Math.sin(L) * Math.sin(TILT));                 /* overhead latitude */
+    var ra = Math.atan2(Math.sin(L) * Math.cos(TILT), Math.cos(L));
+    var th = rad * (280.46061837 + 360.98564736629 * d) + lng * rad;   /* how far Earth has spun */
+    var H = th - ra;                                                   /* angle past the day's high point */
+    var phi = lat * rad;
+    var el = Math.asin(Math.sin(phi) * Math.sin(dec) + Math.cos(phi) * Math.cos(dec) * Math.cos(H));
+    var az = Math.atan2(Math.sin(H), Math.cos(H) * Math.sin(phi) - Math.tan(dec) * Math.cos(phi));
+    return { days: d, circle: n360(L * deg), dec: dec * deg, turn: n180(H * deg), el: el * deg, az: n360(az * deg + 180) };
+  }
+
+  /* One sample per minute for a whole day. t0 = the day's first instant, len = its length in minutes (1440, or 1380 / 1500 when clocks change). */
+  function dayTable(t0, len, lat, lng) {
+    var el = new Float64Array(len + 1), az = new Float64Array(len + 1);
+    for (var i = 0; i <= len; i++) {
+      var p = at(t0 + i * 60000, lat, lng);
+      el[i] = p.el; az[i] = p.az;
+    }
+    return { t0: t0, len: len, el: el, az: az };
+  }
+
+  function phase(el) {
+    if (el >= 6) return 'day';
+    if (el >= -4) return 'golden';
+    if (el >= -6) return 'blue';
+    if (el >= -12) return 'twilight';
+    return 'night';
+  }
+
+  /* First minute (with a fraction) where the height crosses a line going up or down. */
+  function cross(tb, line, up, from) {
+    for (var i = from || 0; i < tb.len; i++) {
+      var a = tb.el[i], b = tb.el[i + 1];
+      if (up ? (a < line && b >= line) : (a >= line && b < line)) return i + (line - a) / (b - a);
+    }
+    return null;
+  }
+
+  var RISE = -0.833;
+  function highest(tb) { var hi = 0; for (var i = 1; i <= tb.len; i++) if (tb.el[i] > tb.el[hi]) hi = i; return hi; }
+  function events(tb) {
+    var out = [];
+    function add(key, min, label, sub, ph) { if (min !== null) out.push({ key: key, min: min, label: label, sub: sub, ph: ph }); }
+    var hi = highest(tb);
+    add('blueA', cross(tb, -6, true), 'Blue hour begins', 'first usable light', 'blue');
+    add('goldA', cross(tb, -4, true), 'Golden hour begins', 'blue hour ends', 'golden');
+    add('rise', cross(tb, RISE, true), 'Sunrise', '', 'golden');
+    add('goldAe', cross(tb, 6, true), 'Golden hour ends', 'light turns plain', 'day');
+    if (tb.el[hi] > RISE) add('noon', hi, 'Sun at its highest', 'solar noon', 'day');
+    add('goldP', cross(tb, 6, false, hi), 'Golden hour begins', '', 'golden');
+    add('set', cross(tb, RISE, false, hi), 'Sunset', '', 'golden');
+    add('blueP', cross(tb, -4, false, hi), 'Blue hour begins', 'golden hour ends', 'blue');
+    add('bluePe', cross(tb, -6, false, hi), 'Blue hour ends', 'dark from here', 'twilight');
+    out.sort(function (x, y) { return x.min - y.min; });
+    return out;
+  }
+
+  function tableAt(tb, min) {       /* interpolate the table at a fractional minute */
+    var i = Math.max(0, Math.min(tb.len - 1, Math.floor(min))), f = Math.max(0, Math.min(1, min - i));
+    var a = tb.az[i], b = tb.az[i + 1], dz = n180(b - a);
+    return { el: tb.el[i] + (tb.el[i + 1] - tb.el[i]) * f, az: n360(a + dz * f) };
+  }
+
+  /* Compass bearing and distance (meters) from one point on the map to another. */
+  function bearing(lat1, lng1, lat2, lng2) {
+    var p1 = lat1 * rad, p2 = lat2 * rad, dl = (lng2 - lng1) * rad;
+    return n360(Math.atan2(Math.sin(dl) * Math.cos(p2), Math.cos(p1) * Math.sin(p2) - Math.sin(p1) * Math.cos(p2) * Math.cos(dl)) * deg);
+  }
+  function distance(lat1, lng1, lat2, lng2) {
+    var p1 = lat1 * rad, p2 = lat2 * rad, a = Math.sin((p2 - p1) / 2), b = Math.sin((lng2 - lng1) * rad / 2);
+    return 2 * 6371008.8 * Math.asin(Math.sqrt(a * a + Math.cos(p1) * Math.cos(p2) * b * b));
+  }
+
+  /* For each day (t0s = list of day starts, in ms), find the moment the sun crosses compass bearing B while it is up. */
+  function alignments(t0s, lat, lng, B) {
+    var out = [];
+    for (var k = 0; k < t0s.length; k++) {
+      var t0 = t0s[k], t1 = k + 1 < t0s.length ? t0s[k + 1] : t0 + 86400000, pt = 0, pd = 0, has = false;
+      for (var t = t0; t <= t1; t += 240000) {
+        var d = n180(at(t, lat, lng).az - B);
+        /* a real crossing changes sign with a small jump; the wrap at 180 changes sign with a jump near 360 */
+        if (has && (pd < 0) !== (d < 0) && Math.abs(pd) + Math.abs(d) < 180) {
+          var a = pt, b = t, da = pd;
+          for (var j = 0; j < 14; j++) {                               /* close in on the exact moment */
+            var mid = (a + b) / 2, dm = n180(at(mid, lat, lng).az - B);
+            if ((dm < 0) === (da < 0)) { a = mid; da = dm; } else b = mid;
+          }
+          var tm = (a + b) / 2, pm = at(tm, lat, lng);
+          if (pm.el >= RISE && tm < t1) out.push({ t: tm, t0: t0, day: k, el: pm.el });
+        }
+        pt = t; pd = d; has = true;
+      }
+    }
+    return out;
+  }
+
+  return { position: position, dayTable: dayTable, phase: phase, events: events, highest: highest, at: tableAt, cross: cross, n360: n360, n180: n180, RISE: RISE, bearing: bearing, distance: distance, alignments: alignments };
+})();
+if (typeof module !== 'undefined') module.exports = SUN;
+</script>
+
+<script id="app">
+(function () {
+  'use strict';
+  var BUILD = document.querySelector('meta[name="build"]').content;
+  var KEY = 'lightscout_v1', SEEN = 'lightscout_seen';
+  var COL = { night: '#0a1013', twilight: '#14293f', blue: '#2f74d0', day: '#9cc7e3', goldLo: [229, 91, 42], goldHi: [246, 180, 69] };
+  var NAMES = { day: 'Daylight', golden: 'Golden hour', blue: 'Blue hour', twilight: 'Twilight', night: 'Night' };
+  var DIRS = ['north', 'northeast', 'east', 'southeast', 'south', 'southwest', 'west', 'northwest'];
+  var BANDS = { low: [-1, 10], mid: [10, 25], high: [25, 91], any: [-1, 91] };
+  var TILES = {
+    street: { url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', opts: { maxZoom: 19, className: 'ls-dim', attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' } },
+    sat: { url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', opts: { maxZoom: 19, maxNativeZoom: 18, attribution: 'Imagery &copy; Esri, Maxar, Earthstar Geographics, and the GIS User Community' } }
+  };
+  var $ = function (id) { return document.getElementById(id); };
+  var NS = 'http://www.w3.org/2000/svg';
+  var REDUCE = false; try { REDUCE = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+
+  /* ---------- time zones, via the browser's own tables ---------- */
+  var PHONE_TZ = 'UTC'; try { PHONE_TZ = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'; } catch (e) {}
+  var fmtCache = {};
+  function tzOK(z) { try { new Intl.DateTimeFormat('en-US', { timeZone: z }); return true; } catch (e) { return false; } }
+  function dtf(z) { if (!fmtCache[z]) fmtCache[z] = new Intl.DateTimeFormat('en-US', { timeZone: z, hour12: false, hourCycle: 'h23', year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' }); return fmtCache[z]; }
+  function wall(z, ms) {                     /* the clock on the wall in zone z at this instant */
+    var o = {}; dtf(z).formatToParts(new Date(ms)).forEach(function (p) { o[p.type] = p.value; });
+    var hh = +o.hour; if (hh === 24) hh = 0;
+    return { y: +o.year, m: +o.month - 1, d: +o.day, h: hh, mi: +o.minute, s: +o.second };
+  }
+  function tzOff(z, ms) { var w = wall(z, ms); return Math.round((Date.UTC(w.y, w.m, w.d, w.h, w.mi, w.s) - ms) / 60000); }
+  function instantOf(z, y, m, d, h, mi) {   /* the instant when the wall clock in zone z reads this */
+    var g = Date.UTC(y, m, d, h || 0, mi || 0), ms = g - tzOff(z, g) * 60000;
+    return g - tzOff(z, ms) * 60000;
+  }
+  function zoneMidnight(z, y, m, d) { return instantOf(z, y, m, d, 0, 0); }
+  function longZone(z, ms) {                /* "Eastern Standard Time (UTC-5)", or the zone's name when the browser has no long name */
+    var name = '';
+    try { new Intl.DateTimeFormat('en-US', { timeZone: z, timeZoneName: 'long' }).formatToParts(new Date(ms)).forEach(function (p) { if (p.type === 'timeZoneName') name = p.value; }); } catch (e) {}
+    if (!name || /^GMT|^UTC/.test(name)) name = zoneName(z);
+    return name + ' (' + offLabel(z, ms) + ')';
+  }
+  function offLabel(z, ms) { var o = tzOff(z, ms), s = o < 0 ? '-' : '+', a = Math.abs(o); return 'UTC' + s + Math.floor(a / 60) + (a % 60 ? ':' + (a % 60 < 10 ? '0' : '') + a % 60 : ''); }
+  function zoneName(z) { return z.replace(/_/g, ' '); }
+  var ZONES = null;
+  function allZones() {
+    if (ZONES) return ZONES;
+    var list = null;
+    try { if (typeof Intl.supportedValuesOf === 'function') list = Intl.supportedValuesOf('timeZone'); } catch (e) {}
+    if (!list || !list.length) list = ['Pacific/Honolulu', 'America/Anchorage', 'America/Los_Angeles', 'America/Phoenix', 'America/Denver', 'America/Chicago', 'America/New_York', 'America/Halifax', 'America/St_Johns', 'America/Mexico_City', 'America/Bogota', 'America/Sao_Paulo', 'Atlantic/Reykjavik', 'Europe/London', 'Europe/Paris', 'Europe/Berlin', 'Europe/Madrid', 'Europe/Rome', 'Europe/Athens', 'Europe/Moscow', 'Africa/Cairo', 'Africa/Johannesburg', 'Asia/Dubai', 'Asia/Karachi', 'Asia/Kolkata', 'Asia/Bangkok', 'Asia/Shanghai', 'Asia/Tokyo', 'Asia/Seoul', 'Australia/Perth', 'Australia/Sydney', 'Pacific/Auckland', 'UTC'];
+    if (list.indexOf(PHONE_TZ) < 0) list = list.concat([PHONE_TZ]);
+    ZONES = list;
+    return ZONES;
+  }
+
+  /* ---------- storage, guarded ---------- */
+  var storeOK = false;
+  try { localStorage.setItem(KEY + '_probe', '1'); storeOK = localStorage.getItem(KEY + '_probe') === '1'; localStorage.removeItem(KEY + '_probe'); } catch (e) { storeOK = false; }
+  function load() { try { var s = storeOK ? localStorage.getItem(KEY) : null; return s ? JSON.parse(s) : {}; } catch (e) { return {}; } }
+  function save() {
+    syncHash();
+    if (!storeOK) return;
+    try { localStorage.setItem(KEY, JSON.stringify({ lat: S.lat, lng: S.lng, zoom: S.zoom, layer: S.layer, mode: S.mode, tLat: S.tLat, tLng: S.tLng, band: S.band, roofFt: S.roofFt, units: S.units, tz: S.tz })); } catch (e) {}
+  }
+  var web = /^https?:$/.test(location.protocol);
+  if (!storeOK || !web) {
+    $('warn').hidden = false;
+    $('warn').textContent = web ? 'This browser is blocking site data, so Light Scout will not remember your spot between visits. Everything else works.' : 'This copy was opened outside its web address. It will not remember your spot, and "Use my location" will not work. Open it from its https address for the full tool.';
+  }
+
+  /* ---------- state ---------- */
+  var saved = load(), now = new Date(), link = readHash(), sharedLink = link.s === '1';
+  var S = {
+    lat: num(link.lat, num(saved.lat, 41.0814)),
+    lng: num(link.lng, num(saved.lng, -81.519)),
+    zoom: Math.max(2, Math.min(19, Math.round(num(link.z, num(saved.zoom, 16))))),
+    layer: (link.layer || saved.layer) === 'sat' ? 'sat' : 'street',
+    mode: (link.mode || saved.mode) === 'plan' ? 'plan' : 'see',
+    tLat: num(link.tlat, num(saved.tLat, null)),
+    tLng: num(link.tlng, num(saved.tLng, null)),
+    band: Object.prototype.hasOwnProperty.call(BANDS, link.band || saved.band) || (link.band || saved.band) === 'roof' ? (link.band || saved.band) : 'low',
+    roofFt: Math.max(5, Math.min(600, num(link.roof, num(saved.roofFt, 30)))),
+    units: (link.u || saved.units) === 'm' || (!link.u && !saved.units && !/^en-US/i.test(navigator.language || 'en-US')) ? 'm' : 'ft',
+    tz: tzOK(link.tz || saved.tz || '') ? (link.tz || saved.tz) : PHONE_TZ,
+    step: 1, y: 0, m: 0, d: 0, min: 0
+  };
+  S.lat = Math.max(-85, Math.min(85, S.lat)); S.lng = ((S.lng + 180) % 360 + 360) % 360 - 180;
+  if (S.tLat !== null) { S.tLat = Math.max(-85, Math.min(85, S.tLat)); S.tLng = ((S.tLng + 180) % 360 + 360) % 360 - 180; }
+  if (S.mode === 'plan' && S.tLat !== null) S.step = 3;
+  setToday(now.getTime());
+  if (sharedLink && link.d && /^\d{4}-\d{2}-\d{2}$/.test(link.d) && +link.d.slice(0, 4) >= 1900 && +link.d.slice(0, 4) <= 2100) { var ld = link.d.split('-'); S.y = +ld[0]; S.m = +ld[1] - 1; S.d = +ld[2]; }
+  if (sharedLink && link.t && /^\d{1,4}$/.test(link.t)) S.min = Math.max(0, Math.min(1500, +link.t));
+  var TB = null, EV = [], map = null, layers = {}, toastTimer = 0, tileWarned = false, tileFails = 0, lastSearch = 0, searching = false, pageText = '';
+  var LU = { key: '', all: [], B: 0, dist: 0 };
+
+  function num(v, dflt) { var n = typeof v === 'string' ? parseFloat(v) : v; return typeof n === 'number' && isFinite(n) ? n : dflt; }
+  function setToday(ms) { var w = wall(S.tz, ms); S.y = w.y; S.m = w.m; S.d = w.d; S.min = Math.max(0, Math.round((ms - zoneMidnight(S.tz, w.y, w.m, w.d)) / 60000)); }
+
+  /* ---------- share links: the whole plan lives in the address bar ---------- */
+  function readHash() {
+    var out = {};
+    try {
+      var hsh = location.hash.replace(/^#/, ''); if (!hsh) return out;
+      hsh.split('&').forEach(function (kv) { var i = kv.indexOf('='); if (i > 0) out[decodeURIComponent(kv.slice(0, i))] = decodeURIComponent(kv.slice(i + 1).replace(/\+/g, ' ')); });
+    } catch (e) {}
+    return out;
+  }
+  function hashString() {
+    var p = ['lat=' + S.lat.toFixed(5), 'lng=' + S.lng.toFixed(5), 'z=' + S.zoom, 'd=' + S.y + '-' + pad(S.m + 1) + '-' + pad(S.d), 't=' + S.min, 'mode=' + S.mode];
+    if (S.tLat !== null) p.push('tlat=' + S.tLat.toFixed(5), 'tlng=' + S.tLng.toFixed(5), 'band=' + S.band, 'roof=' + S.roofFt);
+    if (S.layer === 'sat') p.push('layer=sat');
+    p.push('u=' + S.units, 'tz=' + encodeURIComponent(S.tz));
+    return p.join('&');
+  }
+  var hashTimer = 0;
+  function syncHash() { clearTimeout(hashTimer); hashTimer = setTimeout(writeHash, 300); }   /* a slider drag calls this many times a second; Safari stops accepting address changes past 100 in 30 s */
+  function writeHash() { try { if (web) history.replaceState(null, '', location.pathname + location.search + '#' + hashString()); } catch (e) {} }
+  function shareURL() { writeHash(); return (web ? location.origin + location.pathname : 'https://motbuchanan.com/lightscout/') + '#' + hashString() + '&s=1'; }   /* s=1 marks a link someone sent; a reload's own address bar has no s */
+  function planWords() {
+    var w = 'Light Scout: ' + fmtDay(tOf(S.min)) + ' ' + fmtT(tOf(S.min)) + ' at ' + S.lat.toFixed(4) + ', ' + S.lng.toFixed(4);
+    if (S.mode === 'plan' && lineOK()) w += ', looking ' + dirWord(SUN.bearing(S.lat, S.lng, S.tLat, S.tLng));
+    return w;
+  }
+  $('share').addEventListener('click', function () {
+    var url = shareURL(), text = planWords();
+    if (navigator.share) { navigator.share({ title: 'Light Scout', text: text, url: url }).catch(function (err) { if (!err || err.name !== 'AbortError') copyText(url, 'Sharing was not allowed here, so the link was copied instead.'); }); return; }
+    copyText(url, 'Link copied. Paste it anywhere.');
+  });
+  function copyText(str, okMsg) {
+    var done = function () { toast(okMsg); }, fail = function () { showLink(str); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(str).then(done, fail); else fail();
+  }
+  function showLink(str) {                  /* when the clipboard is not allowed: the link in a box, ready to copy by hand */
+    $('linkIn').value = str; $('linkSheet').hidden = false; document.body.style.overflow = 'hidden';
+    var inp = $('linkIn'); try { inp.focus(); inp.select(); } catch (e) {}
+  }
+  $('linkClose').addEventListener('click', function () { $('linkSheet').hidden = true; document.body.style.overflow = ''; });
+  $('linkSheet').addEventListener('click', function (ev) { if (ev.target === this) { this.hidden = true; document.body.style.overflow = ''; } });
+  $('linkIn').addEventListener('click', function () { try { this.select(); } catch (e) {} });
+
+  /* ---------- small helpers ---------- */
+  function h(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined) n.textContent = text; return n; }
+  function rich(node, parts) {              /* plain strings, or [string] for the emphasized words */
+    node.textContent = '';
+    parts.forEach(function (p) { node.appendChild(typeof p === 'string' ? document.createTextNode(p) : h('b', '', p[0])); });
+  }
+  function sv(tag, attrs, parent) { var n = document.createElementNS(NS, tag); for (var k in attrs) n.setAttribute(k, attrs[k]); if (parent) parent.appendChild(n); return n; }
+  function svt(parent, x, y, str, size, fill, anchor) { var t = sv('text', { x: x, y: y, 'font-size': size, fill: fill, 'text-anchor': anchor || 'middle' }, parent); t.textContent = str; return t; }
+  function fmtT(ms) { try { return new Date(ms).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', timeZone: S.tz }); } catch (e) { return new Date(ms).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); } }
+  function fmtDay(ms, style) {
+    var o = style === 'year' ? { month: 'short', day: 'numeric', year: 'numeric' } : style === 'wyear' ? { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' } : style === 'long' ? { weekday: 'long', month: 'long', day: 'numeric' } : { weekday: 'short', month: 'short', day: 'numeric' };
+    try { o.timeZone = S.tz; return new Date(ms).toLocaleDateString([], o); } catch (e) { delete o.timeZone; return new Date(ms).toLocaleDateString([], o); }
+  }
+  function tOf(min) { return TB.t0 + Math.round(min) * 60000; }
+  function dirWord(az) { return DIRS[Math.round(az / 45) % 8]; }
+  function heightWord(el) {
+    if (el < -6) return 'well below the horizon';
+    if (el < -0.8) return 'just below the horizon';
+    if (el < 1) return 'right on the horizon';
+    if (el < 10) return 'very low in the sky';
+    if (el < 25) return 'low in the sky';
+    if (el < 50) return 'partway up the sky';
+    if (el < 75) return 'high in the sky';
+    return 'almost straight overhead';
+  }
+  function shadowWord(r) {
+    if (r < 0.5) return 'very short';
+    if (r < 0.9) return 'shorter than the thing casting them';
+    if (r < 1.15) return 'about as long as the thing casting them';
+    if (r < 2) return 'longer than the thing casting them';
+    if (r < 4) return 'long, about ' + Math.round(r) + ' times the height of the thing casting them';
+    if (r < 20) return 'very long, about ' + Math.round(r) + ' times the height of the thing casting them';
+    return 'so long they stretch out of sight';
+  }
+  function goldColor(el) {
+    var f = Math.max(0, Math.min(1, (el + 4) / 10)), a = COL.goldLo, b = COL.goldHi;
+    return 'rgb(' + Math.round(a[0] + (b[0] - a[0]) * f) + ',' + Math.round(a[1] + (b[1] - a[1]) * f) + ',' + Math.round(a[2] + (b[2] - a[2]) * f) + ')';
+  }
+  function phaseColor(el) { var p = SUN.phase(el); return p === 'golden' ? goldColor(el) : COL[p]; }
+  function swatch(ph) { return ph === 'golden' ? '#f4a93b' : COL[ph]; }
+  function pad(n) { return n < 10 ? '0' + n : '' + n; }
+  function hm(mins) { mins = Math.round(Math.abs(mins)); var hh = Math.floor(mins / 60), mm = mins % 60; return (hh ? hh + ' h ' : '') + mm + ' min'; }
+  /* lengths: the math is in meters, the words follow the units switch */
+  function fmtLen(m) {
+    if (S.units === 'm') return m < 1000 ? Math.round(m) + ' m' : (m / 1000 < 10 ? (m / 1000).toFixed(1) : Math.round(m / 1000)) + ' km';
+    var ft = m * 3.28084; return ft < 1000 ? Math.round(ft) + ' ft' : (ft / 5280 < 10 ? (ft / 5280).toFixed(1) : Math.round(ft / 5280)) + ' mi';
+  }
+  function fmtHeight(m) {                   /* a height above the ground, rounded the way people say it */
+    if (S.units === 'm') return (m < 30 ? Math.round(m) : Math.round(m / 5) * 5).toLocaleString() + ' m';
+    var ft = m * 3.28084; return (ft < 100 ? Math.round(ft) : Math.round(ft / 10) * 10).toLocaleString() + ' ft';
+  }
+  function personH() { return S.units === 'm' ? 1.8 : 6 * 0.3048; }
+  function personWord() { return S.units === 'm' ? '1.8 m person' : '6 ft person'; }
+  function roofM() { return S.roofFt * 0.3048; }
+  function roofWord() { var st = Math.max(1, Math.round(S.roofFt / 10)); return st + (st === 1 ? ' story' : ' stories') + ' (' + fmtHeight(roofM()) + ')'; }
+  function find(k) { for (var i = 0; i < EV.length; i++) if (EV[i].key === k) return EV[i]; return null; }
+  function scrollTop() { try { window.scrollTo({ top: 0, behavior: REDUCE ? 'auto' : 'smooth' }); } catch (e) { window.scrollTo(0, 0); } }
+
+  function toast(msg, undo) {
+    $('toastT').textContent = msg;
+    $('toastB').hidden = !undo;
+    $('toastB').onclick = undo ? function () { undo(); hideToast(); } : null;
+    $('toast').classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(hideToast, undo ? 5000 : 2600);
+  }
+  function hideToast() { $('toast').classList.remove('show'); }
+
+  /* ---------- recompute everything for the day and spot ---------- */
+  function rebuild() {
+    var t0 = zoneMidnight(S.tz, S.y, S.m, S.d), len = Math.round((zoneMidnight(S.tz, S.y, S.m, S.d + 1) - t0) / 60000);
+    if (!(len >= 1200 && len <= 1680)) len = 1440;
+    var wn = wall(S.tz, t0 + 43200000); S.y = wn.y; S.m = wn.m; S.d = wn.d;   /* a shared link can carry "2026-02-30"; settle on the real calendar day */
+    TB = SUN.dayTable(t0, len, S.lat, S.lng);
+    EV = SUN.events(TB);
+    S.min = Math.max(0, Math.min(len - 1, S.min));
+    $('dPick').value = S.y + '-' + pad(S.m + 1) + '-' + pad(S.d);
+    var tw = wall(S.tz, Date.now()), isToday = S.y === tw.y && S.m === tw.m && S.d === tw.d;
+    $('dWord').textContent = fmtDay(TB.t0, 'long') + (isToday ? ' (today)' : '') + (len !== 1440 ? ', clocks change today' : '');
+    $('dayHead').textContent = isToday ? 'The whole of today' : 'The whole day';
+    $('strip').setAttribute('aria-valuemax', String(len));
+    drawZone(); drawStrip(); drawTicks(); drawSegs(); drawDial(); drawNow(); drawPlan();
+  }
+
+  /* ---------- time zone line ---------- */
+  function drawZone() {
+    var hi = SUN.highest(TB), peak = wall(S.tz, TB.t0 + hi * 60000), peakMin = peak.h * 60 + peak.mi;
+    var odd = TB.el[hi] > SUN.RISE && (peakMin < 10 * 60 + 30 || peakMin > 14 * 60 + 45);
+    var t = $('zoneT'), same = S.tz === PHONE_TZ;
+    t.textContent = 'Times in ' + longZone(S.tz, TB.t0 + 43200000).replace(/ \(UTC[^)]*\)$/, '') + (same ? ', your phone\'s clock.' : '.') + (odd ? ' This spot is probably in a different zone: its sun peaks at ' + fmtT(TB.t0 + hi * 60000) + ' on this clock.' : '');
+    $('zone').classList.toggle('warn', odd);
+  }
+  function buildZoneSelect() {
+    var sel = $('zoneSel'); sel.textContent = '';
+    var nowMs = Date.now(), guess = Math.round(S.lng / 15) * 60, zs = allZones(), sug = [], rest = [];
+    var jan = Date.UTC(S.y, 0, 1, 12), jul = Date.UTC(S.y, 6, 1, 12);   /* the zone's standard clock is the smaller of its January and July offsets */
+    zs.forEach(function (z) { var o, std; try { o = tzOff(z, nowMs); std = Math.min(tzOff(z, jan), tzOff(z, jul)); } catch (e) { return; } (Math.abs(std - guess) <= 30 ? sug : rest).push({ z: z, o: o }); });
+    function group(label, arr) {
+      if (!arr.length) return;
+      var g = document.createElement('optgroup'); g.label = label;
+      arr.sort(function (a, b) { return a.o - b.o || (a.z < b.z ? -1 : 1); }).forEach(function (x) {
+        var op = document.createElement('option'); op.value = x.z; op.textContent = zoneName(x.z) + ' (' + offLabel(x.z, nowMs) + ')'; if (x.z === S.tz) op.selected = true; g.appendChild(op);
+      });
+      sel.appendChild(g);
+    }
+    var ph = document.createElement('option'); ph.value = PHONE_TZ; ph.textContent = 'Your phone: ' + zoneName(PHONE_TZ) + ' (' + offLabel(PHONE_TZ, nowMs) + ')'; if (S.tz === PHONE_TZ) ph.selected = true; sel.appendChild(ph);
+    group('Zones that fit this spot', sug);
+    group('All zones', rest);
+  }
+  $('zoneBtn').addEventListener('click', function () {
+    var sel = $('zoneSel'); if (sel.hidden) { buildZoneSelect(); sel.hidden = false; sel.focus(); } else sel.hidden = true;
+  });
+  $('zoneSel').addEventListener('change', function () {
+    if (!tzOK(this.value)) return;
+    var inst = tOf(S.min); S.tz = this.value; setToday(inst); fmtCache = {};
+    rebuild(); save(); this.hidden = true; toast('Times now in ' + zoneName(S.tz));
+  });
+
+  /* ---------- the day bar ---------- */
+  function drawStrip() {
+    var c = $('stripC'), box = $('strip').getBoundingClientRect();
+    var dpr = Math.min(3, window.devicePixelRatio || 1), W = Math.max(10, Math.round(box.width * dpr)), H = Math.round(box.height * dpr);
+    c.width = W; c.height = H;
+    var g = c.getContext('2d');
+    for (var x = 0; x < W; x++) {
+      g.fillStyle = phaseColor(TB.el[Math.min(TB.len, Math.round(x / (W - 1) * TB.len))]);
+      g.fillRect(x, 0, 1, H);
+    }
+    for (var hr = 1; hr < 24; hr++) {
+      var mn = hourMin(hr); if (mn === null) continue;
+      var tx = Math.round(mn / TB.len * W), big = hr % 6 === 0;
+      g.fillStyle = big ? 'rgba(0,0,0,.55)' : 'rgba(0,0,0,.28)';
+      g.fillRect(tx, H - (big ? H * 0.42 : H * 0.2), Math.max(1, Math.round(dpr)), H);
+    }
+  }
+  function hourMin(hr) {                     /* the minute of this day when the wall clock reads hr:00 */
+    var ms = instantOf(S.tz, S.y, S.m, S.d, hr, 0), mn = Math.round((ms - TB.t0) / 60000);
+    return mn >= 0 && mn <= TB.len ? mn : null;
+  }
+  function drawTicks() {
+    var t = $('ticks'); t.textContent = '';
+    [[0, 'midnight'], [6, '6 AM'], [12, 'noon'], [18, '6 PM'], [24, 'midnight']].forEach(function (k) {
+      var mn = k[0] === 24 ? TB.len : hourMin(k[0]); if (mn === null) return;
+      var s = h('span', '', k[1]); s.style.left = (mn / TB.len * 100) + '%'; t.appendChild(s);
+    });
+  }
+
+  /* ---------- the moment, in plain words ---------- */
+  function drawNow() {
+    var p = SUN.at(TB, S.min), ph = SUN.phase(p.el), t = fmtT(tOf(S.min));
+    $('clock').textContent = t;
+    $('phase').textContent = NAMES[ph];
+    $('phase').style.color = ph === 'golden' ? '#f6b445' : ph === 'blue' ? '#8bb8f5' : ph === 'day' ? '#cfe6f3' : '#93a6a8';
+    $('handle').style.left = (S.min / TB.len * 100) + '%';
+    $('strip').setAttribute('aria-valuenow', String(S.min));
+    $('strip').setAttribute('aria-valuetext', t);
+
+    $('lightName').textContent = NAMES[ph] + ' at ' + t;
+    $('lightDesc').textContent = ph === 'night' ? 'Dark. The sun is far below the horizon.'
+      : ph === 'twilight' ? 'Nearly dark. Only a faint glow is left in the sky.'
+      : ph === 'blue' ? 'The sun is just under the horizon. The light is soft, even, and blue, with no hard shadows.'
+      : ph === 'golden' ? 'The sun is low. The light is warm and soft and shadows are long. A favorite time for photos of people.'
+      : p.el > 50 ? 'The sun is high. The light is bright and hard, coming from above, and shadows are short.'
+      : 'Full daylight. Bright, clear light with crisp shadows.';
+
+    if (p.el >= SUN.RISE) rich($('sunSay'), ['The sun is in the ', [dirWord(p.az)], ', ', [heightWord(p.el)], '.']);
+    else rich($('sunSay'), ['The sun is ', [heightWord(p.el)], ', toward the ', [dirWord(p.az)], '.']);
+    var tips = $('tips'); tips.textContent = '';
+    if (p.el > 0.5) {
+      var r = 1 / Math.tan(p.el * Math.PI / 180);
+      rich($('shadowSay'), ['Shadows fall toward the ', [dirWord(SUN.n360(p.az + 180))], ' and are ', [shadowWord(r)], '.']);
+      var lit = litFaces(p.az);
+      tipRow(tips, 'Buildings', 'Direct sun on faces that point ' + joinWords(lit.direct) + '.' + (lit.graze.length ? ' Grazing light on faces that point ' + joinWords(lit.graze) + '.' : '') + ' The rest are in shade.');
+      tipRow(tips, 'Portraits', 'For backlight, put the sun behind your subject: you stand on the ' + dirWord(SUN.n360(p.az + 180)) + ' side and shoot toward the ' + dirWord(p.az) + '. For front light, swap sides.');
+    } else {
+      rich($('shadowSay'), [p.el > -6 ? 'The sun is under the horizon, so there are no hard shadows.' : 'No sunlight at all.']);
+      if (p.el > -6) tipRow(tips, 'Portraits', 'Soft, even light from the whole sky. Face your subject toward the ' + dirWord(p.az) + ', where the sky is brightest.');
+    }
+    $('numSay').textContent = 'In numbers: compass direction ' + (Math.round(p.az) % 360) + '\u00b0, ' + (p.el >= 0 ? p.el.toFixed(1) + '\u00b0 above the horizon.' : Math.abs(p.el).toFixed(1) + '\u00b0 below the horizon.');
+    var ub = $('units').querySelectorAll('button');
+    for (var i = 0; i < ub.length; i++) { ub[i].classList.toggle('on', ub[i].getAttribute('data-u') === S.units); ub[i].setAttribute('aria-pressed', String(ub[i].getAttribute('data-u') === S.units)); }
+    drawSide(p); drawSun(p); drawMath(); drawHint();
+  }
+  function tipRow(ul, head, text) { var li = h('li'); li.appendChild(h('b', '', head)); li.appendChild(h('span', '', text)); ul.appendChild(li); }
+  function joinWords(a) { return a.length <= 1 ? a.join('') : a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1]; }
+  function litFaces(az) {                    /* which way a wall must face to catch this sun */
+    var direct = [], graze = [];
+    DIRS.forEach(function (w, i) { var diff = Math.abs(SUN.n180(i * 45 - az)); if (diff <= 45) direct.push(w); else if (diff < 80) graze.push(w); });
+    return { direct: direct, graze: graze };
+  }
+
+  /* ---------- side view: how high the sun is, how long the shadow is ---------- */
+  function drawSide(p) {
+    var s = $('side'); s.textContent = '';
+    var W = 340, G = 150, px = 214, ph = 46, e = p.el * Math.PI / 180, up = p.el > 0.5;
+    if (!up && p.el > -7) {                                           /* the sun dipping under the horizon */
+      var sy = G + Math.min(13, Math.max(-2, -p.el * 2.2));
+      sv('circle', { cx: px + 86, cy: sy, r: 10, fill: '#b98b3a' }, s);
+    }
+    sv('rect', { x: 0, y: G, width: W, height: 32, fill: '#131920' }, s);
+    sv('line', { x1: 0, y1: G, x2: W, y2: G, stroke: '#3a4d57', 'stroke-width': 2 }, s);
+    if (up) {
+      var hx = px, hy = G - ph, sx = hx + 86 * Math.cos(e), syy = hy - 86 * Math.sin(e);
+      var tip = px - ph / Math.tan(e), cut = tip < 14, tx = cut ? 14 : tip, shadow = personH() / Math.tan(e);
+      sv('line', { x1: sx, y1: syy, x2: cut ? 14 : tip, y2: cut ? hy + (hx - 14) * Math.tan(e) : G, stroke: '#ffe9a8', 'stroke-opacity': 0.55, 'stroke-width': 1.5, 'stroke-dasharray': '4 5' }, s);
+      sv('line', { x1: px, y1: G, x2: tx, y2: G, stroke: '#05080a', 'stroke-width': 7, 'stroke-linecap': 'round' }, s);
+      if (cut) sv('path', { d: 'M22 ' + (G - 6) + ' L14 ' + G + ' L22 ' + (G + 6), fill: 'none', stroke: '#93a6a8', 'stroke-width': 2, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, s);
+      sv('circle', { cx: sx, cy: syy, r: 17, fill: '#ffd76a', 'fill-opacity': 0.22 }, s);
+      sv('circle', { cx: sx, cy: syy, r: 9.5, fill: '#ffd76a' }, s);
+      svt(s, Math.min(sx, 292), syy - 24 > 14 ? syy - 24 : syy + 34, 'sun, ' + Math.round(p.el) + '\u00b0 up', 13, '#ffe3a1');
+      svt(s, cut ? 30 : Math.max(50, Math.min(px - 50, (px + tx) / 2)), G + 20, 'shadow, ' + fmtLen(shadow), 13, '#c4d0cf', cut ? 'start' : 'middle');
+    } else {
+      svt(s, W / 2, 70, p.el > -7 ? 'The sun is at the horizon' : 'The sun is down', 15, '#93a6a8');
+    }
+    sv('rect', { x: px - 6, y: G - ph + 12, width: 12, height: ph - 12, rx: 5, fill: '#c9d6d5' }, s);
+    sv('circle', { cx: px, cy: G - ph + 6, r: 6, fill: '#c9d6d5' }, s);
+    svt(s, px + 12, G + 20, personWord(), 13, '#93a6a8', 'start');
+  }
+
+  /* ---------- the light through the day, as plain time ranges ---------- */
+  function drawSegs() {
+    var ol = $('segs'); ol.textContent = '';
+    var hi = SUN.highest(TB), i, list = [], start = 0, ph = SUN.phase(TB.el[0]);
+    for (i = 1; i <= TB.len; i++) {
+      var q = i < TB.len ? SUN.phase(TB.el[i]) : null;
+      if (q !== ph) { if (ph === 'blue' || ph === 'golden' || ph === 'day') list.push({ ph: ph, a: start, b: i }); start = i; ph = q; }
+    }
+    var rise = find('rise'), set = find('set'), best = $('best'); best.textContent = '';
+    var tw = wall(S.tz, Date.now()), isToday = S.y === tw.y && S.m === tw.m && S.d === tw.d;
+    $('bestHead').textContent = isToday ? 'Best light today' : 'Best light on ' + fmtDay(TB.t0);
+    if (!list.length) {
+      ol.appendChild(h('li', 'empty', 'The sun stays far below the horizon all day here on this date.'));
+      best.appendChild(h('li', 'empty', 'No sunlight at all here on this date. The sun stays far below the horizon.'));
+      $('daylen').textContent = ''; return;
+    }
+    var golden = list.filter(function (g) { return g.ph === 'golden'; });
+    if (!golden.length) best.appendChild(h('li', 'empty', 'No golden hour on this date here: the sun ' + (list.some(function (g) { return g.ph === 'day'; }) ? 'is up all day and never gets low.' : 'never gets close to the horizon.')));
+    golden.forEach(function (g) {
+      var noon = g.a <= hi && g.b > hi, am = g.b <= hi, ev = am ? rise : set, jump = Math.round((g.a + g.b) / 2);
+      var li = h('li'), b = h('button'), sw = h('span', 'sw'); sw.style.background = swatch('golden');
+      b.setAttribute('data-min', String(jump));
+      b.appendChild(h('b', '', noon ? 'Golden light' : (am ? 'Morning golden hour' : 'Evening golden hour')));
+      b.appendChild(h('span', 'when', (g.a === 0 ? 'midnight' : fmtT(tOf(g.a))) + ' to ' + (g.b >= TB.len ? 'midnight' : fmtT(tOf(g.b)))));
+      b.appendChild(h('small', '', ev ? (am ? 'Sunrise ' : 'Sunset ') + fmtT(tOf(ev.min)) + ', in the ' + dirWord(SUN.at(TB, ev.min).az) + '. Warm, soft light and long shadows.' : 'Warm, soft light and long shadows.'));
+      b.addEventListener('click', function () { setMin(jump); if (map) { scrollTop(); toast('Map now shows ' + fmtT(tOf(jump))); } else toast('Time set to ' + fmtT(tOf(jump))); });
+      li.appendChild(sw); li.appendChild(b); best.appendChild(li);
+    });
+    list.forEach(function (g) {
+      var noon = g.a <= hi && g.b > hi, am = g.b <= hi, name, sub, jump = Math.round((g.a + g.b) / 2);
+      if (g.ph === 'blue') { name = (am ? 'Morning' : 'Evening') + ' blue hour'; sub = am ? (rise ? 'Soft blue light before the sun comes up.' : 'Soft blue light while the sun sits just under the horizon.') : (set ? 'The sun is gone but the sky still glows blue.' : 'The sky glows blue while the sun sits just under the horizon.'); }
+      else if (g.ph === 'day') { name = 'Daylight'; sub = 'Bright, plain light. The sun is highest at ' + fmtT(tOf(hi)) + '.'; jump = hi; }
+      else if (noon && TB.el[hi] < SUN.RISE) { name = 'Golden glow, no sunrise'; sub = 'The sun comes close to the horizon but never clears it here on this date.'; jump = hi; }
+      else if (noon && g.a === 0 && g.b >= TB.len) { name = 'Golden light all day'; sub = 'The sun is up all day and stays low: warm light and long shadows the whole time.'; jump = hi; }
+      else if (noon) { name = 'Golden light around midday'; sub = 'The sun stays low the whole time it is up here at this time of year.'; jump = hi; }
+      else {
+        name = (am ? 'Morning' : 'Evening') + ' golden hour';
+        var ev = am ? rise : set;
+        sub = 'Warm, low sun and long shadows.' + (ev ? (am ? ' Sunrise' : ' Sunset') + ' is at ' + fmtT(tOf(ev.min)) + ', in the ' + dirWord(SUN.at(TB, ev.min).az) + '.' : '');
+      }
+      var li = h('li'), b = h('button'), box = h('span');
+      b.setAttribute('data-min', String(jump));
+      var sw = h('span', 'sw'); sw.style.background = swatch(g.ph);
+      box.appendChild(h('b', '', name));
+      box.appendChild(h('span', 'when', (g.a === 0 ? 'from midnight' : fmtT(tOf(g.a))) + ' to ' + (g.b >= TB.len ? 'midnight' : fmtT(tOf(g.b)))));
+      box.appendChild(h('small', '', sub));
+      b.appendChild(sw); b.appendChild(box);
+      b.addEventListener('click', function () { setMin(jump); toast('Jumped to ' + fmtT(tOf(jump))); });
+      li.appendChild(b); ol.appendChild(li);
+    });
+    $('daylen').textContent = rise && set ? 'The sun is up for ' + hm(set.min - rise.min) + ' on this day.' : '';
+  }
+
+  /* ---------- what is drawn over the map ---------- */
+  var R = 140, gStatic, gSun, gLine, dialLabels = [];
+  function polar(az, r) { var a = az * Math.PI / 180; return [r * Math.sin(a), -r * Math.cos(a)]; }
+  function pinDot(parent) { sv('circle', { cx: 0, cy: 0, r: 7, fill: '#4cf0e0', stroke: '#ffffff', 'stroke-width': 2.5 }, parent); }
+
+  function drawDial() {
+    var box = $('dial').getBoundingClientRect();
+    R = Math.max(88, Math.min(165, Math.min(box.width, box.height) * 0.36));
+    var G = $('dialG'); G.textContent = '';
+    gStatic = sv('g', {}, G); gLine = sv('g', {}, G); gSun = sv('g', {}, G); dialLabels = [];
+    var plan = S.mode === 'plan';
+    sv('circle', { cx: 0, cy: 0, r: R, fill: '#0a0e12', 'fill-opacity': plan ? 0.12 : 0.24, stroke: '#ebedef', 'stroke-opacity': plan ? 0.4 : 0.6, 'stroke-width': 1.5 }, gStatic);
+    [['N', 0], ['E', 90], ['S', 180], ['W', 270]].forEach(function (c) { var p = polar(c[1], R + 15); dialLabels.push({ el: svt(gStatic, p[0], p[1] + 5, c[0], 13, '#ebedef'), x: p[0], y: p[1] }); });
+    if (!plan) {
+      ['rise', 'set'].forEach(function (k) {                       /* where the sun comes up and goes down */
+        var e = find(k); if (!e) return;
+        var p = SUN.at(TB, e.min), far = polar(p.az, 4000), lab = polar(p.az, R * 0.56), colr = k === 'rise' ? '#f6b445' : '#f08a4f';
+        sv('line', { x1: 0, y1: 0, x2: far[0], y2: far[1], stroke: '#0a0e12', 'stroke-opacity': 0.55, 'stroke-width': 5 }, gStatic);
+        sv('line', { x1: 0, y1: 0, x2: far[0], y2: far[1], stroke: colr, 'stroke-width': 2.5, 'stroke-dasharray': '9 7' }, gStatic);
+        var off = polar(p.az - 90, 14); if (off[1] > 0) off = [-off[0], -off[1]];
+        svt(gStatic, lab[0] + off[0], lab[1] + off[1] + 4, (k === 'rise' ? 'Sunrise ' : 'Sunset ') + fmtT(tOf(e.min)), 12.5, colr);
+      });
+      var run = [], runPh = null;                                   /* the sun's path that day, drawn around the ring */
+      var flush = function () { if (run.length > 1) sv('polyline', { points: run.join(' '), fill: 'none', stroke: runPh === 'golden' ? '#f4a93b' : '#fff3c4', 'stroke-width': 6, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, gStatic); };
+      for (var i = 0; i <= TB.len; i += 4) {
+        var e1 = TB.el[i];
+        if (e1 < SUN.RISE) { flush(); run = []; runPh = null; continue; }
+        var phs = SUN.phase(e1) === 'golden' ? 'golden' : 'day', q = polar(TB.az[i], R), pt = q[0].toFixed(1) + ',' + q[1].toFixed(1);
+        if (phs !== runPh) { run.push(pt); flush(); run = [pt]; runPh = phs; } else run.push(pt);
+      }
+      flush();
+      for (var hr = 0; hr < 24; hr++) {                             /* a dot each hour, a label every third hour */
+        var idx = hourMin(hr); if (idx === null || TB.el[idx] < 1.5) continue;
+        var a = polar(TB.az[idx], R);
+        sv('circle', { cx: a[0], cy: a[1], r: 3.4, fill: '#0a0e12', stroke: '#ffffff', 'stroke-width': 1.4 }, gStatic);
+      }
+    }
+    pinDot(gStatic);
+    placeDial();
+  }
+
+  function sunGlyph(parent, x, y, up) {
+    sv('circle', { cx: x, cy: y, r: 22, fill: '#0a0e12', 'fill-opacity': 0.4 }, parent);
+    if (up) for (var k = 0; k < 8; k++) { var a = polar(k * 45, 14), b = polar(k * 45, 19.5); sv('line', { x1: x + a[0], y1: y + a[1], x2: x + b[0], y2: y + b[1], stroke: '#ffd76a', 'stroke-width': 2.6, 'stroke-linecap': 'round' }, parent); }
+    sv('circle', { cx: x, cy: y, r: 10, fill: up ? '#ffd76a' : '#0a0e12', stroke: up ? '#ffffff' : '#c9a24d', 'stroke-width': 2, 'stroke-dasharray': up ? 'none' : '3 3' }, parent);
+  }
+  function drawSun(p) {
+    if (!gSun) return;
+    gSun.textContent = '';
+    var plan = S.mode === 'plan';
+    if (!plan && p.el > 0.5) {                                       /* which way shadows fall */
+      var len = Math.max(20, Math.min(R * 0.9, R * 0.24 / Math.tan(p.el * Math.PI / 180))), sd = SUN.n360(p.az + 180), s = polar(sd, len), sl = polar(sd, len + 13);
+      sv('line', { x1: 0, y1: 0, x2: s[0], y2: s[1], stroke: '#ffffff', 'stroke-opacity': 0.4, 'stroke-width': 10, 'stroke-linecap': 'round' }, gSun);
+      sv('line', { x1: 0, y1: 0, x2: s[0], y2: s[1], stroke: '#06090a', 'stroke-width': 7, 'stroke-linecap': 'round' }, gSun);
+      svt(gSun, sl[0], sl[1] + 4, 'shadow', 11.5, '#dfe7e6');
+    }
+    if (p.el > -6) {
+      var up = p.el >= SUN.RISE, far = polar(p.az, 4000), at = polar(p.az, R);
+      sv('line', { x1: 0, y1: 0, x2: far[0], y2: far[1], stroke: '#0a0e12', 'stroke-opacity': 0.5, 'stroke-width': 6 }, gSun);
+      sv('line', { x1: 0, y1: 0, x2: far[0], y2: far[1], stroke: '#ffe9a8', 'stroke-opacity': up ? 1 : 0.45, 'stroke-width': 3 }, gSun);
+      sunGlyph(gSun, at[0], at[1], up);
+    }
+    var sx = p.el > -6 ? polar(p.az, R) : null;                       /* labels under the sun glyph step aside */
+    dialLabels.forEach(function (l) { l.el.setAttribute('opacity', sx && Math.sqrt((l.x - sx[0]) * (l.x - sx[0]) + (l.y - sx[1]) * (l.y - sx[1])) < 30 ? 0 : 1); });
+    pinDot(gSun);
+  }
+
+  function placeDial() {
+    var box = $('dial').getBoundingClientRect(), x = box.width / 2, y = box.height / 2;
+    if (map) { var pt = map.latLngToContainerPoint([S.lat, S.lng]); x = pt.x; y = pt.y; }
+    $('dialG').style.transform = 'translate(' + x.toFixed(1) + 'px, ' + y.toFixed(1) + 'px)';
+    drawSight();
+  }
+
+  /* the line from where you stand to where the sun should be */
+  function drawSight() {
+    if (!gLine) return;
+    gLine.textContent = '';
+    if (S.mode !== 'plan' || !map) return;
+    svt(gLine, 0, 24, 'you', 12, '#bff3ee');
+    if (S.tLat === null) return;
+    var a = map.latLngToContainerPoint([S.lat, S.lng]), b = map.latLngToContainerPoint([S.tLat, S.tLng]);
+    var dx = b.x - a.x, dy = b.y - a.y, far = polar(SUN.bearing(S.lat, S.lng, S.tLat, S.tLng), 4000);
+    sv('line', { x1: 0, y1: 0, x2: far[0], y2: far[1], stroke: '#0a0e12', 'stroke-opacity': 0.6, 'stroke-width': 6 }, gLine);
+    sv('line', { x1: 0, y1: 0, x2: far[0], y2: far[1], stroke: '#4cf0e0', 'stroke-width': 2.5, 'stroke-dasharray': '3 6', 'stroke-linecap': 'round' }, gLine);
+    sv('line', { x1: 0, y1: 0, x2: dx, y2: dy, stroke: '#4cf0e0', 'stroke-width': 3.5 }, gLine);
+    sv('circle', { cx: dx, cy: dy, r: 11, fill: '#0a0e12', 'fill-opacity': 0.55, stroke: '#0a0e12', 'stroke-width': 6 }, gLine);
+    sv('circle', { cx: dx, cy: dy, r: 11, fill: 'none', stroke: '#4cf0e0', 'stroke-width': 3 }, gLine);
+    sv('circle', { cx: dx, cy: dy, r: 3.5, fill: '#ffd76a' }, gLine);
+    svt(gLine, dx, dy - 18, 'sun spot', 12, '#bff3ee');
+  }
+
+  /* ---------- map key ---------- */
+  function drawKey() {
+    var ul = $('key'); ul.textContent = '';
+    var rows = S.mode === 'plan' ? [
+      ['dot', 'Where you will stand.'],
+      ['target', 'Where you want the sun to be.'],
+      ['sight', 'Your line of sight, from you to the sun spot. The sun has to land on this line.'],
+      ['sun', 'Where the sun is at the day and time shown below.'],
+      ['nesw', 'Compass directions, true north. North is always at the top.']
+    ] : [
+      ['dot', 'Your spot. Tap the map to move it.'],
+      ['sun', 'Which way the sun is at the time you picked.'],
+      ['shadow', 'Which way shadows fall. Longer when the sun is lower.'],
+      ['path', 'The sun travels along this curve during the day. The dots are hours.'],
+      ['rise', 'Where the sun comes up.'],
+      ['set', 'Where the sun goes down.'],
+      ['nesw', 'Compass directions, true north. North is always at the top. A phone compass can read a few degrees off.']
+    ];
+    rows.forEach(function (r) {
+      var li = h('li'), g = sv('svg', { width: 46, height: 26, viewBox: '0 0 46 26' }, li);
+      if (r[0] === 'dot') sv('circle', { cx: 23, cy: 13, r: 7, fill: '#4cf0e0', stroke: '#ffffff', 'stroke-width': 2.5 }, g);
+      if (r[0] === 'sun') sunGlyphKey(g);
+      if (r[0] === 'shadow') { sv('line', { x1: 8, y1: 13, x2: 38, y2: 13, stroke: '#ffffff', 'stroke-opacity': 0.4, 'stroke-width': 10, 'stroke-linecap': 'round' }, g); sv('line', { x1: 8, y1: 13, x2: 38, y2: 13, stroke: '#06090a', 'stroke-width': 7, 'stroke-linecap': 'round' }, g); }
+      if (r[0] === 'path') { sv('path', { d: 'M5 6 Q23 28 41 6', fill: 'none', stroke: '#fff3c4', 'stroke-width': 5, 'stroke-linecap': 'round' }, g); sv('circle', { cx: 23, cy: 17, r: 3.2, fill: '#0a0e12', stroke: '#ffffff', 'stroke-width': 1.4 }, g); }
+      if (r[0] === 'rise' || r[0] === 'set') sv('line', { x1: 4, y1: 13, x2: 42, y2: 13, stroke: r[0] === 'rise' ? '#f6b445' : '#f08a4f', 'stroke-width': 3, 'stroke-dasharray': '9 7' }, g);
+      if (r[0] === 'nesw') { var t = sv('text', { x: 23, y: 18, 'text-anchor': 'middle', 'font-size': 14, 'font-weight': 600, fill: '#ebedef' }, g); t.textContent = 'N E'; }
+      if (r[0] === 'target') { sv('circle', { cx: 23, cy: 13, r: 9, fill: 'none', stroke: '#4cf0e0', 'stroke-width': 3 }, g); sv('circle', { cx: 23, cy: 13, r: 3, fill: '#ffd76a' }, g); }
+      if (r[0] === 'sight') sv('line', { x1: 4, y1: 13, x2: 42, y2: 13, stroke: '#4cf0e0', 'stroke-width': 3.5 }, g);
+      li.appendChild(h('span', '', r[1])); ul.appendChild(li);
+    });
+  }
+  function sunGlyphKey(g) {
+    for (var k = 0; k < 8; k++) { var a = polar(k * 45, 8.5), b = polar(k * 45, 12); sv('line', { x1: 23 + a[0], y1: 13 + a[1], x2: 23 + b[0], y2: 13 + b[1], stroke: '#ffd76a', 'stroke-width': 2, 'stroke-linecap': 'round' }, g); }
+    sv('circle', { cx: 23, cy: 13, r: 6, fill: '#ffd76a', stroke: '#ffffff', 'stroke-width': 1.5 }, g);
+  }
+  $('keyBtn').addEventListener('click', function () {
+    var open = $('key').hidden; $('key').hidden = !open;
+    this.textContent = open ? 'Hide key' : 'Map key'; this.setAttribute('aria-expanded', String(open));
+  });
+
+  /* ---------- the math panel, live ---------- */
+  function drawMath() {
+    var p = SUN.position(new Date(tOf(S.min)), S.lat, S.lng);
+    $('hD').textContent = p.days.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    $('hL').textContent = p.circle.toFixed(1) + '\u00b0';
+    $('hDec').textContent = Math.abs(p.dec).toFixed(2) + '\u00b0 ' + (p.dec >= 0 ? 'north' : 'south');
+    $('hH').textContent = Math.abs(p.turn).toFixed(1) + '\u00b0 ' + (p.turn >= 0 ? 'past' : 'short of');
+    $('hHm').textContent = hm(Math.abs(p.turn) * 4) + (p.turn >= 0 ? ' after' : ' before');
+    $('hLat').textContent = Math.abs(S.lat).toFixed(2) + '\u00b0 ' + (S.lat >= 0 ? 'north' : 'south');
+    $('hEl').textContent = Math.abs(p.el).toFixed(1) + '\u00b0 ' + (p.el >= 0 ? 'above' : 'below');
+    $('hAz').textContent = (Math.round(p.az) % 360) + '\u00b0 (' + dirWord(p.az) + ')';
+  }
+
+  /* ---------- moving the two points ---------- */
+  function setPin(lat, lng, opts) {
+    opts = opts || {};
+    var old = { lat: S.lat, lng: S.lng };
+    S.lat = Math.max(-85, Math.min(85, lat)); S.lng = ((lng + 180) % 360 + 360) % 360 - 180;
+    rebuild(); save();
+    if (opts.center && map) map.setView([S.lat, S.lng], Math.max(map.getZoom(), opts.zoom || 15));
+    if (opts.undoable) toast('Your spot moved', function () { setPin(old.lat, old.lng, {}); });
+  }
+  function setTarget(lat, lng, opts) {
+    opts = opts || {};
+    var old = { lat: S.tLat, lng: S.tLng };
+    S.tLat = lat === null ? null : Math.max(-85, Math.min(85, lat));
+    S.tLng = lng === null ? null : ((lng + 180) % 360 + 360) % 360 - 180;
+    save(); drawSight(); drawPlan();
+    if (opts.undoable) toast('Sun spot set', function () { setTarget(old.lat, old.lng, {}); });
+  }
+
+  /* ---------- place search (OpenStreetMap's Nominatim, one request per search, never while typing) ---------- */
+  $('sform').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var q = $('q').value.trim(), box = $('hits'); box.textContent = ''; box.hidden = true;
+    if (!q) return;
+    var m = /^\s*(-?\d{1,2}(?:\.\d+)?)\s*[, ]\s*(-?\d{1,3}(?:\.\d+)?)\s*$/.exec(q);
+    if (m) { var la = +m[1], lo = +m[2]; if (Math.abs(la) <= 85 && Math.abs(lo) <= 180) { setPin(la, lo, { center: true, zoom: 16 }); toast('Spot set to ' + la + ', ' + lo); return; } }
+    if (!web) { showHits([{ msg: 'Place search needs the web address of this tool. Paste coordinates instead, like 41.08, -81.52.' }]); return; }
+    if (searching) return;                     /* one request at a time, however often Find is tapped */
+    var wait = 1100 - (Date.now() - lastSearch); if (wait > 0) { searching = true; showHits([{ msg: 'Searching...' }]); setTimeout(function () { searching = false; $('qGo').click(); }, wait); return; }
+    lastSearch = Date.now(); searching = true;
+    showHits([{ msg: 'Searching...' }]);
+    var ctl = null; try { ctl = new AbortController(); setTimeout(function () { ctl.abort(); }, 9000); } catch (e) {}
+    fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&q=' + encodeURIComponent(q), { signal: ctl ? ctl.signal : undefined })
+      .then(function (r) { if (!r.ok) throw new Error('bad'); return r.json(); })
+      .then(function (list) {
+        if (!list.length) { showHits([{ msg: 'Nothing found for "' + q + '". Try adding the city or country, or paste coordinates.' }]); return; }
+        showHits(list.map(function (x) { return { name: x.display_name, lat: +x.lat, lng: +x.lon, zoom: x.type === 'city' || x.type === 'town' || x.addresstype === 'city' ? 13 : 16 }; }));
+      })
+      .catch(function () { showHits([{ msg: 'The search did not reach OpenStreetMap. Check your connection and try again, or paste coordinates.' }]); })
+      .then(function () { searching = false; });
+  });
+  function showHits(items) {
+    var box = $('hits'); box.textContent = ''; box.hidden = false;
+    items.forEach(function (it) {
+      var li = h('li');
+      if (it.msg) li.appendChild(h('div', 'msg', it.msg));
+      else { var b = h('button', '', it.name); b.addEventListener('click', function () { box.hidden = true; $('q').value = ''; setPin(it.lat, it.lng, { center: true, zoom: it.zoom }); toast('Spot moved to ' + it.name.split(',')[0]); }); li.appendChild(b); }
+      box.appendChild(li);
+    });
+    if (items.length && !items[0].msg) box.appendChild(h('li', 'cred', 'Search results from OpenStreetMap (Nominatim).'));
+  }
+  $('q').addEventListener('input', function () { if (!this.value) { $('hits').hidden = true; $('hits').textContent = ''; } });
+
+  /* ---------- plan a shot: three steps ---------- */
+  function setMode(m) {
+    S.mode = m;
+    if (m === 'plan') S.step = S.tLat === null ? 1 : 3;
+    save(); drawDial(); drawNow(); drawPlan(); drawKey();
+  }
+  function goStep(n) { S.step = n; drawPlan(); scrollTop(); }
+  function lineOK() { return S.tLat !== null && SUN.distance(S.lat, S.lng, S.tLat, S.tLng) >= 3; }
+  function storiesWord(m) { var ft = m * 3.28084, n = Math.round(ft / 10); return ft < 12 ? 'barely above the ground there' : 'about ' + fmtHeight(m) + ' above the ground there, roughly the height of a ' + n + '-story building. Anything taller than that at the spot hides it'; }
+  function swing() {
+    var w = wall(S.tz, Date.now()), lo = [999, 999], hi = [-1, -1];
+    for (var k = 0; k < 366; k += 14) {
+      var t0 = zoneMidnight(S.tz, w.y, w.m, w.d + k), tb = SUN.dayTable(t0, 1440, S.lat, S.lng);
+      [SUN.cross(tb, SUN.RISE, true), SUN.cross(tb, SUN.RISE, false, 600)].forEach(function (mn, i) {
+        if (mn === null) return; var az = SUN.at(tb, mn).az; lo[i] = Math.min(lo[i], az); hi[i] = Math.max(hi[i], az);
+      });
+    }
+    return hi[0] < 0 || hi[1] < 0 ? null : { rise: [lo[0], hi[0]], set: [lo[1], hi[1]] };
+  }
+  function showMoment(hit) {
+    var w = wall(S.tz, hit.t0); S.y = w.y; S.m = w.m; S.d = w.d;
+    S.min = Math.max(0, Math.round((hit.t - hit.t0) / 60000));
+    rebuild(); save(); scrollTop();
+    toast('Map now shows ' + fmtDay(hit.t) + ', ' + fmtT(hit.t));
+  }
+  function tryExample() {
+    S.lat = 41.0814; S.lng = -81.519;
+    var d = 230, B = 250 * Math.PI / 180;
+    S.tLat = S.lat + d * Math.cos(B) / 111320; S.tLng = S.lng + d * Math.sin(B) / (111320 * Math.cos(S.lat * Math.PI / 180));
+    S.band = 'low'; S.step = 3;
+    if (map) map.setView([S.lat, S.lng], 17);
+    rebuild(); save(); toast('Example loaded: a line in downtown Akron, Ohio');
+  }
+  function icsFor(hit, dist, B) {           /* a calendar event for one line-up */
+    function st(ms) { var d = new Date(ms); return d.getUTCFullYear() + pad(d.getUTCMonth() + 1) + pad(d.getUTCDate()) + 'T' + pad(d.getUTCHours()) + pad(d.getUTCMinutes()) + '00Z'; }
+    function esc(s) { return String(s).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n'); }
+    function fold(line) { var out = '', s = line; while (s.length > 72) { out += s.slice(0, 72) + '\r\n '; s = s.slice(72); } return out + s; }
+    var lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Light Scout//EN', 'BEGIN:VEVENT',
+      'UID:lightscout-' + Math.round(hit.t / 60000) + '-' + Math.round(S.lat * 1e4) + '@motbuchanan.com',
+      'DTSTAMP:' + st(Date.now()), 'DTSTART:' + st(hit.t - 20 * 60000), 'DTEND:' + st(hit.t + 10 * 60000),
+      fold('SUMMARY:' + esc('Sun lines up at ' + fmtT(hit.t) + ' (Light Scout)')),
+      fold('DESCRIPTION:' + esc('Stand at ' + S.lat.toFixed(5) + ', ' + S.lng.toFixed(5) + ' looking ' + dirWord(B) + ' (' + Math.round(B) + ' degrees). The sun crosses your line at ' + fmtT(hit.t) + ', ' + (hit.el < 0.3 ? 'sitting right on the horizon' : hit.el.toFixed(1) + ' degrees up') + ', ' + fmtLen(dist) + ' to the spot. Starts 20 minutes early so you are set up. Plan: ' + shareURL())),
+      'LOCATION:' + S.lat.toFixed(5) + ',' + S.lng.toFixed(5), 'GEO:' + S.lat.toFixed(5) + ';' + S.lng.toFixed(5), 'END:VEVENT', 'END:VCALENDAR'];
+    return lines.join('\r\n') + '\r\n';
+  }
+  function downloadText(name, text, type) {
+    try {
+      var blob = new Blob([text], { type: type }), url = URL.createObjectURL(blob), a = h('a');
+      a.href = url; a.download = name; document.body.appendChild(a); a.click();
+      setTimeout(function () { document.body.removeChild(a); URL.revokeObjectURL(url); }, 1500);
+      return true;
+    } catch (e) { return false; }
+  }
+
+  function drawHint() {
+    var on = S.mode === 'plan';
+    $('hint').textContent = !map ? 'Search a place above, paste coordinates, or use your location to set your spot.'
+      : !on ? 'The teal dot is your spot. Tap the map to move it.'
+      : S.step === 1 ? 'Tap the map where you will stand.'
+      : S.step === 2 ? 'Tap the map where the sun should be.'
+      : 'The map shows ' + fmtDay(tOf(S.min)) + ', ' + fmtT(tOf(S.min)) + '. Tap a date below to change it.';
+  }
+  function maxElForRoof(dist) { return Math.atan2(roofM(), dist) * 180 / Math.PI; }
+  function bandIcon(parent, kind) {          /* a small picture of what the sun does in each choice */
+    var g = sv('svg', { width: 44, height: 40, viewBox: '0 0 44 40', 'aria-hidden': 'true' }, parent), sun = '#ffd76a', ground = '#5b6b73';
+    function disc(x, y, r) { sv('circle', { cx: x, cy: y, r: r, fill: sun }, g); }
+    if (kind === 'low') { sv('rect', { x: 0, y: 26, width: 44, height: 14, fill: '#1b262c' }, g); sv('path', { d: 'M12 26a10 10 0 0 1 20 0z', fill: sun }, g); sv('path', { d: 'M3 26h38', stroke: ground, 'stroke-width': 2 }, g); }
+    if (kind === 'roof') { sv('rect', { x: 4, y: 14, width: 12, height: 22, fill: '#3a4d57' }, g); sv('rect', { x: 28, y: 18, width: 12, height: 18, fill: '#3a4d57' }, g); disc(22, 22, 6); sv('path', { d: 'M2 36h40', stroke: ground, 'stroke-width': 2 }, g); }
+    if (kind === 'mid') { disc(30, 16, 6); sv('path', { d: 'M3 34h38', stroke: ground, 'stroke-width': 2 }, g); }
+    if (kind === 'high') { disc(22, 9, 4.5); sv('path', { d: 'M3 34h38', stroke: ground, 'stroke-width': 2 }, g); }
+    if (kind === 'any') { disc(22, 8, 3.5); disc(22, 19, 3.5); disc(22, 30, 3.5); sv('path', { d: 'M3 37h38', stroke: ground, 'stroke-width': 2 }, g); }
+  }
+  function drawPlan() {
+    var on = S.mode === 'plan', box = $('plan'), i;
+    box.hidden = !on;
+    $('dayWrap').hidden = on; $('bestWrap').hidden = on; $('intro').hidden = on || introDone;
+    var ms = $('modes').querySelectorAll('button');
+    for (i = 0; i < ms.length; i++) ms[i].classList.toggle('on', ms[i].getAttribute('data-mode') === S.mode);
+    drawHint();
+    if (!on) return;
+    box.textContent = '';
+    box.appendChild(h('div', 'stepno', 'Step ' + S.step + ' of 3'));
+
+    if (S.step === 1) {
+      box.appendChild(h('h2', '', 'Where will you stand?'));
+      box.appendChild(h('p', '', 'Tap the map on the place where you will be with your camera, or search for it above. Zoom in first so your tap lands in the right place. The teal dot marked "you" is your spot.'));
+      var r1 = h('div', 'btnrow'), n1 = h('button', 'btn go', 'My spot is right. Next');
+      n1.id = 'pNext'; n1.addEventListener('click', function () { goStep(2); });
+      r1.appendChild(n1); box.appendChild(r1);
+      if (S.tLat === null) { var ex = h('button', 'linkbtn', 'Not sure? Show me an example'); ex.id = 'pExample'; ex.addEventListener('click', tryExample); box.appendChild(ex); }
+      return;
+    }
+    if (S.step === 2) {
+      box.appendChild(h('h2', '', 'What should the sun line up with?'));
+      box.appendChild(h('p', '', 'Tap that place on the map. For the sun between two buildings, tap the gap between them. For the sun behind a steeple or a tree, tap it.'));
+      if (S.tLat !== null) {
+        box.appendChild(h('div', 'got', lineOK()
+          ? 'Got it. From your spot, that is toward the ' + dirWord(SUN.bearing(S.lat, S.lng, S.tLat, S.tLng)) + ', ' + fmtLen(SUN.distance(S.lat, S.lng, S.tLat, S.tLng)) + ' away. Tap again to adjust it.'
+          : 'That is right on top of your spot. Tap a place farther away.'));
+      }
+      var r2 = h('div', 'btnrow'), b2 = h('button', 'btn', 'Back'), n2 = h('button', 'btn go', 'Find the dates');
+      b2.id = 'pBack'; n2.id = 'pNext'; n2.disabled = !lineOK();
+      b2.addEventListener('click', function () { goStep(1); }); n2.addEventListener('click', function () { if (lineOK()) goStep(3); });
+      r2.appendChild(b2); r2.appendChild(n2); box.appendChild(r2);
+      return;
+    }
+
+    /* step 3: how high, then the answer */
+    if (!lineOK()) { S.step = 2; drawPlan(); return; }
+    var dist = SUN.distance(S.lat, S.lng, S.tLat, S.tLng), B = SUN.bearing(S.lat, S.lng, S.tLat, S.tLng);
+    box.appendChild(h('h2', '', 'When to be there'));
+    box.appendChild(h('p', '', 'You are looking ' + dirWord(B) + ' from your spot. The place where the sun should be is ' + fmtLen(dist) + ' away.'));
+    box.appendChild(h('div', 'asklabel', 'How should the sun look in the picture?'));
+    var ch = h('div', 'choices'), note = ''; ch.id = 'bands';
+    [['low', 'On the horizon', 'Big, orange, sunrise or sunset look.', 'Touching or just above the horizon (up to 10 degrees). The classic sunrise and sunset shot.'],
+     ['roof', 'Below the rooftops', 'In the gap between buildings.', 'The sun has to sit lower than the buildings beside your spot, so it shows in the gap instead of above the roofs. Set how tall they are.'],
+     ['mid', 'Low in the sky', 'Clear of the ground, light still soft.', '10 to 25 degrees up. Warm light without the sun touching the ground.'],
+     ['high', 'High up', 'Small, bright sun. Hard midday light.', 'More than 25 degrees up. Bright, hard light with short shadows.'],
+     ['any', 'Any height', 'Every day the sun crosses your line.', 'Every day the sun crosses your line, at any height.']].forEach(function (c) {
+      var b = h('button', (S.band === c[0] ? 'on' : '') + (c[0] === 'any' ? ' wide' : ''));
+      b.setAttribute('data-band', c[0]); b.setAttribute('aria-pressed', String(S.band === c[0]));
+      bandIcon(b, c[0]);
+      var txt = h('span'); txt.appendChild(h('b', '', c[1])); txt.appendChild(h('small', '', c[2])); b.appendChild(txt);
+      if (S.band === c[0]) note = c[3];
+      b.addEventListener('click', function () { S.band = c[0]; save(); drawPlan(); });
+      ch.appendChild(b);
+    });
+    box.appendChild(ch);
+    box.appendChild(h('p', 'choicenote', note));
+    var maxEl = 91, minEl = -1;
+    if (S.band === 'roof') {
+      var roof = h('div', 'roof'), stp = h('div', 'stp'), minus = h('button', '', '\u2212'), out = h('output', '', roofWord()), plus = h('button', '', '+');
+      minus.setAttribute('aria-label', 'Shorter'); plus.setAttribute('aria-label', 'Taller'); minus.id = 'roofMinus'; plus.id = 'roofPlus'; out.id = 'roofOut';
+      minus.addEventListener('click', function () { S.roofFt = Math.max(10, S.roofFt - 10); save(); drawPlan(); });
+      plus.addEventListener('click', function () { S.roofFt = Math.min(600, S.roofFt + 10); save(); drawPlan(); });
+      stp.appendChild(minus); stp.appendChild(out); stp.appendChild(plus);
+      roof.appendChild(h('span', 'lbl', 'Buildings beside the gap are about')); roof.appendChild(stp); box.appendChild(roof);
+      maxEl = maxElForRoof(dist);
+      box.appendChild(h('p', 'choicenote', 'From ' + fmtLen(dist) + ' away, a ' + fmtHeight(roofM()) + ' roof is ' + maxEl.toFixed(1) + ' degrees up, so the sun has to be lower than that.'));
+    } else { minEl = BANDS[S.band][0]; maxEl = BANDS[S.band][1]; }
+
+    var w = wall(S.tz, Date.now()), key = [S.lat, S.lng, S.tLat, S.tLng, S.tz, w.y, w.m, w.d].join('|');
+    if (LU.key !== key) {
+      var t0s = [];
+      for (i = 0; i <= 366; i++) t0s.push(zoneMidnight(S.tz, w.y, w.m, w.d + i));
+      LU = { key: key, all: SUN.alignments(t0s, S.lat, S.lng, B), B: B, dist: dist };
+      LU.all.forEach(function (x) { x.t = Math.round(x.t / 60000) * 60000; });
+    }
+    var nowMs = Date.now();
+    var hits = LU.all.filter(function (x) { return x.t >= nowMs && x.el >= minEl && x.el < maxEl; });
+
+    if (!hits.length) {
+      var msg;
+      if (!LU.all.length) {
+        var sw = swing();
+        msg = 'The sun never gets to that direction from your spot.' + (sw ? ' Over a year it only comes up between the ' + dirWord(sw.rise[0]) + ' and the ' + dirWord(sw.rise[1]) + ', and goes down between the ' + dirWord(sw.set[0]) + ' and the ' + dirWord(sw.set[1]) + '. Go back and move one of your two points so your line points somewhere in that sweep.' : '');
+      } else if (S.band === 'roof') {
+        var lowest = LU.all.reduce(function (a, x) { return x.t >= nowMs && x.el < a ? x.el : a; }, 99);
+        msg = 'In the next 12 months the sun is never that low when it crosses your line. The lowest it gets on your line is ' + lowest.toFixed(1) + ' degrees, so it would sit above a ' + fmtHeight(roofM()) + ' roof from here. Try standing farther back from the gap, or set the buildings taller if they are.';
+      } else {
+        var c = { low: 0, mid: 0, high: 0 };
+        LU.all.forEach(function (x) { if (x.t >= nowMs) c[x.el < 10 ? 'low' : x.el < 25 ? 'mid' : 'high']++; });
+        msg = 'In the next 12 months the sun never crosses your line at that height. It does cross it on ' + c.low + ' days while low, ' + c.mid + ' days at medium height, and ' + c.high + ' days while high. Pick one of those above.';
+      }
+      var em = h('div', 'got', msg); em.id = 'noHits'; box.appendChild(em);
+    } else {
+      var first = hits[0], nx = h('div', 'next'); nx.id = 'nextHit';
+      nx.appendChild(h('div', 'lbl', 'Your next chance'));
+      nx.appendChild(h('div', 'big', fmtDay(first.t, wall(S.tz, first.t).y === wall(S.tz, Date.now()).y ? '' : 'wyear') + ' at ' + fmtT(first.t)));
+      nx.appendChild(h('p', '', first.el < 0.3 ? 'The sun will be sitting right on the horizon.' : 'The sun will be ' + heightWord(first.el) + ': ' + storiesWord(dist * Math.tan(first.el * Math.PI / 180)) + '.'));
+      var nr = h('div', 'btnrow'), sb = h('button', 'btn go', 'Show this on the map'), cb = h('button', 'btn', 'Add to calendar');
+      sb.id = 'showNext'; cb.id = 'calNext';
+      sb.addEventListener('click', function () { showMoment(first); });
+      cb.addEventListener('click', function () { if (downloadText('light-scout.ics', icsFor(first, dist, B), 'text/calendar')) toast('Calendar file saved. Open it to add the event.'); else toast('Could not make the calendar file here.'); });
+      nr.appendChild(sb); nr.appendChild(cb); nx.appendChild(nr); box.appendChild(nx);
+
+      var runs = [], cur = null;
+      hits.forEach(function (x) {
+        var am = (x.t - x.t0) < 12 * 3600000;
+        if (cur && x.day - cur.last === 1 && cur.am === am) { cur.items.push(x); cur.last = x.day; }
+        else { cur = { items: [x], last: x.day, am: am }; runs.push(cur); }
+      });
+      var wrap = h('div', 'runs'); wrap.id = 'runs';
+      box.appendChild(h('div', 'asklabel', 'Every day it lines up in the next 12 months'));
+      box.appendChild(h('p', 'choicenote', 'Tap a group of dates to see each day.'));
+      runs.forEach(function (r, ri) {
+        var it = r.items, step = it.length <= 31 ? 1 : Math.ceil(it.length / 24), det = h('details'), sm = h('summary');
+        sm.textContent = it.length === 1 ? fmtDay(it[0].t, 'year') : fmtDay(it[0].t, 'year') + ' to ' + fmtDay(it[it.length - 1].t, 'year');
+        sm.appendChild(h('small', '', (r.am ? 'Mornings' : 'Afternoons and evenings') + ', ' + it.length + (it.length === 1 ? ' day' : ' days') + (step > 1 ? '. Showing 1 day in every ' + step + '.' : '')));
+        det.appendChild(sm);
+        var ol = h('ol', 'rows');
+        it.forEach(function (x, idx) {
+          if (idx % step !== 0 && idx !== it.length - 1) return;
+          var li = h('li'), b = h('button'), d2 = h('span', 'd2', fmtT(x.t));
+          b.appendChild(h('span', 'd1', fmtDay(x.t)));
+          d2.appendChild(h('small', '', x.el < 0.3 ? 'on the horizon' : heightWord(x.el).replace(' in the sky', '') + ', ' + fmtHeight(dist * Math.tan(x.el * Math.PI / 180)) + ' up'));
+          b.appendChild(d2);
+          b.addEventListener('click', function () { showMoment(x); });
+          li.appendChild(b); ol.appendChild(li);
+        });
+        det.appendChild(ol); wrap.appendChild(det);
+      });
+      box.appendChild(wrap);
+      var rate = Math.abs(SUN.n180(SUN.position(new Date(first.t + 120000), S.lat, S.lng).az - SUN.position(new Date(first.t - 120000), S.lat, S.lng).az)) / 4;
+      box.appendChild(h('p', '', 'Get there early. The sun only sits on your line for a few minutes, moving off it in about ' + Math.max(2, Math.round(2 / rate)) + ' min. The heights assume flat ground, and the tool cannot see the real buildings.'));
+    }
+    var r3 = h('div', 'btnrow'), m1 = h('button', 'btn', 'Move where I stand'), m2 = h('button', 'btn', 'Move the sun spot');
+    m1.id = 'pMove1'; m2.id = 'pMove2';
+    m1.addEventListener('click', function () { goStep(1); }); m2.addEventListener('click', function () { goStep(2); });
+    r3.appendChild(m1); r3.appendChild(m2); box.appendChild(r3);
+  }
+  $('modes').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (b) setMode(b.getAttribute('data-mode')); });
+  $('units').addEventListener('click', function (ev) { var b = ev.target.closest('button'); if (!b) return; S.units = b.getAttribute('data-u') === 'm' ? 'm' : 'ft'; save(); drawNow(); drawPlan(); });
+
+  /* ---------- map ---------- */
+  function initMap() {
+    if (typeof L === 'undefined') { var li0 = $('intro').querySelector('li'); if (li0) { li0.textContent = ' Search a place or use your location.'; li0.insertBefore(h('b', '', 'Your spot is where you search.'), li0.firstChild); } $('mapmsg').hidden = false; $('layers').hidden = true; $('modes').hidden = true; $('keyBtn').hidden = true; S.mode = 'see'; return; }
+    map = L.map('map', { center: [S.lat, S.lng], zoom: S.zoom, zoomControl: false, doubleClickZoom: false, worldCopyJump: true });
+    L.control.zoom({ position: 'bottomright' }).addTo(map);
+    ['street', 'sat'].forEach(function (k) {
+      layers[k] = L.tileLayer(TILES[k].url, TILES[k].opts);
+      layers[k].on('loading', function () { tileFails = 0; tileWarned = false; });   /* a new pan or zoom gets a fresh count */
+      layers[k].on('tileerror', function () { if (tileWarned || ++tileFails < 3) return; tileWarned = true; $('mapmsg').hidden = false; setTimeout(function () { $('mapmsg').hidden = true; }, 6000); });
+    });
+    layers[S.layer].addTo(map);
+    setLayerUI();
+    map.on('click', function (e) {
+      if (S.mode === 'plan' && S.step === 2) setTarget(e.latlng.lat, e.latlng.lng, { undoable: true });
+      else if (S.mode === 'plan' && S.step === 3) toast('To move a point, use the Move buttons at the end of the plan');
+      else setPin(e.latlng.lat, e.latlng.lng, { undoable: true });
+    });
+    map.on('move zoom zoomend moveend viewreset resize', placeDial);
+    map.on('zoomend', function () { S.zoom = map.getZoom(); save(); });
+  }
+  function setLayerUI() {
+    var bs = $('layers').querySelectorAll('button');
+    for (var i = 0; i < bs.length; i++) bs[i].classList.toggle('on', bs[i].getAttribute('data-layer') === S.layer);
+  }
+  $('layers').addEventListener('click', function (ev) {
+    var b = ev.target.closest('button'); if (!b || !map) return;
+    var want = b.getAttribute('data-layer'); if (want === S.layer) return;
+    map.removeLayer(layers[S.layer]); S.layer = want; layers[S.layer].addTo(map); setLayerUI(); save();
+  });
+  $('locate').addEventListener('click', function () {
+    if (!navigator.geolocation) { toast('This browser cannot share a location'); return; }
+    toast('Finding you...');
+    navigator.geolocation.getCurrentPosition(function (pos) {
+      setPin(pos.coords.latitude, pos.coords.longitude, { center: true }); toast('Your spot is now where you are');
+    }, function () { toast('Could not get your location'); }, { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 });
+  });
+
+  /* ---------- day ---------- */
+  function shiftDay(n) { var w = wall(S.tz, zoneMidnight(S.tz, S.y, S.m, S.d + n) + 43200000); S.y = w.y; S.m = w.m; S.d = w.d; rebuild(); save(); }
+  $('dPrev').addEventListener('click', function () { shiftDay(-1); });
+  $('dNext').addEventListener('click', function () { shiftDay(1); });
+  $('dPick').addEventListener('change', function () {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(this.value); if (!m || +m[1] < 1900 || +m[1] > 2100) { rebuild(); return; }
+    S.y = +m[1]; S.m = +m[2] - 1; S.d = +m[3]; rebuild(); save();
+  });
+
+  /* ---------- time ---------- */
+  function setMin(v) { S.min = Math.max(0, Math.min(TB.len - 1, Math.round(v))); drawNow(); syncHash(); }
+  var strip = $('strip'), dragging = false;
+  function stripMin(ev) { var b = strip.getBoundingClientRect(); return (ev.clientX - b.left) / b.width * TB.len; }
+  strip.addEventListener('pointerdown', function (ev) { dragging = true; try { strip.setPointerCapture(ev.pointerId); } catch (e) {} setMin(stripMin(ev)); ev.preventDefault(); });
+  strip.addEventListener('pointermove', function (ev) { if (dragging) setMin(stripMin(ev)); });
+  ['pointerup', 'pointercancel'].forEach(function (n) { strip.addEventListener(n, function () { dragging = false; }); });
+  strip.addEventListener('keydown', function (ev) {
+    if (ev.key === 'ArrowLeft' || ev.key === 'ArrowDown') { setMin(S.min - 5); ev.preventDefault(); }
+    if (ev.key === 'ArrowRight' || ev.key === 'ArrowUp') { setMin(S.min + 5); ev.preventDefault(); }
+    if (ev.key === 'Home') { setMin(0); ev.preventDefault(); }
+    if (ev.key === 'End') { setMin(TB.len - 1); ev.preventDefault(); }
+  });
+  $('tMinus').addEventListener('click', function () { setMin(S.min - 5); });
+  $('tPlus').addEventListener('click', function () { setMin(S.min + 5); });
+  $('tNow').addEventListener('click', function () { setToday(Date.now()); rebuild(); save(); });
+
+  /* ---------- welcome, help and about ---------- */
+  var lastFocus = null;
+  function openSheet(words) {
+    lastFocus = document.activeElement; $('sheet').hidden = false; document.body.style.overflow = 'hidden';
+    var first = $('shClose'), inner = $('sheet').querySelector('.in');
+    if (first) try { first.focus({ preventScroll: true }); } catch (e) { first.focus(); }
+    $('words').open = !!words; inner.scrollTop = 0;
+    if (words) { try { inner.scrollTop = $('words').getBoundingClientRect().top - inner.getBoundingClientRect().top - 12; } catch (e) {} }
+    measureSelf();
+  }
+  function closeSheet() {
+    $('sheet').hidden = true; document.body.style.overflow = '';
+    if (lastFocus && lastFocus.focus) try { lastFocus.focus(); } catch (e) {}
+  }
+  var introDone = false; try { introDone = storeOK && localStorage.getItem(SEEN) === '1'; } catch (e) {}
+  $('introOk').addEventListener('click', function () {
+    introDone = true; $('intro').hidden = true;
+    try { if (storeOK) localStorage.setItem(SEEN, '1'); } catch (e) {}
+  });
+  $('wordsBtn').addEventListener('click', function () { openSheet(true); });
+  var measured = false;
+  function sizeLine(bytes) { $('aboutSize').textContent = 'This whole tool is one file, ' + Math.round(bytes / 1024) + ' KB, plus the map library it borrows.'; }
+  function measureSelf() {
+    if (measured || !web) return;
+    if (pageText) { measured = true; sizeLine(pageText.length); return; }      /* the version check already fetched the page */
+    measured = true;
+    fetch(location.pathname, { cache: 'no-store' }).then(function (r) { return r.blob(); }).then(function (b) { sizeLine(b.size); }).catch(function () {});
+  }
+  $('help').addEventListener('click', function () { openSheet(false); });
+  $('shClose').addEventListener('click', closeSheet);
+  $('sheet').addEventListener('click', function (ev) { if (ev.target === this) closeSheet(); });
+  document.addEventListener('keydown', function (ev) { if (ev.key !== 'Escape') return; if (!$('sheet').hidden) closeSheet(); if (!$('linkSheet').hidden) { $('linkSheet').hidden = true; document.body.style.overflow = ''; } });
+
+  /* ---------- version badge ---------- */
+  $('mbVer').addEventListener('click', function () { toast('v' + BUILD + ' loaded'); });
+
+  /* ---------- go ---------- */
+  initMap();
+  rebuild(); drawKey();
+  if (sharedLink && link.lat && link.lng) { if (!introDone) toast('Shared plan loaded'); introDone = true; }
+  $('intro').hidden = introDone || S.mode === 'plan';
+  syncHash();
+  var rz = 0;
+  window.addEventListener('resize', function () { clearTimeout(rz); rz = setTimeout(function () { if (map) map.invalidateSize(); drawStrip(); drawTicks(); drawDial(); drawNow(); }, 120); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { drawDial(); drawNow(); });
+
+  /* ---------- version buster: if the deployed file is newer than this cached one, reload onto it ---------- */
+  try {
+    if (web) {
+      fetch(location.pathname + '?cb=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.text(); }).then(function (t) {
+        pageText = t; if (measured) sizeLine(t.length);
+        var m = t.match(/<meta name="build" content="([^"]+)"/);
+        if (m && m[1] !== BUILD && sessionStorage.getItem('ls_bust') !== m[1]) {
+          sessionStorage.setItem('ls_bust', m[1]);
+          location.replace(location.pathname + '?v=' + encodeURIComponent(m[1]) + location.hash);
+        }
+      }).catch(function () {});
+    }
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>
