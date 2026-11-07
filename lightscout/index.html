@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="build" content="0.5.2">
+<meta name="build" content="0.6">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0d1116">
 <meta name="description" content="Light Scout shows where the sun will be at any spot, any day, any time: direction, height, shadows, golden hour. Plan a shot by lining the sun up with a gap or a landmark and get the dates to be there.">
@@ -104,7 +104,7 @@ html.embed .mb-home{display:none}
 
 /* ---- map ---- */
 .mapbox{position:relative;overflow:hidden}
-#map{height:42vh;min-height:290px;background:#0a0e12}
+#map{height:max(240px,min(52vh,calc(100vh - 430px)));height:max(240px,min(52svh,calc(100svh - 430px)));background:#0a0e12}
 #dial{position:absolute;top:0;left:0;right:0;bottom:0;inset:0;width:100%;height:100%;pointer-events:none;z-index:650;overflow:hidden}
 #dial text{font-family:var(--mb-ui);font-weight:600;paint-order:stroke;stroke:#0a0e12;stroke-width:3.6px;stroke-linejoin:round}
 .mapctl{position:absolute;right:10px;top:10px;z-index:900}
@@ -126,6 +126,21 @@ html.embed .mb-home{display:none}
 
 /* ---- panels ---- */
 .side{padding:0 12px 110px}
+:root{--top-h:57px;--dock-h:0px}
+html{scroll-padding-top:calc(var(--top-h) + var(--dock-h) + 8px)}
+.dock{position:sticky;top:var(--top-h);z-index:1100;background:var(--ground);padding:8px 12px 10px;border-bottom:1px solid var(--mb-line);box-shadow:0 6px 12px -8px rgba(0,0,0,.7)}
+.dock .datebar button,.dock .datebar input{height:40px}
+.dock .datebar button{width:40px}
+.dock .datebar .now{width:auto;padding:0 14px;background:var(--mb-teal);border-color:var(--mb-teal);color:var(--teal-ink);font:800 15px var(--mb-ui)}
+.timerow{display:grid;grid-template-columns:56px 1fr 56px;gap:8px;align-items:center;margin-top:6px}
+.timerow > button{height:44px;border-radius:12px;border:1px solid var(--mb-line);background:var(--ground);font:700 13px var(--mb-ui);line-height:1.1;cursor:pointer;padding:2px}
+.timerow > button:active{background:var(--panel2)}
+.dock .readout{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;margin:0;min-width:0}
+.dock .clock{font-size:clamp(24px,7.4vw,30px)}
+.dock .phase{font-size:13px;padding:0;border:0;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.dock .strip{height:44px;margin-top:6px}
+.dock .ticks{height:18px;margin-top:3px}
+@media (orientation:landscape) and (max-height:500px){.dock{position:static;box-shadow:none}html{scroll-padding-top:calc(var(--top-h) + 8px)}}
 .ask{font-size:15px;color:var(--mb-dim);margin-bottom:6px}
 .datebar{display:flex;align-items:center;gap:6px}
 .datebar button{width:44px;height:44px;border:1px solid var(--mb-line);background:var(--ground);border-radius:12px;display:grid;place-items:center;cursor:pointer;flex:none}
@@ -150,10 +165,6 @@ html.embed .mb-home{display:none}
 .legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font-size:14px;color:var(--mb-soft)}
 .legend span{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
 .legend i{width:13px;height:13px;border-radius:3px;display:inline-block;border:1px solid rgba(255,255,255,.18)}
-.nudges{display:grid;grid-template-columns:1fr 1.2fr 1fr;gap:8px;margin-top:12px}
-.nudges button{min-height:46px;border-radius:12px;border:1px solid var(--mb-line);background:var(--ground);font:700 15px var(--mb-ui);cursor:pointer;padding:4px}
-.nudges button:active{background:var(--panel2)}
-.nudges #tNow{background:var(--mb-teal);border-color:var(--mb-teal);color:var(--teal-ink);font-weight:800}
 
 .lightblock h2{font-size:21px;font-weight:800;line-height:1.2;letter-spacing:-.01em;margin-top:4px}
 .lightblock .desc{margin-top:6px;color:var(--mb-soft)}
@@ -276,7 +287,11 @@ html.embed .mb-home{display:none}
   .tips li{grid-template-columns:84px 1fr}
 }
 @media (min-width:900px){
-  .grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(380px,1fr);align-items:start}
+  .grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(380px,1fr);grid-template-areas:"map dock" "map side";grid-template-rows:auto 1fr;align-items:start}
+  .mapwrap{grid-area:map}
+  .dock{grid-area:dock;position:static;box-shadow:none;padding:12px 22px 12px;border-bottom:1px solid var(--mb-line)}
+  .side{grid-area:side}
+  html{scroll-padding-top:calc(var(--top-h) + 8px)}
   .mapwrap{position:sticky;top:63px}
   #map{height:calc(100vh - 230px)}
   .side{padding:0 22px 110px}
@@ -335,6 +350,22 @@ html.embed .mb-home{display:none}
     <ul class="key" id="key" hidden></ul>
   </section>
 
+  <section class="dock" id="dock" aria-label="Day and time">
+      <div class="datebar">
+        <button id="dPrev" aria-label="Previous day" type="button"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M11 3 5 9l6 6" fill="none" stroke="#ebedef" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <input type="date" id="dPick" aria-label="Date" min="1900-01-01" max="2100-12-31">
+        <button id="dNext" aria-label="Next day" type="button"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="m7 3 6 6-6 6" fill="none" stroke="#ebedef" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button id="tNow" class="now" type="button">Now</button>
+      </div>
+      <div class="timerow">
+        <button id="tMinus" type="button" aria-label="5 minutes earlier">-5 min</button>
+        <div class="readout"><div class="clock" id="clock">0:00</div><div class="phase" id="phase"></div></div>
+        <button id="tPlus" type="button" aria-label="5 minutes later">+5 min</button>
+      </div>
+      <div class="strip" id="strip" role="slider" aria-label="Time of day" aria-valuemin="0" aria-valuemax="1440" aria-valuenow="0" tabindex="0"><canvas id="stripC"></canvas><div class="handle" id="handle"></div></div>
+      <div class="ticks" id="ticks" aria-hidden="true"></div>
+  </section>
+
   <section class="side">
     <div class="plan" id="plan" hidden></div>
 
@@ -342,7 +373,7 @@ html.embed .mb-home{display:none}
       <h2>New here? Three things.</h2>
       <ol>
         <li><b>The teal dot is where you stand.</b> Tap the map to move it, or search a place.</li>
-        <li><b>The yellow sun shows which way the sun is</b> at the time on the time bar further down. Shadows fall the other way.</li>
+        <li><b>The yellow sun shows which way the sun is</b> at the time on the time bar under the map. Shadows fall the other way.</li>
         <li><b>Orange on the bar is golden hour,</b> the warm, low light photographers chase.</li>
       </ol>
       <button class="btn go" id="introOk" type="button">Got it</button>
@@ -355,31 +386,13 @@ html.embed .mb-home{display:none}
     </section>
 
     <section class="block" id="whenBlock">
-      <div class="lbl">Time</div>
-      <div class="readout">
-        <div class="clock" id="clock">0:00</div>
-        <div class="phase" id="phase"></div>
-      </div>
-      <div class="ask" style="margin:10px 0 0">Slide the bar to change the time</div>
-      <div class="strip" id="strip" role="slider" aria-label="Time of day" aria-valuemin="0" aria-valuemax="1440" aria-valuenow="0" tabindex="0"><canvas id="stripC"></canvas><div class="handle" id="handle"></div></div>
-      <div class="ticks" id="ticks" aria-hidden="true"></div>
-      <div class="legend" aria-hidden="true">
+      <div class="lbl">Reading the time bar</div>
+      <div class="legend" style="margin-top:6px" aria-hidden="true">
         <span><i style="background:#0a1013"></i>Night</span>
         <span><i style="background:#14293f"></i>Twilight</span>
         <span><i style="background:#2f74d0"></i>Blue hour</span>
         <span><i style="background:#f4a93b"></i>Golden hour</span>
         <span><i style="background:#9cc7e3"></i>Daylight</span>
-      </div>
-      <div class="nudges">
-        <button id="tMinus" type="button">5 min earlier</button>
-        <button id="tNow" type="button">Right now</button>
-        <button id="tPlus" type="button">5 min later</button>
-      </div>
-      <div class="lbl" style="margin-top:18px">Day</div>
-      <div class="datebar" style="margin-top:6px">
-        <button id="dPrev" aria-label="Previous day" type="button"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M11 3 5 9l6 6" fill="none" stroke="#ebedef" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-        <input type="date" id="dPick" aria-label="Date" min="1900-01-01" max="2100-12-31">
-        <button id="dNext" aria-label="Next day" type="button"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="m7 3 6 6-6 6" fill="none" stroke="#ebedef" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       </div>
       <div class="dayword" id="dWord"></div>
       <div class="zone" id="zone"><span id="zoneT"></span> <button id="zoneBtn" type="button">Change</button><select id="zoneSel" aria-label="Time zone for the times shown" hidden></select></div>
@@ -438,7 +451,7 @@ turn = angle from the spin step</div></li>
   </section>
 </main>
 
-<button class="mb-ver" id="mbVer" type="button">v0.5.2 &middot; Nov 6</button>
+<button class="mb-ver" id="mbVer" type="button">v0.6 &middot; Nov 7</button>
 <div id="toast" role="status"><span id="toastT"></span><button id="toastB" hidden type="button">Undo</button></div>
 
 <div class="sheet" id="linkSheet" hidden>
@@ -795,6 +808,15 @@ if (typeof module !== 'undefined') module.exports = SUN;
   function roofM() { return S.roofFt * 0.3048; }
   function roofWord() { var st = Math.max(1, Math.round(S.roofFt / 10)); return st + (st === 1 ? ' story' : ' stories') + ' (' + fmtHeight(roofM()) + ')'; }
   function find(k) { for (var i = 0; i < EV.length; i++) if (EV[i].key === k) return EV[i]; return null; }
+  function measureBars() {
+    try {
+      var r = document.documentElement.style, top = document.querySelector('.top'), dk = $('dock');
+      if (top) r.setProperty('--top-h', top.offsetHeight + 'px');
+      var stuck = dk && getComputedStyle(dk).position === 'sticky';
+      r.setProperty('--dock-h', stuck ? dk.offsetHeight + 'px' : '0px');
+    } catch (e) {}
+  }
+  window.addEventListener('resize', measureBars); window.addEventListener('orientationchange', function () { setTimeout(measureBars, 300); });
   function scrollTop() { try { window.scrollTo({ top: 0, behavior: REDUCE ? 'auto' : 'smooth' }); } catch (e) { window.scrollTo(0, 0); } }
 
   function toast(msg, undo) {
@@ -1527,6 +1549,7 @@ if (typeof module !== 'undefined') module.exports = SUN;
   if (sharedLink && link.lat && link.lng) { if (!introDone) toast('Shared plan loaded'); introDone = true; }
   $('intro').hidden = introDone || S.mode === 'plan';
   syncHash();
+  measureBars(); setTimeout(measureBars, 400);
   var rz = 0;
   window.addEventListener('resize', function () { clearTimeout(rz); rz = setTimeout(function () { if (map) map.invalidateSize(); drawStrip(); drawTicks(); drawDial(); drawNow(); }, 120); });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { drawDial(); drawNow(); });
