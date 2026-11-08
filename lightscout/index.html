@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="build" content="0.6">
+<meta name="build" content="0.7.1">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0d1116">
 <meta name="description" content="Light Scout shows where the sun will be at any spot, any day, any time: direction, height, shadows, golden hour. Plan a shot by lining the sun up with a gap or a landmark and get the dates to be there.">
@@ -55,12 +55,6 @@ html.embed .mb-home{display:none}
 .block{padding:18px 0 4px;border-top:1px solid var(--mb-line);margin-top:14px}
 .block:first-of-type{border-top:0}
 .lbl{font-size:14px;font-weight:600;color:var(--mb-dim)}
-.intro{margin-top:14px;padding:14px 16px 16px;border-radius:4px;background:#13201f;border-left:4px solid var(--mb-teal)}
-.intro h2{font-size:18px;font-weight:800;line-height:1.25}
-.intro ol{margin-top:8px;list-style:decimal;padding-left:22px;color:var(--mb-soft);font-size:16px}
-.intro li{padding:3px 0}
-.intro li b{color:var(--mb-ink)}
-.intro .btn{margin-top:12px;min-height:44px}
 .best li{display:grid;grid-template-columns:18px 1fr;gap:12px;align-items:start;padding:10px 0;border-top:1px solid var(--mb-line)}
 .best li:first-child{border-top:0}
 .best button{display:block;width:100%;text-align:left;background:transparent;border:0;padding:0;cursor:pointer;line-height:1.35;color:inherit}
@@ -126,6 +120,28 @@ html.embed .mb-home{display:none}
 
 /* ---- panels ---- */
 .side{padding:0 12px 110px}
+#guideBtn{flex:none;width:46px;height:46px;border-radius:50%;border:1px solid var(--mb-line);background:#141b20;padding:2px;cursor:pointer}
+#guideBtn[aria-expanded="true"]{border-color:var(--mb-teal);outline:2px solid var(--mb-teal)}
+#guideBtn img,#guideBtn svg{display:block;width:100%;height:100%}
+.gart{flex:none;width:64px;height:64px}
+.gart img,.gart svg{display:block;width:100%;height:100%}
+#tour{position:fixed;inset:0;z-index:1500;touch-action:none}
+#tour .hole{position:fixed;border-radius:12px;box-shadow:0 0 0 9999px rgba(4,8,10,.72);outline:3px solid var(--mb-teal);outline-offset:2px;pointer-events:none;transition:all .25s ease}
+#tour .tcard{position:fixed;left:12px;right:12px;max-width:460px;margin:0 auto;background:#141b20;border:1px solid var(--mb-line);border-radius:16px;padding:14px;display:flex;gap:12px;align-items:flex-start;box-shadow:0 10px 30px rgba(0,0,0,.6)}
+#tour .ttext{flex:1;min-width:0}
+#tour .tcount{font-size:13px;color:var(--mb-dim)}
+#tour .tsay{font-size:16.5px;line-height:1.4;margin-top:2px}
+#tour .tbtns{display:flex;justify-content:space-between;gap:8px;margin-top:12px}
+#tour .tbtns button,#help2 .hbtns button{min-height:44px;border-radius:12px;padding:0 16px;font:700 15px var(--mb-ui);cursor:pointer;border:1px solid var(--mb-line);background:var(--ground);color:var(--mb-ink)}
+#tour .tbtns .go,#help2 .hbtns .go{background:var(--mb-teal);border-color:var(--mb-teal);color:var(--teal-ink);font-weight:800}
+#help2{position:fixed;left:12px;right:12px;top:calc(var(--top-h) + 8px);z-index:1450;max-width:480px;margin-left:auto;max-height:calc(100vh - var(--top-h) - 24px);max-height:calc(100dvh - var(--top-h) - 24px);overflow:auto;background:#141b20;border:1px solid var(--mb-line);border-radius:16px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.6)}
+#help2 .hhead{display:flex;gap:12px;align-items:center}
+#help2 h2{font-size:18px;font-weight:800;line-height:1.25;flex:1;min-width:0}
+#hX{flex:none;min-height:44px;border-radius:12px;padding:0 14px;font:700 15px var(--mb-ui);cursor:pointer;border:1px solid var(--mb-line);background:var(--ground);color:var(--mb-ink)}
+#help2 ul{margin-top:10px;padding-left:18px;list-style:disc;color:var(--mb-soft);font-size:15.5px}
+#help2 li{padding:3px 0}
+#help2 .hbtns{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+@media (prefers-reduced-motion:reduce){#tour .hole{transition:none}}
 :root{--top-h:57px;--dock-h:0px}
 html{scroll-padding-top:calc(var(--top-h) + var(--dock-h) + 8px)}
 .dock{position:sticky;top:var(--top-h);z-index:1100;background:var(--ground);padding:8px 12px 10px;border-bottom:1px solid var(--mb-line);box-shadow:0 6px 12px -8px rgba(0,0,0,.7)}
@@ -140,7 +156,7 @@ html{scroll-padding-top:calc(var(--top-h) + var(--dock-h) + 8px)}
 .dock .phase{font-size:13px;padding:0;border:0;max-width:100%;overflow:hidden;text-overflow:ellipsis}
 .dock .strip{height:44px;margin-top:6px}
 .dock .ticks{height:18px;margin-top:3px}
-@media (orientation:landscape) and (max-height:500px){.dock{position:static;box-shadow:none}html{scroll-padding-top:calc(var(--top-h) + 8px)}}
+@media (orientation:landscape) and (max-height:500px){.dock{position:static;box-shadow:none;z-index:auto}html{scroll-padding-top:calc(var(--top-h) + 8px)}}
 .ask{font-size:15px;color:var(--mb-dim);margin-bottom:6px}
 .datebar{display:flex;align-items:center;gap:6px}
 .datebar button{width:44px;height:44px;border:1px solid var(--mb-line);background:var(--ground);border-radius:12px;display:grid;place-items:center;cursor:pointer;flex:none}
@@ -206,6 +222,7 @@ html{scroll-padding-top:calc(var(--top-h) + var(--dock-h) + 8px)}
 .linkbtn{background:none;border:0;padding:12px 0;margin-top:4px;min-height:44px;color:var(--mb-teal);font:700 15px var(--mb-ui);text-decoration:underline;cursor:pointer}
 .asklabel{margin-top:16px;font-weight:800;font-size:17px;color:var(--mb-ink)}
 .choices{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+@media (max-width:360px){.choices{grid-template-columns:1fr}}
 .choices button{display:grid;grid-template-columns:44px 1fr;gap:10px;align-items:center;text-align:left;min-height:64px;padding:8px 10px;border-radius:12px;border:1px solid var(--mb-line);background:var(--mb-glass);cursor:pointer;line-height:1.2;color:inherit}
 .choices button svg{display:block}
 .choices b{display:block;font-size:15px;font-weight:800}
@@ -275,9 +292,6 @@ html{scroll-padding-top:calc(var(--top-h) + var(--dock-h) + 8px)}
 }
 @media (max-width:380px){
   html:not(.embed) .brand svg{display:none}
-  html:not(.embed) #help span{display:none}
-  html:not(.embed) #help{width:42px;padding:0;justify-content:center;font-size:18px}
-  html:not(.embed) #help::after{content:"?"}
   .mb-home{padding:7px 9px}
 }
 @media (max-width:390px){
@@ -289,7 +303,7 @@ html{scroll-padding-top:calc(var(--top-h) + var(--dock-h) + 8px)}
 @media (min-width:900px){
   .grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(380px,1fr);grid-template-areas:"map dock" "map side";grid-template-rows:auto 1fr;align-items:start}
   .mapwrap{grid-area:map}
-  .dock{grid-area:dock;position:static;box-shadow:none;padding:12px 22px 12px;border-bottom:1px solid var(--mb-line)}
+  .dock{grid-area:dock;position:static;box-shadow:none;z-index:auto;padding:12px 22px 12px;border-bottom:1px solid var(--mb-line)}
   .side{grid-area:side}
   html{scroll-padding-top:calc(var(--top-h) + 8px)}
   .mapwrap{position:sticky;top:63px}
@@ -313,7 +327,7 @@ html{scroll-padding-top:calc(var(--top-h) + var(--dock-h) + 8px)}
   </div>
   <div class="r">
     <button class="tbtn" id="share" aria-label="Share a link to this plan" type="button"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5v8M4.8 4.6 8 1.4l3.2 3.2M3 8.5v4.3a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V8.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Share</span></button>
-    <button class="tbtn" id="help" aria-label="Help and about" type="button"><span>Help</span></button>
+    <button id="guideBtn" type="button" aria-label="Help: explain this screen" aria-haspopup="dialog" aria-expanded="false"></button>
   </div>
 </header>
 
@@ -369,15 +383,6 @@ html{scroll-padding-top:calc(var(--top-h) + var(--dock-h) + 8px)}
   <section class="side">
     <div class="plan" id="plan" hidden></div>
 
-    <div class="intro" id="intro" hidden>
-      <h2>New here? Three things.</h2>
-      <ol>
-        <li><b>The teal dot is where you stand.</b> Tap the map to move it, or search a place.</li>
-        <li><b>The yellow sun shows which way the sun is</b> at the time on the time bar under the map. Shadows fall the other way.</li>
-        <li><b>Orange on the bar is golden hour,</b> the warm, low light photographers chase.</li>
-      </ol>
-      <button class="btn go" id="introOk" type="button">Got it</button>
-    </div>
 
     <section class="block" id="bestWrap">
       <h2 class="head" id="bestHead">Best light today</h2>
@@ -451,7 +456,23 @@ turn = angle from the spin step</div></li>
   </section>
 </main>
 
-<button class="mb-ver" id="mbVer" type="button">v0.6 &middot; Nov 7</button>
+<div id="tour" hidden role="dialog" aria-modal="true" aria-labelledby="tSay">
+  <div class="hole" id="tHole"></div>
+  <div class="tcard" id="tCard">
+    <div class="gart" id="tArt"></div>
+    <div class="ttext">
+      <div class="tcount" id="tCount"></div>
+      <p class="tsay" id="tSay" aria-live="polite"></p>
+      <div class="tbtns"><button id="tSkip" type="button">Skip tour</button><button id="tNext" class="go" type="button">Next</button></div>
+    </div>
+  </div>
+</div>
+<div id="help2" hidden role="dialog" aria-modal="false" aria-labelledby="hTitle">
+  <div class="hhead"><div class="gart" id="hArt"></div><h2 id="hTitle">Help</h2><button id="hX" type="button" aria-label="Close help">Close</button></div>
+  <ul id="hList"></ul>
+  <div class="hbtns"><button id="hTour" class="go" type="button">Show me the tour again</button><button id="hWords" type="button">What the words mean</button><button id="hAbout" type="button">About this tool</button><button id="hClose" type="button">Close</button></div>
+</div>
+<button class="mb-ver" id="mbVer" type="button">v0.7.1 &middot; Nov 7</button>
 <div id="toast" role="status"><span id="toastT"></span><button id="toastB" hidden type="button">Undo</button></div>
 
 <div class="sheet" id="linkSheet" hidden>
@@ -823,6 +844,7 @@ if (typeof module !== 'undefined') module.exports = SUN;
     $('toastT').textContent = msg;
     $('toastB').hidden = !undo;
     $('toastB').onclick = undo ? function () { undo(); hideToast(); } : null;
+    try { var dk = $('dock').getBoundingClientRect(), ih = window.innerHeight; $('toast').style.bottom = (dk.top < ih && dk.bottom > ih - 110) ? (ih - dk.top + 10) + 'px' : ''; } catch (e) {}
     $('toast').classList.add('show');
     clearTimeout(toastTimer);
     toastTimer = setTimeout(hideToast, undo ? 5000 : 2600);
@@ -1036,7 +1058,7 @@ if (typeof module !== 'undefined') module.exports = SUN;
   /* ---------- what is drawn over the map ---------- */
   var R = 140, gStatic, gSun, gLine, dialLabels = [];
   function polar(az, r) { var a = az * Math.PI / 180; return [r * Math.sin(a), -r * Math.cos(a)]; }
-  function pinDot(parent) { sv('circle', { cx: 0, cy: 0, r: 7, fill: '#4cf0e0', stroke: '#ffffff', 'stroke-width': 2.5 }, parent); }
+  function pinDot(parent) { sv('circle', { cx: 0, cy: 0, r: 7, fill: '#4cf0e0', stroke: '#ffffff', 'stroke-width': 2.5, 'data-tour': 'pin' }, parent); }
 
   function drawDial() {
     var box = $('dial').getBoundingClientRect();
@@ -1075,7 +1097,7 @@ if (typeof module !== 'undefined') module.exports = SUN;
   }
 
   function sunGlyph(parent, x, y, up) {
-    sv('circle', { cx: x, cy: y, r: 22, fill: '#0a0e12', 'fill-opacity': 0.4 }, parent);
+    sv('circle', { cx: x, cy: y, r: 22, fill: '#0a0e12', 'fill-opacity': 0.4, 'data-tour': parent === gSun ? 'sun' : 'key' }, parent);
     if (up) for (var k = 0; k < 8; k++) { var a = polar(k * 45, 14), b = polar(k * 45, 19.5); sv('line', { x1: x + a[0], y1: y + a[1], x2: x + b[0], y2: y + b[1], stroke: '#ffd76a', 'stroke-width': 2.6, 'stroke-linecap': 'round' }, parent); }
     sv('circle', { cx: x, cy: y, r: 10, fill: up ? '#ffd76a' : '#0a0e12', stroke: up ? '#ffffff' : '#c9a24d', 'stroke-width': 2, 'stroke-dasharray': up ? 'none' : '3 3' }, parent);
   }
@@ -1303,9 +1325,12 @@ if (typeof module !== 'undefined') module.exports = SUN;
     if (kind === 'any') { disc(22, 8, 3.5); disc(22, 19, 3.5); disc(22, 30, 3.5); sv('path', { d: 'M3 37h38', stroke: ground, 'stroke-width': 2 }, g); }
   }
   function drawPlan() {
+    if (!$('help2').hidden) setTimeout(openHelp, 0);
     var on = S.mode === 'plan', box = $('plan'), i;
     box.hidden = !on;
-    $('dayWrap').hidden = on; $('bestWrap').hidden = on; $('intro').hidden = on || introDone;
+    $('dayWrap').hidden = on; $('bestWrap').hidden = on;
+    if (!on && !tourDone && !tourOpen && wantTour) setTimeout(startTour, 400);
+    if (!$('help2').hidden) openHelp();
     var ms = $('modes').querySelectorAll('button');
     for (i = 0; i < ms.length; i++) ms[i].classList.toggle('on', ms[i].getAttribute('data-mode') === S.mode);
     drawHint();
@@ -1446,7 +1471,7 @@ if (typeof module !== 'undefined') module.exports = SUN;
 
   /* ---------- map ---------- */
   function initMap() {
-    if (typeof L === 'undefined') { var li0 = $('intro').querySelector('li'); if (li0) { li0.textContent = ' Search a place or use your location.'; li0.insertBefore(h('b', '', 'Your spot is where you search.'), li0.firstChild); } $('mapmsg').hidden = false; $('layers').hidden = true; $('modes').hidden = true; $('keyBtn').hidden = true; S.mode = 'see'; return; }
+    if (typeof L === 'undefined') { $('mapmsg').hidden = false; $('layers').hidden = true; $('modes').hidden = true; $('keyBtn').hidden = true; S.mode = 'see'; return; }
     map = L.map('map', { center: [S.lat, S.lng], zoom: S.zoom, zoomControl: false, doubleClickZoom: false, worldCopyJump: true });
     L.control.zoom({ position: 'bottomright' }).addTo(map);
     ['street', 'sat'].forEach(function (k) {
@@ -1521,11 +1546,124 @@ if (typeof module !== 'undefined') module.exports = SUN;
     $('sheet').hidden = true; document.body.style.overflow = '';
     if (lastFocus && lastFocus.focus) try { lastFocus.focus(); } catch (e) {}
   }
-  var introDone = false; try { introDone = storeOK && localStorage.getItem(SEEN) === '1'; } catch (e) {}
-  $('introOk').addEventListener('click', function () {
-    introDone = true; $('intro').hidden = true;
-    try { if (storeOK) localStorage.setItem(SEEN, '1'); } catch (e) {}
+/* ---------- the guide: stand-in art, first-visit tour, screen help ---------- */
+  var TOUR_KEY = 'lightscout_tour', tourEndedAt = 0, tourDone = false, tourOpen = false, wantTour = !sharedLink, tourSteps = [], tourAt = 0, artFail = {};
+  try { tourDone = storeOK && localStorage.getItem(TOUR_KEY) === 'done'; } catch (e) {}
+  function standInSVG(pose) {      /* a brass sundial with two eyes; Mot's guide-<pose>.png files replace it */
+    var ticks = '', arm = '', ey = pose === 'think' ? 61 : 64, ex = pose === 'think' ? 2 : 0;
+    for (var k = 0; k < 12; k++) { var a = k * Math.PI / 6, x1 = 50 + 27 * Math.sin(a), y1 = 58 - 27 * Math.cos(a), x2 = 50 + 31 * Math.sin(a), y2 = 58 - 31 * Math.cos(a); ticks += '<line x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + x2.toFixed(1) + '" y2="' + y2.toFixed(1) + '" stroke="#7a5b1e" stroke-width="2" stroke-linecap="round"/>'; }
+    if (pose === 'wave') arm = '<path d="M82 60 Q90 52 92 40" fill="none" stroke="#7a5b1e" stroke-width="5" stroke-linecap="round"/><circle cx="92" cy="37" r="5" fill="#c9a24d" stroke="#7a5b1e" stroke-width="3"/>';
+    if (pose === 'point') arm = '<path d="M83 62 L95 58" fill="none" stroke="#7a5b1e" stroke-width="5" stroke-linecap="round"/><path d="M93 53 L99 58 L93 63" fill="none" stroke="#7a5b1e" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>';
+    if (pose === 'think') arm = '<path d="M80 76 Q72 84 64 82" fill="none" stroke="#7a5b1e" stroke-width="5" stroke-linecap="round"/>';
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">' +
+      '<circle cx="50" cy="58" r="34" fill="#c9a24d" stroke="#7a5b1e" stroke-width="4"/>' +
+      '<circle cx="50" cy="58" r="25" fill="none" stroke="#e8cc85" stroke-width="1.5"/>' + ticks +
+      '<path d="M50 58 L50 16 L69 58 Z" fill="#e8cc85" stroke="#7a5b1e" stroke-width="3" stroke-linejoin="round"/>' +
+      '<circle cx="' + (41 + ex) + '" cy="' + ey + '" r="4.2" fill="#1b1206"/><circle cx="' + (59 + ex) + '" cy="' + ey + '" r="4.2" fill="#1b1206"/>' + arm + '</svg>';
+  }
+  function guideArt(box, pose) {
+    box.textContent = '';
+    function inline() { box.textContent = ''; try { var d = new DOMParser().parseFromString(standInSVG(pose), 'image/svg+xml'); box.appendChild(document.importNode(d.documentElement, true)); } catch (e) {} }
+    if (artFail[pose]) { inline(); return; }
+    var img = new Image(); img.alt = ''; img.decoding = 'async';
+    img.onerror = function () { artFail[pose] = true; inline(); };
+    img.src = 'guide-' + pose + '.png'; box.appendChild(img);
+  }
+  function overlaps(a, b) { if (!a || !b) return false; var r = a.getBoundingClientRect(), q = b.getBoundingClientRect(); return q.width > 0 && r.left < q.right && r.right > q.left && r.top < q.bottom && r.bottom > q.top; }
+  function visible(el) { if (!el) return false; var r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0; }
+  var STEPS = [
+    { pose: 'wave', top: true, el: function () { return map && document.querySelector('#dialG [data-tour="pin"]'); }, say: 'Hi. I will show you around in seven quick steps. This dot is where you stand. Tap anywhere on the map to move it, or search for a place.' },
+    { pose: 'point', top: true, el: function () { if (!map) return null; var sn = document.querySelector('#dialG [data-tour="sun"]'); if (!sn || overlaps(sn, $('locate')) || overlaps(sn, $('layers'))) return $('dial'); return sn; }, say: 'The sun symbol shows which way the sun is from your spot. Shadows fall the opposite way.' },
+    { pose: 'point', top: 'nearest', el: function () { return $('strip'); }, also: function () { return $('ticks'); }, say: 'Slide this to change the time. The sun on the map moves as you slide. Orange is golden hour, the warm, soft light photographers chase. Blue is blue hour.' },
+    { pose: 'point', top: 'nearest', el: function () { return $('dock').querySelector('.datebar'); }, say: 'Pick any day here. The whole page updates for that date. Now jumps back to the current time.' },
+    { pose: 'point', top: false, el: function () { return $('bestWrap'); }, say: 'This is the best light for the day you picked. Tap one to jump straight to it.' },
+    { pose: 'point', top: true, el: function () { return map && $('modes'); }, say: 'Want the sun lined up with a gap or a building? Plan a shot finds the days and times.' },
+    { pose: 'idle', top: false, el: function () { return $('guideBtn'); }, say: 'I live up here. Tap me any time and I will explain what is on the screen.' }
+  ];
+  function startTour() {
+    if (tourOpen || S.mode !== 'see') return;
+    if (!$('sheet').hidden) closeSheet();
+    closeHelp();
+    tourSteps = STEPS.filter(function (st) { var el = st.el(); return el && (el === $('guideBtn') || el.getClientRects().length); });
+    if (!tourSteps.length) return;
+    tourOpen = true; tourAt = 0; $('tour').hidden = false; showStep();
+  }
+  function showStep() {
+    var st = tourSteps[tourAt];
+    if (st.top === true) { try { window.scrollTo(0, 0); var rt = st.el().getBoundingClientRect(); if (rt.bottom > window.innerHeight - 8) window.scrollBy(0, rt.bottom - window.innerHeight + 24); } catch (e) {} }
+    else if (st.top === 'nearest') { try { window.scrollTo(0, 0); var r0 = (st.also ? st.also() : st.el()).getBoundingClientRect(); if (r0.bottom > window.innerHeight - 8) window.scrollBy(0, r0.bottom - window.innerHeight + 16); } catch (e) {} }
+    else if (st.el() !== $('guideBtn')) { try { st.el().scrollIntoView({ block: 'center' }); } catch (e) {} }
+    guideArt($('tArt'), st.pose);
+    $('tCount').textContent = 'Step ' + (tourAt + 1) + ' of ' + tourSteps.length;
+    $('tSay').textContent = st.say;
+    $('tNext').textContent = tourAt === tourSteps.length - 1 ? 'Done' : 'Next';
+    setTimeout(placeStep, 90);
+    try { $('tNext').focus({ preventScroll: true }); } catch (e) {}
+  }
+  function placeStep() {
+    if (!tourOpen) return;
+    var st = tourSteps[tourAt], el = st.el(); if (!visible(el)) { $('tHole').style.width = '0px'; return; }
+    var r = el.getBoundingClientRect(), pad = 8, vw = window.innerWidth, vh = window.innerHeight;
+    if (st.also) { var r2 = st.also().getBoundingClientRect(); if (r2.height) r = { left: Math.min(r.left, r2.left), right: Math.max(r.right, r2.right), top: Math.min(r.top, r2.top), bottom: Math.max(r.bottom, r2.bottom), width: Math.max(r.right, r2.right) - Math.min(r.left, r2.left), height: Math.max(r.bottom, r2.bottom) - Math.min(r.top, r2.top) }; }
+    var w = Math.max(r.width + pad * 2, 52), hgt = Math.max(r.height + pad * 2, 52);
+    var left = r.left + r.width / 2 - w / 2, top = r.top + r.height / 2 - hgt / 2;
+    left = Math.max(4, Math.min(vw - w - 4, left)); hgt = Math.min(hgt, vh * 0.55);
+    var hole = $('tHole'); hole.style.left = left + 'px'; hole.style.top = top + 'px'; hole.style.width = Math.min(w, vw - 8) + 'px'; hole.style.height = hgt + 'px';
+    var card = $('tCard'), ch = card.offsetHeight, below = vh - (top + hgt), y;
+    if (below >= ch + 20) y = top + hgt + 12;
+    else if (top >= ch + 20) y = top - ch - 12;
+    else { y = vh - ch - 12; var room = y - 12 - top; if (room >= 52) { hgt = room; hole.style.height = hgt + 'px'; } else { top = Math.max(4, y - 64); hole.style.top = top + 'px'; hole.style.height = '52px'; } }
+    card.style.top = Math.max(8, Math.min(vh - ch - 8, y)) + 'px';
+  }
+  function endTour(write) {
+    if (!tourOpen) return;
+    tourOpen = false; $('tour').hidden = true; tourDone = true; tourEndedAt = Date.now();
+    if (write) try { if (storeOK) localStorage.setItem(TOUR_KEY, 'done'); } catch (e) {}
+    try { $('guideBtn').focus({ preventScroll: true }); } catch (e) {}
+  }
+  $('tNext').addEventListener('click', function () { if (tourAt >= tourSteps.length - 1) { endTour(true); return; } tourAt++; showStep(); });
+  $('tSkip').addEventListener('click', function () { endTour(true); });
+  document.addEventListener('click', function (ev) { if (Date.now() - tourEndedAt < 350 && !ev.target.closest('#tour')) { ev.stopPropagation(); ev.preventDefault(); } }, true);
+  $('tour').addEventListener('keydown', function (ev) {
+    if (ev.key !== 'Tab') return; ev.preventDefault();
+    (document.activeElement === $('tNext') ? $('tSkip') : $('tNext')).focus();
   });
+  window.addEventListener('resize', function () { if (tourOpen) setTimeout(placeStep, 120); });
+  window.addEventListener('scroll', function () { if (tourOpen) placeStep(); }, { passive: true });
+
+  var HELP = {
+    see: ['What you are looking at', [
+      'The teal dot is your spot. Tap the map to move it, or search for a place above the map.',
+      'The sun symbol shows which way the sun is at the time on the time bar. The curved line is its path across the whole day. Shadows fall the opposite way.',
+      'Slide the time bar to change the time. Orange is golden hour, blue is blue hour, light blue is plain daylight.',
+      'Best light lists the golden hours for the day you picked. Tap one and the map jumps to that time.',
+      'Plan a shot, at the top, finds the days the sun lines up with a gap or a building.']],
+    1: ['Plan a shot, step 1', [
+      'Tap the map where you will stand with the camera.',
+      'You can move it later with the Move buttons at the end of the plan.']],
+    2: ['Plan a shot, step 2', [
+      'Tap the thing the sun should line up with: a gap between buildings, a tower, a tree.',
+      'The line between your two taps is your line of sight. The sun has to land on it.']],
+    3: ['Plan a shot, step 3', [
+      'Pick how the sun should look in the picture. Each choice is a height in the sky.',
+      'Your next chance is the next day and time the sun sits on your line at that height. Add it to your calendar so you do not miss it.',
+      'Below that, tap a group of dates to see every day it lines up in the next 12 months.',
+      'The tool cannot see hills or trees. If something tall is in the way, the real moment can be a little earlier or later.']]
+  };
+  function openHelp() {
+    var key = S.mode === 'plan' ? (S.step || 1) : 'see', hp = HELP[key] || HELP.see, ul = $('hList');
+    $('hTitle').textContent = hp[0]; ul.textContent = '';
+    hp[1].forEach(function (t) { ul.appendChild(h('li', '', t)); });
+    guideArt($('hArt'), 'think');
+    $('help2').hidden = false; $('guideBtn').setAttribute('aria-expanded', 'true');
+  }
+  function closeHelp() { if ($('help2').hidden) return; $('help2').hidden = true; $('guideBtn').setAttribute('aria-expanded', 'false'); }
+  $('guideBtn').addEventListener('click', function () { if (tourOpen) return; if ($('help2').hidden) openHelp(); else closeHelp(); });
+  $('hClose').addEventListener('click', function () { closeHelp(); try { $('guideBtn').focus(); } catch (e) {} });
+  $('hX').addEventListener('click', function () { closeHelp(); try { $('guideBtn').focus(); } catch (e) {} });
+  $('hWords').addEventListener('click', function () { closeHelp(); openSheet(true); });
+  $('hAbout').addEventListener('click', function () { closeHelp(); openSheet(false); });
+  $('hTour').addEventListener('click', function () { closeHelp(); if (S.mode === 'plan' && map) setMode('see'); startTour(); });
   $('wordsBtn').addEventListener('click', function () { openSheet(true); });
   var measured = false;
   function sizeLine(bytes) { $('aboutSize').textContent = 'This whole tool is one file, ' + Math.round(bytes / 1024) + ' KB, plus the map library it borrows.'; }
@@ -1535,10 +1673,9 @@ if (typeof module !== 'undefined') module.exports = SUN;
     measured = true;
     fetch(location.pathname, { cache: 'no-store' }).then(function (r) { return r.blob(); }).then(function (b) { sizeLine(b.size); }).catch(function () {});
   }
-  $('help').addEventListener('click', function () { openSheet(false); });
   $('shClose').addEventListener('click', closeSheet);
   $('sheet').addEventListener('click', function (ev) { if (ev.target === this) closeSheet(); });
-  document.addEventListener('keydown', function (ev) { if (ev.key !== 'Escape') return; if (!$('sheet').hidden) closeSheet(); if (!$('linkSheet').hidden) { $('linkSheet').hidden = true; document.body.style.overflow = ''; } });
+  document.addEventListener('keydown', function (ev) { if (ev.key !== 'Escape') return; if (tourOpen) { endTour(true); return; } if (!$('help2').hidden) closeHelp(); if (!$('sheet').hidden) closeSheet(); if (!$('linkSheet').hidden) { $('linkSheet').hidden = true; document.body.style.overflow = ''; } });
 
   /* ---------- version badge ---------- */
   $('mbVer').addEventListener('click', function () { toast('v' + BUILD + ' loaded'); });
@@ -1546,12 +1683,13 @@ if (typeof module !== 'undefined') module.exports = SUN;
   /* ---------- go ---------- */
   initMap();
   rebuild(); drawKey();
-  if (sharedLink && link.lat && link.lng) { if (!introDone) toast('Shared plan loaded'); introDone = true; }
-  $('intro').hidden = introDone || S.mode === 'plan';
+  if (sharedLink && link.lat && link.lng) { toast('Shared plan loaded'); wantTour = false; }
+  guideArt($('guideBtn'), 'idle');
+  if (wantTour && !tourDone && S.mode === 'see') setTimeout(startTour, 700);
   syncHash();
   measureBars(); setTimeout(measureBars, 400);
   var rz = 0;
-  window.addEventListener('resize', function () { clearTimeout(rz); rz = setTimeout(function () { if (map) map.invalidateSize(); drawStrip(); drawTicks(); drawDial(); drawNow(); }, 120); });
+  window.addEventListener('resize', function () { clearTimeout(rz); rz = setTimeout(function () { if (map) map.invalidateSize(); drawStrip(); drawTicks(); drawDial(); drawNow(); measureBars(); if (tourOpen) placeStep(); }, 120); });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { drawDial(); drawNow(); });
 
   /* ---------- version buster: if the deployed file is newer than this cached one, reload onto it ---------- */
