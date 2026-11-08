@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="build" content="0.7.1">
+<meta name="build" content="0.7.3">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0d1116">
 <meta name="description" content="Light Scout shows where the sun will be at any spot, any day, any time: direction, height, shadows, golden hour. Plan a shot by lining the sun up with a gap or a landmark and get the dates to be there.">
@@ -472,7 +472,7 @@ turn = angle from the spin step</div></li>
   <ul id="hList"></ul>
   <div class="hbtns"><button id="hTour" class="go" type="button">Show me the tour again</button><button id="hWords" type="button">What the words mean</button><button id="hAbout" type="button">About this tool</button><button id="hClose" type="button">Close</button></div>
 </div>
-<button class="mb-ver" id="mbVer" type="button">v0.7.1 &middot; Nov 7</button>
+<button class="mb-ver" id="mbVer" type="button">v0.7.3 &middot; Nov 8</button>
 <div id="toast" role="status"><span id="toastT"></span><button id="toastB" hidden type="button">Undo</button></div>
 
 <div class="sheet" id="linkSheet" hidden>
@@ -1393,7 +1393,7 @@ if (typeof module !== 'undefined') module.exports = SUN;
       stp.appendChild(minus); stp.appendChild(out); stp.appendChild(plus);
       roof.appendChild(h('span', 'lbl', 'Buildings beside the gap are about')); roof.appendChild(stp); box.appendChild(roof);
       maxEl = maxElForRoof(dist);
-      box.appendChild(h('p', 'choicenote', 'From ' + fmtLen(dist) + ' away, a ' + fmtHeight(roofM()) + ' roof is ' + maxEl.toFixed(1) + ' degrees up, so the sun has to be lower than that.'));
+      box.appendChild(h('p', 'choicenote', 'From ' + fmtLen(dist) + ' away, ' + (/^(8\d*|1[18](\d{3})?)$/.test(fmtHeight(roofM()).split(' ')[0].replace(/\D/g, '')) ? 'an ' : 'a ') + fmtHeight(roofM()) + ' roof is ' + maxEl.toFixed(1) + ' degrees up, so the sun has to be lower than that.'));
     } else { minEl = BANDS[S.band][0]; maxEl = BANDS[S.band][1]; }
 
     var w = wall(S.tz, Date.now()), key = [S.lat, S.lng, S.tLat, S.tLng, S.tz, w.y, w.m, w.d].join('|');
@@ -1549,7 +1549,7 @@ if (typeof module !== 'undefined') module.exports = SUN;
 /* ---------- the guide: stand-in art, first-visit tour, screen help ---------- */
   var TOUR_KEY = 'lightscout_tour', tourEndedAt = 0, tourDone = false, tourOpen = false, wantTour = !sharedLink, tourSteps = [], tourAt = 0, artFail = {};
   try { tourDone = storeOK && localStorage.getItem(TOUR_KEY) === 'done'; } catch (e) {}
-  function standInSVG(pose) {      /* a brass sundial with two eyes; Mot's guide-<pose>.png files replace it */
+  function standInSVG(pose) {      /* drawn fallback, used only if a guide-<pose>.png file is missing (Mot's art is the compass guide) */
     var ticks = '', arm = '', ey = pose === 'think' ? 61 : 64, ex = pose === 'think' ? 2 : 0;
     for (var k = 0; k < 12; k++) { var a = k * Math.PI / 6, x1 = 50 + 27 * Math.sin(a), y1 = 58 - 27 * Math.cos(a), x2 = 50 + 31 * Math.sin(a), y2 = 58 - 31 * Math.cos(a); ticks += '<line x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + x2.toFixed(1) + '" y2="' + y2.toFixed(1) + '" stroke="#7a5b1e" stroke-width="2" stroke-linecap="round"/>'; }
     if (pose === 'wave') arm = '<path d="M82 60 Q90 52 92 40" fill="none" stroke="#7a5b1e" stroke-width="5" stroke-linecap="round"/><circle cx="92" cy="37" r="5" fill="#c9a24d" stroke="#7a5b1e" stroke-width="3"/>';
