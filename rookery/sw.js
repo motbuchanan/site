@@ -1,5 +1,5 @@
 /* Rookery service worker — offline cache for the checklist */
-const CACHE = 'rookery-v1.5';
+const CACHE = 'rookery-v1.6';
 const ASSETS = ['./', './index.html', './manifest.webmanifest'];
 
 self.addEventListener('install', (e) => {

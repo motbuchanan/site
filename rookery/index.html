@@ -130,6 +130,11 @@
   .gstep b{color:var(--forest);}
   .gapfoot{text-align:center; font-size:12.5px; color:var(--muted); padding:18px 16px 8px; line-height:1.5;}
   .gapfoot a{color:var(--forest); font-weight:700;}
+  .installbar{display:flex; align-items:center; gap:8px; background:var(--forest-lite); border:1px solid #cfe0d9; border-radius:12px; margin:14px 12px 0; padding:9px 10px 9px 12px;}
+  .ib-btn{flex:1; display:flex; align-items:center; gap:9px; background:var(--forest); color:#fff; border:none; border-radius:9px; padding:11px 12px; font-size:14px; font-weight:700; cursor:pointer; text-align:left;}
+  .ib-icon{font-size:15px;}
+  .ib-x{flex:none; width:34px; height:34px; border:none; background:transparent; color:var(--muted); font-size:22px; line-height:1; cursor:pointer; border-radius:8px;}
+  .ib-x:active{background:#d9e6e0;}
   .sheet p{font-size:13px; color:var(--muted); margin:0 0 12px;}
   label.fl{display:block; font-size:12px; font-weight:700; color:var(--ink); margin:12px 0 5px;}
   input.fi, textarea.fi{width:100%; border:1px solid var(--line); border-radius:10px; padding:11px; font-size:15px; background:#fff; color:var(--ink); font-family:inherit;}
@@ -159,7 +164,7 @@
     <h1 id="hTitle">Rookery</h1>
     <div style="display:flex;align-items:center;gap:7px;">
       <button class="ver" id="helpBtn" aria-label="How to use">? Guide</button>
-      <button class="ver" id="verBtn">v1.5 · Nov 8</button>
+      <button class="ver" id="verBtn">v1.6 · Nov 8</button>
     </div>
   </div>
   <div class="sub" id="hSub">Your Hallmark Beauty of Birds collection. Tap a bird's name to look it up.</div>
@@ -171,6 +176,7 @@
 </header>
 
 <main>
+  <div id="installBar" class="installbar" hidden><button id="installBtn" class="ib-btn"><span class="ib-icon">⬇</span><span class="ib-label">Install Rookery on your phone</span></button><button id="installX" class="ib-x" aria-label="Dismiss">×</button></div>
   <div class="view active" id="view-collection"></div>
   <div class="view" id="view-money"></div>
 </main>
@@ -779,7 +785,7 @@ document.getElementById("nav-money").onclick=()=>switchView("money");
 
 let toastTimer=null;
 function toast(msg){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove("show"),1700); }
-document.getElementById("verBtn").onclick=()=>toast("Rookery v1.5 · Beauty of Birds tracker · Nov 8 2026");
+document.getElementById("verBtn").onclick=()=>toast("Rookery v1.6 · Beauty of Birds tracker · Nov 8 2026");
 
 /* ===================== NEW-USER GUIDE ===================== */
 const GUIDE_KEY = "bob_public_guide_seen";
@@ -805,6 +811,41 @@ loadState();
 renderAll();
 applyIncomingSync();
 if('serviceWorker' in navigator){ window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); }); }
+
+/* ===================== INSTALL PROMPT ===================== */
+(function(){
+  var bar=document.getElementById("installBar");
+  var btn=document.getElementById("installBtn");
+  var xb=document.getElementById("installX");
+  var deferred=null;
+  function standalone(){ try{ return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone===true; }catch(e){ return false; } }
+  function dismissed(){ try{ return localStorage.getItem("rookery_install_dismiss")==="1"; }catch(e){ return false; } }
+  function isIOS(){ return /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream; }
+  function show(label){ if(standalone()||dismissed()) return; bar.querySelector(".ib-label").textContent=label; bar.hidden=false; }
+  window.addEventListener("beforeinstallprompt", function(e){ e.preventDefault(); deferred=e; show("Install Rookery on your phone"); });
+  if(isIOS() && !standalone() && !dismissed()){ show("Add Rookery to your home screen"); }
+  btn.addEventListener("click", function(){
+    if(deferred){ deferred.prompt(); deferred.userChoice.then(function(){ deferred=null; bar.hidden=true; }); }
+    else if(isIOS()){
+      openSheet('<h2>Keep Rookery on your phone</h2>'+
+        '<p>Safari does not have an install button, but you can add Rookery to your home screen in two taps:</p>'+
+        '<div class="guide">'+
+        '<div class="gstep"><b>1.</b> Tap the Share button at the bottom of Safari (the square with an arrow pointing up).</div>'+
+        '<div class="gstep"><b>2.</b> Scroll down and tap <b>Add to Home Screen</b>, then Add.</div>'+
+        '</div>'+
+        '<p style="font-size:11.5px;margin-top:10px;">It opens full screen after that and works offline.</p>'+
+        '<div class="sheetbtns"><button class="btn primary" id="iosOk">Got it</button></div>');
+      document.getElementById("iosOk").onclick=closeSheet;
+    } else {
+      openSheet('<h2>Keep Rookery on your phone</h2>'+
+        '<p>In your browser menu, choose <b>Install app</b> or <b>Add to Home screen</b>. It opens full screen and works offline.</p>'+
+        '<div class="sheetbtns"><button class="btn primary" id="genOk">Got it</button></div>');
+      document.getElementById("genOk").onclick=closeSheet;
+    }
+  });
+  xb.addEventListener("click", function(){ bar.hidden=true; try{ localStorage.setItem("rookery_install_dismiss","1"); }catch(e){} });
+  window.addEventListener("appinstalled", function(){ bar.hidden=true; });
+})();
 // First visit: show the guide once (unless a sync link is being applied)
 try{
   if(!localStorage.getItem(GUIDE_KEY) && location.hash.indexOf("#c=")!==0){ showGuide(); }
