@@ -125,6 +125,8 @@
   .guide{margin-top:6px;}
   .gstep{font-size:13px; color:var(--ink); padding:9px 11px; margin-bottom:7px; background:#fff; border:1px solid var(--line); border-left:3px solid var(--forest); border-radius:9px;}
   .gstep b{color:var(--forest);}
+  .gapfoot{text-align:center; font-size:12.5px; color:var(--muted); padding:18px 16px 8px; line-height:1.5;}
+  .gapfoot a{color:var(--forest); font-weight:700;}
   .sheet p{font-size:13px; color:var(--muted); margin:0 0 12px;}
   label.fl{display:block; font-size:12px; font-weight:700; color:var(--ink); margin:12px 0 5px;}
   input.fi, textarea.fi{width:100%; border:1px solid var(--line); border-radius:10px; padding:11px; font-size:15px; background:#fff; color:var(--ink); font-family:inherit;}
@@ -154,7 +156,7 @@
     <h1 id="hTitle">Rookery</h1>
     <div style="display:flex;align-items:center;gap:7px;">
       <button class="ver" id="helpBtn" aria-label="How to use">? Guide</button>
-      <button class="ver" id="verBtn">v1.3 · Nov 8</button>
+      <button class="ver" id="verBtn">v1.4 · Nov 8</button>
     </div>
   </div>
   <div class="sub" id="hSub">Your Hallmark Beauty of Birds collection. Tap a bird's name to look it up.</div>
@@ -458,6 +460,16 @@ function renderCollection(){
     el.appendChild(rows);
     vCollection.appendChild(el);
   });
+  const foot = document.createElement("div");
+  foot.className = "gapfoot";
+  foot.innerHTML = 'Spot a bird that is missing, or a year that looks wrong? '+
+    '<a href="'+gapMailto()+'">Tell me and I will fix it</a>.';
+  vCollection.appendChild(foot);
+}
+function gapMailto(){
+  const subject = "Rookery: a missing bird or a gap";
+  const body = "What bird or edition is missing (or what looks wrong):\n\nYear / series if you know it:\n\nAnything else you would want the tracker to do:\n";
+  return "mailto:motbuchanan@gmail.com?subject="+encodeURIComponent(subject)+"&body="+encodeURIComponent(body);
 }
 
 /* ===================== RENDER: MONEY ===================== */
@@ -758,7 +770,7 @@ document.getElementById("nav-money").onclick=()=>switchView("money");
 
 let toastTimer=null;
 function toast(msg){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove("show"),1700); }
-document.getElementById("verBtn").onclick=()=>toast("Rookery v1.3 · Beauty of Birds tracker · Nov 8 2026");
+document.getElementById("verBtn").onclick=()=>toast("Rookery v1.4 · Beauty of Birds tracker · Nov 8 2026");
 
 /* ===================== NEW-USER GUIDE ===================== */
 const GUIDE_KEY = "bob_public_guide_seen";
@@ -773,7 +785,7 @@ function showGuide(){
       '<div class="gstep"><b>Money tab (optional).</b> If you buy and resell to fund your collecting, it tracks a simple wallet: add what you spend on lots, log what your doubles sell for, and see whether sales are covering your buying.</div>'+
       '<div class="gstep"><b>Keep it safe.</b> On the Money tab, <b>Backup</b> saves your data to paste onto another device, and <b>Share my list</b> makes a link that copies your checkmarks to someone else.</div>'+
     '</div>'+
-    '<p style="font-size:11.5px;margin-top:10px;">Hallmark releases a new bird each year, plus companions, miniatures and special editions. New ones get added here as they come out.</p>'+
+    '<p style="font-size:11.5px;margin-top:10px;">Hallmark releases a new bird each year, plus companions, miniatures and special editions. New ones get added here as they come out. Spot one missing? There is a link at the bottom of the list to tell me.</p>'+
     '<div class="sheetbtns"><button class="btn primary" id="guideClose">Start collecting</button></div>'
   );
   document.getElementById("guideClose").onclick=()=>{ closeSheet(); try{ localStorage.setItem(GUIDE_KEY,"1"); }catch(e){} };
