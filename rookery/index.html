@@ -164,7 +164,7 @@
     <h1 id="hTitle">Rookery</h1>
     <div style="display:flex;align-items:center;gap:7px;">
       <button class="ver" id="helpBtn" aria-label="How to use">? Guide</button>
-      <button class="ver" id="verBtn">v1.7 · Nov 8</button>
+      <button class="ver" id="verBtn">v1.8 · Nov 8</button>
     </div>
   </div>
   <div class="sub" id="hSub">Your Hallmark Beauty of Birds collection. Tap a bird's name to look it up.</div>
@@ -293,15 +293,24 @@ const DATA = {
   },
   comp: {
     title: "Complementary & Seasonal Keepsakes",
-    note: "Other bird Keepsakes collectors pair with the series (suggested by the community). Not part of the numbered Beauty of Birds line.",
+    note: "Bird Keepsakes outside the numbered series that collectors pair with Beauty of Birds: premium and club birds, mystery reveals, and seasonal pieces.",
     warn: false,
     birds: [
+      {id:"comp-flamingo", name:"Fancy Flamingo", meta:"2021 · premium"},
+      {id:"comp-mute-swan", name:"Mute Swan", meta:"2024 · premium"},
+      {id:"comp-stunning-swan", name:"Stunning Swan", meta:"2018 · premium"},
+      {id:"comp-stunning-swallow", name:"Stunning Swallow", meta:"premium Keepsake"},
+      {id:"comp-pretty-parrot", name:"Pretty Parrot", meta:"2018 · Ornament Club"},
+      {id:"comp-parakeet", name:"Indian Ring-Necked Parakeet", meta:"2022 · Ornament Club"},
+      {id:"comp-fruit-dove", name:"Fruit Dove", meta:"2025 · Ornament Club"},
+      {id:"comp-toucan", name:"Toucan", meta:"2023"},
+      {id:"comp-lovebirds", name:"Love Birds", meta:"2026"},
+      {id:"comp-cockatiel", name:"Clever Cockatiel Surprise", meta:"2020 · mystery reveal"},
       {id:"comp-raven", name:"Ravishing Raven", meta:"2017 · Halloween"},
       {id:"comp-owl", name:"Happy “Owl”oween", meta:"2016 · Halloween"},
-      {id:"comp-flamingo", name:"Fancy Flamingo", meta:"2021"},
-      {id:"comp-toucan", name:"Toucan", meta:"2023"},
-      {id:"comp-swan", name:"Mute Swan", meta:"2024"},
-      {id:"comp-lovebirds", name:"Love Birds", meta:"2026"}
+      {id:"comp-vulture", name:"Spooky Vulture", meta:"2021 · Halloween · QFO5302"},
+      {id:"comp-stately-raven", name:"Stately Little Raven", meta:"2019 · Halloween mini"},
+      {id:"comp-wee-owl", name:"Wee Little Owl", meta:"2017 · Halloween mini"}
     ]
   }
 };
@@ -806,7 +815,7 @@ document.getElementById("nav-money").onclick=()=>switchView("money");
 
 let toastTimer=null;
 function toast(msg){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove("show"),1700); }
-document.getElementById("verBtn").onclick=()=>toast("Rookery v1.7 · Beauty of Birds tracker · Nov 8 2026");
+document.getElementById("verBtn").onclick=()=>toast("Rookery v1.8 · Beauty of Birds tracker · Nov 8 2026");
 
 /* ===================== NEW-USER GUIDE ===================== */
 const GUIDE_KEY = "bob_public_guide_seen";
