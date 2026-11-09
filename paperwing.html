@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1b2a3a">
+<title>Paper Wing</title>
+<meta name="description" content="Ten paper airplanes with animated fold-by-fold steps, why each one flies, and a flight log.">
+<link rel="manifest" href="paperwing-manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="paperwing-icon-192.png">
+<link rel="apple-touch-icon" href="paperwing-icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<style>
+:root{
+  --bg:#eaf3fb; --bg2:#fbf6ea; --paper:#fffdf7; --ink:#1b2a3a; --ink2:#4e6072; --line:#d6d0c2;
+  --sky:#2b7de9; --sky2:#dbe9fb; --sun:#f5a524; --grass:#3aa25a; --red:#e2553f; --teal:#1fa48f; --orange:#f07f2e;
+  --card:#ffffff; --shadow:0 4px 14px rgba(27,42,58,.12), 0 1px 2px rgba(27,42,58,.08);
+  --acc:#2b7de9; --acc2:#dbe9fb;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 60%,#f6efe0 100%) fixed;color:var(--ink);font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:17px;line-height:1.35;min-height:100dvh}
+header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,#22364b,#1b2a3a);color:#fff;padding:calc(10px + env(safe-area-inset-top)) 16px 10px;display:flex;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 2px 12px rgba(0,0,0,.25)}
+header h1{margin:0;font-size:21px;letter-spacing:.4px;display:flex;align-items:center;gap:9px}
+header h1 img{width:30px;height:30px;border-radius:8px;display:block;box-shadow:0 2px 4px rgba(0,0,0,.4)}
+.blurb{margin:-4px 0 10px;color:var(--ink2);font-size:15px}
+.filters{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 12px}
+.filters::-webkit-scrollbar{display:none}
+.filters button{flex:none;border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 12px;font-family:inherit;font-size:13px;font-weight:600;color:var(--ink2);cursor:pointer}
+.filters button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+#ver{font-size:12px;background:rgba(255,255,255,.14);padding:5px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.2);color:#fff;font-family:inherit}
+main{padding:14px 16px 130px;max-width:720px;width:100%;margin:0 auto}
+.screen{display:none}.screen.on{display:block;animation:in .25s ease-out}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+h2{font-size:24px;margin:6px 0 10px;letter-spacing:-.2px}
+h3{font-size:17px;margin:14px 0 6px}
+p{margin:6px 0}
+.muted{color:var(--ink2);font-size:15px}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.card{--acc:#2b7de9;--acc2:#dbe9fb;position:relative;overflow:hidden;background:linear-gradient(160deg,#fff 0%,var(--acc2) 100%);border-radius:18px;box-shadow:var(--shadow);padding:12px;border:0;text-align:left;font-family:inherit;color:var(--ink);cursor:pointer;display:flex;flex-direction:column;gap:6px;transition:transform .12s,box-shadow .12s}
+.card::before{content:"";position:absolute;inset:auto -30% -55% auto;width:150px;height:150px;border-radius:50%;background:var(--acc);opacity:.13}
+.card:active{transform:scale(.96);box-shadow:0 1px 4px rgba(27,42,58,.15)}
+.card svg{width:100%;height:112px;display:block;filter:drop-shadow(0 6px 6px rgba(27,42,58,.18));position:relative}
+.card b{font-size:19px}
+.card .tag{font-size:13px;color:var(--ink2)}
+.pill{display:inline-block;font-size:12px;padding:3px 9px;border-radius:999px;background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.pill.acc{background:var(--acc);color:#fff}
+.stage{border-radius:20px;box-shadow:var(--shadow),inset 0 0 0 1px rgba(255,255,255,.6);padding:8px;position:relative;background:linear-gradient(180deg,#bfe0ff 0%,#e9f4ff 55%,#d9e8c8 100%);overflow:hidden}
+.stage::after{content:"";position:absolute;left:0;right:0;bottom:0;height:22%;background:linear-gradient(180deg,rgba(90,160,90,0) 0%,rgba(90,160,90,.28) 100%);pointer-events:none}
+.stage svg{width:100%;height:auto;display:block;touch-action:manipulation;position:relative;z-index:1}
+.stepbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:12px 0 6px}
+.stepbar .n{font-weight:700;font-size:15px}
+.dots{display:flex;gap:5px;flex-wrap:wrap;justify-content:center}
+.dots i{width:8px;height:8px;border-radius:50%;background:var(--line);display:block;transition:transform .2s,background .2s}
+.dots i.done{background:var(--grass)}.dots i.cur{background:var(--acc);transform:scale(1.45);box-shadow:0 0 0 3px var(--acc2)}
+.steptext{background:var(--card);border-radius:16px;padding:13px 15px;box-shadow:var(--shadow);min-height:74px;font-size:17px;border-left:5px solid var(--acc);animation:in .25s ease-out}
+.steptext b{color:var(--acc)}
+.row{display:flex;gap:10px;margin-top:12px}
+button.big{flex:1;font-size:17px;padding:14px 10px;border-radius:14px;border:0;background:linear-gradient(180deg,#2c4159,#1b2a3a);color:#fff;font-family:inherit;font-weight:700;cursor:pointer;box-shadow:0 4px 0 #0f1a26,0 6px 12px rgba(27,42,58,.25);transition:transform .08s,box-shadow .08s}
+button.big:active{transform:translateY(3px);box-shadow:0 1px 0 #0f1a26,0 2px 6px rgba(27,42,58,.25)}
+button.big.alt{background:#fff;color:var(--ink);box-shadow:0 4px 0 #cfc8b8,0 6px 12px rgba(27,42,58,.12)}
+button.big.alt:active{box-shadow:0 1px 0 #cfc8b8}
+button.big.go{background:linear-gradient(180deg,var(--acc),color-mix(in srgb,var(--acc) 75%,#000));box-shadow:0 4px 0 color-mix(in srgb,var(--acc) 55%,#000),0 6px 14px rgba(43,125,233,.35)}
+button.big.go:active{box-shadow:0 1px 0 color-mix(in srgb,var(--acc) 55%,#000)}
+button.big:disabled{opacity:.35;box-shadow:none;transform:none}
+.tabs{position:fixed;left:0;right:0;bottom:0;display:flex;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);z-index:5;box-shadow:0 -4px 16px rgba(27,42,58,.08)}
+.tabs button{flex:1;border:0;background:none;padding:10px 4px 8px;font-family:inherit;color:var(--ink2);font-size:12px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer}
+.tabs button svg{width:24px;height:24px;transition:transform .15s}
+.tabs button.on{color:var(--sky);font-weight:700}.tabs button.on svg{transform:translateY(-2px) scale(1.1)}
+.back{background:none;border:0;color:var(--sky);font-size:16px;padding:6px 0;font-family:inherit;cursor:pointer;font-weight:600}
+.why{background:var(--card);border-radius:18px;box-shadow:var(--shadow);padding:14px;margin:12px 0;border-top:4px solid var(--acc)}
+.why svg{width:100%;height:auto;display:block;margin:6px 0}
+.stat{display:grid;grid-template-columns:90px 1fr;gap:8px;align-items:center;margin:6px 0;font-size:15px}
+.bar{height:14px;background:#eef1f5;border-radius:7px;overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,.08)}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--acc2),var(--acc));border-radius:7px;animation:grow .6s ease-out}
+@keyframes grow{from{width:0}}
+table{width:100%;border-collapse:collapse;font-size:15px}
+td{padding:8px 6px;border-top:1px solid var(--line);vertical-align:top}
+td:first-child{font-weight:700;white-space:nowrap;width:38%}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form label{font-size:13px;color:var(--ink2);display:flex;flex-direction:column;gap:4px}
+.form input,.form select{font-size:17px;padding:11px;border-radius:12px;border:1px solid var(--line);font-family:inherit;background:#fff;width:100%;box-shadow:inset 0 1px 2px rgba(0,0,0,.05)}
+.form .full{grid-column:1/-1}
+.log li{list-style:none;padding:9px 0;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:8px;font-size:15px}
+.log{padding:0;margin:8px 0}
+.del{background:none;border:0;color:var(--red);font-size:14px;font-family:inherit;cursor:pointer}
+#toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:10px 16px;border-radius:12px;opacity:0;transition:.25s;pointer-events:none;font-size:15px;z-index:9;box-shadow:0 6px 16px rgba(0,0,0,.25)}
+#toast.show{opacity:1;transform:translateX(-50%)}
+.seg{display:grid;grid-template-columns:repeat(5,1fr);background:#fff;border-radius:14px;border:1px solid var(--line);overflow:hidden;margin:8px 0;box-shadow:var(--shadow)}
+.seg button{border:0;background:none;padding:11px 2px;font-family:inherit;font-size:13px;color:var(--ink2);cursor:pointer;font-weight:600;min-height:44px}
+.seg button.on{background:var(--acc);color:#fff}
+.legend{display:flex;gap:14px;font-size:13px;color:var(--ink2);margin-top:4px;flex-wrap:wrap}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:middle}
+.legend .cg::before{background:var(--red)}.legend .cl::before{background:var(--sky)}
+.tip{background:linear-gradient(135deg,#fff3d6,#ffe4b0);border-radius:14px;padding:11px 13px;font-size:15px;margin:12px 0;box-shadow:var(--shadow);border-left:5px solid var(--sun)}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:8}
+</style>
+</head>
+<body>
+<header>
+  <h1><img src="paperwing-icon-192.png" alt="" onerror="this.style.display='none'">Paper Wing</h1>
+  <button id="ver">v0.3 · Nov 8</button>
+</header>
+
+<main>
+<!-- HOME -->
+<section class="screen on" id="s-home">
+  <h2>Pick a plane</h2>
+  <p class="muted">Ten planes, one sheet of paper each. Tap one, fold along, then take it outside and log the flight.</p>
+  <div class="filters" id="filters"></div>
+  <div class="cards" id="cards"></div>
+  <div class="tip">Paper: regular letter size (8.5 × 11). Fold on a hard table and run your thumbnail down every crease. Crisp folds fly; soft folds wobble.</div>
+</section>
+
+<!-- FOLD -->
+<section class="screen" id="s-fold">
+  <button class="back" id="backHome">‹ All planes</button>
+  <h2 id="foldTitle">Dart</h2>
+  <p class="blurb" id="foldBlurb"></p>
+  <div class="stage"><svg id="stage" viewBox="0 0 100 100"></svg></div>
+  <div class="stepbar"><span class="n" id="stepN">Step 1 of 8</span><div class="dots" id="dots"></div></div>
+  <div class="steptext" id="stepText"></div>
+  <div class="row">
+    <button class="big alt" id="prev">‹ Back</button>
+    <button class="big go" id="play">▶ Show fold</button>
+    <button class="big" id="next">Next ›</button>
+  </div>
+  <div class="row"><button class="big alt" id="toWhy">Why does this one fly?</button></div>
+</section>
+
+<!-- WHY -->
+<section class="screen" id="s-why">
+  <h2>Why it flies</h2>
+  <div class="seg" id="whySeg"></div>
+  <div id="whyPlane"></div>
+  <div class="why">
+    <h3>Balance: the one rule that matters</h3>
+    <p>Every plane has a <b style="color:var(--red)">weight center</b> (where it balances on your finger) and a <b style="color:var(--sky)">lift center</b> (the middle of the wing area). The weight center must sit a little <b>ahead</b> of the lift center.</p>
+    <svg viewBox="0 0 320 90">
+      <g fill="none" stroke="#1b2a3a" stroke-width="1.5">
+        <path d="M20 45 L140 20 L140 70 Z" fill="#fffdf7"/>
+        <text x="40" y="86" font-size="11" fill="#4a5a6a">Nose-heavy: glides</text>
+        <path d="M180 45 L300 20 L300 70 Z" fill="#fffdf7"/>
+        <text x="196" y="86" font-size="11" fill="#4a5a6a">Tail-heavy: stalls</text>
+      </g>
+      <circle cx="70" cy="45" r="5" fill="#d94f3d"/><circle cx="100" cy="45" r="5" fill="#2b7de9"/>
+      <circle cx="270" cy="45" r="5" fill="#d94f3d"/><circle cx="245" cy="45" r="5" fill="#2b7de9"/>
+      <path d="M150 30 q-40 -18 -110 -6" fill="none" stroke="#3aa25a" stroke-width="2" stroke-dasharray="4 3"/>
+      <path d="M310 60 q-20 -45 -60 -35 q-10 3 -14 20" fill="none" stroke="#d94f3d" stroke-width="2" stroke-dasharray="4 3"/>
+    </svg>
+    <p class="muted">Test: balance the plane on one finger. The finger should be just in front of the middle of the wings.</p>
+  </div>
+  <div class="why">
+    <h3>Lift and wing loading</h3>
+    <p>Wings shove air down. Air shoves the plane up. More speed or more wing means more lift.</p>
+    <p><b>Wing loading</b> = weight ÷ wing area. Same sheet of paper, same weight, so the only thing that changes is how much of it became wing. Small wings (Dart) must fly fast to stay up. Big wings (Glider) can float slowly.</p>
+    <svg viewBox="0 0 320 70">
+      <path d="M20 12 L120 12 L120 42 L20 42 Z" fill="#dbe9fb"/><text x="70" y="66" font-size="12" text-anchor="middle" fill="#4a5a6a">big wing · floats</text>
+      <path d="M200 19 L300 19 L300 35 L200 35 Z" fill="#dbe9fb"/><text x="250" y="66" font-size="12" text-anchor="middle" fill="#4a5a6a">small wing · fast</text>
+      <g stroke="#2b7de9" stroke-width="1.5"><path d="M40 52 v-6 M70 52 v-6 M100 52 v-6"/><path d="M230 45 v-6 M270 45 v-6"/></g>
+    </svg>
+  </div>
+  <div class="why">
+    <h3>Dihedral: the shallow Y</h3>
+    <p>Looking from the front, the wings should angle up slightly, like a shallow Y. If the plane tips, the low wing gets flatter and makes more lift, which pushes it back level. Flat wings drift; drooping wings roll over.</p>
+    <svg viewBox="0 0 320 60">
+      <g fill="none" stroke="#1b2a3a" stroke-width="2"><path d="M20 40 L70 28 L120 40"/><path d="M70 28 v14"/></g><text x="40" y="56" font-size="11" fill="#3aa25a">good: shallow Y</text>
+      <g fill="none" stroke="#1b2a3a" stroke-width="2"><path d="M200 28 L250 40 L300 28"/><path d="M250 26 v14"/></g><text x="222" y="56" font-size="11" fill="#d94f3d">bad: droop</text>
+    </svg>
+  </div>
+  <div class="why">
+    <h3>Fix it</h3>
+    <table>
+      <tr><td>Dives into the ground</td><td>Bend the back edges of both wings up a little (about the width of a fingernail). That is "up elevator."</td></tr>
+      <tr><td>Climbs, stalls, drops</td><td>Too much up. Flatten the back edges, or add a paperclip to the nose.</td></tr>
+      <tr><td>Turns one way</td><td>Check the wings match. Then bend the back edge of the wing on the turning side up a touch.</td></tr>
+      <tr><td>Rolls over</td><td>Raise the wings into more of a Y (more dihedral).</td></tr>
+      <tr><td>Wobbles</td><td>Soft folds or gaps. Re-crease everything hard. Tape the body shut behind the nose.</td></tr>
+      <tr><td>Just falls</td><td>Throw level and medium, not hard. Point the nose slightly down for a Dart, level for a Glider.</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- LOG -->
+<section class="screen" id="s-log">
+  <h2>Flight log</h2>
+  <p class="muted">Step off the distance (one big step ≈ 3 feet). Count hang time out loud.</p>
+  <div class="form">
+    <label>Plane<select id="fPlane"></select></label>
+    <label>Pilot<input id="fWho" placeholder="Your name" list="pilots"><datalist id="pilots"></datalist></label>
+    <label>Distance (ft)<input id="fDist" type="number" inputmode="decimal" placeholder="24"></label>
+    <label>Hang time (s)<input id="fHang" type="number" inputmode="decimal" placeholder="2.5"></label>
+    <div class="full row" style="margin-top:0"><button class="big go" id="fSave">Log flight</button></div>
+  </div>
+  <h3>Best distance by plane</h3>
+  <div class="why" style="margin-top:6px"><svg id="chart" viewBox="0 0 320 250"></svg></div>
+  <h3>Best pilot</h3>
+  <div class="why" style="margin-top:6px" id="pilotBoard"></div>
+  <h3>All flights</h3>
+  <ul class="log" id="logList"></ul>
+</section>
+</main>
+
+<nav class="tabs">
+  <button data-go="s-home" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11 L12 4 L21 11 V20 H3 Z"/></svg>Planes</button>
+  <button data-go="s-why"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 4 2c-1 .7-1.5 1.2-1.5 2.5M12 17h.01"/></svg>Why</button>
+  <button data-go="s-log"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>Log</button>
+</nav>
+<div id="toast"></div><canvas id="confetti"></canvas>
+
+<script>
+/* ---------- tiny helpers ---------- */
+const $=s=>document.querySelector(s);
+const VERSION='v0.3 · Nov 8';
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),1600);}
+$('#ver').onclick=()=>toast('Paper Wing '+VERSION);
+const store={key:'paperwing.v1',mem:null,
+  load(){try{const r=localStorage.getItem(this.key);this.mem=r?JSON.parse(r):{flights:[]};}catch(e){this.mem=this.mem||{flights:[]};}return this.mem;},
+  save(){try{localStorage.setItem(this.key,JSON.stringify(this.mem));}catch(e){}}};
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id));
+  document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.go===id||(id==='s-fold'&&b.dataset.go==='s-home')));
+  window.scrollTo(0,0);}
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{show(b.dataset.go);if(b.dataset.go==='s-log')renderLog();if(b.dataset.go==='s-why')renderWhy(whyId);});
+
+/* ---------- fold geometry engine ----------
+   A sheet is a stack of layers (polygons, bottom -> top). A fold = a line + a point
+   on the moving side. Every layer is split by the line; the moving halves are
+   reflected across it and stacked on top in reverse order. Same as real paper. */
+const EPS=1e-6;
+function side(a,b,p){return (b[0]-a[0])*(p[1]-a[1])-(b[1]-a[1])*(p[0]-a[0]);}
+function clip(poly,a,b,keepSign){ // Sutherland-Hodgman against half-plane
+  const out=[];const n=poly.length;
+  for(let i=0;i<n;i++){const P=poly[i],Q=poly[(i+1)%n];const sp=side(a,b,P)*keepSign,sq=side(a,b,Q)*keepSign;
+    if(sp>=-EPS)out.push(P);
+    if((sp>EPS&&sq<-EPS)||(sp<-EPS&&sq>EPS)){const t=sp/(sp-sq);out.push([P[0]+(Q[0]-P[0])*t,P[1]+(Q[1]-P[1])*t]);}}
+  return dedupe(out);
+}
+function dedupe(p){const o=[];for(const q of p){const l=o[o.length-1];if(!l||Math.hypot(l[0]-q[0],l[1]-q[1])>1e-4)o.push(q);}
+  if(o.length>1&&Math.hypot(o[0][0]-o[o.length-1][0],o[0][1]-o[o.length-1][1])<1e-4)o.pop();return o;}
+function area(p){let s=0;for(let i=0;i<p.length;i++){const a=p[i],b=p[(i+1)%p.length];s+=a[0]*b[1]-b[0]*a[1];}return Math.abs(s)/2;}
+function normal(a,b){const dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy);return [-dy/L,dx/L];}
+function reflectPt(p,a,n,s){ // s=1 full reflection, s in [-1,1] animates
+  const d=(p[0]-a[0])*n[0]+(p[1]-a[1])*n[1];return [p[0]-(1+s)*d*n[0],p[1]-(1+s)*d*n[1]];}
+function applyFold(layers,a,b,movePt){
+  const sgn=Math.sign(side(a,b,movePt))||1;const n=normal(a,b);
+  const stay=[],move=[];
+  for(const L of layers){const s=clip(L,a,b,-sgn),m=clip(L,a,b,sgn);if(s.length>=3&&area(s)>0.01)stay.push(s);if(m.length>=3&&area(m)>0.01)move.push(m);}
+  return {stay,move,n,a,moved:move.slice().reverse().map(p=>p.map(q=>reflectPt(q,a,n,1)))};
+}
+function centroid(polys){let x=0,y=0,k=0;for(const p of polys)for(const q of p){x+=q[0];y+=q[1];k++;}return k?[x/k,y/k]:[0,0];}
+
+/* ---------- plane designs ---------- */
+// Sheet coords: portrait letter, W=85, H=110 (tenths of an inch). cx=42.5.
+const W=85,H=110,CX=42.5;
+const rect=(w,h)=>[[0,0],[w,0],[w,h],[0,h]];
+const half=(cx,h)=>({t:'fold',a:[cx,0],b:[cx,h],m:[cx+30,h/2],text:'Fold the paper in half the long way. Line the edges up exactly, then crease hard.'});
+const unfold={t:'unfold',text:'Unfold it. That crease down the middle is your <b>center line</b>. Almost everything aims at it.'};
+const halfThenUnfold=[half(CX,H),unfold];
+// Shared portrait folds (left/right corners to center, then slanted edges to center)
+const cornerL={t:'fold',a:[CX,0],b:[0,CX],m:[4,4]}, cornerR={t:'fold',a:[CX,0],b:[W,CX],m:[81,4]};
+const slantL={t:'fold',a:[CX,0],b:[0,102.6],m:[4,60]}, slantR={t:'fold',a:[CX,0],b:[W,102.6],m:[81,60]};
+const closeUp={t:'fold',a:[CX,0],b:[CX,H],m:[4,80]};
+const S=(base,text)=>Object.assign({},base,{text});
+// Landscape sheet for the Moth (paper turned sideways): LW=110 wide, LH=85 tall
+const LW=110,LH=85,LCX=55;
+const PLANES=[
+ {id:'dart',acc:'#e2553f',acc2:'#fde3d8',name:'Dart',tag:'Fast and straight',diff:'Easy',fam:'fast',w:W,h:H,
+  stats:{speed:5,float:1,distance:4,tricks:2},
+  blurb:'The classic. Tiny wings, so it has to go fast. Throw it hard and level, slightly nose-down.',
+  cg:[0.40],cl:[0.55],
+  steps:[...halfThenUnfold,
+   S(cornerL,'Fold the <b>top-left corner</b> down so its edge lies along the center line.'),
+   S(cornerR,'Same on the <b>top-right corner</b>. You have a pointed roof.'),
+   S(slantL,'Fold the <b>left slanted edge</b> in to the center line again. Keep the point sharp.'),
+   S(slantR,'Same on the <b>right slanted edge</b>. Now it looks like a long thin arrow.'),
+   S(closeUp,'Fold the whole thing in half along the center crease. The folded flaps go on the <b>outside</b>.'),
+   {t:'fold',a:[CX+7,0],b:[CX+7,H],m:[81,60],text:'Fold the <b>wing</b> down along the line, about ¾ inch from the bottom edge. Flip it over and fold the other wing to match.'},
+   {t:'final',text:'Open the wings into a shallow Y. Hold under the middle, throw hard and level.'}]},
+ {id:'glider',acc:'#2b7de9',acc2:'#dbe9fb',name:'Glider',tag:'Slow and floaty',diff:'Easy',fam:'float',w:W,h:H,
+  stats:{speed:2,float:5,distance:3,tricks:2},
+  blurb:'Big wide wings and a locked nose. Toss it gently and it hangs in the air.',
+  cg:[0.42],cl:[0.55],
+  steps:[...halfThenUnfold,
+   S(cornerL,'Fold the <b>top-left corner</b> to the center line.'),
+   S(cornerR,'Fold the <b>top-right corner</b> to the center line.'),
+   {t:'fold',a:[0,CX],b:[W,CX],m:[CX,4],text:'Fold the whole pointed top <b>down</b> along the line where the corners end. The point should land near the bottom.'},
+   {t:'fold',a:[CX,CX],b:[0,W],m:[4,45],text:'Fold the new <b>top-left corner</b> to the center line. It lands on top of the folded point.'},
+   {t:'fold',a:[CX,CX],b:[W,W],m:[81,45],text:'Same on the <b>top-right</b>. A little triangle of the point pokes out below the flaps.'},
+   {t:'note',text:'Optional lock: fold that little poking-out triangle <b>up</b> over the two flaps to hold them shut. This is the "Nakamura lock."'},
+   S(closeUp,'Fold in half along the center crease, flaps on the <b>outside</b>.'),
+   {t:'fold',a:[CX+9,0],b:[CX+9,H],m:[81,60],text:'Fold the <b>wing</b> down about 1 inch from the bottom edge. Flip and match the other wing.'},
+   {t:'final',text:'Open the wings flat with a slight Y. Toss it softly and level, like you are placing it on a shelf.'}]},
+ {id:'bulldog',acc:'#8a5a2b',acc2:'#f2e3d0',name:'Bulldog',tag:'Tough blunt nose',diff:'Easy',fam:'fast',w:W,h:H,
+  stats:{speed:4,float:2,distance:4,tricks:2},
+  blurb:'A Dart with its point folded back. Blunt nose, more weight up front, and it survives crashing into walls.',
+  cg:[0.38],cl:[0.56],
+  steps:[...halfThenUnfold,
+   S(cornerL,'Fold the <b>top-left corner</b> to the center line.'),
+   S(cornerR,'Fold the <b>top-right corner</b> to the center line.'),
+   S(slantL,'Fold the <b>left slanted edge</b> in to the center line.'),
+   S(slantR,'Fold the <b>right slanted edge</b> in to the center line. Long arrow.'),
+   {t:'fold',a:[0,22],b:[W,22],m:[CX,3],text:'Fold the <b>sharp tip down</b> about 2 inches, straight across. Now the nose is flat, like a bulldog.'},
+   S(closeUp,'Fold in half along the center crease. The folded nose stays on the <b>outside</b>.'),
+   {t:'fold',a:[CX+8,0],b:[CX+8,H],m:[81,60],text:'Fold the <b>wing</b> down about ¾ inch from the bottom edge. Flip and match.'},
+   {t:'final',text:'Open the wings into a shallow Y. Throw firm and level. It forgives a sloppy throw better than the Dart.'}]},
+ {id:'needle',acc:'#6b4fd8',acc2:'#e6e0fb',name:'Needle',tag:'Thin as a pencil',diff:'Medium',fam:'fast',w:W,h:H,
+  stats:{speed:5,float:1,distance:5,tricks:2},
+  blurb:'The Dart, folded one more time. Almost no wing at all. Built for one thing: a long, hard, straight throw.',
+  cg:[0.42],cl:[0.58],
+  steps:[...halfThenUnfold,
+   S(cornerL,'Fold the <b>top-left corner</b> to the center line.'),
+   S(cornerR,'Fold the <b>top-right corner</b> to the center line.'),
+   S(slantL,'Fold the <b>left slanted edge</b> to the center line.'),
+   S(slantR,'Fold the <b>right slanted edge</b> to the center line.'),
+   {t:'fold',a:[CX,0],b:[20.62,H],m:[10,90],text:'One more time: fold the <b>left edge</b> to the center line. It gets thick here, so press hard.'},
+   {t:'fold',a:[CX,0],b:[64.38,H],m:[75,90],text:'Same on the <b>right edge</b>. It looks like a skinny spear now.'},
+   S(closeUp,'Fold in half along the center crease, flaps on the <b>outside</b>.'),
+   {t:'fold',a:[CX+5,0],b:[CX+5,H],m:[81,60],text:'Fold the <b>wing</b> down about ½ inch from the bottom edge. Flip and match.'},
+   {t:'final',text:'Pinch the body, wings in a shallow Y. Throw it hard and straight, like a dart at a board.'}]},
+ {id:'plank',acc:'#c2413a',acc2:'#f9dcd9',name:'Plank',tag:'No point at all',diff:'Easy',fam:'float',w:W,h:H,
+  stats:{speed:2,float:4,distance:2,tricks:3},
+  blurb:'A square-nosed flying wing. The folded band up front is the weight. Wide, slow, and very calm.',
+  cg:[0.30],cl:[0.50],
+  steps:[
+   {t:'fold',a:[0,12],b:[W,12],m:[CX,2],text:'Fold the <b>top edge down</b> about 1¼ inch. Crease hard.'},
+   {t:'fold',a:[0,24],b:[W,24],m:[CX,14],text:'Fold that band down again, same width.'},
+   {t:'fold',a:[0,36],b:[W,36],m:[CX,26],text:'And once more. That thick band is the <b>nose</b>. It holds all the weight up front.'},
+   S(closeUp,'Fold the paper in half the long way, the band on the <b>outside</b>.'),
+   {t:'fold',a:[CX+10,0],b:[CX+10,H],m:[81,60],text:'Fold the <b>wing</b> down about 1 inch from the middle fold. Flip and match.'},
+   {t:'final',text:'Open the wings flat with a tiny Y. Push it forward gently. Bend the back edges up a hair if it dives.'}]},
+ {id:'delta',acc:'#1fa48f',acc2:'#d5f2ec',name:'Delta',tag:'Wide and steady',diff:'Medium',fam:'steady',w:W,h:H,
+  stats:{speed:3,float:4,distance:4,tricks:3},
+  blurb:'A triangle wing with winglets. Steady in wind, and the winglets let you steer it.',
+  cg:[0.45],cl:[0.58],
+  steps:[...halfThenUnfold,
+   S(cornerL,'Fold the <b>top-left corner</b> to the center line.'),
+   S(cornerR,'Fold the <b>top-right corner</b> to the center line.'),
+   S(slantL,'Fold the <b>left slanted edge</b> in to the center line.'),
+   S(slantR,'Fold the <b>right slanted edge</b> in to the center line. Long arrow shape.'),
+   {t:'fold',a:[0,30],b:[W,30],m:[CX,4],text:'Fold the <b>nose tip down</b> about 3 inches. This blunt nose moves weight forward and keeps it from diving.'},
+   S(closeUp,'Fold in half along the center crease. The folded nose goes on the <b>outside</b>.'),
+   {t:'fold',a:[CX+6,0],b:[CX+6,H],m:[81,60],text:'Fold the <b>wing</b> down along the line, about ½ inch from the bottom. Flip and match.'},
+   {t:'fold',a:[17,0],b:[17,H],m:[4,60],text:'Fold the <b>wingtip up</b> along a line ½ inch from the outer edge. Flip and match. These are winglets.'},
+   {t:'final',text:'Open the wings level, winglets pointing straight up. Throw medium and level.'}]},
+ {id:'hawk',acc:'#d98a12',acc2:'#fcebcd',name:'Hawk',tag:'Swept-back wings',diff:'Medium',fam:'steady',w:W,h:H,
+  stats:{speed:3,float:4,distance:4,tricks:3},
+  blurb:'Glider folds with the wings creased on a slant, so they sweep back like a hawk diving. Smooth and stable.',
+  cg:[0.42],cl:[0.60],
+  steps:[...halfThenUnfold,
+   S(cornerL,'Fold the <b>top-left corner</b> to the center line.'),
+   S(cornerR,'Fold the <b>top-right corner</b> to the center line.'),
+   {t:'fold',a:[0,CX],b:[W,CX],m:[CX,4],text:'Fold the pointed top <b>down</b> along the line where the corners end.'},
+   {t:'fold',a:[CX,CX],b:[0,W],m:[4,45],text:'Fold the new <b>top-left corner</b> to the center line.'},
+   {t:'fold',a:[CX,CX],b:[W,W],m:[81,45],text:'Same on the <b>top-right</b>. Skip the lock on this one.'},
+   S(closeUp,'Fold in half along the center crease, flaps on the <b>outside</b>.'),
+   {t:'fold',a:[CX+4,26],b:[CX+12,H],m:[81,60],text:'Fold the <b>wing</b> down on a <b>slant</b>: close to the body at the nose, about 1 inch out at the tail. Flip and match.'},
+   {t:'final',text:'Open the wings with a slight Y. Throw medium and level. The slant pulls the lift center back, which keeps the nose pointed forward.'}]},
+ {id:'moth',acc:'#3f8f3a',acc2:'#dff0d6',name:'Moth',tag:'Short and wide',diff:'Easy',fam:'steady',w:LW,h:LH,land:true,
+  stats:{speed:2,float:4,distance:3,tricks:3},
+  blurb:'Dart folds on a sideways sheet. Short body, wide stubby wings. Good indoors and in tight spaces.',
+  cg:[0.44],cl:[0.56],
+  steps:[S(half(LCX,LH),'Turn the paper <b>sideways</b>. Fold it in half the short way, edges lined up. Crease hard.'),unfold,
+   {t:'fold',a:[LCX,0],b:[0,LCX],m:[4,4],text:'Fold the <b>top-left corner</b> to the center line.'},
+   {t:'fold',a:[LCX,0],b:[LW,LCX],m:[106,4],text:'Fold the <b>top-right corner</b> to the center line.'},
+   {t:'fold',a:[LCX,0],b:[19.8,LH],m:[20,45],text:'Fold the <b>left slanted edge</b> to the center line.'},
+   {t:'fold',a:[LCX,0],b:[90.2,LH],m:[90,45],text:'Fold the <b>right slanted edge</b> to the center line. Short, fat arrow.'},
+   {t:'fold',a:[LCX,0],b:[LCX,LH],m:[4,70],text:'Fold in half along the center crease, flaps on the <b>outside</b>.'},
+   {t:'fold',a:[LCX+6,0],b:[LCX+6,LH],m:[100,60],text:'Fold the <b>wing</b> down about ½ inch from the bottom edge. Flip and match.'},
+   {t:'final',text:'Open the wings into a flat Y. Throw gently and level. Great for hallway runways.'}]},
+ {id:'looper',acc:'#d6336c',acc2:'#fbdbe7',name:'Looper',tag:'Does a loop',diff:'Medium',fam:'tricks',w:W,h:H,
+  stats:{speed:4,float:2,distance:2,tricks:5},
+  blurb:'A Dart with big flaps bent up at the back. Throw it up and it loops all the way over.',
+  cg:[0.40],cl:[0.55],
+  steps:[...halfThenUnfold,
+   S(cornerL,'Fold the <b>top-left corner</b> to the center line.'),
+   S(cornerR,'Fold the <b>top-right corner</b> to the center line.'),
+   S(slantL,'Fold the <b>left slanted edge</b> to the center line.'),
+   S(slantR,'Fold the <b>right slanted edge</b> to the center line.'),
+   S(closeUp,'Fold in half along the center crease, flaps on the <b>outside</b>.'),
+   {t:'fold',a:[CX+8,0],b:[CX+8,H],m:[81,60],text:'Fold the <b>wing</b> down about ¾ inch from the bottom edge. Flip and match.'},
+   {t:'note',text:'Bend the <b>back edge</b> of each wing straight <b>up</b>, a strip about ½ inch deep. These are elevators, and here they are cranked way up on purpose.'},
+   {t:'final',text:'Throw it hard and <b>upward</b>. The flaps push the tail down, the nose comes up and over, and it loops. More bend means a tighter loop.'}]},
+ {id:'ring',acc:'#f07f2e',acc2:'#ffe6d2',name:'Ring',tag:'"That can\'t fly"',diff:'Weird',fam:'tricks',w:H,h:W,land:true,
+  stats:{speed:3,float:3,distance:3,tricks:5},
+  blurb:'No wings at all. It is a hoop with a heavy band on one edge. It flies because it spins.',
+  cg:null,
+  steps:[
+   {t:'fold',a:[0,10],b:[H,10],m:[55,2],text:'Turn the paper <b>sideways</b>. Fold the top edge down about 1 inch. Crease hard.'},
+   {t:'fold',a:[0,20],b:[H,20],m:[55,4],text:'Fold that band down again, same width.'},
+   {t:'fold',a:[0,30],b:[H,30],m:[55,6],text:'And once more. The band is now thick and stiff. That band is the <b>weight</b> and the <b>nose</b>.'},
+   {t:'note',text:'Curl the sheet into a <b>ring</b> with the thick band on the outside. Tuck one end of the band into the fold of the other end so it holds.'},
+   {t:'final',text:'Hold it like a football with the band forward. Throw with a flick of the wrist so it <b>spins</b>. Spin is what keeps it steady.'}]}
+];
+const FAMS=[['all','All 10'],['fast','Fast'],['float','Floaty'],['steady','Steady'],['tricks','Tricks']];
+// Final top-view outlines (viewBox 0 0 100 100), nose up. wing = outer silhouette for the accent stroke.
+const FINALS={
+ dart:{path:'M50 6 L62 90 L50 82 L38 90 Z M50 6 L58 74 L50 70 L42 74 Z',wing:'M50 6 L62 90 L50 82 L38 90 Z'},
+ glider:{path:'M50 12 L84 88 L50 78 L16 88 Z M50 12 L58 74 L50 70 L42 74 Z',wing:'M50 12 L84 88 L50 78 L16 88 Z'},
+ bulldog:{path:'M44 14 L56 14 L64 90 L50 82 L36 90 L44 14 Z M44 14 L56 14 L56 22 L44 22 Z M50 22 L57 74 L50 70 L43 74 Z',wing:'M44 14 L56 14 L64 90 L50 82 L36 90 Z'},
+ needle:{path:'M50 4 L57 92 L50 86 L43 92 Z M50 4 L54 80 L50 77 L46 80 Z',wing:'M50 4 L57 92 L50 86 L43 92 Z'},
+ plank:{path:'M20 26 L80 26 L82 80 L50 74 L18 80 Z M20 26 L80 26 L80 38 L20 38 Z M50 38 L50 74',wing:'M20 26 L80 26 L82 80 L50 74 L18 80 Z'},
+ delta:{path:'M50 14 L82 86 L50 78 L18 86 Z M82 86 L88 80 L82 74 M18 86 L12 80 L18 74 M50 14 L57 72 L50 68 L43 72 Z',wing:'M50 14 L82 86 L50 78 L18 86 Z'},
+ hawk:{path:'M50 10 L82 68 L74 92 L50 78 L26 92 L18 68 Z M50 10 L57 72 L50 68 L43 72 Z',wing:'M50 10 L82 68 L74 92 L50 78 L26 92 L18 68 Z'},
+ moth:{path:'M50 22 L90 76 L50 68 L10 76 Z M50 22 L56 62 L50 58 L44 62 Z',wing:'M50 22 L90 76 L50 68 L10 76 Z'},
+ looper:{path:'M50 8 L64 88 L50 80 L36 88 Z M50 8 L58 74 L50 70 L42 74 Z M58 80 L63 84 L64 88 M42 80 L37 84 L36 88',wing:'M50 8 L64 88 L50 80 L36 88 Z'},
+ ring:{path:'',wing:''}
+};
+const WHY={
+ dart:'Almost the whole sheet got folded into the body, so the wings are skinny. High wing loading. It needs speed to make lift, which is why a soft toss just drops it. The long body acts like a spear: lots of weight forward, very stable, very straight.',
+ glider:'Folding the point down and locking it puts a lump of paper right at the nose. That is your weight center, well forward. The rest of the sheet stays wide and flat as wing. Low wing loading, so it can fly slowly and hang.',
+ bulldog:'Folding the point back stacks extra layers right at the nose, so the weight center moves forward. A nose-heavy plane is a stable plane: it wants to point where it is going. The flat front also spreads a crash out, so it does not crumple like a Dart tip.',
+ needle:'Three rounds of folding pack almost all the paper into the body. The wings are slivers, so wing loading is the highest of the ten. No speed, no lift. Lots of speed, and it cuts through the air with almost nothing slowing it down. That is why it can win on distance.',
+ plank:'No point, no sweep. The three-fold band puts the weight in the front third, and the big flat wing behind it puts the lift center in the middle. Weight ahead of lift is the whole rule, so even this brick-shaped thing glides.',
+ delta:'Wide triangle wing plus the folded-down nose. The winglets stop air from spilling off the wingtips, which cuts drag and keeps it from rolling. Bend one winglet and it turns that way.',
+ hawk:'Creasing the wings on a slant sweeps them back. That moves the lift center toward the tail while the folded nose keeps weight up front, so the gap between them grows. A bigger gap means a plane that settles itself fast after a bump.',
+ moth:'Same folds as a Dart, but on a sheet turned sideways. The body comes out short and the wings come out fat. More wing for the same weight means low wing loading, so it flies slow and turns easy. Short body, though, so it wobbles more than a Dart.',
+ looper:'The bent-up flaps at the back are elevators. Air hits them and pushes the tail down, which tips the nose up. On a normal plane you bend them a fingernail. Here they are huge, so the nose keeps coming up until the plane goes all the way over.',
+ ring:'No wings, but the whole hoop is a wing. Air flows through and around the ring and the band on the front edge is the weight center, so the nose stays forward. Spin makes it a gyroscope, like a football, so it does not tumble. The Ring is happiest in still air with a smooth flick.'
+};
+/* ---------- home cards ---------- */
+function planeIcon(p){
+  const grad='<defs><linearGradient id="pg'+p.id+'" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="'+p.acc2+'"/></linearGradient></defs>';
+  if(p.id==='ring')return '<svg viewBox="0 0 100 100">'+grad+'<ellipse cx="50" cy="55" rx="34" ry="22" fill="url(#pg'+p.id+')" stroke="#1b2a3a" stroke-width="2"/><ellipse cx="50" cy="55" rx="24" ry="14" fill="#eaf3fb" stroke="#1b2a3a" stroke-width="2"/><path d="M16 55 A34 22 0 0 0 84 55" fill="none" stroke="'+p.acc+'" stroke-width="7" opacity=".7"/></svg>';
+  return '<svg viewBox="0 0 100 100">'+grad+'<path d="'+FINALS[p.id].path+'" fill="url(#pg'+p.id+')" stroke="#1b2a3a" stroke-width="2" stroke-linejoin="round"/><path d="'+FINALS[p.id].wing+'" fill="none" stroke="'+p.acc+'" stroke-width="1.2" opacity=".6"/></svg>';
+}
+let fam='all';
+function renderCards(){
+  $('#filters').innerHTML=FAMS.map(f=>'<button data-f="'+f[0]+'" class="'+(f[0]===fam?'on':'')+'">'+f[1]+'</button>').join('');
+  document.querySelectorAll('#filters button').forEach(b=>b.onclick=()=>{fam=b.dataset.f;renderCards();});
+  $('#cards').innerHTML=PLANES.filter(p=>fam==='all'||p.fam===fam).map(p=>'<button class="card" data-id="'+p.id+'" style="--acc:'+p.acc+';--acc2:'+p.acc2+'">'+planeIcon(p)+'<b>'+p.name+'</b><span class="tag">'+p.tag+'</span><span><span class="pill acc">'+p.diff+'</span> <span class="pill">'+p.steps.length+' steps</span></span></button>').join('');
+  document.querySelectorAll('.card').forEach(c=>c.onclick=()=>openPlane(c.dataset.id));
+}
+renderCards();
+
+/* ---------- fold viewer ---------- */
+let cur=null,stepIdx=0,states=[],anim=null;
+function computeStates(p){ // states[i] = layers BEFORE step i; states[n] = after last
+  const out=[];let layers=[rect(p.w,p.h)];let creases=[];let snap=[];
+  for(let i=0;i<p.steps.length;i++){const s=p.steps[i];out.push({layers,creases:creases.slice(),fold:null});
+    if(s.t==='fold'){snap.push({layers,creases:creases.slice()});const f=applyFold(layers,s.a,s.b,s.m);out[i].fold=f;layers=f.stay.concat(f.moved);}
+    else if(s.t==='unfold'){const sn=snap.pop();const last=p.steps[i-1];layers=sn.layers;creases=sn.creases.concat([[last.a,last.b]]);}
+  }
+  out.push({layers,creases:creases.slice(),fold:null});return out;
+}
+function setAcc(p){document.documentElement.style.setProperty('--acc',p.acc);document.documentElement.style.setProperty('--acc2',p.acc2);}
+function openPlane(id){cur=PLANES.find(p=>p.id===id);setAcc(cur);states=computeStates(cur);stepIdx=0;$('#foldTitle').textContent=cur.name;$('#foldBlurb').textContent=cur.blurb;whyId=id;show('s-fold');renderStep();}
+$('#backHome').onclick=()=>{stopAnim();show('s-home');};
+$('#toWhy').onclick=()=>{show('s-why');renderWhy(cur.id);};
+$('#prev').onclick=()=>{if(stepIdx>0){stepIdx--;renderStep();}};
+$('#next').onclick=()=>{if(stepIdx<cur.steps.length-1){stepIdx++;renderStep();}};
+$('#play').onclick=()=>playFold();
+function stopAnim(){if(anim){cancelAnimationFrame(anim);anim=null;}if(pendingT){clearTimeout(pendingT);pendingT=null;}if(fallbackT){clearInterval(fallbackT);fallbackT=null;}}
+let fallbackT=null;
+function pts(p){return p.map(q=>q[0].toFixed(2)+','+q[1].toFixed(2)).join(' ');}
+let pendingT=null;
+function renderStep(){
+  stopAnim();const s=cur.steps[stepIdx];const n=cur.steps.length;
+  $('#stepN').textContent='Step '+(stepIdx+1)+' of '+n;
+  $('#dots').innerHTML=cur.steps.map((_,i)=>'<i class="'+(i<stepIdx?'done':i===stepIdx?'cur':'')+'"></i>').join('');
+  const st=$('#stepText');st.innerHTML=s.text;st.style.animation='none';void st.offsetWidth;st.style.animation='';
+  $('#prev').disabled=stepIdx===0;$('#next').textContent=stepIdx===n-1?'Done ✓':'Next ›';
+  $('#next').onclick=()=>{if(stepIdx<n-1){stepIdx++;renderStep();}else{confetti();setTimeout(()=>{show('s-log');renderLog();$('#fPlane').value=cur.id;toast('Go fly it, then log it here');},900);}};
+  $('#play').style.display=s.t==='fold'?'':'none';
+  if(s.t==='final'){drawFinal();return;}
+  drawSheet(states[stepIdx],s.t==='fold'?s:null,-1);
+  if(s.t==='fold')pendingT=setTimeout(playFold,300);
+}
+function sheetBox(){const pad=8;return {x:-pad,y:-pad,w:cur.w+pad*2,h:cur.h+pad*2};}
+function drawSheet(state,foldStep,s,t){ // s: -1 = before, 1 = after, between = animating
+  t=t||0;const svg=$('#stage');const B=sheetBox();svg.setAttribute('viewBox',B.x+' '+B.y+' '+B.w+' '+B.h);
+  let g='';
+  const paper=(poly,shade,extra)=>'<polygon points="'+pts(poly)+'" fill="'+(shade?'url(#pshade)':'url(#ppaper)')+'" stroke="#1b2a3a" stroke-width="0.7" stroke-linejoin="round"'+(extra||'')+'/>';
+  const shadow=(poly,lift)=>'<polygon points="'+pts(poly.map(q=>[q[0]+lift*1.2,q[1]+lift*1.6]))+'" fill="rgba(27,42,58,'+(0.10+0.18*lift)+')" filter="url(#blur)"/>';
+  // desk shadow under whole sheet
+  const all=foldStep&&state.fold?state.fold.stay.concat(s<=-1?state.fold.move:[]):state.layers;
+  for(const L of all)g+=shadow(L,0.4);
+  if(foldStep&&state.fold){
+    const f=state.fold;
+    for(const L of f.stay)g+=paper(L,false);
+    if(s<=-1){for(const L of f.move)g+=paper(L,false);}
+    else{
+      const sc=Math.min(1,Math.max(0,s));const lift=Math.sin(Math.PI*Math.min(1,(sc+1)/2))*0.9+0.2; // hovers mid-fold
+      const base=s<0?f.move:f.move.slice().reverse();
+      const mv=base.map(p=>p.map(q=>reflectPt(q,f.a,f.n,Math.min(1,s))));
+      const mvB=base.map(p=>p.map(q=>reflectPt(q,f.a,f.n,s))); // with overshoot for the bounce
+      const airborne=s>-1&&s<1;
+      for(const L of mvB)g+=shadow(L,airborne?lift:0.4);
+      for(const L of mvB)g+=paper(L,s>0);
+    }
+    for(const c of state.creases)g+='<line x1="'+c[0][0]+'" y1="'+c[0][1]+'" x2="'+c[1][0]+'" y2="'+c[1][1]+'" stroke="#9aa3ad" stroke-width="0.5" stroke-dasharray="1.5 1.5"/>';
+    const seg=clipLineToBox(foldStep.a,foldStep.b,cur.w,cur.h);
+    const acc=cur.acc;
+    if(seg){const flash=s>=1&&t>0.85?1+(1-t)/0.15*2.5:1;
+      g+='<line x1="'+seg[0][0]+'" y1="'+seg[0][1]+'" x2="'+seg[1][0]+'" y2="'+seg[1][1]+'" stroke="'+acc+'" stroke-width="'+(1*flash)+'" stroke-dasharray="2.2 1.6" stroke-linecap="round" opacity="'+(s>=1?0.9:1)+'"/>';}
+    if(s<1){const c0=centroid(f.move),c1=centroid(f.moved);const mid=[(c0[0]+c1[0])/2,(c0[1]+c1[1])/2];
+      const dx=c1[0]-c0[0],dy=c1[1]-c0[1];const px=-dy*0.35,py=dx*0.35;
+      g+='<path d="M'+c0[0]+' '+c0[1]+' Q'+(mid[0]+px)+' '+(mid[1]+py)+' '+c1[0]+' '+c1[1]+'" fill="none" stroke="'+acc+'" stroke-width="1.2" marker-end="url(#arr)" opacity="'+(1-Math.max(0,s))+'"/>';}
+  }else{
+    for(const L of state.layers)g+=paper(L,false);
+    for(const c of state.creases)g+='<line x1="'+c[0][0]+'" y1="'+c[0][1]+'" x2="'+c[1][0]+'" y2="'+c[1][1]+'" stroke="#9aa3ad" stroke-width="0.5" stroke-dasharray="1.5 1.5"/>';
+  }
+  svg.innerHTML='<defs><marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="'+(cur.acc)+'"/></marker>'+
+   '<linearGradient id="ppaper" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#f6efdc"/></linearGradient>'+
+   '<linearGradient id="pshade" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f3ead5"/><stop offset="1" stop-color="#e6d9bd"/></linearGradient>'+
+   '<filter id="blur" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="1.2"/></filter></defs>'+g;
+}
+function clipLineToBox(a,b,w,h){ // extend line, clip to sheet rectangle (with margin)
+  const m=2;const dx=b[0]-a[0],dy=b[1]-a[1];let t0=-1e9,t1=1e9;
+  const bounds=[[-m,w+m,dx,a[0]],[-m,h+m,dy,a[1]]];
+  for(const [lo,hi,d,o] of bounds){if(Math.abs(d)<1e-9){if(o<lo||o>hi)return null;}else{let ta=(lo-o)/d,tb=(hi-o)/d;if(ta>tb)[ta,tb]=[tb,ta];t0=Math.max(t0,ta);t1=Math.min(t1,tb);}}
+  if(t0>t1)return null;return [[a[0]+dx*t0,a[1]+dy*t0],[a[0]+dx*t1,a[1]+dy*t1]];
+}
+function playFold(){
+  stopAnim();const s=cur.steps[stepIdx];if(s.t!=='fold')return;const st=states[stepIdx];const myStep=stepIdx;
+  const T=1150;let t0=null;let done=false;
+  const frame=()=>{if(done||myStep!==stepIdx)return;const now=performance.now();if(t0===null)t0=now;
+    const t=Math.min(1,(now-t0)/T);
+    // ease with a small overshoot bounce at the end
+    let e;if(t<0.85){const u=t/0.85;e=-Math.cos(Math.PI*u);}else{const u=(t-0.85)/0.15;e=1+Math.sin(u*Math.PI)*0.12*(1-u);}
+    drawSheet(st,s,e,t);
+    if(t>=1){done=true;stopAnim();}};
+  const loop=()=>{frame();if(!done)anim=requestAnimationFrame(loop);};
+  drawSheet(st,s,-1,0);
+  anim=requestAnimationFrame(loop);
+  // fallback: if rAF is starved (background tab, some webviews) drive with a timer
+  fallbackT=setInterval(()=>{if(!done)frame();else{clearInterval(fallbackT);fallbackT=null;}},40);
+}
+function drawFinal(){
+  const svg=$('#stage');svg.setAttribute('viewBox','0 0 100 100');const acc=cur.acc;
+  const defs='<defs><linearGradient id="fg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="'+cur.acc2+'"/></linearGradient><marker id="arr2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="'+acc+'"/></marker><filter id="fs" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="3" stdDeviation="2" flood-color="#1b2a3a" flood-opacity=".3"/></filter></defs>';
+  const swoosh='<path d="M8 78 C 25 70, 30 40, 50 30" fill="none" stroke="'+acc+'" stroke-width="1.6" stroke-dasharray="3 2.5" opacity=".7" stroke-linecap="round"><animate attributeName="stroke-dashoffset" from="55" to="0" dur="1.6s" repeatCount="indefinite"/></path>';
+  if(cur.id==='ring'){svg.innerHTML=defs+swoosh+'<g filter="url(#fs)"><ellipse cx="55" cy="52" rx="34" ry="21" fill="url(#fg)" stroke="#1b2a3a" stroke-width="2"/><ellipse cx="55" cy="52" rx="24" ry="13" fill="#e3f0fb" stroke="#1b2a3a" stroke-width="2"/><path d="M21 52 A34 21 0 0 0 89 52" fill="none" stroke="'+acc+'" stroke-width="7" opacity=".75"/></g><path d="M44 20 q11 -9 22 -3" fill="none" stroke="'+acc+'" stroke-width="1.5" marker-end="url(#arr2)"/><text x="55" y="92" font-size="5" text-anchor="middle" fill="#4e6072">thick band forward · spin it</text>';return;}
+  const F=FINALS[cur.id];
+  svg.innerHTML=defs+swoosh+'<g filter="url(#fs)"><path d="'+F.path+'" fill="url(#fg)" stroke="#1b2a3a" stroke-width="1.6" stroke-linejoin="round"/><path d="'+F.wing+'" fill="none" stroke="'+acc+'" stroke-width="1" opacity=".55"/></g>'+
+   '<g fill="none" stroke="#1b2a3a" stroke-width="1.2"><path d="M18 96 L30 91 L42 96"/><path d="M30 91 v5"/></g><text x="46" y="96" font-size="4.5" fill="#4e6072">front view: shallow Y</text>';
+}
+/* ---------- confetti ---------- */
+function confetti(){
+  const c=$('#confetti');const ctx=c.getContext('2d');c.width=innerWidth*devicePixelRatio;c.height=innerHeight*devicePixelRatio;ctx.scale(devicePixelRatio,devicePixelRatio);
+  const cols=[cur?cur.acc:'#2b7de9','#f5a524','#3aa25a','#ffffff','#e2553f'];const N=90;const ps=[];
+  for(let i=0;i<N;i++)ps.push({x:innerWidth/2,y:innerHeight*0.45,vx:(Math.random()-0.5)*14,vy:-Math.random()*13-4,r:Math.random()*5+3,c:cols[i%cols.length],a:Math.random()*6,va:(Math.random()-0.5)*0.4});
+  let t=0;const step=()=>{ctx.clearRect(0,0,innerWidth,innerHeight);t++;for(const p of ps){p.vy+=0.35;p.x+=p.vx;p.y+=p.vy;p.vx*=0.985;p.a+=p.va;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.a);ctx.fillStyle=p.c;ctx.globalAlpha=Math.max(0,1-t/70);ctx.fillRect(-p.r/2,-p.r/4,p.r,p.r/2);ctx.restore();}
+    if(t<75)requestAnimationFrame(step);else ctx.clearRect(0,0,innerWidth,innerHeight);};step();
+}
+/* ---------- why panel ---------- */
+let whyId='dart';
+$('#whySeg').innerHTML=PLANES.map(p=>'<button data-id="'+p.id+'">'+p.name+'</button>').join('');
+document.querySelectorAll('#whySeg button').forEach(b=>b.onclick=()=>renderWhy(b.dataset.id));
+function renderWhy(id){
+  whyId=id;const p=PLANES.find(x=>x.id===id);setAcc(p);
+  document.querySelectorAll('#whySeg button').forEach(b=>b.classList.toggle('on',b.dataset.id===id));
+  const bar=(k,label)=>'<div class="stat"><span>'+label+'</span><div class="bar"><i style="width:'+(p.stats[k]*20)+'%"></i></div></div>';
+  let fig='';
+  if(id==='ring'){fig='<svg viewBox="0 0 100 70"><ellipse cx="50" cy="38" rx="34" ry="20" fill="none" stroke="#1b2a3a" stroke-width="2"/><path d="M16 38 A34 20 0 0 0 84 38" fill="none" stroke="#1b2a3a" stroke-width="8" opacity=".25"/><circle cx="50" cy="56" r="3" fill="#d94f3d"/><text x="50" y="68" font-size="5" text-anchor="middle" fill="#4a5a6a">weight lives in the band</text></svg>';}
+  else{const F=FINALS[id];const cgY=6+p.cg[0]*84,clY=6+p.cl[0]*84;
+    fig='<svg viewBox="0 0 100 100"><path d="'+F.path+'" fill="#fffdf7" stroke="#1b2a3a" stroke-width="1.6" stroke-linejoin="round"/><circle cx="50" cy="'+cgY+'" r="3" fill="#d94f3d"/><circle cx="50" cy="'+clY+'" r="3" fill="#2b7de9"/></svg>';}
+  const why=WHY[id];
+  $('#whyPlane').innerHTML='<div class="why"><h3 style="margin-top:0">'+p.name+' · '+p.tag+'</h3>'+fig+(id!=='ring'?'<div class="legend"><span class="cg">weight center</span><span class="cl">lift center</span></div>':'')+
+    '<p>'+why+'</p>'+bar('speed','Speed')+bar('float','Hang time')+bar('distance','Distance')+bar('tricks','Weird factor')+'</div>';
+}
+
+/* ---------- flight log ---------- */
+$('#fPlane').innerHTML=PLANES.map(p=>'<option value="'+p.id+'">'+p.name+'</option>').join('');
+$('#fSave').onclick=()=>{
+  const d=parseFloat($('#fDist').value),h=parseFloat($('#fHang').value);const who=($('#fWho').value||'Pilot').trim();
+  if(isNaN(d)&&isNaN(h)){toast('Enter a distance or a hang time');return;}
+  const m=store.load();m.flights.push({p:$('#fPlane').value,who,d:isNaN(d)?null:d,h:isNaN(h)?null:h,t:Date.now()});store.save();
+  $('#fDist').value='';$('#fHang').value='';renderLog();toast('Logged');
+};
+function fmtDate(t){const d=new Date(t);return (d.getMonth()+1)+'/'+d.getDate();}
+function renderLog(){
+  const m=store.load();const fl=m.flights;
+  // pilots datalist
+  const pilots=[...new Set(fl.map(f=>f.who))];$('#pilots').innerHTML=pilots.map(x=>'<option value="'+x.replace(/"/g,'')+'">').join('');
+  // chart: best distance per plane
+  const best=PLANES.map(p=>{const v=fl.filter(f=>f.p===p.id&&f.d!=null).map(f=>f.d);return {name:p.name,acc:p.acc,v:v.length?Math.max(...v):0};});
+  const max=Math.max(10,...best.map(b=>b.v));let c='';const x0=74,bw=200,rh=24;
+  best.forEach((b,i)=>{const y=6+i*rh;const w=b.v/max*bw;
+    c+='<text x="'+(x0-8)+'" y="'+(y+14)+'" font-size="12" text-anchor="end" fill="#4a5a6a">'+b.name+'</text>';
+    c+='<rect x="'+x0+'" y="'+(y+3)+'" width="'+bw+'" height="14" rx="7" fill="#eef1f5"/>';
+    if(b.v)c+='<rect x="'+x0+'" y="'+(y+3)+'" width="'+Math.max(14,w)+'" height="14" rx="7" fill="'+b.acc+'"/><text x="'+(x0+Math.max(14,w)+6)+'" y="'+(y+14)+'" font-size="12" fill="#1b2a3a">'+b.v+' ft</text>';});
+  $('#chart').innerHTML=c||'';
+  // pilot board
+  const byWho={};for(const f of fl){const w=byWho[f.who]=byWho[f.who]||{d:0,h:0,n:0};w.n++;if(f.d!=null)w.d=Math.max(w.d,f.d);if(f.h!=null)w.h=Math.max(w.h,f.h);}
+  const rows=Object.entries(byWho).sort((a,b)=>b[1].d-a[1].d);
+  $('#pilotBoard').innerHTML=rows.length?'<table>'+rows.map(([w,r])=>'<tr><td>'+esc(w)+'</td><td>'+(r.d?'best '+r.d+' ft':'')+(r.h?' · '+r.h+' s hang':'')+' · '+r.n+' flight'+(r.n>1?'s':'')+'</td></tr>').join('')+'</table>':'<p class="muted">No flights yet. Go outside.</p>';
+  // list
+  $('#logList').innerHTML=fl.slice().reverse().map((f,i)=>{const idx=fl.length-1-i;const p=PLANES.find(x=>x.id===f.p);
+    return '<li><span><b>'+(p?p.name:f.p)+'</b> · '+esc(f.who)+' · '+fmtDate(f.t)+'</span><span>'+(f.d!=null?f.d+' ft':'')+(f.h!=null?' · '+f.h+' s':'')+' <button class="del" data-i="'+idx+'">✕</button></span></li>';}).join('');
+  document.querySelectorAll('.del').forEach(b=>b.onclick=()=>{const m=store.load();m.flights.splice(+b.dataset.i,1);store.save();renderLog();});
+}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+renderWhy('dart');
+/* ---------- offline: service worker, https only, scoped to Paper Wing's own files ---------- */
+if('serviceWorker' in navigator&&location.protocol==='https:'){
+  window.addEventListener('load',()=>{navigator.serviceWorker.register('paperwing-sw.js',{scope:'./paperwing'}).catch(()=>{});});
+}
+</script>
+</body>
+</html>
