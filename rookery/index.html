@@ -136,6 +136,8 @@
   .ib-icon{font-size:15px;}
   .ib-x{flex:none; width:34px; height:34px; border:none; background:transparent; color:var(--muted); font-size:22px; line-height:1; cursor:pointer; border-radius:8px;}
   .ib-x:active{background:#d9e6e0;}
+  .updbar{position:fixed; left:12px; right:12px; bottom:calc(72px + env(safe-area-inset-bottom)); z-index:55; display:flex; align-items:center; gap:8px; background:var(--forest-lite); border:1px solid #cfe0d9; border-radius:12px; padding:8px 8px 8px 10px; box-shadow:0 6px 22px rgba(0,0,0,.18); max-width:560px; margin:0 auto;}
+  .updbar[hidden]{display:none;}
   .sheet p{font-size:13px; color:var(--muted); margin:0 0 12px;}
   label.fl{display:block; font-size:12px; font-weight:700; color:var(--ink); margin:12px 0 5px;}
   input.fi, textarea.fi{width:100%; border:1px solid var(--line); border-radius:10px; padding:11px; font-size:15px; background:#fff; color:var(--ink); font-family:inherit;}
@@ -165,7 +167,7 @@
     <h1 id="hTitle">Rookery</h1>
     <div style="display:flex;align-items:center;gap:7px;">
       <button class="ver" id="helpBtn" aria-label="How to use">? Guide</button>
-      <button class="ver" id="verBtn">v1.11 · Nov 9</button>
+      <button class="ver" id="verBtn">v1.13 · Nov 9</button>
     </div>
   </div>
   <div class="sub" id="hSub">Your Hallmark Beauty of Birds collection. Tap a bird's name to look it up.</div>
@@ -178,6 +180,7 @@
 
 <main>
   <div id="installBar" class="installbar" hidden><button id="installBtn" class="ib-btn"><span class="ib-icon">⬇</span><span class="ib-label">Install Rookery on your phone</span></button><button id="installX" class="ib-x" aria-label="Dismiss">×</button></div>
+  <div id="updBar" class="updbar" hidden role="status"><button id="updBtn" class="ib-btn"><span class="ib-icon">↻</span><span class="ib-label" id="updLabel">A new version of Rookery is ready. Tap to update</span></button><button id="updX" class="ib-x" aria-label="Later">×</button></div>
   <div class="view active" id="view-collection"></div>
   <div class="view" id="view-money"></div>
 </main>
@@ -890,7 +893,7 @@ document.getElementById("nav-money").onclick=()=>switchView("money");
 
 let toastTimer=null;
 function toast(msg){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove("show"),1700); }
-document.getElementById("verBtn").onclick=()=>toast("Rookery v1.11 · Beauty of Birds tracker · Nov 9 2026");
+document.getElementById("verBtn").onclick=()=>toast("Rookery v1.13 · Beauty of Birds tracker · Nov 9 2026");
 
 /* ===================== NEW-USER GUIDE ===================== */
 const GUIDE_KEY = "bob_public_guide_seen";
@@ -915,7 +918,57 @@ document.getElementById("helpBtn").onclick=showGuide;
 loadState();
 renderAll();
 applyIncomingSync();
-if('serviceWorker' in navigator){ window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); }); }
+if('serviceWorker' in navigator){
+  window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); });
+}
+
+/* ===================== UPDATE CHECK ===================== */
+// Looks for a newer Rookery on open, when you come back to the app, when the
+// connection returns, and every 30 minutes while it's open. The version on the
+// badge (verBtn) is the single source of truth: the live page's badge is compared
+// with this one. Updating is a tap, never automatic, so nothing you're typing is lost.
+(function(){
+  var badge = document.getElementById('verBtn');
+  var CUR = ((badge && badge.textContent.match(/v(\d+(?:\.\d+)*)/)) || [])[1] || '0';
+  var bar = document.getElementById('updBar'), label = document.getElementById('updLabel');
+  var lastCheck = 0, offered = null, snoozedFor = null;
+  function newer(a, b){
+    var pa = a.split('.').map(Number), pb = b.split('.').map(Number);
+    for (var i = 0; i < Math.max(pa.length, pb.length); i++){
+      var x = pa[i] || 0, y = pb[i] || 0; if (x !== y) return x > y;
+    }
+    return false;
+  }
+  function offer(v){
+    if (v === snoozedFor) return;
+    offered = v; label.textContent = 'Rookery v' + v + ' is ready. Tap to update'; bar.hidden = false;
+  }
+  function check(force){
+    if (!navigator.onLine) return;
+    var now = Date.now(); if (!force && now - lastCheck < 15000) return; lastCheck = now;
+    if (navigator.serviceWorker && navigator.serviceWorker.getRegistration){
+      navigator.serviceWorker.getRegistration().then(function(r){ if (r) r.update().catch(function(){}); }).catch(function(){});
+    }
+    fetch('./', { cache: 'no-store' }).then(function(res){ return res.ok ? res.text() : ''; }).then(function(t){
+      var m = t.match(/id="verBtn">v(\d+(?:\.\d+)*)/);
+      if (m && newer(m[1], CUR)) offer(m[1]);
+    }).catch(function(){});
+  }
+  document.getElementById('updBtn').addEventListener('click', function(){
+    label.textContent = 'Updating…';
+    var go = function(){ location.reload(); };
+    if (navigator.serviceWorker && navigator.serviceWorker.getRegistration){
+      navigator.serviceWorker.getRegistration().then(function(r){ return r ? r.update() : null; }).then(go, go);
+    } else go();
+  });
+  document.getElementById('updX').addEventListener('click', function(){ bar.hidden = true; snoozedFor = offered; });
+  window.addEventListener('load', function(){ setTimeout(function(){ check(true); }, 2500); });
+  document.addEventListener('visibilitychange', function(){ if (!document.hidden) check(false); });
+  window.addEventListener('online', function(){ check(true); });
+  setInterval(function(){ if (!document.hidden) check(true); }, 30 * 60 * 1000);
+  window.__rookeryCheckForUpdate = check;
+})();
+
 
 /* ===================== INSTALL PROMPT ===================== */
 (function(){
