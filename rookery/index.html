@@ -164,7 +164,7 @@
     <h1 id="hTitle">Rookery</h1>
     <div style="display:flex;align-items:center;gap:7px;">
       <button class="ver" id="helpBtn" aria-label="How to use">? Guide</button>
-      <button class="ver" id="verBtn">v1.9 · Nov 8</button>
+      <button class="ver" id="verBtn">v1.10 · Nov 9</button>
     </div>
   </div>
   <div class="sub" id="hSub">Your Hallmark Beauty of Birds collection. Tap a bird's name to look it up.</div>
@@ -299,7 +299,17 @@ const DATA = {
       {id:"comp-flamingo", name:"Fancy Flamingo", meta:"2021 · premium"},
       {id:"comp-mute-swan", name:"Mute Swan", meta:"2024 · premium"},
       {id:"comp-stunning-swan", name:"Stunning Swan", meta:"2018 · premium"},
-      {id:"comp-stunning-swallow", name:"Stunning Swallow", meta:"premium Keepsake"},
+      {id:"comp-stunning-swallow", name:"Stunning Swallow", meta:"2017 · premium"},
+      {id:"comp-dazzling-hummingbird", name:"Dazzling Hummingbird", meta:"2016 · premium"},
+      {id:"comp-ruby-cardinal-2015", name:"Ruby Red Cardinal", meta:"2015 · premium"},
+      {id:"comp-ruby-cardinal-2016", name:"Ruby Red Cardinal", meta:"2016 · premium"},
+      {id:"comp-beautiful-chickadee", name:"Beautiful Black-Capped Chickadee", meta:"2020 · premium"},
+      {id:"comp-peace-dove", name:"Peace Dove", meta:"2021 · premium"},
+      {id:"comp-captivating-cockatoo", name:"Captivating Cockatoo", meta:"2021 · premium"},
+      {id:"comp-majestic-cardinal", name:"Majestic Cardinal", meta:"2019 · premium"},
+      {id:"comp-majestic-lady-cardinal", name:"Majestic Lady Cardinal", meta:"2019 · premium"},
+      {id:"comp-clever-cockatiel-2019", name:"Clever Cockatiel", meta:"2019 · Ornament Club"},
+      {id:"comp-rainbow-lorikeet", name:"Rainbow Lorikeet", meta:"2024 · Ornament Club"},
       {id:"comp-pretty-parrot", name:"Pretty Parrot", meta:"2018 · Ornament Club"},
       {id:"comp-parakeet", name:"Indian Ring-Necked Parakeet", meta:"2022 · Ornament Club"},
       {id:"comp-fruit-dove", name:"Fruit Dove", meta:"2025 · Ornament Club"},
@@ -312,9 +322,20 @@ const DATA = {
       {id:"comp-stately-raven", name:"Stately Little Raven", meta:"2019 · Halloween mini"},
       {id:"comp-wee-owl", name:"Wee Little Owl", meta:"2017 · Halloween mini"}
     ]
+  },
+  sets: {
+    title: "Sets & Tie-ins",
+    note: "Beauty of Birds branded pieces that aren’t ornaments — tree toppers, skirts, stockings, and multi-piece sets collectors add to round out the display.",
+    warn: false,
+    birds: [
+      {id:"sets-2020-outdoor", name:"Set of Outdoor Ornaments", meta:"2020"},
+      {id:"sets-2022-skirt-topper", name:"Cardinal Couple Tree Skirt & Topper", meta:"2022"},
+      {id:"sets-2023-topper-skirt", name:"Mini Tree Topper & Skirt Set", meta:"2023"},
+      {id:"sets-2023-stocking", name:"Stocking", meta:"2023"}
+    ]
   }
 };
-const SECTION_ORDER = ["main","lady","mini","special","comp"];
+const SECTION_ORDER = ["main","lady","mini","special","comp","sets"];
 const BY_ID = {};
 SECTION_ORDER.forEach(k=> DATA[k].birds.forEach(b=>{ BY_ID[b.id]=b; }));
 
@@ -815,7 +836,7 @@ document.getElementById("nav-money").onclick=()=>switchView("money");
 
 let toastTimer=null;
 function toast(msg){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove("show"),1700); }
-document.getElementById("verBtn").onclick=()=>toast("Rookery v1.9 · Beauty of Birds tracker · Nov 8 2026");
+document.getElementById("verBtn").onclick=()=>toast("Rookery v1.10 · Beauty of Birds tracker · Nov 9 2026");
 
 /* ===================== NEW-USER GUIDE ===================== */
 const GUIDE_KEY = "bob_public_guide_seen";
