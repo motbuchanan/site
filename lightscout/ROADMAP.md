@@ -41,7 +41,7 @@ A sun planner for photos, as one HTML file: tap a spot on a map, pick a day and 
 - Version stamp in two places that must match: meta build + the mb-ver button text (and the toast). Bump both every change, with the real date.
 
 ## Open queue (ideas, in rough order of value)
-1. DONE Nov 8 (site v7.65). Still open: swap shot-lightscout-2.jpg for a real phone screenshot of the Manhattanhenge plan with satellite tiles; name the guide.
+1. DONE Nov 8 (site v7.67). Still open: swap shot-lightscout-2.jpg for a real phone screenshot of the Manhattanhenge plan with satellite tiles; name the guide.
 2. Moon: rise, set, phase and position (the most asked-for thing in every competitor review). The math is a known model (suncalc has it); one more path on the dial.
 3. Save a stamped picture of the plan (PNG with date, time, spot, direction) for people who share screenshots. Needs the map drawn to a canvas, which cross-origin tiles block; draw the dial and the words only, or use a tile source that allows it.
 4. Sun at the same time across the year (the whole-year arc fan SunCalc draws), and solstice / equinox jump buttons.
