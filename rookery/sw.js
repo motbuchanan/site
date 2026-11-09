@@ -1,5 +1,5 @@
 /* Rookery service worker — offline cache for the checklist */
-const CACHE = 'rookery-v1.10';
+const CACHE = 'rookery-v1.11';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 
 self.addEventListener('install', (e) => {
