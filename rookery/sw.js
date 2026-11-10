@@ -1,7 +1,7 @@
 /* Rookery service worker — offline copy of the checklist.
    Pages load network-first so a new upload shows up on the next open;
    the saved copy is only used when there is no connection. */
-const CACHE = 'rookery-v1.13';
+const CACHE = 'rookery-v1.14';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 
 self.addEventListener('install', (e) => {
