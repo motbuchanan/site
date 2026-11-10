@@ -6,7 +6,7 @@ Self-documenting record of this repo. Fetch this file (raw) before any work and 
 The "This Phone" portfolio at motbuchanan.com: a phone-shaped home screen of single-file HTML apps, hosted on GitHub Pages from repo motbuchanan/site. Temporary front door that Mot now intends to keep (The Closet concept likely abandoned in favor of this).
 
 ## Current version
-- index.html footer: **v7.84 · Nov 10** (v7.83: Paper Wing card text restored, Two Cans practice copy fixed. v7.82: 20 icons redrawn as one teal/orange set, Haunt Inc. removed, app count line now 30. v7.81: desktop headline left + hover peek right + card right + light on phone + corner links). FOUR stamps must match: footer tagline, Settings updBadge, About verNum, Software Update verNum2.
+- index.html footer: **v7.85 · Nov 10** (v7.84: a page and a link for every app. v7.83: Paper Wing card text restored, Two Cans practice copy fixed. v7.82: 20 icons redrawn as one teal/orange set, Haunt Inc. removed, app count line now 30. v7.81: desktop headline left + hover peek right + card right + light on phone + corner links). FOUR stamps must match: footer tagline, Settings updBadge, About verNum, Software Update verNum2.
 - buildlog.html: log r17 · Nov 10 (badge v1.7). Nov 10 entry: the icons match now. Nov 8 entry: Paper Wing joins the phone. Nov 8 entry: Light Scout joins the phone. (Previous: Nov 1, The Keep opens by the hearth.) Rookery (v7.62 to v7.66) has no build log entry yet. Caught up through v7.53. Dates for Side Boss and RoughCut joining (Sep 27), desktop fit (Oct 8) and Two Cans (Oct 20) are best estimates from version order.
 - og.png: real 1200x630 screenshot of the phone in the studio (Oct 18). Regenerate when the home screen changes a lot.
 - LAYOUT LAW (v7.75, Nov 9, Mot's call; do not change picks without his instruction): TOP 8 icons loose (rows 1-2), BOTTOM ROW = 4 folders. Row1 All Thumbs, RoughCut, Light Scout, The Keep; row2 Pocket Shark, Measure Up, LiftSafe, Nazca; folders Learn (sharp, harp, brewdeck, knightschool, upcard), Make (paperwing, pigment, bloom), Tools (civic-compass, rookery, twocans, reframe, sideboss, triangle, gather, spectra), Play (shelf, brickbreak, sudoku, jigsaw, fiveletters, starstuff). NO WIDGET: tried in v7.73 and v7.74 and rejected on glass ("just a weird little video clip off in the corner, nothing says this is a pool game you should play; I like just having the app icons better"). Do not re-propose a home-screen widget or video tile.
@@ -31,6 +31,15 @@ The "This Phone" portfolio at motbuchanan.com: a phone-shaped home screen of sin
 - RESUME: separate project (motbuchanan/resume). Never linked from this site. Never logged here.
 
 ## What shipped (newest first)
+
+### v7.85 · Nov 10 · the one ask: pitch me a build
+- The site's one call to action is a build-ideas intake. Pill on the home-screen widget ("Got a build idea? Pitch me one"), the dock lightbulb icon (it replaced the envelope; dock is now Settings, camera, lightbulb), "pitch me a build" in the desktop corner links, a section on every app page, and the link `motbuchanan.com/?idea`.
+- Four questions: the problem (required), who would use it (one chip), how they handle it now, their name. "Write the email" opens the visitor's OWN email app with everything filled in, addressed to the site's existing say-hi address. "Copy it instead" copies the same text. Nothing is sent by the site and no outside service is involved, so the No tracking line stays true. The only thing kept is an unsent draft in that visitor's browser (key `ideaDraft`), cleared by Clear the form.
+- Promise wording, locked: anyone may send one, no promise, no charge ("If I dig it, I might build it").
+- LINES[0], the plain first widget line (rule from v7.76 below still holds), is now "Everything here, I built on a phone. / Games, tools and lessons for the people around me." It was "I build stuff for people. / Tap an icon to see what it is." Phone visitors now see the same promise the desktop headline makes.
+- PUBLIC EMAIL is now motbuchanan.builds@gmail.com everywhere on the site (intake, desktop say hi, Settings say hi, links.html, brickbreak.html, Reframe report links, Rookery). The personal address must never go back on a public page. Reframe v1.8 and Rookery v1.14 bumped for this (cache names too). Brick Breaker v1.2.
+- Settings > Say hi still opens email directly. The intake has a "Just saying hi" link for the same thing.
+- App pages regenerated (all 30 change once, for the new section).
 
 ### v7.84 · Nov 10 · a page and a link for every app
 - New folder `app/`: one page per app (`app/<slug>.html`) plus a 1200x630 share image (`app/<slug>.jpg`). 30 apps. The page is plain text a search engine or a link preview can read: what it is, why, how, what I learned, screenshots, a button straight into the app. Link form: `motbuchanan.com/app/pocket-shark`.
