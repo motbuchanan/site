@@ -173,6 +173,7 @@ def page(x, apps, ver, stamp, fav):
 %(shots)s
 %(secs)s
 %(take)s
+<section><h2>Got a build idea?</h2><p>Tell me about a problem a small app could fix. If I dig it, I might build it. No promise, and no charge.</p><p class="take"><a href="../?idea">Pitch me a build</a></p></section>
 <nav class="more" aria-label="More apps"><h2>More from the phone</h2><ul>%(others)s</ul></nav>
 <p class="foot">Built on a phone. Runs in your browser.</p>
 </div>
