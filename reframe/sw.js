@@ -1,6 +1,6 @@
 /* Reframe service worker - offline shell.
    Bump CACHE on every reframe.html change so old copies never stick. */
-const CACHE = 'reframe-v1_7';
+const CACHE = 'reframe-v1_8';
 const ASSETS = [
   './',
   './index.html',

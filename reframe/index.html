@@ -148,7 +148,7 @@
 <div class="wm">Reframe</div>
 <div class="sub" id="wholine">plain words for expert talk</div>
 </div></div>
-    <div style="display:flex;gap:6px;align-items:center;flex:0 0 auto"><div class="badge" id="help" title="How to use this">?</div><div class="badge" id="packbtn">Medical</div><div class="badge" id="badge">v1.7</div></div>
+    <div style="display:flex;gap:6px;align-items:center;flex:0 0 auto"><div class="badge" id="help" title="How to use this">?</div><div class="badge" id="packbtn">Medical</div><div class="badge" id="badge">v1.8</div></div>
   </header>
 
   <div class="note">
@@ -222,8 +222,8 @@
     </div>
   </section>
 
-  <div class="foot">Reframe v1.7 &middot; runs entirely on this device &middot; suggestions only. You stay the author.<br>
-  Spotted a bad suggestion? <a id="reportlink" href="mailto:motbuchanan@gmail.com?subject=Reframe%20suggestion%20report" style="color:var(--accent)">Report it</a> and make the tool better.</div>
+  <div class="foot">Reframe v1.8 &middot; runs entirely on this device &middot; suggestions only. You stay the author.<br>
+  Spotted a bad suggestion? <a id="reportlink" href="mailto:motbuchanan.builds@gmail.com?subject=Reframe%20suggestion%20report" style="color:var(--accent)">Report it</a> and make the tool better.</div>
 </div>
 
 <div class="welcome hide" id="welcome">
@@ -1259,7 +1259,7 @@ $("w-skip").onclick=function(){if(wSel!==PACK)setPack(wSel,true);$("welcome").cl
   store.set("reframe.tour.done","1");toast("Tap ? up top whenever you want the tour");};
 
 /* ============ init ============ */
-$("badge").onclick=function(){toast("Reframe v1.7 \u00b7 on-device \u00b7 built Aug 18");};
+$("badge").onclick=function(){toast("Reframe v1.8 \u00b7 on-device \u00b7 Nov 10 2026");};
 function renderWPacks(sel){
   var w=$("wpacks");w.innerHTML="";
   Object.keys(PACKS).forEach(function(k){
@@ -1281,7 +1281,7 @@ function updateReport(issues){
   var body="Pack: "+(pk?pk.name:"?")+"\n";
   body+=flagged.length?("Flagged terms: "+flagged.join(", ")+"\n"):"";
   body+="\nWhat was wrong with the suggestion:\n\n(Your text stays on your device. Only what you type below is sent.)";
-  a.href="mailto:motbuchanan@gmail.com?subject="+encodeURIComponent("Reframe report - "+(pk?pk.name:"pack"))+"&body="+encodeURIComponent(body);
+  a.href="mailto:motbuchanan.builds@gmail.com?subject="+encodeURIComponent("Reframe report - "+(pk?pk.name:"pack"))+"&body="+encodeURIComponent(body);
 }
 function a11yButton(el,label){
   if(!el)return;
