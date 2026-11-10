@@ -445,10 +445,9 @@ header .dot{width:46px;height:46px;font-size:22px}
   </div>
 </div>
 
-<script src="config.js"></script>
 <script type="module">
-const VERSION = 'v0.16';
-const VDATE = 'Oct 20 2026';
+const VERSION = 'v0.17';
+const VDATE = 'Nov 10 2026';
 const FB_VER = '10.12.2';
 const ROOM = 'main';
 
@@ -517,8 +516,9 @@ const sndSend = () => tone([660], .09, .1, .12);
 const sndGet  = () => tone([784, 1047], .16, .11, .2);
 
 /* ---------- config ---------- */
-const DEMO = new URLSearchParams(location.search).has('demo');
-const CFG = window.TWOCANS_CONFIG || null;
+// Website copy: practice only. It never loads a config file and never talks to a server.
+const DEMO = true;
+const CFG = null;
 function configReady(){
   if (!CFG || !CFG.firebase || !Array.isArray(CFG.people) || CFG.people.length < 2) return false;
   const f = CFG.firebase;
