@@ -19,6 +19,57 @@ SITE = 'https://motbuchanan.com/'
 KEEP_EXTRA = set()
 CAT = {'play': ('Play', '#4cf0e0'), 'learn': ('Learn', '#f59847'),
        'tool': ('Tool', '#ff6fae'), 'make': ('Make', '#b57cff')}
+# what each app is, in a few plain words, for search result titles ("Pocket Shark: a free 3D pool game with a coach")
+SHORT = {
+    'light-scout': 'a free golden hour planner for photos',
+    'rookery': 'a free Hallmark Beauty of Birds checklist',
+    'civic-compass': 'a free civic toolkit for voters',
+    'pocket-shark': 'a free 3D pool game with a coach',
+    'the-brew-deck': 'free homebrew beer lessons and recipes',
+    'roughcut': 'a free video editor for your phone browser',
+    'side-boss': 'a free side hustle planner game',
+    'gather': 'a free holiday and party planner',
+    'the-keep': 'a free walking game drawn in letters',
+    'knight-school': 'learn chess free, from the first move',
+    'all-thumbs': 'a free course on building apps on a phone',
+    'pigment': 'a free color wheel and paint mixer',
+    'reframe': 'a free tool that swaps jargon for plain words',
+    'star-stuff': 'a free planet merge game',
+    'the-production-triangle': 'good, fast or cheap, by dragging',
+    'liftsafe': 'a free forklift operator course',
+    'brick-breaker': 'a free brick breaker game',
+    'sharp': 'a free piano trainer that lights the next key',
+    'harp': 'a free harmonica trainer',
+    'nazca': 'a free infinite drawing canvas',
+    'the-upcard': 'learn blackjack strategy free, with a coach',
+    'sudoku': 'free daily sudoku puzzles',
+    'game-shelf': '24 free board and card games',
+    'jigsaw': 'turn any photo into a free jigsaw puzzle',
+    'five-letters': 'a free daily five-letter word game',
+    'measure-up': 'a free music game for school subjects',
+    'bloom': 'grow a different plant every time',
+    'spectra': 'a free journal for the colors you see in music',
+    'two-cans': 'private two-phone chat, practice copy',
+    'paper-wing': 'ten paper airplanes, folded step by step',
+}
+APPCAT = {'play': 'GameApplication', 'learn': 'EducationalApplication', 'tool': 'UtilitiesApplication', 'make': 'MultimediaApplication'}
+PERSON = {'@type': 'Person', 'name': 'Mot Buchanan', 'url': 'https://motbuchanan.com/'}
+
+
+def full_what(a):
+    # what search engines read: the card line plus its note (Two Cans: "practice version" must travel with "locked")
+    w = a['what']
+    if a.get('note') and 'practice' in a['note']:  # only notes that change what the app is; skip trivia like file sizes
+        n = a['note'].strip()
+        w += ' ' + n[0].upper() + n[1:] + ('' if n.endswith('.') else '.')
+    return w
+
+
+def ld(obj):
+    # schema labels for search engines and AI search; "</" escaped so it can never close the script tag
+    return '<script type="application/ld+json">' + json.dumps(obj, ensure_ascii=False).replace('</', '<\\/') + '</script>'
+
+
 MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 
@@ -114,7 +165,14 @@ section p{color:var(--soft);max-width:36em}
 def page(x, apps, ver, stamp, fav):
     a = x['a']
     label, cc = CAT[x['cat']]
-    title = a['name'] + ' · Mot Buchanan'
+    short = SHORT.get(x['slug'])
+    if not short:
+        print('NOTE: no SHORT line for %s, its title is just the name' % x['slug'])
+    title = a['name'] + (': ' + short if short else '') + ' · Mot Buchanan'
+    schema = ld({'@context': 'https://schema.org', '@type': 'WebApplication', 'name': a['name'], 'description': full_what(a),
+                 'url': SITE + 'app/' + x['slug'], 'image': SITE + 'app/' + x['slug'] + '.jpg',
+                 'applicationCategory': APPCAT.get(x['cat'], 'WebApplication'), 'operatingSystem': 'Any, runs in a web browser',
+                 'isAccessibleForFree': True, 'offers': {'@type': 'Offer', 'price': '0', 'priceCurrency': 'USD'}, 'author': PERSON})
     url = SITE + 'app/' + x['slug']
     since = a.get('since')
     nfiles = len(a.get('files') or [])
@@ -147,7 +205,7 @@ def page(x, apps, ver, stamp, fav):
 <link rel="canonical" href="%(url)s">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Mot Buchanan">
-<meta property="og:title" content="%(name)s">
+<meta property="og:title" content="%(title)s">
 <meta property="og:description" content="%(what)s">
 <meta property="og:url" content="%(url)s">
 <meta property="og:image" content="%(url)s.jpg">
@@ -159,11 +217,12 @@ def page(x, apps, ver, stamp, fav):
 %(fav)s
 <link href="../fonts/fonts.css" rel="stylesheet">
 <script data-goatcounter="https://motbuchanan.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+%(schema)s
 <style>%(css)s</style>
 </head>
 <body>
 <div class="wrap">
-<nav class="top"><a href="../">Mot Buchanan</a><a href="../">all apps</a></nav>
+<nav class="top"><a href="../">Mot Buchanan</a><a href="./">all apps</a></nav>
 <header>
 <div class="head"><img class="ico" src="%(icon)s" alt="" width="112" height="112"><div><p class="cat">%(label)s</p><h1>%(name)s</h1></div></div>
 <p class="what">%(what)s</p>
@@ -183,7 +242,7 @@ def page(x, apps, ver, stamp, fav):
 """ % dict(title=e(title), what=e(a['what']), url=url, name=e(a['name']), css=CSS % dict(cc=cc), slug=x['slug'],
            icon=x['icon'], label=label, facts=e(facts), open=e(x['open']), verb=e(a['verb']), note=note, shots=shots,
            secs=secs, take=('<section><h2>Take it</h2><p class="take">%s</p></section>' % take) if take else '',
-           others=others, ver=ver, stamp=stamp, fav=fav)
+           others=others, ver=ver, stamp=stamp, fav=fav, schema=schema)
 
 
 SHARE = """<!doctype html><html><head><meta charset="utf-8"><link href="../fonts/fonts.css" rel="stylesheet"><style>
@@ -230,6 +289,94 @@ def share_images(site, apps):
     asyncio.run(run())
 
 
+INDEX = """<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>All apps · Mot Buchanan</title>
+<meta name="description" content="Every app on motbuchanan.com: %(n)d free games, tools, lessons and art toys Mot Buchanan built on a phone. They run in your browser, nothing to install.">
+<link rel="canonical" href="https://motbuchanan.com/app/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Mot Buchanan">
+<meta property="og:title" content="All apps · Mot Buchanan">
+<meta property="og:description" content="%(n)d free games, tools, lessons and art toys, all built on a phone.">
+<meta property="og:url" content="https://motbuchanan.com/app/">
+<meta property="og:image" content="https://motbuchanan.com/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0a0d11">
+%(fav)s
+<link href="../fonts/fonts.css" rel="stylesheet">
+<script data-goatcounter="https://motbuchanan.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+%(schema)s
+<style>
+:root{--ink:#eef1f4;--soft:#c2c9d1;--dim:#8f99a6;--line:#232a33;--bg:#0a0d11}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%%}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,system-ui,sans-serif;padding:0 max(20px,env(safe-area-inset-left)) 56px max(20px,env(safe-area-inset-right))}
+a{color:inherit}
+.wrap{max-width:760px;margin:0 auto}
+.top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:6px 0 20px;font:500 13px 'JetBrains Mono',monospace}
+.top a{text-decoration:none;color:var(--soft);display:inline-block;padding:14px 0}
+h1{font:800 clamp(30px,9vw,46px)/1.05 'Archivo',system-ui,sans-serif;letter-spacing:-.01em}
+.lead{font-size:clamp(16px,4.4vw,19px);color:var(--soft);margin:14px 0 8px;max-width:34em}
+h2{font:700 11px 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;margin:34px 0 4px;padding-top:18px;border-top:1px solid var(--line)}
+ul{list-style:none}
+li a{display:flex;gap:14px;align-items:center;padding:12px 0;text-decoration:none}
+li img{width:56px;height:56px;border-radius:14px;flex:0 0 auto;background:#12161c}
+li b{display:block;font:700 17px 'Archivo',system-ui,sans-serif}
+li span{display:block;font-size:14.5px;color:var(--soft);line-height:1.4}
+li a:hover b,li a:focus-visible b{text-decoration:underline}
+li a:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+.foot{margin-top:34px;font:400 11px 'JetBrains Mono',monospace;color:var(--dim)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="top"><a href="../about.html">Mot Buchanan</a><a href="../">the phone</a></nav>
+<h1>All apps</h1>
+<p class="lead">Everything on my phone-shaped home screen, as a plain list. Every one is free and runs in your browser. I built them all on a phone.</p>
+%(groups)s
+<p class="foot">Built on a phone. Runs in your browser.</p>
+</div>
+</body>
+</html>
+"""
+
+
+def small_icon(uri, px=112):
+    # the list page shows 30 icons, so shrink each to 112px to keep the page light
+    m = re.match(r'data:image/\w+;base64,(.*)$', uri)
+    if not m:
+        return uri  # a drawn (svg) icon is already small
+    try:
+        import base64, io
+        from PIL import Image
+        im = Image.open(io.BytesIO(base64.b64decode(m.group(1)))).convert('RGB').resize((px, px), Image.LANCZOS)
+        buf = io.BytesIO()
+        im.save(buf, 'JPEG', quality=82)
+        return 'data:image/jpeg;base64,' + base64.b64encode(buf.getvalue()).decode()
+    except Exception:
+        return uri
+
+
+def index_page(apps, fav):
+    groups = ''
+    for cat in ('play', 'learn', 'make', 'tool'):
+        label, cc = CAT[cat]
+        rows = [x for x in apps if x['cat'] == cat]
+        if not rows:
+            continue
+        groups += '<h2 style="color:%s">%s</h2><ul>' % (cc, label)
+        for x in rows:
+            groups += '<li><a href="%s.html"><img src="%s" alt="" width="56" height="56" loading="lazy"><div><b>%s</b><span>%s</span></div></a></li>' % (
+                x['slug'], small_icon(x['icon']), e(x['a']['name']), e(full_what(x['a'])))
+        groups += '</ul>'
+    schema = ld({'@context': 'https://schema.org', '@type': 'CollectionPage', 'name': 'All apps', 'url': SITE + 'app/', 'author': PERSON,
+                 'hasPart': [{'@type': 'WebApplication', 'name': x['a']['name'], 'url': SITE + 'app/' + x['slug']} for x in apps]})
+    return INDEX % dict(n=len(apps), fav=fav, schema=schema, groups=groups)
+
+
 def main():
     site = sys.argv[1]
     apps, ver, fav = load(site)
@@ -244,13 +391,18 @@ def main():
         if new != old:
             open(f, 'w', encoding='utf8').write(new)
             changed.append(x['slug'] + '.html')
-    urls = [SITE, SITE + 'about.html'] + [SITE + 'app/' + x['slug'] for x in apps]
+    f = os.path.join(site, 'app', 'index.html')
+    new = index_page(apps, fav)
+    if not os.path.exists(f) or open(f, encoding='utf8').read() != new:
+        open(f, 'w', encoding='utf8').write(new)
+        changed.append('index.html')
+    urls = [SITE, SITE + 'about.html', SITE + 'app/'] + [SITE + 'app/' + x['slug'] for x in apps]
     sm = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
     sm += ''.join('  <url><loc>%s</loc></url>\n' % u for u in urls) + '</urlset>\n'
     open(os.path.join(site, 'sitemap.xml'), 'w', encoding='utf8').write(sm)
     if '--images' in sys.argv:
         share_images(site, apps)
-    keep = {x['slug'] + ext for x in apps for ext in ('.html', '.jpg')}
+    keep = {x['slug'] + ext for x in apps for ext in ('.html', '.jpg')} | {'index.html'}
     for f in sorted(os.listdir(os.path.join(site, 'app'))):
         if f not in keep and not f.startswith('_') and f not in KEEP_EXTRA:
             print('OLD FILE, delete it from the repo: app/' + f)
