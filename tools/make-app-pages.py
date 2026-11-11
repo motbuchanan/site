@@ -158,6 +158,7 @@ def page(x, apps, ver, stamp, fav):
 <meta name="theme-color" content="#0a0d11">
 %(fav)s
 <link href="../fonts/fonts.css" rel="stylesheet">
+<script data-goatcounter="https://motbuchanan.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 <style>%(css)s</style>
 </head>
 <body>
