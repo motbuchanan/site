@@ -11,7 +11,10 @@
 <link href="../fonts/fonts.css" rel="stylesheet">
 
 <title>All Thumbs: build it on a phone</title>
-<meta name="description" content="Six small interactive explainers, one map: computer, internet, browser, Linux, Python, and Git, with live progress tracking.">
+<link rel="canonical" href="https://motbuchanan.com/allthumbs/">
+<meta property="og:title" content="All Thumbs: build it on a phone">
+<meta property="og:image" content="https://motbuchanan.com/allthumbs/icon-512.png">
+<meta name="description" content="A build-it-on-a-phone course: eleven interactive explainers, from what a computer is to two phones sharing one Firebase database, each with sandboxes, a practice gym and a quiz.">
 <style>
 :root{
   --bg:#12141a; --panel:#1a1d26; --panel2:#222633; --ink:#e9ecf3; --dim:#98a0b0;
@@ -42,7 +45,7 @@ p{margin:8px 0}
 @media(max-width:420px){.heromascot{width:110px;flex-basis:110px}}
 .herotitle{flex:1;min-width:0}
 .herolede{margin-top:14px}
-.mb-ver{position:fixed;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:900;font:600 10px var(--mb-mono);letter-spacing:.04em;color:var(--mb-teal);background:var(--mb-glass);border:1px solid rgba(76,240,224,.25);border-radius:999px;padding:4px 9px;backdrop-filter:blur(8px);cursor:pointer;user-select:none;opacity:.85}
+.mb-ver{position:fixed;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:900;font:600 10px var(--mb-mono);letter-spacing:.04em;color:var(--mb-teal);background:var(--mb-glass);border:1px solid rgba(76,240,224,.25);border-radius:999px;padding:10px 12px;backdrop-filter:blur(8px);cursor:pointer;user-select:none;opacity:.85}
 .overall{margin-top:14px}
 .obar{height:14px;background:var(--panel2);border:1px solid var(--line);border-radius:999px;overflow:hidden}
 .obar > div{height:100%;width:0%;border-radius:999px;
@@ -97,8 +100,8 @@ footer{color:#5b6272;font-size:12.5px;text-align:center;margin:30px 0 10px;line-
     </div>
   </div>
   <p class="sub herolede" style="font-size:18px">I build almost everything on a phone. This is the course I built to teach myself what was actually happening under it, one small explainer at a time.</p>
-  <p>Each part is a standalone interactive explainer with real working sandboxes, missions, a practice gym with randomized drills, and a five-question quiz. Do them in order for the full story: first how anything reaches your screen, then the toolbox people build it all with, then the part under your own apps, ending with my real Game Shelf taken apart.</p>
-  <p class="sub">Every gym has two tracks. <b>General</b> is the course anyone can take and pass. <b>The Trail</b> swaps in real cases from my own one-thumb phone builds, the actual bugs and fixes, not textbook exercises. Supposedly all thumbs, I still built the whole thing. I saw what I needed to know, so I built the tool to teach it to myself.</p>
+  <p>Each part is a standalone interactive explainer with real working sandboxes, missions, a practice gym with randomized drills, and a five-question quiz. Do them in order for the full story: first how anything reaches your screen, then the toolbox people build it all with, then the part under your own apps, with my real Game Shelf taken apart. After that the course follows what I learned next, starting with two phones sharing one database.</p>
+  <p class="sub">Every gym has two tracks. <b>General</b> is the course anyone can take and pass. <b>The Trail</b> swaps in real cases from my own one-thumb phone builds, the actual bugs and fixes. Supposedly all thumbs, I still built the whole thing. I saw what I needed to know, so I built the tool to teach it to myself.</p>
   <div class="overall">
     <div class="obar"><div id="obarFill"></div></div>
     <div class="oline"><span>course progress</span><b id="opct">0%</b></div>
@@ -113,6 +116,9 @@ footer{color:#5b6272;font-size:12.5px;text-align:center;margin:30px 0 10px;line-
 
 <h2>Unit 3 · Under your own apps</h2>
 <div id="unit3"></div>
+
+<h2>Unit 4 · Shared and live</h2>
+<div id="unit4"></div>
 
 <div class="note">
   <div class="notewrap">
@@ -131,10 +137,10 @@ footer{color:#5b6272;font-size:12.5px;text-align:center;margin:30px 0 10px;line-
 </footer>
 </main>
 <div id="toast" role="status"></div>
-<button class="mb-ver" id="mbVer" type="button">v1.22 &middot; Oct 24</button>
+<button class="mb-ver" id="mbVer" type="button">v1.23 &middot; Nov 13</button>
 <script>
 "use strict";
-var VERSION = "v1.22 · Oct 24";
+var VERSION = "v1.23 · Nov 13";
 
 /* pure helpers (testable) */
 function countDone(state){
@@ -180,6 +186,9 @@ var ROWS = [
   { key:"shelf101_v1", img:"thumb-beside-phone", file:"shelf-dissected.html", title:"The Shelf Dissected",
     sub:"The keystone. Your real Game Shelf taken apart: the hub, the four registrations, the service worker, the Firestore cabinet, and 282 commits of history.",
     total:6, color:"#d9b35a", unit:3 },
+  { key:"firebase101_v1", img:"thumb-on-phone", file:"firebase-basics.html", title:"Who Tapped First",
+    sub:"Two phones, one buzzer. Sign-in, where data sits, the security rules that are the real lock, live listeners, and settling a tie fairly.",
+    total:6, color:"#ff7a9c", unit:4 },
 ];
 
 function initApp(){
@@ -191,7 +200,7 @@ function initApp(){
     clearTimeout(toastT);
     toastT = setTimeout(function(){ el.classList.remove("show"); }, 1800);
   }
-  $("mbVer").addEventListener("click", function(){ toast("v1.22 loaded"); });
+  $("mbVer").addEventListener("click", function(){ toast("v1.23 loaded"); });
 
   function readState(key){
     try {
@@ -203,6 +212,7 @@ function initApp(){
     $("unit1").innerHTML = "";
     $("unit2").innerHTML = "";
     $("unit3").innerHTML = "";
+    $("unit4").innerHTML = "";
     ROWS.forEach(function(r, i){
       var a = document.createElement("a");
       a.className = "row";
@@ -222,7 +232,7 @@ function initApp(){
         "<div class=\"rbar\"><div style=\"background:" + r.color + "\"></div></div>" +
         "<div class=\"rline\"><span class=\"rstats\">not started on this device</span><span class=\"rpct\">0%</span></div>" +
         "</div>";
-      $(r.unit === 1 ? "unit1" : (r.unit === 3 ? "unit3" : "unit2")).appendChild(a);
+      $("unit" + r.unit).appendChild(a);
     });
   }
   function refreshProgress(){

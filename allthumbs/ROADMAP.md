@@ -1,5 +1,35 @@
 # All Thumbs: course roadmap and state
 
+## v1.23 (Nov 13 2026) - expansion map approved + Chapter 11: Who Tapped First (Firebase)
+
+The ten-chapter course was complete at v1.22. On Nov 13 the course was picked back up to cover what has been learned since. The old "Tier 3, pick one" list is replaced by this map. Most recent is authoritative.
+
+### Approved unit map (Nov 13 2026)
+
+- Unit 4, Shared and live: Ch 11 Firebase for real. BUILT (this version).
+- Unit 5, Trust nothing: Ch 12 Break It (hostile testing: phone, tablet, landscape, blocked storage, and why the builder never grades its own work; Trail = real Breaker findings such as a chess trainer dying in private mode and a word game covering its own keyboard sideways). Ch 13 Debugging (root cause first, stale copy vs real bug, the tap-the-badge update check). Ch 14 Robots on GitHub (CI/CD, the validation gates and the Breaker as the worked example).
+- Unit 6, Directing AI: Ch 15 How models work plus the prompting gym. Ch 16 Agents, skills and schedules (the separate reviewer, the monthly sweep, the rulebook refresh).
+- Branches, each with its own mini-hub: AI images and video (the mascot pipeline as the spine); Video editing (companion to RoughCut; RoughCut is ready, so this branch is READY TO START); Game development (later).
+- Build order: Ch 11, then Ch 12, then Ch 14. One chapter per sitting.
+
+### Open decisions
+
+- Do the media and editing branches live inside All Thumbs or stand as sibling courses on the site? Undecided Nov 13. Does not block Ch 12. Must be settled before the first branch chapter ships, because it sets the folder, the hub and the mascot.
+- Hub design pass: it was deferred "until the branches start growing". With 11 rows and branches coming, it is now due. Do it as pick-from-options, before Ch 12 ships.
+
+### Chapter 11 details
+
+- NEW chapter: firebase-basics.html "Who Tapped First" (storage key firebase101_v1, state {m,quizBest,gym}, rose accent #ff7a9c, hero thumb-on-phone; think / oops / aha poke-ins, all images already in the repo). Chapter 8 explained that a cloud database exists; this one teaches the four jobs it does, told through the two-phone buzzer: who is asking (anonymous vs email sign-in, the uid as a name tag), where it sits (collection / document / field, odd-even path rule), are they allowed (security rules as the only lock, denied writes as the lock working), who was first (plain read-then-write vs a transaction, and the same guard stopping double scoring). Plus asked-once vs listening.
+- Engine (pure, module-exported): hasUid, sameUidAcross, pathKind, evalRule(rule, asker), seesUpdate, race(mode), scoreAfter(guarded). Five sandboxes: sign-in picker with two devices, path builder, rule x asker verdict, once-vs-listening two-phone message counter, the tie race played step by step. 6 missions, yes/no gym with 4 General levels (name tags, rules, listening, ties), 9 Trail cases (buzzer rules, the Downloads sign-in trap, first-tap transaction, rock paper scissors scoring guard, the two-account messenger lock, voice notes refused until the rules learned them, the config key scare, the Game Shelf orphan-record reset, live sync with offline storage off), 5-question quiz with retry.
+- New in this chapter, to carry back to older chapters when they are next touched: the badge shows number AND date, one meta name="build" tag mirrors VERSION, and tapping the badge checks the live file for a newer build and offers to load it. Also meta description, canonical and share tags.
+- Hub v1.23: "Unit 4 - Shared and live" added with the Chapter 11 row (total 6), lede extended, units now placed by number ("unit" + r.unit), stale search description fixed (it still said six explainers), canonical and share tags added.
+- Validated: 0 dashes, 0 curly quotes, 0 Jekyll tokens, node --check, acorn, 25 engine unit tests, 38-assertion jsdom smoke (every sandbox, all 6 missions, 50 gym drills across both tracks, quiz, storage blocked, hub reads the new key), fitcheck 0 problems, Breaker run plus separate reviewer.
+- Known, not fixed here: the ten older chapters fail fitcheck on their nav strip (the checker does not see it as a scrolling strip; adding overflow-y:hidden to nav clears it), and their badges show the number without the date. Fold both into the hub design pass.
+- Optional art: a dedicated Chapter 11 mascot (the thumb holding a buzzer button, same sticker style, plain white background, no shadow). If made, save it as thumb-firebase.png and the chapter and hub get pointed at it.
+- Reviewer pass (separate agent, Nov 13): 0 breaks. Fixed before ship: section headings hiding under the sticky nav after a chip tap (scroll-margin-top), hub badge under 32px tall, an overstated line about what rules refuse, a made-up error message replaced with the real one, six copy flags. Left open: path builder has no step back; quiz answers are only ever the 2nd or 3rd option (shuffle them); Hint then answer still scores a rep (same as older chapters).
+- NEEDS ONE REAL TEST: Trail case 2 says Firebase sign-in fails when the file is opened from Downloads. Believable, not verified. Check it once on the phone and fix the case if it is wrong.
+- FOLLOW-UP outside this folder: the site home screen card for All Thumbs still says 10 of 10 chapters and 11 files.
+
 ## v1.22 (Oct 24 2026) - fonts load from the site's shared fonts/ folder (../fonts/fonts.css) instead of Google. No content change.
 
 ## v1.21 (Oct 22 2026) - full audit of the live course after ch8-10 went up

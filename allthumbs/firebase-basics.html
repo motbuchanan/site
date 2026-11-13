@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14181d">
+<meta name="build" content="v0.1 · Nov 13">
+<title>Who Tapped First: Firebase sign-in, rules, listeners and ties</title>
+<meta name="description" content="Chapter 11 of All Thumbs. The four jobs of a real backend, taught with a two-phone buzzer: who is asking, where the data sits, who is allowed, and who tapped first.">
+<link rel="canonical" href="https://motbuchanan.com/allthumbs/firebase-basics.html">
+<meta property="og:title" content="Who Tapped First: Firebase for people who build on a phone">
+<meta property="og:description" content="Sign-in, data shape, security rules, live listeners and ties, each with a sandbox you can break.">
+<meta property="og:image" content="https://motbuchanan.com/allthumbs/icon-512.png">
+<link rel="icon" href="favicon.png">
+<style>
+  :root{
+    --canvas:#14181d; --panel:#1c2229; --card:#171c22; --line:#2c3540;
+    --ink:#e8ecf0; --soft:#97a3ae; --dim:#6b7682;
+    --green:#6fe08c; --amber:#f5b04c; --blue:#5aa7e8; --red:#e87a6d; --rose:#ff7a9c; --trail:#c8a4f0;
+    --mono:ui-monospace,'SF Mono','Cascadia Mono','Roboto Mono',Consolas,Menlo,monospace;
+    --sans:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',sans-serif;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html{scroll-behavior:smooth;}
+  body{margin:0; background:var(--canvas); color:var(--ink); font-family:var(--sans); font-size:17px; line-height:1.6; padding-bottom:70px; overflow-wrap:anywhere;}
+  header{padding:26px 20px 10px; max-width:760px; margin:0 auto; display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap;}
+  .wordmark{font-family:var(--mono); font-size:12px; letter-spacing:.2em; color:var(--soft); text-transform:uppercase;}
+  h1{margin:6px 0 2px; font-size:clamp(26px,8vw,32px); line-height:1.15; letter-spacing:-.01em;}
+  .subtitle{color:var(--soft); margin:0; font-size:15px;}
+  .vbadge{font-family:var(--mono); font-size:11px; color:var(--soft); border:1px solid var(--line); border-radius:999px; padding:9px 12px; background:var(--panel); cursor:pointer; white-space:nowrap; margin-top:4px;}
+  nav{position:sticky; top:0; z-index:30; background:#14181d; border-bottom:1px solid var(--line); overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch;}
+  .navrow{display:flex; gap:8px; padding:10px 16px; max-width:760px; margin:0 auto; width:max-content;}
+  .navchip{font-family:var(--mono); font-size:12px; color:var(--soft); border:1px solid var(--line); border-radius:999px; padding:9px 13px; background:var(--card); text-decoration:none; white-space:nowrap;}
+  .navchip:active{color:var(--ink); border-color:var(--rose);}
+  main{max-width:760px; margin:0 auto; padding:0 16px;}
+  section{background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:22px 18px; margin:18px 0; scroll-margin-top:68px;}
+  .eyebrow{font-family:var(--mono); font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--rose); margin:0 0 6px;}
+  h2{margin:0 0 10px; font-size:23px; line-height:1.2;}
+  p{margin:10px 0;}
+  .soft{color:var(--soft);} .small{font-size:14px;}
+  code{font-family:var(--mono); font-size:.9em; background:var(--card); border:1px solid var(--line); border-radius:6px; padding:1px 6px; color:var(--green);}
+  .note{border-left:3px solid var(--rose); background:var(--card); border-radius:0 10px 10px 0; padding:10px 14px; margin:14px 0; font-size:15px; color:var(--soft);}
+  .btn{display:inline-block; font-family:var(--mono); font-size:14px; color:var(--ink); background:var(--card); border:1px solid var(--line); border-radius:10px; padding:11px 16px; cursor:pointer; user-select:none;}
+  .btn:active{border-color:var(--rose); transform:translateY(1px);}
+  .btn.primary{border-color:var(--rose); color:var(--rose);}
+  .simwrap{margin:14px 0;}
+  .picker{display:flex; gap:8px; flex-wrap:wrap; margin:10px 0;}
+  .plabel{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--dim); margin:14px 0 0;}
+  .chipbtn{font-family:var(--mono); font-size:12.5px; padding:10px 13px; border-radius:999px; border:1px solid var(--line); background:var(--card); color:var(--soft); cursor:pointer;}
+  .chipbtn.on{border-color:var(--rose); color:var(--rose); background:rgba(255,122,156,.1); font-weight:700;}
+  .mascotspot{text-align:center; margin:6px 0 2px;}
+  .mascotspot img{height:230px; max-width:100%; width:auto; object-fit:contain; filter:drop-shadow(0 10px 22px rgba(0,0,0,.5));}
+  .tipbox{position:relative; background:var(--card); border:1px solid var(--line); border-left:3px solid var(--rose); border-radius:0 12px 12px 0; padding:16px 16px 16px 118px; margin:22px 0; min-height:96px;}
+  .tipbox .poke{position:absolute; left:-14px; bottom:-8px; height:150px; width:auto; transform:rotate(-8deg); filter:drop-shadow(0 8px 16px rgba(0,0,0,.45)); pointer-events:none;}
+  .tipbox.right{border-left:1px solid var(--line); border-right:3px solid var(--rose); border-radius:12px 0 0 12px; padding:16px 118px 16px 16px;}
+  .tipbox.right .poke{left:auto; right:-14px; transform:rotate(8deg);}
+  .tipbox .tt{font-weight:700; color:var(--rose); font-size:15px;}
+  .tipbox .tp{margin:4px 0 0; font-size:14.5px; color:var(--soft); line-height:1.55;}
+
+  /* the four jobs strip */
+  .jobs{display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin:14px 0;}
+  .job{border:1px solid var(--line); border-radius:12px; background:var(--card); padding:11px 12px; text-decoration:none; color:var(--ink); display:block;}
+  .job .jn{font-family:var(--mono); font-size:11px; color:var(--rose); letter-spacing:.14em;}
+  .job .jt{font-weight:650; font-size:15.5px; line-height:1.3;}
+  .job .jd{font-size:13px; color:var(--soft); line-height:1.4; margin-top:2px;}
+
+  /* phones */
+  .phonerow{display:flex; gap:12px; justify-content:center; margin:14px 0; flex-wrap:wrap;}
+  .phone{flex:1 1 130px; max-width:190px; min-width:0; border:2px solid var(--line); border-radius:18px; background:#0e1216; padding:10px 10px 12px;}
+  .phone .pcap{font-family:var(--mono); font-size:11px; color:var(--dim); text-align:center; margin-bottom:8px; letter-spacing:.06em;}
+  .phone .pscreen{min-height:86px; border-radius:10px; background:var(--card); border:1px solid var(--line); display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:10px 6px;}
+  .phone .big{font-family:var(--mono); font-size:19px; font-weight:700; color:var(--rose); line-height:1.2;}
+  .phone .pscreen.empty .big{color:var(--dim);}
+  .phone .lbl{font-family:var(--mono); font-size:10.5px; color:var(--dim); margin-top:6px;}
+  .phone.won{border-color:var(--green);} .phone.won .big{color:var(--green);}
+  .phone.lost .big{color:var(--soft);}
+  .phone .pbtn{display:block; width:100%; margin-top:8px; font-family:var(--mono); font-size:11.5px; padding:10px 4px; border-radius:8px; border:1px solid var(--line); background:var(--panel); color:var(--soft); cursor:pointer; text-align:center;}
+  .cabinet{text-align:center; margin:8px 0 2px;}
+  .cabinet span{display:inline-block; font-family:var(--mono); font-size:12px; color:var(--soft); border:1px dashed var(--line); border-radius:12px; padding:7px 14px; background:var(--card); max-width:100%;}
+  .cabinet b{color:var(--rose);}
+
+  /* path builder */
+  .pathbar{font-family:var(--mono); font-size:14px; background:#0d1114; border:1px solid var(--line); border-radius:10px; padding:11px 12px; margin:10px 0; min-height:44px;}
+  .pathbar .seg.c{color:var(--amber);} .pathbar .seg.d{color:var(--green);} .pathbar .sl{color:var(--dim);}
+  .pathinfo{border:1px dashed var(--line); border-radius:12px; padding:12px 14px; color:var(--soft); font-size:15px; min-height:74px;}
+  .pathinfo b{color:var(--ink);}
+  .fields{font-family:var(--mono); font-size:13px; line-height:1.7; margin-top:8px; color:var(--ink);}
+  .fields .k{color:var(--blue);}
+
+  /* rules */
+  .rulecode{font-family:var(--mono); font-size:13px; background:#0d1114; border:1px solid var(--line); border-radius:10px; padding:11px 12px; color:var(--green); margin:10px 0;}
+  .verdict{border-radius:12px; padding:13px 14px; font-size:15px; margin:10px 0; border:1px solid var(--line); background:var(--card);}
+  .verdict .vt{font-family:var(--mono); font-size:12px; letter-spacing:.16em; text-transform:uppercase; margin-bottom:4px; color:var(--dim);}
+  .verdict.yes{border-color:rgba(111,224,140,.5);} .verdict.yes .vt{color:var(--green);}
+  .verdict.no{border-color:rgba(232,122,109,.5);} .verdict.no .vt{color:var(--red);}
+
+  /* race timeline */
+  .lanes{border:1px solid var(--line); border-radius:12px; background:#0d1114; padding:10px; margin:12px 0; min-height:70px;}
+  .step{display:flex; gap:10px; align-items:flex-start; font-size:14px; padding:7px 4px; border-bottom:1px solid rgba(44,53,64,.6); animation:stepin .3s ease;}
+  .step:last-child{border-bottom:none;}
+  .step .who{flex:0 0 62px; font-family:var(--mono); font-size:11px; padding-top:2px;}
+  .step .who.p1{color:var(--blue);} .step .who.p2{color:var(--amber);} .step .who.db{color:var(--rose);}
+  .step.bad .what{color:var(--red);} .step.good .what{color:var(--green);}
+  .lanes .idle{color:var(--dim); font-size:14px; padding:6px 4px;}
+  @keyframes stepin{from{opacity:0; transform:translateX(-8px);} to{opacity:1; transform:none;}}
+
+  /* missions, gym, quiz (course standard) */
+  .mission{display:flex; gap:10px; align-items:flex-start; background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px; margin:8px 0; font-size:14.5px;}
+  .mission .mk{font-family:var(--mono); flex:0 0 auto; width:22px; height:22px; border-radius:50%; border:1px solid var(--line); color:var(--dim); display:flex; align-items:center; justify-content:center; font-size:12px;}
+  .mission.done{border-color:rgba(111,224,140,.5);}
+  .mission.done .mk{border-color:var(--green); color:var(--green); background:rgba(111,224,140,.1);}
+  .mission.done .mtext{color:var(--soft);}
+  .mission .mtext b{color:var(--rose);}
+  .gym{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px; margin:14px 0;}
+  .gymstats{display:flex; gap:18px; flex-wrap:wrap; font-size:12.5px; color:#9aa5b1; margin-bottom:10px; letter-spacing:.04em;}
+  .gymstats b{color:var(--green); font-size:15px; margin-left:4px;}
+  .gymtabs{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;}
+  .gtab{font-size:12px; padding:9px 12px; border-radius:999px; border:1px solid var(--line); background:transparent; color:inherit; cursor:pointer;}
+  .gtab.on{border-color:var(--rose); color:var(--rose); font-weight:700;}
+  .gymcard{border:1px dashed var(--line); border-radius:10px; padding:12px;}
+  .gymcard.active{border-style:solid; border-color:var(--rose);}
+  .gymcard.win{border-style:solid; border-color:var(--green);}
+  .gymcard.trailmode.active{border-color:var(--trail);}
+  .ggoal{font-size:15px; line-height:1.5;} .ggoal b{color:var(--rose);}
+  .ghint{font-size:13.5px; color:var(--blue); margin-top:8px; display:none;} .ghint.show{display:block;}
+  .gbtns{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;}
+  .tracktoggle{display:flex; gap:8px; margin:14px 0 10px; align-items:center; flex-wrap:wrap;}
+  .tracktoggle .tlabel{font-family:var(--mono); font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--dim);}
+  .ttab{font-family:var(--mono); font-size:12.5px; padding:9px 14px; border-radius:999px; border:1px solid var(--line); background:var(--card); color:var(--soft); cursor:pointer;}
+  .ttab.on.general{border-color:var(--rose); color:var(--rose); background:rgba(255,122,156,.1); font-weight:700;}
+  .ttab.on.trail{border-color:var(--trail); color:var(--trail); background:rgba(200,164,240,.12); font-weight:700;}
+  .trailbanner{font-family:var(--mono); font-size:11.5px; color:var(--trail); background:rgba(200,164,240,.08); border:1px solid rgba(200,164,240,.3); border-radius:8px; padding:7px 11px; margin:8px 0; display:none;}
+  .trailbanner.show{display:block;}
+  .quizq{margin:16px 0;} .quizq .q{font-weight:600; margin-bottom:8px;}
+  .quizopt{display:block; width:100%; text-align:left; font-size:14.5px; padding:11px 14px; border-radius:10px; border:1px solid var(--line); background:var(--card); color:var(--ink); cursor:pointer; margin:6px 0; font-family:var(--sans);}
+  .quizopt.right{border-color:var(--green); background:rgba(111,224,140,.1);}
+  .quizopt.wrong{border-color:var(--red); background:rgba(232,122,109,.1);}
+  .qresult{font-weight:700; margin-top:10px;}
+  .backhub{display:inline-flex; align-items:center; gap:7px; font-family:var(--mono); font-size:12px; color:var(--soft); border:1px solid var(--line); border-radius:999px; padding:10px 14px; background:var(--card); text-decoration:none;}
+  footer{max-width:760px; margin:8px auto 30px; padding:0 20px; color:var(--dim); font-size:12px; text-align:center;}
+  #toast{position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(90px); background:var(--card); color:var(--ink); border:1px solid var(--rose); border-radius:999px; padding:10px 18px; font-family:var(--mono); font-size:13px; transition:transform .3s ease; z-index:99; pointer-events:none; max-width:88vw; text-align:center;}
+  #toast.show{transform:translateX(-50%) translateY(0);}
+  #updbar{display:none; position:fixed; left:12px; right:12px; bottom:calc(14px + env(safe-area-inset-bottom)); z-index:100; background:var(--card); border:1px solid var(--green); color:var(--green); border-radius:12px; padding:13px 14px; font-family:var(--mono); font-size:13px; text-align:center; cursor:pointer;}
+  #updbar.show{display:block;}
+  @media(max-width:380px){ .tipbox{padding-left:96px;} .tipbox.right{padding:16px 96px 16px 16px;} .tipbox .poke{height:124px;} }
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:.001s !important; transition-duration:.001s !important;} html{scroll-behavior:auto;} }
+  .btn:focus-visible,.chipbtn:focus-visible,.quizopt:focus-visible,.navchip:focus-visible,.gtab:focus-visible,.ttab:focus-visible{outline:2px solid var(--rose); outline-offset:2px;}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="wordmark">All Thumbs &middot; chapter 11</div>
+    <h1>Who Tapped First</h1>
+    <p class="subtitle">Two phones, one buzzer, and the four jobs a real backend does.</p>
+  </div>
+  <button class="vbadge" id="vbadge" type="button">v0.1 &middot; Nov 13</button>
+</header>
+
+<nav>
+  <div class="navrow">
+    <a class="navchip" href="#idea">the idea</a>
+    <a class="navchip" href="#who">who is asking</a>
+    <a class="navchip" href="#where">where it sits</a>
+    <a class="navchip" href="#lock">the lock</a>
+    <a class="navchip" href="#listen">listening</a>
+    <a class="navchip" href="#ties">ties</a>
+    <a class="navchip" href="#missions">missions</a>
+    <a class="navchip" href="#gym">gym</a>
+    <a class="navchip" href="#quiz">quiz</a>
+  </div>
+</nav>
+
+<main>
+
+<section id="idea">
+  <p class="eyebrow">from knowing to building</p>
+  <h2>Chapter 8 said the cabinet exists. This is how you run one.</h2>
+  <div class="mascotspot"><img src="thumb-on-phone.png" alt="the thumb mascot standing on a phone"></div>
+  <p>The first thing I built on Firebase was a buzzer. Two phones, one big button, and whoever taps first wins the round. It held the four questions any shared app has to answer.</p>
+  <p>Before a tap can count, the database has four jobs to do:</p>
+  <div class="jobs">
+    <a class="job" href="#who"><div class="jn">JOB 1</div><div class="jt">Who is asking?</div><div class="jd">Sign-in. A name tag on every request.</div></a>
+    <a class="job" href="#where"><div class="jn">JOB 2</div><div class="jt">Where does it sit?</div><div class="jd">The shape: folders, pages, fields.</div></a>
+    <a class="job" href="#lock"><div class="jn">JOB 3</div><div class="jt">Are they allowed?</div><div class="jd">Security rules. The actual lock.</div></a>
+    <a class="job" href="#ties"><div class="jn">JOB 4</div><div class="jt">Who was first?</div><div class="jd">Transactions. Settling a tie fairly.</div></a>
+  </div>
+  <p>Between jobs 3 and 4 sits the part that makes it feel alive: every phone <a href="#listen" style="color:var(--rose)">listening</a> for changes. Each job below has a sandbox. None of them talk to a real server. They run a small model of the rules Firestore follows, so you can break things safely.</p>
+</section>
+
+<section id="who">
+  <p class="eyebrow">job 1 &middot; who is asking</p>
+  <h2>Sign-in is a name tag</h2>
+  <p>A database on the open internet gets requests from anyone. To decide anything, it first needs to know <b>who sent this one</b>. Signing in is how a device gets a name tag, called a <b>uid</b> (user ID), a long random string. After that, the tag rides along on every read and write.</p>
+  <p>Start with two kinds. <b>Anonymous</b> sign-in hands this browser on this device a tag with no name, no email and no password. It is enough for a buzzer. <b>Email and password</b> makes an account, so the same person gets the same tag on every device they own.</p>
+  <div class="simwrap">
+    <p class="plabel">how do the devices sign in?</p>
+    <div class="picker" id="authPick">
+      <button class="chipbtn on" data-auth="none" type="button">not at all</button>
+      <button class="chipbtn" data-auth="anon" type="button">anonymous</button>
+      <button class="chipbtn" data-auth="email" type="button">email + password</button>
+    </div>
+    <div class="phonerow">
+      <div class="phone"><div class="pcap">your phone</div><div class="pscreen empty" id="authScrA"><div class="big" id="authA">no tag</div><div class="lbl">uid</div></div></div>
+      <div class="phone"><div class="pcap">your tablet</div><div class="pscreen empty" id="authScrB"><div class="big" id="authB">no tag</div><div class="lbl">uid</div></div></div>
+    </div>
+    <div class="note" id="authNote">Not signed in: the database sees a request with no name tag at all. It cannot tell your phone from a stranger's.</div>
+  </div>
+  <div class="tipbox">
+    <img class="poke" src="thumb-think.png" alt="">
+    <div class="tt">Anonymous still counts</div>
+    <p class="tp">Nobody typed anything, and it is still real sign-in. The database can now tell this phone from that one, and that is all a buzzer needs. When the same person has to be recognized on a second device, you have outgrown it.</p>
+  </div>
+</section>
+
+<section id="where">
+  <p class="eyebrow">job 2 &middot; where it sits</p>
+  <h2>Folders hold pages. Pages hold facts.</h2>
+  <p>Firestore has exactly two kinds of container, and they always take turns. A <b>collection</b> is a folder. A <b>document</b> is one page inside it, holding named facts called <b>fields</b>. A page can hold more folders, and so on down.</p>
+  <p>Every piece of data has an address, a <b>path</b>, that reads folder, page, folder, page. The whole buzzer lived at <code>buzz/room</code>: one folder, one page, two fields. Build some paths below and watch the pattern.</p>
+  <div class="simwrap">
+    <div class="pathbar" id="pathBar"><span class="sl">(empty: pick a folder)</span></div>
+    <div class="picker" id="pathPick"></div>
+    <div class="pathinfo" id="pathInfo">Start by tapping a folder.</div>
+    <div class="picker"><button class="btn" id="pathReset" type="button">start over</button></div>
+  </div>
+  <div class="note">Count the steps in a path. Odd number: you are standing in a folder. Even number: you are holding a page. Ask for a page with an odd path and Firestore answers: "Document references must have an even number of segments."</div>
+</section>
+
+<section id="lock">
+  <p class="eyebrow">job 3 &middot; are they allowed</p>
+  <h2>The rules are the lock. Nothing else is.</h2>
+  <p>Chapter 8 said the config block in your page is not a password. The only thing standing between a stranger and your data is a short file of <b>security rules</b> that lives on the database itself. Every request is checked against it: this name tag, this path, read or write. Yes or no.</p>
+  <p>Pick a rule, pick who is knocking, and read the verdict.</p>
+  <div class="simwrap">
+    <p class="plabel">the rule on the cabinet</p>
+    <div class="picker" id="rulePick">
+      <button class="chipbtn" data-rule="open" type="button">wide open</button>
+      <button class="chipbtn on" data-rule="auth" type="button">anyone signed in</button>
+      <button class="chipbtn" data-rule="members" type="button">two accounts only</button>
+      <button class="chipbtn" data-rule="locked" type="button">locked shut</button>
+    </div>
+    <div class="rulecode" id="ruleCode"></div>
+    <p class="plabel">who is knocking</p>
+    <div class="picker" id="askPick">
+      <button class="chipbtn on" data-ask="out" type="button">not signed in</button>
+      <button class="chipbtn" data-ask="stranger" type="button">signed-in stranger</button>
+      <button class="chipbtn" data-ask="member" type="button">one of the two</button>
+    </div>
+    <div class="verdict" id="ruleVerdict"></div>
+  </div>
+  <div class="tipbox right">
+    <img class="poke" src="thumb-oops.png" alt="">
+    <div class="tt">A denied write is the lock working</div>
+    <p class="tp">A path no rule covers is denied. Rules that check the shape of a write also refuse a shape they do not list. So when you add a new kind of data and the save fails, look at the rules first. That is the lock doing its job, and now it needs to learn the new thing.</p>
+  </div>
+</section>
+
+<section id="listen">
+  <p class="eyebrow">the live part</p>
+  <h2>Asking once is a photo. Listening is a phone call.</h2>
+  <p>There are two ways to read. <b>Ask once</b> (<code>getDoc</code>) and you get the page as it was at that instant, then nothing. <b>Listen</b> (<code>onSnapshot</code>) and the database calls you back every time the page changes, for as long as the app is open.</p>
+  <p>Set how the tablet reads, then send from the phone.</p>
+  <div class="simwrap">
+    <p class="plabel">how the tablet reads</p>
+    <div class="picker" id="readPick">
+      <button class="chipbtn on" data-read="once" type="button">asked once</button>
+      <button class="chipbtn" data-read="listen" type="button">listening</button>
+    </div>
+    <div class="cabinet"><span>messages in the cabinet: <b id="lsCloud">0</b></span></div>
+    <div class="phonerow">
+      <div class="phone"><div class="pcap">your phone</div><div class="pscreen" id="lsScrA"><div class="big" id="lsA">0</div><div class="lbl">messages shown</div></div><button class="pbtn" id="lsSend" type="button">send one</button></div>
+      <div class="phone"><div class="pcap">your tablet</div><div class="pscreen" id="lsScrB"><div class="big" id="lsB">0</div><div class="lbl">messages shown</div></div><button class="pbtn" id="lsAsk" type="button">ask again</button></div>
+    </div>
+    <div class="note" id="lsNote">Asked once: the tablet read the page when it opened. It has no idea anything changed until it asks again.</div>
+  </div>
+</section>
+
+<section id="ties">
+  <p class="eyebrow">job 4 &middot; who was first</p>
+  <h2>Two taps in the same instant</h2>
+  <p>Each phone does the obvious thing: <b>read</b> the page, see no winner yet, <b>write</b> its own name. When two phones do that in the same split second, both read "no winner" before either has written. Then both write. The slower write lands on top of the faster one and the wrong phone wins.</p>
+  <p>The fix is a <b>transaction</b>. It means: read, decide, and write as one move, and if the page changed while I was deciding, throw my answer away and start again. Firestore does the rerun for you (up to five tries), and it needs a connection. Run it both ways. Phone 1 is always a hair faster.</p>
+  <div class="simwrap">
+    <div class="picker" id="racePick">
+      <button class="chipbtn on" data-race="plain" type="button">plain read then write</button>
+      <button class="chipbtn" data-race="txn" type="button">transaction</button>
+    </div>
+    <div class="phonerow">
+      <div class="phone" id="racePhA"><div class="pcap">phone 1 &middot; faster</div><div class="pscreen empty"><div class="big" id="raceA">ready</div></div></div>
+      <div class="phone" id="racePhB"><div class="pcap">phone 2</div><div class="pscreen empty"><div class="big" id="raceB">ready</div></div></div>
+    </div>
+    <div class="picker" style="justify-content:center"><button class="btn primary" id="raceGo" type="button">both tap at once</button></div>
+    <div class="lanes" id="raceLanes"><div class="idle">Nothing has happened yet.</div></div>
+    <div class="cabinet"><span>the page says winner: <b id="raceDoc">nobody</b></span></div>
+  </div>
+  <div class="tipbox">
+    <img class="poke" src="thumb-aha.png" alt="">
+    <div class="tt">The same trick stops double scoring</div>
+    <p class="tp">When a round ends, both phones notice and both try to add the point. Inside a transaction, each one first checks a field that records which round was already scored. The second phone sees it is done and writes nothing. One round, one point, no matter how many phones were watching.</p>
+  </div>
+</section>
+
+<section id="missions">
+  <p class="eyebrow">missions</p>
+  <h2>Prove it</h2>
+  <p>Six things to make happen in the sandboxes above. They tick off as you go.</p>
+  <div id="missionList"></div>
+</section>
+
+<section id="gym">
+  <p class="eyebrow">the gym</p>
+  <h2>Practice: call it before the database does</h2>
+  <p class="small soft">Randomized yes or no drills. Each one is answered by the same model the sandboxes run on. A wrong call resets your streak, because this gym tests the mental model.</p>
+  <div class="tracktoggle">
+    <span class="tlabel">practice</span>
+    <button class="ttab general on" id="trackGeneral" type="button">General</button>
+    <button class="ttab trail" id="trackTrail" type="button">The Trail</button>
+  </div>
+  <div class="trailbanner" id="trailBanner">The Trail: real cases from my builds. The buzzer, the rock paper scissors remix, a private two-phone messenger, and the Game Shelf.</div>
+  <div class="gym">
+    <div class="gymstats"><span>reps<b id="repN">0</b></span><span>streak<b id="strN">0</b></span><span>best<b id="bestN">0</b></span></div>
+    <div class="gymtabs" id="gymTabs"></div>
+    <div class="gymcard" id="gymCard">
+      <div class="ggoal" id="gGoal">Pick a level (or Surprise me) and tap <b>Start drill</b>.</div>
+      <div id="gymBoard"></div>
+      <div class="ghint" id="gHint"></div>
+      <div class="gbtns">
+        <button class="btn primary" id="gStart" type="button">Start drill</button>
+        <button class="btn" id="gYes" type="button" style="display:none">Yes</button>
+        <button class="btn" id="gNo" type="button" style="display:none">No</button>
+        <button class="btn" id="gHintBtn" type="button" style="display:none">Hint</button>
+        <button class="btn" id="gSkip" type="button" style="display:none">Skip</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="quiz">
+  <p class="eyebrow">quiz</p>
+  <h2>Five questions</h2>
+  <div id="quizBox"></div>
+</section>
+
+<div style="text-align:center;margin:24px 0 8px;">
+  <a class="backhub" href="index.html">&larr; back to All Thumbs</a>
+</div>
+
+</main>
+<footer>Who Tapped First &middot; All Thumbs chapter 11 &middot; the sandboxes are models, nothing here is sent anywhere</footer>
+<div id="updbar" role="button" tabindex="0">A newer version is up. Tap to load it.</div>
+<div id="toast" role="status"></div>
+
+<script>
+"use strict";
+var VERSION = "v0.1 · Nov 13";
+var STORE_KEY = "firebase101_v1";
+
+/* ---------- guarded storage ---------- */
+var memStore = {};
+function loadState(){
+  try{ var raw = localStorage.getItem(STORE_KEY); if(raw) return JSON.parse(raw); }catch(e){}
+  return memStore[STORE_KEY] || { m:{}, quizBest:0, gym:{ reps:0, streak:0, best:0 } };
+}
+function saveState(s){
+  memStore[STORE_KEY] = s;
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(s)); }catch(e){}
+}
+function getState(){
+  var s = loadState();
+  if(!s || typeof s !== "object") s = {};
+  if(!s.m) s.m = {};
+  if(!s.gym) s.gym = { reps:0, streak:0, best:0 };
+  if(typeof s.quizBest !== "number") s.quizBest = 0;
+  return s;
+}
+
+/* ---------- BACKEND ENGINE (pure, testable) ----------
+   A small honest model of what Firestore decides. No network.
+   hasUid(mode)            does a request carry a name tag?         mode: none | anon | email
+   sameUidAcross(mode)     same tag on a second device?             only email accounts
+   pathKind(segments)      odd count = collection, even = document, 0 = root
+   evalRule(rule, asker)   rule: open | auth | members | locked     asker: out | stranger | member
+   seesUpdate(readMode)    does a reader update by itself?          once | listen
+   race(mode)              two phones tap together, phone 1 first   plain | txn
+   scoreAfter(guarded)     points added when 2 phones both resolve one round
+*/
+function hasUid(mode){ return mode === "anon" || mode === "email"; }
+function sameUidAcross(mode){ return mode === "email"; }
+function pathKind(segs){
+  var n = segs.length;
+  if(n === 0) return "root";
+  return (n % 2 === 1) ? "collection" : "document";
+}
+var RULES = {
+  open:    { code:"allow read, write: if true;", name:"wide open" },
+  auth:    { code:"allow read, write: if request.auth != null;", name:"anyone signed in" },
+  members: { code:"allow read, write: if request.auth.uid in ['uid_of_me', 'uid_of_them'];", name:"two accounts only" },
+  locked:  { code:"allow read, write: if false;", name:"locked shut" }
+};
+function evalRule(rule, asker){
+  if(rule === "open")   return { allow:true,  why:"The rule says yes to everyone on the internet, name tag or not." };
+  if(rule === "locked") return { allow:false, why:"The rule says no to everyone. Even you. Safe, and useless until you write a real rule." };
+  if(rule === "auth"){
+    if(asker === "out") return { allow:false, why:"No name tag on the request, so request.auth is empty. Denied." };
+    return { allow:true, why:"There is a name tag, and this rule asks for nothing more. A stranger who signs in gets through too." };
+  }
+  if(rule === "members"){
+    if(asker === "member") return { allow:true, why:"The name tag matches one of the two listed accounts." };
+    if(asker === "stranger") return { allow:false, why:"Signed in, but the uid is not on the list. Denied." };
+    return { allow:false, why:"No name tag at all, so it cannot be on the list. Denied." };
+  }
+  return { allow:false, why:"Unknown rule. Firestore denies anything no rule allows." };
+}
+function seesUpdate(readMode){ return readMode === "listen"; }
+function race(mode){
+  var steps = [], winner;
+  steps.push({ who:"p1", what:"reads the page: no winner yet" });
+  steps.push({ who:"p2", what:"reads the page: no winner yet" });
+  if(mode === "txn"){
+    steps.push({ who:"p1", what:"commits winner = phone 1. The page had not changed since its read, so it is accepted.", cls:"good" });
+    steps.push({ who:"db", what:"page now says winner: phone 1" });
+    steps.push({ who:"p2", what:"tries to commit winner = phone 2. Refused: the page changed after phone 2 read it.", cls:"bad" });
+    steps.push({ who:"p2", what:"the transaction runs again and reads: winner is phone 1" });
+    steps.push({ who:"p2", what:"there is already a winner, so it writes nothing", cls:"good" });
+    winner = "p1";
+  } else {
+    steps.push({ who:"p1", what:"writes winner = phone 1" });
+    steps.push({ who:"db", what:"page now says winner: phone 1" });
+    steps.push({ who:"p2", what:"still trusts its old read, so it writes winner = phone 2", cls:"bad" });
+    steps.push({ who:"db", what:"page now says winner: phone 2. The last write landed on top.", cls:"bad" });
+    winner = "p2";
+  }
+  return { steps:steps, winner:winner, firstKeepsWin:(winner === "p1") };
+}
+function scoreAfter(guarded){ return guarded ? 1 : 2; }
+
+/* ---------- small DOM helpers ---------- */
+function $(id){ return document.getElementById(id); }
+function el(tag, cls, html){ var e=document.createElement(tag); if(cls)e.className=cls; if(html!=null)e.innerHTML=html; return e; }
+var toastTimer = null;
+function toast(msg){ var t=$("toast"); if(!t)return; t.textContent=msg; t.className="show"; clearTimeout(toastTimer); toastTimer=setTimeout(function(){t.className="";},1900); }
+function setOn(boxId, attr, val){
+  [].forEach.call(document.querySelectorAll("#"+boxId+" .chipbtn"), function(x){ x.classList.toggle("on", x.getAttribute(attr) === val); });
+}
+function wirePick(boxId, attr, fn){
+  var box=$(boxId); if(!box) return;
+  box.addEventListener("click", function(e){ var b=e.target.closest("["+attr+"]"); if(b){ setOn(boxId, attr, b.getAttribute(attr)); fn(b.getAttribute(attr)); } });
+}
+
+/* ---------- job 1: sign-in sandbox ---------- */
+var AUTH_NOTE = {
+  none:"Not signed in: the database sees a request with no name tag at all. It cannot tell your phone from a stranger's.",
+  anon:"Anonymous: each device gets its own tag, with no name behind it. The database can tell them apart, but it has no idea they belong to the same person.",
+  email:"Email and password: one account, so both devices carry the same tag. Now the database knows it is you on either one."
+};
+var AUTH_TAGS = { none:["no tag","no tag"], anon:["k3f9...","q7x2..."], email:["m8t4...","m8t4..."] };
+function setAuth(mode){
+  var tags = AUTH_TAGS[mode];
+  $("authA").textContent = tags[0]; $("authB").textContent = tags[1];
+  $("authScrA").className = "pscreen" + (hasUid(mode) ? "" : " empty");
+  $("authScrB").className = "pscreen" + (hasUid(mode) ? "" : " empty");
+  $("authNote").textContent = AUTH_NOTE[mode] + (hasUid(mode) && !sameUidAcross(mode) ? " Different tags." : (sameUidAcross(mode) ? " Same tag." : ""));
+  if(mode === "anon") markMission("signin");
+}
+
+/* ---------- job 2: path builder ---------- */
+var TREE = {
+  buzz:{ room:{ _fields:{ winner:'""', round:"1" } } },
+  rooms:{ main:{ _fields:{ name:'"our line"' }, messages:{ m1:{ _fields:{ from:'"uid k3f9..."', text:'"hi"', ts:"(server time)" } } }, seen:{ k3f9:{ _fields:{ at:"(server time)" } } } } }
+};
+var pathSegs = [];
+function nodeAt(segs){ var n = TREE; for(var i=0;i<segs.length;i++){ if(!n || !n[segs[i]]) return null; n = n[segs[i]]; } return n; }
+function childrenOf(segs){ var n = nodeAt(segs); if(!n) return []; return Object.keys(n).filter(function(k){ return k !== "_fields"; }); }
+function renderPath(){
+  var bar=$("pathBar"), pick=$("pathPick"), info=$("pathInfo"); if(!bar) return;
+  if(!pathSegs.length){ bar.innerHTML = "<span class='sl'>(empty: pick a folder)</span>"; }
+  else {
+    bar.innerHTML = pathSegs.map(function(s,i){ return "<span class='seg "+(i%2===0?"c":"d")+"'>"+s+"</span>"; }).join("<span class='sl'> / </span>");
+  }
+  var kind = pathKind(pathSegs), kids = childrenOf(pathSegs);
+  pick.innerHTML = "";
+  kids.forEach(function(k){
+    var b = el("button","chipbtn", (kind === "collection" ? "page: " : "folder: ") + k);
+    b.type = "button";
+    b.addEventListener("click", function(){ pathSegs.push(k); renderPath(); });
+    pick.appendChild(b);
+  });
+  if(kind === "root"){ info.innerHTML = "Start by tapping a folder. The top level of a database is always folders (collections)."; }
+  else if(kind === "collection"){ info.innerHTML = "<b>"+pathSegs.length+" step"+(pathSegs.length>1?"s":"")+": a collection.</b> A folder. It holds pages, and nothing else. You cannot store a fact directly in a folder."; }
+  else {
+    var f = (nodeAt(pathSegs) || {})._fields || {}, rows = Object.keys(f).map(function(k){ return "<span class='k'>"+k+"</span>: "+f[k]; }).join("<br>");
+    info.innerHTML = "<b>"+pathSegs.length+" steps: a document.</b> One page. Its fields:<div class='fields'>"+rows+"</div>" + (kids.length ? "<div class='small' style='margin-top:8px'>This page also holds more folders. Keep going.</div>" : "");
+    if(pathSegs.length >= 4) markMission("path");
+  }
+}
+
+/* ---------- job 3: rules ---------- */
+var ruleSel = "auth", askSel = "out";
+function renderRule(){
+  var r = evalRule(ruleSel, askSel), v = $("ruleVerdict"); if(!v) return;
+  $("ruleCode").textContent = RULES[ruleSel].code;
+  v.className = "verdict " + (r.allow ? "yes" : "no");
+  v.innerHTML = "<div class='vt'>" + (r.allow ? "allowed" : "denied (permission-denied)") + "</div>" + r.why +
+    (ruleSel === "open" ? " <span class='soft'>Firebase's test mode starts this open and stamps an end date on it, so it shuts itself off. Do not ship on it.</span>" : "");
+}
+
+/* ---------- listening sandbox ---------- */
+var ls = { cloud:0, b:0, mode:"once" };
+var LS_NOTE = {
+  once:"Asked once: the tablet read the page when it opened. It has no idea anything changed until it asks again.",
+  listen:"Listening: the database calls the tablet back on every change. Nobody refreshes anything."
+};
+function renderLs(){
+  $("lsCloud").textContent = ls.cloud; $("lsA").textContent = ls.cloud; $("lsB").textContent = ls.b;
+  $("lsNote").textContent = LS_NOTE[ls.mode] + (ls.b < ls.cloud ? " The tablet is " + (ls.cloud - ls.b) + " behind." : "");
+}
+function lsSend(){
+  ls.cloud++;
+  if(seesUpdate(ls.mode)){ ls.b = ls.cloud; markMission("listen"); }
+  renderLs();
+}
+
+/* ---------- job 4: the race ---------- */
+var raceMode = "plain", raceTimers = [];
+function raceReset(){
+  raceTimers.forEach(clearTimeout); raceTimers = [];
+  $("raceA").textContent = "ready"; $("raceB").textContent = "ready";
+  $("racePhA").className = "phone"; $("racePhB").className = "phone";
+  $("raceDoc").textContent = "nobody";
+  $("raceLanes").innerHTML = "<div class='idle'>Nothing has happened yet.</div>";
+  $("raceGo").textContent = "both tap at once";
+}
+function raceFinish(res){
+  var first = res.firstKeepsWin;
+  $("raceA").textContent = first ? "you won" : "you lost";
+  $("raceB").textContent = first ? "too slow" : "you won";
+  $("racePhA").className = "phone " + (first ? "won" : "lost");
+  $("racePhB").className = "phone " + (first ? "lost" : "won");
+  $("raceDoc").textContent = first ? "phone 1" : "phone 2";
+  $("raceLanes").appendChild(el("div","step "+(first?"good":"bad"),"<span class='who db'>result</span><span class='what'>"+(first ? "The faster phone kept the win. Both phones agree." : "The slower phone took the win. Phone 1 tapped first and lost.")+"</span>"));
+  $("raceGo").textContent = "run it again";
+  if(first) markMission("race");
+}
+function raceRun(instant){
+  raceReset();
+  var res = race(raceMode), lanes = $("raceLanes"), names = { p1:"phone 1", p2:"phone 2", db:"the page" };
+  lanes.innerHTML = "";
+  function show(st){ lanes.appendChild(el("div","step"+(st.cls?" "+st.cls:""),"<span class='who "+st.who+"'>"+names[st.who]+"</span><span class='what'>"+st.what+"</span>")); }
+  if(instant){ res.steps.forEach(show); raceFinish(res); return res; }
+  res.steps.forEach(function(st,i){ raceTimers.push(setTimeout(function(){ show(st); }, 550*i)); });
+  raceTimers.push(setTimeout(function(){ raceFinish(res); }, 550*res.steps.length));
+  return res;
+}
+
+/* ---------- missions ---------- */
+var MISSIONS = [
+  { id:"signin", text:"Sign both devices in <b>anonymously</b> and see two different name tags." },
+  { id:"path",   text:"Build a path <b>four steps deep</b> that ends on a page." },
+  { id:"denied", text:"Get a request <b>denied</b> by a rule." },
+  { id:"listen", text:"Set the tablet to <b>listening</b> and watch it update by itself." },
+  { id:"race",   text:"Run the tie with a <b>transaction</b> so the faster phone keeps the win." },
+  { id:"gym",    text:"Land one gym drill correct." }
+];
+function renderMissions(){
+  var box=$("missionList"); if(!box)return; var s=getState(); box.innerHTML="";
+  MISSIONS.forEach(function(m){
+    var done=!!s.m[m.id], row=el("div","mission"+(done?" done":""));
+    row.innerHTML = "<span class='mk'>"+(done?"✓":"")+"</span><span class='mtext'>"+m.text+"</span>";
+    box.appendChild(row);
+  });
+}
+function markMission(id){ var s=getState(); if(!s.m[id]){ s.m[id]=true; saveState(s); renderMissions(); toast("mission done"); } }
+
+/* ---------- GYM ---------- */
+function rn(list){ return list[Math.floor(Math.random()*list.length)]; }
+var G_APPS = ["a trivia buzzer","a shared grocery list","a two-player card game","a family chore chart","a class sign-up sheet","a scoreboard"];
+function makeDrill(level){
+  var app = rn(G_APPS), story, yes, hint;
+  if(level === 0){
+    var am = rn(["none","anon","email"]), amName = { none:"no sign-in at all", anon:"anonymous sign-in", email:"email and password accounts" }[am];
+    if(Math.random() < 0.5){
+      story = "<b>"+app+"</b> uses <b>"+amName+"</b>. A phone sends a write. Does the database get a name tag (a uid) with it?";
+      yes = hasUid(am);
+      hint = yes ? "Any real sign-in, anonymous included, puts a uid on every request." : "No sign-in means no uid. The request arrives with request.auth empty.";
+    } else {
+      story = "<b>"+app+"</b> uses <b>"+amName+"</b>. The same person opens it on a second device. Does the database see the same uid as on the first?";
+      yes = sameUidAcross(am);
+      hint = yes ? "An account follows the person. Sign in with the same email on any device and the uid matches." : (am === "anon" ? "Anonymous tags are made per device. Two devices, two unrelated uids." : "Nobody signed in, so there is no uid on either device to match.");
+    }
+  } else if(level === 1){
+    var rule = rn(["open","auth","members","locked"]), ask = rn(["out","stranger","member"]);
+    var askName = { out:"a device that is not signed in", stranger:"a signed-in stranger", member:"one of the two listed accounts" }[ask];
+    var r = evalRule(rule, ask);
+    story = "The rule is <code>"+RULES[rule].code+"</code> and the write comes from <b>"+askName+"</b>. Does it go through?";
+    yes = r.allow; hint = r.why;
+  } else if(level === 2){
+    var rm = rn(["once","listen"]);
+    story = "In <b>"+app+"</b>, phone two read the data with <b>"+(rm==="once"?"getDoc (ask once)":"onSnapshot (a listener)")+"</b>. Phone one saves a change. Does phone two's screen update without anyone reopening or refreshing?";
+    yes = seesUpdate(rm);
+    hint = yes ? "A listener gets called back on every change. That is the live part." : "Asking once is a photo of that instant. Nothing arrives until it asks again.";
+  } else {
+    if(Math.random() < 0.5){
+      var mode = rn(["plain","txn"]);
+      story = "Two phones hit the button in <b>"+app+"</b> at the same instant. The code uses <b>"+(mode==="plain"?"a plain read, then a write":"a transaction")+"</b>. Does the phone that tapped first keep the win?";
+      yes = race(mode).firstKeepsWin;
+      hint = yes ? "A transaction refuses the second commit because the page changed after it was read, reruns it, and it backs off." : "Both read 'no winner' before either wrote. The later write lands on top, so the slower phone wins.";
+    } else {
+      var g = rn([true,false]);
+      story = "A round ends in <b>"+app+"</b>. Both phones notice and both try to add the point. The code " + (g ? "<b>checks a 'round already scored' field inside a transaction</b>" : "<b>just adds 1 from each phone</b>") + ". Does the score go up by exactly one?";
+      yes = scoreAfter(g) === 1;
+      hint = yes ? "The second phone sees the round was already scored and writes nothing." : "Two phones each add 1. One round, two points.";
+    }
+  }
+  return { story:story, yes:yes, hint:hint };
+}
+
+/* ---------- TRAIL drills: real cases from the builds ---------- */
+var TRAIL_CASES = [
+  { story:"The buzzer. Rules were <code>if request.auth != null</code> and both phones signed in anonymously. A phone taps the button. Does the write go through?",
+    yes:true, hint:"Anonymous sign-in is real sign-in. There was a uid on the request, the rule asked for nothing more, so it was allowed." },
+  { story:"Testing the buzzer by opening the file straight from Downloads on the phone, not from its https address. Does Firebase sign-in work there?",
+    yes:false, hint:"A file opened from Downloads is a content:// page with no real web address, so sign-in has nothing to stand on. Test anything Firebase from the live address. Same trap as Chapter 7." },
+  { story:"The buzzer again. Two taps land in the same instant, and the code claims the win inside a transaction. Does the faster phone keep the win?",
+    yes:true, hint:"First tap wins was the whole reason for the transaction. The second commit is refused, reruns, sees a winner and backs off." },
+  { story:"Rock paper scissors, the buzzer's remix. Both phones see the round resolve and both try to score it. Scoring runs in a transaction guarded by a resolvedRound field. Does the winner get exactly one point?",
+    yes:true, hint:"Only one phone gets to apply each round. The other reads resolvedRound, sees it is done, and writes nothing." },
+  { story:"The private two-phone messenger. Its rules allow exactly two accounts. Someone else finds the page, makes their own account and signs in. Can they read the messages?",
+    yes:false, hint:"Signed in is not the same as allowed. Their uid is not one of the two on the list, so every read is denied." },
+  { story:"The messenger gets voice notes. The app is updated to send them, but the security rules still only describe text and photos. Does the first voice note save?",
+    yes:false, hint:"The database refused it without any fuss. These rules spell out what a message may contain, and a voice note was not on the list. The fix was teaching the rules the new kind of message." },
+  { story:"The key scare. The Firebase config block is sitting in the page source where anyone can copy it. With rules locked to two accounts, can a stranger use that config to read the data?",
+    yes:false, hint:"The config only names which cabinet to talk to. The rules are the lock, and they still check the uid on every request." },
+  { story:"The Game Shelf reset. Reset clears every record key on its list, but one game's key was never added to the list. Another device is still listening with that record on it. Does the reset stick?",
+    yes:false, hint:"The orphan record survived, and the listening device pushed it straight back to everyone. The set you can write and the set you can clear have to be the same set." },
+  { story:"The messenger on an older iPad. The browser crashed whenever the app used the offline database, so offline storage was switched off and everything is held in memory. Do new messages still arrive live?",
+    yes:true, hint:"Listening does not depend on the offline copy. With it off, the listener still gets every change while the app is open." }
+];
+var lastTrail = null;
+function makeTrailDrill(){ var c; do { c = rn(TRAIL_CASES); } while(c === lastTrail); lastTrail = c; return c; }
+
+var gym = { level:-1, drill:null, answered:false, track:"general" };
+var GYM_LEVELS = [ {lv:0,name:"name tags"}, {lv:1,name:"rules"}, {lv:2,name:"listening"}, {lv:3,name:"ties"} ];
+function gymStatsRender(){ var s=getState(); $("repN").textContent=s.gym.reps||0; $("strN").textContent=s.gym.streak||0; $("bestN").textContent=s.gym.best||0; }
+function renderGymTabs(){
+  var box=$("gymTabs"); if(!box)return; box.innerHTML="";
+  var all=el("button","gtab"+(gym.level===-1?" on":""),"Surprise me"); all.type="button";
+  all.addEventListener("click",function(){ gym.level=-1; renderGymTabs(); }); box.appendChild(all);
+  GYM_LEVELS.forEach(function(L){ var t=el("button","gtab"+(gym.level===L.lv?" on":""),L.name); t.type="button"; t.addEventListener("click",function(){ gym.level=L.lv; renderGymTabs(); }); box.appendChild(t); });
+}
+function gymButtons(playing){
+  ["gYes","gNo","gHintBtn","gSkip"].forEach(function(id){ $(id).style.display = playing ? "" : "none"; });
+  $("gStart").style.display = playing ? "none" : "";
+}
+function gymStart(){
+  if(gym.track==="trail"){ gym.drill=makeTrailDrill(); }
+  else { gym.drill=makeDrill(gym.level===-1 ? Math.floor(Math.random()*4) : gym.level); }
+  gym.answered=false;
+  $("gymCard").className="gymcard active"+(gym.track==="trail"?" trailmode":"");
+  $("gGoal").innerHTML="Yes or no?";
+  $("gymBoard").innerHTML="<div class='note' style='margin-top:10px'>"+gym.drill.story+"</div>";
+  $("gHint").className="ghint"; $("gHint").innerHTML="";
+  gymButtons(true);
+}
+function gymDone(){ gym.answered=true; gymButtons(false); $("gStart").textContent="Next drill"; gymStatsRender(); }
+function gymAnswer(saidYes){
+  if(gym.answered||!gym.drill)return;
+  var s=getState(), correct=(saidYes===gym.drill.yes);
+  if(correct){
+    s.gym.reps=(s.gym.reps||0)+1; s.gym.streak=(s.gym.streak||0)+1;
+    if(s.gym.streak>(s.gym.best||0)) s.gym.best=s.gym.streak; saveState(s);
+    $("gymCard").className="gymcard win"+(gym.track==="trail"?" trailmode":"");
+    $("gGoal").innerHTML="Correct. The answer is <b>"+(gym.drill.yes?"yes":"no")+"</b>.";
+    markMission("gym");
+  } else {
+    s.gym.streak=0; saveState(s);
+    $("gymCard").className="gymcard"+(gym.track==="trail"?" trailmode":"");
+    $("gGoal").innerHTML="Not quite. The answer is <b>"+(gym.drill.yes?"yes":"no")+"</b>.";
+  }
+  $("gHint").className="ghint show"; $("gHint").innerHTML=gym.drill.hint;
+  gymDone();
+}
+function gymSkip(){
+  if(gym.answered||!gym.drill)return;
+  var s=getState(); s.gym.streak=0; saveState(s);
+  $("gHint").className="ghint show"; $("gHint").innerHTML="Answer: "+(gym.drill.yes?"yes.":"no.")+" "+gym.drill.hint;
+  gymDone();
+}
+function setTrack(t){
+  gym.track=t; gym.drill=null; gym.answered=false;
+  $("trackGeneral").classList.toggle("on",t==="general"); $("trackTrail").classList.toggle("on",t==="trail");
+  $("gymTabs").style.display=(t==="trail")?"none":""; $("trailBanner").className="trailbanner"+(t==="trail"?" show":"");
+  $("gymCard").className="gymcard";
+  $("gGoal").innerHTML=(t==="trail")?"Real cases from the builds. Tap <b>Start drill</b>.":"Pick a level (or Surprise me) and tap <b>Start drill</b>.";
+  $("gymBoard").innerHTML=""; $("gHint").className="ghint"; $("gHint").innerHTML="";
+  gymButtons(false); $("gStart").textContent="Start drill";
+}
+function initGym(){
+  renderGymTabs(); gymStatsRender();
+  $("trackGeneral").addEventListener("click",function(){setTrack("general");});
+  $("trackTrail").addEventListener("click",function(){setTrack("trail");});
+  $("gStart").addEventListener("click",gymStart);
+  $("gYes").addEventListener("click",function(){gymAnswer(true);});
+  $("gNo").addEventListener("click",function(){gymAnswer(false);});
+  $("gHintBtn").addEventListener("click",function(){ if(gym.drill){$("gHint").className="ghint show"; $("gHint").innerHTML=gym.drill.hint;} });
+  $("gSkip").addEventListener("click",gymSkip);
+}
+
+/* ---------- quiz ---------- */
+var QUIZ = [
+  { q:"A game signs every player in anonymously. What does the database get on each request?",
+    opts:["Nothing, anonymous means no sign-in","A uid for that device, with no name or email behind it","The player's email address","The same uid for every player"], a:1 },
+  { q:"The path rooms/main/messages has three steps. What is it?",
+    opts:["A document","A field","A collection, a folder of pages","A security rule"], a:2 },
+  { q:"What actually stops a stranger from reading your data?",
+    opts:["Hiding the config block","The security rules on the database","Using a long project name","Putting the page in a subfolder"], a:1 },
+  { q:"The tablet read the score with a one-time read. The phone changes the score. What does the tablet show?",
+    opts:["The new score, right away","The old score, until it asks again","An error","Nothing at all"], a:1 },
+  { q:"Two phones read 'no winner' and both write their own name with plain writes. Who does the page say won?",
+    opts:["Whoever tapped first","Both of them","Whoever's write landed last","Nobody, the database rejects ties"], a:2 }
+];
+var quizAnswered={};
+function renderQuiz(){
+  var box=$("quizBox"); if(!box)return; box.innerHTML=""; quizAnswered={};
+  QUIZ.forEach(function(item,qi){
+    var wrap=el("div","quizq"); wrap.appendChild(el("div","q",(qi+1)+". "+item.q));
+    item.opts.forEach(function(opt,oi){
+      var b=el("button","quizopt",opt); b.type="button";
+      b.addEventListener("click",function(){
+        if(quizAnswered[qi]!=null)return; quizAnswered[qi]=oi;
+        var kids=wrap.querySelectorAll(".quizopt"); kids[item.a].classList.add("right");
+        if(oi!==item.a)b.classList.add("wrong");
+        var got=0,ans=0; for(var k in quizAnswered){ans++; if(quizAnswered[k]===QUIZ[k].a)got++;}
+        if(ans===QUIZ.length){
+          var s=getState(); if(got>(s.quizBest||0)){s.quizBest=got; saveState(s);}
+          box.appendChild(el("div","qresult","You got "+got+" / "+QUIZ.length+(got===QUIZ.length?", perfect.":".")));
+          var again=el("button","btn","Try the quiz again"); again.type="button"; again.style.marginTop="10px";
+          again.addEventListener("click",renderQuiz); box.appendChild(again);
+        }
+      });
+      wrap.appendChild(b);
+    });
+    box.appendChild(wrap);
+  });
+}
+
+/* ---------- version badge, update check ---------- */
+function buildOf(html){ var m=/<meta name="build" content="([^"]*)"/.exec(html||""); return m ? m[1] : null; }
+function reloadFresh(build){ try{ location.replace(location.pathname + "?v=" + encodeURIComponent(build) + location.hash); }catch(e){ location.reload(); } }
+function checkUpdate(manual){
+  if(typeof fetch !== "function" || !/^https?:$/.test(location.protocol)){ if(manual) toast(VERSION + " · open the live address to check for updates"); return; }
+  fetch(location.pathname + "?nc=" + Date.now(), { cache:"no-store" }).then(function(r){ return r.ok ? r.text() : ""; }).then(function(html){
+    var live = buildOf(html);
+    if(live && live !== VERSION){
+      var bar=$("updbar"); bar.textContent="Newer version is up (" + live + "). Tap to load it."; bar.className="show";
+      bar.onclick=function(){ reloadFresh(live); };
+    } else if(manual){ toast(live ? VERSION + " · you have the newest" : VERSION + " · could not check right now"); }
+  }).catch(function(){ if(manual) toast(VERSION + " · could not check right now"); });
+}
+function initBadge(){
+  var b=$("vbadge"); if(!b)return; b.textContent=VERSION;
+  b.addEventListener("click",function(){ toast("Who Tapped First · " + VERSION); checkUpdate(true); });
+  checkUpdate(false);
+}
+
+function initApp(){
+  initBadge();
+  wirePick("authPick","data-auth",setAuth);
+  renderPath(); $("pathReset").addEventListener("click",function(){ pathSegs=[]; renderPath(); });
+  wirePick("rulePick","data-rule",function(v){ ruleSel=v; renderRule(); if(!evalRule(ruleSel,askSel).allow) markMission("denied"); });
+  wirePick("askPick","data-ask",function(v){ askSel=v; renderRule(); if(!evalRule(ruleSel,askSel).allow) markMission("denied"); });
+  renderRule();
+  wirePick("readPick","data-read",function(v){ ls.mode=v; if(seesUpdate(v) && ls.b<ls.cloud){ ls.b=ls.cloud; } renderLs(); });
+  $("lsSend").addEventListener("click",lsSend);
+  $("lsAsk").addEventListener("click",function(){ ls.b=ls.cloud; renderLs(); });
+  renderLs();
+  wirePick("racePick","data-race",function(v){ raceMode=v; raceReset(); });
+  $("raceGo").addEventListener("click",function(){ raceRun(false); });
+  renderMissions(); initGym(); renderQuiz();
+  window._lab = { raceRun:raceRun, gym:gym, gymStart:gymStart, gymAnswer:gymAnswer, setTrack:setTrack, getState:getState };
+}
+if(typeof window!=="undefined" && typeof document!=="undefined"){
+  if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",initApp); } else { initApp(); }
+}
+if(typeof module!=="undefined" && module.exports){
+  module.exports = { hasUid:hasUid, sameUidAcross:sameUidAcross, pathKind:pathKind, evalRule:evalRule, seesUpdate:seesUpdate, race:race, scoreAfter:scoreAfter, makeDrill:makeDrill, TRAIL_CASES:TRAIL_CASES, RULES:RULES, buildOf:buildOf, VERSION:VERSION };
+}
+</script>
+</body>
+</html>
