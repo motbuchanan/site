@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#14181d">
-<meta name="build" content="v0.1 · Nov 13">
+<meta name="build" content="v0.2 · Nov 13">
 <title>Who Tapped First: Firebase sign-in, rules, listeners and ties</title>
 <meta name="description" content="Chapter 11 of All Thumbs. The four jobs of a real backend, taught with a two-phone buzzer: who is asking, where the data sits, who is allowed, and who tapped first.">
 <link rel="canonical" href="https://motbuchanan.com/allthumbs/firebase-basics.html">
@@ -43,6 +43,7 @@
   .btn{display:inline-block; font-family:var(--mono); font-size:14px; color:var(--ink); background:var(--card); border:1px solid var(--line); border-radius:10px; padding:11px 16px; cursor:pointer; user-select:none;}
   .btn:active{border-color:var(--rose); transform:translateY(1px);}
   .btn.primary{border-color:var(--rose); color:var(--rose);}
+  .btn[disabled]{opacity:.4; cursor:default;}
   .simwrap{margin:14px 0;}
   .picker{display:flex; gap:8px; flex-wrap:wrap; margin:10px 0;}
   .plabel{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--dim); margin:14px 0 0;}
@@ -154,7 +155,7 @@
     <h1>Who Tapped First</h1>
     <p class="subtitle">Two phones, one buzzer, and the four jobs a real backend does.</p>
   </div>
-  <button class="vbadge" id="vbadge" type="button">v0.1 &middot; Nov 13</button>
+  <button class="vbadge" id="vbadge" type="button">v0.2 &middot; Nov 13</button>
 </header>
 
 <nav>
@@ -222,7 +223,7 @@
     <div class="pathbar" id="pathBar"><span class="sl">(empty: pick a folder)</span></div>
     <div class="picker" id="pathPick"></div>
     <div class="pathinfo" id="pathInfo">Start by tapping a folder.</div>
-    <div class="picker"><button class="btn" id="pathReset" type="button">start over</button></div>
+    <div class="picker"><button class="btn" id="pathBack" type="button">back one step</button><button class="btn" id="pathReset" type="button">start over</button></div>
   </div>
   <div class="note">Count the steps in a path. Odd number: you are standing in a folder. Even number: you are holding a page. Ask for a page with an odd path and Firestore answers: "Document references must have an even number of segments."</div>
 </section>
@@ -353,7 +354,7 @@
 
 <script>
 "use strict";
-var VERSION = "v0.1 · Nov 13";
+var VERSION = "v0.2 · Nov 13";
 var STORE_KEY = "firebase101_v1";
 
 /* ---------- guarded storage ---------- */
@@ -479,6 +480,7 @@ function renderPath(){
     bar.innerHTML = pathSegs.map(function(s,i){ return "<span class='seg "+(i%2===0?"c":"d")+"'>"+s+"</span>"; }).join("<span class='sl'> / </span>");
   }
   var kind = pathKind(pathSegs), kids = childrenOf(pathSegs);
+  if($("pathBack")) $("pathBack").disabled = !pathSegs.length;
   pick.innerHTML = "";
   kids.forEach(function(k){
     var b = el("button","chipbtn", (kind === "collection" ? "page: " : "folder: ") + k);
@@ -490,7 +492,7 @@ function renderPath(){
   else if(kind === "collection"){ info.innerHTML = "<b>"+pathSegs.length+" step"+(pathSegs.length>1?"s":"")+": a collection.</b> A folder. It holds pages, and nothing else. You cannot store a fact directly in a folder."; }
   else {
     var f = (nodeAt(pathSegs) || {})._fields || {}, rows = Object.keys(f).map(function(k){ return "<span class='k'>"+k+"</span>: "+f[k]; }).join("<br>");
-    info.innerHTML = "<b>"+pathSegs.length+" steps: a document.</b> One page. Its fields:<div class='fields'>"+rows+"</div>" + (kids.length ? "<div class='small' style='margin-top:8px'>This page also holds more folders. Keep going.</div>" : "");
+    info.innerHTML = "<b>"+pathSegs.length+" steps: a document.</b> One page. Its fields:<div class='fields'>"+rows+"</div>" + (kids.length ? "<div class='small' style='margin-top:8px'>This page also holds more folders. Keep going.</div>" : "<div class='small' style='margin-top:8px'>End of this branch. Nothing sits under this page. Go back one step or start over.</div>");
     if(pathSegs.length >= 4) markMission("path");
   }
 }
@@ -719,16 +721,22 @@ var QUIZ = [
   { q:"Two phones read 'no winner' and both write their own name with plain writes. Who does the page say won?",
     opts:["Whoever tapped first","Both of them","Whoever's write landed last","Nobody, the database rejects ties"], a:2 }
 ];
-var quizAnswered={};
+var quizAnswered={}, quizOrder=[];
+function shuffled(n){
+  var a=[], i, j, t; for(i=0;i<n;i++) a.push(i);
+  for(i=n-1;i>0;i--){ j=Math.floor(Math.random()*(i+1)); t=a[i]; a[i]=a[j]; a[j]=t; }
+  return a;
+}
 function renderQuiz(){
-  var box=$("quizBox"); if(!box)return; box.innerHTML=""; quizAnswered={};
+  var box=$("quizBox"); if(!box)return; box.innerHTML=""; quizAnswered={}; quizOrder=[];
   QUIZ.forEach(function(item,qi){
     var wrap=el("div","quizq"); wrap.appendChild(el("div","q",(qi+1)+". "+item.q));
-    item.opts.forEach(function(opt,oi){
-      var b=el("button","quizopt",opt); b.type="button";
+    var order=shuffled(item.opts.length); quizOrder.push(order);
+    order.forEach(function(oi,pos){
+      var b=el("button","quizopt",item.opts[oi]); b.type="button";
       b.addEventListener("click",function(){
         if(quizAnswered[qi]!=null)return; quizAnswered[qi]=oi;
-        var kids=wrap.querySelectorAll(".quizopt"); kids[item.a].classList.add("right");
+        var kids=wrap.querySelectorAll(".quizopt"); kids[order.indexOf(item.a)].classList.add("right");
         if(oi!==item.a)b.classList.add("wrong");
         var got=0,ans=0; for(var k in quizAnswered){ans++; if(quizAnswered[k]===QUIZ[k].a)got++;}
         if(ans===QUIZ.length){
@@ -767,6 +775,7 @@ function initApp(){
   initBadge();
   wirePick("authPick","data-auth",setAuth);
   renderPath(); $("pathReset").addEventListener("click",function(){ pathSegs=[]; renderPath(); });
+  $("pathBack").addEventListener("click",function(){ if(pathSegs.length){ pathSegs.pop(); renderPath(); } });
   wirePick("rulePick","data-rule",function(v){ ruleSel=v; renderRule(); if(!evalRule(ruleSel,askSel).allow) markMission("denied"); });
   wirePick("askPick","data-ask",function(v){ askSel=v; renderRule(); if(!evalRule(ruleSel,askSel).allow) markMission("denied"); });
   renderRule();
@@ -777,13 +786,13 @@ function initApp(){
   wirePick("racePick","data-race",function(v){ raceMode=v; raceReset(); });
   $("raceGo").addEventListener("click",function(){ raceRun(false); });
   renderMissions(); initGym(); renderQuiz();
-  window._lab = { raceRun:raceRun, gym:gym, gymStart:gymStart, gymAnswer:gymAnswer, setTrack:setTrack, getState:getState };
+  window._lab = { quizOrder:function(){ return quizOrder; }, raceRun:raceRun, gym:gym, gymStart:gymStart, gymAnswer:gymAnswer, setTrack:setTrack, getState:getState };
 }
 if(typeof window!=="undefined" && typeof document!=="undefined"){
   if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",initApp); } else { initApp(); }
 }
 if(typeof module!=="undefined" && module.exports){
-  module.exports = { hasUid:hasUid, sameUidAcross:sameUidAcross, pathKind:pathKind, evalRule:evalRule, seesUpdate:seesUpdate, race:race, scoreAfter:scoreAfter, makeDrill:makeDrill, TRAIL_CASES:TRAIL_CASES, RULES:RULES, buildOf:buildOf, VERSION:VERSION };
+  module.exports = { hasUid:hasUid, sameUidAcross:sameUidAcross, pathKind:pathKind, evalRule:evalRule, seesUpdate:seesUpdate, race:race, scoreAfter:scoreAfter, shuffled:shuffled, QUIZ:QUIZ, makeDrill:makeDrill, TRAIL_CASES:TRAIL_CASES, RULES:RULES, buildOf:buildOf, VERSION:VERSION };
 }
 </script>
 </body>
