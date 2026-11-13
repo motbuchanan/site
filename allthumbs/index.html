@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#12141a">
+<meta name="build" content="v1.24 · Nov 13">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <link href="../fonts/fonts.css" rel="stylesheet">
-
 <title>All Thumbs: build it on a phone</title>
 <link rel="canonical" href="https://motbuchanan.com/allthumbs/">
 <meta property="og:title" content="All Thumbs: build it on a phone">
@@ -17,130 +17,133 @@
 <meta name="description" content="A build-it-on-a-phone course: eleven interactive explainers, from what a computer is to two phones sharing one Firebase database, each with sandboxes, a practice gym and a quiz.">
 <style>
 :root{
-  --bg:#12141a; --panel:#1a1d26; --panel2:#222633; --ink:#e9ecf3; --dim:#98a0b0;
-  --line:#2e3342; --good:#7ddf9a;
-  --mb-ink:#ebedef; --mb-soft:#c2c9d1; --mb-dim:#7d8794;
-  --mb-teal:#4cf0e0; --mb-orange:#f59847;
+  --bg:#12141a; --panel:#1a1d26; --panel2:#222633; --ink:#e9ecf3; --dim:#98a0b0; --line:#2e3342; --good:#7ddf9a;
+  --mb-ink:#ebedef; --mb-soft:#c2c9d1; --mb-dim:#7d8794; --mb-teal:#4cf0e0; --mb-orange:#f59847;
   --mb-glass:rgba(14,18,23,.62); --mb-line:rgba(255,255,255,.12);
-  --mb-ui:'Archivo',system-ui,-apple-system,sans-serif;
-  --mb-mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  --mb-ui:'Archivo',system-ui,-apple-system,sans-serif; --mb-mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;background:var(--bg);color:var(--ink);
-  background-image:radial-gradient(1100px 500px at 50% -140px,#1d2230 0%,transparent 60%);
-  font-family:var(--mb-ui);
-  font-size:16px;line-height:1.55}
-.mono{font-family:var(--mb-mono)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--mb-ui);font-size:16px;line-height:1.55;overflow-wrap:anywhere;
+  background-image:radial-gradient(1100px 500px at 50% -140px,#1d2230 0%,transparent 60%)}
 main{max-width:680px;margin:0 auto;padding:8px 14px 90px}
-.hero{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px 16px;margin:18px 0}
-.topline{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
-.kick{font:600 11px var(--mb-mono);letter-spacing:.08em;text-transform:uppercase;color:#9db4ff;margin:0 0 6px}
-h1{font:800 34px var(--mb-ui);line-height:1.1;margin:4px 0 8px;letter-spacing:-.02em}
-h2{font:600 11px var(--mb-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin:26px 4px 10px}
 p{margin:8px 0}
+.lab{font:600 11px var(--mb-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
 .sub{color:var(--dim)}
-.small{font-size:13px;color:var(--dim)}
-.herowrap{display:flex;gap:16px;align-items:center}
-.heromascot{width:132px;height:auto;flex:0 0 132px}
-@media(max-width:420px){.heromascot{width:110px;flex-basis:110px}}
-.herotitle{flex:1;min-width:0}
-.herolede{margin-top:14px}
-.mb-ver{position:fixed;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:900;font:600 10px var(--mb-mono);letter-spacing:.04em;color:var(--mb-teal);background:var(--mb-glass);border:1px solid rgba(76,240,224,.25);border-radius:999px;padding:10px 12px;backdrop-filter:blur(8px);cursor:pointer;user-select:none;opacity:.85}
-.overall{margin-top:14px}
-.obar{height:14px;background:var(--panel2);border:1px solid var(--line);border-radius:999px;overflow:hidden}
-.obar > div{height:100%;width:0%;border-radius:999px;
-  background:linear-gradient(90deg,#45c8ff,#3ddc84,#ff8a3d,#f0653a);transition:width .5s}
-.oline{display:flex;justify-content:space-between;font:600 11px var(--mb-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-top:6px}
-.oline b{color:var(--ink)}
-.row{display:block;background:var(--panel);border:1px solid var(--line);border-radius:16px;
-  margin:16px 0;text-decoration:none;color:var(--ink);overflow:hidden}
-.row:active{transform:scale(.99)}
-.rspot{position:relative;display:flex;align-items:flex-end;justify-content:center;
-  min-height:230px;padding:18px 16px 12px}
-.rspotnum{position:absolute;top:12px;left:16px;font-weight:800;font-size:15px}
-.rdone{position:absolute;top:12px;right:16px;font:600 11px var(--mb-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--good)}
-.rmascot{height:210px;width:auto;max-width:88%;object-fit:contain;object-position:bottom center;
-  filter:drop-shadow(0 8px 18px rgba(0,0,0,.45))}
-.rbody{padding:14px 18px 18px}
-.rtitle{font-weight:800;font-size:21px;line-height:1.2;display:block}
-.rsub{color:var(--dim);font-size:14.5px;margin:8px 0 14px 0;line-height:1.5}
-.rbar{height:8px;background:var(--panel2);border-radius:999px;overflow:hidden}
-.rbar > div{height:100%;width:0%;border-radius:999px;transition:width .5s}
-.rline{display:flex;justify-content:space-between;font:500 11px var(--mb-mono);letter-spacing:.04em;color:var(--dim);margin:8px 0 0 0}
-.rchips{display:inline}
-.chip{display:inline-block;border:1px solid #b7a4e3;color:#b7a4e3;border-radius:999px;
-  padding:1px 8px;font:600 10px var(--mb-mono);letter-spacing:.08em;text-transform:uppercase;margin-left:8px;vertical-align:1px}
+.top{display:flex;gap:14px;align-items:center;margin:22px 0 6px}
+.top img{height:104px;width:auto}
+h1{font:800 clamp(30px,9vw,40px) var(--mb-ui);letter-spacing:-.02em;line-height:1.05;margin:2px 0 0}
+.done-line{font:600 12px var(--mb-mono);color:var(--mb-soft);margin-top:6px}
+.lede{font-size:17px;color:var(--mb-soft);margin:12px 0 4px}
+.how{font-size:14.5px}
+.how b{color:var(--ink)}
+/* shelves */
+.shelf{margin:28px 0 0}
+.shead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin:0 4px 6px}
+.shead h2{margin:0;font:600 11px var(--mb-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.shead .cnt{font:600 11px var(--mb-mono);color:var(--dim);white-space:nowrap}
+.books{display:flex;align-items:flex-end;gap:5px;padding:18px 4px 0;min-height:226px}
+.plank{height:12px;background:linear-gradient(#3a4052,#262a37);border-radius:3px;box-shadow:0 6px 10px rgba(0,0,0,.35)}
+.spine{position:relative;flex:1 1 50px;min-width:36px;max-width:66px;border-radius:5px 5px 2px 2px;border:1px solid rgba(255,255,255,.08);
+  background:#1d212c;overflow:hidden;cursor:pointer;transition:transform .25s ease;padding:0;color:var(--ink);font:inherit}
+.spine .fill{position:absolute;left:0;right:0;bottom:0;opacity:.3;pointer-events:none}
+.spine .band{position:absolute;left:0;right:0;top:0;height:28px;display:flex;align-items:center;justify-content:center;font:800 14px var(--mb-ui);color:#10131a;pointer-events:none}
+.spine .ttl{position:absolute;top:36px;bottom:24px;left:0;right:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.spine .ttl span{display:block;height:100%;writing-mode:vertical-rl;transform:rotate(180deg);font:700 12.5px var(--mb-ui);line-height:1.15;text-align:center;white-space:normal;overflow-wrap:normal}
+.spine .ft{position:absolute;bottom:5px;left:0;right:0;font:600 9.5px var(--mb-mono);color:var(--dim);text-align:center;pointer-events:none}
+.spine.done .ft{color:var(--good)}
+.spine.done .fill{opacity:.5}
+.spine.plan{background:transparent;border:1.5px dashed #3a4052}
+.spine.plan .band{background:transparent !important;color:var(--dim)}
+.spine.plan .ttl span{color:var(--dim)}
+.spine.sel{transform:translateY(-16px)}
+.spine.course{flex:1 1 104px;max-width:128px;border-width:1.5px;border-style:dashed}
+.spine.course .band{font:700 11px var(--mb-mono);letter-spacing:.06em}
+.spine.course .ttl span{font-size:14px}
+.spine.course:after{content:"";position:absolute;inset:5px;border:1px solid currentColor;border-radius:3px;opacity:.25;pointer-events:none}
+.tab{flex:0 0 16px;align-self:flex-end;height:118px;border-radius:4px 4px 0 0;background:#262a37;border:1px solid var(--line);display:flex;align-items:center;justify-content:center}
+.tab span{writing-mode:vertical-rl;transform:rotate(180deg);font:600 9px var(--mb-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--dim);white-space:nowrap}
+.prop{flex:0 0 auto;align-self:flex-end;display:flex;align-items:flex-end;margin-left:auto;pointer-events:none}
+.prop img{height:150px;width:auto;filter:drop-shadow(0 6px 10px rgba(0,0,0,.45));margin-bottom:-2px}
+.bookend{flex:0 0 12px;height:96px;align-self:flex-end;margin-left:auto;background:#3a4052;border-radius:3px 3px 0 0;box-shadow:inset -3px 0 0 #2b3040}
+.prop + .bookend{margin-left:0}
+@media(max-width:360px){.books{gap:3px;padding-left:2px;padding-right:2px}.spine{min-width:30px}.spine .ttl span{font-size:11.5px}.spine .band{font-size:12.5px}.tab{flex-basis:13px}.bookend{flex-basis:9px}}
+/* the pulled-out book */
+.pull{background:var(--panel);border:1px solid var(--line);border-radius:16px;margin:18px 0 0;overflow:hidden;display:grid;grid-template-columns:120px 1fr;gap:4px}
+.pull .art{display:flex;align-items:flex-end;justify-content:center;padding:14px 0 0}
+.pull .art img{height:150px;max-width:110px;width:auto;object-fit:contain;filter:drop-shadow(0 8px 14px rgba(0,0,0,.45))}
+.pull .art .blank{width:70px;height:110px;border:1.5px dashed #3a4052;border-radius:6px 6px 0 0;margin-bottom:0}
+.pull .tx{padding:16px 16px 16px 4px;min-width:0}
+.pull h3{font:800 20px var(--mb-ui);margin:4px 0 6px;line-height:1.2}
+.pull .bar{height:8px;background:var(--panel2);border-radius:999px;overflow:hidden;margin:12px 0 6px}
+.pull .bar div{height:100%;border-radius:999px}
+.pull .st{font:500 11px var(--mb-mono);color:var(--dim);margin-bottom:12px}
+.chip{display:inline-block;border:1px solid #b7a4e3;color:#b7a4e3;border-radius:999px;padding:1px 8px;font:600 10px var(--mb-mono);letter-spacing:.08em;text-transform:uppercase;margin-left:6px}
+@media(max-width:360px){.pull{grid-template-columns:86px 1fr}.pull .art img{height:118px;max-width:80px}}
+.prim{display:inline-block;background:var(--mb-teal);color:#06110f;font:800 15px var(--mb-ui);border:0;border-radius:13px;padding:13px 18px;text-decoration:none;cursor:pointer}
+.prim:active{transform:translateY(1px);background:#3fd6c7}
+.btn{display:inline-block;background:var(--mb-glass);color:var(--mb-ink);border:1px solid var(--mb-line);border-radius:13px;padding:11px 16px;font:700 14px var(--mb-ui);cursor:pointer}
+.note{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;margin:28px 0 18px;font-size:14px;color:var(--dim)}
 .notewrap{display:flex;gap:14px;align-items:flex-start}
 .notewrap img{height:88px;width:auto;flex:0 0 auto;filter:drop-shadow(0 6px 14px rgba(0,0,0,.4))}
-.footmascot{height:76px;width:auto;margin-bottom:8px;filter:drop-shadow(0 6px 14px rgba(0,0,0,.4))}
-.note{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;margin:18px 0;font-size:14px;color:var(--dim)}
 .note b{color:var(--ink)}
 .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 4px}
-.btn{display:inline-block;background:var(--mb-glass);color:var(--mb-ink);border:1px solid var(--mb-line);
-  border-radius:13px;padding:11px 16px;font:700 14px var(--mb-ui);cursor:pointer}
 footer{color:#5b6272;font-size:12.5px;text-align:center;margin:30px 0 10px;line-height:1.7}
-#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(80px);
-  background:var(--panel2);border:1px solid #9db4ff;color:var(--ink);border-radius:999px;
-  padding:10px 18px;font:600 11px var(--mb-mono);transition:transform .25s;z-index:950;pointer-events:none;white-space:nowrap}
+.mb-ver{position:fixed;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:900;font:600 10px var(--mb-mono);letter-spacing:.04em;color:var(--mb-teal);background:var(--mb-glass);border:1px solid rgba(76,240,224,.25);border-radius:999px;padding:10px 12px;backdrop-filter:blur(8px);cursor:pointer;user-select:none;opacity:.85}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(90px);background:var(--panel2);border:1px solid #9db4ff;color:var(--ink);border-radius:999px;padding:10px 18px;font:600 11px var(--mb-mono);transition:transform .25s;z-index:950;pointer-events:none;max-width:88vw;text-align:center}
 #toast.show{transform:translateX(-50%) translateY(0)}
+#updbar{display:none;position:fixed;left:12px;right:12px;width:auto;bottom:calc(60px + env(safe-area-inset-bottom));z-index:960;background:var(--panel2);border:1px solid var(--good);color:var(--good);border-radius:12px;padding:13px 14px;font:600 13px var(--mb-mono);text-align:center;cursor:pointer}
+#updbar.show{display:block}
+.noscript a{color:var(--mb-teal)}
 :focus-visible{outline:2px solid #9db4ff;outline-offset:2px}
 @media (prefers-reduced-motion:reduce){*{transition:none !important}}
 </style>
 </head>
 <body>
 <main>
-<div class="hero">
-  <div class="topline">
-    <div class="herowrap">
-      <img class="heromascot" src="thumb-phone-hero.png" alt="All Thumbs mascot holding a phone">
-      <div class="herotitle">
-        <div class="kick">build it on a phone</div>
-        <h1>All Thumbs</h1>
-      </div>
-    </div>
-  </div>
-  <p class="sub herolede" style="font-size:18px">I build almost everything on a phone. This is the course I built to teach myself what was actually happening under it, one small explainer at a time.</p>
-  <p>Each part is a standalone interactive explainer with real working sandboxes, missions, a practice gym with randomized drills, and a five-question quiz. Do them in order for the full story: first how anything reaches your screen, then the toolbox people build it all with, then the part under your own apps, with my real Game Shelf taken apart. After that the course follows what I learned next, starting with two phones sharing one database.</p>
-  <p class="sub">Every gym has two tracks. <b>General</b> is the course anyone can take and pass. <b>The Trail</b> swaps in real cases from my own one-thumb phone builds, the actual bugs and fixes. Supposedly all thumbs, I still built the whole thing. I saw what I needed to know, so I built the tool to teach it to myself.</p>
-  <div class="overall">
-    <div class="obar"><div id="obarFill"></div></div>
-    <div class="oline"><span>course progress</span><b id="opct">0%</b></div>
+<div class="top">
+  <img src="thumb-phone-hero.png" alt="All Thumbs mascot holding a phone">
+  <div>
+    <div class="lab">build it on a phone</div>
+    <h1>All Thumbs</h1>
+    <div class="done-line" id="doneLine">&nbsp;</div>
   </div>
 </div>
+<p class="lede">I build almost everything on a phone. This is the course I built to teach myself what was actually happening under it, one small explainer at a time.</p>
+<p class="sub how">Each book is a chapter with working sandboxes, missions, a practice gym and a five-question quiz. It fills with its color as you finish. Every gym has two tracks: <b>General</b> is the course anyone can take, and <b>The Trail</b> swaps in real cases from my own one-thumb phone builds. Tap a spine to pull it off the shelf.</p>
 
-<h2>Unit 1 · How anything reaches your screen</h2>
-<div id="unit1"></div>
-
-<h2>Unit 2 · Your toolbox</h2>
-<div id="unit2"></div>
-
-<h2>Unit 3 · Under your own apps</h2>
-<div id="unit3"></div>
-
-<h2>Unit 4 · Shared and live</h2>
-<div id="unit4"></div>
+<div id="shelves"></div>
+<noscript><div class="note noscript"><b>Chapters:</b><ol>
+<li><a href="computer-basics.html">1. The Fast Idiot</a></li>
+<li><a href="internet-basics.html">2. The Second After You Tap</a></li>
+<li><a href="browser-basics.html">3. The Painter</a></li>
+<li><a href="linux-basics.html">4. Under the Hood</a></li>
+<li><a href="python-basics.html">5. Second Language</a></li>
+<li><a href="git-basics.html">6. Save Points</a></li>
+<li><a href="hosting-basics.html">7. Ship It</a></li>
+<li><a href="data-basics.html">8. Where Data Lives</a></li>
+<li><a href="api-basics.html">9. The Order Window</a></li>
+<li><a href="shelf-dissected.html">10. The Shelf Dissected</a></li>
+<li><a href="firebase-basics.html">11. Who Tapped First</a></li>
+</ol></div></noscript>
 
 <div class="note">
   <div class="notewrap">
     <img src="thumb-think.png" alt="">
     <div>
-      <b>How progress works:</b> each explainer saves your missions and best quiz score in this browser, on this device. This page reads those saves live. Different device or browser, different progress. Nothing is uploaded anywhere.
-      <div class="btnrow"><button id="refreshBtn" class="btn">Refresh progress</button></div>
+      <b>How progress works:</b> each chapter saves your missions and best quiz score in this browser, on this device. This page reads those saves live. Different device or browser, different progress. Nothing is uploaded anywhere.
+      <div class="btnrow"><button id="refreshBtn" class="btn" type="button">Refresh progress</button></div>
     </div>
   </div>
 </div>
 
-<footer>
-  <img class="footmascot" src="thumb-wave.png" alt=""><br>
-  All Thumbs · a small course · built on a phone<br>
-  Suggested rhythm: one part per sitting. Missions first, quiz last.
-</footer>
+<footer>All Thumbs · a small course · built on a phone<br>Suggested rhythm: one chapter per sitting. Missions first, quiz last.</footer>
 </main>
+<button id="updbar" type="button">A newer version is up. Tap to load it.</button>
 <div id="toast" role="status"></div>
-<button class="mb-ver" id="mbVer" type="button">v1.23 &middot; Nov 13</button>
+<button class="mb-ver" id="mbVer" type="button">v1.24 &middot; Nov 13</button>
 <script>
 "use strict";
-var VERSION = "v1.23 · Nov 13";
+var VERSION = "v1.24 · Nov 13";
 
 /* pure helpers (testable) */
 function countDone(state){
@@ -155,124 +158,311 @@ function pctOf(done, total, quiz){
   return Math.max(0, Math.min(1, raw));
 }
 
-var ROWS = [
-  { key:"computer101_v1", img:"thumb-computer", file:"computer-basics.html", title:"The Fast Idiot",
-    sub:"What a computer actually is: worker, desk, cabinet, and a toy CPU you really run.",
-    total:5, color:"#45c8ff", unit:1 },
-  { key:"internet101_v1", img:"thumb-internet", file:"internet-basics.html", title:"The Second After You Tap",
-    sub:"What the internet actually is: DNS, hopping packets, a network you can break, and 404.",
-    total:6, color:"#3ddc84", unit:1 },
-  { key:"browser101_v1", img:"thumb-browser", file:"browser-basics.html", title:"The Painter",
-    sub:"What a browser does: HTML becomes a live tree, CSS dresses it, JS edits it while you watch.",
-    total:6, color:"#ff8a3d", unit:1 },
-  { key:"linux101_v1", img:"thumb-linux", file:"linux-basics.html", title:"Under the Hood",
-    sub:"What Linux and an operating system are, with a real terminal sandbox.",
-    total:6, color:"#7de38a", unit:2 },
-  { key:"python101_v1", img:"thumb-python", file:"python-basics.html", title:"Second Language",
-    sub:"What Python is, with a working mini interpreter and translator.",
-    total:4, color:"#e8c35a", unit:2 },
-  { key:"git101_v1", img:"thumb-git", file:"git-basics.html", title:"Save Points",
-    sub:"What Git actually does: a real mini git, a live commit map, and a merge-conflict boss level.",
-    total:7, color:"#f0653a", unit:2 },
-  { key:"hosting101_v1", img:"thumb-hosting", file:"hosting-basics.html", title:"Ship It",
-    sub:"How a file on your phone becomes a web address: repos, index.html, root vs folder, and the content:// trap.",
-    total:6, color:"#b7a4e3", unit:2 },
-  { key:"data101_v1", img:"thumb-data", file:"data-basics.html", title:"Where Data Lives",
-    sub:"The three places an app keeps data, why progress sticks to one device, and how a cloud database (Firebase) syncs it.",
-    total:6, color:"#45d4c4", unit:3 },
-  { key:"api101_v1", img:"thumb-api", file:"api-basics.html", title:"The Order Window",
-    sub:"What an API call is: verbs, URLs, status codes, reading JSON, keys and rate limits. You have been making them for months.",
-    total:6, color:"#ff9a6b", unit:3 },
-  { key:"shelf101_v1", img:"thumb-beside-phone", file:"shelf-dissected.html", title:"The Shelf Dissected",
-    sub:"The keystone. Your real Game Shelf taken apart: the hub, the four registrations, the service worker, the Firestore cabinet, and 282 commits of history.",
-    total:6, color:"#d9b35a", unit:3 },
-  { key:"firebase101_v1", img:"thumb-on-phone", file:"firebase-basics.html", title:"Who Tapped First",
-    sub:"Two phones, one buzzer. Sign-in, where data sits, the security rules that are the real lock, live listeners, and settling a tie fairly.",
-    total:6, color:"#ff7a9c", unit:4 },
+/* the course. Built chapters have a key and a file; planned ones do not yet.
+   To add a chapter: give it key, img, file and total, and it becomes a real book. */
+var CH = [
+{
+"key": "computer101_v1",
+"img": "thumb-computer",
+"file": "computer-basics.html",
+"title": "The Fast Idiot",
+"sub": "What a computer actually is: worker, desk, cabinet, and a toy CPU you really run.",
+"total": 5,
+"color": "#45c8ff",
+"n": 1
+},
+{
+"key": "internet101_v1",
+"img": "thumb-internet",
+"file": "internet-basics.html",
+"title": "The Second After You Tap",
+"sub": "What the internet actually is: DNS, hopping packets, a network you can break, and 404.",
+"total": 6,
+"color": "#3ddc84",
+"n": 2
+},
+{
+"key": "browser101_v1",
+"img": "thumb-browser",
+"file": "browser-basics.html",
+"title": "The Painter",
+"sub": "What a browser does: HTML becomes a live tree, CSS dresses it, JS edits it while you watch.",
+"total": 6,
+"color": "#ff8a3d",
+"n": 3
+},
+{
+"key": "linux101_v1",
+"img": "thumb-linux",
+"file": "linux-basics.html",
+"title": "Under the Hood",
+"sub": "What Linux and an operating system are, with a real terminal sandbox.",
+"total": 6,
+"color": "#7de38a",
+"n": 4
+},
+{
+"key": "python101_v1",
+"img": "thumb-python",
+"file": "python-basics.html",
+"title": "Second Language",
+"sub": "What Python is, with a working mini interpreter and translator.",
+"total": 4,
+"color": "#e8c35a",
+"n": 5
+},
+{
+"key": "git101_v1",
+"img": "thumb-git",
+"file": "git-basics.html",
+"title": "Save Points",
+"sub": "What Git actually does: a real mini git, a live commit map, and a merge-conflict boss level.",
+"total": 7,
+"color": "#f0653a",
+"n": 6
+},
+{
+"key": "hosting101_v1",
+"img": "thumb-hosting",
+"file": "hosting-basics.html",
+"title": "Ship It",
+"sub": "How a file on your phone becomes a web address: repos, index.html, root vs folder, and the content:// trap.",
+"total": 6,
+"color": "#b7a4e3",
+"n": 7
+},
+{
+"key": "data101_v1",
+"img": "thumb-data",
+"file": "data-basics.html",
+"title": "Where Data Lives",
+"sub": "The three places an app keeps data, why progress sticks to one device, and how a cloud database (Firebase) syncs it.",
+"total": 6,
+"color": "#45d4c4",
+"n": 8
+},
+{
+"key": "api101_v1",
+"img": "thumb-api",
+"file": "api-basics.html",
+"title": "The Order Window",
+"sub": "What an API call is: verbs, URLs, status codes, reading JSON, keys and rate limits. You have been making them for months.",
+"total": 6,
+"color": "#ff9a6b",
+"n": 9
+},
+{
+"key": "shelf101_v1",
+"img": "thumb-beside-phone",
+"file": "shelf-dissected.html",
+"title": "The Shelf Dissected",
+"sub": "The keystone. Your real Game Shelf taken apart: the hub, the four registrations, the service worker, the Firestore cabinet, and 282 commits of history.",
+"total": 6,
+"color": "#d9b35a",
+"n": 10
+},
+{
+"key": "firebase101_v1",
+"img": "thumb-on-phone",
+"file": "firebase-basics.html",
+"title": "Who Tapped First",
+"sub": "Two phones, one buzzer. Sign-in, where data sits, the security rules that are the real lock, live listeners, and settling a tie fairly.",
+"total": 6,
+"color": "#ff7a9c",
+"n": 11
+},
+{
+"title": "Break It",
+"sub": "Why the builder never grades its own work. Break a small app on purpose: phone, tablet, sideways, storage blocked.",
+"color": "#ffd166",
+"n": 12
+},
+{
+"title": "Debugging",
+"sub": "Root cause first. Is it a stale copy or a real bug, and how do you tell?",
+"color": "#8ec5ff",
+"n": 13
+},
+{
+"title": "Robots on GitHub",
+"sub": "A robot that checks every upload before it goes live.",
+"color": "#a3e635",
+"n": 14
+},
+{
+"title": "How Models Work",
+"sub": "What the model is doing with your words, plus a prompting gym.",
+"color": "#7aa2ff",
+"n": 15
+},
+{
+"title": "Agents and Schedules",
+"sub": "A second reviewer, saved skills, and jobs that run on their own.",
+"color": "#e0a3ff",
+"n": 16
+}
 ];
+var COURSES = [
+{
+"title": "Images and video",
+"sub": "A course of its own: making, using and fixing AI images and video, with this course's mascot pipeline as the worked example.",
+"color": "#f59847",
+"status": "planned"
+},
+{
+"title": "Video editing",
+"sub": "A course of its own, built alongside RoughCut: cuts, pacing, sound, the rules and the tricks.",
+"color": "#4cf0e0",
+"status": "next to build"
+},
+{
+"title": "Game development",
+"sub": "A course of its own: game loops, input, collision and game feel.",
+"color": "#98a0b0",
+"status": "later"
+}
+];
+var SHELVES = [{"t": "The basics", "groups": [{"lab": "your screen", "ch": [1, 2, 3]}, {"lab": "your toolbox", "ch": [4, 5, 6, 7]}]}, {"t": "Under your own apps", "groups": [{"lab": "your apps", "ch": [8, 9, 10]}, {"lab": "shared + live", "ch": [11]}, {"lab": "trust nothing", "ch": [12, 13, 14]}]}, {"t": "Directing AI", "groups": [{"lab": "", "ch": [15, 16]}, {"lab": "", "courses": [0]}]}, {"t": "Branch courses", "groups": [{"lab": "", "courses": [1, 2]}]}];
+/* Bookend mascots that fill a shelf's empty space. Swap in new leaning poses here. */
+var PROPS = ["thumb-wave", "thumb-cool", "thumb-happy", "thumb-thumbsup"];
+var ROWS = CH.filter(function(c){ return !!c.key; });
+
+function stateOf(c){
+  if(!c.key) return null;
+  try { var raw = localStorage.getItem(c.key); return raw ? JSON.parse(raw) : {}; } catch(e){ return {}; }
+}
+function progressOf(c){
+  if(!c.key) return null;
+  var st = stateOf(c) || {}, done = countDone(st), quiz = st.quizBest || 0;
+  return { st:st, done:done, quiz:quiz, reps:(st.gym && st.gym.reps) || 0, pct:pctOf(done, c.total, quiz) };
+}
+function firstOpen(){
+  for(var i = 0; i < ROWS.length; i++){ if(progressOf(ROWS[i]).pct < 1) return ROWS[i].n; }
+  return ROWS[ROWS.length - 1].n;
+}
 
 function initApp(){
   function $(id){ return document.getElementById(id); }
-  var toastT = null;
-  function toast(msg){
-    var el = $("toast");
-    el.textContent = msg; el.classList.add("show");
-    clearTimeout(toastT);
-    toastT = setTimeout(function(){ el.classList.remove("show"); }, 1800);
-  }
-  $("mbVer").addEventListener("click", function(){ toast("v1.23 loaded"); });
+  var toastT = null, sel = firstOpen(), selCourse = -1;
+  function toast(msg){ var el = $("toast"); el.textContent = msg; el.classList.add("show"); clearTimeout(toastT); toastT = setTimeout(function(){ el.classList.remove("show"); }, 1900); }
+  function el(tag, cls, html){ var e = document.createElement(tag); if(cls) e.className = cls; if(html != null) e.innerHTML = html; return e; }
 
-  function readState(key){
-    try {
-      var raw = localStorage.getItem(key);
-      return raw ? JSON.parse(raw) : null;
-    } catch(e){ return null; }
+  function spine(c){
+    var pr = progressOf(c), plan = !pr, pct = plan ? 0 : Math.round(pr.pct * 100);
+    var b = el("button", "spine" + (plan ? " plan" : "") + (pr && pr.pct >= 1 ? " done" : ""));
+    if(c.n === sel && selCourse < 0) b.setAttribute("data-sel", "1");
+    b.type = "button"; b.id = "spine_" + c.n;
+    b.style.height = (176 + ((c.n * 37) % 4) * 10) + "px";
+    b.setAttribute("aria-pressed", c.n === sel && selCourse < 0 ? "true" : "false");
+    b.setAttribute("aria-label", "Chapter " + c.n + ", " + c.title + ", " + (plan ? "planned" : (pr.pct >= 1 ? "complete" : pct + " percent")));
+    b.innerHTML = (plan ? "" : "<div class='fill' style='background:" + c.color + ";height:" + pct + "%'></div>") +
+      "<div class='band' style='background:" + c.color + "'>" + c.n + "</div><div class='ttl'><span>" + c.title + "</span></div>" +
+      "<div class='ft'>" + (plan ? "soon" : (pr.pct >= 1 ? "done" : pct + "%")) + "</div>";
+    b.addEventListener("click", function(){ pick(b, function(){ sel = c.n; selCourse = -1; }); });
+    return b;
   }
-  function buildRows(){
-    $("unit1").innerHTML = "";
-    $("unit2").innerHTML = "";
-    $("unit3").innerHTML = "";
-    $("unit4").innerHTML = "";
-    ROWS.forEach(function(r, i){
-      var a = document.createElement("a");
-      a.className = "row";
-      a.href = r.file;
-      a.id = "row_" + r.key;
-      var mascot = r.img ? "<img class=\"rmascot\" src=\"" + r.img + ".png\" alt=\"\">" : "";
-      var spotbg = "background:radial-gradient(120% 80% at 50% 100%, " + r.color + "33, " + r.color + "12 45%, transparent 75%);";
-      a.innerHTML =
-        "<div class=\"rspot\" style=\"" + spotbg + "\">" +
-        "<span class=\"rspotnum\" style=\"color:" + r.color + "\">" + (i + 1) + "</span>" +
-        "<span class=\"rdone\" style=\"display:none\">complete \u2713</span>" +
-        mascot +
-        "</div>" +
-        "<div class=\"rbody\">" +
-        "<span class=\"rtitle\">" + r.title + "<span class=\"rchips\"></span></span>" +
-        "<div class=\"rsub\">" + r.sub + "</div>" +
-        "<div class=\"rbar\"><div style=\"background:" + r.color + "\"></div></div>" +
-        "<div class=\"rline\"><span class=\"rstats\">not started on this device</span><span class=\"rpct\">0%</span></div>" +
-        "</div>";
-      $("unit" + r.unit).appendChild(a);
+  function courseSpine(i){
+    var x = COURSES[i], b = el("button", "spine plan course");
+    if(selCourse === i) b.setAttribute("data-sel", "1");
+    b.type = "button"; b.id = "course_" + i;
+    b.style.height = (196 + i * 6) + "px"; b.style.borderColor = x.color + "99"; b.style.color = x.color;
+    b.setAttribute("aria-pressed", selCourse === i ? "true" : "false");
+    b.setAttribute("aria-label", x.title + " course, " + x.status);
+    b.innerHTML = "<div class='band' style='color:" + x.color + "'>COURSE</div><div class='ttl'><span style='color:" + x.color + "'>" + x.title + "</span></div><div class='ft'>" + x.status + "</div>";
+    b.addEventListener("click", function(){ pick(b, function(){ selCourse = i; }); });
+    return b;
+  }
+  /* re-render without the tapped book jumping out from under the thumb */
+  function pick(btn, apply){
+    var id = btn.id, before = btn.getBoundingClientRect().top;
+    apply(); render();
+    var now = $(id); if(now){ var d = now.getBoundingClientRect().top - before; if(Math.abs(d) > 2) window.scrollBy(0, d); try{ now.focus({ preventScroll:true }); }catch(e){} }
+  }
+
+  function chapterCard(c){
+    var pr = progressOf(c), card = el("div", "pull");
+    var art = c.img ? "<img src='" + c.img + ".png' alt=''>" : "<div class='blank'></div>";
+    var body = "<span class='lab' style='color:" + c.color + "'>chapter " + c.n + (pr ? "" : " · planned") + "</span><h3>" + c.title + "</h3><div class='sub' style='font-size:14.5px'>" + c.sub + "</div>";
+    if(pr){
+      var pct = Math.round(pr.pct * 100), started = pr.done || pr.quiz || pr.reps;
+      var stats = started ? (pr.done + "/" + c.total + (c.key === "python101_v1" ? " lessons" : " missions") + " · quiz " + pr.quiz + "/5" + (pr.reps ? " · " + pr.reps + " reps" : "")) : "not started on this device";
+      var boss = (c.key === "git101_v1" && pr.st.boss) ? "<span class='chip'>boss beaten</span>" : "";
+      body += "<div class='bar'><div style='width:" + pct + "%;background:" + c.color + "'></div></div><div class='st'>" + stats + " · " + pct + "%" + boss + "</div>" +
+        "<a class='prim' href='" + c.file + "'>" + (pr.pct >= 1 ? "Open again" : (started ? "Keep going" : "Start")) + "</a>";
+    } else {
+      body += "<div class='st' style='margin-top:12px'>Not built yet. It goes on the shelf when it is.</div>";
+    }
+    card.innerHTML = "<div class='art'>" + art + "</div><div class='tx'>" + body + "</div>";
+    return card;
+  }
+  function courseCard(i){
+    var x = COURSES[i], card = el("div", "pull");
+    card.innerHTML = "<div class='art'><div class='blank' style='border-color:" + x.color + "99'></div></div><div class='tx'><span class='lab' style='color:" + x.color + "'>course · " + x.status + "</span><h3>" + x.title + "</h3><div class='sub' style='font-size:14.5px'>" + x.sub + "</div><div class='st' style='margin-top:12px'>Not built yet.</div></div>";
+    return card;
+  }
+
+  function fillProps(){
+    var k = 0;
+    [].forEach.call(document.querySelectorAll("#shelves .books"), function(bk){
+      var old = bk.querySelector(".prop"); if(old) old.remove();
+      var used = 0;
+      [].forEach.call(bk.children, function(e){ if(!e.classList.contains("bookend")) used += e.getBoundingClientRect().width + 5; });
+      var end = bk.querySelector(".bookend"), free = bk.clientWidth - 8 - used - (end ? end.getBoundingClientRect().width : 0);
+      if(free >= 78){ var p = el("div", "prop", "<img src='" + PROPS[k % PROPS.length] + ".png' alt=''>"); bk.insertBefore(p, end); }
+      k++;
     });
   }
-  function refreshProgress(){
-    var sum = 0;
-    ROWS.forEach(function(r){
-      var st = readState(r.key) || {};
-      var done = countDone(st);
-      var quiz = st.quizBest || 0;
-      var pct = pctOf(done, r.total, quiz);
-      sum += pct;
-      var row = $("row_" + r.key);
-      row.querySelector(".rbar > div").style.width = Math.round(pct * 100) + "%";
-      row.querySelector(".rpct").textContent = Math.round(pct * 100) + "%";
-      var reps = (st.gym && st.gym.reps) || 0;
-      row.querySelector(".rstats").textContent = (done || quiz || reps) ?
-        (done + "/" + r.total + " missions · quiz " + quiz + "/5" + (reps ? " · " + reps + " reps" : "")) :
-        "not started on this device";
-      row.querySelector(".rdone").style.display = pct >= 1 ? "" : "none";
-      var chips = row.querySelector(".rchips");
-      chips.innerHTML = "";
-      if(r.key === "git101_v1" && st.boss){
-        chips.innerHTML = "<span class=\"chip\">boss beaten</span>";
-      }
+
+  function render(){
+    var host = $("shelves"); host.innerHTML = "";
+    SHELVES.forEach(function(S){
+      var chs = [], crs = [];
+      S.groups.forEach(function(g){ (g.ch || []).forEach(function(n){ chs.push(CH[n - 1]); }); (g.courses || []).forEach(function(i){ crs.push(i); }); });
+      var built = chs.filter(function(c){ return !!c.key; }), done = built.filter(function(c){ return progressOf(c).pct >= 1; }).length;
+      var cnt = chs.length ? (built.length ? done + " of " + chs.length + " done" : chs.length + " planned") : "";
+      if(crs.length) cnt += (cnt ? " + " : "") + crs.length + " course" + (crs.length > 1 ? "s" : "");
+      var s = el("section", "shelf", "<div class='shead'><h2>" + S.t + "</h2><span class='cnt'>" + cnt + "</span></div>");
+      var bk = el("div", "books");
+      S.groups.forEach(function(g, gi){
+        if(gi > 0 && g.lab) bk.appendChild(el("div", "tab", "<span>" + g.lab + "</span>"));
+        (g.ch || []).forEach(function(n){ bk.appendChild(spine(CH[n - 1])); });
+        (g.courses || []).forEach(function(i){ bk.appendChild(courseSpine(i)); });
+      });
+      bk.appendChild(el("div", "bookend"));
+      s.appendChild(bk); s.appendChild(el("div", "plank"));
+      host.appendChild(s);
+      if(selCourse < 0 && chs.some(function(c){ return c.n === sel; })) host.appendChild(chapterCard(CH[sel - 1]));
+      if(selCourse >= 0 && crs.indexOf(selCourse) >= 0) host.appendChild(courseCard(selCourse));
     });
-    var overall = Math.round((sum / ROWS.length) * 100);
-    $("obarFill").style.width = overall + "%";
-    $("opct").textContent = overall + "%";
+    var allDone = ROWS.filter(function(c){ return progressOf(c).pct >= 1; }).length;
+    $("doneLine").textContent = allDone + " of " + ROWS.length + " chapters done on this device";
+    fillProps();
+    /* lift the chosen book a frame later so the pull-out animates */
+    var lift = function(){ [].forEach.call(document.querySelectorAll("#shelves [data-sel]"), function(x){ x.classList.add("sel"); }); };
+    if(typeof requestAnimationFrame === "function"){ requestAnimationFrame(function(){ requestAnimationFrame(lift); }); } else { lift(); }
   }
-  buildRows();
-  refreshProgress();
-  $("refreshBtn").addEventListener("click", function(){
-    refreshProgress();
-    toast("Progress re-read from this device");
-  });
-  window.addEventListener("focus", refreshProgress);
-  window.addEventListener("storage", refreshProgress);
-  document.addEventListener("visibilitychange", function(){
-    if(!document.hidden) refreshProgress();
-  });
-  window.refreshProgress = refreshProgress;
+
+  function buildOf(html){ var m = /<meta name="build" content="([^"]*)"/.exec(html || ""); return m ? m[1] : null; }
+  function checkUpdate(manual){
+    if(typeof fetch !== "function" || !/^https?:$/.test(location.protocol)){ if(manual) toast(VERSION + " · open the live address to check for updates"); return; }
+    fetch(location.pathname + "?nc=" + Date.now(), { cache:"no-store" }).then(function(r){ return r.ok ? r.text() : ""; }).then(function(html){
+      var live = buildOf(html);
+      if(live && live !== VERSION){
+        var bar = $("updbar"); bar.textContent = "Newer version is up (" + live + "). Tap to load it."; bar.className = "show";
+        bar.onclick = function(){ try{ location.replace(location.pathname + "?v=" + encodeURIComponent(live)); }catch(e){ location.reload(); } };
+      } else if(manual){ toast(live ? VERSION + " · you have the newest" : VERSION + " · could not check right now"); }
+    }).catch(function(){ if(manual) toast(VERSION + " · could not check right now"); });
+  }
+  $("mbVer").addEventListener("click", function(){ checkUpdate(true); });
+  $("refreshBtn").addEventListener("click", function(){ render(); toast("Progress re-read from this device"); });
+
+  render();
+  checkUpdate(false);
+  if(typeof ResizeObserver === "function"){ new ResizeObserver(function(){ fillProps(); }).observe($("shelves")); }
+  else { window.addEventListener("resize", fillProps); }
+  window.addEventListener("storage", render);
+  document.addEventListener("visibilitychange", function(){ if(!document.hidden) render(); });
+  window.refreshProgress = render;
 }
 
 if(typeof window !== "undefined" && typeof document !== "undefined"){
@@ -280,7 +470,7 @@ if(typeof window !== "undefined" && typeof document !== "undefined"){
   else { initApp(); }
 }
 if(typeof module !== "undefined" && module.exports){
-  module.exports = { countDone: countDone, pctOf: pctOf, ROWS: ROWS };
+  module.exports = { countDone: countDone, pctOf: pctOf, ROWS: ROWS, CH: CH, SHELVES: SHELVES, COURSES: COURSES };
 }
 </script>
 </body>

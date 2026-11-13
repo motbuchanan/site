@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#14181d">
-<meta name="build" content="v0.2 · Nov 13">
+<meta name="build" content="v0.3 · Nov 13">
 <title>Who Tapped First: Firebase sign-in, rules, listeners and ties</title>
 <meta name="description" content="Chapter 11 of All Thumbs. The four jobs of a real backend, taught with a two-phone buzzer: who is asking, where the data sits, who is allowed, and who tapped first.">
 <link rel="canonical" href="https://motbuchanan.com/allthumbs/firebase-basics.html">
@@ -155,7 +155,7 @@
     <h1>Who Tapped First</h1>
     <p class="subtitle">Two phones, one buzzer, and the four jobs a real backend does.</p>
   </div>
-  <button class="vbadge" id="vbadge" type="button">v0.2 &middot; Nov 13</button>
+  <button class="vbadge" id="vbadge" type="button">v0.3 &middot; Nov 13</button>
 </header>
 
 <nav>
@@ -354,7 +354,7 @@
 
 <script>
 "use strict";
-var VERSION = "v0.2 · Nov 13";
+var VERSION = "v0.3 · Nov 13";
 var STORE_KEY = "firebase101_v1";
 
 /* ---------- guarded storage ---------- */
@@ -622,7 +622,7 @@ var TRAIL_CASES = [
   { story:"The buzzer. Rules were <code>if request.auth != null</code> and both phones signed in anonymously. A phone taps the button. Does the write go through?",
     yes:true, hint:"Anonymous sign-in is real sign-in. There was a uid on the request, the rule asked for nothing more, so it was allowed." },
   { story:"Testing the buzzer by opening the file straight from Downloads on the phone, not from its https address. Does Firebase sign-in work there?",
-    yes:false, hint:"A file opened from Downloads is a content:// page with no real web address, so sign-in has nothing to stand on. Test anything Firebase from the live address. Same trap as Chapter 7." },
+    yes:false, hint:"I tested it on the phone. The Firebase library loaded, then anonymous sign-in sat for 20 seconds and never answered. No error message, only silence. A file opened from Downloads is a content:// page, not a web address. Test anything Firebase from the live address. Same trap as Chapter 7." },
   { story:"The buzzer again. Two taps land in the same instant, and the code claims the win inside a transaction. Does the faster phone keep the win?",
     yes:true, hint:"First tap wins was the whole reason for the transaction. The second commit is refused, reruns, sees a winner and backs off." },
   { story:"Rock paper scissors, the buzzer's remix. Both phones see the round resolve and both try to score it. Scoring runs in a transaction guarded by a resolvedRound field. Does the winner get exactly one point?",

@@ -1,5 +1,26 @@
 # All Thumbs: course roadmap and state
 
+## v1.24 (Nov 13 2026) - hub design pass: the shelf
+
+The hub was one tall card per chapter (about 6,000px of scrolling at 11 chapters, double that by 16). Three layouts were mocked as phone renders (A the shelf, B a route line, C next-up plus index). Mot picked A, then flagged that three books on a shelf look empty, so round 2 regrouped and filled the shelves. That is what shipped.
+
+- Structure: four topic shelves replace the six unit headings. The basics (ch 1-7), Under your own apps (ch 8-14), Directing AI (ch 15-16 plus the Images and video course), Branch courses (Video editing, Game development). Unit names survive as small divider tabs standing between books ("your toolbox", "shared + live", "trust nothing"). Chapter files never mention unit numbers, so nothing else changed.
+- Each chapter is a book spine: color band with its number, title running up the spine, a fill that rises with its progress (same countDone / pctOf math and storage keys as before, all three state shapes). Planned chapters are dashed ghost books with no link. Branch courses are wide boxed sets marked COURSE.
+- Tap a spine: it lifts 16px (the one signature motion) and opens one card under its shelf with the mascot, description, stats, and Start / Keep going / Open again. Default selection is the first unfinished built chapter. The page compensates so a tapped book never jumps out from under the thumb. Git's "boss beaten" chip moved into its card.
+- Books flex wider when a shelf has fewer of them (max 66px, course boxes 128px). Each shelf ends with a bookend; any gap of 78px or more gets a mascot prop leaning on it (refit on resize). At 320px the books squeeze to 30px and no props show.
+- PROPS (one line in the script) lists the prop images: currently thumb-wave, thumb-cool, thumb-happy, thumb-thumbsup. New leaning or posing bookend art drops in by editing that list.
+- Also: badge tap now checks the live file for a newer build and offers a reload (meta build + VERSION + badge kept in step), a done line under the title ("10 of 11 chapters done on this device"), a noscript list of plain chapter links, aria-labels and aria-pressed on every spine.
+- Adding a chapter now: give its CH entry key, img, file and total. It turns from a ghost into a real book in place. Planned titles for 12-16 are working titles.
+
+### Art wanted (Mot plans to generate these)
+
+- New chapter mascots for the new concepts (12 Break It onward), same sticker style as the rest, plain white background, no shadow.
+- Bookend mascots made for the shelf: leaning on the bookend, sitting on the plank edge, peeking from behind a book, holding a book. Possibly animated. Until then the four existing poses stand in.
+
+### Validation
+
+0 dashes, 0 curly quotes, node --check, acorn, jsdom (4 shelves, 16 books + 3 courses, default selection, card stats and links, planned books unlinked, course cards, version in 3 places, noscript links, storage blocked, lift lands a frame later), real-tap checks (each tapped book rises 16px and stays put, Keep going opens the chapter), fitcheck 0 problems, Breaker clean on phone / iPad / blocked storage, separate reviewer. Reviewer found no breaks; fixed before ship: keyboard focus now stays on the picked book, the update bar is a real button, the extra re-render on window focus is gone, Python's card says lessons, finished books fill stronger. Left as is: the previously lifted book snaps down instead of easing down.
+
 ## v1.23 (Nov 13 2026) - expansion map approved + Chapter 11: Who Tapped First (Firebase)
 
 The ten-chapter course was complete at v1.22. On Nov 13 the course was picked back up to cover what has been learned since. The old "Tier 3, pick one" list is replaced by this map. Most recent is authoritative.
@@ -27,7 +48,7 @@ The ten-chapter course was complete at v1.22. On Nov 13 the course was picked ba
 - Known, not fixed here: the ten older chapters fail fitcheck on their nav strip (the checker does not see it as a scrolling strip; adding overflow-y:hidden to nav clears it), and their badges show the number without the date. Fold both into the hub design pass.
 - Optional art: a dedicated Chapter 11 mascot (the thumb holding a buzzer button, same sticker style, plain white background, no shadow). If made, save it as thumb-firebase.png and the chapter and hub get pointed at it.
 - Reviewer pass (separate agent, Nov 13): 0 breaks. Fixed before ship: section headings hiding under the sticky nav after a chip tap (scroll-margin-top), hub badge under 32px tall, an overstated line about what rules refuse, a made-up error message replaced with the real one, six copy flags. Fixed same day in chapter v0.2 (Nov 13): the path builder got a "back one step" button and an end-of-branch note, and quiz options now shuffle on every load and retry (the right answers used to sit only in the 2nd or 3rd slot). Left open: Hint then answer still scores a rep (same as older chapters).
-- NEEDS ONE REAL TEST: Trail case 2 says Firebase sign-in fails when the file is opened from Downloads. Believable, not verified. Check it once on the phone and fix the case if it is wrong.
+- TESTED Nov 13 (chapter v0.3): Trail case 2 is confirmed on the build phone. A one-time test page opened from Downloads (content://) loaded the Firebase library, then anonymous sign-in gave no answer in 20 seconds and no error. The hint now says exactly that. One run on one phone (Android Chrome); the cause was not dug into.
 - FOLLOW-UP outside this folder: the site home screen card for All Thumbs still says 10 of 10 chapters and 11 files.
 
 ## v1.22 (Oct 24 2026) - fonts load from the site's shared fonts/ folder (../fonts/fonts.css) instead of Google. No content change.
