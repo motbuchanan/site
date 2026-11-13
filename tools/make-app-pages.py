@@ -139,6 +139,7 @@ a{color:inherit}
 .cat{font:700 11px 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--cc)}
 h1{font:800 clamp(30px,9vw,46px)/1.05 'Archivo',system-ui,sans-serif;letter-spacing:-.01em;overflow-wrap:anywhere}
 .what{font-size:clamp(17px,4.6vw,20px);line-height:1.45;color:var(--ink);margin:22px 0 0;max-width:34em}
+.for{font:600 13px 'JetBrains Mono',monospace;letter-spacing:.03em;color:var(--cc);margin-top:12px}
 .facts{font:400 12px 'JetBrains Mono',monospace;color:var(--dim);margin-top:12px;overflow-wrap:anywhere}
 .go{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin:26px 0 0}
 .btn{display:inline-block;background:var(--cc);color:#0a0d11;font:700 16px 'Archivo',system-ui,sans-serif;text-decoration:none;
@@ -226,7 +227,7 @@ def page(x, apps, ver, stamp, fav):
 <header>
 <div class="head"><img class="ico" src="%(icon)s" alt="" width="112" height="112"><div><p class="cat">%(label)s</p><h1>%(name)s</h1></div></div>
 <p class="what">%(what)s</p>
-<p class="facts">%(facts)s</p>
+%(forline)s<p class="facts">%(facts)s</p>
 <div class="go"><a class="btn" href="%(open)s">%(verb)s</a><a class="alt" href="../?app=%(slug)s">See it on the phone</a></div>
 %(note)s
 </header>
@@ -242,7 +243,7 @@ def page(x, apps, ver, stamp, fav):
 """ % dict(title=e(title), what=e(a['what']), url=url, name=e(a['name']), css=CSS % dict(cc=cc), slug=x['slug'],
            icon=x['icon'], label=label, facts=e(facts), open=e(x['open']), verb=e(a['verb']), note=note, shots=shots,
            secs=secs, take=('<section><h2>Take it</h2><p class="take">%s</p></section>' % take) if take else '',
-           others=others, ver=ver, stamp=stamp, fav=fav, schema=schema)
+           others=others, ver=ver, stamp=stamp, fav=fav, schema=schema, forline=('<p class="for">Built for %s</p>\n' % e(a['for'])) if a.get('for') else '')
 
 
 SHARE = """<!doctype html><html><head><meta charset="utf-8"><link href="../fonts/fonts.css" rel="stylesheet"><style>
