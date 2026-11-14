@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14181d">
+<meta name="build" content="v0.2 · Nov 14">
+<title>Debugging: root cause first, stale copy or real bug</title>
+<meta name="description" content="Chapter 13 of All Thumbs. Debugging for people who build on a phone: tell an old cached copy from a real bug, find the broken piece by halving, and fix the cause instead of the symptom.">
+<link rel="canonical" href="https://motbuchanan.com/allthumbs/debug-basics.html">
+<meta property="og:title" content="Debugging: root cause first">
+<meta property="og:description" content="Solve stale-or-real cases, find a hidden bad piece in three tests, and pick the fix that goes to the root cause.">
+<meta property="og:image" content="https://motbuchanan.com/allthumbs/icon-512.png">
+<link rel="icon" href="favicon.png">
+<style>
+
+  :root{
+    --canvas:#14181d; --panel:#1c2229; --card:#171c22; --line:#2c3540;
+    --ink:#e8ecf0; --soft:#97a3ae; --dim:#6b7682;
+    --green:#6fe08c; --amber:#f5b04c; --blue:#5aa7e8; --red:#e87a6d; --rose:#8ec5ff; --trail:#c8a4f0;
+    --mono:ui-monospace,'SF Mono','Cascadia Mono','Roboto Mono',Consolas,Menlo,monospace;
+    --sans:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',sans-serif;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html{scroll-behavior:smooth; scroll-padding-top:64px;}
+  body{margin:0; background:var(--canvas); color:var(--ink); font-family:var(--sans); font-size:17px; line-height:1.6; padding-bottom:70px; overflow-wrap:anywhere;}
+  header{padding:26px 20px 10px; max-width:760px; margin:0 auto; display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap;}
+  .wordmark{font-family:var(--mono); font-size:12px; letter-spacing:.2em; color:var(--soft); text-transform:uppercase;}
+  h1{margin:6px 0 2px; font-size:clamp(26px,8vw,32px); line-height:1.15; letter-spacing:-.01em;}
+  .subtitle{color:var(--soft); margin:0; font-size:15px;}
+  .vbadge{font-family:var(--mono); font-size:11px; color:var(--soft); border:1px solid var(--line); border-radius:999px; padding:9px 12px; background:var(--panel); cursor:pointer; white-space:nowrap; margin-top:4px;}
+  nav{position:sticky; top:0; z-index:30; background:#14181d; border-bottom:1px solid var(--line); overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch;}
+  .navrow{display:flex; gap:8px; padding:10px 16px; max-width:760px; margin:0 auto; width:max-content;}
+  .navchip{font-family:var(--mono); font-size:12px; color:var(--soft); border:1px solid var(--line); border-radius:999px; padding:9px 13px; background:var(--card); text-decoration:none; white-space:nowrap;}
+  .navchip:active{color:var(--ink); border-color:var(--rose);}
+  main{max-width:760px; margin:0 auto; padding:0 16px;}
+  section{background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:22px 18px; margin:18px 0; scroll-margin-top:68px;}
+  .eyebrow{font-family:var(--mono); font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--rose); margin:0 0 6px;}
+  h2{margin:0 0 10px; font-size:23px; line-height:1.2;}
+  p{margin:10px 0;}
+  .soft{color:var(--soft);} .small{font-size:14px;}
+  code{font-family:var(--mono); font-size:.9em; background:var(--card); border:1px solid var(--line); border-radius:6px; padding:1px 6px; color:var(--green);}
+  .note{border-left:3px solid var(--rose); background:var(--card); border-radius:0 10px 10px 0; padding:10px 14px; margin:14px 0; font-size:15px; color:var(--soft);}
+  .btn{display:inline-block; font-family:var(--mono); font-size:14px; color:var(--ink); background:var(--card); border:1px solid var(--line); border-radius:10px; padding:11px 16px; cursor:pointer; user-select:none;}
+  .btn:active{border-color:var(--rose); transform:translateY(1px);}
+  .btn.primary{border-color:var(--rose); color:var(--rose);}
+  .btn[disabled]{opacity:.4; cursor:default;}
+  .simwrap{margin:14px 0;}
+  .picker{display:flex; gap:8px; flex-wrap:wrap; margin:10px 0;}
+  .plabel{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--dim); margin:14px 0 0;}
+  .chipbtn{font-family:var(--mono); font-size:12.5px; padding:10px 13px; border-radius:999px; border:1px solid var(--line); background:var(--card); color:var(--soft); cursor:pointer;}
+  .chipbtn.on{border-color:var(--rose); color:var(--rose); background:rgba(142,197,255,.1); font-weight:700;}
+  .mascotspot{text-align:center; margin:6px 0 2px;}
+  .mascotspot img{height:230px; max-width:100%; width:auto; object-fit:contain; filter:drop-shadow(0 10px 22px rgba(0,0,0,.5));}
+  .tipbox{position:relative; background:var(--card); border:1px solid var(--line); border-left:3px solid var(--rose); border-radius:0 12px 12px 0; padding:16px 16px 16px 118px; margin:22px 0; min-height:96px;}
+  .tipbox .poke{position:absolute; left:-14px; bottom:-8px; height:150px; width:auto; transform:rotate(-8deg); filter:drop-shadow(0 8px 16px rgba(0,0,0,.45)); pointer-events:none;}
+  .tipbox.right{border-left:1px solid var(--line); border-right:3px solid var(--rose); border-radius:12px 0 0 12px; padding:16px 118px 16px 16px;}
+  .tipbox.right .poke{left:auto; right:-14px; transform:rotate(8deg);}
+  .tipbox .tt{font-weight:700; color:var(--rose); font-size:15px;}
+  .tipbox .tp{margin:4px 0 0; font-size:14.5px; color:var(--soft); line-height:1.55;}
+
+  /* missions, gym, quiz (course standard) */
+  .mission{display:flex; gap:10px; align-items:flex-start; background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px; margin:8px 0; font-size:14.5px;}
+  .mission .mk{font-family:var(--mono); flex:0 0 auto; width:22px; height:22px; border-radius:50%; border:1px solid var(--line); color:var(--dim); display:flex; align-items:center; justify-content:center; font-size:12px;}
+  .mission.done{border-color:rgba(111,224,140,.5);}
+  .mission.done .mk{border-color:var(--green); color:var(--green); background:rgba(111,224,140,.1);}
+  .mission.done .mtext{color:var(--soft);}
+  .mission .mtext b{color:var(--rose);}
+  .gym{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px; margin:14px 0;}
+  .gymstats{display:flex; gap:18px; flex-wrap:wrap; font-size:12.5px; color:#9aa5b1; margin-bottom:10px; letter-spacing:.04em;}
+  .gymstats b{color:var(--green); font-size:15px; margin-left:4px;}
+  .gymtabs{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;}
+  .gtab{font-size:12px; padding:9px 12px; border-radius:999px; border:1px solid var(--line); background:transparent; color:inherit; cursor:pointer;}
+  .gtab.on{border-color:var(--rose); color:var(--rose); font-weight:700;}
+  .gymcard{border:1px dashed var(--line); border-radius:10px; padding:12px;}
+  .gymcard.active{border-style:solid; border-color:var(--rose);}
+  .gymcard.win{border-style:solid; border-color:var(--green);}
+  .gymcard.trailmode.active{border-color:var(--trail);}
+  .ggoal{font-size:15px; line-height:1.5;} .ggoal b{color:var(--rose);}
+  .ghint{font-size:13.5px; color:var(--blue); margin-top:8px; display:none;} .ghint.show{display:block;}
+  .gbtns{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;}
+  .tracktoggle{display:flex; gap:8px; margin:14px 0 10px; align-items:center; flex-wrap:wrap;}
+  .tracktoggle .tlabel{font-family:var(--mono); font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--dim);}
+  .ttab{font-family:var(--mono); font-size:12.5px; padding:9px 14px; border-radius:999px; border:1px solid var(--line); background:var(--card); color:var(--soft); cursor:pointer;}
+  .ttab.on.general{border-color:var(--rose); color:var(--rose); background:rgba(142,197,255,.1); font-weight:700;}
+  .ttab.on.trail{border-color:var(--trail); color:var(--trail); background:rgba(200,164,240,.12); font-weight:700;}
+  .trailbanner{font-family:var(--mono); font-size:11.5px; color:var(--trail); background:rgba(200,164,240,.08); border:1px solid rgba(200,164,240,.3); border-radius:8px; padding:7px 11px; margin:8px 0; display:none;}
+  .trailbanner.show{display:block;}
+  .quizq{margin:16px 0;} .quizq .q{font-weight:600; margin-bottom:8px;}
+  .quizopt{display:block; width:100%; text-align:left; font-size:14.5px; padding:11px 14px; border-radius:10px; border:1px solid var(--line); background:var(--card); color:var(--ink); cursor:pointer; margin:6px 0; font-family:var(--sans);}
+  .quizopt.right{border-color:var(--green); background:rgba(111,224,140,.1);}
+  .quizopt.wrong{border-color:var(--red); background:rgba(232,122,109,.1);}
+  .qresult{font-weight:700; margin-top:10px;}
+  .backhub{display:inline-flex; align-items:center; gap:7px; font-family:var(--mono); font-size:12px; color:var(--soft); border:1px solid var(--line); border-radius:999px; padding:10px 14px; background:var(--card); text-decoration:none;}
+  footer{max-width:760px; margin:8px auto 30px; padding:0 20px; color:var(--dim); font-size:12px; text-align:center;}
+  #toast{position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(90px); background:var(--card); color:var(--ink); border:1px solid var(--rose); border-radius:999px; padding:10px 18px; font-family:var(--mono); font-size:13px; transition:transform .3s ease; z-index:99; pointer-events:none; max-width:88vw; text-align:center;}
+  #toast.show{transform:translateX(-50%) translateY(0);}
+  #updbar{display:none; position:fixed; left:12px; right:12px; bottom:calc(14px + env(safe-area-inset-bottom)); z-index:100; background:var(--card); border:1px solid var(--green); color:var(--green); border-radius:12px; padding:13px 14px; font-family:var(--mono); font-size:13px; text-align:center; cursor:pointer;}
+  #updbar.show{display:block;}
+  @media(max-width:380px){ .tipbox{padding-left:96px;} .tipbox.right{padding:16px 96px 16px 16px;} .tipbox .poke{height:124px;} }
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:.001s !important; transition-duration:.001s !important;} html{scroll-behavior:auto;} }
+  .btn:focus-visible,.chipbtn:focus-visible,.quizopt:focus-visible,.navchip:focus-visible,.gtab:focus-visible,.ttab:focus-visible{outline:2px solid var(--rose); outline-offset:2px;}
+
+  .lanes{border:1px solid var(--line); border-radius:12px; background:#0d1114; padding:10px; margin:12px 0; min-height:70px; max-height:320px; overflow-y:auto;}
+  .step{display:flex; gap:10px; align-items:flex-start; font-size:14px; padding:6px 4px; border-bottom:1px solid rgba(44,53,64,.6);}
+  .step:last-child{border-bottom:none;}
+  .step .who{flex:0 0 66px; font-family:var(--mono); font-size:11px; padding-top:2px;}
+  .step .who.p1{color:var(--blue);} .step .who.p2{color:var(--amber);} .step .who.db{color:var(--rose);}
+  .step.bad .what{color:var(--red);} .step.warn .what{color:var(--amber);} .step.good .what{color:var(--green);}
+  .lanes .idle{color:var(--dim); font-size:14px; padding:6px 4px;}
+  .revcard{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; margin:12px 0;}
+  .revmeta{font-family:var(--mono); font-size:11.5px; color:var(--dim); letter-spacing:.04em;}
+  .revtxt{font-size:16px; margin:6px 0 10px; line-height:1.5;}
+  .revopts{display:flex; gap:8px; flex-wrap:wrap;}
+  .chipbtn.right{border-color:var(--green); color:var(--green); background:rgba(111,224,140,.1);}
+  .chipbtn.wrong{border-color:var(--red); color:var(--red); background:rgba(232,122,109,.1);}
+  .revwhy{margin-top:12px; font-size:14.5px; color:var(--soft);} .revwhy b{color:var(--ink);}
+  .revdone{font-size:16px; margin-bottom:10px;} .revdone b{color:var(--rose);}
+  .gopts{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;}
+  .steps4{display:grid; gap:8px; margin:12px 0;}
+  .steps4 div{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:10px 12px; font-size:14.5px; color:var(--soft);}
+  .steps4 b{color:var(--ink); display:block;}
+  .case{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; margin:12px 0;}
+  .ev{background:#0d1114; border:1px solid var(--line); border-left:3px solid var(--blue); border-radius:0 10px 10px 0; padding:9px 12px; margin:7px 0; font-size:14.5px; color:var(--soft);}
+  .result{display:none; border:1px solid var(--line); border-left:3px solid var(--green); background:var(--card); border-radius:0 10px 10px 0; padding:11px 13px; font-size:15px; color:var(--soft); margin:10px 0;}
+  .result.show{display:block;} .result.bad{border-left-color:var(--red);} .result b{color:var(--ink);}
+  .lognum{font-family:var(--mono); font-size:12px; color:var(--rose); align-self:center;}
+  .pieces{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin:12px 0;}
+  .pc{display:flex; flex-direction:column; align-items:center; gap:2px; font:inherit; padding:10px 4px; border-radius:10px; border:1px solid var(--line); background:var(--card); color:var(--dim); cursor:pointer; min-height:56px;}
+  .pc .pn{font-family:var(--mono); font-size:12.5px;} .pc .ps{font-family:var(--mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase;}
+  .pc.on{border-color:var(--rose); color:var(--ink); background:rgba(142,197,255,.1);}
+  .pc.out{opacity:.38; text-decoration:line-through;}
+  .pc.bad{opacity:1; text-decoration:none; border-color:var(--red); background:rgba(232,122,109,.18); color:var(--ink);}
+  @media(max-width:360px){ .pieces{grid-template-columns:repeat(2,1fr);} }
+  .fixopts{display:flex; flex-direction:column; gap:2px; margin-top:6px;}
+  #updbar{width:auto; font-family:var(--mono);}
+</style>
+<style>
+.nextch{display:flex;flex-wrap:wrap;gap:12px;max-width:760px;margin:28px auto 16px;padding:0 16px;box-sizing:border-box}
+.nextch a{flex:1 1 100%;min-height:56px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;gap:4px;padding:12px 16px;border:1px solid rgba(255,255,255,.16);border-radius:12px;background:rgba(255,255,255,.04);color:inherit;text-decoration:none;font-size:16px;font-weight:700;line-height:1.3}
+.nextch a small{font-size:12px;font-weight:400;opacity:.65}
+.nextch a:active{border-color:currentColor}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="wordmark">All Thumbs &middot; chapter 13</div>
+    <h1>Debugging</h1>
+    <p class="subtitle">Root cause first. Is it a stale copy or a real bug, and how do you tell?</p>
+  </div>
+  <button class="vbadge" id="vbadge" type="button">v0.2 &middot; Nov 14</button>
+</header>
+
+<nav>
+  <div class="navrow">
+    <a class="navchip" href="#idea">the idea</a>
+    <a class="navchip" href="#stale">stale or real</a>
+    <a class="navchip" href="#half">cut it in half</a>
+    <a class="navchip" href="#fix">the real fix</a>
+    <a class="navchip" href="#missions">missions</a>
+    <a class="navchip" href="#gym">gym</a>
+    <a class="navchip" href="#quiz">quiz</a>
+  </div>
+</nav>
+
+<main>
+
+<section id="idea">
+  <p class="eyebrow">symptom and cause</p>
+  <h2>"It's broken" is where you start</h2>
+  <div class="mascotspot"><img src="thumb-aha.png" alt="the thumb mascot with a lightbulb idea"></div>
+  <p>A bug shows up as a <b>symptom</b>: a blank screen, a button that does nothing, a score that says NaN. The <b>root cause</b> is the one line or the one missing step that makes it happen. Fixing the symptom (hiding the NaN, wrapping more code around the button) makes the bug quieter, and it comes back somewhere else.</p>
+  <p>Before I ask for any fix now, I work through four questions in order:</p>
+  <div class="steps4">
+    <div><b>1. Can I make it happen again?</b> Same taps, same phone, same result. If I can't repeat it, I can't prove I fixed it.</div>
+    <div><b>2. Am I looking at the file I think I am?</b> The version badge answers this. An old copy has fooled me before.</div>
+    <div><b>3. Where exactly does it break?</b> Cut the problem in half until one piece is left.</div>
+    <div><b>4. Did the fix really work?</b> Run the same taps again and watch the symptom stay gone.</div>
+  </div>
+</section>
+
+<section id="stale">
+  <p class="eyebrow">stale or real</p>
+  <h2>The fix didn't work. Or did it?</h2>
+  <p>You uploaded a fix, opened the app, and the bug is still there. There are four very different reasons that can happen, and only one of them means your code is still wrong. Gather evidence before you decide.</p>
+  <div class="case" id="caseCard"></div>
+  <p class="plabel">gather evidence</p>
+  <div class="picker" id="evPick">
+    <button class="chipbtn" data-ev="badge" type="button">tap the version badge</button>
+    <button class="chipbtn" data-ev="repo" type="button">look at the file on GitHub</button>
+    <button class="chipbtn" data-ev="addr" type="button">look at the address bar</button>
+    <button class="chipbtn" data-ev="fresh" type="button">reload a fresh copy</button>
+  </div>
+  <div id="evLog"></div>
+  <p class="plabel">your verdict</p>
+  <div class="picker" id="verPick"></div>
+  <div class="result" id="verResult"></div>
+  <div class="picker"><button class="btn" id="nextCase" type="button">next case</button><span class="lognum" id="caseNum"></span></div>
+  <div class="tipbox">
+    <img class="poke" src="thumb-think.png" alt="">
+    <div class="tt">Why every app has a badge</div>
+    <p class="tp">Early on, a caching problem kept showing me an old copy of an app, and I thought my fixes weren't landing. Now every app shows its version and date, and it's the first thing I look at. One more thing: right after an upload, Pages can take a minute to publish, so give it a moment before you call anything stale.</p>
+  </div>
+</section>
+
+<section id="half">
+  <p class="eyebrow">cut it in half</p>
+  <h2>Find the one bad piece in three tests</h2>
+  <p>This page has eight pieces, and one of them breaks it. Testing them one by one could take up to seven tests. Instead, switch half of them off and test. If the page works, the bad piece is in the half you switched off. If it still breaks, it's in the half that's still on. Keep halving.</p>
+  <div class="pieces" id="pieces"></div>
+  <div class="picker" style="justify-content:center">
+    <button class="btn primary" id="halfTest" type="button">test the page</button>
+    <button class="btn" id="halfNew" type="button">hide a new bug</button>
+  </div>
+  <div class="result" id="halfResult"></div>
+  <div class="lanes" id="halfLog"><div class="idle">Switch some pieces off, then test.</div></div>
+  <div class="tipbox right">
+    <img class="poke" src="thumb-tip.png" alt="">
+    <div class="tt">How I used this on Nov 13</div>
+    <p class="tp">Firebase sign-in sat silent when a page was opened from Downloads. I had a test page try three steps in order: load the library, sign in, read one page. Step one worked, and step two never answered. That narrowed it to sign-in in one run, without guessing.</p>
+  </div>
+</section>
+
+<section id="fix">
+  <p class="eyebrow">the real fix</p>
+  <h2>Patch the symptom or fix the cause?</h2>
+  <p>Each bug below comes with three possible fixes. One hides the symptom, one throws everything out, and one goes to the root cause. Pick the one you'd ask for.</p>
+  <div class="case" id="fixCard"></div>
+</section>
+
+<section id="missions">
+  <p class="eyebrow">missions</p>
+  <h2>Prove it</h2>
+  <p>Six things to make happen in the sandboxes above. They tick off as you go.</p>
+  <div id="missionList"></div>
+</section>
+
+<section id="gym">
+  <p class="eyebrow">the gym</p>
+  <h2>Practice: find it before you fix it</h2>
+  <p class="small soft">Randomized drills. A wrong call resets your streak.</p>
+  <div class="tracktoggle">
+    <span class="tlabel">practice</span>
+    <button class="ttab general on" id="trackGeneral" type="button">General</button>
+    <button class="ttab trail" id="trackTrail" type="button">The Trail</button>
+  </div>
+  <div class="trailbanner" id="trailBanner">The Trail: real bugs and false alarms from my own builds, plus two habits worth keeping.</div>
+  <div class="gym">
+    <div class="gymstats"><span>reps<b id="repN">0</b></span><span>streak<b id="strN">0</b></span><span>best<b id="bestN">0</b></span></div>
+    <div class="gymtabs" id="gymTabs"></div>
+    <div class="gymcard" id="gymCard">
+      <div class="ggoal" id="gGoal">Pick a level (or Surprise me) and tap <b>Start drill</b>.</div>
+      <div id="gymBoard"></div>
+      <div class="gopts" id="gOpts"></div>
+      <div class="ghint" id="gHint"></div>
+      <div class="gbtns">
+        <button class="btn primary" id="gStart" type="button">Start drill</button>
+        <button class="btn" id="gHintBtn" type="button" style="display:none">Hint</button>
+        <button class="btn" id="gSkip" type="button" style="display:none">Skip</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="quiz">
+  <p class="eyebrow">quiz</p>
+  <h2>Five questions</h2>
+  <div id="quizBox"></div>
+</section>
+
+<div style="text-align:center;margin:24px 0 8px;">
+  <a class="backhub" href="index.html">&larr; back to All Thumbs</a>
+</div>
+
+</main>
+<div class="nextch"><a href="actions-basics.html"><small>Next up</small>Chapter 14: Robots on GitHub</a></div>
+<footer>Debugging &middot; All Thumbs chapter 13 &middot; the sandboxes are models, nothing here is sent anywhere</footer>
+<button id="updbar" type="button">A newer version is up. Tap to load it.</button>
+<div id="toast" role="status"></div>
+
+<script>
+"use strict";
+var VERSION = "v0.2 · Nov 14";
+var STORE_KEY = "debug101_v1";
+
+/* ---------- guarded storage ---------- */
+var memStore = {};
+function loadState(){
+  try{ var raw = localStorage.getItem(STORE_KEY); if(raw) return JSON.parse(raw); }catch(e){}
+  return memStore[STORE_KEY] || null;
+}
+function saveState(s){
+  memStore[STORE_KEY] = s;
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(s)); }catch(e){}
+}
+function getState(){
+  var s = loadState();
+  if(!s || typeof s !== "object") s = {};
+  if(!s.m) s.m = {};
+  if(!s.gym) s.gym = { reps:0, streak:0, best:0 };
+  if(typeof s.quizBest !== "number") s.quizBest = 0;
+  return s;
+}
+
+/* ---------- ENGINE (pure, testable) ---------- */
+var VERDICTS = ["an old copy is cached","the upload never landed","the bug is real","I opened the downloaded copy"];
+var TRUTHS = ["stale","notLanded","real","downloads"];
+var CASE_APPS = [
+  { app:"a word game", bug:"the keyboard still sits under the grid when the phone is sideways" },
+  { app:"a drum trainer", bug:"the Stop button still lets one sound keep playing" },
+  { app:"a pool game", bug:"the cue still sticks after a scratch" },
+  { app:"a grocery list", bug:"checked items still come back after a reload" },
+  { app:"a scoreboard", bug:"the total still shows NaN after a reset" }
+];
+/* evidence(truth, kind) -> what you see */
+function evidence(truth, kind){
+  var oldV = "v1.3 · Nov 10", newV = "v1.4 · Nov 13";
+  if(kind === "badge"){
+    if(truth === "real") return "The badge on your screen says " + newV + ", the version with the fix.";
+    return "The badge on your screen says " + oldV + ".";
+  }
+  if(kind === "repo"){
+    if(truth === "notLanded") return "The file on GitHub still says " + oldV + ". Its history shows no upload today.";
+    return "The file on GitHub says " + newV + " and the fix is in it.";
+  }
+  if(kind === "addr"){
+    if(truth === "downloads") return "The address bar starts with content://media/ (that's how Android shows it). That's a file in your Downloads, not your site.";
+    return "The address bar shows your live site's https address.";
+  }
+  if(kind === "fresh"){
+    if(truth === "stale") return "After a fresh reload the badge says " + newV + " and the bug is gone.";
+    if(truth === "notLanded") return "After a fresh reload it still says " + oldV + ". There's nothing newer to load.";
+    if(truth === "real") return "After a fresh reload it still says " + newV + ", and the bug is still there.";
+    return "Reloading shows the same " + oldV + ". You're reloading the same downloaded file.";
+  }
+  return "";
+}
+var VERDICT_WHY = {
+  stale:"Your phone was showing a copy it saved earlier. The live file was already fixed. Nothing to change in the code.",
+  notLanded:"The fix never reached GitHub, so there's nothing new to load. Upload it again and check the file on GitHub.",
+  real:"You're running the fixed version and the bug is still there. Now it's worth digging into the code.",
+  downloads:"You opened an old download instead of the live site. Open the https address instead."
+};
+
+/* halving: which pieces could still be the bad one? */
+var PIECES = ["header","menu","score","timer","sound","save","board","help"];
+function narrow(possible, on, broke){
+  /* possible, on: arrays of indexes. If the page broke, the bad piece is among those switched on. */
+  return possible.filter(function(i){ var isOn = on.indexOf(i) >= 0; return broke ? isOn : !isOn; });
+}
+function testsNeeded(n){ var t = 0; while((1 << t) < n) t++; return t; }
+
+/* fix cards: a is the root-cause option */
+var FIXES = [
+  { bug:"The score sometimes shows NaN.", opts:["If the score is NaN, show 0 instead","Find where the score gets added to an empty box, and check the box first","Rewrite the whole scoring system"], a:1, why:"NaN means math was done on something that isn't a number, usually an empty (undefined) value. Showing 0 hides it, and a rewrite throws away the parts that work." },
+  { bug:"With saving blocked, the app never draws anything.", opts:["Wrap only the drawing code in try/catch","Send every save and load through one guarded helper with a copy kept in memory","Remove saving from the app"], a:1, why:"The drawing code was fine. One unguarded storage read threw an error and stopped the whole script before drawing started." },
+  { bug:"Turned sideways, the letter grid covers the keyboard.", opts:["Hide the grid when the phone is sideways","Add a layout rule for short, wide screens so the grid shrinks","Lock the app to portrait"], a:1, why:"The grid had a minimum width that didn't fit a short screen. Fix the size rule and both directions work." },
+  { bug:"A title spills off a 320px phone.", opts:["Add overflow-x:hidden so the page can't scroll sideways","Size the title with clamp() and let long words wrap","Make a separate small-phone version"], a:1, why:"Hiding the overflow cuts the title off instead of fitting it. A fluid size makes it fit." },
+  { bug:"Tapping +1 fast counts double.", opts:["Ignore taps that come too close together","Find where the tap listener gets attached twice, and attach it once","Swap the button for a slider"], a:1, why:"Each tap ran the code twice because the listener was added twice. Ignoring fast taps would also block real fast taps." },
+  { bug:"Reset clears the game, then the old score comes back a second later.", opts:["Clear the score again a second after reset","Add the missing key to the list reset clears, so everything you can save is something you can clear","Turn off live sync"], a:1, why:"One saved key wasn't on reset's list, so another device that was still listening pushed it right back." }
+];
+
+/* gym */
+function rn(list){ return list[Math.floor(Math.random() * list.length)]; }
+var HALF_N = [4, 8, 16, 32];
+function makeDrill(level){
+  if(level === 0){
+    var ti = Math.floor(Math.random() * 4), t = TRUTHS[ti], c = rn(CASE_APPS);
+    var kinds = ["badge","repo","addr"];
+    var ev = kinds.map(function(k){ return evidence(t, k); }).join(" ");
+    return { story:"You uploaded a fix for " + c.app + ", but " + c.bug + ". " + ev + " What's going on?", opts:VERDICTS, a:ti, hint:VERDICT_WHY[t] };
+  }
+  if(level === 1){
+    var n = rn(HALF_N), need = testsNeeded(n), opts = [2,3,4,5];
+    return { story:"A page has " + n + " pieces and one of them breaks it. You switch half off and test, again and again. What's the most tests you'll need?", opts:opts.map(String), a:opts.indexOf(need),
+      hint:"Each test halves the suspects: " + n + (function(){ var s = "", x = n; while(x > 1){ x = x / 2; s += " to " + x; } return s; })() + ". That's " + need + " tests." };
+  }
+  var f = rn(FIXES), pick = Math.random() < 0.5 ? 0 : f.a;
+  return { story:"Bug: " + f.bug + " Proposed fix: <b>" + f.opts[pick] + "</b>. What does that fix do?", opts:["patches the symptom","fixes the root cause"], a:pick === f.a ? 1 : 0, hint:f.why };
+}
+var TRAIL_CASES = [
+  { story:"Firebase sign-in sat silent when a page was opened from Downloads. A test page tried load library, sign in, read, in order. Library loaded, sign-in never answered. Did that narrow down where it breaks?", a:0, hint:"Yes. Three steps, one run, and the failure sat at step two." },
+  { story:"My fixes seemed not to land, and it turned out the phone was showing an old copy. When a fix seems to fail, should the badge be the first thing I check?", a:0, hint:"Yes. That's exactly why every app shows its version and date." },
+  { story:"A 205 KB file pasted into GitHub's phone editor landed as 1 byte. Was the problem in my code?", a:1, hint:"No. The paste got cut off. The code was fine; the upload wasn't. That's why big files go through Upload files." },
+  { story:"Knight School never drew with storage blocked. One unguarded storage read near the top threw an error. Would wrapping only the board-drawing code in try/catch have fixed it?", a:1, hint:"No. The error happened before drawing started. The root cause was the unguarded read." },
+  { story:"On the Game Shelf, reset left one game's record behind and another device pushed it back. Was the root cause in the live listener?", a:1, hint:"No. The listener did its job. The key was missing from reset's list." },
+  { story:"I opened a chapter from Downloads and its mascot image showed as broken. Is the chapter's image link broken?", a:1, hint:"No. The image lives in the allthumbs folder on the site. A downloaded copy has nothing next to it." },
+  { story:"A page spills sideways on a small phone. Is adding overflow-x:hidden to the page a root-cause fix?", a:1, hint:"No. It hides the spill and cuts content off. The fit check rules it out on purpose." },
+  { story:"I change three things at once and the bug goes away. Do I know which change fixed it?", a:1, hint:"No. One change, one test. Otherwise two of the changes might be junk, or one might break something else." }
+];
+
+/* ---------- DOM helpers ---------- */
+function $(id){ return document.getElementById(id); }
+function el(tag, cls, html){ var e = document.createElement(tag); if(cls) e.className = cls; if(html != null) e.innerHTML = html; return e; }
+var toastTimer = null;
+function toast(msg){ var t = $("toast"); if(!t) return; t.textContent = msg; t.className = "show"; clearTimeout(toastTimer); toastTimer = setTimeout(function(){ t.className = ""; }, 1900); }
+function shuffled(n){ var a = [], i, j, t; for(i = 0; i < n; i++) a.push(i); for(i = n - 1; i > 0; i--){ j = Math.floor(Math.random() * (i + 1)); t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+
+/* ---------- stale or real ---------- */
+var sc = { order:shuffled(4), i:0, app:null, seen:{}, answered:false, solved:0, toolsUsed:{} };
+function curTruth(){ return TRUTHS[sc.order[sc.i % 4]]; }
+function renderCase(){
+  sc.app = CASE_APPS[(sc.i + Math.floor(Math.random() * CASE_APPS.length)) % CASE_APPS.length];
+  sc.seen = {}; sc.answered = false;
+  $("caseCard").innerHTML = "<div class='revmeta'>case " + (sc.i + 1) + "</div><div class='revtxt'>You uploaded a fix for <b>" + sc.app.app + "</b> and opened it on your phone. But " + sc.app.bug + ".</div>";
+  $("evLog").innerHTML = ""; $("verResult").className = "result"; $("verResult").innerHTML = "";
+  [].forEach.call(document.querySelectorAll("#evPick .chipbtn"), function(x){ x.classList.remove("on"); });
+  var vp = $("verPick"); vp.innerHTML = "";
+  VERDICTS.forEach(function(v, vi){ var b = el("button", "chipbtn", v); b.type = "button"; b.addEventListener("click", function(){ verdict(vi, b); }); vp.appendChild(b); });
+  $("caseNum").textContent = sc.solved + " solved";
+}
+function showEvidence(kind, btn){
+  if(sc.seen[kind]) return; sc.seen[kind] = true; sc.toolsUsed[kind] = true; btn.classList.add("on");
+  $("evLog").appendChild(el("div", "ev", evidence(curTruth(), kind)));
+  if(Object.keys(sc.toolsUsed).length === 4) markMission("tools");
+}
+function verdict(vi, btn){
+  if(sc.answered) return;
+  var t = curTruth(), right = TRUTHS[vi] === t, kids = $("verPick").children;
+  if(!Object.keys(sc.seen).length){ toast("gather some evidence first"); return; }
+  sc.answered = true;
+  kids[TRUTHS.indexOf(t)].classList.add("right"); if(!right) btn.classList.add("wrong");
+  var box = $("verResult"); box.className = "result show " + (right ? "good" : "bad");
+  box.innerHTML = "<b>" + (right ? "Right: " : "It was: ") + VERDICTS[TRUTHS.indexOf(t)] + ".</b> " + VERDICT_WHY[t];
+  if(right){ sc.solved++; if(t === "stale") markMission("stale"); if(sc.solved >= 4) markMission("four"); }
+  $("caseNum").textContent = sc.solved + " solved";
+}
+function nextCase(){ sc.i++; if(sc.i % 4 === 0) sc.order = shuffled(4); renderCase(); }
+
+/* ---------- halving ---------- */
+var hv = { bad:0, on:[], possible:[], tests:0, done:false };
+function halfNew(){ hv.bad = Math.floor(Math.random() * PIECES.length); hv.on = PIECES.map(function(p, i){ return i; }); hv.possible = hv.on.slice(); hv.tests = 0; hv.done = false; $("halfLog").innerHTML = "<div class='idle'>Switch some pieces off, then test.</div>"; $("halfResult").className = "result"; renderPieces(); }
+function renderPieces(){
+  var box = $("pieces"); box.innerHTML = "";
+  PIECES.forEach(function(p, i){
+    var on = hv.on.indexOf(i) >= 0, out = hv.possible.indexOf(i) < 0;
+    var b = el("button", "pc" + (on ? " on" : "") + (out ? " out" : "") + (hv.done && i === hv.bad ? " bad" : ""), "<span class='pn'>" + p + "</span><span class='ps'>" + (on ? "on" : "off") + "</span>");
+    b.type = "button"; b.setAttribute("aria-pressed", on ? "true" : "false");
+    b.addEventListener("click", function(){ if(hv.done) return; var k = hv.on.indexOf(i); if(k >= 0) hv.on.splice(k, 1); else hv.on.push(i); renderPieces(); });
+    box.appendChild(b);
+  });
+}
+function halfTest(){
+  if(hv.done) return;
+  if(!hv.on.length){ toast("switch at least one piece on"); return; }
+  hv.tests++;
+  var broke = hv.on.indexOf(hv.bad) >= 0, before = hv.possible.length;
+  hv.possible = narrow(hv.possible, hv.on, broke);
+  var log = $("halfLog"); if(hv.tests === 1) log.innerHTML = "";
+  var onNames = hv.on.slice().sort(function(a, b){ return a - b; }).map(function(i){ return PIECES[i]; }).join(", ");
+  log.appendChild(el("div", "step " + (broke ? "bad" : "good"), "<span class='who p1'>test " + hv.tests + "</span><span class='what'>On: " + onNames + ". The page " + (broke ? "breaks" : "works") + ". Suspects: " + before + " to " + hv.possible.length + ".</span>"));
+  if(hv.possible.length === 1){
+    hv.done = true; hv.bad = hv.possible[0];
+    var box = $("halfResult"); box.className = "result show good";
+    box.innerHTML = "<b>Found it: " + PIECES[hv.bad] + ", in " + hv.tests + " test" + (hv.tests === 1 ? "" : "s") + ".</b> " + (hv.tests <= 3 ? "Three is the most halving ever needs for eight pieces." : "Halving can always do it in three. Try switching exactly half off each time.");
+    if(hv.tests <= 3) markMission("half");
+  }
+  renderPieces();
+}
+
+/* ---------- fix cards ---------- */
+var fx = { i:0, right:0, answered:false };
+function renderFix(){
+  var box = $("fixCard");
+  if(fx.i >= FIXES.length){
+    box.innerHTML = "<div class='revdone'><b>" + fx.right + " of " + FIXES.length + "</b> went to the root cause.</div>";
+    var again = el("button", "btn", "go through them again"); again.type = "button"; again.addEventListener("click", function(){ fx = { i:0, right:0, answered:false }; renderFix(); }); box.appendChild(again);
+    if(fx.right === FIXES.length) markMission("fixes");
+    return;
+  }
+  var f = FIXES[fx.i], order = shuffled(f.opts.length);
+  box.innerHTML = "<div class='revmeta'>bug " + (fx.i + 1) + " of " + FIXES.length + "</div><div class='revtxt'>" + f.bug + "</div>";
+  var col = el("div", "fixopts");
+  order.forEach(function(oi){
+    var b = el("button", "quizopt", f.opts[oi]); b.type = "button"; b.setAttribute("data-oi", oi);
+    b.addEventListener("click", function(){
+      if(fx.answered) return; fx.answered = true;
+      var ok = oi === f.a; if(ok) fx.right++;
+      col.querySelector("[data-oi='" + f.a + "']").classList.add("right"); if(!ok) b.classList.add("wrong");
+      box.appendChild(el("div", "revwhy", "<b>" + (ok ? "Root cause." : "That one hides it or starts over.") + "</b> " + f.why));
+      var nx = el("button", "btn primary", fx.i + 1 < FIXES.length ? "next bug" : "see the score"); nx.type = "button"; nx.style.marginTop = "10px";
+      nx.addEventListener("click", function(){ fx.i++; fx.answered = false; renderFix(); }); box.appendChild(nx);
+    });
+    col.appendChild(b);
+  });
+  box.appendChild(col);
+}
+
+/* ---------- missions ---------- */
+var MISSIONS = [
+  { id:"stale",  text:"Catch a fix that was there all along: solve an <b>old copy</b> case." },
+  { id:"tools",  text:"Use all <b>four</b> kinds of evidence." },
+  { id:"four",   text:"Solve <b>four</b> stale-or-real cases." },
+  { id:"half",   text:"Find the bad piece in <b>three tests or fewer</b>." },
+  { id:"fixes",  text:"Pick the <b>root-cause fix</b> for all six bugs." },
+  { id:"gym",    text:"Land one gym drill correct." }
+];
+function renderMissions(){
+  var box = $("missionList"); if(!box) return; var s = getState(); box.innerHTML = "";
+  MISSIONS.forEach(function(m){ var done = !!s.m[m.id], row = el("div", "mission" + (done ? " done" : "")); row.innerHTML = "<span class='mk'>" + (done ? "✓" : "") + "</span><span class='mtext'>" + m.text + "</span>"; box.appendChild(row); });
+}
+function markMission(id){ var s = getState(); if(!s.m[id]){ s.m[id] = true; saveState(s); renderMissions(); toast("mission done"); } }
+
+/* ---------- gym ---------- */
+var gym = { level:-1, drill:null, answered:false, track:"general", lastTrail:null };
+var GYM_LEVELS = [ { lv:0, name:"what's going on" }, { lv:1, name:"halving" }, { lv:2, name:"symptom or cause" } ];
+function makeTrailDrill(){ var c; do { c = rn(TRAIL_CASES); } while(c === gym.lastTrail); gym.lastTrail = c; return { story:c.story, opts:["Yes","No"], a:c.a, hint:c.hint }; }
+function gymStatsRender(){ var s = getState(); $("repN").textContent = s.gym.reps || 0; $("strN").textContent = s.gym.streak || 0; $("bestN").textContent = s.gym.best || 0; }
+function renderGymTabs(){
+  var box = $("gymTabs"); box.innerHTML = "";
+  var all = el("button", "gtab" + (gym.level === -1 ? " on" : ""), "Surprise me"); all.type = "button"; all.addEventListener("click", function(){ gym.level = -1; renderGymTabs(); }); box.appendChild(all);
+  GYM_LEVELS.forEach(function(L){ var t = el("button", "gtab" + (gym.level === L.lv ? " on" : ""), L.name); t.type = "button"; t.addEventListener("click", function(){ gym.level = L.lv; renderGymTabs(); }); box.appendChild(t); });
+}
+function gymPlaying(on){ $("gHintBtn").style.display = on ? "" : "none"; $("gSkip").style.display = on ? "" : "none"; $("gStart").style.display = on ? "none" : ""; }
+function gymStart(){
+  gym.drill = gym.track === "trail" ? makeTrailDrill() : makeDrill(gym.level === -1 ? Math.floor(Math.random() * 3) : gym.level);
+  gym.answered = false;
+  $("gymCard").className = "gymcard active" + (gym.track === "trail" ? " trailmode" : "");
+  $("gGoal").innerHTML = "Your call:";
+  $("gymBoard").innerHTML = "<div class='note' style='margin-top:10px'>" + gym.drill.story + "</div>";
+  $("gHint").className = "ghint"; $("gHint").innerHTML = "";
+  var box = $("gOpts"); box.innerHTML = "";
+  gym.drill.opts.forEach(function(o, oi){ var b = el("button", "chipbtn", o); b.type = "button"; b.addEventListener("click", function(){ gymAnswer(oi); }); box.appendChild(b); });
+  gymPlaying(true);
+}
+function gymDone(){ gym.answered = true; gymPlaying(false); $("gStart").textContent = "Next drill"; gymStatsRender(); }
+function gymAnswer(oi){
+  if(gym.answered || !gym.drill) return;
+  var s = getState(), ok = oi === gym.drill.a, kids = $("gOpts").children;
+  kids[gym.drill.a].classList.add("right"); if(!ok && kids[oi]) kids[oi].classList.add("wrong");
+  if(ok){ s.gym.reps = (s.gym.reps || 0) + 1; s.gym.streak = (s.gym.streak || 0) + 1; if(s.gym.streak > (s.gym.best || 0)) s.gym.best = s.gym.streak; saveState(s); $("gymCard").className = "gymcard win" + (gym.track === "trail" ? " trailmode" : ""); $("gGoal").innerHTML = "Correct: <b>" + gym.drill.opts[gym.drill.a] + "</b>."; markMission("gym"); }
+  else { s.gym.streak = 0; saveState(s); $("gymCard").className = "gymcard" + (gym.track === "trail" ? " trailmode" : ""); $("gGoal").innerHTML = "Not quite. The answer is <b>" + gym.drill.opts[gym.drill.a] + "</b>."; }
+  $("gHint").className = "ghint show"; $("gHint").innerHTML = gym.drill.hint;
+  gymDone();
+}
+function gymSkip(){
+  if(gym.answered || !gym.drill) return;
+  var s = getState(); s.gym.streak = 0; saveState(s);
+  $("gOpts").children[gym.drill.a].classList.add("right");
+  $("gHint").className = "ghint show"; $("gHint").innerHTML = "Answer: " + gym.drill.opts[gym.drill.a] + ". " + gym.drill.hint;
+  gymDone();
+}
+function setTrack(t){
+  gym.track = t; gym.drill = null; gym.answered = false;
+  $("trackGeneral").classList.toggle("on", t === "general"); $("trackTrail").classList.toggle("on", t === "trail");
+  $("gymTabs").style.display = t === "trail" ? "none" : ""; $("trailBanner").className = "trailbanner" + (t === "trail" ? " show" : "");
+  $("gymCard").className = "gymcard"; $("gOpts").innerHTML = "";
+  $("gGoal").innerHTML = t === "trail" ? "Real bugs from my builds. Tap <b>Start drill</b>." : "Pick a level (or Surprise me) and tap <b>Start drill</b>.";
+  $("gymBoard").innerHTML = ""; $("gHint").className = "ghint"; $("gHint").innerHTML = "";
+  gymPlaying(false); $("gStart").textContent = "Start drill";
+}
+
+/* ---------- quiz (options shuffle every load) ---------- */
+var QUIZ = [
+  { q:"You uploaded a fix and the bug is still there. What do you check first?", opts:["The code","The version badge on screen","Your internet","The fonts"], a:1 },
+  { q:"On an Android phone, the address bar starts with content://media/. What does that mean?", opts:["The site is down","You opened a downloaded copy, not the live site","GitHub is updating","The page is secure"], a:1 },
+  { q:"Sixteen pieces, one breaks the page. Halving each time, what's the most tests you need?", opts:["2","4","8","16"], a:1 },
+  { q:"You changed three things at once and the bug is gone. What do you know?", opts:["Which change fixed it","That all three were needed","Only that something in those three changes helped","That it will never come back"], a:2 },
+  { q:"The score shows NaN, so you make it show 0 instead. What did that do?", opts:["Fixed the root cause","Patched the symptom","Rewrote the scoring","Nothing at all"], a:1 }
+];
+var quizAnswered = {}, quizOrder = [];
+function renderQuiz(){
+  var box = $("quizBox"); if(!box) return; box.innerHTML = ""; quizAnswered = {}; quizOrder = [];
+  QUIZ.forEach(function(item, qi){
+    var wrap = el("div", "quizq"); wrap.appendChild(el("div", "q", (qi + 1) + ". " + item.q));
+    var order = shuffled(item.opts.length); quizOrder.push(order);
+    order.forEach(function(oi){
+      var b = el("button", "quizopt", item.opts[oi]); b.type = "button";
+      b.addEventListener("click", function(){
+        if(quizAnswered[qi] != null) return; quizAnswered[qi] = oi;
+        wrap.querySelectorAll(".quizopt")[order.indexOf(item.a)].classList.add("right");
+        if(oi !== item.a) b.classList.add("wrong");
+        var got = 0, ans = 0; for(var k in quizAnswered){ ans++; if(quizAnswered[k] === QUIZ[k].a) got++; }
+        if(ans === QUIZ.length){
+          var s = getState(); if(got > (s.quizBest || 0)){ s.quizBest = got; saveState(s); }
+          box.appendChild(el("div", "qresult", "You got " + got + " / " + QUIZ.length + (got === QUIZ.length ? ", perfect." : ".")));
+          var again = el("button", "btn", "Try the quiz again"); again.type = "button"; again.style.marginTop = "10px"; again.addEventListener("click", renderQuiz); box.appendChild(again);
+        }
+      });
+      wrap.appendChild(b);
+    });
+    box.appendChild(wrap);
+  });
+}
+
+/* ---------- version badge, update check ---------- */
+function buildOf(html){ var m = /<meta name="build" content="([^"]*)"/.exec(html || ""); return m ? m[1] : null; }
+function checkUpdate(manual){
+  if(typeof fetch !== "function" || !/^https?:$/.test(location.protocol)){ if(manual) toast(VERSION + " · open the live address to check for updates"); return; }
+  fetch(location.pathname + "?nc=" + Date.now(), { cache:"no-store" }).then(function(r){ return r.ok ? r.text() : ""; }).then(function(html){
+    var live = buildOf(html);
+    if(live && live !== VERSION){
+      var bar = $("updbar"); bar.textContent = "Newer version is up (" + live + "). Tap to load it."; bar.className = "show";
+      bar.onclick = function(){ try{ location.replace(location.pathname + "?v=" + encodeURIComponent(live) + location.hash); }catch(e){ location.reload(); } };
+    } else if(manual){ toast(live ? VERSION + " · you have the newest" : VERSION + " · could not check right now"); }
+  }).catch(function(){ if(manual) toast(VERSION + " · could not check right now"); });
+}
+
+function initApp(){
+  var b = $("vbadge"); b.textContent = VERSION; b.addEventListener("click", function(){ checkUpdate(true); }); checkUpdate(false);
+  $("evPick").addEventListener("click", function(e){ var x = e.target.closest("[data-ev]"); if(x) showEvidence(x.getAttribute("data-ev"), x); });
+  $("nextCase").addEventListener("click", nextCase);
+  renderCase();
+  $("halfTest").addEventListener("click", halfTest);
+  $("halfNew").addEventListener("click", halfNew);
+  halfNew();
+  renderFix(); renderMissions();
+  renderGymTabs(); gymStatsRender();
+  $("trackGeneral").addEventListener("click", function(){ setTrack("general"); });
+  $("trackTrail").addEventListener("click", function(){ setTrack("trail"); });
+  $("gStart").addEventListener("click", gymStart);
+  $("gHintBtn").addEventListener("click", function(){ if(gym.drill){ $("gHint").className = "ghint show"; $("gHint").innerHTML = gym.drill.hint; } });
+  $("gSkip").addEventListener("click", gymSkip);
+  renderQuiz();
+  window._lab = { sc:sc, curTruth:curTruth, hv:hv, fx:fx, gym:gym, quizOrder:function(){ return quizOrder; }, getState:getState };
+}
+if(typeof window !== "undefined" && typeof document !== "undefined"){
+  if(document.readyState === "loading"){ document.addEventListener("DOMContentLoaded", initApp); } else { initApp(); }
+}
+if(typeof module !== "undefined" && module.exports){
+  module.exports = { evidence:evidence, VERDICTS:VERDICTS, TRUTHS:TRUTHS, narrow:narrow, testsNeeded:testsNeeded, PIECES:PIECES, FIXES:FIXES, makeDrill:makeDrill, TRAIL_CASES:TRAIL_CASES, QUIZ:QUIZ, shuffled:shuffled, buildOf:buildOf, VERSION:VERSION };
+}
+</script>
+</body>
+</html>

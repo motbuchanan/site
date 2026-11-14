@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="build" content="v3.2 · Nov 14">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#191210">
 <title>The Painter: What a Browser Actually Does</title>
@@ -157,6 +158,24 @@ footer{color:#6b5c4d;font-size:12.5px;text-align:center;margin:30px 0 10px;line-
   .trailbanner.show{display:block;}
   .backhub{display:inline-flex;align-items:center;gap:7px;font-family:monospace;font-size:12px;color:var(--soft,#c9b8a8);border:1px solid var(--line,#3a2a1a);border-radius:999px;padding:7px 13px;background:var(--panel,#1a130c);text-decoration:none;}
 </style>
+<style>
+/* tune-up v1.29 */
+nav{overflow-y:hidden}
+#vbadge,.gtab,.chip{min-height:32px}
+.cheat{white-space:normal;overflow-x:visible}
+.cheat b{display:block}
+.cheat span{display:block;margin:0 0 10px}
+.cheat span:last-child{margin-bottom:0}
+p,li,.tp,.soft,.small,.wline,.tl-hint,code{overflow-wrap:anywhere}
+#httpOut div,.tl-hint,.wline{white-space:pre-wrap}
+#atUpd{position:fixed;left:12px;right:12px;bottom:calc(76px + env(safe-area-inset-bottom));z-index:200;background:#12161b;border:1px solid #3ddc84;color:#3ddc84;border-radius:12px;padding:13px 14px;font:13px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;text-align:center;cursor:pointer}
+</style>
+<style>
+.nextch{display:flex;flex-wrap:wrap;gap:12px;max-width:760px;margin:28px auto 16px;padding:0 16px;box-sizing:border-box}
+.nextch a{flex:1 1 100%;min-height:56px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;gap:4px;padding:12px 16px;border:1px solid rgba(255,255,255,.16);border-radius:12px;background:rgba(255,255,255,.04);color:inherit;text-decoration:none;font-size:16px;font-weight:700;line-height:1.3}
+.nextch a small{font-size:12px;font-weight:400;opacity:.65}
+.nextch a:active{border-color:currentColor}
+</style>
 </head>
 <body>
 <main>
@@ -168,7 +187,7 @@ footer{color:#6b5c4d;font-size:12.5px;text-align:center;margin:30px 0 10px;line-
       <h1>The Painter</h1>
       <p class="sub" style="font-size:18px">What a browser actually does with HTML, CSS, and JS.</p>
     </div>
-    <button id="vbadge" aria-label="version">v3.1</button>
+    <button id="vbadge" aria-label="version">v3.2 · Nov 14</button>
   </div>
   <svg class="herosvg" viewBox="0 0 260 110" aria-hidden="true">
     <rect x="20" y="18" width="66" height="76" rx="8" fill="#2b211c" stroke="#42332a" stroke-width="2"/>
@@ -195,7 +214,7 @@ footer{color:#6b5c4d;font-size:12.5px;text-align:center;margin:30px 0 10px;line-
       <div class="bk">View source, on any page, shows the exact text the server sent. The web is the only medium that ships its own source code to every visitor.</div>
       <div class="tap">tap</div></div>
     <div class="fcard" tabindex="0"><div class="fr">Dark mode extensions work on any site</div>
-      <div class="bk">They can restyle pages they have never seen because a page is not a picture. It is a live structure, and anyone with access can re-dress it.</div>
+      <div class="bk">They can restyle pages they have never seen because a page is a live structure, and anyone with access can re-dress it.</div>
       <div class="tap">tap</div></div>
   </div>
 </section>
@@ -325,16 +344,25 @@ footer{color:#6b5c4d;font-size:12.5px;text-align:center;margin:30px 0 10px;line-
   <button id="retryBtn" class="btn ghost">Try again</button>
 </section>
 
+<div class="nextch"><a href="linux-basics.html"><small>Next up</small>Chapter 4: Under the Hood</a></div>
 <footer>
-  The Painter · a small explainer · made on a phone<br>
-  Course order: computer, internet, then this one. The toolbox explainers come next.
+  The Painter · a small explainer · made on a phone
 </footer>
 <div style="text-align:center;margin:24px 0 8px;"><a class="backhub" href="index.html">&larr; back to All Thumbs</a></div>
 </main>
 <div id="toast" role="status"></div>
 <script>
 "use strict";
-var VERSION = "v3.1 · Aug 26";
+function atShuffle(Q){
+  Q.forEach(function(it){
+    var ok = it.opts ? "opts" : "a", rk = it.opts ? "a" : "r";
+    var arr = it[ok], right = arr[it[rk]], pin = /^(all|none|both) of/i;
+    var last = arr.filter(function(x){ return pin.test(x); }), rest = arr.filter(function(x){ return !pin.test(x); });
+    for(var i = rest.length - 1; i > 0; i--){ var j = Math.floor(Math.random() * (i + 1)), t = rest[i]; rest[i] = rest[j]; rest[j] = t; }
+    it[ok] = rest.concat(last); it[rk] = it[ok].indexOf(right);
+  });
+}
+var VERSION = "v3.2 · Nov 14";
 
 /* ============ ENGINE (pure, testable) ============ */
 function stripComments(css){
@@ -489,7 +517,7 @@ function initApp(){
         var t = ch.nodeValue.replace(/\s+/g, " ").trim();
         if(t){
           if(t.length > 24) t = t.slice(0, 24) + "\u2026";
-          out += "<div class=\"ttext\" style=\"padding-left:" + (depth * 16) + "px\">\u201C" + t.replace(/</g,"&lt;") + "\u201D</div>";
+          out += "<div class=\"ttext\" style=\"padding-left:" + (depth * 16) + "px\">\"" + t.replace(/</g,"&lt;") + "\"</div>";
         }
       } else if(ch.nodeType === 1){
         out += "<div class=\"tnode\" style=\"padding-left:" + (depth * 16) + "px\">&lt;" + ch.tagName.toLowerCase() + "&gt;</div>";
@@ -716,7 +744,7 @@ function initApp(){
       } },
     { id:"b07", lv:3, make:function(){
         var W = pickFrom(B_WORDS);
-        return { goal:"Precision build: make the painted page (HTML recipe below) contain an <b>h1 whose text is exactly \u201C" + W + "\u201D</b>.",
+        return { goal:"Precision build: make the painted page (HTML recipe below) contain an <b>h1 whose text is exactly \"" + W + "\"</b>.",
           seed:function(){},
           steps:[function(){
             var h = parsedInput().querySelector("h1");
@@ -726,8 +754,8 @@ function initApp(){
           fill:"<h1>" + W + "</h1>", fillEl:"htmlIn", append:false };
       } },
     { id:"w01", lv:4, make:function(){
-        var title = pickFrom(["Pigment","Waystone","Pocket Ninja","The Brew Deck","Measure Up"]);
-        return { goal:"<b>App header.</b> Build the top of one of your apps: an <b>h1 with the title \u201C" + title + "\u201D</b> and a <b>p right under it</b> (the subtitle line). Two elements, in that order.",
+        var title = pickFrom(["Pigment","Knight School","Pocket Ninja","The Brew Deck","Measure Up"]);
+        return { goal:"<b>App header.</b> Build the top of one of your apps: an <b>h1 with the title \"" + title + "\"</b> and a <b>p right under it</b> (the subtitle line). Two elements, in that order.",
           seed:function(){},
           steps:[function(){
             var doc = parsedInput();
@@ -888,7 +916,7 @@ function initApp(){
     { q:"What can JS do that HTML and CSS cannot?", a:["Make text bold","Choose colors","Change the tree while you are using the page"], r:2 },
     { q:"View source on any website shows you...", a:["A locked, encrypted blob","Only what the owner allows","The recipe text the site sent you"], r:2 }
   ];
-  function renderQuiz(){
+  function renderQuiz(){ atShuffle(QUIZ);
     var wrap = $("quizwrap");
     wrap.innerHTML = ""; $("scoreEl").textContent = ""; $("retryBtn").style.display = "none";
     var answered = 0, correct = 0;
@@ -931,6 +959,26 @@ if(typeof window !== "undefined" && typeof document !== "undefined"){
 if(typeof module !== "undefined" && module.exports){
   module.exports = { scopeCSS: scopeCSS, cssRules: cssRules };
 }
+</script>
+<script>
+(function(){
+  var m = document.querySelector('meta[name="build"]'), cur = m ? m.getAttribute("content") : "";
+  function buildOf(h){ var x = /<meta name="build" content="([^"]*)"/.exec(h || ""); return x ? x[1] : ""; }
+  function show(live){
+    var bar = document.getElementById("atUpd");
+    if(!bar){ bar = document.createElement("button"); bar.id = "atUpd"; bar.type = "button"; document.body.appendChild(bar); }
+    bar.textContent = "Newer version is up (" + live + "). Tap to load it.";
+    bar.onclick = function(){ try{ location.replace(location.pathname + "?v=" + encodeURIComponent(live) + location.hash); }catch(e){ location.reload(); } };
+  }
+  function check(){
+    if(!cur || typeof fetch !== "function" || !/^https?:$/.test(location.protocol)) return;
+    fetch(location.pathname + "?nc=" + Date.now(), { cache:"no-store" }).then(function(r){ return r.ok ? r.text() : ""; }).then(function(h){
+      var live = buildOf(h); if(live && live !== cur) show(live);
+    }).catch(function(){});
+  }
+  var b = document.getElementById("vbadge"); if(b) b.addEventListener("click", check);
+  check();
+})();
 </script>
 </body>
 </html>

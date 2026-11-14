@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14181d">
+<meta name="build" content="v0.2 · Nov 14">
+<title>Break It: testing an app the way real people use it</title>
+<meta name="description" content="Chapter 12 of All Thumbs. Why the builder is the worst tester of their own app: hunt six planted bugs, let a monkey tap at random, and sort real findings like a second reviewer.">
+<link rel="canonical" href="https://motbuchanan.com/allthumbs/break-basics.html">
+<meta property="og:title" content="Break It: testing an app the way real people use it">
+<meta property="og:description" content="Hunt planted bugs, watch random taps find a crash, and sort real findings into Break, Fix, Improve and Not a problem.">
+<meta property="og:image" content="https://motbuchanan.com/allthumbs/icon-512.png">
+<link rel="icon" href="favicon.png">
+<style>
+  :root{
+    --canvas:#14181d; --panel:#1c2229; --card:#171c22; --line:#2c3540;
+    --ink:#e8ecf0; --soft:#97a3ae; --dim:#6b7682;
+    --green:#6fe08c; --amber:#f5b04c; --blue:#5aa7e8; --red:#e87a6d; --rose:#ffd166; --trail:#c8a4f0;
+    --mono:ui-monospace,'SF Mono','Cascadia Mono','Roboto Mono',Consolas,Menlo,monospace;
+    --sans:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',sans-serif;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html{scroll-behavior:smooth; scroll-padding-top:64px;}
+  body{margin:0; background:var(--canvas); color:var(--ink); font-family:var(--sans); font-size:17px; line-height:1.6; padding-bottom:70px; overflow-wrap:anywhere;}
+  header{padding:26px 20px 10px; max-width:760px; margin:0 auto; display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap;}
+  .wordmark{font-family:var(--mono); font-size:12px; letter-spacing:.2em; color:var(--soft); text-transform:uppercase;}
+  h1{margin:6px 0 2px; font-size:clamp(26px,8vw,32px); line-height:1.15; letter-spacing:-.01em;}
+  .subtitle{color:var(--soft); margin:0; font-size:15px;}
+  .vbadge{font-family:var(--mono); font-size:11px; color:var(--soft); border:1px solid var(--line); border-radius:999px; padding:9px 12px; background:var(--panel); cursor:pointer; white-space:nowrap; margin-top:4px;}
+  nav{position:sticky; top:0; z-index:30; background:#14181d; border-bottom:1px solid var(--line); overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch;}
+  .navrow{display:flex; gap:8px; padding:10px 16px; max-width:760px; margin:0 auto; width:max-content;}
+  .navchip{font-family:var(--mono); font-size:12px; color:var(--soft); border:1px solid var(--line); border-radius:999px; padding:9px 13px; background:var(--card); text-decoration:none; white-space:nowrap;}
+  .navchip:active{color:var(--ink); border-color:var(--rose);}
+  main{max-width:760px; margin:0 auto; padding:0 16px;}
+  section{background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:22px 18px; margin:18px 0; scroll-margin-top:68px;}
+  .eyebrow{font-family:var(--mono); font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--rose); margin:0 0 6px;}
+  h2{margin:0 0 10px; font-size:23px; line-height:1.2;}
+  p{margin:10px 0;}
+  .soft{color:var(--soft);} .small{font-size:14px;}
+  code{font-family:var(--mono); font-size:.9em; background:var(--card); border:1px solid var(--line); border-radius:6px; padding:1px 6px; color:var(--green);}
+  .note{border-left:3px solid var(--rose); background:var(--card); border-radius:0 10px 10px 0; padding:10px 14px; margin:14px 0; font-size:15px; color:var(--soft);}
+  .btn{display:inline-block; font-family:var(--mono); font-size:14px; color:var(--ink); background:var(--card); border:1px solid var(--line); border-radius:10px; padding:11px 16px; cursor:pointer; user-select:none;}
+  .btn:active{border-color:var(--rose); transform:translateY(1px);}
+  .btn.primary{border-color:var(--rose); color:var(--rose);}
+  .btn[disabled]{opacity:.4; cursor:default;}
+  .simwrap{margin:14px 0;}
+  .picker{display:flex; gap:8px; flex-wrap:wrap; margin:10px 0;}
+  .plabel{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--dim); margin:14px 0 0;}
+  .chipbtn{font-family:var(--mono); font-size:12.5px; padding:10px 13px; border-radius:999px; border:1px solid var(--line); background:var(--card); color:var(--soft); cursor:pointer;}
+  .chipbtn.on{border-color:var(--rose); color:var(--rose); background:rgba(255,209,102,.1); font-weight:700;}
+  .mascotspot{text-align:center; margin:6px 0 2px;}
+  .mascotspot img{height:230px; max-width:100%; width:auto; object-fit:contain; filter:drop-shadow(0 10px 22px rgba(0,0,0,.5));}
+  .tipbox{position:relative; background:var(--card); border:1px solid var(--line); border-left:3px solid var(--rose); border-radius:0 12px 12px 0; padding:16px 16px 16px 118px; margin:22px 0; min-height:96px;}
+  .tipbox .poke{position:absolute; left:-14px; bottom:-8px; height:150px; width:auto; transform:rotate(-8deg); filter:drop-shadow(0 8px 16px rgba(0,0,0,.45)); pointer-events:none;}
+  .tipbox.right{border-left:1px solid var(--line); border-right:3px solid var(--rose); border-radius:12px 0 0 12px; padding:16px 118px 16px 16px;}
+  .tipbox.right .poke{left:auto; right:-14px; transform:rotate(8deg);}
+  .tipbox .tt{font-weight:700; color:var(--rose); font-size:15px;}
+  .tipbox .tp{margin:4px 0 0; font-size:14.5px; color:var(--soft); line-height:1.55;}
+
+  /* missions, gym, quiz (course standard) */
+  .mission{display:flex; gap:10px; align-items:flex-start; background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px; margin:8px 0; font-size:14.5px;}
+  .mission .mk{font-family:var(--mono); flex:0 0 auto; width:22px; height:22px; border-radius:50%; border:1px solid var(--line); color:var(--dim); display:flex; align-items:center; justify-content:center; font-size:12px;}
+  .mission.done{border-color:rgba(111,224,140,.5);}
+  .mission.done .mk{border-color:var(--green); color:var(--green); background:rgba(111,224,140,.1);}
+  .mission.done .mtext{color:var(--soft);}
+  .mission .mtext b{color:var(--rose);}
+  .gym{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px; margin:14px 0;}
+  .gymstats{display:flex; gap:18px; flex-wrap:wrap; font-size:12.5px; color:#9aa5b1; margin-bottom:10px; letter-spacing:.04em;}
+  .gymstats b{color:var(--green); font-size:15px; margin-left:4px;}
+  .gymtabs{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;}
+  .gtab{font-size:12px; padding:9px 12px; border-radius:999px; border:1px solid var(--line); background:transparent; color:inherit; cursor:pointer;}
+  .gtab.on{border-color:var(--rose); color:var(--rose); font-weight:700;}
+  .gymcard{border:1px dashed var(--line); border-radius:10px; padding:12px;}
+  .gymcard.active{border-style:solid; border-color:var(--rose);}
+  .gymcard.win{border-style:solid; border-color:var(--green);}
+  .gymcard.trailmode.active{border-color:var(--trail);}
+  .ggoal{font-size:15px; line-height:1.5;} .ggoal b{color:var(--rose);}
+  .ghint{font-size:13.5px; color:var(--blue); margin-top:8px; display:none;} .ghint.show{display:block;}
+  .gbtns{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;}
+  .tracktoggle{display:flex; gap:8px; margin:14px 0 10px; align-items:center; flex-wrap:wrap;}
+  .tracktoggle .tlabel{font-family:var(--mono); font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--dim);}
+  .ttab{font-family:var(--mono); font-size:12.5px; padding:9px 14px; border-radius:999px; border:1px solid var(--line); background:var(--card); color:var(--soft); cursor:pointer;}
+  .ttab.on.general{border-color:var(--rose); color:var(--rose); background:rgba(255,209,102,.1); font-weight:700;}
+  .ttab.on.trail{border-color:var(--trail); color:var(--trail); background:rgba(200,164,240,.12); font-weight:700;}
+  .trailbanner{font-family:var(--mono); font-size:11.5px; color:var(--trail); background:rgba(200,164,240,.08); border:1px solid rgba(200,164,240,.3); border-radius:8px; padding:7px 11px; margin:8px 0; display:none;}
+  .trailbanner.show{display:block;}
+  .quizq{margin:16px 0;} .quizq .q{font-weight:600; margin-bottom:8px;}
+  .quizopt{display:block; width:100%; text-align:left; font-size:14.5px; padding:11px 14px; border-radius:10px; border:1px solid var(--line); background:var(--card); color:var(--ink); cursor:pointer; margin:6px 0; font-family:var(--sans);}
+  .quizopt.right{border-color:var(--green); background:rgba(111,224,140,.1);}
+  .quizopt.wrong{border-color:var(--red); background:rgba(232,122,109,.1);}
+  .qresult{font-weight:700; margin-top:10px;}
+  .backhub{display:inline-flex; align-items:center; gap:7px; font-family:var(--mono); font-size:12px; color:var(--soft); border:1px solid var(--line); border-radius:999px; padding:10px 14px; background:var(--card); text-decoration:none;}
+  footer{max-width:760px; margin:8px auto 30px; padding:0 20px; color:var(--dim); font-size:12px; text-align:center;}
+  #toast{position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(90px); background:var(--card); color:var(--ink); border:1px solid var(--rose); border-radius:999px; padding:10px 18px; font-family:var(--mono); font-size:13px; transition:transform .3s ease; z-index:99; pointer-events:none; max-width:88vw; text-align:center;}
+  #toast.show{transform:translateX(-50%) translateY(0);}
+  #updbar{display:none; position:fixed; left:12px; right:12px; bottom:calc(14px + env(safe-area-inset-bottom)); z-index:100; background:var(--card); border:1px solid var(--green); color:var(--green); border-radius:12px; padding:13px 14px; font-family:var(--mono); font-size:13px; text-align:center; cursor:pointer;}
+  #updbar.show{display:block;}
+  @media(max-width:380px){ .tipbox{padding-left:96px;} .tipbox.right{padding:16px 96px 16px 16px;} .tipbox .poke{height:124px;} }
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:.001s !important; transition-duration:.001s !important;} html{scroll-behavior:auto;} }
+  .btn:focus-visible,.chipbtn:focus-visible,.quizopt:focus-visible,.navchip:focus-visible,.gtab:focus-visible,.ttab:focus-visible{outline:2px solid var(--rose); outline-offset:2px;}
+
+  /* bug hunt */
+  .stage{background:#0d1114; border:1px solid var(--line); border-radius:14px; padding:18px 10px; margin:12px 0; display:flex; justify-content:center; overflow:hidden; min-height:300px; align-items:center;}
+  .dev{position:relative; border:3px solid #39424e; border-radius:22px; background:#f4f1e8; overflow:hidden; transition:width .3s ease, height .3s ease;}
+  .dev.phone{width:206px; height:300px;} .dev.small{width:160px; height:300px;} .dev.tablet{width:min(100%,300px); height:280px; border-radius:16px;} .dev.sideways{width:min(100%,300px); height:150px;}
+  .app{position:absolute; inset:0; padding:12px 12px 10px; display:flex; flex-direction:column; gap:8px; color:#20242b; font-family:var(--sans);}
+  .apphead{background:#2f6fd6; color:#fff; font-weight:800; font-size:15px; border-radius:8px; padding:8px 10px; text-align:center;}
+  .appin{font:15px var(--sans); padding:9px 10px; border:1px solid #b9b2a2; border-radius:8px; background:#fff; color:#20242b; width:100%; min-width:0;}
+  .appnum{font:800 44px var(--sans); text-align:center; line-height:1;}
+  .approw{display:flex; gap:8px;}
+  .appbtn{flex:1 1 0; font:800 17px var(--sans); padding:12px 0; border-radius:10px; border:0; background:#20242b; color:#fff; cursor:pointer;}
+  .appbtn.save{background:#d95f2b;}
+  .appstat{font-size:13px; color:#555; text-align:center; overflow-wrap:anywhere;}
+  .appstat.spill{white-space:nowrap; overflow-wrap:normal; text-align:left; width:max-content; color:#b3261e; font-weight:700;}
+  .dev.tablet .app{padding:16px 22px;}
+  .dev.small .approw{width:200px;}
+  .dev.sideways .app{padding:6px 10px; gap:5px;}
+  .dev.sideways .apphead{position:absolute; left:10px; right:10px; bottom:8px; padding:16px 10px; z-index:2; opacity:.96;}
+  .dev.sideways .appnum{font-size:28px;}
+  .dev.sideways .appin{padding:6px 8px;}
+  .dead{position:absolute; inset:0; z-index:3; background:#fff; display:none; flex-direction:column; align-items:center; justify-content:center; gap:8px; padding:14px; text-align:center; color:#20242b; font-size:13px;}
+  .dead b{font-size:16px;} .dead span{font-family:var(--mono); font-size:11px; color:#b3261e;}
+  .dead .btn{color:#20242b; background:#ece6d8; border-color:#b9b2a2;}
+  .dev.isdead .dead{display:flex;}
+  .loghead{display:flex; justify-content:space-between; align-items:baseline; margin:16px 0 6px;}
+  .lognum{font-family:var(--mono); font-size:12px; color:var(--rose);}
+  .bug{background:var(--card); border:1px dashed var(--line); border-radius:10px; padding:10px 12px; margin:7px 0; font-size:14px;}
+  .bug.got{border-style:solid; border-color:rgba(255,209,102,.55);}
+  .bug .bt{font-weight:700;} .bug .bt.dim{color:var(--dim); font-weight:500; font-family:var(--mono); font-size:12px;}
+  .bug .brun{font-family:var(--mono); font-size:11px; color:var(--rose); font-weight:500; margin-left:6px; white-space:nowrap;}
+  .bug .bw{color:var(--ink); margin-top:4px;} .bug .bx{color:var(--soft); margin-top:4px; font-size:13.5px;} .bug .bx b{color:var(--ink);}
+  /* monkey */
+  .tinygame{background:#0d1114; border:1px solid var(--line); border-radius:14px; padding:14px; margin:12px 0;}
+  .tgscreen{font-family:var(--mono); font-size:13px; color:var(--green); background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px; text-align:center; min-height:46px;}
+  .tgbtns{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:10px;}
+  .tgb{font-family:var(--mono); font-size:13px; padding:11px 4px; border-radius:9px; border:1px solid var(--line); background:var(--panel); color:var(--soft); transition:background .12s ease;}
+  .tgb.hit{background:rgba(255,209,102,.25); color:var(--ink); border-color:var(--rose);}
+  .tgb.boom{background:rgba(232,122,109,.35); border-color:var(--red);}
+  .mstats{display:flex; gap:14px; flex-wrap:wrap; font-family:var(--mono); font-size:12px; color:var(--soft); margin:8px 2px;}
+  .mstats .bad{color:var(--red);}
+  .mfirst{display:none; border:1px solid var(--line); border-left:3px solid var(--rose); background:var(--card); border-radius:0 10px 10px 0; padding:10px 12px; font-size:14.5px; color:var(--soft); margin:8px 0;}
+  .mfirst.show{display:block;} .mfirst.bad{border-left-color:var(--red);} .mfirst b{color:var(--ink);}
+  .lanes{border:1px solid var(--line); border-radius:12px; background:#0d1114; padding:10px; margin:12px 0; min-height:70px; max-height:320px; overflow-y:auto;}
+  .step{display:flex; gap:10px; align-items:flex-start; font-size:14px; padding:6px 4px; border-bottom:1px solid rgba(44,53,64,.6);}
+  .step:last-child{border-bottom:none;}
+  .step .who{flex:0 0 66px; font-family:var(--mono); font-size:11px; padding-top:2px;}
+  .step .who.p1{color:var(--blue);} .step .who.p2{color:var(--amber);} .step .who.db{color:var(--rose);}
+  .step.bad .what{color:var(--red);} .step.warn .what{color:var(--amber);} .step.good .what{color:var(--green);}
+  .lanes .idle{color:var(--dim); font-size:14px; padding:6px 4px;}
+  /* reviewer */
+  .buckets{display:grid; grid-template-columns:1fr; gap:6px; margin:12px 0; font-size:14px; color:var(--soft);}
+  .buckets b{display:inline-block; min-width:110px; font-family:var(--mono); font-size:12.5px;}
+  .bk-break{color:var(--red);} .bk-fix{color:var(--amber);} .bk-imp{color:var(--blue);} .bk-ok{color:var(--green);}
+  .revcard{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; margin:12px 0;}
+  .revmeta{font-family:var(--mono); font-size:11.5px; color:var(--dim); letter-spacing:.04em;}
+  .revtxt{font-size:16px; margin:6px 0 10px; line-height:1.5;}
+  .revopts{display:flex; gap:8px; flex-wrap:wrap;}
+  .chipbtn.right{border-color:var(--green); color:var(--green); background:rgba(111,224,140,.1);}
+  .chipbtn.wrong{border-color:var(--red); color:var(--red); background:rgba(232,122,109,.1);}
+  .revwhy{margin-top:12px; font-size:14.5px; color:var(--soft);} .revwhy b{color:var(--ink);}
+  .revdone{font-size:16px; margin-bottom:10px;} .revdone b{color:var(--rose);}
+  .gopts{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;}
+  #updbar{width:auto; font-family:var(--mono);}
+</style>
+<style>
+.nextch{display:flex;flex-wrap:wrap;gap:12px;max-width:760px;margin:28px auto 16px;padding:0 16px;box-sizing:border-box}
+.nextch a{flex:1 1 100%;min-height:56px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;gap:4px;padding:12px 16px;border:1px solid rgba(255,255,255,.16);border-radius:12px;background:rgba(255,255,255,.04);color:inherit;text-decoration:none;font-size:16px;font-weight:700;line-height:1.3}
+.nextch a small{font-size:12px;font-weight:400;opacity:.65}
+.nextch a:active{border-color:currentColor}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="wordmark">All Thumbs &middot; chapter 12</div>
+    <h1>Break It</h1>
+    <p class="subtitle">Why the person who built it is the worst person to test it.</p>
+  </div>
+  <button class="vbadge" id="vbadge" type="button">v0.2 &middot; Nov 14</button>
+</header>
+
+<nav>
+  <div class="navrow">
+    <a class="navchip" href="#idea">the idea</a>
+    <a class="navchip" href="#hunt">bug hunt</a>
+    <a class="navchip" href="#monkey">random taps</a>
+    <a class="navchip" href="#review">the reviewer</a>
+    <a class="navchip" href="#missions">missions</a>
+    <a class="navchip" href="#gym">gym</a>
+    <a class="navchip" href="#quiz">quiz</a>
+  </div>
+</nav>
+
+<main>
+
+<section id="idea">
+  <p class="eyebrow">the blind spot</p>
+  <h2>You test the path you built</h2>
+  <div class="mascotspot"><img src="thumb-oops.png" alt="the thumb mascot looking sheepish"></div>
+  <p>When I finish an app, I open it and use it the way I built it to be used. Tap the big button, play a round, it works, ship it. That check only proves the one path I already knew about.</p>
+  <p>A real person turns the phone sideways. They tap the same button four times because the first tap felt slow. Their browser is set to block saving, so the app can't keep anything. They have a smaller phone than mine. None of that is in my head while I'm building, so none of it gets tested.</p>
+  <p>So I built a second tester, the Breaker, whose whole job is to use my apps badly. On Oct 23 it went through five apps on my site. Two of them were broken for real people: one never drew its chessboard when saving was blocked, and one hid four keyboard letters when the phone was turned sideways. Both were already live on my site.</p>
+  <div class="tipbox">
+    <img class="poke" src="thumb-think.png" alt="">
+    <div class="tt">Hand it to someone who doesn't know</div>
+    <p class="tp">The builder knows which button comes next, so their thumb never goes anywhere else. The fix is to hand the app to something that doesn't know, whether that's a robot, a friend, or a kid.</p>
+  </div>
+</section>
+
+<section id="hunt">
+  <p class="eyebrow">bug hunt</p>
+  <h2>Six bugs are hiding in this app</h2>
+  <p>Snack Count works fine if you use it like I built it: type a snack, tap +1 a few times, tap Save. I planted six bugs in it. Each one only shows up when you use it the way a real person might.</p>
+  <p>Change the device and the storage, then use the app. A bug goes in the log the moment you trigger it.</p>
+  <p class="plabel">device</p>
+  <div class="picker" id="devPick">
+    <button class="chipbtn on" data-dev="phone" type="button">my phone</button>
+    <button class="chipbtn" data-dev="small" type="button">small phone</button>
+    <button class="chipbtn" data-dev="sideways" type="button">sideways</button>
+    <button class="chipbtn" data-dev="tablet" type="button">tablet</button>
+  </div>
+  <p class="plabel">storage</p>
+  <div class="picker" id="stoPick">
+    <button class="chipbtn on" data-sto="on" type="button">saving works</button>
+    <button class="chipbtn" data-sto="blocked" type="button">blocked (strict settings)</button>
+  </div>
+  <div class="stage" id="stage">
+    <div class="dev phone" id="dev">
+      <div class="app" id="app">
+        <div class="apphead" id="appHead">Snack Count</div>
+        <input class="appin" id="appName" type="text" placeholder="snack name" maxlength="60" autocomplete="off">
+        <div class="appnum" id="appNum">0</div>
+        <div class="approw"><button class="appbtn" id="appPlus" type="button">+1</button><button class="appbtn save" id="appSave" type="button">Save</button></div>
+        <div class="appstat" id="appStat">nothing saved yet</div>
+      </div>
+      <div class="dead" id="dead"><b>The app stopped.</b><span>Uncaught SecurityError: localStorage is not available</span><button class="btn" id="deadReload" type="button">reload it</button></div>
+    </div>
+  </div>
+  <div class="note" id="huntNote">Start with the app as built: type a snack, tap +1, tap Save.</div>
+  <div class="loghead"><span class="plabel" style="margin:0">bug log</span><span class="lognum" id="logNum">0 of 6 found</span></div>
+  <div id="bugLog"></div>
+  <div class="picker"><button class="btn" id="huntReset" type="button">clear the log</button></div>
+</section>
+
+<section id="monkey">
+  <p class="eyebrow">random taps</p>
+  <h2>A monkey finds what you never tried</h2>
+  <p>The Breaker's main trick is dumb on purpose. It taps random spots, over and over, and writes down every tap. When something crashes, the log shows the exact taps that led there.</p>
+  <p>This tiny game has six buttons, and you can tap them yourself. The way I play it (New, Move, Move, Save) never crashes. Let the monkey loose and see what it finds.</p>
+  <div class="tinygame" id="tinyGame">
+    <div class="tgscreen" id="tgScreen">game · 0 moves</div>
+    <div class="tgbtns" id="tgBtns"></div>
+  </div>
+  <div class="picker" style="justify-content:center">
+    <button class="btn" id="humanGo" type="button">play it my way</button>
+    <button class="btn primary" data-taps="10" type="button">10 random taps</button>
+    <button class="btn primary" data-taps="50" type="button">50</button>
+    <button class="btn primary" data-taps="150" type="button">150</button>
+  </div>
+  <div class="mstats" id="mStats"></div>
+  <div class="mfirst" id="mFirst"></div>
+  <div class="lanes" id="mLog"><div class="idle">No taps yet.</div></div>
+  <div class="tipbox right">
+    <img class="poke" src="thumb-aha.png" alt="">
+    <div class="tt">What random taps can't tell you</div>
+    <p class="tp">The monkey finds crashes, dead ends and screens that fall off the edge. It has no idea whether the game's rules are right, or whether it's any fun. A person still has to play it for that.</p>
+  </div>
+</section>
+
+<section id="review">
+  <p class="eyebrow">the second reviewer</p>
+  <h2>Sort what the Breaker found</h2>
+  <p>A raw test run is a pile of maybe-problems. Some are real, and some come from the test machine itself, which has no graphics chip and no speakers. So a second agent, one that never saw the app being built, reads every finding, opens the code to confirm it, and sorts it into four piles.</p>
+  <div class="buckets">
+    <div><b class="bk-break">Break</b> a real person gets stuck or loses something</div>
+    <div><b class="bk-fix">Fix</b> a real defect, but nobody is stuck</div>
+    <div><b class="bk-imp">Improve</b> polish or feel</div>
+    <div><b class="bk-ok">Not a problem</b> checked and cleared</div>
+  </div>
+  <p>These eight came out of the real Oct 23 sweep of my site. Sort them the way the reviewer did.</p>
+  <div class="revcard" id="revCard"></div>
+  <div class="tipbox">
+    <img class="poke" src="thumb-tip.png" alt="">
+    <div class="tt">Then break it again</div>
+    <p class="tp">A fix doesn't count until the same test runs again and the problem is gone. The new version number on the badge is how I know my phone is running the fixed file and not an old copy.</p>
+  </div>
+</section>
+
+<section id="missions">
+  <p class="eyebrow">missions</p>
+  <h2>Prove it</h2>
+  <p>Six things to make happen in the sandboxes above. They tick off as you go.</p>
+  <div id="missionList"></div>
+</section>
+
+<section id="gym">
+  <p class="eyebrow">the gym</p>
+  <h2>Practice: call it like a tester</h2>
+  <p class="small soft">Randomized drills. A wrong call resets your streak.</p>
+  <div class="tracktoggle">
+    <span class="tlabel">practice</span>
+    <button class="ttab general on" id="trackGeneral" type="button">General</button>
+    <button class="ttab trail" id="trackTrail" type="button">The Trail</button>
+  </div>
+  <div class="trailbanner" id="trailBanner">The Trail: real findings from the Oct 23 Breaker sweep of five apps on my site.</div>
+  <div class="gym">
+    <div class="gymstats"><span>reps<b id="repN">0</b></span><span>streak<b id="strN">0</b></span><span>best<b id="bestN">0</b></span></div>
+    <div class="gymtabs" id="gymTabs"></div>
+    <div class="gymcard" id="gymCard">
+      <div class="ggoal" id="gGoal">Pick a level (or Surprise me) and tap <b>Start drill</b>.</div>
+      <div id="gymBoard"></div>
+      <div class="gopts" id="gOpts"></div>
+      <div class="ghint" id="gHint"></div>
+      <div class="gbtns">
+        <button class="btn primary" id="gStart" type="button">Start drill</button>
+        <button class="btn" id="gHintBtn" type="button" style="display:none">Hint</button>
+        <button class="btn" id="gSkip" type="button" style="display:none">Skip</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="quiz">
+  <p class="eyebrow">quiz</p>
+  <h2>Five questions</h2>
+  <div id="quizBox"></div>
+</section>
+
+<div style="text-align:center;margin:24px 0 8px;">
+  <a class="backhub" href="index.html">&larr; back to All Thumbs</a>
+</div>
+
+</main>
+<div class="nextch"><a href="debug-basics.html"><small>Next up</small>Chapter 13: Debugging</a></div>
+<footer>Break It &middot; All Thumbs chapter 12 &middot; the sandboxes are models, nothing here is sent anywhere</footer>
+<button id="updbar" type="button">A newer version is up. Tap to load it.</button>
+<div id="toast" role="status"></div>
+
+<script>
+"use strict";
+var VERSION = "v0.2 · Nov 14";
+var STORE_KEY = "break101_v1";
+
+/* ---------- guarded storage ---------- */
+var memStore = {};
+function loadState(){
+  try{ var raw = localStorage.getItem(STORE_KEY); if(raw) return JSON.parse(raw); }catch(e){}
+  return memStore[STORE_KEY] || null;
+}
+function saveState(s){
+  memStore[STORE_KEY] = s;
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(s)); }catch(e){}
+}
+function getState(){
+  var s = loadState();
+  if(!s || typeof s !== "object") s = {};
+  if(!s.m) s.m = {};
+  if(!s.gym) s.gym = { reps:0, streak:0, best:0 };
+  if(typeof s.quizBest !== "number") s.quizBest = 0;
+  return s;
+}
+
+/* ---------- ENGINE (pure, testable) ---------- */
+/* huntCheck: which planted bug (if any) does this action trigger in Snack Count?
+   action: "device" | "plus" | "save"
+   ctx: { device:"phone"|"small"|"sideways"|"tablet", storage:"on"|"blocked", name:"", quickTaps:n } */
+function huntCheck(action, ctx){
+  if(action === "device") return ctx.device === "small" ? "edge" : null;
+  if(action === "plus"){
+    if(ctx.device === "sideways") return "covered";
+    if((ctx.quickTaps || 0) >= 4) return "mash";
+    return null;
+  }
+  if(action === "save"){
+    if(ctx.storage === "blocked") return "crash";
+    var n = (ctx.name || "").trim();
+    if(!n) return "empty";
+    if(n.length > 18) return "long";
+    return null;
+  }
+  return null;
+}
+var BUGS = {
+  mash:    { t:"Tapping fast counts double", run:"my phone", what:"Four quick taps on +1, and from that tap on every tap adds 2. The button's listener was attached twice, so one tap runs the code two times.", twin:"Breaker taps the same button four times in a row on purpose, because real thumbs do that when a tap feels slow.", fix:"Attach the listener once, when the app starts." },
+  crash:   { t:"Blocked storage kills the app", run:"storage blocked", what:"With storage blocked, Save throws an error nobody caught, and the whole app stops.", twin:"Knight School did something close to this: with storage blocked, no chessboard was ever drawn.", fix:"Wrap every save and load in try/catch, and keep a copy in memory." },
+  edge:    { t:"Save hangs off a small phone", run:"small phone", what:"On a 320px phone the Save button runs past the right edge and gets cut off.", twin:"The Breaker's screenshots caught Knight School's Woodshop button cut to Woodsho. The fit check also loads every page at 320px.", fix:"Let button rows wrap, and size things with min() instead of fixed widths." },
+  covered: { t:"Sideways, the header covers +1", run:"sideways", what:"Turned sideways, the title bar slides down over the +1 button. Your tap lands on the title, so nothing counts.", twin:"Five Letters did this for real: sideways, the letter grid covered R, T, Y and U.", fix:"Add a layout rule for short, wide screens." },
+  empty:   { t:"An empty name saves as undefined", run:"my phone", what:"Tap Save without typing a name and the app proudly saves a snack called undefined.", twin:"Random taps hit Save before typing all the time. People do too.", fix:"Check the box before saving, and say what is missing." },
+  long:    { t:"A long name runs off the screen", run:"my phone", what:"A snack name longer than 18 letters pushes past the right edge and gets cut off.", twin:"The Breaker checks every run for text and boxes that spill past the screen.", fix:"Let long words wrap (overflow-wrap:anywhere)." }
+};
+var BUG_ORDER = ["mash","crash","edge","covered","empty","long"];
+
+/* the tiny game the monkey taps */
+var TG_BTNS = ["New","Move","Undo","Save","Menu","Back"];
+function tgStep(state, btn){
+  /* returns { state, crash:"", left:false, note:"" } */
+  var s = { screen:state.screen, moves:state.moves };
+  if(btn === "Menu"){ s.screen = "menu"; return { state:s, note:"opened the menu" }; }
+  if(btn === "Back"){
+    if(s.screen === "menu"){ s.screen = "game"; return { state:s, note:"back to the game" }; }
+    return { state:s, left:true, note:"left the app (Back on the game screen goes to the home page)" };
+  }
+  if(s.screen === "menu") return { state:s, note:"tapped " + btn + " behind the menu, nothing happened" };
+  if(btn === "New"){ s.moves = 0; return { state:s, note:"new game" }; }
+  if(btn === "Move"){ s.moves++; return { state:s, note:"move " + s.moves }; }
+  if(btn === "Undo"){
+    if(s.moves === 0) return { state:s, crash:"Undo with no moves: TypeError, cannot read properties of undefined" };
+    s.moves--; return { state:s, note:"undo, back to " + s.moves };
+  }
+  if(btn === "Save") return { state:s, note:"saved at " + s.moves + " moves" };
+  return { state:s, note:"" };
+}
+function rngFrom(seed){
+  var a = seed >>> 0;
+  return function(){ a = (a + 0x6D2B79F5) >>> 0; var t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+}
+function monkeyRun(seed, n){
+  var r = rngFrom(seed), st = { screen:"game", moves:0 }, steps = [], crashes = [], left = 0, recent = [];
+  for(var i = 1; i <= n; i++){
+    var btn = TG_BTNS[Math.floor(r() * TG_BTNS.length)], res = tgStep(st, btn);
+    recent.push(btn); if(recent.length > 4) recent.shift();
+    if(res.crash){ crashes.push({ at:i, cause:res.crash, before:recent.slice() }); steps.push({ i:i, btn:btn, kind:"crash", txt:res.crash }); st = { screen:"game", moves:0 }; recent = []; continue; }
+    if(res.left){ left++; steps.push({ i:i, btn:btn, kind:"left", txt:res.note }); st = { screen:"game", moves:0 }; recent = []; continue; }
+    steps.push({ i:i, btn:btn, kind:"ok", txt:res.note }); st = res.state;
+  }
+  return { seed:seed, steps:steps, crashes:crashes, left:left };
+}
+function humanRun(){
+  var st = { screen:"game", moves:0 }, out = [];
+  ["New","Move","Move","Save"].forEach(function(b){ var r = tgStep(st, b); out.push({ btn:b, txt:r.note, crash:r.crash || "" }); st = r.state; });
+  return out;
+}
+
+/* real findings from the Oct 23 sweep */
+var BUCKETS = ["Break","Fix","Improve","Not a problem"];
+var REVIEW = [
+  { app:"Knight School", txt:"With storage blocked (private mode or strict settings), no chessboard is ever drawn. New game, Coach and Learn do nothing.", a:0, why:"A real person opens it in private mode and gets nothing. That is a Break. Cause: one unguarded localStorage read stopped the whole script." },
+  { app:"Five Letters", txt:"Turned sideways, the letter grid slides over the keyboard. Tapping R, T, Y or U hits a grid tile instead.", a:0, why:"You cannot type four letters, so you cannot play. Break." },
+  { app:"Knight School", txt:"The version badge says Sep 21, but the file changed on Oct 22.", a:1, why:"Nobody is stuck, but the badge is how I check an upload landed, so a wrong one is a real defect. Fix." },
+  { app:"Knight School", txt:"The Woodshop button label is cut off and reads Woodsho.", a:1, why:"Real defect, still usable. Fix." },
+  { app:"Gather", txt:"Fast taps highlight text in blue, like a text selection.", a:2, why:"Looks sloppy, breaks nothing. Improve." },
+  { app:"Pocket Shark", txt:"Each tap takes 12 to 40 seconds in the 3D pool game.", a:3, why:"The test machine has no graphics chip, and slowness there is never counted as a bug. Not a problem. The reviewer read the code instead." },
+  { app:"Home screen", txt:"Two version spots say 7.52 and two say 7.51.", a:1, why:"The four spots drifted apart. Nobody is stuck, but it is a real defect. Fix, and bump all four together from now on." },
+  { app:"Five Letters", txt:"The report says the app was left. The tester had tapped the Home button.", a:3, why:"Home is supposed to leave the app. Checked and cleared." }
+];
+
+/* gym templates: caught = would random tapping (plus the Breaker's checks) catch it; run = which run shows it; b = bucket */
+var ISSUES = [
+  { t:"the app crashes when you tap Undo before making a move", caught:true, run:0, b:0 },
+  { t:"with saving blocked by the browser, the app opens to a blank screen", caught:true, run:3, b:0 },
+  { t:"turned sideways, the header covers the Start button", caught:true, run:1, b:0 },
+  { t:"tapping Save twice fast saves two copies", caught:true, run:0, b:1 },
+  { t:"with storage blocked, a finished game is not kept, but the game still plays", caught:true, run:3, b:1 },
+  { t:"on a tablet, the buttons stretch into one long thin strip", caught:true, run:2, b:2 },
+  { t:"a button is 20px tall and hard to hit with a thumb", caught:true, run:0, b:2 },
+  { t:"the scoring rule adds points wrong, but nothing crashes", caught:false, run:4, b:1 },
+  { t:"the game gets boring after two minutes", caught:false, run:4, b:2 },
+  { t:"a song starts playing the moment the page opens", caught:false, run:4, b:1 }
+];
+var ARTIFACTS = [
+  { t:"a 3D scene draws slowly on the test machine, which has no graphics chip", h:"That is the test machine, not the app. Checked and cleared." },
+  { t:"no sound comes out on the test machine, which has no speakers", h:"That is the test machine, not the app. Checked and cleared." },
+  { t:"the report says a page was left after the tester tapped a Back to home link", h:"The link did what it is meant to do. Checked and cleared." }
+];
+var RUNS = ["my phone","sideways","tablet","storage blocked","none of them"];
+var G_APPS = ["a trivia game","a grocery list","a card game","a chore chart","a drum trainer","a scoreboard"];
+function rn(list){ return list[Math.floor(Math.random() * list.length)]; }
+function makeDrill(level){
+  var app = rn(G_APPS);
+  if(level === 0){
+    var it = rn(ISSUES);
+    return { story:"In <b>" + app + "</b>, " + it.t + ". Would the Breaker's random taps and checks catch it?", opts:["Yes","No"], a:it.caught ? 0 : 1,
+      hint: it.caught ? "Random taps, the device runs and the storage-blocked run all catch crashes, dead ends and layout problems." : "Random taps can't judge rules, fun or sound. A person has to play it for that." };
+  }
+  if(level === 1){
+    var pool = ISSUES.filter(function(x){ return x.caught; }), it2 = rn(pool);
+    return { story:"In <b>" + app + "</b>, " + it2.t + ". Which run shows it first?", opts:RUNS.slice(0,4), a:it2.run,
+      hint:"Portrait finds crashes and mashing; sideways finds things covering each other, the tablet finds stretched layouts, and storage blocked finds a missing try/catch." };
+  }
+  if(Math.random() < 0.3){
+    var art = rn(ARTIFACTS);
+    return { story:"The Breaker reports: " + art.t + ". Which pile?", opts:BUCKETS, a:3, hint:art.h };
+  }
+  var it3 = rn(ISSUES);
+  return { story:"In <b>" + app + "</b>, " + it3.t + ". Which pile?", opts:BUCKETS, a:it3.b,
+    hint:["Someone gets stuck or loses something: Break.","Real defect, nobody stuck: Fix.","Polish or feel: Improve.","Not the app's fault: Not a problem."][it3.b] };
+}
+var TRAIL_CASES = [
+  { story:"Knight School read a saved theme with no try/catch. With storage blocked, does the chessboard still draw?", a:1, hint:"No. That one read threw an error and the rest of the script never ran. Nothing drew, and the buttons were dead." },
+  { story:"Five Letters, phone turned sideways. Can you still type R, T, Y and U?", a:1, hint:"No. The grid had a minimum width that pushed it down over the keyboard." },
+  { story:"Five Letters with storage blocked. You win today's word. Does your record show the win?", a:1, hint:"No. The save failed without a message and nothing kept a copy in memory, so the win vanished." },
+  { story:"Gather with storage blocked kept working from memory and showed a banner with a Save backup button. Is that the right way to handle it?", a:0, hint:"Yes. That is the pattern every app should follow. The reviewer marked it Not a problem." },
+  { story:"The home screen showed 7.52 in two spots and 7.51 in two others. Should all four be bumped together on every change?", a:0, hint:"Yes. Four copies of one number will drift unless they always move together." },
+  { story:"Gather's badge and its offline cache still said v0.7 after the file changed. Will installed phones surely get the new file?", a:1, hint:"No. Phones that installed it can keep the cached copy until the cache name changes. Bump it with the version." },
+  { story:"Pocket Shark's taps took 12 to 40 seconds each on the test machine. Is that a bug in the game?", a:1, hint:"No. The test machine has no graphics chip. The reviewer switched to reading the code." },
+  { story:"Every app loaded its fonts from Google's font server. Did that keep the promise that nothing leaves your device?", a:1, hint:"No. Each visit sent the visitor's address to Google. The fonts now live on the site itself." },
+  { story:"The tester tapped Home in Five Letters and the report said it left the app. Should the reviewer clear it?", a:0, hint:"Yes. Home is supposed to leave. Checked and cleared." }
+];
+
+/* ---------- DOM helpers ---------- */
+function $(id){ return document.getElementById(id); }
+function el(tag, cls, html){ var e = document.createElement(tag); if(cls) e.className = cls; if(html != null) e.innerHTML = html; return e; }
+var toastTimer = null;
+function toast(msg){ var t = $("toast"); if(!t) return; t.textContent = msg; t.className = "show"; clearTimeout(toastTimer); toastTimer = setTimeout(function(){ t.className = ""; }, 1900); }
+function setOn(boxId, attr, val){ [].forEach.call(document.querySelectorAll("#" + boxId + " .chipbtn"), function(x){ x.classList.toggle("on", x.getAttribute(attr) === val); }); }
+function wirePick(boxId, attr, fn){ var box = $(boxId); if(!box) return; box.addEventListener("click", function(e){ var b = e.target.closest("[" + attr + "]"); if(b){ setOn(boxId, attr, b.getAttribute(attr)); fn(b.getAttribute(attr)); } }); }
+
+/* ---------- bug hunt ---------- */
+var hunt = { device:"phone", storage:"on", count:0, taps:[], found:{}, dead:false, doubled:false };
+var DEV_NOTE = {
+  phone:"My phone, portrait. Most bugs here need you to use the app a little badly.",
+  small:"A 320px phone, the smallest one still common.",
+  sideways:"The same phone turned sideways: wide and very short.",
+  tablet:"A tablet. Try the app here too. Not every run finds something."
+};
+function foundBug(id){
+  if(!id || hunt.found[id]) return;
+  hunt.found[id] = true;
+  var s = getState(); s.hunt = hunt.found; saveState(s);
+  renderLog(); toast("bug found: " + BUGS[id].t);
+  var n = Object.keys(hunt.found).length;
+  if(n >= 1) markMission("first");
+  if(n >= 6) markMission("all6");
+}
+function renderLog(){
+  var box = $("bugLog"); if(!box) return; box.innerHTML = "";
+  var n = 0;
+  BUG_ORDER.forEach(function(id){
+    var b = BUGS[id], got = !!hunt.found[id];
+    if(got) n++;
+    var row = el("div", "bug" + (got ? " got" : ""));
+    row.innerHTML = got ? "<div class='bt'>" + b.t + " <span class='brun'>" + b.run + "</span></div><div class='bw'>" + b.what + "</div><div class='bx'><b>For real:</b> " + b.twin + "</div><div class='bx'><b>Fix:</b> " + b.fix + "</div>" : "<div class='bt dim'>not found yet</div>";
+    box.appendChild(row);
+  });
+  $("logNum").textContent = n + " of 6 found";
+}
+function renderApp(){
+  var d = $("dev"); d.className = "dev " + hunt.device + (hunt.dead ? " isdead" : "");
+  $("appNum").textContent = hunt.count;
+  $("huntNote").textContent = DEV_NOTE[hunt.device] + (hunt.storage === "blocked" ? " Storage is blocked, like strict privacy settings or some school iPads." : "");
+}
+function huntPlus(){
+  if(hunt.dead) return;
+  var now = Date.now();
+  hunt.taps = hunt.taps.filter(function(t){ return now - t < 450; }); hunt.taps.push(now);
+  var bug = huntCheck("plus", { device:hunt.device, quickTaps:hunt.taps.length });
+  if(bug === "covered"){ $("appStat").textContent = "your tap hit the title bar, nothing counted"; foundBug("covered"); return; }
+  if(bug === "mash") hunt.doubled = true;
+  hunt.count += hunt.doubled ? 2 : 1;
+  if(hunt.doubled){ $("appStat").textContent = "+" + 2 + " (that tap counted twice)"; foundBug("mash"); }
+  renderApp();
+}
+function huntSave(){
+  if(hunt.dead) return;
+  var name = $("appName").value, bug = huntCheck("save", { storage:hunt.storage, name:name });
+  if(bug === "crash"){ hunt.dead = true; renderApp(); foundBug("crash"); return; }
+  if(bug === "empty"){ $("appStat").textContent = "Saved: undefined x " + hunt.count; foundBug("empty"); return; }
+  $("appStat").innerHTML = "";
+  $("appStat").appendChild(document.createTextNode("Saved: " + name.trim() + " x " + hunt.count));
+  $("appStat").classList.toggle("spill", bug === "long");
+  if(bug === "long") foundBug("long");
+}
+function huntDevice(v){ hunt.device = v; renderApp(); foundBug(huntCheck("device", { device:v })); }
+function huntReload(){ hunt.dead = false; hunt.count = 0; hunt.doubled = false; hunt.taps = []; $("appStat").textContent = "nothing saved yet"; $("appStat").classList.remove("spill"); renderApp(); }
+
+/* ---------- monkey ---------- */
+var mTimers = [], mSeed = 1;
+function tgButtons(){
+  var box = $("tgBtns"); box.innerHTML = "";
+  TG_BTNS.forEach(function(b){ var x = el("button", "tgb", b); x.type = "button"; x.setAttribute("data-tg", b); x.addEventListener("click", function(){ handTap(b); }); box.appendChild(x); });
+}
+var handState = { screen:"game", moves:0 }, handN = 0;
+function handTap(btn){
+  mStop(); var log = $("mLog"); if(!handN){ log.innerHTML = ""; $("mStats").innerHTML = ""; $("mFirst").className = "mfirst"; $("mFirst").innerHTML = ""; }
+  handN++; var r = tgStep(handState, btn), kind = r.crash ? "crash" : (r.left ? "left" : "ok");
+  flash(btn, kind);
+  log.appendChild(el("div", "step " + (kind === "crash" ? "bad" : (kind === "left" ? "warn" : "")), "<span class='who p1'>you " + handN + "</span><span class='what'>" + btn + ": " + (r.crash || r.note) + "</span>"));
+  log.scrollTop = log.scrollHeight;
+  if(r.crash || r.left){ handState = { screen:"game", moves:0 }; $("tgScreen").textContent = r.crash ? "crashed, reloading" : "left the app, reopening"; }
+  else { handState = r.state; $("tgScreen").textContent = r.note; }
+}
+function flash(btn, kind){ var x = document.querySelector("[data-tg='" + btn + "']"); if(!x) return; x.className = "tgb hit" + (kind === "crash" ? " boom" : ""); setTimeout(function(){ x.className = "tgb"; }, 140); }
+function mStop(){ mTimers.forEach(clearTimeout); mTimers = []; }
+function handReset(){ handState = { screen:"game", moves:0 }; handN = 0; }
+function showSummary(res, n){
+  var uniq = {}; res.crashes.forEach(function(c){ uniq[c.cause] = 1; });
+  $("mStats").innerHTML = "<span>" + n + " taps</span><span>seed " + res.seed + "</span><span class='" + (res.crashes.length ? "bad" : "") + "'>" + res.crashes.length + " crash" + (res.crashes.length === 1 ? "" : "es") + "</span><span>" + res.left + " left the app</span>";
+  if(res.crashes.length){
+    var c = res.crashes[0];
+    $("mFirst").className = "mfirst show bad";
+    $("mFirst").innerHTML = "<b>First crash, tap " + c.at + ".</b> The last taps, ending with the crash: " + c.before.join(", ") + ". " + c.cause + ". That list of taps is how you make the bug happen again on purpose.";
+    markMission("monkey");
+  } else {
+    $("mFirst").className = "mfirst show";
+    $("mFirst").innerHTML = "<b>No crash this time.</b> Run it again: a new seed means a new order of taps.";
+  }
+}
+function monkeyGo(n, instant){
+  mStop(); handReset(); var res = monkeyRun(mSeed, n); mSeed++;
+  var log = $("mLog"); log.innerHTML = ""; $("mStats").innerHTML = ""; $("mFirst").className = "mfirst"; $("mFirst").innerHTML = "";
+  var screen = $("tgScreen");
+  function show(st){
+    var cls = st.kind === "crash" ? "bad" : (st.kind === "left" ? "warn" : "");
+    if(log.children.length > 40) log.removeChild(log.firstChild);
+    log.appendChild(el("div", "step " + cls, "<span class='who p" + (st.kind === "ok" ? "1" : "2") + "'>tap " + st.i + "</span><span class='what'>" + st.btn + ": " + st.txt + "</span>"));
+    log.scrollTop = log.scrollHeight;
+    screen.textContent = st.kind === "crash" ? "crashed, reloading" : (st.kind === "left" ? "left the app, reopening" : st.txt);
+  }
+  if(instant){ res.steps.forEach(show); showSummary(res, n); return res; }
+  var gap = n <= 10 ? 260 : (n <= 50 ? 70 : 28);
+  res.steps.forEach(function(st, i){ mTimers.push(setTimeout(function(){ flash(st.btn, st.kind); show(st); }, gap * i)); });
+  mTimers.push(setTimeout(function(){ showSummary(res, n); }, gap * res.steps.length + 60));
+  return res;
+}
+function humanGo(){
+  mStop(); handReset(); var log = $("mLog"); log.innerHTML = ""; $("mStats").innerHTML = ""; $("mFirst").className = "mfirst"; $("mFirst").innerHTML = "";
+  humanRun().forEach(function(st, i){ log.appendChild(el("div", "step good", "<span class='who p1'>tap " + (i + 1) + "</span><span class='what'>" + st.btn + ": " + st.txt + "</span>")); });
+  log.appendChild(el("div", "step", "<span class='who db'>result</span><span class='what'>Played my way: no crash, every time. That's why I never found the Undo bug myself.</span>"));
+  $("tgScreen").textContent = "saved at 2 moves";
+}
+
+/* ---------- reviewer ---------- */
+var rev = { i:0, right:0, answered:false, gotOk:false };
+function renderRev(){
+  var box = $("revCard"); if(!box) return;
+  if(rev.i >= REVIEW.length){
+    box.innerHTML = "<div class='revdone'><b>" + rev.right + " of " + REVIEW.length + "</b> sorted the way the reviewer did.</div>";
+    var again = el("button", "btn", "sort them again"); again.type = "button"; again.addEventListener("click", function(){ rev = { i:0, right:0, answered:false, gotOk:rev.gotOk }; renderRev(); }); box.appendChild(again);
+    markMission("review");
+    return;
+  }
+  var f = REVIEW[rev.i];
+  box.innerHTML = "<div class='revmeta'>finding " + (rev.i + 1) + " of " + REVIEW.length + " &middot; " + f.app + "</div><div class='revtxt'>" + f.txt + "</div>";
+  var row = el("div", "revopts");
+  BUCKETS.forEach(function(b, bi){
+    var x = el("button", "chipbtn", b); x.type = "button";
+    x.addEventListener("click", function(){
+      if(rev.answered) return; rev.answered = true;
+      var ok = bi === f.a; if(ok){ rev.right++; if(f.a === 3) markMission("okpile"); }
+      row.children[f.a].classList.add("right"); if(!ok) x.classList.add("wrong");
+      box.appendChild(el("div", "revwhy", "<b>" + (ok ? "Same call as the reviewer." : "The reviewer said " + BUCKETS[f.a] + ".") + "</b> " + f.why));
+      var nx = el("button", "btn primary", rev.i + 1 < REVIEW.length ? "next finding" : "see the score"); nx.type = "button"; nx.style.marginTop = "10px";
+      nx.addEventListener("click", function(){ rev.i++; rev.answered = false; renderRev(); }); box.appendChild(nx);
+    });
+    row.appendChild(x);
+  });
+  box.appendChild(row);
+}
+
+/* ---------- missions ---------- */
+var MISSIONS = [
+  { id:"first",  text:"Find your <b>first bug</b> in Snack Count." },
+  { id:"all6",   text:"Find <b>all six</b> planted bugs." },
+  { id:"monkey", text:"Let the monkey find a <b>crash</b>, and read the taps that caused it." },
+  { id:"okpile", text:"Put a finding in the <b>Not a problem</b> pile." },
+  { id:"review", text:"Sort all <b>eight</b> real findings." },
+  { id:"gym",    text:"Land one gym drill correct." }
+];
+function renderMissions(){
+  var box = $("missionList"); if(!box) return; var s = getState(); box.innerHTML = "";
+  MISSIONS.forEach(function(m){ var done = !!s.m[m.id], row = el("div", "mission" + (done ? " done" : "")); row.innerHTML = "<span class='mk'>" + (done ? "✓" : "") + "</span><span class='mtext'>" + m.text + "</span>"; box.appendChild(row); });
+}
+function markMission(id){ var s = getState(); if(!s.m[id]){ s.m[id] = true; saveState(s); renderMissions(); toast("mission done"); } }
+
+/* ---------- gym ---------- */
+var gym = { level:-1, drill:null, answered:false, track:"general", lastTrail:null };
+var GYM_LEVELS = [ { lv:0, name:"caught?" }, { lv:1, name:"which run" }, { lv:2, name:"which pile" } ];
+function makeTrailDrill(){ var c; do { c = rn(TRAIL_CASES); } while(c === gym.lastTrail); gym.lastTrail = c; return { story:c.story, opts:["Yes","No"], a:c.a, hint:c.hint }; }
+function gymStatsRender(){ var s = getState(); $("repN").textContent = s.gym.reps || 0; $("strN").textContent = s.gym.streak || 0; $("bestN").textContent = s.gym.best || 0; }
+function renderGymTabs(){
+  var box = $("gymTabs"); box.innerHTML = "";
+  var all = el("button", "gtab" + (gym.level === -1 ? " on" : ""), "Surprise me"); all.type = "button"; all.addEventListener("click", function(){ gym.level = -1; renderGymTabs(); }); box.appendChild(all);
+  GYM_LEVELS.forEach(function(L){ var t = el("button", "gtab" + (gym.level === L.lv ? " on" : ""), L.name); t.type = "button"; t.addEventListener("click", function(){ gym.level = L.lv; renderGymTabs(); }); box.appendChild(t); });
+}
+function gymPlaying(on){ $("gHintBtn").style.display = on ? "" : "none"; $("gSkip").style.display = on ? "" : "none"; $("gStart").style.display = on ? "none" : ""; }
+function gymStart(){
+  gym.drill = gym.track === "trail" ? makeTrailDrill() : makeDrill(gym.level === -1 ? Math.floor(Math.random() * 3) : gym.level);
+  gym.answered = false;
+  $("gymCard").className = "gymcard active" + (gym.track === "trail" ? " trailmode" : "");
+  $("gGoal").innerHTML = "Your call:";
+  $("gymBoard").innerHTML = "<div class='note' style='margin-top:10px'>" + gym.drill.story + "</div>";
+  $("gHint").className = "ghint"; $("gHint").innerHTML = "";
+  var box = $("gOpts"); box.innerHTML = "";
+  gym.drill.opts.forEach(function(o, oi){ var b = el("button", "chipbtn", o); b.type = "button"; b.addEventListener("click", function(){ gymAnswer(oi); }); box.appendChild(b); });
+  gymPlaying(true);
+}
+function gymDone(){ gym.answered = true; gymPlaying(false); $("gStart").textContent = "Next drill"; gymStatsRender(); }
+function gymAnswer(oi){
+  if(gym.answered || !gym.drill) return;
+  var s = getState(), ok = oi === gym.drill.a, kids = $("gOpts").children;
+  kids[gym.drill.a].classList.add("right"); if(!ok && kids[oi]) kids[oi].classList.add("wrong");
+  if(ok){ s.gym.reps = (s.gym.reps || 0) + 1; s.gym.streak = (s.gym.streak || 0) + 1; if(s.gym.streak > (s.gym.best || 0)) s.gym.best = s.gym.streak; saveState(s); $("gymCard").className = "gymcard win" + (gym.track === "trail" ? " trailmode" : ""); $("gGoal").innerHTML = "Correct: <b>" + gym.drill.opts[gym.drill.a] + "</b>."; markMission("gym"); }
+  else { s.gym.streak = 0; saveState(s); $("gymCard").className = "gymcard" + (gym.track === "trail" ? " trailmode" : ""); $("gGoal").innerHTML = "Not quite. The answer is <b>" + gym.drill.opts[gym.drill.a] + "</b>."; }
+  $("gHint").className = "ghint show"; $("gHint").innerHTML = gym.drill.hint;
+  gymDone();
+}
+function gymSkip(){
+  if(gym.answered || !gym.drill) return;
+  var s = getState(); s.gym.streak = 0; saveState(s);
+  $("gOpts").children[gym.drill.a].classList.add("right");
+  $("gHint").className = "ghint show"; $("gHint").innerHTML = "Answer: " + gym.drill.opts[gym.drill.a] + ". " + gym.drill.hint;
+  gymDone();
+}
+function setTrack(t){
+  gym.track = t; gym.drill = null; gym.answered = false;
+  $("trackGeneral").classList.toggle("on", t === "general"); $("trackTrail").classList.toggle("on", t === "trail");
+  $("gymTabs").style.display = t === "trail" ? "none" : ""; $("trailBanner").className = "trailbanner" + (t === "trail" ? " show" : "");
+  $("gymCard").className = "gymcard"; $("gOpts").innerHTML = "";
+  $("gGoal").innerHTML = t === "trail" ? "Real findings from the sweep. Tap <b>Start drill</b>." : "Pick a level (or Surprise me) and tap <b>Start drill</b>.";
+  $("gymBoard").innerHTML = ""; $("gHint").className = "ghint"; $("gHint").innerHTML = "";
+  gymPlaying(false); $("gStart").textContent = "Start drill";
+}
+
+/* ---------- quiz (options shuffle every load) ---------- */
+var QUIZ = [
+  { q:"Why is the builder a bad tester of their own app?", opts:["They don't know how the code works","They only test the path they already built","They test on a computer","They are too careful"], a:1 },
+  { q:"What does the storage-blocked run copy?", opts:["A phone with no internet","A browser that refuses to let the page save","A full phone","An old browser"], a:1 },
+  { q:"What are random taps good at finding?", opts:["Whether the game is fun","Whether the rules are right","Crashes, dead ends and layout problems","Spelling mistakes"], a:2 },
+  { q:"The test machine has no graphics chip, so a 3D game crawls. Which pile?", opts:["Break","Fix","Improve","Not a problem"], a:3 },
+  { q:"You fixed a Break. What proves it is gone?", opts:["You remember fixing it","Running the same test again","The file got bigger","Nobody has complained"], a:1 }
+];
+var quizAnswered = {}, quizOrder = [];
+function shuffled(n){ var a = [], i, j, t; for(i = 0; i < n; i++) a.push(i); for(i = n - 1; i > 0; i--){ j = Math.floor(Math.random() * (i + 1)); t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+function renderQuiz(){
+  var box = $("quizBox"); if(!box) return; box.innerHTML = ""; quizAnswered = {}; quizOrder = [];
+  QUIZ.forEach(function(item, qi){
+    var wrap = el("div", "quizq"); wrap.appendChild(el("div", "q", (qi + 1) + ". " + item.q));
+    var order = shuffled(item.opts.length); quizOrder.push(order);
+    order.forEach(function(oi){
+      var b = el("button", "quizopt", item.opts[oi]); b.type = "button";
+      b.addEventListener("click", function(){
+        if(quizAnswered[qi] != null) return; quizAnswered[qi] = oi;
+        wrap.querySelectorAll(".quizopt")[order.indexOf(item.a)].classList.add("right");
+        if(oi !== item.a) b.classList.add("wrong");
+        var got = 0, ans = 0; for(var k in quizAnswered){ ans++; if(quizAnswered[k] === QUIZ[k].a) got++; }
+        if(ans === QUIZ.length){
+          var s = getState(); if(got > (s.quizBest || 0)){ s.quizBest = got; saveState(s); }
+          box.appendChild(el("div", "qresult", "You got " + got + " / " + QUIZ.length + (got === QUIZ.length ? ", perfect." : ".")));
+          var again = el("button", "btn", "Try the quiz again"); again.type = "button"; again.style.marginTop = "10px"; again.addEventListener("click", renderQuiz); box.appendChild(again);
+        }
+      });
+      wrap.appendChild(b);
+    });
+    box.appendChild(wrap);
+  });
+}
+
+/* ---------- version badge, update check ---------- */
+function buildOf(html){ var m = /<meta name="build" content="([^"]*)"/.exec(html || ""); return m ? m[1] : null; }
+function checkUpdate(manual){
+  if(typeof fetch !== "function" || !/^https?:$/.test(location.protocol)){ if(manual) toast(VERSION + " · open the live address to check for updates"); return; }
+  fetch(location.pathname + "?nc=" + Date.now(), { cache:"no-store" }).then(function(r){ return r.ok ? r.text() : ""; }).then(function(html){
+    var live = buildOf(html);
+    if(live && live !== VERSION){
+      var bar = $("updbar"); bar.textContent = "Newer version is up (" + live + "). Tap to load it."; bar.className = "show";
+      bar.onclick = function(){ try{ location.replace(location.pathname + "?v=" + encodeURIComponent(live) + location.hash); }catch(e){ location.reload(); } };
+    } else if(manual){ toast(live ? VERSION + " · you have the newest" : VERSION + " · could not check right now"); }
+  }).catch(function(){ if(manual) toast(VERSION + " · could not check right now"); });
+}
+
+function initApp(){
+  var b = $("vbadge"); b.textContent = VERSION; b.addEventListener("click", function(){ checkUpdate(true); }); checkUpdate(false);
+  var saved = getState().hunt; if(saved) for(var k in saved){ if(BUGS[k]) hunt.found[k] = true; }
+  wirePick("devPick", "data-dev", huntDevice);
+  wirePick("stoPick", "data-sto", function(v){ hunt.storage = v; renderApp(); });
+  $("appPlus").addEventListener("click", huntPlus);
+  $("appHead").addEventListener("click", function(){ if(hunt.device === "sideways" && !hunt.dead){ $("appStat").textContent = "your tap hit the title bar, nothing counted"; foundBug("covered"); } });
+  $("appSave").addEventListener("click", huntSave);
+  $("deadReload").addEventListener("click", huntReload);
+  $("huntReset").addEventListener("click", function(){ hunt.found = {}; var s = getState(); s.hunt = {}; saveState(s); renderLog(); huntReload(); });
+  renderApp(); renderLog();
+  tgButtons();
+  $("humanGo").addEventListener("click", humanGo);
+  [].forEach.call(document.querySelectorAll("[data-taps]"), function(x){ x.addEventListener("click", function(){ monkeyGo(+x.getAttribute("data-taps"), false); }); });
+  renderRev(); renderMissions();
+  renderGymTabs(); gymStatsRender();
+  $("trackGeneral").addEventListener("click", function(){ setTrack("general"); });
+  $("trackTrail").addEventListener("click", function(){ setTrack("trail"); });
+  $("gStart").addEventListener("click", gymStart);
+  $("gHintBtn").addEventListener("click", function(){ if(gym.drill){ $("gHint").className = "ghint show"; $("gHint").innerHTML = gym.drill.hint; } });
+  $("gSkip").addEventListener("click", gymSkip);
+  renderQuiz();
+  window._lab = { hunt:hunt, monkeyGo:monkeyGo, gym:gym, rev:rev, quizOrder:function(){ return quizOrder; }, getState:getState };
+}
+if(typeof window !== "undefined" && typeof document !== "undefined"){
+  if(document.readyState === "loading"){ document.addEventListener("DOMContentLoaded", initApp); } else { initApp(); }
+}
+if(typeof module !== "undefined" && module.exports){
+  module.exports = { huntCheck:huntCheck, BUGS:BUGS, BUG_ORDER:BUG_ORDER, tgStep:tgStep, monkeyRun:monkeyRun, humanRun:humanRun, REVIEW:REVIEW, BUCKETS:BUCKETS, ISSUES:ISSUES, makeDrill:makeDrill, TRAIL_CASES:TRAIL_CASES, QUIZ:QUIZ, shuffled:shuffled, buildOf:buildOf, VERSION:VERSION };
+}
+</script>
+</body>
+</html>

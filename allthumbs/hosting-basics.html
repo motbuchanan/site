@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta name="build" content="v0.9 · Nov 14">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#14181d">
 <title>Ship It: Hosting</title>
@@ -350,6 +351,20 @@
   .quizopt.wrong{border-color:var(--red);background:rgba(232,122,109,.1);}
   .qresult{font-weight:700;margin-top:10px;}
 </style>
+<style>
+/* tune-up v1.29 */
+nav{overflow-y:hidden}
+#vbadge,.gtab,.chip{min-height:32px}
+p,li,.tp,.soft,.small,.wline,.tl-hint,code{overflow-wrap:anywhere}
+#httpOut div,.tl-hint,.wline{white-space:pre-wrap}
+#atUpd{position:fixed;left:12px;right:12px;bottom:calc(76px + env(safe-area-inset-bottom));z-index:200;background:#12161b;border:1px solid #3ddc84;color:#3ddc84;border-radius:12px;padding:13px 14px;font:13px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;text-align:center;cursor:pointer}
+</style>
+<style>
+.nextch{display:flex;flex-wrap:wrap;gap:12px;max-width:760px;margin:28px auto 16px;padding:0 16px;box-sizing:border-box}
+.nextch a{flex:1 1 100%;min-height:56px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;gap:4px;padding:12px 16px;border:1px solid rgba(255,255,255,.16);border-radius:12px;background:rgba(255,255,255,.04);color:inherit;text-decoration:none;font-size:16px;font-weight:700;line-height:1.3}
+.nextch a small{font-size:12px;font-weight:400;opacity:.65}
+.nextch a:active{border-color:currentColor}
+</style>
 </head>
 <body>
 <header>
@@ -358,7 +373,7 @@
     <h1>Ship It</h1>
     <p class="subtitle">How a file on your phone becomes a web address anyone can open.</p>
   </div>
-  <button class="vbadge" id="vbadge" type="button">v0.7</button>
+  <button class="vbadge" id="vbadge" type="button">v0.9 · Nov 14</button>
 </header>
 
 <nav>
@@ -381,7 +396,7 @@
   <div class="mascotspot"><img src="thumb-hosting.png" alt="mascot holding a globe"></div>
   <p>You built something. It works when you open it on your own phone. But nobody else can see it, because it only exists on your device. <b>Hosting</b> is the step that puts a copy of your file on a computer that is always on and always reachable, and hands you a web address that points at it.</p>
   <p>That's the whole trick. A host is just a computer that stays awake so your file has an address. When someone types that address, the host sends them a copy of your file. GitHub Pages is one of these hosts, and it's free.</p>
-  <div class="note">You already did this. This course lives on GitHub Pages. Everything below is the thing you fought with to get the mascots to show up, taken apart slowly.</div>
+  <div class="note">This course lives on GitHub Pages. Everything below is what I fought with to get its mascots to show up, taken apart slowly.</div>
 </section>
 
 <section id="repo">
@@ -436,7 +451,7 @@
 <section id="paths">
   <p class="eyebrow">root vs folder</p>
   <h2>Where a file sits decides how you point at it</h2>
-  <p>This is the exact thing that broke your mascots. A file's address depends on <b>where it lives in the repo</b>. Two choices:</p>
+  <p>This is the exact thing that broke my mascots. A file's address depends on <b>where it lives in the repo</b>. Two choices:</p>
   <p><b>Flat (root):</b> the image sits right next to index.html. Your code points at it by bare name: <code>thumb-git.png</code>.</p>
   <p><b>In a folder:</b> the image sits inside a folder called <code>img</code>. Now the same code has to say <code>img/thumb-git.png</code>, with the folder name and a slash in front.</p>
   <p>If the code and the file disagree, the browser asks for an address that has nothing at it, and the image shows broken. Line them up below.</p>
@@ -462,7 +477,7 @@
 
   <div class="tipbox right">
     <img class="poke" src="thumb-oops.png" alt="">
-    <div class="tt">The zip trap you hit</div><p class="tp">GitHub's web uploader does not unpack a zip. It just stores the zip as one file. To get a folder up, either upload the loose files into a folder, or go flat and keep everything in the root. Flat is the simplest on a phone.</p>
+    <div class="tt">The zip trap I hit</div><p class="tp">GitHub's web uploader does not unpack a zip. It just stores the zip as one file. To get a folder up, either upload the loose files into a folder, or go flat and keep everything in the root. Flat is the simplest on a phone.</p>
   </div>
 </section>
 
@@ -471,7 +486,7 @@
   <h2>Opening from Downloads is not the same as opening from the web</h2>
   <div class="mascotspot"><img src="thumb-on-phone.png" alt="mascot standing on a phone"></div>
   <p>Here's the one that fools everyone on a phone. When you open your HTML file straight from your Downloads folder, the address bar shows something like <code>content://</code> or <code>file://</code>. That is <b>not the web</b>. It's your phone handing you the raw file off local storage.</p>
-  <p>Things that quietly break in that mode: saved progress vanishes between opens, images by relative name may not load, and anything that needs a real web address (like a service worker) just won't run. Then you upload it, open the real <code>https://</code> address, and suddenly it all works. The file was never broken. The way you opened it was.</p>
+  <p>Things that break in that mode without an error: saved progress vanishes between opens, images by relative name may not load, and anything that needs a real web address (like a service worker) just won't run. Then you upload it, open the real <code>https://</code> address, and suddenly it all works. The file was never broken. The way you opened it was.</p>
 
   <div class="simwrap">
     <div class="picker" id="openPicker">
@@ -507,7 +522,7 @@
     <button class="ttab general on" id="trackGeneral" type="button">General</button>
     <button class="ttab trail" id="trackTrail" type="button">The Trail</button>
   </div>
-  <div class="trailbanner" id="trailBanner">The Trail: real cases from Mot's one-thumb-on-a-phone builds. Same rules, actual stakes.</div>
+  <div class="trailbanner" id="trailBanner">The Trail: real cases from my one-thumb-on-a-phone builds. Same rules, actual stakes.</div>
   <div class="gym">
     <div class="gymstats"><span>reps<b id="repN">0</b></span><span>streak<b id="strN">0</b></span><span>best<b id="bestN">0</b></span></div>
     <div class="gymtabs" id="gymTabs"></div>
@@ -537,13 +552,43 @@
 </div>
 
 </main>
+<div class="nextch"><a href="data-basics.html"><small>Next up</small>Chapter 8: Where Data Lives</a></div>
 <footer>Ship It &middot; a curiosity tool &middot; nothing here uploads anywhere real</footer>
 <div id="toast" role="status"></div>
+<script>
+(function(){
+  var m = document.querySelector('meta[name="build"]'), cur = m ? m.getAttribute("content") : "";
+  function buildOf(h){ var x = /<meta name="build" content="([^"]*)"/.exec(h || ""); return x ? x[1] : ""; }
+  function show(live){
+    var bar = document.getElementById("atUpd");
+    if(!bar){ bar = document.createElement("button"); bar.id = "atUpd"; bar.type = "button"; document.body.appendChild(bar); }
+    bar.textContent = "Newer version is up (" + live + "). Tap to load it.";
+    bar.onclick = function(){ try{ location.replace(location.pathname + "?v=" + encodeURIComponent(live) + location.hash); }catch(e){ location.reload(); } };
+  }
+  function check(){
+    if(!cur || typeof fetch !== "function" || !/^https?:$/.test(location.protocol)) return;
+    fetch(location.pathname + "?nc=" + Date.now(), { cache:"no-store" }).then(function(r){ return r.ok ? r.text() : ""; }).then(function(h){
+      var live = buildOf(h); if(live && live !== cur) show(live);
+    }).catch(function(){});
+  }
+  var b = document.getElementById("vbadge"); if(b) b.addEventListener("click", check);
+  check();
+})();
+</script>
 </body>
 
 <script>
 "use strict";
-var VERSION = "v0.8 \u00B7 Oct 25";
+function atShuffle(Q){
+  Q.forEach(function(it){
+    var ok = it.opts ? "opts" : "a", rk = it.opts ? "a" : "r";
+    var arr = it[ok], right = arr[it[rk]], pin = /^(all|none|both) of/i;
+    var last = arr.filter(function(x){ return pin.test(x); }), rest = arr.filter(function(x){ return !pin.test(x); });
+    for(var i = rest.length - 1; i > 0; i--){ var j = Math.floor(Math.random() * (i + 1)), t = rest[i]; rest[i] = rest[j]; rest[j] = t; }
+    it[ok] = rest.concat(last); it[rk] = it[ok].indexOf(right);
+  });
+}
+var VERSION = "v0.9 · Nov 14";
 var STORE_KEY = "hosting101_v1";
 
 /* ---------- guarded storage ---------- */
@@ -820,22 +865,22 @@ function makeDrill(level){
 
 /* ---------- TRAIL drills: real cases from Mot's actual builds ---------- */
 var TRAIL_CASES = [
-  { story:"The mascot upload. Your code says <code>img/thumb-git.png</code> but you uploaded the PNGs loose to the repo <b>root</b> (no img folder, because the zip wouldn't unpack). Does the image load?",
-    loads:false, hint:"The file is at the root (thumb-git.png) but the code asks for img/thumb-git.png. No img folder exists, so 404. The fix you used: change the code to the bare name." },
-  { story:"After the fix. You rewrote index.html to point at <code>thumb-git.png</code> (bare) and the PNGs sit in the repo root. Does it load?",
-    loads:true, hint:"Code and file agree: both root, bare name. Loads. This is the flat layout you shipped." },
-  { story:"The 404 that started it all. You opened <code>motbuchanan.github.io/reveal</code> with no trailing slash and no index.html yet (the hub was named course.html). Front door?",
-    loads:false, hint:"No index.html at the root means the bare address has no front door. You fixed it by renaming course.html to index.html." },
+  { story:"The mascot upload. My code said <code>img/thumb-git.png</code> but I uploaded the PNGs loose to the repo <b>root</b> (no img folder, because the zip wouldn't unpack). Does the image load?",
+    loads:false, hint:"The file is at the root (thumb-git.png) but the code asks for img/thumb-git.png. No img folder exists, so 404. The fix I used: change the code to the bare name." },
+  { story:"After the fix. I rewrote index.html to point at <code>thumb-git.png</code> (bare) and the PNGs sit in the repo root. Does it load?",
+    loads:true, hint:"Code and file agree: both root, bare name. Loads. This is the flat layout I shipped." },
+  { story:"The 404 that started it all. I opened <code>motbuchanan.github.io/reveal</code> with no trailing slash and no index.html yet (the hub was named course.html). Front door?",
+    loads:false, hint:"No index.html at the root means the bare address has no front door. I fixed it by renaming course.html to index.html." },
   { story:"The rename fix. Hub is now <code>index.html</code> at the repo root. Someone visits <code>motbuchanan.github.io/reveal/</code>. Loads?",
     loads:true, hint:"index.html at the root IS the front door. The bare address serves it. This is why the hub is index.html, not hub.html." },
-  { story:"The content:// trap on your son's iPad. You opened the game shelf HTML straight from Downloads to test. Address bar shows <code>content://</code>. Does saved progress persist between opens?",
+  { story:"The content:// trap on my son's iPad. I opened the game shelf HTML straight from Downloads to test. Address bar shows <code>content://</code>. Does saved progress persist between opens?",
     loads:false, hint:"content:// is local storage, not the web. Progress may not persist and the service worker won't run. Open the https:// Pages URL to really test." },
   { story:"measureup/ inside the gameshelf repo. The game lives in a subfolder <code>measureup/</code> with its own index.html and all-relative paths. Someone visits <code>&hellip;/gameshelf/measureup/</code>. Loads?",
-    loads:true, hint:"A subfolder with its own index.html serves at that subfolder's bare address. This is the folder-in-repo pattern you now use for self-contained apps." },
-  { story:"The zip you tried to upload. You zipped index.html + an img folder and uploaded the .zip to GitHub web. Do the images appear on the site?",
+    loads:true, hint:"A subfolder with its own index.html serves at that subfolder's bare address. This is the folder-in-repo pattern I now use for self-contained apps." },
+  { story:"The zip I tried to upload. I zipped index.html + an img folder and uploaded the .zip to GitHub web. Do the images appear on the site?",
     loads:false, hint:"GitHub web upload stores the zip as one file, it does not unpack it. The images are trapped inside the zip. You have to upload loose files." },
   { story:"Reframe deployed as a subfolder. Self-contained app, all-relative paths, its own scoped sw.js, dropped into an existing repo as its own folder. Visiting its folder address. Loads?",
-    loads:true, hint:"Self-contained + all-relative paths + own sw.js = safe as a folder-in-repo. This is the pattern that works for your single-file apps." }
+    loads:true, hint:"Self-contained + all-relative paths + own sw.js = safe as a folder-in-repo. This is the pattern that works for my single-file apps." }
 ];
 function makeTrailDrill(){
   return TRAIL_CASES[Math.floor(Math.random()*TRAIL_CASES.length)];
@@ -959,7 +1004,7 @@ var QUIZ = [
     opts:["Upload a zip and it unpacks","Keep files flat in the repo root and point at them by bare name","Email them to GitHub","You can't host images"], a:1 }
 ];
 var quizAnswered = {};
-function renderQuiz(){
+function renderQuiz(){ atShuffle(QUIZ);
   var box = $("quizBox"); if(!box) return;
   box.innerHTML = "";
   QUIZ.forEach(function(item, qi){
@@ -992,7 +1037,7 @@ function renderQuiz(){
 /* ---------- version badge ---------- */
 function initBadge(){
   var b = $("vbadge"); if(!b) return;
-  b.textContent = VERSION.split(" ")[0];
+  b.textContent = VERSION;
   b.addEventListener("click", function(){ toast("Ship It \u00B7 " + VERSION); });
 }
 

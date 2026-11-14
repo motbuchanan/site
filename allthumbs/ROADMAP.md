@@ -1,5 +1,72 @@
 # All Thumbs: course roadmap and state
 
+## v1.29 (Nov 14 2026) - Tune-up of the whole course (all 16 chapters and the hub)
+
+Came out of a full-course audit on Nov 13. Every page was touched, so every badge moved:
+1 v3.3, 2 v3.2, 3 v3.2, 4 v3.2, 5 v3.3, 6 v3.2, 7 v0.9, 8 v0.3, 9 v0.3, 10 v0.3, 11 v0.4, 12 v0.2, 13 v0.2, 14 v0.3, 15 v0.2, 16 v0.2, hub v1.29. All dated Nov 14.
+
+- Quizzes in chapters 1 to 10 now shuffle their answers on every load (the right answer used to sit second in most of them; Python was 5 of 5). An "All of these" answer stays last.
+- Chapters 1 to 10 got the badge update check that 11 to 16 already had: a build tag in the page head, and a bar that offers the newer version when the live page differs.
+- Every chapter ends with a "Next up" link to the following chapter. Chapter 16 links back to the shelf.
+- Voice: chapters 7 to 10 were written to the owner as "you". Owner stories are now first person ("I", "my"), the same voice as 11 to 16. The reader is still "you".
+- Copy: removed "quietly" (chapters 5, 6, 7, 10, 12), the "why the badge number matters" heading (10), three "not X, it is Y" lines and the curly quotes drawn in chapters 2 and 3. Old "course order" footer lines are gone. The badge on chapters 1 to 10 now shows the date too. The app manifest says sixteen explainers.
+- A separate reviewer checked the whole pass (no breaks); its 8 fixes are in.
+- Names: a private dashboard and a private family tool were named in drills (chapters 3, 5, 8). Swapped for public apps or a plain description.
+- Layout: cheat sheets in 1, 2, 3 and 6 stack and wrap instead of scrolling sideways; long terminal and code lines wrap; the fit check went from 141 flags to 6 (the 6 are italic overhang on terminal lines, nothing cut off). Badges and small chips are at least 32px tall.
+- How it was done: tools kept outside the repo (a tune-up script plus a list of text swaps) run over clean copies, so the pass can be repeated.
+
+### Open queue after the tune-up (agreed order)
+1. Video editing branch (RoughCut is ready). Files stay in this folder with an edit- prefix.
+2. Chapter 17 "Ship One": make a real repo and put a real page live. Then JavaScript, Fit the Screen, and not shipping the default look.
+3. Smaller gaps noted: installing and offline (service workers) as its own chapter, getting found (titles, share images, sitemap).
+4. Last: home screen card and the plain search page (both still say 10 of 10), sitemap entries for the chapters, new mascots.
+- Not done on purpose: Chapter 3 keeps a second h1 inside its demo preview; heading levels in 1, 2, 3 and 6 skip from h1 to h3.
+
+## v1.28 (Nov 13 2026) - Unit 6: Chapters 15 and 16. All 16 planned chapters are built.
+
+- NEW chapter 15: models-basics.html "How Models Work" (storage key models101_v1, periwinkle accent #7aa2ff, hero thumb-phone-hero-b). A language model picks a likely next piece of text over and over; chatting doesn't change the trained model; fluent can still be wrong. Sandboxes: a toy next-word model with a temperature slider (shows each choice's chance), a rough token splitter with the four-characters rule of thumb, the desk (a 5-page context window where old pages slide off and a saved note stays), and a brief builder (six ingredients; each one removes a guess, ending with "ask me questions first"). The gym is the prompting gym: true or false, better brief, token counts, plus 8 Trail cases from real builds (the invented "played for weeks" line, the Firebase guess settled by a test, the rulebook's default-look idea, handoff docs, saved rules).
+- NEW chapter 16: agents-basics.html "Agents and Schedules" (storage key agents101_v1, lilac accent #e0a3ff, hero thumb-cool). Agent = model + tools + a loop of acting and checking. Sandboxes: run an agent on a two-problem job with or without tools, a self-check and a reviewer (only tools + a reviewer ship clean); match six tasks to five of Mot's saved skills; set up a scheduled task (fresh every run, nobody watching: full prompt, report only); six real reviewer catches from building chapters 11 to 14 on Nov 13. Gym: tool or not, which skill, safe to run alone, plus 8 Trail cases (monthly sweep is report-only, checks never push, the early GitHub-push experiment, the separate reviewer, the rulebook task).
+- Both: 6 missions, 5-question shuffled quiz, badge update check, same build pattern as 11 to 14 (a shared assembly script now builds chapters from parts).
+- Hub v1.28: books 15 and 16 real; every chapter book is real now. Only the three branch-course boxes stay planned (stand-in mascot). Description says sixteen explainers.
+- Separate review of 15 and 16 (no breaks found), fixes applied before delivery: the agent run without a self-check no longer claims checks passed; the "tools but no check" mission only ticks when the check is off; the invented-line story now says "nobody had confirmed it" (what the review said) instead of "I never said that"; four "not X, it's Y" lines rewritten; the toy model's version/badge loop removed; bar percentages always add to 100; the token splitter keeps emoji whole; memory-feature note added where runs "start fresh"; the schedule note matches the time picked; "every chapter since Chapter 11"; leftover code and duplicate CSS removed.
+- Still open: the site home screen card says All Thumbs is 10 of 10. Mot is holding that change until the branch courses are added.
+- Mot's plan: play through chapters 13 to 16 over the weekend of Nov 14 and 15 and report issues.
+
+## v1.27 (Nov 13 2026) - Chapter 13: Debugging, and stand-in mascots on the shelf
+
+- NEW chapter: debug-basics.html "Debugging" (storage key debug101_v1, state {m, quizBest, gym}, sky accent #8ec5ff, hero thumb-aha; think / tip poke-ins). Unit "trust nothing". With it, the "Under your own apps" shelf is all real books (8 to 14).
+- Teaches symptom vs root cause and four questions in order: can I make it happen again, am I running the file I think I am (the badge), where exactly does it break, did the fix really work.
+- Sandboxes: (1) Stale or real: a fix "didn't work"; gather evidence (badge, the file on GitHub, the address bar, a fresh reload) and pick old copy cached / upload never landed / bug is real / opened the downloaded copy. (2) Cut it in half: eight pieces, one bad; switching half off each test finds it in three. (3) Six real-shaped bugs, each with a symptom patch, a start-over, and the root-cause fix (NaN score, blocked storage, sideways grid, 320px spill, double listener, the reset key list).
+- Real stories used: the caching problem behind the version badge, today's Firebase-from-Downloads test (library loaded, sign-in silent), the 1-byte paste, Knight School's unguarded read, the Game Shelf reset key.
+- 6 missions, gym with 3 General levels (what's going on, halving math, symptom or cause) and 8 Trail cases. 5-question quiz, options shuffled. Same badge update check.
+- Reviewer pass (separate agent, Nov 13): no breaks. Fixed before ship: the halving result no longer implies one test is the maximum, the NaN explanation is now accurate, "Run reset twice" became a real symptom patch, the 1-byte story stops at what is on record (also fixed in Chapter 14, now v0.2), the badge tipbox no longer claims every badge checks for updates, Android is named for content:// addresses, a line about Pages taking a minute to publish, and duplicate styles. The Downloads-image Trail case is real (Mot's Nov 13 screenshots of Chapter 11 opened from Downloads).
+- Hub v1.27: book 13 real (key, img thumb-aha, file, total 6); description says fourteen explainers; noscript list gained ch 13.
+- Hub, Mot's ask: cards for planned chapters and course boxes now show a dimmed stand-in mascot (PLACEHOLDER: thumb-tip for chapters, thumb-phone-hero-a for courses, so the pose never repeats the progress note's thumb-think) with an "art soon" tag, instead of an empty dashed box. Shelf props now shrink to fit narrower gaps (never under 96px tall); each PROPS entry carries its image's width-to-height ratio. When the new chapter and bookend art exists, swap PLACEHOLDER and PROPS.
+
+## v1.26 (Nov 13 2026) - Chapter 14: Robots on GitHub
+
+- NEW chapter: actions-basics.html "Robots on GitHub" (storage key actions101_v1, state {m, quizBest, gym}, lime accent #a3e635, hero thumb-nice; think / tip / aha poke-ins, all images already in the repo). Unit "trust nothing". Built before Ch 13 per the approved build order; book 13 (Debugging) stays a ghost on the shelf.
+- Teaches CI in plain words, starting from the robot Mot already has: every upload starts GitHub Pages' "pages build and deployment" run in the Actions tab. Then .nojekyll (both of Mot's repos have one; Jekyll only touches double-brace text on pages that open with front matter), why a green check means deployed and not working, the parts of a workflow file, and that a robot only catches what it was told to check.
+- Sandboxes: (1) a step-by-step model of one upload (clean page, double-brace page, broken script; with or without .nojekyll; with or without front matter); only no .nojekyll + front matter + double braces silently eats text, and a broken script always ships with a green check. (2) A sample workflow file (Check my pages: on push, ubuntu-latest, checkout, a "no outside fonts" grep step) with 8 tappable parts. (3) Six of Mot's real gates as toggleable robot checks against eight uploads with one planted problem each; all six on stops six, and the scoring-rule bug always goes live.
+- Phone tip in the chapter: make .github/workflows/check.yml with Add file, Create new file, typing the whole path (each slash becomes a folder). States plainly that robots stay checks-only and every upload still comes from the phone.
+- 6 missions, gym with 3 General levels (does this check catch it, green or red, read the file) and 10 Trail cases (the Pages run, .nojekyll, the 1-byte paste, version drift, Gather's cache name, Google Fonts, no pushing, schedules, free on public repos). 5-question quiz, options shuffled every load. Same badge update check as Ch 11 and 12.
+- Facts checked against GitHub docs Nov 13: Pages runs "pages build and deployment" on pushes to its branch; .nojekyll skips the Jekyll build; standard runners are free for public repositories.
+- Hub v1.26: book 14 turned real (key, img thumb-nice, file, total 6), description says thirteen explainers, noscript list gained ch 14.
+- Reviewer pass (separate agent, Nov 13): two Breaks fixed before ship. The sample workflow searched the whole repo and would have flagged its own file (and this chapter), so it failed on every push; it now searches only .html files for the full font-server address, and the chapter builds that address in code so the page itself never matches (tested: passes on a repo holding the chapter and the workflow, fails once a Google Fonts link is added). The Gather Trail case was rewritten to match the report (badge and cache name both stayed v0.7). Also fixed: the monthly sweep is described as a scheduled task outside GitHub, the Breaker check is now "storage-blocked taps" so its answers stay true, workflow lines are 34px tall, "Here's the catch" is gone, push is per push, the schedule hint mentions cron and the 60-day pause, and a .nojekyll + front matter upload now shows the stray --- lines.
+- Not set up yet: no workflow file exists in Mot's repos. The chapter's file is a teaching sample. Turning it into a real check.yml for the site repo is an open option.
+- Optional art: a dedicated Chapter 14 mascot (the thumb as a little robot or with a checkmark badge, same sticker style, plain white background, no shadow), saved as thumb-robot.png.
+
+## v1.25 (Nov 13 2026) - Chapter 12: Break It
+
+- NEW chapter: break-basics.html "Break It" (storage key break101_v1, state {m, quizBest, gym, hunt}, yellow accent #ffd166, hero thumb-oops; think / aha / tip poke-ins, all images already in the repo). Unit "trust nothing", on the "Under your own apps" shelf.
+- Teaches why the builder is the worst tester of their own app (you test the path you built), and how the Breaker works: random taps, the phone / sideways / tablet / storage-blocked runs, and the separate reviewer that sorts findings into Break / Fix / Improve / Not a problem.
+- Sandboxes: (1) Snack Count, a mini app in a device frame with six planted bugs (fast taps count double, private mode kills it, Save cut off on a small phone, sideways header covers +1, empty name saves as undefined, long name runs off the screen), each logged with its real-world twin and a one-line fix. (2) A seeded monkey that taps a six-button tiny game 10 / 50 / 150 times; the "my way" path never crashes, random taps find the Undo crash and the Back-leaves-the-app dead end, and the first crash shows the taps that led to it. (3) A reviewer sorter with eight real findings from the Oct 23 sweep (tools/BREAK-REPORT.md in the site repo).
+- 6 missions, gym with 3 General levels (caught by the Breaker or not, which run shows it, which pile) and 9 Trail cases from the Oct 23 sweep (Knight School private mode, Five Letters sideways and storage-blocked, Gather's banner and stale cache, the home screen's four version spots, Pocket Shark on a machine with no graphics chip, Google Fonts, the Home button "leaving" the app). 5-question quiz, options shuffled every load.
+- Same badge update check and meta build as Chapter 11.
+- Hub v1.25: book 12 turned from a ghost into a real book (key, img thumb-oops, file, total 6), search description now says twelve explainers, noscript list gained ch 12.
+- Reviewer pass (separate agent, Nov 13): one Break fixed before ship, the sideways bug could never be logged because the tap lands on the header, which had no handler. Also fixed: three easy-paced taps no longer count as mashing (now four taps inside 450ms), the crash screen sits above the sideways header, "storage blocked" is no longer equated with private browsing (current private windows still save; the run copies strict settings and some school iPads), two lines softened to match the report (Pocket Shark slowness, Gather cache), per-finding gym hints, the tiny-game buttons can be tapped by hand, and copy fixes. Left as is: a 150-tap log keeps only the last 41 rows (the first crash is pinned in the summary box above it).
+- Optional art: a dedicated Chapter 12 mascot (the thumb holding a cracked phone or a hammer, same sticker style, plain white background, no shadow). If made, save it as thumb-break.png and the chapter and hub get pointed at it.
+
 ## v1.24 (Nov 13 2026) - hub design pass: the shelf
 
 The hub was one tall card per chapter (about 6,000px of scrolling at 11 chapters, double that by 16). Three layouts were mocked as phone renders (A the shelf, B a route line, C next-up plus index). Mot picked A, then flagged that three books on a shelf look empty, so round 2 regrouped and filled the shelves. That is what shipped.
@@ -31,7 +98,7 @@ The ten-chapter course was complete at v1.22. On Nov 13 the course was picked ba
 - Unit 5, Trust nothing: Ch 12 Break It (hostile testing: phone, tablet, landscape, blocked storage, and why the builder never grades its own work; Trail = real Breaker findings such as a chess trainer dying in private mode and a word game covering its own keyboard sideways). Ch 13 Debugging (root cause first, stale copy vs real bug, the tap-the-badge update check). Ch 14 Robots on GitHub (CI/CD, the validation gates and the Breaker as the worked example).
 - Unit 6, Directing AI: Ch 15 How models work plus the prompting gym. Ch 16 Agents, skills and schedules (the separate reviewer, the monthly sweep, the rulebook refresh).
 - Branches, each with its own mini-hub: AI images and video (the mascot pipeline as the spine); Video editing (companion to RoughCut; RoughCut is ready, so this branch is READY TO START); Game development (later).
-- Build order: Ch 11, then Ch 12, then Ch 14. One chapter per sitting.
+- Build order: Ch 11, then Ch 12, then Ch 14. One chapter per sitting. Ch 11 to 16 BUILT Nov 13. The core course map is complete. Remaining: the branches (Video editing is ready to start; Images and video; Game development later), the branch folder question, new mascot art, and the home screen card (Mot: wait until the updates settle).
 
 ### Open decisions
 

@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="build" content="v3.2 · Nov 14">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b1512">
 <title>The Second After You Tap: What the Internet Actually Is</title>
@@ -157,6 +158,24 @@ footer{color:#4c6156;font-size:12.5px;text-align:center;margin:30px 0 10px;line-
   .trailbanner.show{display:block;}
   .backhub{display:inline-flex;align-items:center;gap:7px;font-family:monospace;font-size:12px;color:var(--soft,#a9c3b6);border:1px solid var(--line,#24463a);border-radius:999px;padding:7px 13px;background:var(--panel,#101b16);text-decoration:none;}
 </style>
+<style>
+/* tune-up v1.29 */
+nav{overflow-y:hidden}
+#vbadge,.gtab,.chip{min-height:32px}
+.cheat{white-space:normal;overflow-x:visible}
+.cheat b{display:block}
+.cheat span{display:block;margin:0 0 10px}
+.cheat span:last-child{margin-bottom:0}
+p,li,.tp,.soft,.small,.wline,.tl-hint,code{overflow-wrap:anywhere}
+#httpOut div,.tl-hint,.wline{white-space:pre-wrap}
+#atUpd{position:fixed;left:12px;right:12px;bottom:calc(76px + env(safe-area-inset-bottom));z-index:200;background:#12161b;border:1px solid #3ddc84;color:#3ddc84;border-radius:12px;padding:13px 14px;font:13px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;text-align:center;cursor:pointer}
+</style>
+<style>
+.nextch{display:flex;flex-wrap:wrap;gap:12px;max-width:760px;margin:28px auto 16px;padding:0 16px;box-sizing:border-box}
+.nextch a{flex:1 1 100%;min-height:56px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;gap:4px;padding:12px 16px;border:1px solid rgba(255,255,255,.16);border-radius:12px;background:rgba(255,255,255,.04);color:inherit;text-decoration:none;font-size:16px;font-weight:700;line-height:1.3}
+.nextch a small{font-size:12px;font-weight:400;opacity:.65}
+.nextch a:active{border-color:currentColor}
+</style>
 </head>
 <body>
 <main>
@@ -168,7 +187,7 @@ footer{color:#4c6156;font-size:12.5px;text-align:center;margin:30px 0 10px;line-
       <h1>The Second After You Tap</h1>
       <p class="sub" style="font-size:18px">What the internet actually is, and where your request goes.</p>
     </div>
-    <button id="vbadge" aria-label="version">v3.1</button>
+    <button id="vbadge" aria-label="version">v3.2 · Nov 14</button>
   </div>
   <svg class="herosvg" viewBox="0 0 280 110" aria-hidden="true">
     <line x1="30" y1="80" x2="90" y2="55" stroke="#24463a" stroke-width="2.5"/>
@@ -348,16 +367,25 @@ footer{color:#4c6156;font-size:12.5px;text-align:center;margin:30px 0 10px;line-
   <button id="retryBtn" class="btn ghost">Try again</button>
 </section>
 
+<div class="nextch"><a href="browser-basics.html"><small>Next up</small>Chapter 3: The Painter</a></div>
 <footer>
-  The Second After You Tap · a small explainer · made on a phone<br>
-  Course order: the computer first, this one second, the browser next.
+  The Second After You Tap · a small explainer · made on a phone
 </footer>
 <div style="text-align:center;margin:24px 0 8px;"><a class="backhub" href="index.html">&larr; back to All Thumbs</a></div>
 </main>
 <div id="toast" role="status"></div>
 <script>
 "use strict";
-var VERSION = "v3.1 · Aug 26";
+function atShuffle(Q){
+  Q.forEach(function(it){
+    var ok = it.opts ? "opts" : "a", rk = it.opts ? "a" : "r";
+    var arr = it[ok], right = arr[it[rk]], pin = /^(all|none|both) of/i;
+    var last = arr.filter(function(x){ return pin.test(x); }), rest = arr.filter(function(x){ return !pin.test(x); });
+    for(var i = rest.length - 1; i > 0; i--){ var j = Math.floor(Math.random() * (i + 1)), t = rest[i]; rest[i] = rest[j]; rest[j] = t; }
+    it[ok] = rest.concat(last); it[rk] = it[ok].indexOf(right);
+  });
+}
+var VERSION = "v3.2 · Nov 14";
 
 /* ============ ENGINE (DOM-free) ============ */
 function makeDNS(){
@@ -810,7 +838,7 @@ function initApp(){
       } },
     { id:"i30", lv:3, make:function(){
         var sc = FIELD_CALLS[Math.floor(Math.random() * FIELD_CALLS.length)];
-        return { goal:"<b>Field call.</b> A friend reports: \u201C" + sc.sym + "\u201D What actually happened?",
+        return { goal:"<b>Field call.</b> A friend reports: \"" + sc.sym + "\" What actually happened?",
           scenario: sc,
           hints:["Which layer does the symptom point at: your device, your router, the road, the name lookup, or the server?","Re-read the pocket reference in part 6; the answer is one of its lines."] };
       } },
@@ -986,7 +1014,7 @@ function initApp(){
     { q:"A 404 error means...", a:["Your internet connection is broken","The server crashed","The server answered: that page does not exist"], r:2 },
     { q:"Wifi is on but nothing loads. Most likely:", a:["Your device is broken","Your link to your router works, the road beyond it is out","DNS deleted your favorite sites"], r:1 }
   ];
-  function renderQuiz(){
+  function renderQuiz(){ atShuffle(QUIZ);
     var wrap = $("quizwrap");
     wrap.innerHTML = ""; $("scoreEl").textContent = ""; $("retryBtn").style.display = "none";
     var answered = 0, correct = 0;
@@ -1029,6 +1057,26 @@ if(typeof window !== "undefined" && typeof document !== "undefined"){
 if(typeof module !== "undefined" && module.exports){
   module.exports = { makeDNS: makeDNS, dnsLookup: dnsLookup, dnsAdd: dnsAdd, bfsPath: bfsPath, serveRequest: serveRequest, NET_EDGES: NET_EDGES };
 }
+</script>
+<script>
+(function(){
+  var m = document.querySelector('meta[name="build"]'), cur = m ? m.getAttribute("content") : "";
+  function buildOf(h){ var x = /<meta name="build" content="([^"]*)"/.exec(h || ""); return x ? x[1] : ""; }
+  function show(live){
+    var bar = document.getElementById("atUpd");
+    if(!bar){ bar = document.createElement("button"); bar.id = "atUpd"; bar.type = "button"; document.body.appendChild(bar); }
+    bar.textContent = "Newer version is up (" + live + "). Tap to load it.";
+    bar.onclick = function(){ try{ location.replace(location.pathname + "?v=" + encodeURIComponent(live) + location.hash); }catch(e){ location.reload(); } };
+  }
+  function check(){
+    if(!cur || typeof fetch !== "function" || !/^https?:$/.test(location.protocol)) return;
+    fetch(location.pathname + "?nc=" + Date.now(), { cache:"no-store" }).then(function(r){ return r.ok ? r.text() : ""; }).then(function(h){
+      var live = buildOf(h); if(live && live !== cur) show(live);
+    }).catch(function(){});
+  }
+  var b = document.getElementById("vbadge"); if(b) b.addEventListener("click", check);
+  check();
+})();
 </script>
 </body>
 </html>

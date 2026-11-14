@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#12141a">
-<meta name="build" content="v1.24 · Nov 13">
+<meta name="build" content="v1.29 · Nov 14">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -14,7 +14,7 @@
 <link rel="canonical" href="https://motbuchanan.com/allthumbs/">
 <meta property="og:title" content="All Thumbs: build it on a phone">
 <meta property="og:image" content="https://motbuchanan.com/allthumbs/icon-512.png">
-<meta name="description" content="A build-it-on-a-phone course: eleven interactive explainers, from what a computer is to two phones sharing one Firebase database, each with sandboxes, a practice gym and a quiz.">
+<meta name="description" content="A build-it-on-a-phone course: sixteen interactive explainers, from what a computer is to AI agents that check their own work, each with sandboxes, a practice gym and a quiz.">
 <style>
 :root{
   --bg:#12141a; --panel:#1a1d26; --panel2:#222633; --ink:#e9ecf3; --dim:#98a0b0; --line:#2e3342; --good:#7ddf9a;
@@ -63,7 +63,7 @@ h1{font:800 clamp(30px,9vw,40px) var(--mb-ui);letter-spacing:-.02em;line-height:
 .tab{flex:0 0 16px;align-self:flex-end;height:118px;border-radius:4px 4px 0 0;background:#262a37;border:1px solid var(--line);display:flex;align-items:center;justify-content:center}
 .tab span{writing-mode:vertical-rl;transform:rotate(180deg);font:600 9px var(--mb-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--dim);white-space:nowrap}
 .prop{flex:0 0 auto;align-self:flex-end;display:flex;align-items:flex-end;margin-left:auto;pointer-events:none}
-.prop img{height:150px;width:auto;filter:drop-shadow(0 6px 10px rgba(0,0,0,.45));margin-bottom:-2px}
+.prop img{height:150px;width:auto;max-width:none;filter:drop-shadow(0 6px 10px rgba(0,0,0,.45));margin-bottom:-2px}
 .bookend{flex:0 0 12px;height:96px;align-self:flex-end;margin-left:auto;background:#3a4052;border-radius:3px 3px 0 0;box-shadow:inset -3px 0 0 #2b3040}
 .prop + .bookend{margin-left:0}
 @media(max-width:360px){.books{gap:3px;padding-left:2px;padding-right:2px}.spine{min-width:30px}.spine .ttl span{font-size:11.5px}.spine .band{font-size:12.5px}.tab{flex-basis:13px}.bookend{flex-basis:9px}}
@@ -71,7 +71,9 @@ h1{font:800 clamp(30px,9vw,40px) var(--mb-ui);letter-spacing:-.02em;line-height:
 .pull{background:var(--panel);border:1px solid var(--line);border-radius:16px;margin:18px 0 0;overflow:hidden;display:grid;grid-template-columns:120px 1fr;gap:4px}
 .pull .art{display:flex;align-items:flex-end;justify-content:center;padding:14px 0 0}
 .pull .art img{height:150px;max-width:110px;width:auto;object-fit:contain;filter:drop-shadow(0 8px 14px rgba(0,0,0,.45))}
-.pull .art .blank{width:70px;height:110px;border:1.5px dashed #3a4052;border-radius:6px 6px 0 0;margin-bottom:0}
+.pull .art{position:relative}
+.pull .art img.stand{opacity:.42;filter:grayscale(.85) drop-shadow(0 8px 14px rgba(0,0,0,.45))}
+.pull .art .soon{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);font:600 9.5px var(--mb-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--dim);background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:3px 8px;white-space:nowrap}
 .pull .tx{padding:16px 16px 16px 4px;min-width:0}
 .pull h3{font:800 20px var(--mb-ui);margin:4px 0 6px;line-height:1.2}
 .pull .bar{height:8px;background:var(--panel2);border-radius:999px;overflow:hidden;margin:12px 0 6px}
@@ -124,6 +126,11 @@ footer{color:#5b6272;font-size:12.5px;text-align:center;margin:30px 0 10px;line-
 <li><a href="api-basics.html">9. The Order Window</a></li>
 <li><a href="shelf-dissected.html">10. The Shelf Dissected</a></li>
 <li><a href="firebase-basics.html">11. Who Tapped First</a></li>
+<li><a href="break-basics.html">12. Break It</a></li>
+<li><a href="debug-basics.html">13. Debugging</a></li>
+<li><a href="actions-basics.html">14. Robots on GitHub</a></li>
+<li><a href="models-basics.html">15. How Models Work</a></li>
+<li><a href="agents-basics.html">16. Agents and Schedules</a></li>
 </ol></div></noscript>
 
 <div class="note">
@@ -140,10 +147,10 @@ footer{color:#5b6272;font-size:12.5px;text-align:center;margin:30px 0 10px;line-
 </main>
 <button id="updbar" type="button">A newer version is up. Tap to load it.</button>
 <div id="toast" role="status"></div>
-<button class="mb-ver" id="mbVer" type="button">v1.24 &middot; Nov 13</button>
+<button class="mb-ver" id="mbVer" type="button">v1.29 &middot; Nov 14</button>
 <script>
 "use strict";
-var VERSION = "v1.24 · Nov 13";
+var VERSION = "v1.29 · Nov 14";
 
 /* pure helpers (testable) */
 function countDone(state){
@@ -246,7 +253,7 @@ var CH = [
 "img": "thumb-api",
 "file": "api-basics.html",
 "title": "The Order Window",
-"sub": "What an API call is: verbs, URLs, status codes, reading JSON, keys and rate limits. You have been making them for months.",
+"sub": "What an API call is: verbs, URLs, status codes, reading JSON, keys and rate limits. My apps have been making them for months.",
 "total": 6,
 "color": "#ff9a6b",
 "n": 9
@@ -256,7 +263,7 @@ var CH = [
 "img": "thumb-beside-phone",
 "file": "shelf-dissected.html",
 "title": "The Shelf Dissected",
-"sub": "The keystone. Your real Game Shelf taken apart: the hub, the four registrations, the service worker, the Firestore cabinet, and 282 commits of history.",
+"sub": "The keystone. My real Game Shelf taken apart: the hub, the four registrations, the service worker, the Firestore cabinet, and 282 commits of history.",
 "total": 6,
 "color": "#d9b35a",
 "n": 10
@@ -272,32 +279,52 @@ var CH = [
 "n": 11
 },
 {
+"key": "break101_v1",
+"img": "thumb-oops",
+"file": "break-basics.html",
 "title": "Break It",
-"sub": "Why the builder never grades its own work. Break a small app on purpose: phone, tablet, sideways, storage blocked.",
+"sub": "Why the person who built it is the worst person to test it. Hunt six planted bugs, let a monkey tap at random, sort real findings.",
+"total": 6,
 "color": "#ffd166",
 "n": 12
 },
 {
+"key": "debug101_v1",
+"img": "thumb-aha",
+"file": "debug-basics.html",
 "title": "Debugging",
-"sub": "Root cause first. Is it a stale copy or a real bug, and how do you tell?",
+"sub": "Root cause first. Tell an old copy from a real bug, find the broken piece by halving, and fix the cause instead of the symptom.",
+"total": 6,
 "color": "#8ec5ff",
 "n": 13
 },
 {
+"key": "actions101_v1",
+"img": "thumb-nice",
+"file": "actions-basics.html",
 "title": "Robots on GitHub",
-"sub": "A robot that checks every upload before it goes live.",
+"sub": "A computer that checks every upload. The Pages robot you already have, what a workflow file says, and why a green check doesn't mean it works.",
+"total": 6,
 "color": "#a3e635",
 "n": 14
 },
 {
+"key": "models101_v1",
+"img": "thumb-phone-hero-b",
+"file": "models-basics.html",
 "title": "How Models Work",
-"sub": "What the model is doing with your words, plus a prompting gym.",
+"sub": "What the AI is doing with your words: next words, tokens, the desk it reads from, and a brief it can use.",
+"total": 6,
 "color": "#7aa2ff",
 "n": 15
 },
 {
+"key": "agents101_v1",
+"img": "thumb-cool",
+"file": "agents-basics.html",
 "title": "Agents and Schedules",
-"sub": "A second reviewer, saved skills, and jobs that run on their own.",
+"sub": "An AI that uses tools and checks its work, saved skills, scheduled tasks, and why a second reviewer catches what the builder misses.",
+"total": 6,
 "color": "#e0a3ff",
 "n": 16
 }
@@ -324,7 +351,9 @@ var COURSES = [
 ];
 var SHELVES = [{"t": "The basics", "groups": [{"lab": "your screen", "ch": [1, 2, 3]}, {"lab": "your toolbox", "ch": [4, 5, 6, 7]}]}, {"t": "Under your own apps", "groups": [{"lab": "your apps", "ch": [8, 9, 10]}, {"lab": "shared + live", "ch": [11]}, {"lab": "trust nothing", "ch": [12, 13, 14]}]}, {"t": "Directing AI", "groups": [{"lab": "", "ch": [15, 16]}, {"lab": "", "courses": [0]}]}, {"t": "Branch courses", "groups": [{"lab": "", "courses": [1, 2]}]}];
 /* Bookend mascots that fill a shelf's empty space. Swap in new leaning poses here. */
-var PROPS = ["thumb-wave", "thumb-cool", "thumb-happy", "thumb-thumbsup"];
+var PROPS = [ { img:"thumb-wave", w:0.54 }, { img:"thumb-cool", w:0.39 }, { img:"thumb-happy", w:0.39 }, { img:"thumb-thumbsup", w:0.51 } ];
+/* Stand-in art for books and courses that have no mascot yet. */
+var PLACEHOLDER = { img:"thumb-tip", course:"thumb-phone-hero-a" };
 var ROWS = CH.filter(function(c){ return !!c.key; });
 
 function stateOf(c){
@@ -381,7 +410,7 @@ function initApp(){
 
   function chapterCard(c){
     var pr = progressOf(c), card = el("div", "pull");
-    var art = c.img ? "<img src='" + c.img + ".png' alt=''>" : "<div class='blank'></div>";
+    var art = c.img ? "<img src='" + c.img + ".png' alt=''>" : "<img class='stand' src='" + PLACEHOLDER.img + ".png' alt=''><span class='soon'>art soon</span>";
     var body = "<span class='lab' style='color:" + c.color + "'>chapter " + c.n + (pr ? "" : " · planned") + "</span><h3>" + c.title + "</h3><div class='sub' style='font-size:14.5px'>" + c.sub + "</div>";
     if(pr){
       var pct = Math.round(pr.pct * 100), started = pr.done || pr.quiz || pr.reps;
@@ -397,7 +426,7 @@ function initApp(){
   }
   function courseCard(i){
     var x = COURSES[i], card = el("div", "pull");
-    card.innerHTML = "<div class='art'><div class='blank' style='border-color:" + x.color + "99'></div></div><div class='tx'><span class='lab' style='color:" + x.color + "'>course · " + x.status + "</span><h3>" + x.title + "</h3><div class='sub' style='font-size:14.5px'>" + x.sub + "</div><div class='st' style='margin-top:12px'>Not built yet.</div></div>";
+    card.innerHTML = "<div class='art'><img class='stand' src='" + PLACEHOLDER.course + ".png' alt=''><span class='soon'>art soon</span></div><div class='tx'><span class='lab' style='color:" + x.color + "'>course · " + x.status + "</span><h3>" + x.title + "</h3><div class='sub' style='font-size:14.5px'>" + x.sub + "</div><div class='st' style='margin-top:12px'>Not built yet.</div></div>";
     return card;
   }
 
@@ -408,7 +437,11 @@ function initApp(){
       var used = 0;
       [].forEach.call(bk.children, function(e){ if(!e.classList.contains("bookend")) used += e.getBoundingClientRect().width + 5; });
       var end = bk.querySelector(".bookend"), free = bk.clientWidth - 8 - used - (end ? end.getBoundingClientRect().width : 0);
-      if(free >= 78){ var p = el("div", "prop", "<img src='" + PROPS[k % PROPS.length] + ".png' alt=''>"); bk.insertBefore(p, end); }
+      if(free >= 52){
+        /* pick the next pose, shrinking it if the gap is narrow (never under 96px tall) */
+        var pr = PROPS[k % PROPS.length], h = Math.min(150, Math.floor((free - 6) / pr.w));
+        if(h >= 96){ var p = el("div", "prop", "<img src='" + pr.img + ".png' alt='' style='height:" + h + "px'>"); bk.insertBefore(p, end); }
+      }
       k++;
     });
   }

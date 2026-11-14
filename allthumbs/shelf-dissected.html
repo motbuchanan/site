@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="build" content="v0.3 · Nov 14">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#14181d">
 <title>The Shelf Dissected</title>
@@ -423,15 +424,29 @@
 .stat .sn{font-size:26px;font-weight:700;color:var(--brass);line-height:1.1;}
 .stat .sl{font-family:var(--mono);font-size:10.5px;color:var(--dim);margin-top:4px;letter-spacing:.06em;text-transform:uppercase;}
 </style>
+<style>
+/* tune-up v1.29 */
+nav{overflow-y:hidden}
+#vbadge,.gtab,.chip{min-height:32px}
+p,li,.tp,.soft,.small,.wline,.tl-hint,code{overflow-wrap:anywhere}
+#httpOut div,.tl-hint,.wline{white-space:pre-wrap}
+#atUpd{position:fixed;left:12px;right:12px;bottom:calc(76px + env(safe-area-inset-bottom));z-index:200;background:#12161b;border:1px solid #3ddc84;color:#3ddc84;border-radius:12px;padding:13px 14px;font:13px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;text-align:center;cursor:pointer}
+</style>
+<style>
+.nextch{display:flex;flex-wrap:wrap;gap:12px;max-width:760px;margin:28px auto 16px;padding:0 16px;box-sizing:border-box}
+.nextch a{flex:1 1 100%;min-height:56px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;gap:4px;padding:12px 16px;border:1px solid rgba(255,255,255,.16);border-radius:12px;background:rgba(255,255,255,.04);color:inherit;text-decoration:none;font-size:16px;font-weight:700;line-height:1.3}
+.nextch a small{font-size:12px;font-weight:400;opacity:.65}
+.nextch a:active{border-color:currentColor}
+</style>
 </head>
 <body>
 <header>
   <div>
     <div class="wordmark">All Thumbs &middot; chapter 10 &middot; keystone</div>
     <h1>The Shelf Dissected</h1>
-    <p class="subtitle">Your actual Game Shelf, taken apart. Every chapter so far was a piece of this.</p>
+    <p class="subtitle">My actual Game Shelf, taken apart. Every chapter so far was a piece of this.</p>
   </div>
-  <button class="vbadge" id="vbadge" type="button">v0.1</button>
+  <button class="vbadge" id="vbadge" type="button">v0.3 · Nov 14</button>
 </header>
 
 <nav>
@@ -454,7 +469,7 @@
   <p class="eyebrow">what it is</p>
   <h2>"A series of HTML files" was the right answer. Here is the rest of it.</h2>
   <div class="mascotspot"><img src="thumb-beside-phone.png" alt="mascot beside a phone"></div>
-  <p>When this course started you described the Game Shelf as "a series of HTML files" and said you did not really know what it was beyond that. That description was correct. It just stops early. Pulled fresh from the repo today, the shelf is:</p>
+  <p>When this course started, I described my Game Shelf as "a series of HTML files" and did not really know what it was beyond that. That description was correct. It just stops early. Pulled fresh from the repo today, the shelf is:</p>
   <div class="bigstat">
     <div class="stat"><div class="sn" id="stHtml">84</div><div class="sl">html pages</div></div>
     <div class="stat"><div class="sn" id="stCommits">282</div><div class="sl">commits</div></div>
@@ -475,8 +490,8 @@
 
 <section id="register">
   <p class="eyebrow">adding a game</p>
-  <h2>A new game has to be registered in four places, or it breaks quietly</h2>
-  <p>This is the single most important thing in the chapter, and it is the thing that bit you in July. A game is not "on the shelf" when its HTML file is uploaded. It is on the shelf when four separate lists know about it. Miss one and nothing errors. The shelf just quietly does the wrong thing, sometimes weeks later.</p>
+  <h2>A new game has to be registered in four places, or it breaks without an error</h2>
+  <p>This is the single most important thing in the chapter, and it is the thing that bit me in July. A game is "on the shelf" only when four separate lists know about it. Uploading its HTML file does none of that. Miss one and nothing errors. The shelf just does the wrong thing, sometimes weeks later.</p>
   <p>Pretend you just finished <code>puffkart.html</code>. Tick what you remembered to do, then read the verdict.</p>
   <div class="simwrap">
     <div class="checks" id="regChecks"></div>
@@ -492,14 +507,14 @@
 
 <section id="sw">
   <p class="eyebrow">the service worker</p>
-  <h2>Why the shelf plays with no signal, and why the badge number matters</h2>
-  <p><code>sw.js</code> is a small script the browser installs beside your site and keeps running between visits (Chapter 7 mentioned it as the thing that will not run from <code>content://</code>). The shelf's worker is <b>network-first</b>: when you are online every request goes to the real server, so an upload shows up on a plain refresh. As responses fly past, it quietly saves copies. Offline, it serves those copies, so a kid can play in the car.</p>
+  <h2>How the shelf plays with no signal, and what the badge number is for</h2>
+  <p><code>sw.js</code> is a small script the browser installs beside your site and keeps running between visits (Chapter 7 mentioned it as the thing that will not run from <code>content://</code>). The shelf's worker is <b>network-first</b>: when you are online every request goes to the real server, so an upload shows up on a plain refresh. As responses fly past, it saves a copy of each. Offline, it serves those copies, so a kid can play in the car.</p>
   <p>It also <b>precaches</b> a list of core files on install, <span id="stPre">135</span> of them today, so the first offline visit already has the hub, the shared scripts, and the main games. That list lives in a constant called <code>CORE</code>, and the cache itself is named <code>gameshelf-v70</code>.</p>
-  <p>That name is your deploy ritual. Bumping it to <code>v71</code> tells every device "throw out the old copies, seed fresh ones." Forget the bump after changing the precache list and devices keep serving stale files. This is the same stale-cache lesson from Chapter 2 and the badge rule from this course, running inside your own app.</p>
+  <p>That name is my deploy ritual. Bumping it to <code>v71</code> tells every device "throw out the old copies, seed fresh ones." Forget the bump after changing the precache list and devices keep serving stale files. This is the same stale-cache lesson from Chapter 2 and the badge rule from this course, running inside my own app.</p>
   <div class="tipbox right">
     <img class="poke" src="thumb-nice.png" alt="">
     <div class="tt">From v1 to v70 in four months</div>
-    <p class="tp">The cache name has been bumped roughly 70 times since June 12. Each bump is a real deploy you made from a phone. The timeline section has the full run.</p>
+    <p class="tp">The cache name has been bumped roughly 70 times since June 12. Each bump is a real deploy I made from a phone. The timeline section has the full run.</p>
   </div>
 </section>
 
@@ -566,13 +581,43 @@
 </div>
 
 </main>
+<div class="nextch"><a href="firebase-basics.html"><small>Next up</small>Chapter 11: Who Tapped First</a></div>
 <footer style="text-align:center;color:var(--dim);font-size:12px;padding:20px;">The Shelf Dissected &middot; read from the real repo &middot; nothing here edits it</footer>
 <div id="toast" role="status"></div>
+<script>
+(function(){
+  var m = document.querySelector('meta[name="build"]'), cur = m ? m.getAttribute("content") : "";
+  function buildOf(h){ var x = /<meta name="build" content="([^"]*)"/.exec(h || ""); return x ? x[1] : ""; }
+  function show(live){
+    var bar = document.getElementById("atUpd");
+    if(!bar){ bar = document.createElement("button"); bar.id = "atUpd"; bar.type = "button"; document.body.appendChild(bar); }
+    bar.textContent = "Newer version is up (" + live + "). Tap to load it.";
+    bar.onclick = function(){ try{ location.replace(location.pathname + "?v=" + encodeURIComponent(live) + location.hash); }catch(e){ location.reload(); } };
+  }
+  function check(){
+    if(!cur || typeof fetch !== "function" || !/^https?:$/.test(location.protocol)) return;
+    fetch(location.pathname + "?nc=" + Date.now(), { cache:"no-store" }).then(function(r){ return r.ok ? r.text() : ""; }).then(function(h){
+      var live = buildOf(h); if(live && live !== cur) show(live);
+    }).catch(function(){});
+  }
+  var b = document.getElementById("vbadge"); if(b) b.addEventListener("click", check);
+  check();
+})();
+</script>
 </body>
 
 <script>
 "use strict";
-var VERSION = "v0.2 · Oct 25";
+function atShuffle(Q){
+  Q.forEach(function(it){
+    var ok = it.opts ? "opts" : "a", rk = it.opts ? "a" : "r";
+    var arr = it[ok], right = arr[it[rk]], pin = /^(all|none|both) of/i;
+    var last = arr.filter(function(x){ return pin.test(x); }), rest = arr.filter(function(x){ return !pin.test(x); });
+    for(var i = rest.length - 1; i > 0; i--){ var j = Math.floor(Math.random() * (i + 1)), t = rest[i]; rest[i] = rest[j]; rest[j] = t; }
+    it[ok] = rest.concat(last); it[rk] = it[ok].indexOf(right);
+  });
+}
+var VERSION = "v0.3 · Nov 14";
 var STORE_KEY = "shelf101_v1";
 
 /* ---------- guarded storage ---------- */
@@ -638,7 +683,7 @@ var PARTS = [
   { n:"achievements.js", d:"74 named games and the badge ladder for each.", c:"ch5",
     long:"<b>NAMES</b> maps each game key to a display name; the badge logic hands out ladders from there. If a game is missing from NAMES it earns nothing, silently. Scrabble was missing until the July audit. Pure data plus a little logic, the Chapter 5 shape." },
   { n:"Firestore", d:"The cloud cabinet. Six people's devices read and write one shared store.", c:"ch8",
-    long:"<b>Not in the repo at all.</b> It lives on Google's servers. The repo only holds the address (the config) and the rules for talking to it. Chapter 8's whole point: the data that has to be the same on your phone and the kid's iPad cannot live in either one, so it lives here. Every record, every multiplayer room, every reset goes through it." }
+    long:"<b>Not in the repo at all.</b> It lives on Google's servers. The repo only holds the address (the config) and the rules for talking to it. Chapter 8's whole point: the data that has to be the same on my phone and my son's iPad cannot live in either one, so it lives here. Every record, every multiplayer room, every reset goes through it." }
 ];
 function initAnatomy(){
   var box=$("anat"); if(!box) return;
@@ -667,7 +712,7 @@ function shipGame(){
   if(res.clean){ v.innerHTML="<div class='verdict ok'><div class='vt'>Ships clean.</div>All four lists know about puffkart. It is on the shelf, works offline, resets properly, and earns badges.</div>"; markMission("shipclean"); }
   else {
     var li=res.problems.map(function(p){ return "<li><b>"+p.file+"</b>: "+p.why+"</li>"; }).join("");
-    v.innerHTML="<div class='verdict bad'><div class='vt'>Uploads fine. "+res.problems.length+" silent bug"+(res.problems.length>1?"s":"")+".</div>Nothing errors. Here is what quietly goes wrong:<ul>"+li+"</ul></div>";
+    v.innerHTML="<div class='verdict bad'><div class='vt'>Uploads fine. "+res.problems.length+" silent bug"+(res.problems.length>1?"s":"")+".</div>Nothing errors. Here is what goes wrong without an error:<ul>"+li+"</ul></div>";
     markMission("seebug");
     if(res.problems.some(function(p){return p.id==="gamekey";})) markMission("v34");
   }
@@ -747,9 +792,9 @@ var TRAIL_CASES = [
     loads:false, hint:"Scrabble played fine and earned nothing. No badge ladder existed for it. Fix 3 of the audit: one line in achievements.js." },
   { story:"The shelf writes <code>shelf_tv=\"1\"</code> to turn on TV mode. Chess reads <code>gn_tv===\"on\"</code> instead. Does TV mode work in chess?",
     loads:false, hint:"Two parts of the system disagreed on the key name, so chess could never see TV mode. Fixed to read shelf_tv. Different bug, same shape: lists that do not read each other." },
-  { story:"You fix a bug inside trouble.html only, touch nothing else, and upload. The service worker is network-first. Clean?",
+  { story:"I fix a bug inside trouble.html only, touch nothing else, and upload. The service worker is network-first. Clean?",
     loads:true, hint:"Network-first means a plain refresh fetches the new trouble.html. No shared list changed, so no bump needed. This is exactly why the worker was written that way: day-to-day edits need nothing." },
-  { story:"June 14. You deploy a dozen times in two days and the cache name climbs v7 to v16. Each bump is a precache change. Clean?",
+  { story:"June 14. I deploy a dozen times in two days and the cache name climbs v7 to v16. Each bump is a precache change. Clean?",
     loads:true, hint:"Bumping on every precache change is the ritual working as designed. Each bump re-seeds every device. Noisy, correct." },
   { story:"The audit checked every tile href in index.html against the files on disk: 67 refs, all resolve, zero orphan pages. Clean?",
     loads:true, hint:"That is the registration check done by hand across the whole shelf. All four lists lined up for every game. Clean, and the reason AUDIT-2026-07.md exists." },
@@ -779,10 +824,10 @@ var QUIZ = [
   { q:"Where does the shared data (records, rooms) actually live?", opts:["In index.html","In gamenight.js","In each device's localStorage","In Firestore, on Google's servers; the repo only holds the address and rules"], a:3 }
 ];
 var quizAnswered={};
-function renderQuiz(){ var box=$("quizBox"); if(!box)return; box.innerHTML=""; QUIZ.forEach(function(item,qi){ var wrap=el("div","quizq"); wrap.appendChild(el("div","q",(qi+1)+". "+item.q)); item.opts.forEach(function(opt,oi){ var b=el("button","quizopt",opt); b.addEventListener("click",function(){ if(quizAnswered[qi]!=null)return; quizAnswered[qi]=oi; var kids=wrap.querySelectorAll(".quizopt"); kids[item.a].classList.add("right"); if(oi!==item.a)b.classList.add("wrong"); var got=0,ans=0; for(var k in quizAnswered){ans++; if(quizAnswered[k]===QUIZ[k].a)got++;} if(ans===QUIZ.length){ var s=getState(); if(got>(s.quizBest||0)){s.quizBest=got;saveState(s);} box.appendChild(el("div","qresult","You got "+got+" / "+QUIZ.length+(got===QUIZ.length?", perfect.":"."))); } }); wrap.appendChild(b); }); box.appendChild(wrap); }); }
+function renderQuiz(){ atShuffle(QUIZ); var box=$("quizBox"); if(!box)return; box.innerHTML=""; QUIZ.forEach(function(item,qi){ var wrap=el("div","quizq"); wrap.appendChild(el("div","q",(qi+1)+". "+item.q)); item.opts.forEach(function(opt,oi){ var b=el("button","quizopt",opt); b.addEventListener("click",function(){ if(quizAnswered[qi]!=null)return; quizAnswered[qi]=oi; var kids=wrap.querySelectorAll(".quizopt"); kids[item.a].classList.add("right"); if(oi!==item.a)b.classList.add("wrong"); var got=0,ans=0; for(var k in quizAnswered){ans++; if(quizAnswered[k]===QUIZ[k].a)got++;} if(ans===QUIZ.length){ var s=getState(); if(got>(s.quizBest||0)){s.quizBest=got;saveState(s);} box.appendChild(el("div","qresult","You got "+got+" / "+QUIZ.length+(got===QUIZ.length?", perfect.":"."))); } }); wrap.appendChild(b); }); box.appendChild(wrap); }); }
 
 /* ---------- badge + boot ---------- */
-function initBadge(){ var b=$("vbadge"); if(!b)return; b.textContent=VERSION.split(" ")[0]; b.addEventListener("click",function(){ toast("The Shelf Dissected · "+VERSION); }); }
+function initBadge(){ var b=$("vbadge"); if(!b)return; b.textContent=VERSION; b.addEventListener("click",function(){ toast("The Shelf Dissected · "+VERSION); }); }
 function initApp(){ initBadge(); initAnatomy(); initRegister(); initTimeline(); renderMissions(); initGym(); renderQuiz(); }
 if(typeof window!=="undefined" && typeof document!=="undefined"){ if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",initApp); } else { initApp(); } }
 if(typeof module!=="undefined" && module.exports){ module.exports={ registerGame:registerGame, cacheOk:cacheOk, makeDrill:makeDrill, makeTrailDrill:makeTrailDrill, FACTS:FACTS, REG:REG }; }

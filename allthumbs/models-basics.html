@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14181d">
+<meta name="build" content="v0.2 · Nov 14">
+<title>How Models Work: next words, tokens, the desk, and a good brief</title>
+<meta name="description" content="Chapter 15 of All Thumbs. What an AI model does with your words: it picks the next piece of text, reads in tokens, only sees what is on its desk, and does better work from a real brief.">
+<link rel="canonical" href="https://motbuchanan.com/allthumbs/models-basics.html">
+<meta property="og:title" content="How Models Work: what the model is doing with your words">
+<meta property="og:description" content="Watch a toy model pick words, split text into tokens, run out of desk space, and turn a thin request into a real brief.">
+<meta property="og:image" content="https://motbuchanan.com/allthumbs/icon-512.png">
+<link rel="icon" href="favicon.png">
+<style>
+
+  :root{
+    --canvas:#14181d; --panel:#1c2229; --card:#171c22; --line:#2c3540;
+    --ink:#e8ecf0; --soft:#97a3ae; --dim:#6b7682;
+    --green:#6fe08c; --amber:#f5b04c; --blue:#5aa7e8; --red:#e87a6d; --rose:#7aa2ff; --trail:#c8a4f0;
+    --mono:ui-monospace,'SF Mono','Cascadia Mono','Roboto Mono',Consolas,Menlo,monospace;
+    --sans:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',sans-serif;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html{scroll-behavior:smooth; scroll-padding-top:64px;}
+  body{margin:0; background:var(--canvas); color:var(--ink); font-family:var(--sans); font-size:17px; line-height:1.6; padding-bottom:70px; overflow-wrap:anywhere;}
+  header{padding:26px 20px 10px; max-width:760px; margin:0 auto; display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap;}
+  .wordmark{font-family:var(--mono); font-size:12px; letter-spacing:.2em; color:var(--soft); text-transform:uppercase;}
+  h1{margin:6px 0 2px; font-size:clamp(26px,8vw,32px); line-height:1.15; letter-spacing:-.01em;}
+  .subtitle{color:var(--soft); margin:0; font-size:15px;}
+  .vbadge{font-family:var(--mono); font-size:11px; color:var(--soft); border:1px solid var(--line); border-radius:999px; padding:9px 12px; background:var(--panel); cursor:pointer; white-space:nowrap; margin-top:4px;}
+  nav{position:sticky; top:0; z-index:30; background:#14181d; border-bottom:1px solid var(--line); overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch;}
+  .navrow{display:flex; gap:8px; padding:10px 16px; max-width:760px; margin:0 auto; width:max-content;}
+  .navchip{font-family:var(--mono); font-size:12px; color:var(--soft); border:1px solid var(--line); border-radius:999px; padding:9px 13px; background:var(--card); text-decoration:none; white-space:nowrap;}
+  .navchip:active{color:var(--ink); border-color:var(--rose);}
+  main{max-width:760px; margin:0 auto; padding:0 16px;}
+  section{background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:22px 18px; margin:18px 0; scroll-margin-top:68px;}
+  .eyebrow{font-family:var(--mono); font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--rose); margin:0 0 6px;}
+  h2{margin:0 0 10px; font-size:23px; line-height:1.2;}
+  p{margin:10px 0;}
+  .soft{color:var(--soft);} .small{font-size:14px;}
+  code{font-family:var(--mono); font-size:.9em; background:var(--card); border:1px solid var(--line); border-radius:6px; padding:1px 6px; color:var(--green);}
+  .note{border-left:3px solid var(--rose); background:var(--card); border-radius:0 10px 10px 0; padding:10px 14px; margin:14px 0; font-size:15px; color:var(--soft);}
+  .btn{display:inline-block; font-family:var(--mono); font-size:14px; color:var(--ink); background:var(--card); border:1px solid var(--line); border-radius:10px; padding:11px 16px; cursor:pointer; user-select:none;}
+  .btn:active{border-color:var(--rose); transform:translateY(1px);}
+  .btn.primary{border-color:var(--rose); color:var(--rose);}
+  .btn[disabled]{opacity:.4; cursor:default;}
+  .simwrap{margin:14px 0;}
+  .picker{display:flex; gap:8px; flex-wrap:wrap; margin:10px 0;}
+  .plabel{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--dim); margin:14px 0 0;}
+  .chipbtn{font-family:var(--mono); font-size:12.5px; padding:10px 13px; border-radius:999px; border:1px solid var(--line); background:var(--card); color:var(--soft); cursor:pointer;}
+  .chipbtn.on{border-color:var(--rose); color:var(--rose); background:rgba(122,162,255,.1); font-weight:700;}
+  .mascotspot{text-align:center; margin:6px 0 2px;}
+  .mascotspot img{height:230px; max-width:100%; width:auto; object-fit:contain; filter:drop-shadow(0 10px 22px rgba(0,0,0,.5));}
+  .tipbox{position:relative; background:var(--card); border:1px solid var(--line); border-left:3px solid var(--rose); border-radius:0 12px 12px 0; padding:16px 16px 16px 118px; margin:22px 0; min-height:96px;}
+  .tipbox .poke{position:absolute; left:-14px; bottom:-8px; height:150px; width:auto; transform:rotate(-8deg); filter:drop-shadow(0 8px 16px rgba(0,0,0,.45)); pointer-events:none;}
+  .tipbox.right{border-left:1px solid var(--line); border-right:3px solid var(--rose); border-radius:12px 0 0 12px; padding:16px 118px 16px 16px;}
+  .tipbox.right .poke{left:auto; right:-14px; transform:rotate(8deg);}
+  .tipbox .tt{font-weight:700; color:var(--rose); font-size:15px;}
+  .tipbox .tp{margin:4px 0 0; font-size:14.5px; color:var(--soft); line-height:1.55;}
+
+  /* missions, gym, quiz (course standard) */
+  .mission{display:flex; gap:10px; align-items:flex-start; background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px; margin:8px 0; font-size:14.5px;}
+  .mission .mk{font-family:var(--mono); flex:0 0 auto; width:22px; height:22px; border-radius:50%; border:1px solid var(--line); color:var(--dim); display:flex; align-items:center; justify-content:center; font-size:12px;}
+  .mission.done{border-color:rgba(111,224,140,.5);}
+  .mission.done .mk{border-color:var(--green); color:var(--green); background:rgba(111,224,140,.1);}
+  .mission.done .mtext{color:var(--soft);}
+  .mission .mtext b{color:var(--rose);}
+  .gym{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px; margin:14px 0;}
+  .gymstats{display:flex; gap:18px; flex-wrap:wrap; font-size:12.5px; color:#9aa5b1; margin-bottom:10px; letter-spacing:.04em;}
+  .gymstats b{color:var(--green); font-size:15px; margin-left:4px;}
+  .gymtabs{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;}
+  .gtab{font-size:12px; padding:9px 12px; border-radius:999px; border:1px solid var(--line); background:transparent; color:inherit; cursor:pointer;}
+  .gtab.on{border-color:var(--rose); color:var(--rose); font-weight:700;}
+  .gymcard{border:1px dashed var(--line); border-radius:10px; padding:12px;}
+  .gymcard.active{border-style:solid; border-color:var(--rose);}
+  .gymcard.win{border-style:solid; border-color:var(--green);}
+  .gymcard.trailmode.active{border-color:var(--trail);}
+  .ggoal{font-size:15px; line-height:1.5;} .ggoal b{color:var(--rose);}
+  .ghint{font-size:13.5px; color:var(--blue); margin-top:8px; display:none;} .ghint.show{display:block;}
+  .gbtns{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;}
+  .tracktoggle{display:flex; gap:8px; margin:14px 0 10px; align-items:center; flex-wrap:wrap;}
+  .tracktoggle .tlabel{font-family:var(--mono); font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--dim);}
+  .ttab{font-family:var(--mono); font-size:12.5px; padding:9px 14px; border-radius:999px; border:1px solid var(--line); background:var(--card); color:var(--soft); cursor:pointer;}
+  .ttab.on.general{border-color:var(--rose); color:var(--rose); background:rgba(122,162,255,.1); font-weight:700;}
+  .ttab.on.trail{border-color:var(--trail); color:var(--trail); background:rgba(200,164,240,.12); font-weight:700;}
+  .trailbanner{font-family:var(--mono); font-size:11.5px; color:var(--trail); background:rgba(200,164,240,.08); border:1px solid rgba(200,164,240,.3); border-radius:8px; padding:7px 11px; margin:8px 0; display:none;}
+  .trailbanner.show{display:block;}
+  .quizq{margin:16px 0;} .quizq .q{font-weight:600; margin-bottom:8px;}
+  .quizopt{display:block; width:100%; text-align:left; font-size:14.5px; padding:11px 14px; border-radius:10px; border:1px solid var(--line); background:var(--card); color:var(--ink); cursor:pointer; margin:6px 0; font-family:var(--sans);}
+  .quizopt.right{border-color:var(--green); background:rgba(111,224,140,.1);}
+  .quizopt.wrong{border-color:var(--red); background:rgba(232,122,109,.1);}
+  .qresult{font-weight:700; margin-top:10px;}
+  .backhub{display:inline-flex; align-items:center; gap:7px; font-family:var(--mono); font-size:12px; color:var(--soft); border:1px solid var(--line); border-radius:999px; padding:10px 14px; background:var(--card); text-decoration:none;}
+  footer{max-width:760px; margin:8px auto 30px; padding:0 20px; color:var(--dim); font-size:12px; text-align:center;}
+  #toast{position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(90px); background:var(--card); color:var(--ink); border:1px solid var(--rose); border-radius:999px; padding:10px 18px; font-family:var(--mono); font-size:13px; transition:transform .3s ease; z-index:99; pointer-events:none; max-width:88vw; text-align:center;}
+  #toast.show{transform:translateX(-50%) translateY(0);}
+  #updbar{display:none; position:fixed; left:12px; right:12px; bottom:calc(14px + env(safe-area-inset-bottom)); z-index:100; background:var(--card); border:1px solid var(--green); color:var(--green); border-radius:12px; padding:13px 14px; font-family:var(--mono); font-size:13px; text-align:center; cursor:pointer;}
+  #updbar.show{display:block;}
+  @media(max-width:380px){ .tipbox{padding-left:96px;} .tipbox.right{padding:16px 96px 16px 16px;} .tipbox .poke{height:124px;} }
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:.001s !important; transition-duration:.001s !important;} html{scroll-behavior:auto;} }
+  .btn:focus-visible,.chipbtn:focus-visible,.quizopt:focus-visible,.navchip:focus-visible,.gtab:focus-visible,.ttab:focus-visible{outline:2px solid var(--rose); outline-offset:2px;}
+
+  .lanes{border:1px solid var(--line); border-radius:12px; background:#0d1114; padding:10px; margin:12px 0; min-height:70px; max-height:320px; overflow-y:auto;}
+  .step{display:flex; gap:10px; align-items:flex-start; font-size:14px; padding:6px 4px; border-bottom:1px solid rgba(44,53,64,.6);}
+  .step:last-child{border-bottom:none;}
+  .step .who{flex:0 0 66px; font-family:var(--mono); font-size:11px; padding-top:2px;}
+  .step .who.p1{color:var(--blue);} .step .who.p2{color:var(--amber);} .step .who.db{color:var(--rose);}
+  .step.bad .what{color:var(--red);} .step.warn .what{color:var(--amber);} .step.good .what{color:var(--green);}
+  .lanes .idle{color:var(--dim); font-size:14px; padding:6px 4px;}
+  .revcard{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; margin:12px 0;}
+  .revmeta{font-family:var(--mono); font-size:11.5px; color:var(--dim); letter-spacing:.04em;}
+  .revtxt{font-size:16px; margin:6px 0 10px; line-height:1.5;}
+  .revopts{display:flex; gap:8px; flex-wrap:wrap;}
+  .chipbtn.right{border-color:var(--green); color:var(--green); background:rgba(111,224,140,.1);}
+  .chipbtn.wrong{border-color:var(--red); color:var(--red); background:rgba(232,122,109,.1);}
+  .revwhy{margin-top:12px; font-size:14.5px; color:var(--soft);} .revwhy b{color:var(--ink);}
+  .revdone{font-size:16px; margin-bottom:10px;} .revdone b{color:var(--rose);}
+  .gopts{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;}
+  .result{display:none; border:1px solid var(--line); border-left:3px solid var(--green); background:var(--card); border-radius:0 10px 10px 0; padding:11px 13px; font-size:15px; color:var(--soft); margin:10px 0;}
+  .result.show{display:block;} .result.bad{border-left-color:var(--red);} .result b{color:var(--ink);}
+  .lognum{font-family:var(--mono); font-size:12px; color:var(--rose);}
+  #updbar{width:auto; font-family:var(--mono);}
+  .sentence{background:#0d1114; border:1px solid var(--line); border-radius:12px; padding:14px; margin:12px 0; min-height:56px; font-size:18px; line-height:1.6;}
+  .sentence .w{color:var(--ink);} .sentence .w.new{color:var(--rose); font-weight:700;}
+  .sentence .idle, .bars .idle{color:var(--dim); font-size:14px;}
+  .bars{margin:8px 0;}
+  .bar{display:grid; grid-template-columns:96px 1fr 44px; gap:8px; align-items:center; font-family:var(--mono); font-size:12.5px; padding:4px 0;}
+  .bar .bw{color:var(--ink); overflow-wrap:anywhere;} .bar .bp{color:var(--soft); text-align:right;}
+  .bar .bt{height:12px; background:var(--card); border:1px solid var(--line); border-radius:999px; overflow:hidden;}
+  .bar .bf{display:block; height:100%; background:var(--rose); transition:width .25s ease;}
+  .slider{display:flex; align-items:center; gap:10px; margin:10px 0; flex-wrap:wrap;}
+  .slider input{flex:1 1 160px; accent-color:var(--rose); min-height:32px;}
+  textarea{width:100%; font:15px var(--sans); color:var(--ink); background:#0d1114; border:1px solid var(--line); border-radius:10px; padding:10px 12px; resize:vertical;}
+  .toks{display:flex; flex-wrap:wrap; gap:4px; margin:10px 0; font-family:var(--mono); font-size:13px;}
+  .tk{padding:3px 4px; border-radius:5px; white-space:pre; color:var(--ink);}
+  .tk.c0{background:rgba(122,162,255,.22);} .tk.c1{background:rgba(111,224,140,.2);} .tk.c2{background:rgba(245,176,76,.22);} .tk.c3{background:rgba(232,122,109,.2);}
+  .mstats{display:flex; gap:14px; flex-wrap:wrap; font-family:var(--mono); font-size:12px; color:var(--soft); margin:8px 2px;}
+  .desk{display:grid; grid-template-columns:1fr; gap:6px; background:#0d1114; border:1px solid var(--line); border-radius:12px; padding:10px; margin:12px 0;}
+  .page{background:var(--card); border:1px solid var(--line); border-radius:8px; padding:8px 10px; font-size:14px; color:var(--soft); min-height:38px;}
+  .page.empty{border-style:dashed; color:var(--dim); font-family:var(--mono); font-size:11.5px;}
+  .page.key{border-color:#45d4c4; color:var(--ink);} .page.pin{border-color:var(--rose); color:var(--ink);}
+  .ingredients{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr)); gap:8px; margin:12px 0;}
+  .chk{display:flex; gap:10px; align-items:center; text-align:left; font:inherit; font-size:14.5px; color:var(--ink); background:var(--card); border:1px solid var(--line); border-radius:10px; padding:10px 12px; cursor:pointer; min-height:44px;}
+  .chk .box{flex:0 0 22px; height:22px; border-radius:6px; border:1px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:13px; color:var(--canvas);}
+  .chk.on{border-color:var(--rose);} .chk.on .box{background:var(--rose); border-color:var(--rose);}
+  .briefbox{background:#0d1114; border:1px solid var(--line); border-radius:12px; padding:12px 14px; margin:10px 0; font-size:15px; color:var(--ink); line-height:1.55;}
+  .guesses{margin:10px 0;}
+  .guesses .g{background:var(--card); border:1px dashed var(--line); border-radius:8px; padding:7px 10px; margin:5px 0; font-size:14px; color:var(--soft);}
+  .guesses .g.ok{border-style:solid; border-color:rgba(111,224,140,.5); color:var(--ink);}
+</style>
+<style>
+.nextch{display:flex;flex-wrap:wrap;gap:12px;max-width:760px;margin:28px auto 16px;padding:0 16px;box-sizing:border-box}
+.nextch a{flex:1 1 100%;min-height:56px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;gap:4px;padding:12px 16px;border:1px solid rgba(255,255,255,.16);border-radius:12px;background:rgba(255,255,255,.04);color:inherit;text-decoration:none;font-size:16px;font-weight:700;line-height:1.3}
+.nextch a small{font-size:12px;font-weight:400;opacity:.65}
+.nextch a:active{border-color:currentColor}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="wordmark">All Thumbs &middot; chapter 15</div>
+    <h1>How Models Work</h1>
+    <p class="subtitle">What the AI is doing with your words, and how to give it a brief it can use.</p>
+  </div>
+  <button class="vbadge" id="vbadge" type="button">v0.2 &middot; Nov 14</button>
+</header>
+
+<nav>
+  <div class="navrow">
+    <a class="navchip" href="#idea">the idea</a>
+    <a class="navchip" href="#next">next word</a>
+    <a class="navchip" href="#tokens">tokens</a>
+    <a class="navchip" href="#desk">the desk</a>
+    <a class="navchip" href="#brief">the brief</a>
+    <a class="navchip" href="#missions">missions</a>
+    <a class="navchip" href="#gym">gym</a>
+    <a class="navchip" href="#quiz">quiz</a>
+  </div>
+</nav>
+
+<main>
+
+<section id="idea">
+  <p class="eyebrow">what's inside</p>
+  <h2>It writes one piece at a time</h2>
+  <div class="mascotspot"><img src="thumb-phone-hero-b.png" alt="the thumb mascot holding a phone"></div>
+  <p>Every app in this course was built by me directing an AI model from my phone. I think of it like running a creative department: I give the brief, look at what comes back, and send notes; the model writes the code.</p>
+  <p>Under the chat window, a <b>language model</b> does one thing over and over. It looks at all the text so far and picks a likely next piece. Then it adds that piece and does it again, until the answer is done. It learned what "likely" means by training on a huge amount of text. Nothing you type while chatting changes what it learned.</p>
+  <p>That one fact explains most of what surprises people. It writes fluent text even when it's wrong, because fluent is what it was trained to produce. It only knows what you put in front of it plus what it learned in training. And a vague request gets a guess, because the model usually fills every gap with the most ordinary choice.</p>
+</section>
+
+<section id="next">
+  <p class="eyebrow">next word</p>
+  <h2>A toy model picks the next word</h2>
+  <p>This is a tiny made-up model that knows a few dozen word pairs about this course. Tap <b>next word</b> and it shows the words it could pick, with their chances, then picks one. The <b>temperature</b> slider sets how adventurous it is: low means it almost always takes the top choice, high means it takes chances.</p>
+  <div class="sentence" id="sent"></div>
+  <div class="bars" id="bars"></div>
+  <div class="slider"><span class="plabel" style="margin:0">temperature</span><input type="range" id="temp" min="0" max="20" value="10" aria-label="temperature"><span class="lognum" id="tempVal">1.0</span></div>
+  <div class="picker" style="justify-content:center">
+    <button class="btn primary" id="nextBtn" type="button">next word</button>
+    <button class="btn" id="finishBtn" type="button">finish the sentence</button>
+    <button class="btn" id="resetBtn" type="button">start over</button>
+  </div>
+  <div class="tipbox">
+    <img class="poke" src="thumb-think.png" alt="">
+    <div class="tt">Why it's confident when it's wrong</div>
+    <p class="tp">The toy picks words that tend to follow each other. It has no idea if the sentence is true. Real models are vastly bigger and much better, but they're still picking likely text, so any fact you plan to rely on gets checked.</p>
+  </div>
+</section>
+
+<section id="tokens">
+  <p class="eyebrow">tokens</p>
+  <h2>It reads in chunks called tokens</h2>
+  <p>Before the model sees your message, it gets cut into <b>tokens</b>: common words stay whole, long or rare words get split into pieces. Limits and prices are counted in tokens. For English, a rough rule is about four characters per token. Type something below.</p>
+  <textarea id="tokIn" rows="3" aria-label="text to split into tokens">Make the Save button bigger and keep it on screen when the phone is sideways.</textarea>
+  <div class="toks" id="toks"></div>
+  <div class="mstats" id="tokStats"></div>
+  <p class="small soft">This splitter is a rough picture. Real tokenizers learn their pieces from data, and each model family cuts text a little differently.</p>
+</section>
+
+<section id="desk">
+  <p class="eyebrow">the desk</p>
+  <h2>It only sees what's on the desk</h2>
+  <p>The model's <b>context window</b> is like a desk with room for so many pages. Everything in the chat has to fit on it: your messages, its replies, any files. When this toy desk fills up, the oldest page slides off, and the model can't see it anymore.</p>
+  <div class="desk" id="deskBox"></div>
+  <div class="picker">
+    <button class="btn" id="addMsg" type="button">add a message</button>
+    <button class="btn" id="askQ" type="button">ask: what color is the app?</button>
+    <button class="btn" id="pinNote" type="button">save it as a note</button>
+    <button class="btn" id="clearDesk" type="button">new chat</button>
+  </div>
+  <div class="result" id="deskResult"></div>
+  <div class="tipbox right">
+    <img class="poke" src="thumb-tip.png" alt="">
+    <div class="tt">Why I write handoff docs</div>
+    <p class="tp">A new chat starts with an empty desk. When a big build continues tomorrow, I end today with a handoff document: what's built, what's decided, what's next. The next chat reads it first. Memory features work the same way: saved notes get put back on the desk at the start.</p>
+  </div>
+</section>
+
+<section id="brief">
+  <p class="eyebrow">the brief</p>
+  <h2>Every gap gets filled with the most ordinary choice</h2>
+  <p>"Make me a website" gets the same safe website anyone would get. Each thing you add to a brief takes one guess away from the model. Switch ingredients on and watch what it would have to guess shrink.</p>
+  <div class="ingredients" id="ingr"></div>
+  <div class="briefbox" id="briefOut"></div>
+  <div class="guesses" id="guesses"></div>
+  <div class="tipbox">
+    <img class="poke" src="thumb-aha.png" alt="">
+    <div class="tt">My favorite ingredient</div>
+    <p class="tp">Many of my briefs end with "ask me questions first, one at a time." The model narrows things down with me before it builds, and the first version comes back much closer to what I had in mind.</p>
+  </div>
+</section>
+
+<section id="missions">
+  <p class="eyebrow">missions</p>
+  <h2>Prove it</h2>
+  <p>Six things to make happen in the sandboxes above. They tick off as you go.</p>
+  <div id="missionList"></div>
+</section>
+
+<section id="gym">
+  <p class="eyebrow">the gym</p>
+  <h2>Practice: the prompting gym</h2>
+  <p class="small soft">Randomized drills. A wrong call resets your streak.</p>
+  <div class="tracktoggle">
+    <span class="tlabel">practice</span>
+    <button class="ttab general on" id="trackGeneral" type="button">General</button>
+    <button class="ttab trail" id="trackTrail" type="button">The Trail</button>
+  </div>
+  <div class="trailbanner" id="trailBanner">The Trail: real moments from directing AI on my own builds.</div>
+  <div class="gym">
+    <div class="gymstats"><span>reps<b id="repN">0</b></span><span>streak<b id="strN">0</b></span><span>best<b id="bestN">0</b></span></div>
+    <div class="gymtabs" id="gymTabs"></div>
+    <div class="gymcard" id="gymCard">
+      <div class="ggoal" id="gGoal">Pick a level (or Surprise me) and tap <b>Start drill</b>.</div>
+      <div id="gymBoard"></div>
+      <div class="gopts" id="gOpts"></div>
+      <div class="ghint" id="gHint"></div>
+      <div class="gbtns">
+        <button class="btn primary" id="gStart" type="button">Start drill</button>
+        <button class="btn" id="gHintBtn" type="button" style="display:none">Hint</button>
+        <button class="btn" id="gSkip" type="button" style="display:none">Skip</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="quiz">
+  <p class="eyebrow">quiz</p>
+  <h2>Five questions</h2>
+  <div id="quizBox"></div>
+</section>
+
+<div style="text-align:center;margin:24px 0 8px;">
+  <a class="backhub" href="index.html">&larr; back to All Thumbs</a>
+</div>
+
+</main>
+<div class="nextch"><a href="agents-basics.html"><small>Next up</small>Chapter 16: Agents and Schedules</a></div>
+<footer>How Models Work &middot; All Thumbs chapter 15 &middot; the sandboxes are toy models, nothing here is sent anywhere</footer>
+<button id="updbar" type="button">A newer version is up. Tap to load it.</button>
+<div id="toast" role="status"></div>
+
+<script>
+"use strict";
+var VERSION = "v0.2 · Nov 14";
+var STORE_KEY = "models101_v1";
+
+/* ---------- guarded storage ---------- */
+var memStore = {};
+function loadState(){
+  try{ var raw = localStorage.getItem(STORE_KEY); if(raw) return JSON.parse(raw); }catch(e){}
+  return memStore[STORE_KEY] || null;
+}
+function saveState(s){
+  memStore[STORE_KEY] = s;
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(s)); }catch(e){}
+}
+function getState(){
+  var s = loadState();
+  if(!s || typeof s !== "object") s = {};
+  if(!s.m) s.m = {};
+  if(!s.gym) s.gym = { reps:0, streak:0, best:0 };
+  if(typeof s.quizBest !== "number") s.quizBest = 0;
+  return s;
+}
+
+/* ---------- ENGINE (pure, testable) ---------- */
+function rn(list){ return list[Math.floor(Math.random() * list.length)]; }
+/* toy next-word table: word -> [[next, weight], ...]. "." ends the sentence. */
+var NEXT = {
+  "START": [["The",6],["My",3],["Every",2]],
+  "The": [["thumb",5],["phone",4],["app",4],["robot",2]],
+  "My": [["phone",5],["app",4],["badge",2]],
+  "Every": [["app",4],["upload",3],["chapter",2]],
+  "thumb": [["builds",5],["taps",3],["breaks",1]],
+  "phone": [["builds",3],["shows",3],["crashes",1]],
+  "app": [["works",4],["crashes",2],["shows",2],["saves",2]],
+  "robot": [["checks",5],["ships",2]],
+  "badge": [["shows",5],["checks",1]],
+  "upload": [["ships",3],["breaks",1],["works",1]],
+  "chapter": [["teaches",5],["breaks",1]],
+  "builds": [["apps",5],["games",3],["robots",1]],
+  "taps": [["buttons",5],["everything",2]],
+  "breaks": [["sideways",3],["everything",2],["loudly",1]],
+  "shows": [["the",4],["a",3]],
+  "crashes": [["sideways",3],["again",2]],
+  "works": [["fine",4],["sideways",1]],
+  "saves": [["everything",3],["nothing",1]],
+  "checks": [["every",3],["the",3]],
+  "ships": [["everything",3],["it",2]],
+  "teaches": [["the",3],["a",2]],
+  "the": [["version",4],["page",3],["tests",2]],
+  "a": [["green",3],["version",2],["page",2]],
+  "every": [["upload",4],["page",3]],
+  "green": [["check",6]],
+  "version": [["number",4]],
+  "page": [["."],["sideways",1]],
+  "apps": [["."],["sideways",1]],
+  "games": [["."]],
+  "robots": [["."]],
+  "buttons": [["."]],
+  "everything": [["."]],
+  "sideways": [["."]],
+  "loudly": [["."]],
+  "again": [["."]],
+  "fine": [["."]],
+  "nothing": [["."]],
+  "it": [["."]],
+  "tests": [["."]],
+  "check": [["."]],
+  "number": [["."]]
+};
+function choices(prev){
+  var c = NEXT[prev] || [["."]];
+  return c.map(function(p){ return [p[0], p.length > 1 ? p[1] : 1]; });
+}
+/* probabilities after temperature: p ~ w^(1/T). T near 0 = always the top choice. */
+function probs(prev, T){
+  var c = choices(prev);
+  if(T <= 0.05){ var best = 0; c.forEach(function(x, i){ if(x[1] > c[best][1]) best = i; }); return c.map(function(x, i){ return [x[0], i === best ? 1 : 0]; }); }
+  var raw = c.map(function(x){ return Math.pow(x[1], 1 / T); }), sum = raw.reduce(function(a, b){ return a + b; }, 0);
+  return c.map(function(x, i){ return [x[0], raw[i] / sum]; });
+}
+function sample(ps, r){ var acc = 0; for(var i = 0; i < ps.length; i++){ acc += ps[i][1]; if(r < acc) return ps[i][0]; } return ps[ps.length - 1][0]; }
+
+/* rough tokenizer: words and punctuation; long words split into 4-letter pieces */
+function roughTokens(text){
+  var out = [], parts = String(text).match(/\s*[A-Za-z]+|\s*[0-9]+|\s*[^\sA-Za-z0-9]/gu) || [];
+  parts.forEach(function(p){
+    var lead = p.match(/^\s*/)[0], w = p.slice(lead.length);
+    if(/^[A-Za-z]+$/.test(w) && w.length > 6){
+      var first = true;
+      for(var i = 0; i < w.length; i += 4){ out.push((first ? lead : "") + w.slice(i, i + 4)); first = false; }
+    } else out.push(p);
+  });
+  return out;
+}
+
+/* the desk */
+var DESK_SIZE = 5;
+var FILLER = ["Make the title bigger.","Add a dark theme.","Move Save to the top.","Use bigger buttons.","Add a sound when you win.","Show the score in the corner.","Make the menu slide in.","Add a settings page."];
+var KEY_FACT = "The app's color is teal.";
+function deskAdd(desk, msg, size){ var d = desk.concat([msg]); var pinned = d.filter(function(m){ return m.pin; }); var rest = d.filter(function(m){ return !m.pin; }); while(pinned.length + rest.length > size) rest.shift(); return pinned.concat(rest); }
+function deskKnows(desk){ return desk.some(function(m){ return m.txt === KEY_FACT || (m.pin && m.txt.indexOf("teal") >= 0); }); }
+
+/* the brief */
+var INGR = [
+  { id:"goal",  label:"the goal", line:"A one-page site for a well and water service in a small Ohio town.", guess:"what the site is even for" },
+  { id:"who",   label:"who it's for", line:"For homeowners whose water just stopped, reading on a phone.", guess:"who is reading it, on what screen" },
+  { id:"must",  label:"must haves", line:"A tap-to-call phone number at the top, the towns served, and emergency hours.", guess:"which parts matter most" },
+  { id:"look",  label:"a look to aim for", line:"Plain and sturdy, like a work truck door: deep blue, white, one orange accent.", guess:"colors, fonts and mood (it picks the average website)" },
+  { id:"not",   label:"what to avoid", line:"No stock photos, no carousel, no made-up reviews.", guess:"the usual filler it would add by default" },
+  { id:"ask",   label:"ask me questions first", line:"Before you build, ask me questions one at a time.", guess:"everything you forgot to say" }
+];
+function briefScore(on){ return INGR.filter(function(x){ return on[x.id]; }).length; }
+
+/* gym */
+var FACTS = [
+  { t:"A model picks the next piece of text based on the text so far.", a:0, h:"That's the core loop: look at everything so far, pick a likely next token, repeat." },
+  { t:"Chatting with a model changes what it learned in training.", a:1, h:"No. Your chat sits on the desk for that conversation. The trained model itself doesn't change." },
+  { t:"Fluent, confident text from a model is always true.", a:1, h:"No. It's trained to write likely text. Check any fact that matters." },
+  { t:"A brand-new chat can see what you said in a different chat.", a:1, h:"Not by itself. A new chat starts with an empty desk, unless a memory or notes feature puts something back on it." },
+  { t:"Low temperature makes the model stick to its most likely choices.", a:0, h:"Yes. Low is predictable, high takes more chances." },
+  { t:"Limits and prices for models are usually counted in tokens.", a:0, h:"Yes. Tokens are the chunks the text is cut into." },
+  { t:"When the context window fills up, the model can still see everything.", a:1, h:"No. Something has to give: the oldest part drops off, gets summarized, or the app stops you, depending on the app." },
+  { t:"A vague request gets the most ordinary answer.", a:0, h:"Yes. Every gap gets filled with the most likely, most average choice." }
+];
+var PAIRS = [
+  { goal:"a game for a 6 year old", a:"Make a fun game for a kid.", b:"Make a counting game for a 6 year old on an iPad: big buttons, no reading needed, no way to lose, and ask me questions first.", best:1 },
+  { goal:"fixing a layout bug", a:"Sideways on my phone (915 by 412), the letter grid covers the keyboard so R, T, Y and U can't be tapped. Find the cause before changing anything.", b:"The layout is broken, fix it.", best:0 },
+  { goal:"a logo idea", a:"Logo for a well and water company in Ashland, Ohio: simple enough to read on a truck door from across a road, two colors, no water drops.", b:"Make a cool logo.", best:0 },
+  { goal:"copy for a page", a:"Write something good about my app.", b:"Write two sentences for my pool game's About card, in first person, plain words, no hype words, no em dashes.", best:1 }
+];
+var TOK_Q = [ { w:"cat", n:1 }, { w:"sideways", n:2 }, { w:"troubleshooting", n:4 } ];
+function makeDrill(level){
+  if(level === 0){ var f = rn(FACTS); return { story:"True or false: " + f.t, opts:["True","False"], a:f.a, hint:f.h }; }
+  if(level === 1){ var p = rn(PAIRS); return { story:"Goal: <b>" + p.goal + "</b>. Which brief gets closer on the first try?<br><br><b>A:</b> " + p.a + "<br><b>B:</b> " + p.b, opts:["A","B"], a:p.best, hint:"The better brief names the goal, who it's for, the must-haves and the limits. The thin one forces the model to guess all of that." }; }
+  var q = rn(TOK_Q), opts = ["1","2","4","8"];
+  return { story:"Using this chapter's rough splitter (about four letters per piece for long words), how many tokens is the word <b>" + q.w + "</b>?", opts:opts, a:opts.indexOf(String(q.n)), hint:"Short common words are one token. Long words get split: " + roughTokens(q.w).join(" | ") + "." };
+}
+var TRAIL_CASES = [
+  { story:"Building a chapter, the model wrote a line in my voice saying I'd played two apps for weeks. Nobody had confirmed it. Should a claim like that ship without checking?", a:1, hint:"No. It was a likely-sounding sentence that nobody had checked. The separate reviewer flagged it and it was rewritten." },
+  { story:"The model guessed why Firebase sign-in failed from a Downloads file. Should the guess go into the course as fact?", a:1, hint:"No. A one-tap test on the phone settled it: the library loaded, then sign-in never answered." },
+  { story:"My rulebook says banning one default look just moves the model to the next most common one. Is the fix to choose the look from the subject first?", a:0, hint:"Yes. Avoiding a list still lands on defaults. Starting from the subject's own world gets a look of its own." },
+  { story:"A big build continues in a new chat tomorrow. Will the new chat remember today's decisions by itself?", a:1, hint:"Not on its own. A new chat starts with an empty desk, and a memory feature only brings back short notes. The handoff document carries the real decisions." },
+  { story:"Do I write the code for these apps by hand?", a:1, hint:"No. I direct: brief, look at what comes back, send notes. The model writes the code." },
+  { story:"Do saved instructions (my standards, my rulebook) help because they put the same rules on the desk every time?", a:0, hint:"Yes. The model starts fresh each chat, so the rules have to be brought back each time." },
+  { story:"I tell the model to ask me questions one at a time before it builds. Does that usually bring the first version closer?", a:0, hint:"Yes. Each answer takes away a guess before any code exists." },
+  { story:"The model said a fix was done. Is \"done\" proof the fix worked?", a:1, hint:"No. Proof is the same test passing again: a re-run of the Breaker, a check, or the badge showing the new version." }
+];
+
+/* ---------- DOM helpers ---------- */
+function $(id){ return document.getElementById(id); }
+function el(tag, cls, html){ var e = document.createElement(tag); if(cls) e.className = cls; if(html != null) e.innerHTML = html; return e; }
+var toastTimer = null;
+function toast(msg){ var t = $("toast"); if(!t) return; t.textContent = msg; t.className = "show"; clearTimeout(toastTimer); toastTimer = setTimeout(function(){ t.className = ""; }, 1900); }
+function esc(s){ return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+/* ---------- next word ---------- */
+var nw = { words:[], temp:1, picks:0, lowDone:false, highSeen:{} };
+function lastWord(){ return nw.words.length ? nw.words[nw.words.length - 1] : "START"; }
+function renderSentence(){
+  $("sent").innerHTML = nw.words.length ? nw.words.map(function(w, i){ return "<span class='w" + (i === nw.words.length - 1 ? " new" : "") + "'>" + esc(w) + "</span>"; }).join(" ") : "<span class='idle'>Tap next word to start a sentence.</span>";
+  var done = lastWord() === ".";
+  var bars = $("bars"); bars.innerHTML = "";
+  if(done){ bars.appendChild(el("div", "idle small", "Sentence finished. Start over, or change the temperature and try again.")); return; }
+  var ps = probs(lastWord(), nw.temp), pct = ps.map(function(p){ return Math.round(p[1] * 100); }), top = 0;
+  pct.forEach(function(v, i){ if(v > pct[top]) top = i; });
+  pct[top] += 100 - pct.reduce(function(a, b){ return a + b; }, 0);
+  ps.forEach(function(p, pi){
+    var row = el("div", "bar", "<span class='bw'>" + esc(p[0] === "." ? "(end)" : p[0]) + "</span><span class='bt'><span class='bf' style='width:" + pct[pi] + "%'></span></span><span class='bp'>" + pct[pi] + "%</span>");
+    bars.appendChild(row);
+  });
+}
+function nextWord(){
+  if(lastWord() === ".") return;
+  var w = sample(probs(lastWord(), nw.temp), Math.random());
+  nw.words.push(w); nw.picks++;
+  if(w === "."){
+    if(nw.temp <= 0.3) markMission("cold");
+  }
+  renderSentence();
+}
+function finish(){ var guard = 0; while(lastWord() !== "." && guard++ < 40) nextWord(); }
+function resetSentence(){ nw.words = []; renderSentence(); }
+
+/* ---------- tokens ---------- */
+function renderTokens(){
+  var text = $("tokIn").value, toks = roughTokens(text), box = $("toks"); box.innerHTML = "";
+  toks.forEach(function(t, i){ box.appendChild(el("span", "tk c" + (i % 4), esc(t).replace(/ /g, "&nbsp;"))); });
+  var chars = text.length;
+  $("tokStats").innerHTML = "<span>" + chars + " characters</span><span>" + toks.length + " tokens here</span><span>about " + Math.max(1, Math.round(chars / 4)) + " by the four-character rule</span>";
+  if(toks.some(function(t){ return /^\s*[A-Za-z]{1,4}$/.test(t); }) && toks.length >= 25) markMission("tokens");
+}
+
+/* ---------- the desk ---------- */
+var dk = { desk:[], f:0, sawForget:false };
+function renderDesk(){
+  var box = $("deskBox"); box.innerHTML = "";
+  for(var i = 0; i < DESK_SIZE; i++){
+    var m = dk.desk[i];
+    box.appendChild(el("div", "page" + (m ? (m.pin ? " pin" : (m.txt === KEY_FACT ? " key" : "")) : " empty"), m ? esc(m.txt) : "empty"));
+  }
+}
+function deskAddMsg(){
+  var msg = dk.desk.length === 0 && !dk.desk.some(function(m){ return m.txt === KEY_FACT; }) && dk.f === 0 ? { txt:KEY_FACT } : { txt:FILLER[dk.f++ % FILLER.length] };
+  var hadKey = deskKnows(dk.desk);
+  dk.desk = deskAdd(dk.desk, msg, DESK_SIZE);
+  if(hadKey && !deskKnows(dk.desk)) toast("the color slid off the desk");
+  renderDesk(); $("deskResult").className = "result";
+}
+function deskAsk(){
+  var box = $("deskResult"), knows = deskKnows(dk.desk);
+  box.className = "result show " + (knows ? "good" : "bad");
+  if(knows){ box.innerHTML = "<b>\"Teal.\"</b> The color is still on the desk, so the model can read it."; if(dk.desk.some(function(m){ return m.pin; }) && dk.sawForget) markMission("pinned"); }
+  else { box.innerHTML = "<b>\"I'm not sure, maybe blue?\"</b> The page with the color slid off the desk (or this is a new chat), so the model is guessing."; if(dk.f > 0) { dk.sawForget = true; markMission("forgot"); } }
+}
+function deskPin(){
+  if(dk.desk.some(function(m){ return m.pin; })){ toast("the note is already on the desk"); return; }
+  dk.desk = deskAdd(dk.desk, { txt:"Note: the app is teal.", pin:true }, DESK_SIZE); renderDesk(); toast("saved as a note that stays on the desk");
+}
+function deskClear(){ var pinned = dk.desk.filter(function(m){ return m.pin; }); dk.desk = pinned; dk.f = 0; renderDesk(); $("deskResult").className = "result"; }
+
+/* ---------- the brief ---------- */
+var br = {};
+function renderBrief(){
+  var box = $("ingr"); box.innerHTML = "";
+  INGR.forEach(function(x){
+    var b = el("button", "chk" + (br[x.id] ? " on" : ""), "<span class='box'>" + (br[x.id] ? "✓" : "") + "</span><span>" + x.label + "</span>"); b.type = "button"; b.setAttribute("aria-pressed", br[x.id] ? "true" : "false");
+    b.addEventListener("click", function(){ br[x.id] = !br[x.id]; renderBrief(); });
+    box.appendChild(b);
+  });
+  var lines = ["Make me a website."].concat(INGR.filter(function(x){ return br[x.id]; }).map(function(x){ return x.line; }));
+  $("briefOut").innerHTML = "<div class='plabel' style='margin:0 0 6px'>your brief</div>" + lines.map(esc).join(" ");
+  var missing = INGR.filter(function(x){ return !br[x.id]; });
+  $("guesses").innerHTML = missing.length ? "<div class='plabel' style='margin:0 0 6px'>the model has to guess " + missing.length + " thing" + (missing.length === 1 ? "" : "s") + "</div>" + missing.map(function(x){ return "<div class='g'>" + esc(x.guess) + "</div>"; }).join("") : "<div class='plabel' style='margin:0 0 6px'>nothing left to guess</div><div class='g ok'>A brief like this, plus a few questions back, is how my builds start.</div>";
+  if(briefScore(br) === INGR.length) markMission("brief");
+}
+
+/* ---------- missions ---------- */
+var MISSIONS = [
+  { id:"cold",   text:"Finish a sentence with the temperature <b>at 0.3 or lower</b>." },
+  { id:"tokens", text:"Type something long enough to make <b>25 tokens</b>." },
+  { id:"forgot", text:"Watch the model <b>forget</b> something that slid off the desk." },
+  { id:"pinned", text:"Save the color as a <b>note</b>, and see the model still know it after the desk fills." },
+  { id:"brief",  text:"Build a brief with <b>all six</b> ingredients." },
+  { id:"gym",    text:"Land one gym drill correct." }
+];
+function renderMissions(){
+  var box = $("missionList"); if(!box) return; var s = getState(); box.innerHTML = "";
+  MISSIONS.forEach(function(m){ var done = !!s.m[m.id], row = el("div", "mission" + (done ? " done" : "")); row.innerHTML = "<span class='mk'>" + (done ? "✓" : "") + "</span><span class='mtext'>" + m.text + "</span>"; box.appendChild(row); });
+}
+function markMission(id){ var s = getState(); if(!s.m[id]){ s.m[id] = true; saveState(s); renderMissions(); toast("mission done"); } }
+
+/* ---------- gym ---------- */
+var gym = { level:-1, drill:null, answered:false, track:"general", lastTrail:null };
+var GYM_LEVELS = [ { lv:0, name:"true or false" }, { lv:1, name:"better brief" }, { lv:2, name:"tokens" } ];
+function makeTrailDrill(){ var c; do { c = rn(TRAIL_CASES); } while(c === gym.lastTrail); gym.lastTrail = c; return { story:c.story, opts:["Yes","No"], a:c.a, hint:c.hint }; }
+function gymStatsRender(){ var s = getState(); $("repN").textContent = s.gym.reps || 0; $("strN").textContent = s.gym.streak || 0; $("bestN").textContent = s.gym.best || 0; }
+function renderGymTabs(){
+  var box = $("gymTabs"); box.innerHTML = "";
+  var all = el("button", "gtab" + (gym.level === -1 ? " on" : ""), "Surprise me"); all.type = "button"; all.addEventListener("click", function(){ gym.level = -1; renderGymTabs(); }); box.appendChild(all);
+  GYM_LEVELS.forEach(function(L){ var t = el("button", "gtab" + (gym.level === L.lv ? " on" : ""), L.name); t.type = "button"; t.addEventListener("click", function(){ gym.level = L.lv; renderGymTabs(); }); box.appendChild(t); });
+}
+function gymPlaying(on){ $("gHintBtn").style.display = on ? "" : "none"; $("gSkip").style.display = on ? "" : "none"; $("gStart").style.display = on ? "none" : ""; }
+function gymStart(){
+  gym.drill = gym.track === "trail" ? makeTrailDrill() : makeDrill(gym.level === -1 ? Math.floor(Math.random() * 3) : gym.level);
+  gym.answered = false;
+  $("gymCard").className = "gymcard active" + (gym.track === "trail" ? " trailmode" : "");
+  $("gGoal").innerHTML = "Your call:";
+  $("gymBoard").innerHTML = "<div class='note' style='margin-top:10px'>" + gym.drill.story + "</div>";
+  $("gHint").className = "ghint"; $("gHint").innerHTML = "";
+  var box = $("gOpts"); box.innerHTML = "";
+  gym.drill.opts.forEach(function(o, oi){ var b = el("button", "chipbtn", o); b.type = "button"; b.addEventListener("click", function(){ gymAnswer(oi); }); box.appendChild(b); });
+  gymPlaying(true);
+}
+function gymDone(){ gym.answered = true; gymPlaying(false); $("gStart").textContent = "Next drill"; gymStatsRender(); }
+function gymAnswer(oi){
+  if(gym.answered || !gym.drill) return;
+  var s = getState(), ok = oi === gym.drill.a, kids = $("gOpts").children;
+  kids[gym.drill.a].classList.add("right"); if(!ok && kids[oi]) kids[oi].classList.add("wrong");
+  if(ok){ s.gym.reps = (s.gym.reps || 0) + 1; s.gym.streak = (s.gym.streak || 0) + 1; if(s.gym.streak > (s.gym.best || 0)) s.gym.best = s.gym.streak; saveState(s); $("gymCard").className = "gymcard win" + (gym.track === "trail" ? " trailmode" : ""); $("gGoal").innerHTML = "Correct: <b>" + gym.drill.opts[gym.drill.a] + "</b>."; markMission("gym"); }
+  else { s.gym.streak = 0; saveState(s); $("gymCard").className = "gymcard" + (gym.track === "trail" ? " trailmode" : ""); $("gGoal").innerHTML = "Not quite. The answer is <b>" + gym.drill.opts[gym.drill.a] + "</b>."; }
+  $("gHint").className = "ghint show"; $("gHint").innerHTML = gym.drill.hint;
+  gymDone();
+}
+function gymSkip(){
+  if(gym.answered || !gym.drill) return;
+  var s = getState(); s.gym.streak = 0; saveState(s);
+  $("gOpts").children[gym.drill.a].classList.add("right");
+  $("gHint").className = "ghint show"; $("gHint").innerHTML = "Answer: " + gym.drill.opts[gym.drill.a] + ". " + gym.drill.hint;
+  gymDone();
+}
+function setTrack(t){
+  gym.track = t; gym.drill = null; gym.answered = false;
+  $("trackGeneral").classList.toggle("on", t === "general"); $("trackTrail").classList.toggle("on", t === "trail");
+  $("gymTabs").style.display = t === "trail" ? "none" : ""; $("trailBanner").className = "trailbanner" + (t === "trail" ? " show" : "");
+  $("gymCard").className = "gymcard"; $("gOpts").innerHTML = "";
+  $("gGoal").innerHTML = t === "trail" ? "Real moments from my builds. Tap <b>Start drill</b>." : "Pick a level (or Surprise me) and tap <b>Start drill</b>.";
+  $("gymBoard").innerHTML = ""; $("gHint").className = "ghint"; $("gHint").innerHTML = "";
+  gymPlaying(false); $("gStart").textContent = "Start drill";
+}
+
+/* ---------- quiz (options shuffle every load) ---------- */
+var QUIZ = [
+  { q:"What does a language model do over and over?", opts:["Looks up answers in a database","Picks a likely next piece of text","Searches the web for every word","Copies a stored answer"], a:1 },
+  { q:"What is a token?", opts:["A password for the app","A chunk of text the model reads","A kind of AI model","A saved chat"], a:1 },
+  { q:"A fact slid off the desk in a long chat. What happens when you ask about it?", opts:["The model still knows it","The model guesses","The chat crashes","GitHub saves it"], a:1 },
+  { q:"You raise the temperature. What changes?", opts:["The model gets faster","It takes more chances on less likely words","It reads more tokens","It remembers more"], a:1 },
+  { q:"Which line takes the most guessing away from \"make me a website\"?", opts:["Please","Make it good","For homeowners on a phone, with a tap-to-call number at the top","Thanks in advance"], a:2 }
+];
+var quizAnswered = {}, quizOrder = [];
+function shuffled(n){ var a = [], i, j, t; for(i = 0; i < n; i++) a.push(i); for(i = n - 1; i > 0; i--){ j = Math.floor(Math.random() * (i + 1)); t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+function renderQuiz(){
+  var box = $("quizBox"); if(!box) return; box.innerHTML = ""; quizAnswered = {}; quizOrder = [];
+  QUIZ.forEach(function(item, qi){
+    var wrap = el("div", "quizq"); wrap.appendChild(el("div", "q", (qi + 1) + ". " + item.q));
+    var order = shuffled(item.opts.length); quizOrder.push(order);
+    order.forEach(function(oi){
+      var b = el("button", "quizopt", item.opts[oi]); b.type = "button";
+      b.addEventListener("click", function(){
+        if(quizAnswered[qi] != null) return; quizAnswered[qi] = oi;
+        wrap.querySelectorAll(".quizopt")[order.indexOf(item.a)].classList.add("right");
+        if(oi !== item.a) b.classList.add("wrong");
+        var got = 0, ans = 0; for(var k in quizAnswered){ ans++; if(quizAnswered[k] === QUIZ[k].a) got++; }
+        if(ans === QUIZ.length){
+          var s = getState(); if(got > (s.quizBest || 0)){ s.quizBest = got; saveState(s); }
+          box.appendChild(el("div", "qresult", "You got " + got + " / " + QUIZ.length + (got === QUIZ.length ? ", perfect." : ".")));
+          var again = el("button", "btn", "Try the quiz again"); again.type = "button"; again.style.marginTop = "10px"; again.addEventListener("click", renderQuiz); box.appendChild(again);
+        }
+      });
+      wrap.appendChild(b);
+    });
+    box.appendChild(wrap);
+  });
+}
+
+/* ---------- version badge, update check ---------- */
+function buildOf(html){ var m = /<meta name="build" content="([^"]*)"/.exec(html || ""); return m ? m[1] : null; }
+function checkUpdate(manual){
+  if(typeof fetch !== "function" || !/^https?:$/.test(location.protocol)){ if(manual) toast(VERSION + " · open the live address to check for updates"); return; }
+  fetch(location.pathname + "?nc=" + Date.now(), { cache:"no-store" }).then(function(r){ return r.ok ? r.text() : ""; }).then(function(html){
+    var live = buildOf(html);
+    if(live && live !== VERSION){
+      var bar = $("updbar"); bar.textContent = "Newer version is up (" + live + "). Tap to load it."; bar.className = "show";
+      bar.onclick = function(){ try{ location.replace(location.pathname + "?v=" + encodeURIComponent(live) + location.hash); }catch(e){ location.reload(); } };
+    } else if(manual){ toast(live ? VERSION + " · you have the newest" : VERSION + " · could not check right now"); }
+  }).catch(function(){ if(manual) toast(VERSION + " · could not check right now"); });
+}
+
+function initApp(){
+  var b = $("vbadge"); b.textContent = VERSION; b.addEventListener("click", function(){ checkUpdate(true); }); checkUpdate(false);
+  $("temp").addEventListener("input", function(){ nw.temp = (+this.value) / 10; $("tempVal").textContent = nw.temp.toFixed(1); renderSentence(); });
+  $("nextBtn").addEventListener("click", nextWord); $("finishBtn").addEventListener("click", finish); $("resetBtn").addEventListener("click", resetSentence);
+  renderSentence();
+  $("tokIn").addEventListener("input", renderTokens); renderTokens();
+  $("addMsg").addEventListener("click", deskAddMsg); $("askQ").addEventListener("click", deskAsk); $("pinNote").addEventListener("click", deskPin); $("clearDesk").addEventListener("click", deskClear);
+  renderDesk();
+  renderBrief(); renderMissions();
+  renderGymTabs(); gymStatsRender();
+  $("trackGeneral").addEventListener("click", function(){ setTrack("general"); });
+  $("trackTrail").addEventListener("click", function(){ setTrack("trail"); });
+  $("gStart").addEventListener("click", gymStart);
+  $("gHintBtn").addEventListener("click", function(){ if(gym.drill){ $("gHint").className = "ghint show"; $("gHint").innerHTML = gym.drill.hint; } });
+  $("gSkip").addEventListener("click", gymSkip);
+  renderQuiz();
+  window._lab = { nw:nw, nextWord:nextWord, finish:finish, dk:dk, br:br, gym:gym, quizOrder:function(){ return quizOrder; }, getState:getState };
+}
+if(typeof window !== "undefined" && typeof document !== "undefined"){
+  if(document.readyState === "loading"){ document.addEventListener("DOMContentLoaded", initApp); } else { initApp(); }
+}
+if(typeof module !== "undefined" && module.exports){
+  module.exports = { NEXT:NEXT, choices:choices, probs:probs, sample:sample, roughTokens:roughTokens, deskAdd:deskAdd, deskKnows:deskKnows, DESK_SIZE:DESK_SIZE, KEY_FACT:KEY_FACT, INGR:INGR, briefScore:briefScore, FACTS:FACTS, PAIRS:PAIRS, makeDrill:makeDrill, TRAIL_CASES:TRAIL_CASES, QUIZ:QUIZ, shuffled:shuffled, buildOf:buildOf, VERSION:VERSION };
+}
+</script>
+</body>
+</html>

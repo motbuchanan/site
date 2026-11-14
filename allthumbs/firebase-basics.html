@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#14181d">
-<meta name="build" content="v0.3 · Nov 13">
+<meta name="build" content="v0.4 · Nov 14">
 <title>Who Tapped First: Firebase sign-in, rules, listeners and ties</title>
 <meta name="description" content="Chapter 11 of All Thumbs. The four jobs of a real backend, taught with a two-phone buzzer: who is asking, where the data sits, who is allowed, and who tapped first.">
 <link rel="canonical" href="https://motbuchanan.com/allthumbs/firebase-basics.html">
@@ -147,6 +147,12 @@
   @media (prefers-reduced-motion: reduce){ *{animation-duration:.001s !important; transition-duration:.001s !important;} html{scroll-behavior:auto;} }
   .btn:focus-visible,.chipbtn:focus-visible,.quizopt:focus-visible,.navchip:focus-visible,.gtab:focus-visible,.ttab:focus-visible{outline:2px solid var(--rose); outline-offset:2px;}
 </style>
+<style>
+.nextch{display:flex;flex-wrap:wrap;gap:12px;max-width:760px;margin:28px auto 16px;padding:0 16px;box-sizing:border-box}
+.nextch a{flex:1 1 100%;min-height:56px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;gap:4px;padding:12px 16px;border:1px solid rgba(255,255,255,.16);border-radius:12px;background:rgba(255,255,255,.04);color:inherit;text-decoration:none;font-size:16px;font-weight:700;line-height:1.3}
+.nextch a small{font-size:12px;font-weight:400;opacity:.65}
+.nextch a:active{border-color:currentColor}
+</style>
 </head>
 <body>
 <header>
@@ -155,7 +161,7 @@
     <h1>Who Tapped First</h1>
     <p class="subtitle">Two phones, one buzzer, and the four jobs a real backend does.</p>
   </div>
-  <button class="vbadge" id="vbadge" type="button">v0.3 &middot; Nov 13</button>
+  <button class="vbadge" id="vbadge" type="button">v0.4 &middot; Nov 14</button>
 </header>
 
 <nav>
@@ -348,13 +354,14 @@
 </div>
 
 </main>
+<div class="nextch"><a href="break-basics.html"><small>Next up</small>Chapter 12: Break It</a></div>
 <footer>Who Tapped First &middot; All Thumbs chapter 11 &middot; the sandboxes are models, nothing here is sent anywhere</footer>
 <div id="updbar" role="button" tabindex="0">A newer version is up. Tap to load it.</div>
 <div id="toast" role="status"></div>
 
 <script>
 "use strict";
-var VERSION = "v0.3 · Nov 13";
+var VERSION = "v0.4 · Nov 14";
 var STORE_KEY = "firebase101_v1";
 
 /* ---------- guarded storage ---------- */

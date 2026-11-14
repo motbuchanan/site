@@ -1,7 +1,7 @@
 {
   "name": "All Thumbs",
   "short_name": "All Thumbs",
-  "description": "A phone-first field guide to the machine you build on. Six interactive explainers.",
+  "description": "A phone-first course on the machine you build on. Sixteen interactive explainers.",
   "start_url": "index.html",
   "scope": "./",
   "display": "standalone",

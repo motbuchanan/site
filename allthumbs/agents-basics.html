@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14181d">
+<meta name="build" content="v0.2 · Nov 14">
+<title>Agents and Schedules: AI that uses tools, saved skills, and jobs that run alone</title>
+<meta name="description" content="Chapter 16 of All Thumbs. What an AI agent is, why it needs to check its own work, how saved skills load, how a scheduled task runs with nobody watching, and why a second reviewer catches what the builder misses.">
+<link rel="canonical" href="https://motbuchanan.com/allthumbs/agents-basics.html">
+<meta property="og:title" content="Agents and Schedules: AI that does the work, and checks it">
+<meta property="og:description" content="Run an agent with and without tools, match tasks to saved skills, set up a scheduled task safely, and see what a second reviewer caught.">
+<meta property="og:image" content="https://motbuchanan.com/allthumbs/icon-512.png">
+<link rel="icon" href="favicon.png">
+<style>
+
+  :root{
+    --canvas:#14181d; --panel:#1c2229; --card:#171c22; --line:#2c3540;
+    --ink:#e8ecf0; --soft:#97a3ae; --dim:#6b7682;
+    --green:#6fe08c; --amber:#f5b04c; --blue:#5aa7e8; --red:#e87a6d; --rose:#e0a3ff; --trail:#c8a4f0;
+    --mono:ui-monospace,'SF Mono','Cascadia Mono','Roboto Mono',Consolas,Menlo,monospace;
+    --sans:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',sans-serif;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html{scroll-behavior:smooth; scroll-padding-top:64px;}
+  body{margin:0; background:var(--canvas); color:var(--ink); font-family:var(--sans); font-size:17px; line-height:1.6; padding-bottom:70px; overflow-wrap:anywhere;}
+  header{padding:26px 20px 10px; max-width:760px; margin:0 auto; display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap;}
+  .wordmark{font-family:var(--mono); font-size:12px; letter-spacing:.2em; color:var(--soft); text-transform:uppercase;}
+  h1{margin:6px 0 2px; font-size:clamp(26px,8vw,32px); line-height:1.15; letter-spacing:-.01em;}
+  .subtitle{color:var(--soft); margin:0; font-size:15px;}
+  .vbadge{font-family:var(--mono); font-size:11px; color:var(--soft); border:1px solid var(--line); border-radius:999px; padding:9px 12px; background:var(--panel); cursor:pointer; white-space:nowrap; margin-top:4px;}
+  nav{position:sticky; top:0; z-index:30; background:#14181d; border-bottom:1px solid var(--line); overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch;}
+  .navrow{display:flex; gap:8px; padding:10px 16px; max-width:760px; margin:0 auto; width:max-content;}
+  .navchip{font-family:var(--mono); font-size:12px; color:var(--soft); border:1px solid var(--line); border-radius:999px; padding:9px 13px; background:var(--card); text-decoration:none; white-space:nowrap;}
+  .navchip:active{color:var(--ink); border-color:var(--rose);}
+  main{max-width:760px; margin:0 auto; padding:0 16px;}
+  section{background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:22px 18px; margin:18px 0; scroll-margin-top:68px;}
+  .eyebrow{font-family:var(--mono); font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--rose); margin:0 0 6px;}
+  h2{margin:0 0 10px; font-size:23px; line-height:1.2;}
+  p{margin:10px 0;}
+  .soft{color:var(--soft);} .small{font-size:14px;}
+  code{font-family:var(--mono); font-size:.9em; background:var(--card); border:1px solid var(--line); border-radius:6px; padding:1px 6px; color:var(--green);}
+  .note{border-left:3px solid var(--rose); background:var(--card); border-radius:0 10px 10px 0; padding:10px 14px; margin:14px 0; font-size:15px; color:var(--soft);}
+  .btn{display:inline-block; font-family:var(--mono); font-size:14px; color:var(--ink); background:var(--card); border:1px solid var(--line); border-radius:10px; padding:11px 16px; cursor:pointer; user-select:none;}
+  .btn:active{border-color:var(--rose); transform:translateY(1px);}
+  .btn.primary{border-color:var(--rose); color:var(--rose);}
+  .btn[disabled]{opacity:.4; cursor:default;}
+  .simwrap{margin:14px 0;}
+  .picker{display:flex; gap:8px; flex-wrap:wrap; margin:10px 0;}
+  .plabel{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--dim); margin:14px 0 0;}
+  .chipbtn{font-family:var(--mono); font-size:12.5px; padding:10px 13px; border-radius:999px; border:1px solid var(--line); background:var(--card); color:var(--soft); cursor:pointer;}
+  .chipbtn.on{border-color:var(--rose); color:var(--rose); background:rgba(224,163,255,.1); font-weight:700;}
+  .mascotspot{text-align:center; margin:6px 0 2px;}
+  .mascotspot img{height:230px; max-width:100%; width:auto; object-fit:contain; filter:drop-shadow(0 10px 22px rgba(0,0,0,.5));}
+  .tipbox{position:relative; background:var(--card); border:1px solid var(--line); border-left:3px solid var(--rose); border-radius:0 12px 12px 0; padding:16px 16px 16px 118px; margin:22px 0; min-height:96px;}
+  .tipbox .poke{position:absolute; left:-14px; bottom:-8px; height:150px; width:auto; transform:rotate(-8deg); filter:drop-shadow(0 8px 16px rgba(0,0,0,.45)); pointer-events:none;}
+  .tipbox.right{border-left:1px solid var(--line); border-right:3px solid var(--rose); border-radius:12px 0 0 12px; padding:16px 118px 16px 16px;}
+  .tipbox.right .poke{left:auto; right:-14px; transform:rotate(8deg);}
+  .tipbox .tt{font-weight:700; color:var(--rose); font-size:15px;}
+  .tipbox .tp{margin:4px 0 0; font-size:14.5px; color:var(--soft); line-height:1.55;}
+
+  /* missions, gym, quiz (course standard) */
+  .mission{display:flex; gap:10px; align-items:flex-start; background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px; margin:8px 0; font-size:14.5px;}
+  .mission .mk{font-family:var(--mono); flex:0 0 auto; width:22px; height:22px; border-radius:50%; border:1px solid var(--line); color:var(--dim); display:flex; align-items:center; justify-content:center; font-size:12px;}
+  .mission.done{border-color:rgba(111,224,140,.5);}
+  .mission.done .mk{border-color:var(--green); color:var(--green); background:rgba(111,224,140,.1);}
+  .mission.done .mtext{color:var(--soft);}
+  .mission .mtext b{color:var(--rose);}
+  .gym{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px; margin:14px 0;}
+  .gymstats{display:flex; gap:18px; flex-wrap:wrap; font-size:12.5px; color:#9aa5b1; margin-bottom:10px; letter-spacing:.04em;}
+  .gymstats b{color:var(--green); font-size:15px; margin-left:4px;}
+  .gymtabs{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;}
+  .gtab{font-size:12px; padding:9px 12px; border-radius:999px; border:1px solid var(--line); background:transparent; color:inherit; cursor:pointer;}
+  .gtab.on{border-color:var(--rose); color:var(--rose); font-weight:700;}
+  .gymcard{border:1px dashed var(--line); border-radius:10px; padding:12px;}
+  .gymcard.active{border-style:solid; border-color:var(--rose);}
+  .gymcard.win{border-style:solid; border-color:var(--green);}
+  .gymcard.trailmode.active{border-color:var(--trail);}
+  .ggoal{font-size:15px; line-height:1.5;} .ggoal b{color:var(--rose);}
+  .ghint{font-size:13.5px; color:var(--blue); margin-top:8px; display:none;} .ghint.show{display:block;}
+  .gbtns{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;}
+  .tracktoggle{display:flex; gap:8px; margin:14px 0 10px; align-items:center; flex-wrap:wrap;}
+  .tracktoggle .tlabel{font-family:var(--mono); font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--dim);}
+  .ttab{font-family:var(--mono); font-size:12.5px; padding:9px 14px; border-radius:999px; border:1px solid var(--line); background:var(--card); color:var(--soft); cursor:pointer;}
+  .ttab.on.general{border-color:var(--rose); color:var(--rose); background:rgba(224,163,255,.1); font-weight:700;}
+  .ttab.on.trail{border-color:var(--trail); color:var(--trail); background:rgba(200,164,240,.12); font-weight:700;}
+  .trailbanner{font-family:var(--mono); font-size:11.5px; color:var(--trail); background:rgba(200,164,240,.08); border:1px solid rgba(200,164,240,.3); border-radius:8px; padding:7px 11px; margin:8px 0; display:none;}
+  .trailbanner.show{display:block;}
+  .quizq{margin:16px 0;} .quizq .q{font-weight:600; margin-bottom:8px;}
+  .quizopt{display:block; width:100%; text-align:left; font-size:14.5px; padding:11px 14px; border-radius:10px; border:1px solid var(--line); background:var(--card); color:var(--ink); cursor:pointer; margin:6px 0; font-family:var(--sans);}
+  .quizopt.right{border-color:var(--green); background:rgba(111,224,140,.1);}
+  .quizopt.wrong{border-color:var(--red); background:rgba(232,122,109,.1);}
+  .qresult{font-weight:700; margin-top:10px;}
+  .backhub{display:inline-flex; align-items:center; gap:7px; font-family:var(--mono); font-size:12px; color:var(--soft); border:1px solid var(--line); border-radius:999px; padding:10px 14px; background:var(--card); text-decoration:none;}
+  footer{max-width:760px; margin:8px auto 30px; padding:0 20px; color:var(--dim); font-size:12px; text-align:center;}
+  #toast{position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(90px); background:var(--card); color:var(--ink); border:1px solid var(--rose); border-radius:999px; padding:10px 18px; font-family:var(--mono); font-size:13px; transition:transform .3s ease; z-index:99; pointer-events:none; max-width:88vw; text-align:center;}
+  #toast.show{transform:translateX(-50%) translateY(0);}
+  #updbar{display:none; position:fixed; left:12px; right:12px; bottom:calc(14px + env(safe-area-inset-bottom)); z-index:100; background:var(--card); border:1px solid var(--green); color:var(--green); border-radius:12px; padding:13px 14px; font-family:var(--mono); font-size:13px; text-align:center; cursor:pointer;}
+  #updbar.show{display:block;}
+  @media(max-width:380px){ .tipbox{padding-left:96px;} .tipbox.right{padding:16px 96px 16px 16px;} .tipbox .poke{height:124px;} }
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:.001s !important; transition-duration:.001s !important;} html{scroll-behavior:auto;} }
+  .btn:focus-visible,.chipbtn:focus-visible,.quizopt:focus-visible,.navchip:focus-visible,.gtab:focus-visible,.ttab:focus-visible{outline:2px solid var(--rose); outline-offset:2px;}
+
+  .lanes{border:1px solid var(--line); border-radius:12px; background:#0d1114; padding:10px; margin:12px 0; min-height:70px; max-height:320px; overflow-y:auto;}
+  .step{display:flex; gap:10px; align-items:flex-start; font-size:14px; padding:6px 4px; border-bottom:1px solid rgba(44,53,64,.6);}
+  .step:last-child{border-bottom:none;}
+  .step .who{flex:0 0 66px; font-family:var(--mono); font-size:11px; padding-top:2px;}
+  .step .who.p1{color:var(--blue);} .step .who.p2{color:var(--amber);} .step .who.db{color:var(--rose);}
+  .step.bad .what{color:var(--red);} .step.warn .what{color:var(--amber);} .step.good .what{color:var(--green);}
+  .lanes .idle{color:var(--dim); font-size:14px; padding:6px 4px;}
+  .revcard{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; margin:12px 0;}
+  .revmeta{font-family:var(--mono); font-size:11.5px; color:var(--dim); letter-spacing:.04em;}
+  .revtxt{font-size:16px; margin:6px 0 10px; line-height:1.5;}
+  .revopts{display:flex; gap:8px; flex-wrap:wrap;}
+  .chipbtn.right{border-color:var(--green); color:var(--green); background:rgba(111,224,140,.1);}
+  .chipbtn.wrong{border-color:var(--red); color:var(--red); background:rgba(232,122,109,.1);}
+  .revwhy{margin-top:12px; font-size:14.5px; color:var(--soft);} .revwhy b{color:var(--ink);}
+  .revdone{font-size:16px; margin-bottom:10px;} .revdone b{color:var(--rose);}
+  .gopts{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;}
+  .result{display:none; border:1px solid var(--line); border-left:3px solid var(--green); background:var(--card); border-radius:0 10px 10px 0; padding:11px 13px; font-size:15px; color:var(--soft); margin:10px 0;}
+  .result.show{display:block;} .result.bad{border-left-color:var(--red);} .result b{color:var(--ink);}
+  .lognum{font-family:var(--mono); font-size:12px; color:var(--rose);}
+  #updbar{width:auto; font-family:var(--mono);}
+  .ingredients{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr)); gap:8px; margin:12px 0;}
+  .chk{display:flex; gap:10px; align-items:center; text-align:left; font:inherit; font-size:14.5px; color:var(--ink); background:var(--card); border:1px solid var(--line); border-radius:10px; padding:10px 12px; cursor:pointer; min-height:44px;}
+  .chk .box{flex:0 0 22px; height:22px; border-radius:6px; border:1px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:13px; color:var(--canvas);}
+  .chk.on{border-color:var(--rose);} .chk.on .box{background:var(--rose); border-color:var(--rose);}
+  .skillrow{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr)); gap:6px; margin:12px 0;}
+  .skill{background:#0d1114; border:1px solid var(--line); border-radius:10px; padding:9px 11px; font-size:13.5px; color:var(--soft);}
+  .skill b{display:block; color:var(--rose); font-family:var(--mono); font-size:12.5px; font-weight:600;}
+  .case{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; margin:12px 0;}
+  .catch{display:block; width:100%; text-align:left; font:inherit; font-size:14.5px; color:var(--soft); background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px 14px; margin:8px 0; cursor:pointer;}
+  .catch.open{border-color:var(--rose);}
+  .catch span{display:block;} .catch b{color:var(--ink);}
+  .catch .cch{font-family:var(--mono); font-size:11.5px; color:var(--rose); letter-spacing:.04em; margin-bottom:4px;}
+  .catch .cfound{margin-top:6px; color:var(--ink);} .catch .ctap{margin-top:6px; font-family:var(--mono); font-size:11.5px; color:var(--dim);}
+</style>
+<style>
+.nextch{display:flex;flex-wrap:wrap;gap:12px;max-width:760px;margin:28px auto 16px;padding:0 16px;box-sizing:border-box}
+.nextch a{flex:1 1 100%;min-height:56px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;gap:4px;padding:12px 16px;border:1px solid rgba(255,255,255,.16);border-radius:12px;background:rgba(255,255,255,.04);color:inherit;text-decoration:none;font-size:16px;font-weight:700;line-height:1.3}
+.nextch a small{font-size:12px;font-weight:400;opacity:.65}
+.nextch a:active{border-color:currentColor}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="wordmark">All Thumbs &middot; chapter 16</div>
+    <h1>Agents and Schedules</h1>
+    <p class="subtitle">An AI that does the work, checks it, follows saved rules, and runs on its own.</p>
+  </div>
+  <button class="vbadge" id="vbadge" type="button">v0.2 &middot; Nov 14</button>
+</header>
+
+<nav>
+  <div class="navrow">
+    <a class="navchip" href="#idea">the idea</a>
+    <a class="navchip" href="#loop">the loop</a>
+    <a class="navchip" href="#skills">skills</a>
+    <a class="navchip" href="#sched">schedules</a>
+    <a class="navchip" href="#second">second opinion</a>
+    <a class="navchip" href="#missions">missions</a>
+    <a class="navchip" href="#gym">gym</a>
+    <a class="navchip" href="#quiz">quiz</a>
+  </div>
+</nav>
+
+<main>
+
+<section id="idea">
+  <p class="eyebrow">chat, then agent</p>
+  <h2>A chat answers. An agent does the work.</h2>
+  <div class="mascotspot"><img src="thumb-cool.png" alt="the thumb mascot in sunglasses"></div>
+  <p>In a plain chat, the model writes text and you do everything else: copy the code, save the file, test it. An <b>agent</b> is the same model given <b>tools</b>, like reading files, running commands and searching the web, plus a loop: look, decide, act, check, and go again until the job is done.</p>
+  <p>That's how this chapter got built. The agent read my live repo, wrote the page, ran the syntax checks, the fit check and the Breaker, handed the result to a second agent to review, fixed what it found, and zipped the files for me to upload. My part was the brief, the decisions, and the upload.</p>
+</section>
+
+<section id="loop">
+  <p class="eyebrow">the loop</p>
+  <h2>Give it tools, a check, and a second set of eyes</h2>
+  <p>The job: <b>the Save button is cut off on a 320px phone.</b> Hidden in it are two problems: the first fix only half works, and it also breaks the landscape layout. Pick what the agent gets, then run it.</p>
+  <div class="ingredients" id="loopOpts"></div>
+  <div class="picker" style="justify-content:center"><button class="btn primary" id="loopGo" type="button">run the agent</button></div>
+  <div class="lanes" id="loopLog"><div class="idle">Pick what the agent gets, then run it.</div></div>
+  <div class="result" id="loopResult"></div>
+</section>
+
+<section id="skills">
+  <p class="eyebrow">skills</p>
+  <h2>Saved instructions it loads when they fit</h2>
+  <p>A <b>skill</b> is a saved set of instructions for one kind of job. The agent keeps a one-line description of each skill in view and only reads the full instructions when a task matches. That way my rules come back in every new session, without filling the desk with all of them at once.</p>
+  <p>Here are five of mine. For each task, pick the skill that should load.</p>
+  <div class="skillrow" id="skillRow"></div>
+  <div class="case" id="skillCard"></div>
+</section>
+
+<section id="sched">
+  <p class="eyebrow">schedules</p>
+  <h2>A job that runs while you sleep</h2>
+  <p>A <b>scheduled task</b> starts an agent on its own, on a timer. Two things make it different from a chat: every run starts fresh, with no memory of earlier chats beyond any short notes a memory feature puts back, and nobody is there to say yes or no. Set one up and see if it would work.</p>
+  <p class="plabel">when</p>
+  <div class="picker" id="whenPick">
+    <button class="chipbtn on" data-when="monthly" type="button">the 1st of every month</button>
+    <button class="chipbtn" data-when="weekday" type="button">weekdays at 8:31</button>
+    <button class="chipbtn" data-when="once" type="button">once, next Friday</button>
+  </div>
+  <p class="plabel">the prompt</p>
+  <div class="picker" id="promptPick">
+    <button class="chipbtn on" data-prompt="full" type="button">says everything: which repo, which tool, where to put the report</button>
+    <button class="chipbtn" data-prompt="vague" type="button">"keep going on what we talked about"</button>
+  </div>
+  <p class="plabel">what it may do</p>
+  <div class="picker" id="powerPick">
+    <button class="chipbtn on" data-power="report" type="button">report only</button>
+    <button class="chipbtn" data-power="push" type="button">change files and push them live</button>
+  </div>
+  <div class="picker" style="justify-content:center"><button class="btn primary" id="schedGo" type="button">check this task</button></div>
+  <div class="result" id="schedResult"></div>
+  <div class="tipbox">
+    <img class="poke" src="thumb-think.png" alt="">
+    <div class="tt">Two I really run</div>
+    <p class="tp">On the 1st of every month, one task runs the Breaker over my site and writes a report. Another researches new signs of AI-made design and copy for my rulebook. Both only report. I read them and decide what changes.</p>
+  </div>
+</section>
+
+<section id="second">
+  <p class="eyebrow">second opinion</p>
+  <h2>The builder never grades its own work</h2>
+  <p>Every chapter since Chapter 11 went through a second agent that hadn't seen it being built. Its only job was to find what's wrong and prove it. These are real catches from building Chapters 11 to 14 on Nov 13. Tap each card to see what the builder thought, and what the reviewer found.</p>
+  <div id="catches"></div>
+  <div class="tipbox right">
+    <img class="poke" src="thumb-tip.png" alt="">
+    <div class="tt">Why a fresh agent sees more</div>
+    <p class="tp">The builder knows what it meant to write, so it reads its own work the way it intended it. The reviewer only has the page and the code, the same as a stranger. It's the Chapter 12 lesson again, aimed at the AI.</p>
+  </div>
+</section>
+
+<section id="missions">
+  <p class="eyebrow">missions</p>
+  <h2>Prove it</h2>
+  <p>Six things to make happen in the sandboxes above. They tick off as you go.</p>
+  <div id="missionList"></div>
+</section>
+
+<section id="gym">
+  <p class="eyebrow">the gym</p>
+  <h2>Practice: run it like a manager</h2>
+  <p class="small soft">Randomized drills. A wrong call resets your streak.</p>
+  <div class="tracktoggle">
+    <span class="tlabel">practice</span>
+    <button class="ttab general on" id="trackGeneral" type="button">General</button>
+    <button class="ttab trail" id="trackTrail" type="button">The Trail</button>
+  </div>
+  <div class="trailbanner" id="trailBanner">The Trail: how I really run my agents, skills and scheduled tasks.</div>
+  <div class="gym">
+    <div class="gymstats"><span>reps<b id="repN">0</b></span><span>streak<b id="strN">0</b></span><span>best<b id="bestN">0</b></span></div>
+    <div class="gymtabs" id="gymTabs"></div>
+    <div class="gymcard" id="gymCard">
+      <div class="ggoal" id="gGoal">Pick a level (or Surprise me) and tap <b>Start drill</b>.</div>
+      <div id="gymBoard"></div>
+      <div class="gopts" id="gOpts"></div>
+      <div class="ghint" id="gHint"></div>
+      <div class="gbtns">
+        <button class="btn primary" id="gStart" type="button">Start drill</button>
+        <button class="btn" id="gHintBtn" type="button" style="display:none">Hint</button>
+        <button class="btn" id="gSkip" type="button" style="display:none">Skip</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="quiz">
+  <p class="eyebrow">quiz</p>
+  <h2>Five questions</h2>
+  <div id="quizBox"></div>
+</section>
+
+<div style="text-align:center;margin:24px 0 8px;">
+  <a class="backhub" href="index.html">&larr; back to All Thumbs</a>
+</div>
+
+</main>
+<div class="nextch"><a href="index.html"><small>That was the last chapter</small>Back to the shelf</a></div>
+<footer>Agents and Schedules &middot; All Thumbs chapter 16 &middot; the sandboxes are models, nothing here is sent anywhere</footer>
+<button id="updbar" type="button">A newer version is up. Tap to load it.</button>
+<div id="toast" role="status"></div>
+
+<script>
+"use strict";
+var VERSION = "v0.2 · Nov 14";
+var STORE_KEY = "agents101_v1";
+
+/* ---------- guarded storage ---------- */
+var memStore = {};
+function loadState(){
+  try{ var raw = localStorage.getItem(STORE_KEY); if(raw) return JSON.parse(raw); }catch(e){}
+  return memStore[STORE_KEY] || null;
+}
+function saveState(s){
+  memStore[STORE_KEY] = s;
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(s)); }catch(e){}
+}
+function getState(){
+  var s = loadState();
+  if(!s || typeof s !== "object") s = {};
+  if(!s.m) s.m = {};
+  if(!s.gym) s.gym = { reps:0, streak:0, best:0 };
+  if(typeof s.quizBest !== "number") s.quizBest = 0;
+  return s;
+}
+
+/* ---------- ENGINE (pure, testable) ---------- */
+function rn(list){ return list[Math.floor(Math.random() * list.length)]; }
+var LOOP_OPTS = [
+  { id:"tools",  label:"tools: read files, run commands" },
+  { id:"check",  label:"checks its own work" },
+  { id:"review", label:"a second reviewer" }
+];
+/* agentRun: the Save-button job. Two hidden problems: the first fix only half works (cut), and it breaks landscape (land). */
+function agentRun(o){
+  var s = [], left = [];
+  if(!o.tools){
+    s.push({ who:"agent", what:"can't open the file, so it writes a suggested fix as text" });
+    s.push({ who:"you", what:"copy it into the file by hand and upload it" });
+    s.push({ who:"agent", what:"says \"that should fix it\". Nobody ran anything.", cls:"warn" });
+    return { steps:s, left:["Save is still cut off at 320px","landscape is broken"], claimed:true, ran:false };
+  }
+  s.push({ who:"agent", what:"opens the file and finds Save in a row with a fixed width" });
+  s.push({ who:"agent", what:"edits the row so the buttons can shrink" });
+  var cut = true, land = true;
+  if(o.check){
+    s.push({ who:"check", what:"fit check at 320px: Save still runs 12px past the edge", cls:"bad" });
+    s.push({ who:"agent", what:"reads the result, lets the row wrap instead, runs the check again" });
+    s.push({ who:"check", what:"fit check at 320px: 0 problems", cls:"good" });
+    cut = false;
+  } else {
+    s.push({ who:"agent", what:"says \"done\" without running anything", cls:"warn" });
+  }
+  if(o.review){
+    s.push({ who:"reviewer", what:"a fresh agent opens the page at 320px, a tablet and sideways" });
+    if(cut) s.push({ who:"reviewer", what:"Save is still cut off at 320px", cls:"bad" });
+    s.push({ who:"reviewer", what: o.check ? "sideways, the wrapped row now covers the score" : "sideways, the shrunk buttons now cover the score", cls:"bad" });
+    s.push({ who:"agent", what: o.check ? "fixes what the reviewer proved, and the checks pass again" : "fixes what the reviewer proved, and the reviewer looks again", cls:"good" });
+    cut = false; land = false;
+  }
+  if(cut) left.push("Save is still cut off at 320px");
+  if(land) left.push("landscape is broken");
+  s.push({ who:"agent", what: left.length ? "reports the job is done" : (o.check ? "reports the job is done, with the check results" : "reports the job is done, with the reviewer's notes"), cls: left.length ? "warn" : "good" });
+  return { steps:s, left:left, claimed:true, ran:true };
+}
+
+var SKILLS = [
+  { id:"standards", name:"build standards", what:"how every app is built and delivered: one file, version badge, zip for the phone" },
+  { id:"breakit",   name:"break it",        what:"test a finished build like a stranger, then a second agent reviews it" },
+  { id:"rulebook",  name:"anti-AI rulebook", what:"keep public copy and design from looking machine-made" },
+  { id:"firebase",  name:"Firebase rules",  what:"how cloud sync, accounts and live updates are set up" },
+  { id:"handoff",   name:"handoff writer",  what:"package a big session so a new chat can pick it up" }
+];
+var TASKS = [
+  { t:"Start a brand new single-file app.", a:"standards", why:"Every build starts from the build standards: the file format, the badge, how it gets to my phone." },
+  { t:"The app is finished. Is it ready to hand over?", a:"breakit", why:"Before any handover, the Breaker runs and a second agent reviews the evidence." },
+  { t:"Write the About text for a public page.", a:"rulebook", why:"Public copy goes through the rulebook so it doesn't read like every other AI page." },
+  { t:"Two phones need to see the same score live.", a:"firebase", why:"Live, shared data is a Firebase job, with its own known traps." },
+  { t:"It's late, and the build continues tomorrow in a new chat.", a:"handoff", why:"A new chat starts with an empty desk. The handoff document fills it." },
+  { t:"Redesign a landing page so it doesn't look generic.", a:"rulebook", why:"The rulebook's design half is about exactly this." }
+];
+/* scheduled task check */
+function schedCheck(when, prompt, power){
+  var problems = [];
+  if(prompt === "vague") problems.push("Every run starts fresh, with no memory of earlier chats beyond any short notes a memory feature puts back. \"What we talked about\" means nothing to it, so it guesses.");
+  if(power === "push") problems.push("Nobody is watching to approve. A bad run would change your live site while nobody is up. Keep unattended jobs to reports.");
+  var ok = !problems.length;
+  return { ok:ok, problems:problems, note: ok ? (when === "once" ? "A one-time run with a full prompt and report-only access is safe." : (when === "monthly" ? "A full prompt, report-only, on the 1st of the month: this is how my monthly sweep is set up." : "A full prompt and report-only access: safe on any schedule.")) : "" };
+}
+var CATCHES = [
+  { ch:"Chapter 12", built:"Snack Count has six bugs you can find.", found:"The sideways bug could never be found. A real tap on +1 lands on the header, which had no handler, so the \"all six\" mission could never finish." },
+  { ch:"Chapter 14", built:"A sample robot that fails an upload if a page loads Google Fonts.", found:"It searched the whole repo, including its own file, which contains the words it looks for. It would have failed on every upload." },
+  { ch:"Chapter 14", built:"Gather's badge moved on but its cache name stayed old.", found:"The report says both stayed at v0.7. The case was backwards, so the answer taught the wrong check." },
+  { ch:"Chapter 13", built:"Find the bad piece and the page says that's the most halving ever needs.", found:"Found in one test, it said one test was the most halving needs. Wrong. The most is three." },
+  { ch:"Chapter 12", built:"A line in my voice: I had played both apps for weeks.", found:"Nobody had confirmed it. It was a likely-sounding sentence that nobody had checked, so it was rewritten." },
+  { ch:"Chapter 11", built:"Firebase sign-in can't work from a Downloads file, because it needs https.", found:"The stated reason was too strong to print without proof. A one-tap test on the phone confirmed the result and the hint now says what was seen." }
+];
+/* gym */
+var TOOL_Q = [
+  { t:"read the newest version of a file in your GitHub repo", a:0, h:"It needs a tool to fetch the file. Without one it can only guess at what's there now." },
+  { t:"write a first draft of a paragraph", a:1, h:"Writing text is what the model does on its own. No tool needed." },
+  { t:"run the fit check on a page", a:0, h:"Running a command needs a tool. Without it, any \"it fits\" is a guess." },
+  { t:"know today's date for a version badge", a:0, h:"It needs a clock or a tool. On its own it can be confidently wrong about the date." },
+  { t:"explain what a for loop does", a:1, h:"That's knowledge from training. No tool needed." },
+  { t:"check whether a link on your site still works", a:0, h:"It has to actually visit the link, which takes a tool." }
+];
+var UNATTENDED = [
+  { t:"Every Monday, test the site and write a report", a:0, h:"Report-only with a full prompt is safe to run with nobody watching." },
+  { t:"Every night, fix whatever looks wrong and push it live", a:1, h:"Nobody is there to approve a live change. Keep unattended jobs to reports." },
+  { t:"Monthly, research new AI-design tells and list them for me to pick from", a:0, h:"It only lists findings. I decide what becomes a rule." },
+  { t:"Daily, \"continue the thing we were working on\"", a:1, h:"Each run starts fresh. It has no idea what \"the thing\" is." },
+  { t:"Once, next Friday, remind me to upload the chapter zip", a:0, h:"A one-time reminder changes nothing. Safe." }
+];
+function makeDrill(level){
+  if(level === 0){ var q = rn(TOOL_Q); return { story:"Can the model <b>" + q.t + "</b> without any tools?", opts:["Needs a tool","No tool needed"], a:q.a, hint:q.h }; }
+  if(level === 1){ var t = rn(TASKS); return { story:"Task: <b>" + t.t + "</b> Which skill should load?", opts:SKILLS.map(function(s){ return s.name; }), a:SKILLS.map(function(s){ return s.id; }).indexOf(t.a), hint:t.why }; }
+  var u = rn(UNATTENDED); return { story:"Scheduled task: <b>" + u.t + "</b>. Safe to run with nobody watching?", opts:["Yes","No"], a:u.a, hint:u.h };
+}
+var TRAIL_CASES = [
+  { story:"My monthly Break Sweep runs on the 1st with nobody watching. Does it change any files?", a:1, hint:"No. Report only. I read it and decide what to fix." },
+  { story:"Should an automated check ever push changes to my repos?", a:1, hint:"No. Checks report. Every upload still comes from my phone." },
+  { story:"Early on I let an agent push to GitHub for me. Was it faster than uploading from my phone myself?", a:1, hint:"No. It took more steps and taps than downloading and uploading myself, so I went back to doing my own uploads." },
+  { story:"Is the reviewer in my break-it skill a separate agent that didn't build the app?", a:0, hint:"Yes. That's the whole point: the builder never grades its own work." },
+  { story:"On Nov 13 a reviewer found that a chapter's sample robot would fail on every upload. Had the builder's own tests caught it?", a:1, hint:"No. The builder hadn't caught it. The fresh reviewer ran the command on a clean repo and saw it fail." },
+  { story:"Does the monthly rulebook task add new rules on its own?", a:1, hint:"No. It brings findings. I pick which ones become rules." },
+  { story:"Does a scheduled task's prompt need to stand on its own, with every detail written in?", a:0, hint:"Yes. Every run starts a fresh session with no memory of this chat." },
+  { story:"Do my saved skills load in full every time, whether the task needs them or not?", a:1, hint:"No. The agent sees a one-line description of each and loads a skill when the task matches." }
+];
+
+/* ---------- DOM helpers ---------- */
+function $(id){ return document.getElementById(id); }
+function el(tag, cls, html){ var e = document.createElement(tag); if(cls) e.className = cls; if(html != null) e.innerHTML = html; return e; }
+var toastTimer = null;
+function toast(msg){ var t = $("toast"); if(!t) return; t.textContent = msg; t.className = "show"; clearTimeout(toastTimer); toastTimer = setTimeout(function(){ t.className = ""; }, 1900); }
+function setOn(boxId, attr, val){ [].forEach.call(document.querySelectorAll("#" + boxId + " .chipbtn"), function(x){ x.classList.toggle("on", x.getAttribute(attr) === val); }); }
+function wirePick(boxId, attr, fn){ var box = $(boxId); if(!box) return; box.addEventListener("click", function(e){ var b = e.target.closest("[" + attr + "]"); if(b){ setOn(boxId, attr, b.getAttribute(attr)); fn(b.getAttribute(attr)); } }); }
+
+/* ---------- the loop ---------- */
+var lp = { o:{}, timers:[] };
+function renderLoopOpts(){
+  var box = $("loopOpts"); box.innerHTML = "";
+  LOOP_OPTS.forEach(function(x){
+    var b = el("button", "chk" + (lp.o[x.id] ? " on" : ""), "<span class='box'>" + (lp.o[x.id] ? "✓" : "") + "</span><span>" + x.label + "</span>"); b.type = "button"; b.setAttribute("aria-pressed", lp.o[x.id] ? "true" : "false");
+    b.addEventListener("click", function(){ lp.o[x.id] = !lp.o[x.id]; renderLoopOpts(); loopReset(); });
+    box.appendChild(b);
+  });
+}
+function loopReset(){ lp.timers.forEach(clearTimeout); lp.timers = []; $("loopLog").innerHTML = "<div class='idle'>Pick what the agent gets, then run it.</div>"; $("loopResult").className = "result"; }
+function loopRun(instant){
+  loopReset();
+  var res = agentRun(lp.o), log = $("loopLog"); log.innerHTML = "";
+  var cls = { agent:"p1", you:"p2", check:"db", reviewer:"db" };
+  function show(st){ log.appendChild(el("div", "step" + (st.cls ? " " + st.cls : ""), "<span class='who " + (cls[st.who] || "p1") + "'>" + st.who + "</span><span class='what'>" + st.what + "</span>")); }
+  function finish(){
+    var box = $("loopResult"); box.className = "result show " + (res.left.length ? "bad" : "good");
+    box.innerHTML = res.left.length ? "<b>Shipped with " + res.left.length + " problem" + (res.left.length > 1 ? "s" : "") + ":</b> " + res.left.join("; ") + ". The agent said it was done anyway." : (lp.o.check ? "<b>Shipped with 0 problems.</b> Tools to do the work, a check to prove it, and a reviewer to catch what the check didn't look for." : "<b>Shipped with 0 problems.</b> The reviewer caught both. Add a self-check too, and the agent catches the first one itself before anyone else has to.");
+    if(res.left.length && res.ran && !lp.o.check) markMission("claimed");
+    if(!res.left.length && lp.o.tools && lp.o.check && lp.o.review) markMission("loop");
+  }
+  if(instant){ res.steps.forEach(show); finish(); return res; }
+  res.steps.forEach(function(st, i){ lp.timers.push(setTimeout(function(){ show(st); }, 450 * i)); });
+  lp.timers.push(setTimeout(finish, 450 * res.steps.length));
+  return res;
+}
+
+/* ---------- skills ---------- */
+var sk = { i:0, right:0, answered:false };
+function renderSkillRow(){
+  var row = $("skillRow"); row.innerHTML = "";
+  SKILLS.forEach(function(s){ row.appendChild(el("div", "skill", "<b>" + s.name + "</b><span>" + s.what + "</span>")); });
+}
+function renderSkill(){
+  var box = $("skillCard");
+  if(sk.i >= TASKS.length){
+    box.innerHTML = "<div class='revdone'><b>" + sk.right + " of " + TASKS.length + "</b> matched.</div>";
+    var again = el("button", "btn", "match them again"); again.type = "button"; again.addEventListener("click", function(){ sk = { i:0, right:0, answered:false }; renderSkill(); }); box.appendChild(again);
+    if(sk.right === TASKS.length) markMission("skills");
+    return;
+  }
+  var t = TASKS[sk.i];
+  box.innerHTML = "<div class='revmeta'>task " + (sk.i + 1) + " of " + TASKS.length + "</div><div class='revtxt'>" + t.t + "</div>";
+  var row = el("div", "revopts");
+  SKILLS.forEach(function(s){
+    var b = el("button", "chipbtn", s.name); b.type = "button"; b.setAttribute("data-sk", s.id);
+    b.addEventListener("click", function(){
+      if(sk.answered) return; sk.answered = true;
+      var ok = s.id === t.a; if(ok) sk.right++;
+      row.querySelector("[data-sk='" + t.a + "']").classList.add("right"); if(!ok) b.classList.add("wrong");
+      box.appendChild(el("div", "revwhy", "<b>" + (ok ? "That's the one." : "This one loads: " + SKILLS.filter(function(x){ return x.id === t.a; })[0].name + ".") + "</b> " + t.why));
+      var nx = el("button", "btn primary", sk.i + 1 < TASKS.length ? "next task" : "see the score"); nx.type = "button"; nx.style.marginTop = "10px";
+      nx.addEventListener("click", function(){ sk.i++; sk.answered = false; renderSkill(); }); box.appendChild(nx);
+    });
+    row.appendChild(b);
+  });
+  box.appendChild(row);
+}
+
+/* ---------- schedules ---------- */
+var sd = { when:"monthly", prompt:"full", power:"report", sawBad:false };
+function schedRun(){
+  var r = schedCheck(sd.when, sd.prompt, sd.power), box = $("schedResult");
+  box.className = "result show " + (r.ok ? "good" : "bad");
+  box.innerHTML = r.ok ? "<b>This would work.</b> " + r.note : "<b>This would go wrong:</b> " + r.problems.join(" ");
+  if(!r.ok) sd.sawBad = true;
+  if(r.ok && sd.sawBad) markMission("sched");
+  return r;
+}
+
+/* ---------- second opinion ---------- */
+var seen = {};
+function renderCatches(){
+  var box = $("catches"); box.innerHTML = "";
+  CATCHES.forEach(function(c, i){
+    var open = !!seen[i], b = el("button", "catch" + (open ? " open" : ""), "<span class='cch'>" + c.ch + "</span><span class='cbuilt'><b>The builder:</b> " + c.built + "</span>" + (open ? "<span class='cfound'><b>The reviewer:</b> " + c.found + "</span>" : "<span class='ctap'>tap to see what the reviewer found</span>"));
+    b.type = "button"; b.setAttribute("aria-expanded", open ? "true" : "false");
+    b.addEventListener("click", function(){ seen[i] = true; renderCatches(); if(Object.keys(seen).length === CATCHES.length) markMission("catches"); });
+    box.appendChild(b);
+  });
+}
+
+/* ---------- missions ---------- */
+var MISSIONS = [
+  { id:"claimed", text:"Run the agent with tools but no check, and watch it say <b>done</b> with problems left." },
+  { id:"loop",    text:"Give it tools, a check and a reviewer, and ship with <b>0 problems</b>." },
+  { id:"skills",  text:"Match all <b>six</b> tasks to the right skill." },
+  { id:"sched",   text:"Set up a scheduled task that would go wrong, then <b>fix it</b> so it works." },
+  { id:"catches", text:"Open all <b>six</b> reviewer catches." },
+  { id:"gym",     text:"Land one gym drill correct." }
+];
+function renderMissions(){
+  var box = $("missionList"); if(!box) return; var s = getState(); box.innerHTML = "";
+  MISSIONS.forEach(function(m){ var done = !!s.m[m.id], row = el("div", "mission" + (done ? " done" : "")); row.innerHTML = "<span class='mk'>" + (done ? "✓" : "") + "</span><span class='mtext'>" + m.text + "</span>"; box.appendChild(row); });
+}
+function markMission(id){ var s = getState(); if(!s.m[id]){ s.m[id] = true; saveState(s); renderMissions(); toast("mission done"); } }
+
+/* ---------- gym ---------- */
+var gym = { level:-1, drill:null, answered:false, track:"general", lastTrail:null };
+var GYM_LEVELS = [ { lv:0, name:"tool or not" }, { lv:1, name:"which skill" }, { lv:2, name:"run it alone?" } ];
+function makeTrailDrill(){ var c; do { c = rn(TRAIL_CASES); } while(c === gym.lastTrail); gym.lastTrail = c; return { story:c.story, opts:["Yes","No"], a:c.a, hint:c.hint }; }
+function gymStatsRender(){ var s = getState(); $("repN").textContent = s.gym.reps || 0; $("strN").textContent = s.gym.streak || 0; $("bestN").textContent = s.gym.best || 0; }
+function renderGymTabs(){
+  var box = $("gymTabs"); box.innerHTML = "";
+  var all = el("button", "gtab" + (gym.level === -1 ? " on" : ""), "Surprise me"); all.type = "button"; all.addEventListener("click", function(){ gym.level = -1; renderGymTabs(); }); box.appendChild(all);
+  GYM_LEVELS.forEach(function(L){ var t = el("button", "gtab" + (gym.level === L.lv ? " on" : ""), L.name); t.type = "button"; t.addEventListener("click", function(){ gym.level = L.lv; renderGymTabs(); }); box.appendChild(t); });
+}
+function gymPlaying(on){ $("gHintBtn").style.display = on ? "" : "none"; $("gSkip").style.display = on ? "" : "none"; $("gStart").style.display = on ? "none" : ""; }
+function gymStart(){
+  gym.drill = gym.track === "trail" ? makeTrailDrill() : makeDrill(gym.level === -1 ? Math.floor(Math.random() * 3) : gym.level);
+  gym.answered = false;
+  $("gymCard").className = "gymcard active" + (gym.track === "trail" ? " trailmode" : "");
+  $("gGoal").innerHTML = "Your call:";
+  $("gymBoard").innerHTML = "<div class='note' style='margin-top:10px'>" + gym.drill.story + "</div>";
+  $("gHint").className = "ghint"; $("gHint").innerHTML = "";
+  var box = $("gOpts"); box.innerHTML = "";
+  gym.drill.opts.forEach(function(o, oi){ var b = el("button", "chipbtn", o); b.type = "button"; b.addEventListener("click", function(){ gymAnswer(oi); }); box.appendChild(b); });
+  gymPlaying(true);
+}
+function gymDone(){ gym.answered = true; gymPlaying(false); $("gStart").textContent = "Next drill"; gymStatsRender(); }
+function gymAnswer(oi){
+  if(gym.answered || !gym.drill) return;
+  var s = getState(), ok = oi === gym.drill.a, kids = $("gOpts").children;
+  kids[gym.drill.a].classList.add("right"); if(!ok && kids[oi]) kids[oi].classList.add("wrong");
+  if(ok){ s.gym.reps = (s.gym.reps || 0) + 1; s.gym.streak = (s.gym.streak || 0) + 1; if(s.gym.streak > (s.gym.best || 0)) s.gym.best = s.gym.streak; saveState(s); $("gymCard").className = "gymcard win" + (gym.track === "trail" ? " trailmode" : ""); $("gGoal").innerHTML = "Correct: <b>" + gym.drill.opts[gym.drill.a] + "</b>."; markMission("gym"); }
+  else { s.gym.streak = 0; saveState(s); $("gymCard").className = "gymcard" + (gym.track === "trail" ? " trailmode" : ""); $("gGoal").innerHTML = "Not quite. The answer is <b>" + gym.drill.opts[gym.drill.a] + "</b>."; }
+  $("gHint").className = "ghint show"; $("gHint").innerHTML = gym.drill.hint;
+  gymDone();
+}
+function gymSkip(){
+  if(gym.answered || !gym.drill) return;
+  var s = getState(); s.gym.streak = 0; saveState(s);
+  $("gOpts").children[gym.drill.a].classList.add("right");
+  $("gHint").className = "ghint show"; $("gHint").innerHTML = "Answer: " + gym.drill.opts[gym.drill.a] + ". " + gym.drill.hint;
+  gymDone();
+}
+function setTrack(t){
+  gym.track = t; gym.drill = null; gym.answered = false;
+  $("trackGeneral").classList.toggle("on", t === "general"); $("trackTrail").classList.toggle("on", t === "trail");
+  $("gymTabs").style.display = t === "trail" ? "none" : ""; $("trailBanner").className = "trailbanner" + (t === "trail" ? " show" : "");
+  $("gymCard").className = "gymcard"; $("gOpts").innerHTML = "";
+  $("gGoal").innerHTML = t === "trail" ? "How I really run my agents. Tap <b>Start drill</b>." : "Pick a level (or Surprise me) and tap <b>Start drill</b>.";
+  $("gymBoard").innerHTML = ""; $("gHint").className = "ghint"; $("gHint").innerHTML = "";
+  gymPlaying(false); $("gStart").textContent = "Start drill";
+}
+
+/* ---------- quiz (options shuffle every load) ---------- */
+var QUIZ = [
+  { q:"What turns a chat model into an agent?", opts:["A bigger model","Tools it can use, plus a loop of acting and checking","A faster phone","A longer prompt"], a:1 },
+  { q:"An agent says a fix is done. What proves it?", opts:["It sounds sure","The same check passing again","It used a lot of steps","Nothing, trust it"], a:1 },
+  { q:"What is a skill?", opts:["A paid add-on","A saved set of instructions it loads when a task matches","A kind of model","A GitHub setting"], a:1 },
+  { q:"Why must a scheduled task's prompt say everything?", opts:["Prompts have a word minimum","Each run starts fresh, without this chat's memory","The schedule reads it aloud","It doesn't need to"], a:1 },
+  { q:"Why have a second agent review the work?", opts:["It's faster","It hasn't seen the work being built, so it checks it like a stranger would","It writes better code","To double the cost"], a:1 }
+];
+var quizAnswered = {}, quizOrder = [];
+function shuffled(n){ var a = [], i, j, t; for(i = 0; i < n; i++) a.push(i); for(i = n - 1; i > 0; i--){ j = Math.floor(Math.random() * (i + 1)); t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+function renderQuiz(){
+  var box = $("quizBox"); if(!box) return; box.innerHTML = ""; quizAnswered = {}; quizOrder = [];
+  QUIZ.forEach(function(item, qi){
+    var wrap = el("div", "quizq"); wrap.appendChild(el("div", "q", (qi + 1) + ". " + item.q));
+    var order = shuffled(item.opts.length); quizOrder.push(order);
+    order.forEach(function(oi){
+      var b = el("button", "quizopt", item.opts[oi]); b.type = "button";
+      b.addEventListener("click", function(){
+        if(quizAnswered[qi] != null) return; quizAnswered[qi] = oi;
+        wrap.querySelectorAll(".quizopt")[order.indexOf(item.a)].classList.add("right");
+        if(oi !== item.a) b.classList.add("wrong");
+        var got = 0, ans = 0; for(var k in quizAnswered){ ans++; if(quizAnswered[k] === QUIZ[k].a) got++; }
+        if(ans === QUIZ.length){
+          var s = getState(); if(got > (s.quizBest || 0)){ s.quizBest = got; saveState(s); }
+          box.appendChild(el("div", "qresult", "You got " + got + " / " + QUIZ.length + (got === QUIZ.length ? ", perfect." : ".")));
+          var again = el("button", "btn", "Try the quiz again"); again.type = "button"; again.style.marginTop = "10px"; again.addEventListener("click", renderQuiz); box.appendChild(again);
+        }
+      });
+      wrap.appendChild(b);
+    });
+    box.appendChild(wrap);
+  });
+}
+
+/* ---------- version badge, update check ---------- */
+function buildOf(html){ var m = /<meta name="build" content="([^"]*)"/.exec(html || ""); return m ? m[1] : null; }
+function checkUpdate(manual){
+  if(typeof fetch !== "function" || !/^https?:$/.test(location.protocol)){ if(manual) toast(VERSION + " · open the live address to check for updates"); return; }
+  fetch(location.pathname + "?nc=" + Date.now(), { cache:"no-store" }).then(function(r){ return r.ok ? r.text() : ""; }).then(function(html){
+    var live = buildOf(html);
+    if(live && live !== VERSION){
+      var bar = $("updbar"); bar.textContent = "Newer version is up (" + live + "). Tap to load it."; bar.className = "show";
+      bar.onclick = function(){ try{ location.replace(location.pathname + "?v=" + encodeURIComponent(live) + location.hash); }catch(e){ location.reload(); } };
+    } else if(manual){ toast(live ? VERSION + " · you have the newest" : VERSION + " · could not check right now"); }
+  }).catch(function(){ if(manual) toast(VERSION + " · could not check right now"); });
+}
+
+function initApp(){
+  var b = $("vbadge"); b.textContent = VERSION; b.addEventListener("click", function(){ checkUpdate(true); }); checkUpdate(false);
+  renderLoopOpts(); $("loopGo").addEventListener("click", function(){ loopRun(false); });
+  renderSkillRow(); renderSkill();
+  wirePick("whenPick", "data-when", function(v){ sd.when = v; $("schedResult").className = "result"; });
+  wirePick("promptPick", "data-prompt", function(v){ sd.prompt = v; $("schedResult").className = "result"; });
+  wirePick("powerPick", "data-power", function(v){ sd.power = v; $("schedResult").className = "result"; });
+  $("schedGo").addEventListener("click", schedRun);
+  renderCatches(); renderMissions();
+  renderGymTabs(); gymStatsRender();
+  $("trackGeneral").addEventListener("click", function(){ setTrack("general"); });
+  $("trackTrail").addEventListener("click", function(){ setTrack("trail"); });
+  $("gStart").addEventListener("click", gymStart);
+  $("gHintBtn").addEventListener("click", function(){ if(gym.drill){ $("gHint").className = "ghint show"; $("gHint").innerHTML = gym.drill.hint; } });
+  $("gSkip").addEventListener("click", gymSkip);
+  renderQuiz();
+  window._lab = { lp:lp, loopRun:loopRun, sk:sk, sd:sd, schedRun:schedRun, gym:gym, quizOrder:function(){ return quizOrder; }, getState:getState };
+}
+if(typeof window !== "undefined" && typeof document !== "undefined"){
+  if(document.readyState === "loading"){ document.addEventListener("DOMContentLoaded", initApp); } else { initApp(); }
+}
+if(typeof module !== "undefined" && module.exports){
+  module.exports = { agentRun:agentRun, LOOP_OPTS:LOOP_OPTS, SKILLS:SKILLS, TASKS:TASKS, schedCheck:schedCheck, CATCHES:CATCHES, TOOL_Q:TOOL_Q, UNATTENDED:UNATTENDED, makeDrill:makeDrill, TRAIL_CASES:TRAIL_CASES, QUIZ:QUIZ, shuffled:shuffled, buildOf:buildOf, VERSION:VERSION };
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14181d">
+<meta name="build" content="v0.3 · Nov 14">
+<title>Robots on GitHub: checks that run on every upload</title>
+<meta name="description" content="Chapter 14 of All Thumbs. GitHub Actions for people who build on a phone: the Pages robot you already have, what a workflow file says, and checks that stop a bad upload.">
+<link rel="canonical" href="https://motbuchanan.com/allthumbs/actions-basics.html">
+<meta property="og:title" content="Robots on GitHub: checks that run on every upload">
+<meta property="og:description" content="Watch an upload go live, read a workflow file line by line, and see which problems your checks stop.">
+<meta property="og:image" content="https://motbuchanan.com/allthumbs/icon-512.png">
+<link rel="icon" href="favicon.png">
+<style>
+
+  :root{
+    --canvas:#14181d; --panel:#1c2229; --card:#171c22; --line:#2c3540;
+    --ink:#e8ecf0; --soft:#97a3ae; --dim:#6b7682;
+    --green:#6fe08c; --amber:#f5b04c; --blue:#5aa7e8; --red:#e87a6d; --rose:#a3e635; --trail:#c8a4f0;
+    --mono:ui-monospace,'SF Mono','Cascadia Mono','Roboto Mono',Consolas,Menlo,monospace;
+    --sans:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',sans-serif;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html{scroll-behavior:smooth; scroll-padding-top:64px;}
+  body{margin:0; background:var(--canvas); color:var(--ink); font-family:var(--sans); font-size:17px; line-height:1.6; padding-bottom:70px; overflow-wrap:anywhere;}
+  header{padding:26px 20px 10px; max-width:760px; margin:0 auto; display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap;}
+  .wordmark{font-family:var(--mono); font-size:12px; letter-spacing:.2em; color:var(--soft); text-transform:uppercase;}
+  h1{margin:6px 0 2px; font-size:clamp(26px,8vw,32px); line-height:1.15; letter-spacing:-.01em;}
+  .subtitle{color:var(--soft); margin:0; font-size:15px;}
+  .vbadge{font-family:var(--mono); font-size:11px; color:var(--soft); border:1px solid var(--line); border-radius:999px; padding:9px 12px; background:var(--panel); cursor:pointer; white-space:nowrap; margin-top:4px;}
+  nav{position:sticky; top:0; z-index:30; background:#14181d; border-bottom:1px solid var(--line); overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch;}
+  .navrow{display:flex; gap:8px; padding:10px 16px; max-width:760px; margin:0 auto; width:max-content;}
+  .navchip{font-family:var(--mono); font-size:12px; color:var(--soft); border:1px solid var(--line); border-radius:999px; padding:9px 13px; background:var(--card); text-decoration:none; white-space:nowrap;}
+  .navchip:active{color:var(--ink); border-color:var(--rose);}
+  main{max-width:760px; margin:0 auto; padding:0 16px;}
+  section{background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:22px 18px; margin:18px 0; scroll-margin-top:68px;}
+  .eyebrow{font-family:var(--mono); font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--rose); margin:0 0 6px;}
+  h2{margin:0 0 10px; font-size:23px; line-height:1.2;}
+  p{margin:10px 0;}
+  .soft{color:var(--soft);} .small{font-size:14px;}
+  code{font-family:var(--mono); font-size:.9em; background:var(--card); border:1px solid var(--line); border-radius:6px; padding:1px 6px; color:var(--green);}
+  .note{border-left:3px solid var(--rose); background:var(--card); border-radius:0 10px 10px 0; padding:10px 14px; margin:14px 0; font-size:15px; color:var(--soft);}
+  .btn{display:inline-block; font-family:var(--mono); font-size:14px; color:var(--ink); background:var(--card); border:1px solid var(--line); border-radius:10px; padding:11px 16px; cursor:pointer; user-select:none;}
+  .btn:active{border-color:var(--rose); transform:translateY(1px);}
+  .btn.primary{border-color:var(--rose); color:var(--rose);}
+  .btn[disabled]{opacity:.4; cursor:default;}
+  .simwrap{margin:14px 0;}
+  .picker{display:flex; gap:8px; flex-wrap:wrap; margin:10px 0;}
+  .plabel{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--dim); margin:14px 0 0;}
+  .chipbtn{font-family:var(--mono); font-size:12.5px; padding:10px 13px; border-radius:999px; border:1px solid var(--line); background:var(--card); color:var(--soft); cursor:pointer;}
+  .chipbtn.on{border-color:var(--rose); color:var(--rose); background:rgba(163,230,53,.1); font-weight:700;}
+  .mascotspot{text-align:center; margin:6px 0 2px;}
+  .mascotspot img{height:230px; max-width:100%; width:auto; object-fit:contain; filter:drop-shadow(0 10px 22px rgba(0,0,0,.5));}
+  .tipbox{position:relative; background:var(--card); border:1px solid var(--line); border-left:3px solid var(--rose); border-radius:0 12px 12px 0; padding:16px 16px 16px 118px; margin:22px 0; min-height:96px;}
+  .tipbox .poke{position:absolute; left:-14px; bottom:-8px; height:150px; width:auto; transform:rotate(-8deg); filter:drop-shadow(0 8px 16px rgba(0,0,0,.45)); pointer-events:none;}
+  .tipbox.right{border-left:1px solid var(--line); border-right:3px solid var(--rose); border-radius:12px 0 0 12px; padding:16px 118px 16px 16px;}
+  .tipbox.right .poke{left:auto; right:-14px; transform:rotate(8deg);}
+  .tipbox .tt{font-weight:700; color:var(--rose); font-size:15px;}
+  .tipbox .tp{margin:4px 0 0; font-size:14.5px; color:var(--soft); line-height:1.55;}
+
+  /* missions, gym, quiz (course standard) */
+  .mission{display:flex; gap:10px; align-items:flex-start; background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px; margin:8px 0; font-size:14.5px;}
+  .mission .mk{font-family:var(--mono); flex:0 0 auto; width:22px; height:22px; border-radius:50%; border:1px solid var(--line); color:var(--dim); display:flex; align-items:center; justify-content:center; font-size:12px;}
+  .mission.done{border-color:rgba(111,224,140,.5);}
+  .mission.done .mk{border-color:var(--green); color:var(--green); background:rgba(111,224,140,.1);}
+  .mission.done .mtext{color:var(--soft);}
+  .mission .mtext b{color:var(--rose);}
+  .gym{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px; margin:14px 0;}
+  .gymstats{display:flex; gap:18px; flex-wrap:wrap; font-size:12.5px; color:#9aa5b1; margin-bottom:10px; letter-spacing:.04em;}
+  .gymstats b{color:var(--green); font-size:15px; margin-left:4px;}
+  .gymtabs{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;}
+  .gtab{font-size:12px; padding:9px 12px; border-radius:999px; border:1px solid var(--line); background:transparent; color:inherit; cursor:pointer;}
+  .gtab.on{border-color:var(--rose); color:var(--rose); font-weight:700;}
+  .gymcard{border:1px dashed var(--line); border-radius:10px; padding:12px;}
+  .gymcard.active{border-style:solid; border-color:var(--rose);}
+  .gymcard.win{border-style:solid; border-color:var(--green);}
+  .gymcard.trailmode.active{border-color:var(--trail);}
+  .ggoal{font-size:15px; line-height:1.5;} .ggoal b{color:var(--rose);}
+  .ghint{font-size:13.5px; color:var(--blue); margin-top:8px; display:none;} .ghint.show{display:block;}
+  .gbtns{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;}
+  .tracktoggle{display:flex; gap:8px; margin:14px 0 10px; align-items:center; flex-wrap:wrap;}
+  .tracktoggle .tlabel{font-family:var(--mono); font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--dim);}
+  .ttab{font-family:var(--mono); font-size:12.5px; padding:9px 14px; border-radius:999px; border:1px solid var(--line); background:var(--card); color:var(--soft); cursor:pointer;}
+  .ttab.on.general{border-color:var(--rose); color:var(--rose); background:rgba(163,230,53,.1); font-weight:700;}
+  .ttab.on.trail{border-color:var(--trail); color:var(--trail); background:rgba(200,164,240,.12); font-weight:700;}
+  .trailbanner{font-family:var(--mono); font-size:11.5px; color:var(--trail); background:rgba(200,164,240,.08); border:1px solid rgba(200,164,240,.3); border-radius:8px; padding:7px 11px; margin:8px 0; display:none;}
+  .trailbanner.show{display:block;}
+  .quizq{margin:16px 0;} .quizq .q{font-weight:600; margin-bottom:8px;}
+  .quizopt{display:block; width:100%; text-align:left; font-size:14.5px; padding:11px 14px; border-radius:10px; border:1px solid var(--line); background:var(--card); color:var(--ink); cursor:pointer; margin:6px 0; font-family:var(--sans);}
+  .quizopt.right{border-color:var(--green); background:rgba(111,224,140,.1);}
+  .quizopt.wrong{border-color:var(--red); background:rgba(232,122,109,.1);}
+  .qresult{font-weight:700; margin-top:10px;}
+  .backhub{display:inline-flex; align-items:center; gap:7px; font-family:var(--mono); font-size:12px; color:var(--soft); border:1px solid var(--line); border-radius:999px; padding:10px 14px; background:var(--card); text-decoration:none;}
+  footer{max-width:760px; margin:8px auto 30px; padding:0 20px; color:var(--dim); font-size:12px; text-align:center;}
+  #toast{position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(90px); background:var(--card); color:var(--ink); border:1px solid var(--rose); border-radius:999px; padding:10px 18px; font-family:var(--mono); font-size:13px; transition:transform .3s ease; z-index:99; pointer-events:none; max-width:88vw; text-align:center;}
+  #toast.show{transform:translateX(-50%) translateY(0);}
+  #updbar{display:none; position:fixed; left:12px; right:12px; bottom:calc(14px + env(safe-area-inset-bottom)); z-index:100; background:var(--card); border:1px solid var(--green); color:var(--green); border-radius:12px; padding:13px 14px; font-family:var(--mono); font-size:13px; text-align:center; cursor:pointer;}
+  #updbar.show{display:block;}
+  @media(max-width:380px){ .tipbox{padding-left:96px;} .tipbox.right{padding:16px 96px 16px 16px;} .tipbox .poke{height:124px;} }
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:.001s !important; transition-duration:.001s !important;} html{scroll-behavior:auto;} }
+  .btn:focus-visible,.chipbtn:focus-visible,.quizopt:focus-visible,.navchip:focus-visible,.gtab:focus-visible,.ttab:focus-visible{outline:2px solid var(--rose); outline-offset:2px;}
+
+  .mstats{display:flex; gap:14px; flex-wrap:wrap; font-family:var(--mono); font-size:12px; color:var(--soft); margin:8px 2px;}
+  .mstats .bad{color:var(--red);}
+  .lanes{border:1px solid var(--line); border-radius:12px; background:#0d1114; padding:10px; margin:12px 0; min-height:70px; max-height:320px; overflow-y:auto;}
+  .step{display:flex; gap:10px; align-items:flex-start; font-size:14px; padding:6px 4px; border-bottom:1px solid rgba(44,53,64,.6);}
+  .step:last-child{border-bottom:none;}
+  .step .who{flex:0 0 66px; font-family:var(--mono); font-size:11px; padding-top:2px;}
+  .step .who.p1{color:var(--blue);} .step .who.p2{color:var(--amber);} .step .who.db{color:var(--rose);}
+  .step.bad .what{color:var(--red);} .step.warn .what{color:var(--amber);} .step.good .what{color:var(--green);}
+  .lanes .idle{color:var(--dim); font-size:14px; padding:6px 4px;}
+  .chipbtn.right{border-color:var(--green); color:var(--green); background:rgba(111,224,140,.1);}
+  .chipbtn.wrong{border-color:var(--red); color:var(--red); background:rgba(232,122,109,.1);}
+  .gopts{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;}
+  #updbar{width:auto; font-family:var(--mono);}
+  .lognum{font-family:var(--mono); font-size:12px; color:var(--rose); margin:6px 2px;}
+  /* pipeline result */
+  .result{display:none; border:1px solid var(--line); border-left:3px solid var(--green); background:var(--card); border-radius:0 10px 10px 0; padding:11px 13px; font-size:15px; color:var(--soft); margin:8px 0;}
+  .result.show{display:block;} .result.bad{border-left-color:var(--red);} .result b{color:var(--ink);}
+  /* yaml */
+  .yaml{background:#0d1114; border:1px solid var(--line); border-radius:12px; padding:12px 8px; margin:12px 0; font-family:var(--mono); font-size:clamp(11px,3.3vw,12.5px); line-height:1.5;}
+  .yl{display:block; width:100%; text-align:left; white-space:pre-wrap; overflow-wrap:anywhere; font:inherit; color:var(--soft); background:none; border:0; padding:4px 6px; border-radius:6px; min-height:34px;}
+  .yl.blank{min-height:12px; padding:0 6px;}
+  .yl.part{color:var(--green); cursor:pointer; border:1px dashed transparent;}
+  .yl.part:not(.seen){border-color:rgba(163,230,53,.35);}
+  .yl.part.seen{color:var(--ink);}
+  .yl.part.cur{background:rgba(163,230,53,.14); border-color:var(--rose);}
+  /* checks */
+  .checklist{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr)); gap:8px; margin:12px 0;}
+  .chk{display:flex; gap:10px; align-items:flex-start; text-align:left; font:inherit; font-size:14.5px; color:var(--ink); background:var(--card); border:1px solid var(--line); border-radius:10px; padding:10px 12px; cursor:pointer;}
+  .chk .box{flex:0 0 22px; height:22px; border-radius:6px; border:1px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:13px; color:var(--canvas);}
+  .chk.on{border-color:var(--rose);} .chk.on .box{background:var(--rose); border-color:var(--rose);}
+  .chk .how{font-family:var(--mono); font-size:11.5px; color:var(--dim);}
+  .mstats .warn{color:var(--amber);}
+  .crow{display:flex; gap:10px; align-items:flex-start; background:var(--card); border:1px solid var(--line); border-radius:10px; padding:10px 12px; margin:6px 0; font-size:14.5px;}
+  .crow .mark{flex:0 0 24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font:700 12px var(--mono);}
+  .crow.red{border-color:rgba(232,122,109,.5);} .crow.red .mark{background:rgba(232,122,109,.2); color:var(--red);}
+  .crow.ok .mark{background:rgba(111,224,140,.15); color:var(--green);}
+  .crow.slip{border-color:rgba(245,176,76,.5);} .crow.slip .mark{background:rgba(245,176,76,.18); color:var(--amber);}
+  .crow .tail{color:var(--soft); font-size:13.5px;} .crow .tail b{color:var(--ink);}
+</style>
+<style>
+.nextch{display:flex;flex-wrap:wrap;gap:12px;max-width:760px;margin:28px auto 16px;padding:0 16px;box-sizing:border-box}
+.nextch a{flex:1 1 100%;min-height:56px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;gap:4px;padding:12px 16px;border:1px solid rgba(255,255,255,.16);border-radius:12px;background:rgba(255,255,255,.04);color:inherit;text-decoration:none;font-size:16px;font-weight:700;line-height:1.3}
+.nextch a small{font-size:12px;font-weight:400;opacity:.65}
+.nextch a:active{border-color:currentColor}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="wordmark">All Thumbs &middot; chapter 14</div>
+    <h1>Robots on GitHub</h1>
+    <p class="subtitle">A computer that checks every upload, and why a green check doesn't mean it works.</p>
+  </div>
+  <button class="vbadge" id="vbadge" type="button">v0.3 &middot; Nov 14</button>
+</header>
+
+<nav>
+  <div class="navrow">
+    <a class="navchip" href="#idea">the idea</a>
+    <a class="navchip" href="#pipe">your robot</a>
+    <a class="navchip" href="#file">the file</a>
+    <a class="navchip" href="#checks">your checks</a>
+    <a class="navchip" href="#missions">missions</a>
+    <a class="navchip" href="#gym">gym</a>
+    <a class="navchip" href="#quiz">quiz</a>
+  </div>
+</nav>
+
+<main>
+
+<section id="idea">
+  <p class="eyebrow">ci, in plain words</p>
+  <h2>You already have one robot</h2>
+  <div class="mascotspot"><img src="thumb-nice.png" alt="the thumb mascot looking pleased"></div>
+  <p>Every time I upload a file to my site from my phone, a computer at GitHub wakes up, grabs the new files, and puts them on the live site. It shows up in the repo's <b>Actions</b> tab as a run called <code>pages build and deployment</code>. I never set it up; GitHub Pages turns it on for you.</p>
+  <p>That robot is a <b>workflow</b>: a list of steps a computer runs by itself when something happens, like an upload. The grown-up name for robots that check your work on every upload is <b>CI</b>, continuous integration. GitHub's version is called <b>GitHub Actions</b>, and on a public repo like mine its standard computers cost nothing.</p>
+  <p>My Pages robot ships whatever I give it, so a file with a broken script gets a green check and goes live broken. This chapter is about teaching a robot to look before it ships.</p>
+</section>
+
+<section id="pipe">
+  <p class="eyebrow">your robot</p>
+  <h2>Watch one upload go live</h2>
+  <p>Pick what you're uploading and how the repo is set up, then push it. Each step is something the Pages robot really does.</p>
+  <p class="plabel">the file</p>
+  <div class="picker" id="filePick">
+    <button class="chipbtn on" data-file="clean" type="button">a clean page</button>
+    <button class="chipbtn" data-file="curly" type="button">a page with &#123;&#123; score &#125;&#125; in it</button>
+    <button class="chipbtn" data-file="broken" type="button">a page with a broken script</button>
+  </div>
+  <p class="plabel">the repo</p>
+  <div class="picker" id="nojPick">
+    <button class="chipbtn on" data-noj="yes" type="button">has a .nojekyll file</button>
+    <button class="chipbtn" data-noj="no" type="button">no .nojekyll file</button>
+  </div>
+  <div class="picker" id="fmPick">
+    <button class="chipbtn on" data-fm="no" type="button">page starts with &lt;!DOCTYPE&gt;</button>
+    <button class="chipbtn" data-fm="yes" type="button">page starts with two --- lines</button>
+  </div>
+  <div class="picker" style="justify-content:center"><button class="btn primary" id="pipeGo" type="button">upload it</button></div>
+  <div class="lanes" id="pipeLog"><div class="idle">Nothing uploaded yet.</div></div>
+  <div class="result" id="pipeResult"></div>
+  <div class="tipbox">
+    <img class="poke" src="thumb-think.png" alt="">
+    <div class="tt">What .nojekyll is for</div>
+    <p class="tp">Pages can run a site builder called Jekyll. Jekyll reads &#123;&#123; and &#123;% as its own commands, but only on pages that open with a block between two --- lines. An empty file named .nojekyll tells the robot to skip Jekyll and ship files exactly as they are. Both of my repos have one.</p>
+  </div>
+</section>
+
+<section id="file">
+  <p class="eyebrow">the file</p>
+  <h2>A workflow is a short text file</h2>
+  <p>You write a robot by putting a small file in a folder called <code>.github/workflows/</code> in your repo. The format is <b>YAML</b>: plain lines, indented with spaces, where each line is a name and a value. Tap each part to see what it does.</p>
+  <div class="yaml" id="yaml"></div>
+  <div class="note" id="yamlNote">Tap a highlighted part of the file.</div>
+  <div class="lognum" id="yamlNum">0 of 8 parts</div>
+  <div class="tipbox right">
+    <img class="poke" src="thumb-tip.png" alt="">
+    <div class="tt">Making those folders from a phone</div>
+    <p class="tp">The phone uploader can't make nested folders. On the repo page, use Add file, then Create new file, and type the whole name: .github/workflows/check.yml. Each slash you type turns into a folder.</p>
+  </div>
+</section>
+
+<section id="checks">
+  <p class="eyebrow">your checks</p>
+  <h2>A robot only catches what you told it to look for</h2>
+  <p>Before a zip ever reaches me, my builds go through a list of checks: the scripts parse, no outside fonts, the badge got bumped, no em dashes, the page fits a 320px phone, and the Breaker's taps with saved data blocked. Any of those can run as a robot step on every upload.</p>
+  <p>Below are eight real kinds of upload, each with one problem planted (one is clean). Turn checks on, push them all, and see what gets stopped and what goes live.</p>
+  <div class="checklist" id="checkList"></div>
+  <div class="picker" style="justify-content:center"><button class="btn primary" id="pushAll" type="button">push all eight</button></div>
+  <div class="mstats" id="pushStats"></div>
+  <div id="pushRows"></div>
+  <div class="tipbox">
+    <img class="poke" src="thumb-aha.png" alt="">
+    <div class="tt">Robots check. I upload.</div>
+    <p class="tp">A workflow can be allowed to change files and push them back. Mine won't be: a red X tells me what to fix, and I still do every upload from my phone myself. A workflow can also run on a schedule with no upload at all. My monthly Breaker sweep works the same way, but it runs as a scheduled task outside GitHub.</p>
+  </div>
+</section>
+
+<section id="missions">
+  <p class="eyebrow">missions</p>
+  <h2>Prove it</h2>
+  <p>Six things to make happen in the sandboxes above. They tick off as you go.</p>
+  <div id="missionList"></div>
+</section>
+
+<section id="gym">
+  <p class="eyebrow">the gym</p>
+  <h2>Practice: think like the robot</h2>
+  <p class="small soft">Randomized drills. A wrong call resets your streak.</p>
+  <div class="tracktoggle">
+    <span class="tlabel">practice</span>
+    <button class="ttab general on" id="trackGeneral" type="button">General</button>
+    <button class="ttab trail" id="trackTrail" type="button">The Trail</button>
+  </div>
+  <div class="trailbanner" id="trailBanner">The Trail: real cases from my own repos and uploads.</div>
+  <div class="gym">
+    <div class="gymstats"><span>reps<b id="repN">0</b></span><span>streak<b id="strN">0</b></span><span>best<b id="bestN">0</b></span></div>
+    <div class="gymtabs" id="gymTabs"></div>
+    <div class="gymcard" id="gymCard">
+      <div class="ggoal" id="gGoal">Pick a level (or Surprise me) and tap <b>Start drill</b>.</div>
+      <div id="gymBoard"></div>
+      <div class="gopts" id="gOpts"></div>
+      <div class="ghint" id="gHint"></div>
+      <div class="gbtns">
+        <button class="btn primary" id="gStart" type="button">Start drill</button>
+        <button class="btn" id="gHintBtn" type="button" style="display:none">Hint</button>
+        <button class="btn" id="gSkip" type="button" style="display:none">Skip</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="quiz">
+  <p class="eyebrow">quiz</p>
+  <h2>Five questions</h2>
+  <div id="quizBox"></div>
+</section>
+
+<div style="text-align:center;margin:24px 0 8px;">
+  <a class="backhub" href="index.html">&larr; back to All Thumbs</a>
+</div>
+
+</main>
+<div class="nextch"><a href="models-basics.html"><small>Next up</small>Chapter 15: How Models Work</a></div>
+<footer>Robots on GitHub &middot; All Thumbs chapter 14 &middot; the sandboxes are models, nothing here is sent anywhere</footer>
+<button id="updbar" type="button">A newer version is up. Tap to load it.</button>
+<div id="toast" role="status"></div>
+
+<script>
+"use strict";
+var VERSION = "v0.3 · Nov 14";
+var STORE_KEY = "actions101_v1";
+
+/* ---------- guarded storage ---------- */
+var memStore = {};
+function loadState(){
+  try{ var raw = localStorage.getItem(STORE_KEY); if(raw) return JSON.parse(raw); }catch(e){}
+  return memStore[STORE_KEY] || null;
+}
+function saveState(s){
+  memStore[STORE_KEY] = s;
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(s)); }catch(e){}
+}
+function getState(){
+  var s = loadState();
+  if(!s || typeof s !== "object") s = {};
+  if(!s.m) s.m = {};
+  if(!s.gym) s.gym = { reps:0, streak:0, best:0 };
+  if(typeof s.quizBest !== "number") s.quizBest = 0;
+  return s;
+}
+
+/* ---------- ENGINE (pure, testable) ---------- */
+var OB = String.fromCharCode(123,123), CB = String.fromCharCode(125,125);
+/* pagesRun: what the Pages robot does with one upload.
+   file: clean | curly | broken    noj: has .nojekyll    fm: page opens with front matter (two --- lines) */
+function pagesRun(file, noj, fm){
+  var steps = [
+    { who:"you", what:"upload the file from your phone: that makes a commit" },
+    { who:"github", what:"the commit is a push, so it starts the workflow: pages build and deployment" },
+    { who:"robot", what:"a fresh computer starts up and grabs a copy of every file in the repo" }
+  ];
+  var jekyll = !noj, eaten = jekyll && fm && file === "curly", rawFm = noj && fm;
+  if(jekyll){
+    steps.push({ who:"robot", what:"no .nojekyll file, so it runs Jekyll over the repo" });
+    if(fm && file === "curly") steps.push({ who:"robot", what:"this page opens with two --- lines, so Jekyll reads " + OB + " score " + CB + " as its own command. There is no score in Jekyll, so it writes nothing there.", cls:"warn" });
+    else if(file === "curly") steps.push({ who:"robot", what:"this page has no --- block at the top, so Jekyll copies it untouched" });
+  } else {
+    steps.push({ who:"robot", what:".nojekyll is there, so it skips Jekyll and ships the files exactly as they are" });
+    if(fm) steps.push({ who:"robot", what:"nobody reads the two --- lines either, so they ship too and show up as text at the top of the page", cls:"warn" });
+  }
+  if(file === "broken") steps.push({ who:"robot", what:"nothing in this workflow runs your script, so the broken line goes through unseen", cls:"warn" });
+  steps.push({ who:"robot", what:"deploys the files to the live site", cls:"good" });
+  steps.push({ who:"github", what:"green check on the commit: the deploy worked", cls:"good" });
+  var live = file === "broken" ? "broken" : (eaten ? "text missing" : (rawFm ? "stray dashes" : "works"));
+  return { steps:steps, check:"green", live:live, eaten:eaten };
+}
+
+/* the workflow file, split into tappable parts */
+var YAML_PARTS = [
+  { id:"name",   txt:"name: Check my pages", what:"<b>name</b> is the label you'll see in the Actions tab for each run." },
+  { id:"on",     txt:"on: [push]", what:"<b>on</b> says when the robot wakes up. <code>push</code> means every push to the repo, and each upload from the phone is one. Other choices: a schedule, or a button you press." },
+  { id:"jobs",   txt:"jobs:", what:"<b>jobs</b> holds one or more jobs. Each job gets its own fresh computer." },
+  { id:"runs",   txt:"    runs-on: ubuntu-latest", what:"<b>runs-on</b> picks the computer: here, a clean Linux machine that GitHub starts for this run and throws away after." },
+  { id:"steps",  txt:"    steps:", what:"<b>steps</b> is the to-do list, run top to bottom. If one step fails, the job stops and the commit gets a red X." },
+  { id:"uses",   txt:"      - uses: actions/checkout@v5", what:"<b>uses</b> borrows a step someone already wrote. <code>actions/checkout</code> copies your repo's files onto the robot's computer. Without it, the robot has nothing to look at." },
+  { id:"stepname", txt:"      - name: No outside fonts", what:"Each step can have its own <b>name</b>, so a red X tells you which check failed." },
+  { id:"run",    txt:"        run: \"! grep -rl --include=*.html " + "fonts.google" + "apis.com" + " .\"", what:"<b>run</b> is a command typed into the robot's terminal. <code>grep -rl --include=*.html</code> searches every .html file in the repo for Google's font server address, and the <code>!</code> flips the result: finding one fails the step. It only looks in .html files, so this workflow file doesn't trip over its own words." }
+];
+var YAML_LINES = [
+  "name", "", "on", "", "jobs", "  check:", "runs", "steps", "uses", "stepname", "run"
+];
+
+/* checks and planted problems */
+var CHECKS = [
+  { id:"parse",  name:"scripts parse",        how:"node --check on every script" },
+  { id:"fonts",  name:"no outside fonts",     how:"search .html files for Google's font server" },
+  { id:"badge",  name:"badge was bumped",     how:"compare the version with the last commit" },
+  { id:"dash",   name:"no em dashes",         how:"grep for the dash character" },
+  { id:"fit",    name:"fits a 320px phone",   how:"a headless browser measures the page" },
+  { id:"breaker",name:"storage-blocked taps", how:"taps the page with saved data blocked" }
+];
+var COMMITS = [
+  { msg:"fix the Undo crash",   problem:"a missing bracket stops the whole script", catcher:"parse" },
+  { msg:"new about copy",       problem:"an em dash in the text", catcher:"dash" },
+  { msg:"swap the fonts",       problem:"a link to Google's font server", catcher:"fonts" },
+  { msg:"quick tweak",          problem:"the version badge wasn't bumped", catcher:"badge" },
+  { msg:"bigger title",         problem:"the title spills off a 320px phone", catcher:"fit" },
+  { msg:"save button",          problem:"Save crashes when storage is blocked", catcher:"breaker" },
+  { msg:"new scoring",          problem:"the scoring rule adds points wrong", catcher:"" },
+  { msg:"typo fix",             problem:"", catcher:"" }
+];
+function pushResult(commit, on){
+  /* on: { parse:true, ... }  returns { status:"red"|"green", caughtBy:"", slipped:bool } */
+  if(commit.catcher && on[commit.catcher]) return { status:"red", caughtBy:commit.catcher, slipped:false };
+  return { status:"green", caughtBy:"", slipped:!!commit.problem };
+}
+function pushAll(on){
+  var rows = COMMITS.map(function(c){ var r = pushResult(c, on); return { c:c, r:r }; });
+  var red = rows.filter(function(x){ return x.r.status === "red"; }).length, slipped = rows.filter(function(x){ return x.r.slipped; }).length;
+  return { rows:rows, red:red, slipped:slipped };
+}
+
+/* gym */
+var BUCKET_OPTS = ["green check","red X"];
+function rn(list){ return list[Math.floor(Math.random() * list.length)]; }
+function checkName(id){ for(var i = 0; i < CHECKS.length; i++) if(CHECKS[i].id === id) return CHECKS[i].name; return ""; }
+var YAML_Q = [
+  { k:"on", q:"<code>on: [push]</code>", a:0 },
+  { k:"runs-on", q:"<code>runs-on: ubuntu-latest</code>", a:1 },
+  { k:"uses", q:"<code>uses: actions/checkout@v5</code>", a:2 },
+  { k:"run", q:"<code>run: node --check app.js</code>", a:3 }
+];
+var YAML_OPTS = ["when the robot wakes up","which computer it runs on","copies your files onto the robot","a command the robot types"];
+function makeDrill(level){
+  if(level === 0){
+    var c = rn(COMMITS.filter(function(x){ return x.problem; })), ch = rn(CHECKS);
+    var yes = c.catcher === ch.id;
+    if(Math.random() < 0.45 && c.catcher){ ch = CHECKS.filter(function(x){ return x.id === c.catcher; })[0]; yes = true; }
+    return { story:"Problem: " + c.problem + ". Check: <b>" + ch.name + "</b> (" + ch.how + "). Does that check catch it?", opts:["Yes","No"], a:yes ? 0 : 1,
+      hint: c.catcher ? "That problem is caught by the " + checkName(c.catcher) + " check." + (yes ? "" : " A check only sees what it was written to look for.") : "No robot check catches this one. A person has to play it." };
+  }
+  if(level === 1){
+    var c2 = rn(COMMITS), on = {}, names = [];
+    CHECKS.forEach(function(x){ if(Math.random() < 0.5){ on[x.id] = true; names.push(x.name); } });
+    var r = pushResult(c2, on);
+    return { story:"Upload: \"" + c2.msg + "\"" + (c2.problem ? " (" + c2.problem + ")" : " (nothing wrong)") + ". Checks turned on: <b>" + (names.length ? names.join(", ") : "none") + "</b>. What does the commit get?", opts:BUCKET_OPTS, a:r.status === "red" ? 1 : 0,
+      hint: r.status === "red" ? "The " + checkName(r.caughtBy) + " check fails, so the job stops with a red X." : (c2.problem ? "No check that's turned on looks for this, so it gets a green check and goes live with the problem." : "Nothing is wrong, so every check passes.") };
+  }
+  var y = rn(YAML_Q);
+  return { story:"In a workflow file, what does " + y.q + " do?", opts:YAML_OPTS, a:y.a, hint:"on: when it runs. runs-on: the computer. uses: borrow a step (checkout copies your files). run: a terminal command." };
+}
+var TRAIL_CASES = [
+  { story:"Every upload to my site repo already starts a robot run called pages build and deployment. True?", a:0, hint:"True. GitHub Pages runs it on every push to the branch it publishes from. You can watch it in the Actions tab." },
+  { story:"Both of my repos have a .nojekyll file. Does Jekyll touch my pages?", a:1, hint:"No. .nojekyll tells the robot to skip Jekyll and ship the files exactly as they are." },
+  { story:"A 205 KB index.html pasted into GitHub's phone editor landed as 1 byte. Would the Pages robot have stopped it from going live?", a:1, hint:"No. The Pages robot ships whatever is in the repo, a 1-byte file included, and gives it a green check." },
+  { story:"Same 1-byte file. Would a check that every page still has its version badge have caught it?", a:0, hint:"Yes. A 1-byte file has no badge, so that check fails and the commit gets a red X." },
+  { story:"The home screen's four version spots drifted to 7.52 and 7.51. Can a robot check that all four match on every upload?", a:0, hint:"Yes. Read the four numbers and fail the step if they differ." },
+  { story:"Gather's file changed on Oct 22, but its badge and its offline cache name both stayed v0.7 Sep 27. Would a check that the badge changes whenever the file changes have caught it?", a:0, hint:"Yes. A check comparing the badge with the cache name would have passed, because the two still matched each other. The useful check compares the badge with the last commit." },
+  { story:"Every app loaded Google Fonts. Would a one-line grep check have flagged it on every upload?", a:0, hint:"Yes. That's the example check in the workflow file above." },
+  { story:"Under my rules, should the robot push its own fixes back into the repo?", a:1, hint:"No. Checks only. A red X says what to fix, and every upload still comes from my phone." },
+  { story:"Can a GitHub workflow run on a schedule, with no upload at all?", a:0, hint:"Yes. Put a schedule with a cron line under on: instead of push. It can start a few minutes late, and GitHub pauses schedules in a public repo after 60 days with no activity." },
+  { story:"Do checks on my public repos cost money on GitHub's standard computers?", a:1, hint:"No. GitHub Actions is free on standard runners for public repositories." }
+];
+
+/* ---------- DOM helpers ---------- */
+function $(id){ return document.getElementById(id); }
+function el(tag, cls, html){ var e = document.createElement(tag); if(cls) e.className = cls; if(html != null) e.innerHTML = html; return e; }
+var toastTimer = null;
+function toast(msg){ var t = $("toast"); if(!t) return; t.textContent = msg; t.className = "show"; clearTimeout(toastTimer); toastTimer = setTimeout(function(){ t.className = ""; }, 1900); }
+function setOn(boxId, attr, val){ [].forEach.call(document.querySelectorAll("#" + boxId + " .chipbtn"), function(x){ x.classList.toggle("on", x.getAttribute(attr) === val); }); }
+function wirePick(boxId, attr, fn){ var box = $(boxId); if(!box) return; box.addEventListener("click", function(e){ var b = e.target.closest("[" + attr + "]"); if(b){ setOn(boxId, attr, b.getAttribute(attr)); fn(b.getAttribute(attr)); } }); }
+function esc(s){ return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+/* ---------- pipeline ---------- */
+var pipe = { file:"clean", noj:true, fm:false }, pipeTimers = [];
+var LIVE_TXT = {
+  works:"<b>Live, and it works.</b> Green check, and the page does what it should.",
+  broken:"<b>Live, and broken.</b> Green check anyway. The Pages robot only checks that the deploy worked, not that your script runs.",
+  "stray dashes":"<b>Live, with --- showing at the top.</b> Green check. Without Jekyll, the front matter block is just more text on the page.",
+  "text missing":"<b>Live, with text missing.</b> Green check, but where the page said " + OB + " score " + CB + " there is now nothing. Jekyll ate it without a word."
+};
+function pipeReset(){ pipeTimers.forEach(clearTimeout); pipeTimers = []; $("pipeLog").innerHTML = "<div class='idle'>Nothing uploaded yet.</div>"; $("pipeResult").className = "result"; $("pipeResult").innerHTML = ""; $("pipeGo").textContent = "upload it"; }
+function pipeRun(instant){
+  pipeReset();
+  var res = pagesRun(pipe.file, pipe.noj, pipe.fm), log = $("pipeLog"); log.innerHTML = "";
+  function show(st){ log.appendChild(el("div", "step" + (st.cls ? " " + st.cls : ""), "<span class='who " + (st.who === "you" ? "p1" : (st.who === "github" ? "db" : "p2")) + "'>" + st.who + "</span><span class='what'>" + st.what + "</span>")); }
+  function finish(){
+    var box = $("pipeResult"); box.className = "result show " + (res.live === "works" ? "good" : "bad"); box.innerHTML = LIVE_TXT[res.live];
+    $("pipeGo").textContent = "upload it again";
+    if(res.live === "works" && pipe.file === "clean") markMission("clean");
+    if(res.eaten) markMission("eaten");
+  }
+  if(instant){ res.steps.forEach(show); finish(); return res; }
+  res.steps.forEach(function(st, i){ pipeTimers.push(setTimeout(function(){ show(st); }, 420 * i)); });
+  pipeTimers.push(setTimeout(finish, 420 * res.steps.length));
+  return res;
+}
+
+/* ---------- yaml anatomy ---------- */
+var seenParts = {};
+function renderYaml(){
+  var box = $("yaml"); box.innerHTML = "";
+  YAML_LINES.forEach(function(key){
+    if(!key){ box.appendChild(el("div", "yl blank", "&nbsp;")); return; }
+    var part = YAML_PARTS.filter(function(p){ return p.id === key; })[0];
+    if(!part){ box.appendChild(el("div", "yl plain", esc(key))); return; }
+    var b = el("button", "yl part" + (seenParts[key] ? " seen" : ""), esc(part.txt)); b.type = "button"; b.setAttribute("data-part", key);
+    b.addEventListener("click", function(){
+      seenParts[key] = true; [].forEach.call(box.querySelectorAll(".part"), function(x){ x.classList.remove("cur"); }); b.classList.add("cur", "seen");
+      $("yamlNote").innerHTML = part.what;
+      var n = Object.keys(seenParts).length; $("yamlNum").textContent = n + " of " + YAML_PARTS.length + " parts";
+      if(n === YAML_PARTS.length) markMission("yaml");
+    });
+    box.appendChild(b);
+  });
+}
+
+/* ---------- checks ---------- */
+var checksOn = {};
+function renderChecks(){
+  var box = $("checkList"); box.innerHTML = "";
+  CHECKS.forEach(function(c){
+    var b = el("button", "chk" + (checksOn[c.id] ? " on" : ""), "<span class='box'>" + (checksOn[c.id] ? "✓" : "") + "</span><span><b>" + c.name + "</b><br><span class='how'>" + c.how + "</span></span>");
+    b.type = "button"; b.setAttribute("aria-pressed", checksOn[c.id] ? "true" : "false");
+    b.addEventListener("click", function(){ checksOn[c.id] = !checksOn[c.id]; renderChecks(); });
+    box.appendChild(b);
+  });
+}
+function doPush(){
+  var res = pushAll(checksOn), box = $("pushRows"); box.innerHTML = "";
+  res.rows.forEach(function(x){
+    var r = x.r, cls = r.status === "red" ? "red" : (r.slipped ? "slip" : "ok");
+    var tail = r.status === "red" ? "stopped by <b>" + checkName(r.caughtBy) + "</b>" : (r.slipped ? "went live with: " + x.c.problem : "clean, went live");
+    box.appendChild(el("div", "crow " + cls, "<span class='mark'>" + (r.status === "red" ? "X" : "✓") + "</span><span><b>" + x.c.msg + "</b><br><span class='tail'>" + tail + "</span></span>"));
+  });
+  var nOn = Object.keys(checksOn).filter(function(k){ return checksOn[k]; }).length;
+  $("pushStats").innerHTML = "<span>" + nOn + " of 6 checks on</span><span class='bad'>" + res.red + " stopped</span><span class='warn'>" + res.slipped + " went live with a problem</span>";
+  if(res.red === 6) markMission("allsix");
+  if(nOn === 0 && res.slipped === 7) markMission("none");
+  return res;
+}
+
+/* ---------- missions ---------- */
+var MISSIONS = [
+  { id:"clean",  text:"Upload a <b>clean page</b> and watch it go live with a green check." },
+  { id:"eaten",  text:"Set the repo up so Jekyll <b>eats text</b> from a page, and still get a green check." },
+  { id:"yaml",   text:"Tap all <b>eight parts</b> of the workflow file." },
+  { id:"none",   text:"Push with <b>every check off</b> and watch every problem go live." },
+  { id:"allsix", text:"Turn on enough checks to <b>stop all six</b> problems a robot can catch." },
+  { id:"gym",    text:"Land one gym drill correct." }
+];
+function renderMissions(){
+  var box = $("missionList"); if(!box) return; var s = getState(); box.innerHTML = "";
+  MISSIONS.forEach(function(m){ var done = !!s.m[m.id], row = el("div", "mission" + (done ? " done" : "")); row.innerHTML = "<span class='mk'>" + (done ? "✓" : "") + "</span><span class='mtext'>" + m.text + "</span>"; box.appendChild(row); });
+}
+function markMission(id){ var s = getState(); if(!s.m[id]){ s.m[id] = true; saveState(s); renderMissions(); toast("mission done"); } }
+
+/* ---------- gym ---------- */
+var gym = { level:-1, drill:null, answered:false, track:"general", lastTrail:null };
+var GYM_LEVELS = [ { lv:0, name:"does it catch it?" }, { lv:1, name:"green or red" }, { lv:2, name:"read the file" } ];
+function makeTrailDrill(){ var c; do { c = rn(TRAIL_CASES); } while(c === gym.lastTrail); gym.lastTrail = c; return { story:c.story, opts:["Yes","No"], a:c.a, hint:c.hint }; }
+function gymStatsRender(){ var s = getState(); $("repN").textContent = s.gym.reps || 0; $("strN").textContent = s.gym.streak || 0; $("bestN").textContent = s.gym.best || 0; }
+function renderGymTabs(){
+  var box = $("gymTabs"); box.innerHTML = "";
+  var all = el("button", "gtab" + (gym.level === -1 ? " on" : ""), "Surprise me"); all.type = "button"; all.addEventListener("click", function(){ gym.level = -1; renderGymTabs(); }); box.appendChild(all);
+  GYM_LEVELS.forEach(function(L){ var t = el("button", "gtab" + (gym.level === L.lv ? " on" : ""), L.name); t.type = "button"; t.addEventListener("click", function(){ gym.level = L.lv; renderGymTabs(); }); box.appendChild(t); });
+}
+function gymPlaying(on){ $("gHintBtn").style.display = on ? "" : "none"; $("gSkip").style.display = on ? "" : "none"; $("gStart").style.display = on ? "none" : ""; }
+function gymStart(){
+  gym.drill = gym.track === "trail" ? makeTrailDrill() : makeDrill(gym.level === -1 ? Math.floor(Math.random() * 3) : gym.level);
+  gym.answered = false;
+  $("gymCard").className = "gymcard active" + (gym.track === "trail" ? " trailmode" : "");
+  $("gGoal").innerHTML = "Your call:";
+  $("gymBoard").innerHTML = "<div class='note' style='margin-top:10px'>" + gym.drill.story + "</div>";
+  $("gHint").className = "ghint"; $("gHint").innerHTML = "";
+  var box = $("gOpts"); box.innerHTML = "";
+  gym.drill.opts.forEach(function(o, oi){ var b = el("button", "chipbtn", o); b.type = "button"; b.addEventListener("click", function(){ gymAnswer(oi); }); box.appendChild(b); });
+  gymPlaying(true);
+}
+function gymDone(){ gym.answered = true; gymPlaying(false); $("gStart").textContent = "Next drill"; gymStatsRender(); }
+function gymAnswer(oi){
+  if(gym.answered || !gym.drill) return;
+  var s = getState(), ok = oi === gym.drill.a, kids = $("gOpts").children;
+  kids[gym.drill.a].classList.add("right"); if(!ok && kids[oi]) kids[oi].classList.add("wrong");
+  if(ok){ s.gym.reps = (s.gym.reps || 0) + 1; s.gym.streak = (s.gym.streak || 0) + 1; if(s.gym.streak > (s.gym.best || 0)) s.gym.best = s.gym.streak; saveState(s); $("gymCard").className = "gymcard win" + (gym.track === "trail" ? " trailmode" : ""); $("gGoal").innerHTML = "Correct: <b>" + gym.drill.opts[gym.drill.a] + "</b>."; markMission("gym"); }
+  else { s.gym.streak = 0; saveState(s); $("gymCard").className = "gymcard" + (gym.track === "trail" ? " trailmode" : ""); $("gGoal").innerHTML = "Not quite. The answer is <b>" + gym.drill.opts[gym.drill.a] + "</b>."; }
+  $("gHint").className = "ghint show"; $("gHint").innerHTML = gym.drill.hint;
+  gymDone();
+}
+function gymSkip(){
+  if(gym.answered || !gym.drill) return;
+  var s = getState(); s.gym.streak = 0; saveState(s);
+  $("gOpts").children[gym.drill.a].classList.add("right");
+  $("gHint").className = "ghint show"; $("gHint").innerHTML = "Answer: " + gym.drill.opts[gym.drill.a] + ". " + gym.drill.hint;
+  gymDone();
+}
+function setTrack(t){
+  gym.track = t; gym.drill = null; gym.answered = false;
+  $("trackGeneral").classList.toggle("on", t === "general"); $("trackTrail").classList.toggle("on", t === "trail");
+  $("gymTabs").style.display = t === "trail" ? "none" : ""; $("trailBanner").className = "trailbanner" + (t === "trail" ? " show" : "");
+  $("gymCard").className = "gymcard"; $("gOpts").innerHTML = "";
+  $("gGoal").innerHTML = t === "trail" ? "Real cases from my repos. Tap <b>Start drill</b>." : "Pick a level (or Surprise me) and tap <b>Start drill</b>.";
+  $("gymBoard").innerHTML = ""; $("gHint").className = "ghint"; $("gHint").innerHTML = "";
+  gymPlaying(false); $("gStart").textContent = "Start drill";
+}
+
+/* ---------- quiz (options shuffle every load) ---------- */
+var QUIZ = [
+  { q:"A workflow starts with on: [push]. When does it run?", opts:["Once a day","On every push to the repo, including each phone upload","Only when you press a button","When someone visits the site"], a:1 },
+  { q:"Where does a workflow file live?", opts:["In the repo, inside .github/workflows/","On your phone","In the site's index.html","In GitHub's settings page"], a:0 },
+  { q:"The Pages robot gives your upload a green check. What does that prove?", opts:["The page works","The scripts parse","The files were deployed","Nobody will find a bug"], a:2 },
+  { q:"Your workflow checks fonts and em dashes. You upload a page whose scoring rule is wrong. What happens?", opts:["Red X","Green check, and it goes live wrong","The robot fixes the rule","GitHub emails you"], a:1 },
+  { q:"How do you make .github/workflows/check.yml from the phone?", opts:["You can't","Upload a zip of the folders","Create new file and type the whole path with slashes","Email it to GitHub"], a:2 }
+];
+var quizAnswered = {}, quizOrder = [];
+function shuffled(n){ var a = [], i, j, t; for(i = 0; i < n; i++) a.push(i); for(i = n - 1; i > 0; i--){ j = Math.floor(Math.random() * (i + 1)); t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+function renderQuiz(){
+  var box = $("quizBox"); if(!box) return; box.innerHTML = ""; quizAnswered = {}; quizOrder = [];
+  QUIZ.forEach(function(item, qi){
+    var wrap = el("div", "quizq"); wrap.appendChild(el("div", "q", (qi + 1) + ". " + item.q));
+    var order = shuffled(item.opts.length); quizOrder.push(order);
+    order.forEach(function(oi){
+      var b = el("button", "quizopt", item.opts[oi]); b.type = "button";
+      b.addEventListener("click", function(){
+        if(quizAnswered[qi] != null) return; quizAnswered[qi] = oi;
+        wrap.querySelectorAll(".quizopt")[order.indexOf(item.a)].classList.add("right");
+        if(oi !== item.a) b.classList.add("wrong");
+        var got = 0, ans = 0; for(var k in quizAnswered){ ans++; if(quizAnswered[k] === QUIZ[k].a) got++; }
+        if(ans === QUIZ.length){
+          var s = getState(); if(got > (s.quizBest || 0)){ s.quizBest = got; saveState(s); }
+          box.appendChild(el("div", "qresult", "You got " + got + " / " + QUIZ.length + (got === QUIZ.length ? ", perfect." : ".")));
+          var again = el("button", "btn", "Try the quiz again"); again.type = "button"; again.style.marginTop = "10px"; again.addEventListener("click", renderQuiz); box.appendChild(again);
+        }
+      });
+      wrap.appendChild(b);
+    });
+    box.appendChild(wrap);
+  });
+}
+
+/* ---------- version badge, update check ---------- */
+function buildOf(html){ var m = /<meta name="build" content="([^"]*)"/.exec(html || ""); return m ? m[1] : null; }
+function checkUpdate(manual){
+  if(typeof fetch !== "function" || !/^https?:$/.test(location.protocol)){ if(manual) toast(VERSION + " · open the live address to check for updates"); return; }
+  fetch(location.pathname + "?nc=" + Date.now(), { cache:"no-store" }).then(function(r){ return r.ok ? r.text() : ""; }).then(function(html){
+    var live = buildOf(html);
+    if(live && live !== VERSION){
+      var bar = $("updbar"); bar.textContent = "Newer version is up (" + live + "). Tap to load it."; bar.className = "show";
+      bar.onclick = function(){ try{ location.replace(location.pathname + "?v=" + encodeURIComponent(live) + location.hash); }catch(e){ location.reload(); } };
+    } else if(manual){ toast(live ? VERSION + " · you have the newest" : VERSION + " · could not check right now"); }
+  }).catch(function(){ if(manual) toast(VERSION + " · could not check right now"); });
+}
+
+function initApp(){
+  var b = $("vbadge"); b.textContent = VERSION; b.addEventListener("click", function(){ checkUpdate(true); }); checkUpdate(false);
+  wirePick("filePick", "data-file", function(v){ pipe.file = v; pipeReset(); });
+  wirePick("nojPick", "data-noj", function(v){ pipe.noj = v === "yes"; pipeReset(); });
+  wirePick("fmPick", "data-fm", function(v){ pipe.fm = v === "yes"; pipeReset(); });
+  $("pipeGo").addEventListener("click", function(){ pipeRun(false); });
+  renderYaml(); renderChecks();
+  $("pushAll").addEventListener("click", doPush);
+  renderMissions();
+  renderGymTabs(); gymStatsRender();
+  $("trackGeneral").addEventListener("click", function(){ setTrack("general"); });
+  $("trackTrail").addEventListener("click", function(){ setTrack("trail"); });
+  $("gStart").addEventListener("click", gymStart);
+  $("gHintBtn").addEventListener("click", function(){ if(gym.drill){ $("gHint").className = "ghint show"; $("gHint").innerHTML = gym.drill.hint; } });
+  $("gSkip").addEventListener("click", gymSkip);
+  renderQuiz();
+  window._lab = { pipe:pipe, pipeRun:pipeRun, checksOn:checksOn, doPush:doPush, gym:gym, quizOrder:function(){ return quizOrder; }, getState:getState };
+}
+if(typeof window !== "undefined" && typeof document !== "undefined"){
+  if(document.readyState === "loading"){ document.addEventListener("DOMContentLoaded", initApp); } else { initApp(); }
+}
+if(typeof module !== "undefined" && module.exports){
+  module.exports = { pagesRun:pagesRun, YAML_PARTS:YAML_PARTS, YAML_LINES:YAML_LINES, CHECKS:CHECKS, COMMITS:COMMITS, pushResult:pushResult, pushAll:pushAll, makeDrill:makeDrill, TRAIL_CASES:TRAIL_CASES, QUIZ:QUIZ, shuffled:shuffled, buildOf:buildOf, VERSION:VERSION };
+}
+</script>
+</body>
+</html>

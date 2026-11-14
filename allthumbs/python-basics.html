@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta name="build" content="v3.3 · Nov 14">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#191b22">
 <title>Second Language: Python</title>
@@ -290,6 +291,20 @@
   .trailbanner.show{display:block;}
   .backhub{display:inline-flex;align-items:center;gap:7px;font-family:monospace;font-size:12px;color:var(--soft);border:1px solid var(--line);border-radius:999px;padding:7px 13px;background:var(--card);text-decoration:none;}
 </style>
+<style>
+/* tune-up v1.29 */
+nav{overflow-y:hidden}
+#vbadge,.gtab,.chip{min-height:32px}
+p,li,.tp,.soft,.small,.wline,.tl-hint,code{overflow-wrap:anywhere}
+#httpOut div,.tl-hint,.wline{white-space:pre-wrap}
+#atUpd{position:fixed;left:12px;right:12px;bottom:calc(76px + env(safe-area-inset-bottom));z-index:200;background:#12161b;border:1px solid #3ddc84;color:#3ddc84;border-radius:12px;padding:13px 14px;font:13px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;text-align:center;cursor:pointer}
+</style>
+<style>
+.nextch{display:flex;flex-wrap:wrap;gap:12px;max-width:760px;margin:28px auto 16px;padding:0 16px;box-sizing:border-box}
+.nextch a{flex:1 1 100%;min-height:56px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;gap:4px;padding:12px 16px;border:1px solid rgba(255,255,255,.16);border-radius:12px;background:rgba(255,255,255,.04);color:inherit;text-decoration:none;font-size:16px;font-weight:700;line-height:1.3}
+.nextch a small{font-size:12px;font-weight:400;opacity:.65}
+.nextch a:active{border-color:currentColor}
+</style>
 </head>
 <body>
 
@@ -299,7 +314,7 @@
     <h1>What Python Is</h1>
     <p class="subtitle">For people who already half-speak JavaScript.</p>
   </div>
-  <button class="vbadge" id="vbadge">v3.1</button>
+  <button class="vbadge" id="vbadge">v3.3 · Nov 14</button>
 </header>
 <div class="mascotspot"><img src="thumb-python.png" alt="mascot holding a snake"></div>
 
@@ -522,12 +537,22 @@
 
 <div style="text-align:center;margin:24px 0 8px;"><a class="backhub" href="index.html">&larr; back to All Thumbs</a></div>
 </main>
+<div class="nextch"><a href="git-basics.html"><small>Next up</small>Chapter 6: Save Points</a></div>
 <footer>Second Language &middot; a curiosity tool &middot; the practice pad is a teaching slice, not full Python</footer>
 <div id="toast" role="status"></div>
 
 <script>
 "use strict";
-var VERSION = "v3.2 \u00B7 Oct 25";
+function atShuffle(Q){
+  Q.forEach(function(it){
+    var ok = it.opts ? "opts" : "a", rk = it.opts ? "a" : "r";
+    var arr = it[ok], right = arr[it[rk]], pin = /^(all|none|both) of/i;
+    var last = arr.filter(function(x){ return pin.test(x); }), rest = arr.filter(function(x){ return !pin.test(x); });
+    for(var i = rest.length - 1; i > 0; i--){ var j = Math.floor(Math.random() * (i + 1)), t = rest[i]; rest[i] = rest[j]; rest[j] = t; }
+    it[ok] = rest.concat(last); it[rk] = it[ok].indexOf(right);
+  });
+}
+var VERSION = "v3.3 · Nov 14";
 var STORE_KEY = "python101_v1";
 
 /* ---------- guarded storage ---------- */
@@ -610,7 +635,7 @@ function pyEvalExpr(toks, env, flags){
           left = { k:"str", v:left.v + right.v };
         }
         else if(left.k === "str" || right.k === "str"){
-          throw { type:"TypeError", msg:'can only concatenate str to str. Python will not quietly mix text and numbers like JavaScript does. Try str( ) thinking: put quotes around the number, or keep both sides numbers.' };
+          throw { type:"TypeError", msg:'can only concatenate str to str. Python will not mix text and numbers for you the way JavaScript does. Try str( ) thinking: put quotes around the number, or keep both sides numbers.' };
         }
         else left = { k:"num", v:left.v + right.v, isFloat: left.isFloat || right.isFloat };
       } else {
@@ -792,7 +817,7 @@ function initApp(){
       py:['name = "Sam"','print("Hi " + name)'],
       pairs:[
         { js:[0], py:[0], note:"<b>Strings are the same idea:</b> text in quotes, single or double." },
-        { js:[1], py:[1], note:"<b>+ glues strings in both.</b> One difference to know: Python refuses to mix text and numbers with +, where JavaScript quietly converts. Python makes you be explicit, which catches bugs." }
+        { js:[1], py:[1], note:"<b>+ glues strings in both.</b> One difference to know: Python refuses to mix text and numbers with +, where JavaScript converts for you. Python makes you be explicit, which catches bugs." }
       ]
     },
     {
@@ -980,7 +1005,7 @@ function initApp(){
           fill:'num = "' + maj + "." + min + '"', sol:'num = "' + maj + "." + min + '"\nprint("v" + num)' };
       } },
     { id:"z02", lv:4, make:function(){
-        var app = pickFrom(["gameshelf","pigment","reframe","waystone","pocketninja"]);
+        var app = pickFrom(["gameshelf","pigment","reframe","knightschool","pocketninja"]);
         return { goal:"<b>Make a storage key.</b> Every app you build saves progress under a key like <code>gameshelf_v1</code>. Store <b>app = \"" + app + "\"</b>, then print the key: <b>" + app + "_v1</b>",
           expect:[app + "_v1"], needle:"app",
           hints:["Glue the variable to the fixed suffix with +.","<code>app = \"" + app + "\"</code> then <code>print(app + \"_v1\")</code>"],
@@ -994,7 +1019,7 @@ function initApp(){
           fill:"each = " + price, sol:"each = " + price + "\ncount = " + qty + "\nprint(each * count)" };
       } },
     { id:"z04", lv:4, make:function(){
-        var name = pickFrom(["waystone","pigment","reframe","gameshelf","pocketninja"]);
+        var name = pickFrom(["knightschool","pigment","reframe","gameshelf","pocketninja"]);
         return { goal:"<b>Measure a name.</b> Before you pick a storage key, you want to know how long an app name is. Store <b>app = \"" + name + "\"</b>, then use <b>len</b> to print how many letters it has.",
           expect:[String(name.length)], needle:"len(",
           hints:["len() counts the letters in the text a variable holds.","<code>app = \"" + name + "\"</code> then <code>print(len(app))</code>"],
@@ -1206,7 +1231,7 @@ function initApp(){
       opts:["Rewrite every app in Python","Learn to read it, and let it handle tasks outside the browser","Avoid it completely","Memorize every library name"], a:1 }
   ];
   var answered = 0, correct = 0;
-  function renderQuiz(){
+  function renderQuiz(){ atShuffle(QUIZ);
     answered = 0; correct = 0;
     var wrap = $("quizwrap");
     wrap.innerHTML = "";
@@ -1261,6 +1286,26 @@ if(typeof window !== "undefined" && typeof document !== "undefined"){
 if(typeof module !== "undefined" && module.exports){
   module.exports = { runPython: runPython, pyTokenize: pyTokenize, pyValToString: pyValToString };
 }
+</script>
+<script>
+(function(){
+  var m = document.querySelector('meta[name="build"]'), cur = m ? m.getAttribute("content") : "";
+  function buildOf(h){ var x = /<meta name="build" content="([^"]*)"/.exec(h || ""); return x ? x[1] : ""; }
+  function show(live){
+    var bar = document.getElementById("atUpd");
+    if(!bar){ bar = document.createElement("button"); bar.id = "atUpd"; bar.type = "button"; document.body.appendChild(bar); }
+    bar.textContent = "Newer version is up (" + live + "). Tap to load it.";
+    bar.onclick = function(){ try{ location.replace(location.pathname + "?v=" + encodeURIComponent(live) + location.hash); }catch(e){ location.reload(); } };
+  }
+  function check(){
+    if(!cur || typeof fetch !== "function" || !/^https?:$/.test(location.protocol)) return;
+    fetch(location.pathname + "?nc=" + Date.now(), { cache:"no-store" }).then(function(r){ return r.ok ? r.text() : ""; }).then(function(h){
+      var live = buildOf(h); if(live && live !== cur) show(live);
+    }).catch(function(){});
+  }
+  var b = document.getElementById("vbadge"); if(b) b.addEventListener("click", check);
+  check();
+})();
 </script>
 </body>
 </html>
