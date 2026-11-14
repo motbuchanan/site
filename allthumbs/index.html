@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#12141a">
-<meta name="build" content="v1.29 · Nov 14">
+<meta name="build" content="v1.30 · Nov 14">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -147,10 +147,10 @@ footer{color:#5b6272;font-size:12.5px;text-align:center;margin:30px 0 10px;line-
 </main>
 <button id="updbar" type="button">A newer version is up. Tap to load it.</button>
 <div id="toast" role="status"></div>
-<button class="mb-ver" id="mbVer" type="button">v1.29 &middot; Nov 14</button>
+<button class="mb-ver" id="mbVer" type="button">v1.30 &middot; Nov 14</button>
 <script>
 "use strict";
-var VERSION = "v1.29 · Nov 14";
+var VERSION = "v1.30 · Nov 14";
 
 /* pure helpers (testable) */
 function countDone(state){
@@ -338,9 +338,11 @@ var COURSES = [
 },
 {
 "title": "Video editing",
-"sub": "A course of its own, built alongside RoughCut: cuts, pacing, sound, the rules and the tricks.",
+"sub": "A course of its own, built alongside RoughCut: cuts, pacing, sound, the rules and the tricks. Twelve chapters that end with one finished video.",
 "color": "#4cf0e0",
-"status": "next to build"
+"status": "1 of 12 built",
+"file": "edit-cut.html",
+"cta": "Start Chapter 1: The Cut"
 },
 {
 "title": "Game development",
@@ -426,7 +428,7 @@ function initApp(){
   }
   function courseCard(i){
     var x = COURSES[i], card = el("div", "pull");
-    card.innerHTML = "<div class='art'><img class='stand' src='" + PLACEHOLDER.course + ".png' alt=''><span class='soon'>art soon</span></div><div class='tx'><span class='lab' style='color:" + x.color + "'>course · " + x.status + "</span><h3>" + x.title + "</h3><div class='sub' style='font-size:14.5px'>" + x.sub + "</div><div class='st' style='margin-top:12px'>Not built yet.</div></div>";
+    card.innerHTML = "<div class='art'><img class='stand' src='" + PLACEHOLDER.course + ".png' alt=''><span class='soon'>art soon</span></div><div class='tx'><span class='lab' style='color:" + x.color + "'>course · " + x.status + "</span><h3>" + x.title + "</h3><div class='sub' style='font-size:14.5px'>" + x.sub + "</div>" + (x.file ? "<a class='prim' href='" + x.file + "' style='margin-top:12px'>" + x.cta + "</a>" : "<div class='st' style='margin-top:12px'>Not built yet.</div>") + "</div>";
     return card;
   }
 

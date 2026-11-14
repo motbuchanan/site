@@ -1,5 +1,19 @@
 # All Thumbs: course roadmap and state
 
+## v1.30 (Nov 14 2026) - Video editing branch starts: Chapter 1, The Cut
+
+- New file edit-cut.html (v0.1, then v0.2 the same day). The editing course lives in this folder with an edit- prefix. Its progress key is editcut101_v1.
+- Hub v1.30: the Video editing course card says "1 of 12 built" and links to Chapter 1. The full editing shelf (12 books) waits until more chapters exist.
+- The plan (approved Nov 14): 12 chapters. The reader builds ONE short video across the course. Every chapter has a toy in the page, then a task on the reader's own footage in RoughCut or any editor. Chapter 12 assembles and exports it.
+  1 The Cut, 2 Story First, 3 Covering the Cut, 4 Pacing, 5 Finding the Sound Bite, 6 Sound Carries It, 7 Music and the Beat, 8 Words on Screen, 9 The Picture, 10 Color and Look, 11 Effects With a Reason, 12 Final Cut.
+- Practice clips are drawn in the browser (one scene, three cameras), so there are no video files to host. engine.js keeps the clips behind clipState() and CAMS so real footage could replace them later.
+- Chapter 1 opens with a six-shot list and four filming rules, so nobody is blocked while the shooting course is unbuilt.
+- The gym's second track (The Trail, real cases) is hidden in the editing chapters until there are real editing stories to put in it.
+- Planned next to it: a short shooting course, four chapters, phone only (Light and Frame, Sound, Get Coverage, Talking to a Person). It goes on the shelf before editing.
+- RoughCut is its own repo, served at /roughcut/ on the live site. The chapter links to ../roughcut/.
+- Chapter 1 v0.2: its RoughCut steps were checked against the live app (RoughCut v0.49, Oct 29) and rewritten to match: + New, + Media, + Import, tap to add, hold to move, drag an end to trim, the Cut tab for single frames (In and Out points). Recheck these steps whenever RoughCut renames a control.
+- The Trail track in the editing gym waits until later (Mot, Nov 14).
+
 ## v1.29 (Nov 14 2026) - Tune-up of the whole course (all 16 chapters and the hub)
 
 Came out of a full-course audit on Nov 13. Every page was touched, so every badge moved:

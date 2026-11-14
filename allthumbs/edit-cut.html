@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14181d">
+<meta name="build" content="v0.2 · Nov 14">
+<title>The Cut: where one shot ends and the next begins (video editing, chapter 1)</title>
+<meta name="description" content="Chapter 1 of the All Thumbs video editing course. What a cut does, why a cut hides best in the middle of a move, how to trim the waiting off a clip, and a six-shot list to film on your phone.">
+<link rel="canonical" href="https://motbuchanan.com/allthumbs/edit-cut.html">
+<meta property="og:title" content="The Cut: video editing, chapter 1">
+<meta property="og:description" content="Slide a cut between two shots, trim three clips clean, then do it on your own footage in RoughCut or any editor.">
+<meta property="og:image" content="https://motbuchanan.com/allthumbs/icon-512.png">
+<link rel="icon" href="favicon.png">
+<style>
+
+  :root{
+    --canvas:#14181d; --panel:#1c2229; --card:#171c22; --line:#2c3540;
+    --ink:#e8ecf0; --soft:#97a3ae; --dim:#6b7682;
+    --green:#6fe08c; --amber:#f5b04c; --blue:#5aa7e8; --red:#e87a6d; --rose:#4cf0e0; --trail:#c8a4f0;
+    --mono:ui-monospace,'SF Mono','Cascadia Mono','Roboto Mono',Consolas,Menlo,monospace;
+    --sans:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',sans-serif;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html{scroll-behavior:smooth; scroll-padding-top:64px;}
+  body{margin:0; background:var(--canvas); color:var(--ink); font-family:var(--sans); font-size:17px; line-height:1.6; padding-bottom:70px; overflow-wrap:anywhere;}
+  header{padding:26px 20px 10px; max-width:760px; margin:0 auto; display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap;}
+  .wordmark{font-family:var(--mono); font-size:12px; letter-spacing:.2em; color:var(--soft); text-transform:uppercase;}
+  h1{margin:6px 0 2px; font-size:clamp(26px,8vw,32px); line-height:1.15; letter-spacing:-.01em;}
+  .subtitle{color:var(--soft); margin:0; font-size:15px;}
+  .vbadge{font-family:var(--mono); font-size:11px; color:var(--soft); border:1px solid var(--line); border-radius:999px; padding:9px 12px; background:var(--panel); cursor:pointer; white-space:nowrap; margin-top:4px;}
+  nav{position:sticky; top:0; z-index:30; background:#14181d; border-bottom:1px solid var(--line); overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch;}
+  .navrow{display:flex; gap:8px; padding:10px 16px; max-width:760px; margin:0 auto; width:max-content;}
+  .navchip{font-family:var(--mono); font-size:12px; color:var(--soft); border:1px solid var(--line); border-radius:999px; padding:9px 13px; background:var(--card); text-decoration:none; white-space:nowrap;}
+  .navchip:active{color:var(--ink); border-color:var(--rose);}
+  main{max-width:760px; margin:0 auto; padding:0 16px;}
+  section{background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:22px 18px; margin:18px 0; scroll-margin-top:68px;}
+  .eyebrow{font-family:var(--mono); font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--rose); margin:0 0 6px;}
+  h2{margin:0 0 10px; font-size:23px; line-height:1.2;}
+  p{margin:10px 0;}
+  .soft{color:var(--soft);} .small{font-size:14px;}
+  code{font-family:var(--mono); font-size:.9em; background:var(--card); border:1px solid var(--line); border-radius:6px; padding:1px 6px; color:var(--green);}
+  .note{border-left:3px solid var(--rose); background:var(--card); border-radius:0 10px 10px 0; padding:10px 14px; margin:14px 0; font-size:15px; color:var(--soft);}
+  .btn{display:inline-block; font-family:var(--mono); font-size:14px; color:var(--ink); background:var(--card); border:1px solid var(--line); border-radius:10px; padding:11px 16px; cursor:pointer; user-select:none;}
+  .btn:active{border-color:var(--rose); transform:translateY(1px);}
+  .btn.primary{border-color:var(--rose); color:var(--rose);}
+  .btn[disabled]{opacity:.4; cursor:default;}
+  .simwrap{margin:14px 0;}
+  .picker{display:flex; gap:8px; flex-wrap:wrap; margin:10px 0;}
+  .plabel{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--dim); margin:14px 0 0;}
+  .chipbtn{font-family:var(--mono); font-size:12.5px; padding:10px 13px; border-radius:999px; border:1px solid var(--line); background:var(--card); color:var(--soft); cursor:pointer;}
+  .chipbtn.on{border-color:var(--rose); color:var(--rose); background:rgba(76,240,224,.1); font-weight:700;}
+  .mascotspot{text-align:center; margin:6px 0 2px;}
+  .mascotspot img{height:230px; max-width:100%; width:auto; object-fit:contain; filter:drop-shadow(0 10px 22px rgba(0,0,0,.5));}
+  .tipbox{position:relative; background:var(--card); border:1px solid var(--line); border-left:3px solid var(--rose); border-radius:0 12px 12px 0; padding:16px 16px 16px 118px; margin:22px 0; min-height:96px;}
+  .tipbox .poke{position:absolute; left:-14px; bottom:-8px; height:150px; width:auto; transform:rotate(-8deg); filter:drop-shadow(0 8px 16px rgba(0,0,0,.45)); pointer-events:none;}
+  .tipbox.right{border-left:1px solid var(--line); border-right:3px solid var(--rose); border-radius:12px 0 0 12px; padding:16px 118px 16px 16px;}
+  .tipbox.right .poke{left:auto; right:-14px; transform:rotate(8deg);}
+  .tipbox .tt{font-weight:700; color:var(--rose); font-size:15px;}
+  .tipbox .tp{margin:4px 0 0; font-size:14.5px; color:var(--soft); line-height:1.55;}
+
+  /* missions, gym, quiz (course standard) */
+  .mission{display:flex; gap:10px; align-items:flex-start; background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px; margin:8px 0; font-size:14.5px;}
+  .mission .mk{font-family:var(--mono); flex:0 0 auto; width:22px; height:22px; border-radius:50%; border:1px solid var(--line); color:var(--dim); display:flex; align-items:center; justify-content:center; font-size:12px;}
+  .mission.done{border-color:rgba(111,224,140,.5);}
+  .mission.done .mk{border-color:var(--green); color:var(--green); background:rgba(111,224,140,.1);}
+  .mission.done .mtext{color:var(--soft);}
+  .mission .mtext b{color:var(--rose);}
+  .gym{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px; margin:14px 0;}
+  .gymstats{display:flex; gap:18px; flex-wrap:wrap; font-size:12.5px; color:#9aa5b1; margin-bottom:10px; letter-spacing:.04em;}
+  .gymstats b{color:var(--green); font-size:15px; margin-left:4px;}
+  .gymtabs{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;}
+  .gtab{font-size:12px; padding:9px 12px; border-radius:999px; border:1px solid var(--line); background:transparent; color:inherit; cursor:pointer;}
+  .gtab.on{border-color:var(--rose); color:var(--rose); font-weight:700;}
+  .gymcard{border:1px dashed var(--line); border-radius:10px; padding:12px;}
+  .gymcard.active{border-style:solid; border-color:var(--rose);}
+  .gymcard.win{border-style:solid; border-color:var(--green);}
+  .gymcard.trailmode.active{border-color:var(--trail);}
+  .ggoal{font-size:15px; line-height:1.5;} .ggoal b{color:var(--rose);}
+  .ghint{font-size:13.5px; color:var(--blue); margin-top:8px; display:none;} .ghint.show{display:block;}
+  .gbtns{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;}
+  .tracktoggle{display:flex; gap:8px; margin:14px 0 10px; align-items:center; flex-wrap:wrap;}
+  .tracktoggle .tlabel{font-family:var(--mono); font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--dim);}
+  .ttab{font-family:var(--mono); font-size:12.5px; padding:9px 14px; border-radius:999px; border:1px solid var(--line); background:var(--card); color:var(--soft); cursor:pointer;}
+  .ttab.on.general{border-color:var(--rose); color:var(--rose); background:rgba(76,240,224,.1); font-weight:700;}
+  .ttab.on.trail{border-color:var(--trail); color:var(--trail); background:rgba(200,164,240,.12); font-weight:700;}
+  .trailbanner{font-family:var(--mono); font-size:11.5px; color:var(--trail); background:rgba(200,164,240,.08); border:1px solid rgba(200,164,240,.3); border-radius:8px; padding:7px 11px; margin:8px 0; display:none;}
+  .trailbanner.show{display:block;}
+  .quizq{margin:16px 0;} .quizq .q{font-weight:600; margin-bottom:8px;}
+  .quizopt{display:block; width:100%; text-align:left; font-size:14.5px; padding:11px 14px; border-radius:10px; border:1px solid var(--line); background:var(--card); color:var(--ink); cursor:pointer; margin:6px 0; font-family:var(--sans);}
+  .quizopt.right{border-color:var(--green); background:rgba(111,224,140,.1);}
+  .quizopt.wrong{border-color:var(--red); background:rgba(232,122,109,.1);}
+  .qresult{font-weight:700; margin-top:10px;}
+  .backhub{display:inline-flex; align-items:center; gap:7px; font-family:var(--mono); font-size:12px; color:var(--soft); border:1px solid var(--line); border-radius:999px; padding:10px 14px; background:var(--card); text-decoration:none;}
+  footer{max-width:760px; margin:8px auto 30px; padding:0 20px; color:var(--dim); font-size:12px; text-align:center;}
+  #toast{position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(90px); background:var(--card); color:var(--ink); border:1px solid var(--rose); border-radius:999px; padding:10px 18px; font-family:var(--mono); font-size:13px; transition:transform .3s ease; z-index:99; pointer-events:none; max-width:88vw; text-align:center;}
+  #toast.show{transform:translateX(-50%) translateY(0);}
+  #updbar{display:none; position:fixed; left:12px; right:12px; bottom:calc(14px + env(safe-area-inset-bottom)); z-index:100; background:var(--card); border:1px solid var(--green); color:var(--green); border-radius:12px; padding:13px 14px; font-family:var(--mono); font-size:13px; text-align:center; cursor:pointer;}
+  #updbar.show{display:block;}
+  @media(max-width:380px){ .tipbox{padding-left:96px;} .tipbox.right{padding:16px 96px 16px 16px;} .tipbox .poke{height:124px;} }
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:.001s !important; transition-duration:.001s !important;} html{scroll-behavior:auto;} }
+  .btn:focus-visible,.chipbtn:focus-visible,.quizopt:focus-visible,.navchip:focus-visible,.gtab:focus-visible,.ttab:focus-visible{outline:2px solid var(--rose); outline-offset:2px;}
+
+  .lanes{border:1px solid var(--line); border-radius:12px; background:#0d1114; padding:10px; margin:12px 0; min-height:70px; max-height:320px; overflow-y:auto;}
+  .step{display:flex; gap:10px; align-items:flex-start; font-size:14px; padding:6px 4px; border-bottom:1px solid rgba(44,53,64,.6);}
+  .step:last-child{border-bottom:none;}
+  .step .who{flex:0 0 66px; font-family:var(--mono); font-size:11px; padding-top:2px;}
+  .step .who.p1{color:var(--blue);} .step .who.p2{color:var(--amber);} .step .who.db{color:var(--rose);}
+  .step.bad .what{color:var(--red);} .step.warn .what{color:var(--amber);} .step.good .what{color:var(--green);}
+  .lanes .idle{color:var(--dim); font-size:14px; padding:6px 4px;}
+  .revcard{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; margin:12px 0;}
+  .revmeta{font-family:var(--mono); font-size:11.5px; color:var(--dim); letter-spacing:.04em;}
+  .revtxt{font-size:16px; margin:6px 0 10px; line-height:1.5;}
+  .revopts{display:flex; gap:8px; flex-wrap:wrap;}
+  .chipbtn.right{border-color:var(--green); color:var(--green); background:rgba(111,224,140,.1);}
+  .chipbtn.wrong{border-color:var(--red); color:var(--red); background:rgba(232,122,109,.1);}
+  .revwhy{margin-top:12px; font-size:14.5px; color:var(--soft);} .revwhy b{color:var(--ink);}
+  .revdone{font-size:16px; margin-bottom:10px;} .revdone b{color:var(--rose);}
+  .gopts{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;}
+  .result{display:none; border:1px solid var(--line); border-left:3px solid var(--green); background:var(--card); border-radius:0 10px 10px 0; padding:11px 13px; font-size:15px; color:var(--soft); margin:10px 0;}
+  .result.show{display:block;} .result.bad{border-left-color:var(--red);} .result b{color:var(--ink);}
+  .lognum{font-family:var(--mono); font-size:12px; color:var(--rose);}
+  #updbar{width:auto; font-family:var(--mono);}
+  .tracktoggle{display:none;}
+  .screen{position:relative; background:#0b0e12; border:1px solid var(--line); border-radius:12px; overflow:hidden; margin:12px 0 8px;}
+  .screen canvas{display:block; width:100%; aspect-ratio:16/9;}
+  .rangewrap{margin:10px 0 4px;}
+  .rangewrap label{display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap; font-family:var(--mono); font-size:12.5px; color:var(--soft);}
+  .rangewrap label b{color:var(--rose);}
+  input[type=range]{-webkit-appearance:none; appearance:none; width:100%; height:44px; background:transparent; margin:0;}
+  input[type=range]::-webkit-slider-runnable-track{height:8px; border-radius:4px; background:#2a323c;}
+  input[type=range]::-moz-range-track{height:8px; border-radius:4px; background:#2a323c;}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; appearance:none; width:30px; height:30px; border-radius:50%; background:var(--rose); border:3px solid #0b0e12; margin-top:-11px;}
+  input[type=range]::-moz-range-thumb{width:26px; height:26px; border-radius:50%; background:var(--rose); border:3px solid #0b0e12;}
+  .shots{display:grid; gap:8px; margin:12px 0;}
+  .shot{display:flex; gap:12px; align-items:center; text-align:left; font:inherit; font-size:15px; color:var(--soft); background:var(--card); border:1px solid var(--line); border-radius:10px; padding:10px 12px; cursor:pointer; min-height:52px;}
+  .shot .box{flex:0 0 24px; height:24px; border-radius:6px; border:1px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:14px; color:var(--canvas);}
+  .shot.on{border-color:var(--rose);} .shot.on .box{background:var(--rose); border-color:var(--rose);}
+  .shot b{color:var(--ink);} .shot span.tx{display:block;}
+  .rules{margin:10px 0; padding-left:22px; color:var(--soft);} .rules li{margin:7px 0;} .rules b{color:var(--ink);}
+  .trimclip{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px; margin:10px 0;}
+  .trimclip.bad{border-color:var(--red);} .trimclip.ok{border-color:var(--green);}
+  .tchead{display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap; font-size:14.5px; color:var(--soft);} .tchead b{color:var(--ink);}
+  .tchead .tclen{font-family:var(--mono); font-size:12.5px; color:var(--rose);}
+  .tctrack{position:relative; height:26px; border-radius:6px; background:#2a323c; margin:10px 0; overflow:hidden;}
+  .tctrack .act{position:absolute; top:0; bottom:0; background:var(--rose);}
+  .tctrack .off{position:absolute; top:0; bottom:0; background:rgba(11,14,18,.82);}
+  .tctrack .edge{position:absolute; top:0; bottom:0; width:3px; background:#ece6d8;}
+  .tckey{display:flex; gap:14px; flex-wrap:wrap; font-family:var(--mono); font-size:11.5px; color:var(--dim); margin:8px 0;}
+  .tckey i{display:inline-block; width:12px; height:12px; border-radius:3px; vertical-align:-2px; margin-right:5px;}
+  .tcbtns{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px;}
+  .tcbtns .chipbtn{min-height:46px; border-radius:10px; padding:6px 3px; font-size:12px; line-height:1.25;}
+  .tcbtns .chipbtn:disabled{opacity:.35; cursor:default;}
+  .task{background:var(--card); border:1px solid var(--rose); border-radius:12px; padding:14px 16px; margin:14px 0;}
+  .task ol{margin:8px 0 12px; padding-left:22px; color:var(--soft);} .task li{margin:7px 0;} .task b{color:var(--ink);}
+  .applink{display:inline-block; font-family:var(--mono); font-size:14px; color:var(--rose); border:1px solid var(--rose); border-radius:10px; padding:11px 16px; text-decoration:none; margin:4px 8px 4px 0;}
+  .result.mid{border-left-color:#8a94a6;}
+  .screen.pin{position:sticky; top:62px; z-index:5; box-shadow:0 10px 18px rgba(11,14,18,.75);}
+  @media (orientation:landscape) and (max-height:520px){ .screen{max-width:calc((100vh - 150px) * 16 / 9); margin-left:auto; margin-right:auto;} .screen.pin{max-width:calc((100vh - 220px) * 16 / 9);} }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="wordmark">All Thumbs &middot; video editing &middot; chapter 1</div>
+    <h1>The Cut</h1>
+    <p class="subtitle">Where one shot ends and the next begins, and how to pick the exact spot.</p>
+  </div>
+  <button class="vbadge" id="vbadge" type="button">v0.2 &middot; Nov 14</button>
+</header>
+
+<nav>
+  <div class="navrow">
+    <a class="navchip" href="#idea">the idea</a>
+    <a class="navchip" href="#shots">six shots</a>
+    <a class="navchip" href="#cut">the cut</a>
+    <a class="navchip" href="#trim">the trim</a>
+    <a class="navchip" href="#real">for real</a>
+    <a class="navchip" href="#missions">missions</a>
+    <a class="navchip" href="#gym">gym</a>
+    <a class="navchip" href="#quiz">quiz</a>
+  </div>
+</nav>
+
+<main>
+
+<section id="idea">
+  <p class="eyebrow">the idea</p>
+  <h2>A cut ends one shot and starts the next</h2>
+  <div class="mascotspot"><img src="thumb-wave.png" alt="the thumb mascot waving"></div>
+  <p>Every video you've watched is a row of shots joined by cuts. A cut is the plainest edit there is: one shot stops and another starts on the very next frame. The viewer's brain joins the two and assumes they belong together.</p>
+  <p>A cut can do three jobs. It can <b>skip time</b> (the dough goes in, the loaf comes out). It can <b>change the view</b> (the whole kitchen, then the hands). It can <b>change the subject</b> (the baker, then a customer). Most of editing is choosing which shot comes next and the exact frame to switch on.</p>
+  <div class="note">This is Chapter 1 of a 12-chapter editing course. Each chapter has a toy for trying the idea, then a task to do on your own footage in RoughCut or any editor you like. By Chapter 12 those tasks add up to one finished video.</div>
+</section>
+
+<section id="shots">
+  <p class="eyebrow">before you edit</p>
+  <h2>Film six shots first</h2>
+  <p>You need something to cut. Pick one small job that takes about a minute: making a sandwich, pouring a coffee, folding a paper airplane. Film it as six separate shots, and have the person do the job again for each one, so every shot has the whole thing in it. Tick them off as you get them.</p>
+  <div class="shots" id="shotList"></div>
+  <p class="plabel">four rules while you film</p>
+  <ol class="rules">
+    <li>Let every shot run for at least a slow count of ten, because short clips leave nothing to trim.</li>
+    <li>Keep the phone still during a shot, and move it between shots.</li>
+    <li>Count to three before the action starts and again after it ends. That pause gives you room to trim.</li>
+    <li>Pick upright or sideways and keep it for all six.</li>
+  </ol>
+  <div class="tipbox">
+    <img class="poke" src="thumb-tip.png" alt="">
+    <div class="tt">No footage yet?</div>
+    <p class="tp">Any six clips already on your phone will do for this chapter. You can also download free clips from a stock site such as Pexels or Pixabay and practice on those. Your own shots are better, because Chapter 12 ends with a video that's yours.</p>
+  </div>
+</section>
+
+<section id="cut">
+  <p class="eyebrow">the cut</p>
+  <h2>Cut in the middle of a move</h2>
+  <p>Here are two shots of the same reach for a cup: one wide, one tight. Drag the slider to choose where the wide shot stops (the picture follows your thumb, so you can find the move). Choose where the tight shot starts. Then play it.</p>
+  <div class="screen"><canvas id="cutCv" width="640" height="360" aria-label="drawn practice clip: a person reaches for a cup"></canvas></div>
+  <div class="rangewrap">
+    <label for="cutRange"><span>the wide shot stops at</span><b id="cutAt">0.4s</b></label>
+    <input type="range" id="cutRange" min="0.3" max="4" step="0.1" value="0.4">
+  </div>
+  <p class="plabel">the tight shot starts</p>
+  <div class="picker" id="modePick">
+    <button class="chipbtn on" data-mode="match" type="button">where the wide shot stopped</button>
+    <button class="chipbtn" data-mode="top" type="button">from its own beginning</button>
+  </div>
+  <div class="picker" style="justify-content:center"><button class="btn primary" id="cutPlay" type="button">play the cut</button></div>
+  <div class="result" id="cutResult"></div>
+</section>
+
+<section id="trim">
+  <p class="eyebrow">the trim</p>
+  <h2>Trim the waiting off both ends</h2>
+  <p>Three clips, 14 seconds. Each one has dead time before the action and after it. Nudge the start and end of each clip until the action is what's left, with no more than half a second of air on either side.</p>
+  <div class="tckey"><span><i style="background:#4cf0e0"></i>the action</span><span><i style="background:#2a323c"></i>waiting</span><span><i style="background:#0b0e12;border:1px solid #2a323c"></i>trimmed off</span></div>
+  <div class="screen pin"><canvas id="trimCv" width="640" height="360" aria-label="drawn practice clips: walk to the table, lift the cup, take a sip"></canvas></div>
+  <div id="trimClips"></div>
+  <div class="result show" id="trimResult"></div>
+  <div class="picker" style="justify-content:center">
+    <button class="btn primary" id="trimPlay" type="button">play the three clips</button>
+    <button class="btn" id="trimReset" type="button">start over</button>
+  </div>
+  <div class="tipbox right">
+    <img class="poke" src="thumb-think.png" alt="">
+    <div class="tt">A trim can be undone</div>
+    <p class="tp">In RoughCut and most editing apps, trimming only changes which part of the clip plays. The full video stays on your phone as long as you keep the original, so you can always pull the edge back out. Trim hard, watch it, and loosen it if it feels rushed.</p>
+  </div>
+</section>
+
+<section id="real">
+  <p class="eyebrow">for real</p>
+  <h2>Now do it on your own footage</h2>
+  <div class="task">
+    <ol>
+      <li>Open RoughCut, or any editor you like, and start a new project.</li>
+      <li>Add three of your six shots in this order: <b>wide, medium, tight</b>.</li>
+      <li>Give each shot one part of the job: the wide gets the start, the medium gets the middle, the tight gets the finish. Each moment should play once.</li>
+      <li>Trim the start of each clip so it opens as its part begins to move.</li>
+      <li>Trim the end of each clip so it closes just after that part stops.</li>
+      <li>Play it through. If a cut feels late, trim a little more. If it feels rushed, give some back.</li>
+      <li><b>Keep the project.</b> Chapter 2 picks it up from here.</li>
+    </ol>
+    <a class="applink" href="../roughcut/">open RoughCut</a>
+    <p class="plabel">where it is in RoughCut</p>
+    <ol class="rules">
+      <li>On the Projects screen, tap <b>+ New</b>.</li>
+      <li>Tap <b>+ Media</b>, then <b>+ Import</b>, and pick your shots. Tap each one to add it to the timeline.</li>
+      <li>To change the order, hold a clip until it lifts, then slide it.</li>
+      <li>To trim, tap a clip to select it and drag either end.</li>
+      <li>To trim one frame at a time, open the clip's <b>Cut</b> tab. RoughCut calls the start of a clip its In point and the end its Out point.</li>
+    </ol>
+    <div class="shots" id="realBox"></div>
+  </div>
+</section>
+
+<section id="missions">
+  <p class="eyebrow">missions</p>
+  <h2>Prove it</h2>
+  <p>Six things to make happen. They tick off as you go.</p>
+  <div id="missionList"></div>
+</section>
+
+<section id="gym">
+  <p class="eyebrow">the gym</p>
+  <h2>Practice: make the call</h2>
+  <p class="small soft">Randomized drills. A wrong call resets your streak.</p>
+  <div class="tracktoggle">
+    <span class="tlabel">practice</span>
+    <button class="ttab general on" id="trackGeneral" type="button">General</button>
+    <button class="ttab trail" id="trackTrail" type="button">The Trail</button>
+  </div>
+  <div class="trailbanner" id="trailBanner">The Trail</div>
+  <div class="gym">
+    <div class="gymstats"><span>reps<b id="repN">0</b></span><span>streak<b id="strN">0</b></span><span>best<b id="bestN">0</b></span></div>
+    <div class="gymtabs" id="gymTabs"></div>
+    <div class="gymcard" id="gymCard">
+      <div class="ggoal" id="gGoal">Pick a level (or Surprise me) and tap <b>Start drill</b>.</div>
+      <div id="gymBoard"></div>
+      <div class="gopts" id="gOpts"></div>
+      <div class="ghint" id="gHint"></div>
+      <div class="gbtns">
+        <button class="btn primary" id="gStart" type="button">Start drill</button>
+        <button class="btn" id="gHintBtn" type="button" style="display:none">Hint</button>
+        <button class="btn" id="gSkip" type="button" style="display:none">Skip</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="quiz">
+  <p class="eyebrow">quiz</p>
+  <h2>Five questions</h2>
+  <div id="quizBox"></div>
+</section>
+
+<div style="text-align:center;margin:24px 0 8px;">
+  <a class="backhub" href="index.html">&larr; back to All Thumbs</a>
+</div>
+
+</main>
+<footer>The Cut &middot; All Thumbs video editing, chapter 1 &middot; the practice clips are drawn in your browser, nothing here is sent anywhere</footer>
+<button id="updbar" type="button">A newer version is up. Tap to load it.</button>
+<div id="toast" role="status"></div>
+
+<script>
+"use strict";
+var VERSION = "v0.2 · Nov 14";
+var STORE_KEY = "editcut101_v1";
+
+/* ---------- guarded storage ---------- */
+var memStore = {};
+function loadState(){
+  try{ var raw = localStorage.getItem(STORE_KEY); if(raw) return JSON.parse(raw); }catch(e){}
+  return memStore[STORE_KEY] || null;
+}
+function saveState(s){
+  memStore[STORE_KEY] = s;
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(s)); }catch(e){}
+}
+function getState(){
+  var s = loadState();
+  if(!s || typeof s !== "object") s = {};
+  if(!s.m) s.m = {};
+  if(!s.gym) s.gym = { reps:0, streak:0, best:0 };
+  if(typeof s.quizBest !== "number") s.quizBest = 0;
+  if(!s.shots || typeof s.shots !== "object") s.shots = {};
+  return s;
+}
+
+/* ---------- ENGINE (pure, testable) ---------- */
+function rn(list){ return list[Math.floor(Math.random() * list.length)]; }
+function r1(x){ return Math.round(x * 10) / 10; }
+function clamp01(x){ return x < 0 ? 0 : (x > 1 ? 1 : x); }
+function ease(x){ x = clamp01(x); return x * x * (3 - 2 * x); }
+
+/* The practice clips are one drawn scene. A clip is a timeline of the scene; a shot is a camera on it.
+   To use real footage later, replace clipState + drawScene with a video element per clip. */
+var CLIPS = {
+  A: { dur:5.0, act:[1.5, 3.5], cam:"wide",   name:"wide",   what:"walks to the table" },
+  B: { dur:4.5, act:[1.0, 3.0], cam:"medium", name:"medium", what:"reaches and lifts the cup" },
+  C: { dur:4.5, act:[1.0, 3.0], cam:"tight2",  name:"tight",  what:"takes a sip and sets it down" }
+};
+var CAMS = { wide:{ cx:8, cy:4.5, z:1 }, medium:{ cx:7.3, cy:4.2, z:1.7 }, tight:{ cx:8.3, cy:4.45, z:2.6 }, tight2:{ cx:7.5, cy:3.85, z:2.5, lab:"tight" } };
+function clipState(id, t){
+  if(id === "A") return { px:0.12 + 0.28 * ease((t - 1.5) / 2), reach:0, lift:0, sip:0 };
+  if(id === "B") return { px:0.40, reach:ease((t - 1.0) / 0.8), lift:ease((t - 1.8) / 1.2), sip:0 };
+  return { px:0.40, reach:1, lift:1 - ease((t - 2.2) / 0.8), sip:ease((t - 1.0) / 0.6) - ease((t - 1.6) / 0.6) };
+}
+
+/* the cut toy: clip B seen wide, then tight */
+var MOVE = CLIPS.B.act;
+function cutVerdict(t, mode){
+  t = r1(t);
+  if(mode === "top"){
+    if(t > MOVE[0]) return { kind:"twice", good:false, text:"<b>The move happens twice.</b> The tight shot started from its own beginning, so the viewer watches the hand go for the cup all over again." };
+    return { kind:"wait", good:true, tone:"mid", text:"<b>It joins up, with a wait.</b> Nothing had moved yet, so starting the tight shot from its top works. The cut still lands before there's a move to follow." };
+  }
+  if(t <= MOVE[0]) return { kind:"early", good:false, tone:"mid", text:"<b>Cut before anything moves.</b> The shots join up, but the viewer has no reason to look closer yet. Slide later, into the reach." };
+  if(t >= MOVE[1]) return { kind:"late", good:false, text:"<b>Cut after the move is over.</b> The tight shot opens on a cup that's already up, so the viewer missed the part worth seeing close. Slide earlier." };
+  return { kind:"action", good:true, text:"<b>Cut on the move.</b> The reach starts in the wide shot and finishes in the tight one. The eye follows the move across the cut and hardly notices the switch." };
+}
+function cutSegments(t, mode){
+  t = r1(t);
+  var b0 = mode === "top" ? 0 : t, segs = [];
+  if(t > 0.05) segs.push({ clip:"B", cam:"wide", from:Math.max(0, t - 1.6), to:t });
+  segs.push({ clip:"B", cam:"tight", from:b0, to:Math.min(CLIPS.B.dur, b0 + 1.8) });
+  return segs;
+}
+
+/* the trim toy */
+var TRIM_ORDER = ["A", "B", "C"], STEP = 0.5, AIR = 0.5;
+function freshTrims(){ var o = {}; TRIM_ORDER.forEach(function(id){ o[id] = { a:0, b:CLIPS[id].dur }; }); return o; }
+function nudge(tr, id, edge, dir){
+  var c = CLIPS[id], x = tr[id];
+  if(edge === "a"){ var na = r1(x.a + dir * STEP); if(na >= 0 && na <= x.b - STEP) x.a = na; }
+  else { var nb = r1(x.b + dir * STEP); if(nb <= c.dur && nb >= x.a + STEP) x.b = nb; }
+  return tr;
+}
+function canNudge(tr, id, edge, dir){
+  var c = CLIPS[id], x = tr[id];
+  if(edge === "a"){ var na = r1(x.a + dir * STEP); return na >= 0 && na <= x.b - STEP; }
+  var nb = r1(x.b + dir * STEP); return nb <= c.dur && nb >= x.a + STEP;
+}
+function trimScore(tr){
+  var total = 0, waiting = 0, cut = [], loose = [], state = {};
+  TRIM_ORDER.forEach(function(id, i){
+    var c = CLIPS[id], x = tr[id], lead = r1(c.act[0] - x.a), tail = r1(x.b - c.act[1]);
+    total += x.b - x.a; waiting += Math.max(0, lead) + Math.max(0, tail);
+    if(lead < 0 || tail < 0){ cut.push(i + 1); state[id] = "bad"; }
+    else if(lead > AIR || tail > AIR){ loose.push(i + 1); state[id] = ""; }
+    else state[id] = "ok";
+  });
+  return { total:r1(total), waiting:r1(waiting), cut:cut, loose:loose, state:state, clean:!cut.length && !loose.length };
+}
+function trimSegments(tr){ return TRIM_ORDER.map(function(id){ return { clip:id, cam:CLIPS[id].cam, from:tr[id].a, to:tr[id].b }; }); }
+
+/* the six shots */
+var SHOTS = [
+  { id:"wide",   name:"Wide",        what:"the whole scene: the person and the place" },
+  { id:"medium", name:"Medium",      what:"the person from the waist up, doing the job" },
+  { id:"hands",  name:"Tight",       what:"only the hands at work" },
+  { id:"thing",  name:"The object",  what:"the thing being made, by itself" },
+  { id:"face",   name:"The face",    what:"a look or a reaction" },
+  { id:"result", name:"The result",  what:"the finished thing" }
+];
+
+/* gym */
+var CUT_Q = [
+  { t:"The pour finished three seconds ago and nothing has moved since.", a:0, h:"The action ended. Every extra second is waiting." },
+  { t:"She's halfway through the sentence that makes her point.", a:1, h:"Let the thought finish. A cut in the middle loses it." },
+  { t:"The hand is starting to reach for the tool, and you have a tight shot of the same reach.", a:0, h:"Cut on the move and finish it in the tight shot." },
+  { t:"Ten seconds of the finished cake. The viewer understood it in two.", a:0, h:"Once the shot has said its piece, move on." },
+  { t:"A face is reacting, and the reaction is still changing.", a:1, h:"The change is the content. Cut once it settles." },
+  { t:"The speaker finished the thought and took a breath.", a:0, h:"A finished thought is a clean place to leave." }
+];
+var JOBS = ["Skipped time", "Changed the view", "Changed the subject"];
+var JOB_Q = [
+  { t:"Dough goes in the oven. Next shot: the baked loaf comes out.", a:0, h:"An hour of baking vanished at the cut." },
+  { t:"The whole kitchen. Next shot: close on the hands kneading.", a:1, h:"Same moment, same job, closer camera." },
+  { t:"The baker talks about flour. Next shot: a customer outside the shop.", a:2, h:"A different person in a different place." },
+  { t:"A car pulls out of the driveway. Next shot: it parks at the store.", a:0, h:"The drive was skipped." },
+  { t:"A guitarist seen from across the room. Next shot: fingers on the strings.", a:1, h:"Same player, same moment, new view." },
+  { t:"The coach explains the play. Next shot: the crowd in the stands.", a:2, h:"The cut left the coach for the crowd." }
+];
+var TRIMS = ["Trim the start", "Trim the end", "Leave it"];
+var TRIM_Q = [
+  { t:"The clip opens with the camera still wobbling into place.", a:0, h:"Trim the wobble off the start." },
+  { t:"The clip opens with two seconds of someone saying \"okay, go\".", a:0, h:"The action starts after the \"go\". Trim up to it." },
+  { t:"The action finishes, then the camera drops toward the floor.", a:1, h:"Stop before the camera drops." },
+  { t:"The clip starts as the knife touches the bread and ends as the slice falls.", a:2, h:"It opens on the move and closes on the move. Nothing to trim." },
+  { t:"The clip opens on the action, then runs four seconds after it's over.", a:1, h:"The start is fine. The tail is waiting." },
+  { t:"A quick how-to video. The clip shows three seconds of an empty doorway before anyone walks in.", a:0, h:"In a fast how-to, start as the person appears." },
+  { t:"A wave builds, crests and breaks, and the clip ends half a second later.", a:2, h:"Half a second of air after the move is about right." }
+];
+var lastDrill = null;
+function pick(list){ var x; do { x = rn(list); } while(x === lastDrill); lastDrill = x; return x; }
+function makeDrill(level){
+  if(level === 0){ var q = pick(CUT_Q); return { story:q.t + " <b>Cut or hold?</b>", opts:["Cut", "Hold"], a:q.a, hint:q.h }; }
+  if(level === 1){ var j = pick(JOB_Q); return { story:j.t + " <b>What did the cut do?</b>", opts:JOBS.slice(), a:j.a, hint:j.h }; }
+  var tq = pick(TRIM_Q); return { story:tq.t + " <b>What do you trim?</b>", opts:TRIMS.slice(), a:tq.a, hint:tq.h };
+}
+var TRAIL_CASES = [
+  { story:"Does trimming a clip delete that part of the video from the phone?", a:1, hint:"No. A trim only changes which part plays." },
+  { story:"Can a cut skip time?", a:0, hint:"Yes. That's one of its three jobs." }
+];
+/* ---------- DOM helpers ---------- */
+function $(id){ return document.getElementById(id); }
+function el(tag, cls, html){ var e = document.createElement(tag); if(cls) e.className = cls; if(html != null) e.innerHTML = html; return e; }
+var toastTimer = null;
+function toast(msg){ var t = $("toast"); if(!t) return; t.textContent = msg; t.className = "show"; clearTimeout(toastTimer); toastTimer = setTimeout(function(){ t.className = ""; }, 1900); }
+function setOn(boxId, attr, val){ [].forEach.call(document.querySelectorAll("#" + boxId + " .chipbtn"), function(x){ x.classList.toggle("on", x.getAttribute(attr) === val); }); }
+function wirePick(boxId, attr, fn){ var box = $(boxId); if(!box) return; box.addEventListener("click", function(e){ var b = e.target.closest("[" + attr + "]"); if(b){ setOn(boxId, attr, b.getAttribute(attr)); fn(b.getAttribute(attr)); } }); }
+
+/* ---------- the drawn practice clips ---------- */
+function lerp(a, b, k){ return a + (b - a) * k; }
+function rrect(ctx, x, y, w, h, r){ ctx.beginPath(); ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y); ctx.quadraticCurveTo(x + w, y, x + w, y + r); ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h); ctx.lineTo(x + r, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r); ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y); ctx.closePath(); }
+function drawScene(ctx, W, H, st, cam, label, secs){
+  var u = (W / 16) * cam.z;
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.fillStyle = "#1b2530"; ctx.fillRect(0, 0, W, H);
+  ctx.setTransform(u, 0, 0, u, W / 2 - cam.cx * u, H / 2 - cam.cy * u);
+  /* room */
+  ctx.fillStyle = "#2c3c4d"; ctx.fillRect(11.6, 1.1, 2.7, 2.3);
+  ctx.fillStyle = "#1b2530"; ctx.fillRect(12.88, 1.1, 0.14, 2.3); ctx.fillRect(11.6, 2.18, 2.7, 0.14);
+  ctx.fillStyle = "#11161c"; ctx.fillRect(-20, 7.4, 60, 12);
+  ctx.fillStyle = "#26323f"; ctx.fillRect(-20, 7.28, 60, 0.12);
+  /* table */
+  ctx.fillStyle = "#6b4526"; ctx.fillRect(7.85, 5.66, 0.26, 1.74); ctx.fillRect(11.55, 5.66, 0.26, 1.74);
+  ctx.fillStyle = "#8a5a34"; ctx.fillRect(7.5, 5.4, 4.7, 0.28);
+  /* person */
+  var X = st.px * 16;
+  ctx.fillStyle = "#2b3a55"; ctx.fillRect(X - 0.5, 6.0, 0.42, 1.4); ctx.fillRect(X + 0.08, 6.0, 0.42, 1.4);
+  ctx.fillStyle = "#f59847"; rrect(ctx, X - 0.75, 3.3, 1.5, 2.9, 0.5); ctx.fill();
+  ctx.fillStyle = "#f2c9a0"; ctx.beginPath(); ctx.arc(X + 0.05, 2.55, 0.72, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = "#1b2530"; ctx.beginPath(); ctx.arc(X + 0.42, 2.45, 0.08, 0, Math.PI * 2); ctx.fill();
+  /* cup */
+  var cx = lerp(lerp(8.25, 7.6, st.lift), X + 0.95, st.sip), cy = lerp(lerp(5.4, 3.9, st.lift), 3.3, st.sip);
+  ctx.save(); ctx.translate(cx, cy - 0.3); ctx.rotate(-0.55 * st.sip);
+  ctx.strokeStyle = "#ece6d8"; ctx.lineWidth = 0.09; ctx.beginPath(); ctx.arc(0.3, 0, 0.17, -1.3, 1.3); ctx.stroke();
+  ctx.fillStyle = "#ece6d8"; rrect(ctx, -0.26, -0.3, 0.52, 0.6, 0.08); ctx.fill();
+  ctx.restore();
+  /* arm */
+  var sx = X + 0.45, sy = 3.85, hx = lerp(X + 0.72, cx - 0.3, st.reach), hy = lerp(5.55, cy - 0.3, st.reach);
+  ctx.strokeStyle = "#e0863c"; ctx.lineWidth = 0.34; ctx.lineCap = "round"; ctx.lineJoin = "round";
+  ctx.beginPath(); ctx.moveTo(sx, sy); ctx.quadraticCurveTo((sx + hx) / 2 + 0.1, Math.max(sy, hy) + 0.35, hx, hy); ctx.stroke();
+  ctx.fillStyle = "#f2c9a0"; ctx.beginPath(); ctx.arc(hx, hy, 0.2, 0, Math.PI * 2); ctx.fill();
+  /* slate */
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  var k = W / 640, fs = Math.round(13 * k);
+  ctx.font = "600 " + fs + "px ui-monospace, Menlo, Consolas, monospace"; ctx.textBaseline = "middle";
+  if(label){ var tw = ctx.measureText(label).width; ctx.fillStyle = "rgba(11,14,18,.72)"; ctx.fillRect(10 * k, 10 * k, tw + 16 * k, 24 * k); ctx.fillStyle = "#4cf0e0"; ctx.fillText(label, 18 * k, 22.5 * k); }
+  if(secs != null){ var s = secs.toFixed(1) + "s", sw = ctx.measureText(s).width; ctx.fillStyle = "rgba(11,14,18,.72)"; ctx.fillRect(W - sw - 26 * k, H - 34 * k, sw + 16 * k, 24 * k); ctx.fillStyle = "#ece6d8"; ctx.fillText(s, W - sw - 18 * k, H - 21.5 * k); }
+}
+function fitCanvas(cv){
+  var w = cv.clientWidth || 640, dpr = Math.min(2, window.devicePixelRatio || 1), W = Math.round(w * dpr), H = Math.round(W * 9 / 16);
+  if(cv.width !== W || cv.height !== H){ cv.width = W; cv.height = H; }
+}
+function drawFrame(cvId, clip, camName, t){
+  var cv = $(cvId); if(!cv || !cv.getContext) return;
+  var ctx = null; try{ ctx = cv.getContext("2d"); }catch(e){}
+  if(!ctx) return;
+  fitCanvas(cv);
+  drawScene(ctx, cv.width, cv.height, clipState(clip, t), CAMS[camName], (CAMS[camName].lab || camName).toUpperCase(), t);
+}
+var players = {};
+function stopPlay(cvId){ var p = players[cvId]; if(p){ p.dead = true; if(p.raf && typeof cancelAnimationFrame === "function") cancelAnimationFrame(p.raf); } players[cvId] = null; }
+function playSegs(cvId, segs, done, instant){
+  stopPlay(cvId);
+  if(!instant){ try{ var cvEl = $(cvId), rc = cvEl.getBoundingClientRect(); if(rc.top < 0 || rc.bottom > window.innerHeight) cvEl.scrollIntoView({ block:"center" }); }catch(e){} }
+  var last = segs[segs.length - 1];
+  if(instant || typeof requestAnimationFrame !== "function"){ drawFrame(cvId, last.clip, last.cam, last.to); if(done) done(); return; }
+  var p = { dead:false, raf:0 }, i = 0, t0 = null; players[cvId] = p;
+  function frame(now){
+    if(p.dead) return;
+    if(t0 === null) t0 = now;
+    var sg = segs[i], t = sg.from + (now - t0) / 1000;
+    if(t >= sg.to){
+      i++; t0 = now;
+      if(i >= segs.length){ drawFrame(cvId, sg.clip, sg.cam, sg.to); players[cvId] = null; if(done) done(); return; }
+      sg = segs[i]; t = sg.from;
+    }
+    drawFrame(cvId, sg.clip, sg.cam, t);
+    p.raf = requestAnimationFrame(frame);
+  }
+  p.raf = requestAnimationFrame(frame);
+}
+
+/* ---------- the six shots ---------- */
+function renderShots(){
+  var s = getState(), box = $("shotList"); box.innerHTML = "";
+  SHOTS.forEach(function(x, i){
+    var on = !!s.shots[x.id], b = el("button", "shot" + (on ? " on" : ""), "<span class='box'>" + (on ? "✓" : "") + "</span><span class='tx'><b>" + (i + 1) + ". " + x.name + ":</b> " + x.what + "</span>");
+    b.type = "button"; b.setAttribute("aria-pressed", on ? "true" : "false");
+    b.addEventListener("click", function(){ var st = getState(); st.shots[x.id] = !st.shots[x.id]; saveState(st); renderShots(); if(SHOTS.every(function(y){ return st.shots[y.id]; })) markMission("shots"); });
+    box.appendChild(b);
+  });
+}
+function renderReal(){
+  var s = getState(), box = $("realBox"), on = !!s.shots.real; box.innerHTML = "";
+  var b = el("button", "shot" + (on ? " on" : ""), "<span class='box'>" + (on ? "✓" : "") + "</span><span class='tx'><b>Done.</b> I cut three of my own shots together.</span>");
+  b.type = "button"; b.setAttribute("aria-pressed", on ? "true" : "false");
+  b.addEventListener("click", function(){ var st = getState(); st.shots.real = !st.shots.real; saveState(st); renderReal(); if(st.shots.real) markMission("real"); });
+  box.appendChild(b);
+}
+
+/* ---------- the cut ---------- */
+var ct = { t:0.4, mode:"match" };
+function cutStill(){ stopPlay("cutCv"); drawFrame("cutCv", "B", "wide", ct.t); }
+function cutSet(t){ ct.t = r1(t); $("cutAt").textContent = ct.t.toFixed(1) + "s"; $("cutResult").className = "result"; cutStill(); }
+function cutPlay(instant){
+  var v = cutVerdict(ct.t, ct.mode);
+  $("cutResult").className = "result";
+  playSegs("cutCv", cutSegments(ct.t, ct.mode), function(){
+    var box = $("cutResult"); box.className = "result show " + (v.tone || (v.good ? "good" : "bad")); box.innerHTML = v.text;
+    if(v.kind === "action") markMission("onaction");
+    if(v.kind === "twice") markMission("twice");
+  }, instant);
+  return v;
+}
+
+/* ---------- the trim ---------- */
+var tm = { tr:freshTrims(), show:{ id:"A", edge:"a" } };
+function pct(x, dur){ return (100 * x / dur).toFixed(2) + "%"; }
+function renderTrim(showId){
+  var box = $("trimClips"), sc = trimScore(tm.tr); box.innerHTML = "";
+  TRIM_ORDER.forEach(function(id, i){
+    var c = CLIPS[id], x = tm.tr[id], card = el("div", "trimclip" + (sc.state[id] ? " " + sc.state[id] : ""));
+    card.innerHTML = "<div class='tchead'><span><b>clip " + (i + 1) + " &middot; " + c.name + "</b> " + c.what + "</span><span class='tclen'>" + r1(x.b - x.a).toFixed(1) + "s of " + c.dur.toFixed(1) + "s</span></div>" +
+      "<div class='tctrack'><div class='act' style='left:" + pct(c.act[0], c.dur) + ";width:" + pct(c.act[1] - c.act[0], c.dur) + "'></div>" +
+      "<div class='off' style='left:0;width:" + pct(x.a, c.dur) + "'></div><div class='off' style='left:" + pct(x.b, c.dur) + ";right:0'></div>" +
+      "<div class='edge' style='left:" + pct(x.a, c.dur) + "'></div><div class='edge' style='left:calc(" + pct(x.b, c.dur) + " - 3px)'></div></div>";
+    var row = el("div", "tcbtns");
+    [["a", 1, "start later"], ["a", -1, "start earlier"], ["b", -1, "end sooner"], ["b", 1, "end later"]].forEach(function(d){
+      var b = el("button", "chipbtn", d[2]); b.type = "button"; b.setAttribute("data-clip", id); b.setAttribute("data-edge", d[0]); b.setAttribute("data-dir", String(d[1]));
+      b.disabled = !canNudge(tm.tr, id, d[0], d[1]);
+      b.addEventListener("click", function(){ nudge(tm.tr, id, d[0], d[1]); renderTrim(id, d[0]); });
+      row.appendChild(b);
+    });
+    card.appendChild(row); box.appendChild(card);
+  });
+  var res = $("trimResult");
+  res.className = "result show " + (sc.clean ? "good" : (sc.cut.length ? "bad" : "mid"));
+  res.innerHTML = sc.cut.length ? "<b>Clip" + (sc.cut.length > 1 ? "s " : " ") + sc.cut.join(" and ") + " cut" + (sc.cut.length > 1 ? "" : "s") + " into the action.</b> Part of the move is gone. Give it back."
+    : (sc.clean ? "<b>Clean.</b> 14.0 seconds became " + sc.total.toFixed(1) + ". Every clip opens as the move starts and closes as it stops."
+    : "<b>" + sc.waiting.toFixed(1) + " seconds of waiting left.</b> The three clips run " + sc.total.toFixed(1) + " of 14.0 seconds.");
+  if(sc.clean) markMission("trim");
+  stopPlay("trimCv");
+  tm.show = { id:showId || "A", edge:arguments[1] === "b" ? "b" : "a" };
+  trimStill();
+  return sc;
+}
+function trimStill(){ var id0 = tm.show.id; drawFrame("trimCv", id0, CLIPS[id0].cam, tm.tr[id0][tm.show.edge]); }
+function trimPlay(instant){ playSegs("trimCv", trimSegments(tm.tr), null, instant); }
+
+/* ---------- missions ---------- */
+var MISSIONS = [
+  { id:"shots",    text:"Tick off all <b>six shots</b> on the list." },
+  { id:"onaction", text:"Land a cut <b>in the middle of the move</b>." },
+  { id:"twice",    text:"Make the move <b>happen twice</b>, so you know what a bad join looks like." },
+  { id:"trim",     text:"Trim all three clips <b>clean</b>." },
+  { id:"real",     text:"Do the task on <b>your own footage</b>." },
+  { id:"gym",      text:"Land one gym drill correct." }
+];
+function renderMissions(){
+  var box = $("missionList"); if(!box) return; var s = getState(); box.innerHTML = "";
+  MISSIONS.forEach(function(m){ var done = !!s.m[m.id], row = el("div", "mission" + (done ? " done" : "")); row.innerHTML = "<span class='mk'>" + (done ? "✓" : "") + "</span><span class='mtext'>" + m.text + "</span>"; box.appendChild(row); });
+}
+function markMission(id){ var s = getState(); if(!s.m[id]){ s.m[id] = true; saveState(s); renderMissions(); toast("mission done"); } }
+
+/* ---------- gym ---------- */
+var gym = { level:-1, drill:null, answered:false, track:"general", lastTrail:null };
+var GYM_LEVELS = [ { lv:0, name:"cut or hold" }, { lv:1, name:"what it did" }, { lv:2, name:"which trim" } ];
+function makeTrailDrill(){ var c; do { c = rn(TRAIL_CASES); } while(c === gym.lastTrail); gym.lastTrail = c; return { story:c.story, opts:["Yes","No"], a:c.a, hint:c.hint }; }
+function gymStatsRender(){ var s = getState(); $("repN").textContent = s.gym.reps || 0; $("strN").textContent = s.gym.streak || 0; $("bestN").textContent = s.gym.best || 0; }
+function renderGymTabs(){
+  var box = $("gymTabs"); box.innerHTML = "";
+  var all = el("button", "gtab" + (gym.level === -1 ? " on" : ""), "Surprise me"); all.type = "button"; all.addEventListener("click", function(){ gym.level = -1; renderGymTabs(); }); box.appendChild(all);
+  GYM_LEVELS.forEach(function(L){ var t = el("button", "gtab" + (gym.level === L.lv ? " on" : ""), L.name); t.type = "button"; t.addEventListener("click", function(){ gym.level = L.lv; renderGymTabs(); }); box.appendChild(t); });
+}
+function gymPlaying(on){ $("gHintBtn").style.display = on ? "" : "none"; $("gSkip").style.display = on ? "" : "none"; $("gStart").style.display = on ? "none" : ""; }
+function gymStart(){
+  gym.drill = gym.track === "trail" ? makeTrailDrill() : makeDrill(gym.level === -1 ? Math.floor(Math.random() * 3) : gym.level);
+  gym.answered = false;
+  $("gymCard").className = "gymcard active" + (gym.track === "trail" ? " trailmode" : "");
+  $("gGoal").innerHTML = "Your call:";
+  $("gymBoard").innerHTML = "<div class='note' style='margin-top:10px'>" + gym.drill.story + "</div>";
+  $("gHint").className = "ghint"; $("gHint").innerHTML = "";
+  var box = $("gOpts"); box.innerHTML = "";
+  gym.drill.opts.forEach(function(o, oi){ var b = el("button", "chipbtn", o); b.type = "button"; b.addEventListener("click", function(){ gymAnswer(oi); }); box.appendChild(b); });
+  gymPlaying(true);
+}
+function gymDone(){ gym.answered = true; gymPlaying(false); $("gStart").textContent = "Next drill"; gymStatsRender(); }
+function gymAnswer(oi){
+  if(gym.answered || !gym.drill) return;
+  var s = getState(), ok = oi === gym.drill.a, kids = $("gOpts").children;
+  kids[gym.drill.a].classList.add("right"); if(!ok && kids[oi]) kids[oi].classList.add("wrong");
+  if(ok){ s.gym.reps = (s.gym.reps || 0) + 1; s.gym.streak = (s.gym.streak || 0) + 1; if(s.gym.streak > (s.gym.best || 0)) s.gym.best = s.gym.streak; saveState(s); $("gymCard").className = "gymcard win" + (gym.track === "trail" ? " trailmode" : ""); $("gGoal").innerHTML = "Correct: <b>" + gym.drill.opts[gym.drill.a] + "</b>."; markMission("gym"); }
+  else { s.gym.streak = 0; saveState(s); $("gymCard").className = "gymcard" + (gym.track === "trail" ? " trailmode" : ""); $("gGoal").innerHTML = "Not quite. The answer is <b>" + gym.drill.opts[gym.drill.a] + "</b>."; }
+  $("gHint").className = "ghint show"; $("gHint").innerHTML = gym.drill.hint;
+  gymDone();
+}
+function gymSkip(){
+  if(gym.answered || !gym.drill) return;
+  var s = getState(); s.gym.streak = 0; saveState(s);
+  $("gOpts").children[gym.drill.a].classList.add("right");
+  $("gHint").className = "ghint show"; $("gHint").innerHTML = "Answer: " + gym.drill.opts[gym.drill.a] + ". " + gym.drill.hint;
+  gymDone();
+}
+function setTrack(t){
+  gym.track = t; gym.drill = null; gym.answered = false;
+  $("trackGeneral").classList.toggle("on", t === "general"); $("trackTrail").classList.toggle("on", t === "trail");
+  $("gymTabs").style.display = t === "trail" ? "none" : ""; $("trailBanner").className = "trailbanner" + (t === "trail" ? " show" : "");
+  $("gymCard").className = "gymcard"; $("gOpts").innerHTML = "";
+  $("gGoal").innerHTML = t === "trail" ? "Tap <b>Start drill</b>." : "Pick a level (or Surprise me) and tap <b>Start drill</b>.";
+  $("gymBoard").innerHTML = ""; $("gHint").className = "ghint"; $("gHint").innerHTML = "";
+  gymPlaying(false); $("gStart").textContent = "Start drill";
+}
+
+/* ---------- quiz (options shuffle every load) ---------- */
+var QUIZ = [
+  { q:"What is a cut?", opts:["The point where one shot ends and the next begins","A special effect between two shots","A setting on the camera","The last frame of a video"], a:0 },
+  { q:"You have a wide and a tight shot of the same reach. Where does the cut hide best?", opts:["Before anything moves","In the middle of the move","Long after the move is over","It makes no difference"], a:1 },
+  { q:"A clip opens with three seconds of nothing before the action. What do you do?", opts:["Leave it","Trim the end","Trim the start","Delete the clip"], a:2 },
+  { q:"The same reach plays twice across a cut. What went wrong?", opts:["The first shot was too wide","The second shot started earlier in the move than the first one stopped","The clips were in the wrong order","The phone was upright"], a:1 },
+  { q:"When you film for an edit, how do you shoot each shot?", opts:["Start and stop right on the action","Keep moving the phone so it stays lively","Hold still for at least ten seconds, with a pause before and after the action","Record one long clip of everything"], a:2 }
+];
+var quizAnswered = {}, quizOrder = [];
+function shuffled(n){ var a = [], i, j, t; for(i = 0; i < n; i++) a.push(i); for(i = n - 1; i > 0; i--){ j = Math.floor(Math.random() * (i + 1)); t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+function renderQuiz(){
+  var box = $("quizBox"); if(!box) return; box.innerHTML = ""; quizAnswered = {}; quizOrder = [];
+  QUIZ.forEach(function(item, qi){
+    var wrap = el("div", "quizq"); wrap.appendChild(el("div", "q", (qi + 1) + ". " + item.q));
+    var order = shuffled(item.opts.length); quizOrder.push(order);
+    order.forEach(function(oi){
+      var b = el("button", "quizopt", item.opts[oi]); b.type = "button";
+      b.addEventListener("click", function(){
+        if(quizAnswered[qi] != null) return; quizAnswered[qi] = oi;
+        wrap.querySelectorAll(".quizopt")[order.indexOf(item.a)].classList.add("right");
+        if(oi !== item.a) b.classList.add("wrong");
+        var got = 0, ans = 0; for(var k in quizAnswered){ ans++; if(quizAnswered[k] === QUIZ[k].a) got++; }
+        if(ans === QUIZ.length){
+          var s = getState(); if(got > (s.quizBest || 0)){ s.quizBest = got; saveState(s); }
+          box.appendChild(el("div", "qresult", "You got " + got + " / " + QUIZ.length + (got === QUIZ.length ? ", perfect." : ".")));
+          var again = el("button", "btn", "Try the quiz again"); again.type = "button"; again.style.marginTop = "10px"; again.addEventListener("click", renderQuiz); box.appendChild(again);
+        }
+      });
+      wrap.appendChild(b);
+    });
+    box.appendChild(wrap);
+  });
+}
+
+/* ---------- version badge, update check ---------- */
+function buildOf(html){ var m = /<meta name="build" content="([^"]*)"/.exec(html || ""); return m ? m[1] : null; }
+function checkUpdate(manual){
+  if(typeof fetch !== "function" || !/^https?:$/.test(location.protocol)){ if(manual) toast(VERSION + " · open the live address to check for updates"); return; }
+  fetch(location.pathname + "?nc=" + Date.now(), { cache:"no-store" }).then(function(r){ return r.ok ? r.text() : ""; }).then(function(html){
+    var live = buildOf(html);
+    if(live && live !== VERSION){
+      var bar = $("updbar"); bar.textContent = "Newer version is up (" + live + "). Tap to load it."; bar.className = "show";
+      bar.onclick = function(){ try{ location.replace(location.pathname + "?v=" + encodeURIComponent(live) + location.hash); }catch(e){ location.reload(); } };
+    } else if(manual){ toast(live ? VERSION + " · you have the newest" : VERSION + " · could not check right now"); }
+  }).catch(function(){ if(manual) toast(VERSION + " · could not check right now"); });
+}
+
+function initApp(){
+  var b = $("vbadge"); b.textContent = VERSION; b.addEventListener("click", function(){ checkUpdate(true); }); checkUpdate(false);
+  renderShots(); renderReal();
+  $("cutRange").addEventListener("input", function(){ cutSet(parseFloat(this.value)); });
+  wirePick("modePick", "data-mode", function(v){ ct.mode = v; $("cutResult").className = "result"; cutStill(); });
+  $("cutPlay").addEventListener("click", function(){ cutPlay(false); });
+  $("trimPlay").addEventListener("click", function(){ trimPlay(false); });
+  $("trimReset").addEventListener("click", function(){ tm.tr = freshTrims(); renderTrim(); });
+  cutSet(ct.t); renderTrim();
+  var redraw = function(){ if(!players.cutCv) drawFrame("cutCv", "B", "wide", ct.t); if(!players.trimCv) trimStill(); };
+  if(typeof ResizeObserver === "function"){ try{ var ro = new ResizeObserver(redraw); ro.observe($("cutCv")); ro.observe($("trimCv")); }catch(e){} }
+  else window.addEventListener("resize", redraw);
+  renderMissions();
+  renderGymTabs(); gymStatsRender();
+  $("trackGeneral").addEventListener("click", function(){ setTrack("general"); });
+  $("trackTrail").addEventListener("click", function(){ setTrack("trail"); });
+  $("gStart").addEventListener("click", gymStart);
+  $("gHintBtn").addEventListener("click", function(){ if(gym.drill){ $("gHint").className = "ghint show"; $("gHint").innerHTML = gym.drill.hint; } });
+  $("gSkip").addEventListener("click", gymSkip);
+  renderQuiz();
+  window._lab = { ct:ct, cutSet:cutSet, cutPlay:cutPlay, tm:tm, renderTrim:renderTrim, trimPlay:trimPlay, gym:gym, quizOrder:function(){ return quizOrder; }, getState:getState };
+}
+if(typeof window !== "undefined" && typeof document !== "undefined"){
+  if(document.readyState === "loading"){ document.addEventListener("DOMContentLoaded", initApp); } else { initApp(); }
+}
+if(typeof module !== "undefined" && module.exports){
+  module.exports = { CLIPS:CLIPS, CAMS:CAMS, clipState:clipState, cutVerdict:cutVerdict, cutSegments:cutSegments, freshTrims:freshTrims, nudge:nudge, canNudge:canNudge, trimScore:trimScore, trimSegments:trimSegments, SHOTS:SHOTS, CUT_Q:CUT_Q, JOB_Q:JOB_Q, TRIM_Q:TRIM_Q, makeDrill:makeDrill, TRAIL_CASES:TRAIL_CASES, QUIZ:QUIZ, shuffled:shuffled, buildOf:buildOf, VERSION:VERSION };
+}
+</script>
+</body>
+</html>
