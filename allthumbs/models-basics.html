@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#14181d">
-<meta name="build" content="v0.3 · Nov 15">
+<meta name="build" content="v0.4 · Nov 15">
 <title>How Models Work: next words, tokens, the desk, and a good brief</title>
 <meta name="description" content="Chapter 15 of All Thumbs. What an AI model does with your words: it picks the next piece of text, reads in tokens, only sees what is on its desk, and does better work from a real brief.">
 <link rel="canonical" href="https://motbuchanan.com/allthumbs/models-basics.html">
@@ -163,7 +163,7 @@
     <h1>How Models Work</h1>
     <p class="subtitle">What the AI is doing with your words, and how to give it a brief it can use.</p>
   </div>
-  <button class="vbadge" id="vbadge" type="button">v0.3 &middot; Nov 15</button>
+  <button class="vbadge" id="vbadge" type="button">v0.4 &middot; Nov 15</button>
 </header>
 
 <nav>
@@ -232,7 +232,7 @@
   </div>
   <div class="result" id="deskResult"></div>
   <div class="tipbox right">
-    <img class="poke" src="thumb-tip.png" alt="">
+    <img class="poke" src="thumb-bookend-read.png" alt="">
     <div class="tt">Why I write handoff docs</div>
     <p class="tp">A new chat starts with an empty desk. When a big build continues tomorrow, I end today with a handoff document: what's built, what's decided, what's next. The next chat reads it first. Memory features work the same way: saved notes get put back on the desk at the start.</p>
   </div>
@@ -246,7 +246,7 @@
   <div class="briefbox" id="briefOut"></div>
   <div class="guesses" id="guesses"></div>
   <div class="tipbox">
-    <img class="poke" src="thumb-aha.png" alt="">
+    <img class="poke" src="thumb-director.png" alt="">
     <div class="tt">My favorite ingredient</div>
     <p class="tp">Many of my briefs end with "ask me questions first, one at a time." The model narrows things down with me before it builds, and the first version comes back much closer to what I had in mind.</p>
   </div>
@@ -304,7 +304,7 @@
 
 <script>
 "use strict";
-var VERSION = "v0.3 · Nov 15";
+var VERSION = "v0.4 · Nov 15";
 var STORE_KEY = "models101_v1";
 
 /* ---------- guarded storage ---------- */
@@ -674,6 +674,22 @@ if(typeof window !== "undefined" && typeof document !== "undefined"){
 if(typeof module !== "undefined" && module.exports){
   module.exports = { NEXT:NEXT, choices:choices, probs:probs, sample:sample, roughTokens:roughTokens, deskAdd:deskAdd, deskKnows:deskKnows, DESK_SIZE:DESK_SIZE, KEY_FACT:KEY_FACT, INGR:INGR, briefScore:briefScore, FACTS:FACTS, PAIRS:PAIRS, makeDrill:makeDrill, TRAIL_CASES:TRAIL_CASES, QUIZ:QUIZ, shuffled:shuffled, buildOf:buildOf, VERSION:VERSION };
 }
+</script>
+<style>.atCeleb{display:block;height:170px;width:auto;margin:14px auto 0;pointer-events:none;filter:drop-shadow(0 6px 10px rgba(0,0,0,.45))}</style>
+<script>
+(function(){
+  var host = document.getElementById("quizBox") || document.getElementById("quizwrap");
+  if(!host || typeof MutationObserver !== "function") return;
+  var area = host.parentNode, busy = false;
+  function check(){
+    if(busy) return; busy = true;
+    var t = area.textContent || "", ok = /You got (\d+) \/ \1, perfect|Score: 5\/5/.test(t), img = area.querySelector(".atCeleb");
+    if(ok && !img){ img = document.createElement("img"); img.className = "atCeleb"; img.src = "thumb-celebrate.png"; img.alt = "the thumb mascot celebrating a perfect score"; area.appendChild(img); }
+    else if(!ok && img){ img.remove(); }
+    busy = false;
+  }
+  new MutationObserver(check).observe(area, { childList:true, subtree:true, characterData:true });
+})();
 </script>
 </body>
 </html>

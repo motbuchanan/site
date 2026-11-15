@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="build" content="v0.3 · Nov 14">
+<meta name="build" content="v0.4 · Nov 15">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#14181d">
 <title>The Shelf Dissected</title>
@@ -446,7 +446,7 @@ p,li,.tp,.soft,.small,.wline,.tl-hint,code{overflow-wrap:anywhere}
     <h1>The Shelf Dissected</h1>
     <p class="subtitle">My actual Game Shelf, taken apart. Every chapter so far was a piece of this.</p>
   </div>
-  <button class="vbadge" id="vbadge" type="button">v0.3 · Nov 14</button>
+  <button class="vbadge" id="vbadge" type="button">v0.4 · Nov 15</button>
 </header>
 
 <nav>
@@ -604,6 +604,22 @@ p,li,.tp,.soft,.small,.wline,.tl-hint,code{overflow-wrap:anywhere}
   check();
 })();
 </script>
+<style>.atCeleb{display:block;height:170px;width:auto;margin:14px auto 0;pointer-events:none;filter:drop-shadow(0 6px 10px rgba(0,0,0,.45))}</style>
+<script>
+(function(){
+  var host = document.getElementById("quizBox") || document.getElementById("quizwrap");
+  if(!host || typeof MutationObserver !== "function") return;
+  var area = host.parentNode, busy = false;
+  function check(){
+    if(busy) return; busy = true;
+    var t = area.textContent || "", ok = /You got (\d+) \/ \1, perfect|Score: 5\/5/.test(t), img = area.querySelector(".atCeleb");
+    if(ok && !img){ img = document.createElement("img"); img.className = "atCeleb"; img.src = "thumb-celebrate.png"; img.alt = "the thumb mascot celebrating a perfect score"; area.appendChild(img); }
+    else if(!ok && img){ img.remove(); }
+    busy = false;
+  }
+  new MutationObserver(check).observe(area, { childList:true, subtree:true, characterData:true });
+})();
+</script>
 </body>
 
 <script>
@@ -617,7 +633,7 @@ function atShuffle(Q){
     it[ok] = rest.concat(last); it[rk] = it[ok].indexOf(right);
   });
 }
-var VERSION = "v0.3 · Nov 14";
+var VERSION = "v0.4 · Nov 15";
 var STORE_KEY = "shelf101_v1";
 
 /* ---------- guarded storage ---------- */

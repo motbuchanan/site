@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#14181d">
-<meta name="build" content="v0.4 · Nov 15">
+<meta name="build" content="v0.5 · Nov 15">
 <title>Robots on GitHub: checks that run on every upload</title>
 <meta name="description" content="Chapter 14 of All Thumbs. GitHub Actions for people who build on a phone: the Pages robot you already have, what a workflow file says, and checks that stop a bad upload.">
 <link rel="canonical" href="https://motbuchanan.com/allthumbs/actions-basics.html">
@@ -154,7 +154,7 @@
     <h1>Robots on GitHub</h1>
     <p class="subtitle">A computer that checks every upload, and why a green check doesn't mean it works.</p>
   </div>
-  <button class="vbadge" id="vbadge" type="button">v0.4 &middot; Nov 15</button>
+  <button class="vbadge" id="vbadge" type="button">v0.5 &middot; Nov 15</button>
 </header>
 
 <nav>
@@ -233,7 +233,7 @@
   <div class="mstats" id="pushStats"></div>
   <div id="pushRows"></div>
   <div class="tipbox">
-    <img class="poke" src="thumb-aha.png" alt="">
+    <img class="poke" src="thumb-bookend-left.png" alt="">
     <div class="tt">Robots check. I upload.</div>
     <p class="tp">A workflow can be allowed to change files and push them back. Mine won't be: a red X tells me what to fix, and I still do every upload from my phone myself. A workflow can also run on a schedule with no upload at all. My monthly Breaker sweep works the same way, but it runs as a scheduled task outside GitHub.</p>
   </div>
@@ -291,7 +291,7 @@
 
 <script>
 "use strict";
-var VERSION = "v0.4 · Nov 15";
+var VERSION = "v0.5 · Nov 15";
 var STORE_KEY = "actions101_v1";
 
 /* ---------- guarded storage ---------- */
@@ -639,6 +639,22 @@ if(typeof window !== "undefined" && typeof document !== "undefined"){
 if(typeof module !== "undefined" && module.exports){
   module.exports = { pagesRun:pagesRun, YAML_PARTS:YAML_PARTS, YAML_LINES:YAML_LINES, CHECKS:CHECKS, COMMITS:COMMITS, pushResult:pushResult, pushAll:pushAll, makeDrill:makeDrill, TRAIL_CASES:TRAIL_CASES, QUIZ:QUIZ, shuffled:shuffled, buildOf:buildOf, VERSION:VERSION };
 }
+</script>
+<style>.atCeleb{display:block;height:170px;width:auto;margin:14px auto 0;pointer-events:none;filter:drop-shadow(0 6px 10px rgba(0,0,0,.45))}</style>
+<script>
+(function(){
+  var host = document.getElementById("quizBox") || document.getElementById("quizwrap");
+  if(!host || typeof MutationObserver !== "function") return;
+  var area = host.parentNode, busy = false;
+  function check(){
+    if(busy) return; busy = true;
+    var t = area.textContent || "", ok = /You got (\d+) \/ \1, perfect|Score: 5\/5/.test(t), img = area.querySelector(".atCeleb");
+    if(ok && !img){ img = document.createElement("img"); img.className = "atCeleb"; img.src = "thumb-celebrate.png"; img.alt = "the thumb mascot celebrating a perfect score"; area.appendChild(img); }
+    else if(!ok && img){ img.remove(); }
+    busy = false;
+  }
+  new MutationObserver(check).observe(area, { childList:true, subtree:true, characterData:true });
+})();
 </script>
 </body>
 </html>

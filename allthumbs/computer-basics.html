@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="build" content="v3.3 · Nov 14">
+<meta name="build" content="v3.4 · Nov 15">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0e1320">
 <title>The Fast Idiot: What a Computer Actually Is</title>
@@ -203,7 +203,7 @@ p,li,.tp,.soft,.small,.wline,.tl-hint,code{overflow-wrap:anywhere}
       <h1>The Fast Idiot</h1>
       <p class="sub" style="font-size:18px">What a computer actually is: a very fast worker following a very dumb list.</p>
     </div>
-    <button id="vbadge" aria-label="version">v3.3 · Nov 14</button>
+    <button id="vbadge" aria-label="version">v3.4 · Nov 15</button>
   </div>
   <svg class="herosvg" viewBox="0 0 270 110" aria-hidden="true">
     <rect x="95" y="25" width="80" height="60" rx="10" fill="#1c2536" stroke="#45c8ff" stroke-width="2.5"/>
@@ -381,7 +381,7 @@ function atShuffle(Q){
     it[ok] = rest.concat(last); it[rk] = it[ok].indexOf(right);
   });
 }
-var VERSION = "v3.3 · Nov 14";
+var VERSION = "v3.4 · Nov 15";
 
 /* ============ ENGINE (DOM-free) ============ */
 /* Instructions: ["SET",r,n] ["ADD",r,n] ["SUB",r,n] ["ADDR",r,r2] ["SHOW",r] ["JUMPIF",r,line] ["HALT"] */
@@ -1039,6 +1039,22 @@ if(typeof module !== "undefined" && module.exports){
   }
   var b = document.getElementById("vbadge"); if(b) b.addEventListener("click", check);
   check();
+})();
+</script>
+<style>.atCeleb{display:block;height:170px;width:auto;margin:14px auto 0;pointer-events:none;filter:drop-shadow(0 6px 10px rgba(0,0,0,.45))}</style>
+<script>
+(function(){
+  var host = document.getElementById("quizBox") || document.getElementById("quizwrap");
+  if(!host || typeof MutationObserver !== "function") return;
+  var area = host.parentNode, busy = false;
+  function check(){
+    if(busy) return; busy = true;
+    var t = area.textContent || "", ok = /You got (\d+) \/ \1, perfect|Score: 5\/5/.test(t), img = area.querySelector(".atCeleb");
+    if(ok && !img){ img = document.createElement("img"); img.className = "atCeleb"; img.src = "thumb-celebrate.png"; img.alt = "the thumb mascot celebrating a perfect score"; area.appendChild(img); }
+    else if(!ok && img){ img.remove(); }
+    busy = false;
+  }
+  new MutationObserver(check).observe(area, { childList:true, subtree:true, characterData:true });
 })();
 </script>
 </body>

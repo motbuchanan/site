@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#14181d">
-<meta name="build" content="v0.5 · Nov 15">
+<meta name="build" content="v0.6 · Nov 15">
 <title>Who Tapped First: Firebase sign-in, rules, listeners and ties</title>
 <meta name="description" content="Chapter 11 of All Thumbs. The four jobs of a real backend, taught with a two-phone buzzer: who is asking, where the data sits, who is allowed, and who tapped first.">
 <link rel="canonical" href="https://motbuchanan.com/allthumbs/firebase-basics.html">
@@ -161,7 +161,7 @@
     <h1>Who Tapped First</h1>
     <p class="subtitle">Two phones, one buzzer, and the four jobs a real backend does.</p>
   </div>
-  <button class="vbadge" id="vbadge" type="button">v0.5 &middot; Nov 15</button>
+  <button class="vbadge" id="vbadge" type="button">v0.6 &middot; Nov 15</button>
 </header>
 
 <nav>
@@ -214,7 +214,7 @@
     <div class="note" id="authNote">Not signed in: the database sees a request with no name tag at all. It cannot tell your phone from a stranger's.</div>
   </div>
   <div class="tipbox">
-    <img class="poke" src="thumb-think.png" alt="">
+    <img class="poke" src="thumb-nametag.png" alt="">
     <div class="tt">Anonymous still counts</div>
     <p class="tp">Nobody typed anything, and it is still real sign-in. The database can now tell this phone from that one, and that is all a buzzer needs. When the same person has to be recognized on a second device, you have outgrown it.</p>
   </div>
@@ -257,7 +257,7 @@
     <div class="verdict" id="ruleVerdict"></div>
   </div>
   <div class="tipbox right">
-    <img class="poke" src="thumb-oops.png" alt="">
+    <img class="poke" src="thumb-stop.png" alt="">
     <div class="tt">A denied write is the lock working</div>
     <p class="tp">A path no rule covers is denied. Rules that check the shape of a write also refuse a shape they do not list. So when you add a new kind of data and the save fails, look at the rules first. That is the lock doing its job, and now it needs to learn the new thing.</p>
   </div>
@@ -361,7 +361,7 @@
 
 <script>
 "use strict";
-var VERSION = "v0.5 · Nov 15";
+var VERSION = "v0.6 · Nov 15";
 var STORE_KEY = "firebase101_v1";
 
 /* ---------- guarded storage ---------- */
@@ -801,6 +801,22 @@ if(typeof window!=="undefined" && typeof document!=="undefined"){
 if(typeof module!=="undefined" && module.exports){
   module.exports = { hasUid:hasUid, sameUidAcross:sameUidAcross, pathKind:pathKind, evalRule:evalRule, seesUpdate:seesUpdate, race:race, scoreAfter:scoreAfter, shuffled:shuffled, QUIZ:QUIZ, makeDrill:makeDrill, TRAIL_CASES:TRAIL_CASES, RULES:RULES, buildOf:buildOf, VERSION:VERSION };
 }
+</script>
+<style>.atCeleb{display:block;height:170px;width:auto;margin:14px auto 0;pointer-events:none;filter:drop-shadow(0 6px 10px rgba(0,0,0,.45))}</style>
+<script>
+(function(){
+  var host = document.getElementById("quizBox") || document.getElementById("quizwrap");
+  if(!host || typeof MutationObserver !== "function") return;
+  var area = host.parentNode, busy = false;
+  function check(){
+    if(busy) return; busy = true;
+    var t = area.textContent || "", ok = /You got (\d+) \/ \1, perfect|Score: 5\/5/.test(t), img = area.querySelector(".atCeleb");
+    if(ok && !img){ img = document.createElement("img"); img.className = "atCeleb"; img.src = "thumb-celebrate.png"; img.alt = "the thumb mascot celebrating a perfect score"; area.appendChild(img); }
+    else if(!ok && img){ img.remove(); }
+    busy = false;
+  }
+  new MutationObserver(check).observe(area, { childList:true, subtree:true, characterData:true });
+})();
 </script>
 </body>
 </html>

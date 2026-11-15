@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#14181d">
-<meta name="build" content="v0.3 · Nov 15">
+<meta name="build" content="v0.4 · Nov 15">
 <title>The Cut: where one shot ends and the next begins (video editing, chapter 1)</title>
 <meta name="description" content="Chapter 1 of the All Thumbs video editing course. What a cut does, why a cut hides best in the middle of a move, how to trim the waiting off a clip, and a six-shot list to film on your phone.">
 <link rel="canonical" href="https://motbuchanan.com/allthumbs/edit-cut.html">
@@ -166,7 +166,7 @@
     <h1>The Cut</h1>
     <p class="subtitle">Where one shot ends and the next begins, and how to pick the exact spot.</p>
   </div>
-  <button class="vbadge" id="vbadge" type="button">v0.3 &middot; Nov 15</button>
+  <button class="vbadge" id="vbadge" type="button">v0.4 &middot; Nov 15</button>
 </header>
 
 <nav>
@@ -206,7 +206,7 @@
     <li>Pick upright or sideways and keep it for all six.</li>
   </ol>
   <div class="tipbox">
-    <img class="poke" src="thumb-tip.png" alt="">
+    <img class="poke" src="thumb-filming.png" alt="">
     <div class="tt">No footage yet?</div>
     <p class="tp">Any six clips already on your phone will do for this chapter. You can also download free clips from a stock site such as Pexels or Pixabay and practice on those. Your own shots are better, because Chapter 12 ends with a video that's yours.</p>
   </div>
@@ -243,7 +243,7 @@
     <button class="btn" id="trimReset" type="button">start over</button>
   </div>
   <div class="tipbox right">
-    <img class="poke" src="thumb-think.png" alt="">
+    <img class="poke" src="thumb-undo.png" alt="">
     <div class="tt">A trim can be undone</div>
     <p class="tp">In RoughCut and most editing apps, trimming only changes which part of the clip plays. The full video stays on your phone as long as you keep the original, so you can always pull the edge back out. Trim hard, watch it, and loosen it if it feels rushed.</p>
   </div>
@@ -326,7 +326,7 @@
 
 <script>
 "use strict";
-var VERSION = "v0.3 · Nov 15";
+var VERSION = "v0.4 · Nov 15";
 var STORE_KEY = "editcut101_v1";
 
 /* ---------- guarded storage ---------- */
@@ -753,6 +753,22 @@ if(typeof window !== "undefined" && typeof document !== "undefined"){
 if(typeof module !== "undefined" && module.exports){
   module.exports = { CLIPS:CLIPS, CAMS:CAMS, clipState:clipState, cutVerdict:cutVerdict, cutSegments:cutSegments, freshTrims:freshTrims, nudge:nudge, canNudge:canNudge, trimScore:trimScore, trimSegments:trimSegments, SHOTS:SHOTS, CUT_Q:CUT_Q, JOB_Q:JOB_Q, TRIM_Q:TRIM_Q, makeDrill:makeDrill, TRAIL_CASES:TRAIL_CASES, QUIZ:QUIZ, shuffled:shuffled, buildOf:buildOf, VERSION:VERSION };
 }
+</script>
+<style>.atCeleb{display:block;height:170px;width:auto;margin:14px auto 0;pointer-events:none;filter:drop-shadow(0 6px 10px rgba(0,0,0,.45))}</style>
+<script>
+(function(){
+  var host = document.getElementById("quizBox") || document.getElementById("quizwrap");
+  if(!host || typeof MutationObserver !== "function") return;
+  var area = host.parentNode, busy = false;
+  function check(){
+    if(busy) return; busy = true;
+    var t = area.textContent || "", ok = /You got (\d+) \/ \1, perfect|Score: 5\/5/.test(t), img = area.querySelector(".atCeleb");
+    if(ok && !img){ img = document.createElement("img"); img.className = "atCeleb"; img.src = "thumb-celebrate.png"; img.alt = "the thumb mascot celebrating a perfect score"; area.appendChild(img); }
+    else if(!ok && img){ img.remove(); }
+    busy = false;
+  }
+  new MutationObserver(check).observe(area, { childList:true, subtree:true, characterData:true });
+})();
 </script>
 </body>
 </html>

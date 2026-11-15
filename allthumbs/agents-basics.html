@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#14181d">
-<meta name="build" content="v0.3 · Nov 15">
+<meta name="build" content="v0.4 · Nov 15">
 <title>Agents and Schedules: AI that uses tools, saved skills, and jobs that run alone</title>
 <meta name="description" content="Chapter 16 of All Thumbs. What an AI agent is, why it needs to check its own work, how saved skills load, how a scheduled task runs with nobody watching, and why a second reviewer catches what the builder misses.">
 <link rel="canonical" href="https://motbuchanan.com/allthumbs/agents-basics.html">
@@ -149,7 +149,7 @@
     <h1>Agents and Schedules</h1>
     <p class="subtitle">An AI that does the work, checks it, follows saved rules, and runs on its own.</p>
   </div>
-  <button class="vbadge" id="vbadge" type="button">v0.3 &middot; Nov 15</button>
+  <button class="vbadge" id="vbadge" type="button">v0.4 &middot; Nov 15</button>
 </header>
 
 <nav>
@@ -217,7 +217,7 @@
   <div class="picker" style="justify-content:center"><button class="btn primary" id="schedGo" type="button">check this task</button></div>
   <div class="result" id="schedResult"></div>
   <div class="tipbox">
-    <img class="poke" src="thumb-think.png" alt="">
+    <img class="poke" src="thumb-sleep.png" alt="">
     <div class="tt">Two I really run</div>
     <p class="tp">On the 1st of every month, one task runs the Breaker over my site and writes a report. Another researches new signs of AI-made design and copy for my rulebook. Both only report. I read them and decide what changes.</p>
   </div>
@@ -287,7 +287,7 @@
 
 <script>
 "use strict";
-var VERSION = "v0.3 · Nov 15";
+var VERSION = "v0.4 · Nov 15";
 var STORE_KEY = "agents101_v1";
 
 /* ---------- guarded storage ---------- */
@@ -638,6 +638,22 @@ if(typeof window !== "undefined" && typeof document !== "undefined"){
 if(typeof module !== "undefined" && module.exports){
   module.exports = { agentRun:agentRun, LOOP_OPTS:LOOP_OPTS, SKILLS:SKILLS, TASKS:TASKS, schedCheck:schedCheck, CATCHES:CATCHES, TOOL_Q:TOOL_Q, UNATTENDED:UNATTENDED, makeDrill:makeDrill, TRAIL_CASES:TRAIL_CASES, QUIZ:QUIZ, shuffled:shuffled, buildOf:buildOf, VERSION:VERSION };
 }
+</script>
+<style>.atCeleb{display:block;height:170px;width:auto;margin:14px auto 0;pointer-events:none;filter:drop-shadow(0 6px 10px rgba(0,0,0,.45))}</style>
+<script>
+(function(){
+  var host = document.getElementById("quizBox") || document.getElementById("quizwrap");
+  if(!host || typeof MutationObserver !== "function") return;
+  var area = host.parentNode, busy = false;
+  function check(){
+    if(busy) return; busy = true;
+    var t = area.textContent || "", ok = /You got (\d+) \/ \1, perfect|Score: 5\/5/.test(t), img = area.querySelector(".atCeleb");
+    if(ok && !img){ img = document.createElement("img"); img.className = "atCeleb"; img.src = "thumb-celebrate.png"; img.alt = "the thumb mascot celebrating a perfect score"; area.appendChild(img); }
+    else if(!ok && img){ img.remove(); }
+    busy = false;
+  }
+  new MutationObserver(check).observe(area, { childList:true, subtree:true, characterData:true });
+})();
 </script>
 </body>
 </html>

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#14181d">
-<meta name="build" content="v0.3 · Nov 15">
+<meta name="build" content="v0.4 · Nov 15">
 <title>Debugging: root cause first, stale copy or real bug</title>
 <meta name="description" content="Chapter 13 of All Thumbs. Debugging for people who build on a phone: tell an old cached copy from a real bug, find the broken piece by halving, and fix the cause instead of the symptom.">
 <link rel="canonical" href="https://motbuchanan.com/allthumbs/debug-basics.html">
@@ -149,7 +149,7 @@
     <h1>Debugging</h1>
     <p class="subtitle">Root cause first. Is it a stale copy or a real bug, and how do you tell?</p>
   </div>
-  <button class="vbadge" id="vbadge" type="button">v0.3 &middot; Nov 15</button>
+  <button class="vbadge" id="vbadge" type="button">v0.4 &middot; Nov 15</button>
 </header>
 
 <nav>
@@ -198,7 +198,7 @@
   <div class="result" id="verResult"></div>
   <div class="picker"><button class="btn" id="nextCase" type="button">next case</button><span class="lognum" id="caseNum"></span></div>
   <div class="tipbox">
-    <img class="poke" src="thumb-think.png" alt="">
+    <img class="poke" src="thumb-phone-hero-a.png" alt="">
     <div class="tt">Why every app has a badge</div>
     <p class="tp">Early on, a caching problem kept showing me an old copy of an app, and I thought my fixes weren't landing. Now every app shows its version and date, and it's the first thing I look at. One more thing: right after an upload, Pages can take a minute to publish, so give it a moment before you call anything stale.</p>
   </div>
@@ -281,7 +281,7 @@
 
 <script>
 "use strict";
-var VERSION = "v0.3 · Nov 15";
+var VERSION = "v0.4 · Nov 15";
 var STORE_KEY = "debug101_v1";
 
 /* ---------- guarded storage ---------- */
@@ -621,6 +621,22 @@ if(typeof window !== "undefined" && typeof document !== "undefined"){
 if(typeof module !== "undefined" && module.exports){
   module.exports = { evidence:evidence, VERDICTS:VERDICTS, TRUTHS:TRUTHS, narrow:narrow, testsNeeded:testsNeeded, PIECES:PIECES, FIXES:FIXES, makeDrill:makeDrill, TRAIL_CASES:TRAIL_CASES, QUIZ:QUIZ, shuffled:shuffled, buildOf:buildOf, VERSION:VERSION };
 }
+</script>
+<style>.atCeleb{display:block;height:170px;width:auto;margin:14px auto 0;pointer-events:none;filter:drop-shadow(0 6px 10px rgba(0,0,0,.45))}</style>
+<script>
+(function(){
+  var host = document.getElementById("quizBox") || document.getElementById("quizwrap");
+  if(!host || typeof MutationObserver !== "function") return;
+  var area = host.parentNode, busy = false;
+  function check(){
+    if(busy) return; busy = true;
+    var t = area.textContent || "", ok = /You got (\d+) \/ \1, perfect|Score: 5\/5/.test(t), img = area.querySelector(".atCeleb");
+    if(ok && !img){ img = document.createElement("img"); img.className = "atCeleb"; img.src = "thumb-celebrate.png"; img.alt = "the thumb mascot celebrating a perfect score"; area.appendChild(img); }
+    else if(!ok && img){ img.remove(); }
+    busy = false;
+  }
+  new MutationObserver(check).observe(area, { childList:true, subtree:true, characterData:true });
+})();
 </script>
 </body>
 </html>

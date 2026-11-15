@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#14181d">
-<meta name="build" content="v0.3 · Nov 15">
+<meta name="build" content="v0.4 · Nov 15">
 <title>Break It: testing an app the way real people use it</title>
 <meta name="description" content="Chapter 12 of All Thumbs. Why the builder is the worst tester of their own app: hunt six planted bugs, let a monkey tap at random, and sort real findings like a second reviewer.">
 <link rel="canonical" href="https://motbuchanan.com/allthumbs/break-basics.html">
@@ -177,7 +177,7 @@
     <h1>Break It</h1>
     <p class="subtitle">Why the person who built it is the worst person to test it.</p>
   </div>
-  <button class="vbadge" id="vbadge" type="button">v0.3 &middot; Nov 15</button>
+  <button class="vbadge" id="vbadge" type="button">v0.4 &middot; Nov 15</button>
 </header>
 
 <nav>
@@ -202,7 +202,7 @@
   <p>A real person turns the phone sideways. They tap the same button four times because the first tap felt slow. Their browser is set to block saving, so the app can't keep anything. They have a smaller phone than mine. None of that is in my head while I'm building, so none of it gets tested.</p>
   <p>So I built a second tester, the Breaker, whose whole job is to use my apps badly. On Oct 23 it went through five apps on my site. Two of them were broken for real people: one never drew its chessboard when saving was blocked, and one hid four keyboard letters when the phone was turned sideways. Both were already live on my site.</p>
   <div class="tipbox">
-    <img class="poke" src="thumb-think.png" alt="">
+    <img class="poke" src="thumb-handoff.png" alt="">
     <div class="tt">Hand it to someone who doesn't know</div>
     <p class="tp">The builder knows which button comes next, so their thumb never goes anywhere else. The fix is to hand the app to something that doesn't know, whether that's a robot, a friend, or a kid.</p>
   </div>
@@ -262,7 +262,7 @@
   <div class="mfirst" id="mFirst"></div>
   <div class="lanes" id="mLog"><div class="idle">No taps yet.</div></div>
   <div class="tipbox right">
-    <img class="poke" src="thumb-aha.png" alt="">
+    <img class="poke" src="thumb-shrug.png" alt="">
     <div class="tt">What random taps can't tell you</div>
     <p class="tp">The monkey finds crashes, dead ends and screens that fall off the edge. It has no idea whether the game's rules are right, or whether it's any fun. A person still has to play it for that.</p>
   </div>
@@ -339,7 +339,7 @@
 
 <script>
 "use strict";
-var VERSION = "v0.3 · Nov 15";
+var VERSION = "v0.4 · Nov 15";
 var STORE_KEY = "break101_v1";
 
 /* ---------- guarded storage ---------- */
@@ -789,6 +789,22 @@ if(typeof window !== "undefined" && typeof document !== "undefined"){
 if(typeof module !== "undefined" && module.exports){
   module.exports = { huntCheck:huntCheck, BUGS:BUGS, BUG_ORDER:BUG_ORDER, tgStep:tgStep, monkeyRun:monkeyRun, humanRun:humanRun, REVIEW:REVIEW, BUCKETS:BUCKETS, ISSUES:ISSUES, makeDrill:makeDrill, TRAIL_CASES:TRAIL_CASES, QUIZ:QUIZ, shuffled:shuffled, buildOf:buildOf, VERSION:VERSION };
 }
+</script>
+<style>.atCeleb{display:block;height:170px;width:auto;margin:14px auto 0;pointer-events:none;filter:drop-shadow(0 6px 10px rgba(0,0,0,.45))}</style>
+<script>
+(function(){
+  var host = document.getElementById("quizBox") || document.getElementById("quizwrap");
+  if(!host || typeof MutationObserver !== "function") return;
+  var area = host.parentNode, busy = false;
+  function check(){
+    if(busy) return; busy = true;
+    var t = area.textContent || "", ok = /You got (\d+) \/ \1, perfect|Score: 5\/5/.test(t), img = area.querySelector(".atCeleb");
+    if(ok && !img){ img = document.createElement("img"); img.className = "atCeleb"; img.src = "thumb-celebrate.png"; img.alt = "the thumb mascot celebrating a perfect score"; area.appendChild(img); }
+    else if(!ok && img){ img.remove(); }
+    busy = false;
+  }
+  new MutationObserver(check).observe(area, { childList:true, subtree:true, characterData:true });
+})();
 </script>
 </body>
 </html>
