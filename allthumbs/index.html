@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#12141a">
-<meta name="build" content="v1.30 · Nov 14">
+<meta name="build" content="v1.31 · Nov 15">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -147,10 +147,10 @@ footer{color:#5b6272;font-size:12.5px;text-align:center;margin:30px 0 10px;line-
 </main>
 <button id="updbar" type="button">A newer version is up. Tap to load it.</button>
 <div id="toast" role="status"></div>
-<button class="mb-ver" id="mbVer" type="button">v1.30 &middot; Nov 14</button>
+<button class="mb-ver" id="mbVer" type="button">v1.31 &middot; Nov 15</button>
 <script>
 "use strict";
-var VERSION = "v1.30 · Nov 14";
+var VERSION = "v1.31 · Nov 15";
 
 /* pure helpers (testable) */
 function countDone(state){
@@ -270,7 +270,7 @@ var CH = [
 },
 {
 "key": "firebase101_v1",
-"img": "thumb-on-phone",
+"img": "thumb-firebase",
 "file": "firebase-basics.html",
 "title": "Who Tapped First",
 "sub": "Two phones, one buzzer. Sign-in, where data sits, the security rules that are the real lock, live listeners, and settling a tie fairly.",
@@ -280,7 +280,7 @@ var CH = [
 },
 {
 "key": "break101_v1",
-"img": "thumb-oops",
+"img": "thumb-break",
 "file": "break-basics.html",
 "title": "Break It",
 "sub": "Why the person who built it is the worst person to test it. Hunt six planted bugs, let a monkey tap at random, sort real findings.",
@@ -290,7 +290,7 @@ var CH = [
 },
 {
 "key": "debug101_v1",
-"img": "thumb-aha",
+"img": "thumb-debug",
 "file": "debug-basics.html",
 "title": "Debugging",
 "sub": "Root cause first. Tell an old copy from a real bug, find the broken piece by halving, and fix the cause instead of the symptom.",
@@ -300,7 +300,7 @@ var CH = [
 },
 {
 "key": "actions101_v1",
-"img": "thumb-nice",
+"img": "thumb-actions",
 "file": "actions-basics.html",
 "title": "Robots on GitHub",
 "sub": "A computer that checks every upload. The Pages robot you already have, what a workflow file says, and why a green check doesn't mean it works.",
@@ -310,7 +310,7 @@ var CH = [
 },
 {
 "key": "models101_v1",
-"img": "thumb-phone-hero-b",
+"img": "thumb-models",
 "file": "models-basics.html",
 "title": "How Models Work",
 "sub": "What the AI is doing with your words: next words, tokens, the desk it reads from, and a brief it can use.",
@@ -320,7 +320,7 @@ var CH = [
 },
 {
 "key": "agents101_v1",
-"img": "thumb-cool",
+"img": "thumb-agents",
 "file": "agents-basics.html",
 "title": "Agents and Schedules",
 "sub": "An AI that uses tools and checks its work, saved skills, scheduled tasks, and why a second reviewer catches what the builder misses.",
@@ -332,12 +332,14 @@ var CH = [
 var COURSES = [
 {
 "title": "Images and video",
+"img": "thumb-course-media",
 "sub": "A course of its own: making, using and fixing AI images and video, with this course's mascot pipeline as the worked example.",
 "color": "#f59847",
 "status": "planned"
 },
 {
 "title": "Video editing",
+"img": "thumb-course-edit",
 "sub": "A course of its own, built alongside RoughCut: cuts, pacing, sound, the rules and the tricks. Twelve chapters that end with one finished video.",
 "color": "#4cf0e0",
 "status": "1 of 12 built",
@@ -346,6 +348,7 @@ var COURSES = [
 },
 {
 "title": "Game development",
+"img": "thumb-course-games",
 "sub": "A course of its own: game loops, input, collision and game feel.",
 "color": "#98a0b0",
 "status": "later"
@@ -353,7 +356,7 @@ var COURSES = [
 ];
 var SHELVES = [{"t": "The basics", "groups": [{"lab": "your screen", "ch": [1, 2, 3]}, {"lab": "your toolbox", "ch": [4, 5, 6, 7]}]}, {"t": "Under your own apps", "groups": [{"lab": "your apps", "ch": [8, 9, 10]}, {"lab": "shared + live", "ch": [11]}, {"lab": "trust nothing", "ch": [12, 13, 14]}]}, {"t": "Directing AI", "groups": [{"lab": "", "ch": [15, 16]}, {"lab": "", "courses": [0]}]}, {"t": "Branch courses", "groups": [{"lab": "", "courses": [1, 2]}]}];
 /* Bookend mascots that fill a shelf's empty space. Swap in new leaning poses here. */
-var PROPS = [ { img:"thumb-wave", w:0.54 }, { img:"thumb-cool", w:0.39 }, { img:"thumb-happy", w:0.39 }, { img:"thumb-thumbsup", w:0.51 } ];
+var PROPS = [ { img:"thumb-bookend-right", w:0.61 }, { img:"thumb-bookend-read", w:0.46 }, { img:"thumb-bookend-left", w:0.39, flip:true }, { img:"thumb-wave", w:0.54 } ];
 /* Stand-in art for books and courses that have no mascot yet. */
 var PLACEHOLDER = { img:"thumb-tip", course:"thumb-phone-hero-a" };
 var ROWS = CH.filter(function(c){ return !!c.key; });
@@ -428,7 +431,7 @@ function initApp(){
   }
   function courseCard(i){
     var x = COURSES[i], card = el("div", "pull");
-    card.innerHTML = "<div class='art'><img class='stand' src='" + PLACEHOLDER.course + ".png' alt=''><span class='soon'>art soon</span></div><div class='tx'><span class='lab' style='color:" + x.color + "'>course · " + x.status + "</span><h3>" + x.title + "</h3><div class='sub' style='font-size:14.5px'>" + x.sub + "</div>" + (x.file ? "<a class='prim' href='" + x.file + "' style='margin-top:12px'>" + x.cta + "</a>" : "<div class='st' style='margin-top:12px'>Not built yet.</div>") + "</div>";
+    card.innerHTML = "<div class='art'>" + (x.img ? "<img src='" + x.img + ".png' alt=''>" : "<img class='stand' src='" + PLACEHOLDER.course + ".png' alt=''><span class='soon'>art soon</span>") + "</div><div class='tx'><span class='lab' style='color:" + x.color + "'>course · " + x.status + "</span><h3>" + x.title + "</h3><div class='sub' style='font-size:14.5px'>" + x.sub + "</div>" + (x.file ? "<a class='prim' href='" + x.file + "' style='margin-top:12px'>" + x.cta + "</a>" : "<div class='st' style='margin-top:12px'>Not built yet.</div>") + "</div>";
     return card;
   }
 
@@ -442,9 +445,8 @@ function initApp(){
       if(free >= 52){
         /* pick the next pose, shrinking it if the gap is narrow (never under 96px tall) */
         var pr = PROPS[k % PROPS.length], h = Math.min(150, Math.floor((free - 6) / pr.w));
-        if(h >= 96){ var p = el("div", "prop", "<img src='" + pr.img + ".png' alt='' style='height:" + h + "px'>"); bk.insertBefore(p, end); }
+        if(h >= 96){ k++; var p = el("div", "prop", "<img src='" + pr.img + ".png' alt='' style='height:" + h + "px" + (pr.flip ? ";transform:scaleX(-1)" : "") + "'>"); bk.insertBefore(p, end); }
       }
-      k++;
     });
   }
 

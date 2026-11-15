@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#14181d">
-<meta name="build" content="v0.2 · Nov 14">
+<meta name="build" content="v0.3 · Nov 15">
 <title>Debugging: root cause first, stale copy or real bug</title>
 <meta name="description" content="Chapter 13 of All Thumbs. Debugging for people who build on a phone: tell an old cached copy from a real bug, find the broken piece by halving, and fix the cause instead of the symptom.">
 <link rel="canonical" href="https://motbuchanan.com/allthumbs/debug-basics.html">
@@ -149,7 +149,7 @@
     <h1>Debugging</h1>
     <p class="subtitle">Root cause first. Is it a stale copy or a real bug, and how do you tell?</p>
   </div>
-  <button class="vbadge" id="vbadge" type="button">v0.2 &middot; Nov 14</button>
+  <button class="vbadge" id="vbadge" type="button">v0.3 &middot; Nov 15</button>
 </header>
 
 <nav>
@@ -169,7 +169,7 @@
 <section id="idea">
   <p class="eyebrow">symptom and cause</p>
   <h2>"It's broken" is where you start</h2>
-  <div class="mascotspot"><img src="thumb-aha.png" alt="the thumb mascot with a lightbulb idea"></div>
+  <div class="mascotspot"><img src="thumb-debug.png" alt="the thumb mascot studying a small green bug through a magnifying glass"></div>
   <p>A bug shows up as a <b>symptom</b>: a blank screen, a button that does nothing, a score that says NaN. The <b>root cause</b> is the one line or the one missing step that makes it happen. Fixing the symptom (hiding the NaN, wrapping more code around the button) makes the bug quieter, and it comes back somewhere else.</p>
   <p>Before I ask for any fix now, I work through four questions in order:</p>
   <div class="steps4">
@@ -281,7 +281,7 @@
 
 <script>
 "use strict";
-var VERSION = "v0.2 · Nov 14";
+var VERSION = "v0.3 · Nov 15";
 var STORE_KEY = "debug101_v1";
 
 /* ---------- guarded storage ---------- */

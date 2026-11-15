@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#14181d">
-<meta name="build" content="v0.2 · Nov 14">
+<meta name="build" content="v0.3 · Nov 15">
 <title>Agents and Schedules: AI that uses tools, saved skills, and jobs that run alone</title>
 <meta name="description" content="Chapter 16 of All Thumbs. What an AI agent is, why it needs to check its own work, how saved skills load, how a scheduled task runs with nobody watching, and why a second reviewer catches what the builder misses.">
 <link rel="canonical" href="https://motbuchanan.com/allthumbs/agents-basics.html">
@@ -149,7 +149,7 @@
     <h1>Agents and Schedules</h1>
     <p class="subtitle">An AI that does the work, checks it, follows saved rules, and runs on its own.</p>
   </div>
-  <button class="vbadge" id="vbadge" type="button">v0.2 &middot; Nov 14</button>
+  <button class="vbadge" id="vbadge" type="button">v0.3 &middot; Nov 15</button>
 </header>
 
 <nav>
@@ -170,7 +170,7 @@
 <section id="idea">
   <p class="eyebrow">chat, then agent</p>
   <h2>A chat answers. An agent does the work.</h2>
-  <div class="mascotspot"><img src="thumb-cool.png" alt="the thumb mascot in sunglasses"></div>
+  <div class="mascotspot"><img src="thumb-agents.png" alt="the thumb mascot holding a checklist and an alarm clock"></div>
   <p>In a plain chat, the model writes text and you do everything else: copy the code, save the file, test it. An <b>agent</b> is the same model given <b>tools</b>, like reading files, running commands and searching the web, plus a loop: look, decide, act, check, and go again until the job is done.</p>
   <p>That's how this chapter got built. The agent read my live repo, wrote the page, ran the syntax checks, the fit check and the Breaker, handed the result to a second agent to review, fixed what it found, and zipped the files for me to upload. My part was the brief, the decisions, and the upload.</p>
 </section>
@@ -287,7 +287,7 @@
 
 <script>
 "use strict";
-var VERSION = "v0.2 · Nov 14";
+var VERSION = "v0.3 · Nov 15";
 var STORE_KEY = "agents101_v1";
 
 /* ---------- guarded storage ---------- */

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#14181d">
-<meta name="build" content="v0.3 · Nov 14">
+<meta name="build" content="v0.4 · Nov 15">
 <title>Robots on GitHub: checks that run on every upload</title>
 <meta name="description" content="Chapter 14 of All Thumbs. GitHub Actions for people who build on a phone: the Pages robot you already have, what a workflow file says, and checks that stop a bad upload.">
 <link rel="canonical" href="https://motbuchanan.com/allthumbs/actions-basics.html">
@@ -154,7 +154,7 @@
     <h1>Robots on GitHub</h1>
     <p class="subtitle">A computer that checks every upload, and why a green check doesn't mean it works.</p>
   </div>
-  <button class="vbadge" id="vbadge" type="button">v0.3 &middot; Nov 14</button>
+  <button class="vbadge" id="vbadge" type="button">v0.4 &middot; Nov 15</button>
 </header>
 
 <nav>
@@ -174,7 +174,7 @@
 <section id="idea">
   <p class="eyebrow">ci, in plain words</p>
   <h2>You already have one robot</h2>
-  <div class="mascotspot"><img src="thumb-nice.png" alt="the thumb mascot looking pleased"></div>
+  <div class="mascotspot"><img src="thumb-actions.png" alt="the thumb mascot with a small robot holding a check mark sign"></div>
   <p>Every time I upload a file to my site from my phone, a computer at GitHub wakes up, grabs the new files, and puts them on the live site. It shows up in the repo's <b>Actions</b> tab as a run called <code>pages build and deployment</code>. I never set it up; GitHub Pages turns it on for you.</p>
   <p>That robot is a <b>workflow</b>: a list of steps a computer runs by itself when something happens, like an upload. The grown-up name for robots that check your work on every upload is <b>CI</b>, continuous integration. GitHub's version is called <b>GitHub Actions</b>, and on a public repo like mine its standard computers cost nothing.</p>
   <p>My Pages robot ships whatever I give it, so a file with a broken script gets a green check and goes live broken. This chapter is about teaching a robot to look before it ships.</p>
@@ -291,7 +291,7 @@
 
 <script>
 "use strict";
-var VERSION = "v0.3 · Nov 14";
+var VERSION = "v0.4 · Nov 15";
 var STORE_KEY = "actions101_v1";
 
 /* ---------- guarded storage ---------- */

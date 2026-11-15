@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#14181d">
-<meta name="build" content="v0.2 · Nov 14">
+<meta name="build" content="v0.3 · Nov 15">
 <title>How Models Work: next words, tokens, the desk, and a good brief</title>
 <meta name="description" content="Chapter 15 of All Thumbs. What an AI model does with your words: it picks the next piece of text, reads in tokens, only sees what is on its desk, and does better work from a real brief.">
 <link rel="canonical" href="https://motbuchanan.com/allthumbs/models-basics.html">
@@ -163,7 +163,7 @@
     <h1>How Models Work</h1>
     <p class="subtitle">What the AI is doing with your words, and how to give it a brief it can use.</p>
   </div>
-  <button class="vbadge" id="vbadge" type="button">v0.2 &middot; Nov 14</button>
+  <button class="vbadge" id="vbadge" type="button">v0.3 &middot; Nov 15</button>
 </header>
 
 <nav>
@@ -184,7 +184,7 @@
 <section id="idea">
   <p class="eyebrow">what's inside</p>
   <h2>It writes one piece at a time</h2>
-  <div class="mascotspot"><img src="thumb-phone-hero-b.png" alt="the thumb mascot holding a phone"></div>
+  <div class="mascotspot"><img src="thumb-models.png" alt="the thumb mascot holding a row of tiles, the last one a question mark"></div>
   <p>Every app in this course was built by me directing an AI model from my phone. I think of it like running a creative department: I give the brief, look at what comes back, and send notes; the model writes the code.</p>
   <p>Under the chat window, a <b>language model</b> does one thing over and over. It looks at all the text so far and picks a likely next piece. Then it adds that piece and does it again, until the answer is done. It learned what "likely" means by training on a huge amount of text. Nothing you type while chatting changes what it learned.</p>
   <p>That one fact explains most of what surprises people. It writes fluent text even when it's wrong, because fluent is what it was trained to produce. It only knows what you put in front of it plus what it learned in training. And a vague request gets a guess, because the model usually fills every gap with the most ordinary choice.</p>
@@ -304,7 +304,7 @@
 
 <script>
 "use strict";
-var VERSION = "v0.2 · Nov 14";
+var VERSION = "v0.3 · Nov 15";
 var STORE_KEY = "models101_v1";
 
 /* ---------- guarded storage ---------- */

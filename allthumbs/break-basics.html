@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#14181d">
-<meta name="build" content="v0.2 · Nov 14">
+<meta name="build" content="v0.3 · Nov 15">
 <title>Break It: testing an app the way real people use it</title>
 <meta name="description" content="Chapter 12 of All Thumbs. Why the builder is the worst tester of their own app: hunt six planted bugs, let a monkey tap at random, and sort real findings like a second reviewer.">
 <link rel="canonical" href="https://motbuchanan.com/allthumbs/break-basics.html">
@@ -177,7 +177,7 @@
     <h1>Break It</h1>
     <p class="subtitle">Why the person who built it is the worst person to test it.</p>
   </div>
-  <button class="vbadge" id="vbadge" type="button">v0.2 &middot; Nov 14</button>
+  <button class="vbadge" id="vbadge" type="button">v0.3 &middot; Nov 15</button>
 </header>
 
 <nav>
@@ -197,7 +197,7 @@
 <section id="idea">
   <p class="eyebrow">the blind spot</p>
   <h2>You test the path you built</h2>
-  <div class="mascotspot"><img src="thumb-oops.png" alt="the thumb mascot looking sheepish"></div>
+  <div class="mascotspot"><img src="thumb-break.png" alt="the thumb mascot holding a cracked phone and a rubber mallet"></div>
   <p>When I finish an app, I open it and use it the way I built it to be used. Tap the big button, play a round, it works, ship it. That check only proves the one path I already knew about.</p>
   <p>A real person turns the phone sideways. They tap the same button four times because the first tap felt slow. Their browser is set to block saving, so the app can't keep anything. They have a smaller phone than mine. None of that is in my head while I'm building, so none of it gets tested.</p>
   <p>So I built a second tester, the Breaker, whose whole job is to use my apps badly. On Oct 23 it went through five apps on my site. Two of them were broken for real people: one never drew its chessboard when saving was blocked, and one hid four keyboard letters when the phone was turned sideways. Both were already live on my site.</p>
@@ -339,7 +339,7 @@
 
 <script>
 "use strict";
-var VERSION = "v0.2 · Nov 14";
+var VERSION = "v0.3 · Nov 15";
 var STORE_KEY = "break101_v1";
 
 /* ---------- guarded storage ---------- */
