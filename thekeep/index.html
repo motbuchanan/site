@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="keep-version" content="v0.46.0">
+<meta name="keep-version" content="v0.47.0">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#000">
 <title>The Keep</title>
@@ -220,7 +220,7 @@ html.fromshelf #inPage #inViews{padding-top:calc(58px + env(safe-area-inset-top)
  </div>
  <div id="stick"><div id="knob"></div></div>
  <div id="fps"></div>
- <button class="mb-ver" id="mbVer" type="button">v0.46.0 &middot; Nov 18</button>
+ <button class="mb-ver" id="mbVer" type="button">v0.47.0 &middot; Nov 18</button>
  <div id="toast"></div>
  <div id="updNudge" hidden role="status"><span>A new version of The Keep is here (<b id="updVer"></b>).<span id="updMsg" style="display:block;font-weight:400"></span></span><button class="btn go" id="updGo" type="button">refresh</button><button class="btn" id="updNo" type="button">later</button></div>
  <div id="bkNudge" hidden role="status"><span>Big moment. Back up your progress?</span><button class="btn go" id="bkNudgeGo" type="button">back up</button><button class="btn" id="bkNudgeNo" type="button">later</button></div>
@@ -1333,9 +1333,10 @@ var SHELF={on:false,url:'https://motbuchanan.com/gameshelf/'};
   SHELF.place=place;
 })();
 
-const VERSION='The Keep v0.46.0 · Nov 18 2026';
-const VER_SHORT='v0.46.0 · Nov 18'; // what the badge shows; bump with VERSION
+const VERSION='The Keep v0.47.0 · Nov 18 2026';
+const VER_SHORT='v0.47.0 · Nov 18'; // what the badge shows; bump with VERSION
 const CHANGELOG=[
+ ['v0.47.0 · Nov 18 2026','Under the lake. The water closes in green and murky as you dive, darker the deeper you go, with slow shafts of light from the surface. Kelp sways in beds on the lake floor, and fish swim at every depth, not just the top. In lake country there is a wreck on the bottom: her side stove in, her deck fallen into the hold, her mast lying beside her. Swim in. Deeper still is a drowned temple. Swim through its door, find the hole in the hall ceiling, and come up into a dry room where the air is still good and a lamp is still burning. Each of them has something to tell you. Divers now swim round built things instead of through them, and cannot pass through a floor from above or below.'],
  ['v0.46.0 · Nov 18 2026','Lake country. About one valley in five now grows a big, deep lake to the southeast, with a port on its shore: a pier out over the water, a fish market under red and straw awnings, and the harbormaster\'s house. A ship with red sails is tied up alongside the pier. Walk up the gangway onto the deck, into the captain\'s cabin at the stern, or down the hatch by the mast into the hold. The harbormaster looks after her all day and has plenty to say. Swimmers now go round a ship\'s hull instead of through it. Choose a valley lets you ask for a big lake. Valleys that are not lake country keep their land exactly as before.'],
  ['v0.45.0 · Nov 18 2026','An inn and a mill in every valley, and two new people to run them. The inn stands by a path with a sign over the door: a taproom with a bar, barrels, tables and a fire downstairs, and a passage upstairs with three rooms off it. The innkeeper works the bar by day and sleeps in the east room. The mill is a tall stone mill with its sails over the door, the millstones downstairs and the grain upstairs, where the miller sleeps. Both have plenty to say, and the rest of the valley talks about them too.'],
  ['v0.44.0 · Nov 18 2026','The farmhouses have an upstairs. Both farms now build a two-storey house: a kitchen with the hearth and a table downstairs, a stair up the back wall, and a bedroom under the roof with a window in the gable. The farmer goes up to bed at night and comes down in the morning. The woodcutter\'s cabin and the hermit\'s hut get windows, a chimney and their own furniture. Every home is now built by one shared builder.'],
@@ -1874,6 +1875,7 @@ function genWorld(seed){
   W.waterKind=lakeCountry(seed,DIALS.water)?'lake':'pond';
   if(W.waterKind==='lake'){ LAKE.x=335; LAKE.y=335; LAKE.r=52; } else { LAKE.x=300; LAKE.y=280; LAKE.r=40; }
   const h=W.h, st=W.st, tree=W.tree;
+  if(!W.air||W.air.length!==N*N) W.air=new Float32Array(N*N); W.air.fill(0); W.lamps=[];
   st.fill(0); tree.fill(0); spanClear(); W.rail.fill(0); W.floor.fill(0); W.ruin.fill(0); W.smat.fill(0); W.places.length=0; W.pens.length=0; W.keepBuilt=false;
   for(let y=0;y<N;y++)for(let x=0;x<N;x++){
     const nx=x/N, ny=y/N;
@@ -2424,6 +2426,66 @@ const TOWN_BUILD={
     p.route.bed=fRoute(T,[[0.5,4.5],[0.5,2.5],[3.5,1.5],[3.5,-1.5],[-2.5,-1.5],[-2.5,-0.5],[2.5,-0.5],[2.5,1.0],[3.4,1.4,0,4,0,1]]);
     p.route.wake=fRoute(T,[[3.4,1.4],[2.5,1.0],[2.5,-0.5],[-2.5,-0.5],[-2.5,-1.5],[3.5,-1.5],[3.5,1.5],[0.5,2.5],[0.5,4.5]]);
     p.trail=T.F(0.5,9.0); p.cam=T.F(7.0,11.0).concat(T.F(0,0)); } };
+// ---- under the lake (v0.47): a wreck on the bed and a drowned temple with a dry room at its heart ----
+// The bed under each is levelled first; every height is measured from that level, B.
+function levelBed(T,u0,v0,u1,v1){ let lo=1e9; for(let v=v0;v<=v1+1;v++)for(let u=u0;u<=u1+1;u++){ const i=fCell(T,u,v); if(i>=0&&W.h[i]<lo) lo=W.h[i]; }
+  for(let v=v0;v<=v1+1;v++)for(let u=u0;u<=u1+1;u++){ const i=fCell(T,u,v); if(i<0) continue; W.h[i]=lo; W.st[i]=0; W.spn[i]=0; W.tree[i]=0; W.path[i]=0; } return lo; }
+const WRECK_NAMES=['the wreck of the Heron','the wreck of the Merry Ann','the wreck of the Long Patience','the wreck of the Salt Wren','the wreck of the Ninth Daughter'];
+const TEMPLE_NAMES=['the Drowned Temple','the Hall Under the Lake','the Temple of Still Water','the Sunken Chapel'];
+// a ship on the bottom: her side stove in amidships (swim in), half her deck fallen into the hold, her mast lying
+// beside her on the bed with the rag of a red sail, and a sea chest in the hold
+function buildWreck(T,B){ const u0=0, L=16, cu=u0+3;
+  const half=function(j){ return j>L-5?3-(j-(L-5))*0.75:3; }, inHull=function(u,j){ return j>=0&&j<L&&Math.abs(u+0.5-cu)<=half(j); };
+  const HB=B-0.4, HF=B+0.25, DB=B+2.6, DT=B+2.85, RT=DT+0.8;
+  for(let j=0;j<L;j++)for(let u=u0-1;u<=u0+6;u++){ if(!inHull(u,j)) continue; const i=fCell(T,u,j); if(i<0) continue; const g=W.h[i];
+    const side=!inHull(u-1,j)||!inHull(u+1,j)||!inHull(u,j-1)||!inHull(u,j+1);
+    if(side){ if(u===u0+5&&j>=6&&j<=8) { addSpan(i,HB-g,HF-g,7); continue; }        // the breach: only the bottom planks left
+      addSpan(i,HB-g,(j>=11&&u===u0?DT:RT)-g,7); continue; }
+    addSpan(i,HB-g,HF-g,8);
+    if(!(j>=7&&j<=11&&u>=u0+2)) addSpan(i,DB-g,DT-g,7); }                            // the deck, fallen in by the mast
+  const put=function(u,j,b,t,m){ const i=fCell(T,u,j); if(i>=0) addSpan(i,b-W.h[i],t-W.h[i],m); };
+  put(u0+2,4,HF+0.02,HF+0.7,8); put(u0+3,4,HF+0.02,HF+0.7,8);                        // the sea chest
+  put(u0+1,13,HF+0.02,HF+0.9,8); put(u0+4,3,HF+0.02,HF+0.6,5);
+  for(let u=u0+6;u<=u0+15;u++){ const i=fCell(T,u,9); if(i>=0){ W.tree[i]=0; addSpan(i,0.05,0.55,8); } }  // the mast on the bed
+  for(let u=u0+8;u<=u0+12;u++) for(const j of [10,11]){ const i=fCell(T,u,j); if(i>=0&&((u+j)%3)) { W.tree[i]=0; addSpan(i,0.02,0.16,9); } }   // what is left of the sail
+  return {x:T.F(u0+3,8), open:T.F(u0+3.5,9.5), r:9}; }
+// the temple: a stone platform, a pillared hall with a door to the front, broken columns outside, and above the hall's
+// back half a sealed room you reach by swimming up through a hole in the hall's ceiling. That room holds air.
+function buildTemple(T,B){ const P0=0.6, WH=7.1, RF=7.8, CW=10.8, CR=11.5, STONE=3, DARK=0;
+  for(let v=-7;v<=9;v++)for(let u=-7;u<=7;u++){ const i=fCell(T,u,v); if(i<0) continue; W.st[i]=P0; W.ruin[i]=STONE; }
+  const hall=function(u,v){ return Math.abs(u)<=6&&Math.abs(v)<=6; }, wall=function(u,v){ return Math.abs(u)===6||Math.abs(v)===6; };
+  const room=function(u,v){ return Math.abs(u)<=3&&v>=-5&&v<=-1; }, roomWall=function(u,v){ return room(u,v)&&(Math.abs(u)===3||v===-5||v===-1); };
+  for(let v=-6;v<=6;v++)for(let u=-6;u<=6;u++){ const i=fCell(T,u,v); if(i<0) continue; const g=W.h[i];
+    if(wall(u,v)){ const door=v===6&&Math.abs(u)<=1;
+      if(door){ W.st[i]=P0; addSpan(i,P0+4.2,WH,DARK); } else { W.st[i]=WH; W.ruin[i]=DARK; } addSpan(i,WH,RF,STONE); continue; }
+    if(Math.abs(u)===4&&Math.abs(v)===3){ W.st[i]=WH; W.ruin[i]=STONE; addSpan(i,WH,RF,STONE); continue; }   // pillars
+    const hole=u===0&&v===-3;
+    if(!hole) addSpan(i,WH,RF,STONE);
+    if(room(u,v)){ if(roomWall(u,v)) addSpan(i,RF+0.02,CR,DARK); else { addSpan(i,CW,CR,STONE); W.air[i]=B+RF+AIRB; } } }
+  // the room: a bench and a bowl; the lamp; the hole's own water line
+  { const i=fCell(T,0,-3); if(i>=0) W.air[i]=B+RF+AIRB; }
+  const put=function(u,v,b,t,m){ const i=fCell(T,u,v); if(i>=0) addSpan(i,b,t,m); };
+  put(-2,-4,RF+0.02,RF+0.5,DARK); put(-1,-4,RF+0.02,RF+0.5,DARK); put(2,-2,RF+0.02,RF+0.85,STONE);
+  const lamp=T.F(2.5,-3.5); (W.lamps=W.lamps||[]).push([lamp[0],lamp[1],B+RF+1.3]);
+  // broken columns in front, an altar stone in the hall
+  for(const q of [[-4,8,5.5],[-2,8,2.4],[2,8,4.6],[4,8,1.6],[-4,-8,3.2],[4,-8,6.0]]){ const i=fCell(T,q[0],q[1]); if(i>=0){ W.st[i]=P0+q[2]; W.ruin[i]=STONE; } }
+  { const i=fCell(T,0,1); if(i>=0){ W.st[i]=P0+1.0; W.ruin[i]=DARK; } }
+  return {x:T.F(0.5,0.5), room:T.F(0.5,-3.5), hole:T.F(0.5,-2.5), door:T.F(0.5,6.5), out:T.F(0.5,12), air:B+RF, B:B}; }
+// where they go: the temple in the deepest water clear of the port and the ship, the wreck at middling depth elsewhere
+function placeDeep(seed){ if(W.waterKind!=='lake') return; const rnd=mul32((seed^0xDEE9)>>>0), port=W.places.find(function(o){ return o.key==='port'; });
+  const clear=function(x,y,R){ if(port&&Math.hypot(port.x-x,port.y-y)<R+40) return false; for(const o of W.ruins) if(Math.hypot(o.x-x,o.y-y)<o.r+R+6) return false; return true; };
+  const deepAll=function(T,u0,v0,u1,v1,need){ for(let v=v0;v<=v1;v++)for(let u=u0;u<=u1;u++){ const i=fCell(T,u,v); if(i<0||W.h[i]>WATER-need) return false; } return true; };
+  let best=null;
+  for(let t=0;t<1500;t++){ const an=rnd()*6.2832, rr=LAKE.r*0.8*Math.sqrt(rnd()), x=Math.round(LAKE.x+Math.cos(an)*rr), y=Math.round(LAKE.y+Math.sin(an)*rr), rot=(rnd()*4)|0;
+    if(!clear(x,y,12)) continue; const T=fPlace(x,y,rot); if(!deepAll(T,-8,-8,8,10,14)) continue; const d=WATER-W.h[y*N+x]; if(!best||d>best.d) best={x:x,y:y,rot:rot,d:d}; if(t>500&&best) break; }
+  if(best){ const T=fPlace(best.x,best.y,best.rot), B=levelBed(T,-8,-8,8,10); const r=buildTemple(T,B), nm=TEMPLE_NAMES[(rnd()*TEMPLE_NAMES.length)|0];
+    W.ruins.push({x:r.x[0], y:r.x[1], r:10, dr:9, kind:'temple', name:nm, found:false, zMax:r.B+7.8+2.5, deep:true, hole:r.hole, door:r.door, out:r.out, B:r.B});
+    W.ruins.push({x:r.room[0], y:r.room[1], r:3, dr:2.6, kind:'pocket', name:'the dry room in '+nm, found:false, zMin:r.air-0.2, zMax:r.air+4, deep:true}); }
+  for(let t=0;t<1500;t++){ const an=rnd()*6.2832, rr=LAKE.r*(0.3+0.6*rnd()), x=Math.round(LAKE.x+Math.cos(an)*rr), y=Math.round(LAKE.y+Math.sin(an)*rr), rot=(rnd()*4)|0;
+    if(!clear(x,y,10)) continue; const T=fPlace(x,y,rot); if(!deepAll(T,-1,-1,16,17,6)) continue;
+    const B=levelBed(T,-1,-1,16,17); const r=buildWreck(T,B);
+    W.ruins.push({x:r.x[0], y:r.x[1], open:r.open, r:9, dr:6, kind:'wreck', name:WRECK_NAMES[(rnd()*WRECK_NAMES.length)|0], found:false, zMax:Math.min(WATER-1.5,B+6), deep:true}); break; }
+  try{ const f=JSON.parse(localStorage.getItem('keep_found_'+seed)||'[]'); if(Array.isArray(f)) for(const o of W.ruins) if(o.deep&&f.indexOf(o.name)>=0) o.found=true; }catch(e){} }
 // ---- the port (v0.46): a pier out over the lake, a ship moored alongside it, the harbormaster's house and a fish market ----
 // The place's grid has +v pointing out over the water; the shore is at v=sh.
 const SHIP={HB:WATER-1.6, HF:WATER+0.05, DB:WATER+2.35, DT:WATER+2.6};   // hull bottom, hold floor, deck underside, deck
@@ -2509,7 +2571,7 @@ function townSpot(R,rnd){ let last=null;
   for(let t=0;t<30;t++){ const s=folkSpot(R,rnd,'meadow'); if(!s) break; if(W.ruins.some(function(o){ return Math.hypot(o.x-s[0],o.y-s[1])<o.r+R+14; })) continue; last=s; const q=nearestPath(s[0],s[1],R+14); if(q&&Math.hypot(q[0]-s[0],q[1]-s[1])>R+3) return {x:s[0],y:s[1],q:q}; }
   return last?{x:last[0],y:last[1],q:nearestPath(last[0],last[1],180)}:null; }
 function placeTown(seed){ if(!DIALS.people) return; const rnd=mul32((seed^0x51A7E77)>>>0);
-  if(W.waterKind==='lake') placePort(seed);
+  if(W.waterKind==='lake'){ placePort(seed); placeDeep(seed); }
   for(let k=0;k<TOWN.length;k++){ const F=TOWN[k]; if(F.lake) continue; const s=townSpot(F.R,rnd); if(!s) continue;
     let rot=(rnd()*4)|0; if(s.q){ const dx=s.q[0]-s.x, dy=s.q[1]-s.y, D=[[0,1],[-1,0],[0,-1],[1,0]]; let bd=-9; for(let r=0;r<4;r++){ const d=D[r][0]*dx+D[r][1]*dy; if(d>bd){ bd=d; rot=r; } } }
     const x=s.x, y=s.y, T=fPlace(x,y,rot);
@@ -2702,10 +2764,10 @@ function placeStructures(seed){
 }
 // walk into a ruin for the first time and it tells you its name, and how many of this world's ruins you have found
 function ruinCheck(){ if(!greetHook||!W.ruins.length) return;
-  for(const o of W.ruins){ if(o.found) continue; if(Math.hypot(P.x-o.x,P.y-o.y)>o.dr) continue;
+  for(const o of W.ruins){ if(o.found) continue; if(Math.hypot(P.x-o.x,P.y-o.y)>o.dr) continue; if((o.zMax!=null&&P.z>o.zMax)||(o.zMin!=null&&P.z<o.zMin)) continue;
     let n=1; for(const q of W.ruins) if(q.found) n++;
     const msg='You found '+o.name+'.'+(n===W.ruins.length&&n>1?' That is every ruin in this world.':' ('+n+' of '+W.ruins.length+' ruins)');
-    if(greetHook(msg)!==false){ TBUSY=Date.now()+3400; o.found=true; o.foundAt=Date.now(); { const li=loreFor(o.kind); if(li!=null&&loreTake(li)){ W.loreMsg=o.name.charAt(0).toUpperCase()+o.name.slice(1)+': '+LORE[li][1]; W.loreAt=Date.now()+3800; } }
+    if(greetHook(msg)!==false){ TBUSY=Date.now()+3400; o.found=true; o.foundAt=Date.now(); { const li=o.deep?loreFor(o.kind==='temple'?'drowned':o.kind,true):loreFor(o.kind); if(li!=null&&loreTake(li,o.deep)){ W.loreMsg=o.name.charAt(0).toUpperCase()+o.name.slice(1)+': '+LORE[li][1]; W.loreAt=Date.now()+3800; } }
       try{ localStorage.setItem('keep_found_'+W.seed,JSON.stringify(W.ruins.filter(function(q){ return q.found; }).map(function(q){ return q.name; }))); }catch(e){} }
     return; } }
 function carvePath(x0,y0,x1,y1,sd,wd){
@@ -2728,6 +2790,12 @@ function terr(x,y){
   const a=h[i], b=h[i+1], c=h[i+N], d=h[i+N+1];
   const t=a+(b-a)*fx, u=c+(d-c)*fx; return t+(u-t)*fy;
 }
+// a sealed room under the lake holds air: its cells carry their own water line (0 means the lake's)
+const AIRB=500;   // stored with this added, so 0 can mean none even deep below zero
+function waterLine(x,y,z){ const i=clamp(y|0,0,N-1)*N+clamp(x|0,0,N-1), a=W.air?W.air[i]:0; if(!(a>0)) return WATER; const L=a-AIRB;
+  if(z==null) return L; const g=W.h[i], o=i*SPANS; for(let k=0;k<W.spn[i];k++){ const b=g+W.spb[o+k]; if(b>L+0.5) return z<b?L:WATER; } return WATER; }   // only under the room's own ceiling
+// spans only (never the ground): is this point inside something built?
+function spanSolid(x,y,z){ const i=clamp(y|0,0,N-1)*N+clamp(x|0,0,N-1), n=W.spn[i], o=i*SPANS, g=W.h[i]; for(let k=0;k<n;k++){ if(z>g+W.spb[o+k]&&z<g+W.spt[o+k]) return true; } return false; }
 function groundAt(x,y){ const xi=clamp(x|0,0,N-1), yi=clamp(y|0,0,N-1); return terr(x,y)+W.st[yi*N+xi]; }
 // floorAt: the floor under a body whose feet are at zf. Where the second layer floats over the ground
 // you stand on top of it if you are up there (or stepping onto it), and walk underneath it if there is headroom.
@@ -2788,12 +2856,15 @@ let FOG_R=172, FOG_G=196, FOG_B=222;
 const SKYBIT=1<<30; // marks sky cells in FB.col so compose leaves them out of the day/night exposure
 const fogLUT=new Float32Array(MAXT*4+16);
 for(let i=0;i<fogLUT.length;i++) fogLUT[i]=1-Math.exp(-(i/4)*FOGK);
+// under the water the fog closes in and turns lake-green; refilled only when the murk changes
+let fogMurk=0;
+function fogSet(m){ if(Math.abs(m-fogMurk)<0.01&&!(m===0&&fogMurk!==0)) return; fogMurk=m; const K=FOGK+m*0.085; for(let i=0;i<fogLUT.length;i++) fogLUT[i]=1-Math.exp(-(i/4)*K); }
 const RS={C:0,R:0,cellW:0,cellH:0,K:0,tanHalf:0,offX:0,offY:0,letterbox:false,fovV:0.66};
 const FOV_V=0.66;
 const FB={col:null,px32:null};
 const TMP={flag:null,wflag:null,wdepth:null,wt:null,mirror:null,mflag:null};
 let skyTime=0;
-let UW=0;
+let UW=0, UWDEEP=0;   // under the water, and how deep (0 at the surface, 1 at 20 m and below)
 
 function allocGrid(C,R,cw,ch){
   RS.C=C; RS.R=R; RS.cellW=cw; RS.cellH=ch;
@@ -2825,7 +2896,14 @@ function skyUpdate(){
   // fog meets the horizon; the world is tinted by compose afterwards, so the fog is stored pre-tint
   stormSky();
   FOG_R=clamp(SKY.hr/DAY.tr,0,255); FOG_G=clamp(SKY.hg/DAY.tg,0,255); FOG_B=clamp(SKY.hb/DAY.tb,0,255);
+  FOG0[0]=FOG_R; FOG0[1]=FOG_G; FOG0[2]=FOG_B; uwFog();
 }
+// under the water: the fog closes in and turns lake-green, darker the deeper you go (every frame, from the sky's own fog)
+const FOG0=[172,196,222];
+function uwFog(){ FOG_R=FOG0[0]; FOG_G=FOG0[1]; FOG_B=FOG0[2];
+  if(UW>0){ const lt=0.25+0.75*DAY.k, k=UW, r=(26-16*UWDEEP)*lt, g=(80-46*UWDEEP)*lt, b=(94-44*UWDEEP)*lt;
+    FOG_R+=(r/DAY.tr-FOG_R)*k; FOG_G+=(g/DAY.tg-FOG_G)*k; FOG_B+=(b/DAY.tb-FOG_B)*k; }
+  fogSet(UW>0?UW*(0.6+0.4*clamp(UWDEEP*1.4,0,1)):0); }
 // a sky color divided by the day tint, for sky that reaches the screen through world cells (the lake's reflection)
 function preTint(c){ if(DAY.tr===1&&DAY.tg===1&&DAY.tb===1) return c; const r=Math.min(255,((c>>16)&255)/DAY.tr), g=Math.min(255,((c>>8)&255)/DAY.tg), b=Math.min(255,(c&255)/DAY.tb); return ((r|0)<<16)|((g|0)<<8)|(b|0); }
 function sky(dx,dy,sg,px,py,pz){
@@ -2995,6 +3073,7 @@ function decoPaint(i,C,w,tw,hx,hy,horizon,pz,K,R,ybuf,dx,dy){
 }
 const DQ=[];   // decorations met in the cell being marched, painted after its contents
 function renderFrame(px,py,pz,yaw,pitch){
+  uwFog();
   const C=RS.C,R=RS.R,K=RS.K,tanH=RS.tanHalf; const LIT=DAY.light;
   simBin(px,py);
   const fb=FB.col;
@@ -3301,7 +3380,10 @@ function renderFrame(px,py,pz,yaw,pitch){
       }
     }
     // ---- sky ----
-    for(let r=0;r<ybuf;r++){ if(!flag[r]) fb[r*C+i]=sky(dx,dy,(horizon-r)/K,px,py,pz)|SKYBIT; }
+    if(UW>0.02){ for(let r=0;r<ybuf;r++){ if(flag[r]) continue; const up=(horizon-r)/K;   // under the water there is no sky: the murk, brightening up toward the surface, with the ripples' light on it
+        const k=clamp(up*0.9,0,1)*(1-UWDEEP*0.8)*DAY.k, rp=0.5+0.5*Math.sin(dx*40+r*0.35+skyTime*1.3)*Math.sin(dy*37-r*0.21+skyTime*0.9);
+        fb[r*C+i]=pack(FOG_R+(150-FOG_R)*k*(0.6+0.4*rp),FOG_G+(205-FOG_G)*k*(0.6+0.4*rp),FOG_B+(200-FOG_B)*k*(0.6+0.4*rp),0)|SKYBIT; } }
+    else for(let r=0;r<ybuf;r++){ if(!flag[r]) fb[r*C+i]=sky(dx,dy,(horizon-r)/K,px,py,pz)|SKYBIT; }
     // ---- reflection march ----
     if(wCount>0){
       for(let r=wMin;r<=wMax;r++){ mflag[r]=0; if(wflag[r]) mirror[r]=preTint(sky(dx,dy,(r-horizon)/K,px,py,pz)); }
@@ -3383,11 +3465,13 @@ function compose(){
   const uw=UW, xr=DAY.tr, xg=DAY.tg, xb=DAY.tb, tint=(xr!==1||xg!==1||xb!==1);
   const solid=(RENDERS[DIALS.render|0]||RENDERS[0]).id==='pixels';
   for(let j=0;j<R;j++){
-    let utR=0,utG=0,utB=0,um=0;
-    if(uw>0){ const sgl=1-j/R; utR=12+(46-12)*sgl; utG=46+(118-46)*sgl; utB=72+(150-72)*sgl; um=uw*0.6; }
+    let utR=0,utG=0,utB=0,um=0, shK=0;
+    if(uw>0){ const sgl=1-j/R; utR=12+(46-12)*sgl; utG=46+(118-46)*sgl; utB=72+(150-72)*sgl; um=uw*0.42; shK=uw*DAY.k*sgl*sgl*(1-UWDEEP)*0.55; }
     for(let i=0;i<C;i++){
       const c=fb[j*C+i]; let r=(c>>16)&255, g=(c>>8)&255, b=c&255;
-      if(um>0){ r+=(utR-r)*um; g+=(utG-g)*um; b+=(utB-b)*um; }
+      if(um>0){ r+=(utR-r)*um; g+=(utG-g)*um; b+=(utB-b)*um;
+        if(shK>0){ const a=Math.sin(i*0.21+j*0.06+skyTime*0.35)*Math.sin(i*0.083-j*0.02-skyTime*0.21), sh=a>0.55?(a-0.55)*2.2*shK:0;   // light from the surface, in slow slanting shafts
+          if(sh>0){ r+=(170-r)*sh; g+=(222-g)*sh; b+=(214-b)*sh; } } }
       const lum=(r*77+g*150+b*29)>>8;   // the glyph comes from the untinted light, so night keeps its texture
       if(tint&&!(c&SKYBIT)){ r*=xr; g*=xg; b*=xb; if(r>255)r=255; if(g>255)g=255; if(b>255)b=255; }
       const fg=(0xff000000|(b<<16)|(g<<8)|r)>>>0;
@@ -3402,7 +3486,7 @@ function compose(){
 }
 
 // ---------------- creatures (simulation layer) ----------------
-const SP={BIRD:0,RABBIT:1,DEER:2,SQUIRREL:3,FISH:4,WOLF:5,CARCASS:6,KEEPER:7,FIRE:8,SHEEP:9,COW:10,HEN:11,HORSE:12,TORCH:13};
+const SP={BIRD:0,RABBIT:1,DEER:2,SQUIRREL:3,FISH:4,WOLF:5,CARCASS:6,KEEPER:7,FIRE:8,SHEEP:9,COW:10,HEN:11,HORSE:12,TORCH:13,KELP:14};
 const SPP=[
   { speed:8.0, turn:3.2, sight:16, sep:2.4, wsize:0.95, hsize:0.78, r:52,g:50,b:60 },
   { speed:3.0, turn:5.0, sight:9,  sep:1.0, wsize:0.64, hsize:1.10, r:168,g:132,b:98 },
@@ -3417,7 +3501,8 @@ const SPP=[
   { speed:0.8, turn:0, sight:0, sep:0, wsize:1.46, hsize:2.0, r:200,g:190,b:180 },
   { speed:1.9, turn:0, sight:0, sep:0, wsize:0.36, hsize:0.72, r:220,g:200,b:166 },
   { speed:0.9, turn:0, sight:0, sep:0, wsize:1.40, hsize:2.30, r:132,g:84,b:50 },
-  { speed:0, turn:0, sight:0, sep:0, wsize:0.22, hsize:0.62, r:60,g:50,b:44 }
+  { speed:0, turn:0, sight:0, sep:0, wsize:0.22, hsize:0.62, r:60,g:50,b:44 },
+  { speed:0, turn:0, sight:0, sep:0, wsize:0.62, hsize:3.4, r:46,g:92,b:52 }
 ];
 const CMAX=1600, CDRAW=130;
 const CR_={ n:0,
@@ -5208,7 +5293,8 @@ function beatSweet(id){ if(!trHere('sweet')) return null; const pr2=pairOf(castF
       {label:'Every word.', reply:["I've been talking about the weather at "+him(e.ap)+" for a year. A whole year!","I'm going to go and find "+him(e.ap)+". Right now. Before I lose my nerve."], pick:function(){ e.s='done'; e.c='told'; logChoice('mend','sweet'); }}]};
   return null; }
 // ---- 4. the light in the old stones: a guard has seen it at night; go and look after dark ----
-function lightRuin(){ return W.ruins.length?W.ruins[0]:null; }
+function landRuin(){ for(const o of W.ruins) if(!o.deep) return o; return null; }   // the drowned places never stand in for 'the ruin'
+function lightRuin(){ return landRuin(); }
 function beatLight(id){ if(!trHere('light')||!lightRuin()) return null; const p=part(), k=trKey('light'), L=troublesFor(W.seed).light, rn=lightRuin().name; let e=p.tasks[k];
   if(id!==0&&id!==1) return null;
   if(!e) return {key:k, lines:["Don't laugh. There's a light in "+rn+" at night. Moving about. I've seen it from the wall three nights running.","Nobody else believes me."], options:[
@@ -5233,8 +5319,8 @@ function beatStone(id){ const p=part();
     return {key:k, lines:["A name? On a stone? Which name?","..."+e.carved+". That was my great-grandmother's name. She came from over the hills, they always said. Nobody knew where."], options:[
       {label:'It is in '+e.ru+', in '+e.vn+'.', reply:["Then I'll go. One day soon. I'll take her flowers, even if it's a hundred years late.","Thank you. You've given me back a bit of my family."], pick:function(){ e.s='done'; e.c='told'; logChoice('found','stone'); }},
       {label:'Just a name. I wondered.', reply:["Well. If you ever find out more, come and tell me."], pick:function(){ e.s='done'; e.c='kept'; logChoice('secret','stone'); }}]}; }
-  if(!trHere('stone')||!W.ruins.length) return null; const k=trKey('stone'); if(p.tasks[k]) return null;
-  const teller=castOf(7)&&folkHere('hermit')?7:2; if(id!==teller) return null; const F=stoneFacts(); if(!F) return null; const ru=W.ruins[0].name;
+  if(!trHere('stone')||!landRuin()) return null; const k=trKey('stone'); if(p.tasks[k]) return null;
+  const teller=castOf(7)&&folkHere('hermit')?7:2; if(id!==teller) return null; const F=stoneFacts(); if(!F) return null; const ru=landRuin().name;
   return {key:k, lines:["There's a name cut in "+ru+". Not old-old. A hundred years, maybe. "+F.carved+".","Nobody here knows whose it was. Somebody, somewhere, has lost track of it."], options:[
     {label:"I'll ask about it over the hills", reply:["Try "+F.dn+", by "+F.road+". Families wander. Names stay put."], pick:function(){ p.tasks[k]=Object.assign({s:'asked', t:teller, tn:nm(teller), ru:ru, v:W.seed>>>0, vn:W.valley},F); }},
     {label:'Let it rest', reply:["Maybe that's best. Stones keep their own counsel."], pick:function(){ p.tasks[k]={s:'done', c:'rest', ru:ru, carved:F.carved, v:W.seed>>>0, vn:W.valley}; }}]}; }
@@ -5514,9 +5600,9 @@ const LORE=[
 function loreHas(i){ const p=part(); p.lore=Array.isArray(p.lore)?p.lore:[]; return p.lore.indexOf(i)>=0; }
 function loreCountHere(){ const p=part(); p.loreAt=p.loreAt||{}; return p.loreAt[W.seed>>>0]||0; }
 // the next fragment for a tag here, from the seed; null if none is left or this valley has given two
-function loreFor(tag){ if(W.seed==null||loreCountHere()>=2) return null; const ids=[]; for(let i=0;i<LORE.length;i++) if(LORE[i][0].split(',').indexOf(tag)>=0&&!loreHas(i)&&loreGateOk(i)) ids.push(i);
+function loreFor(tag,free){ if(W.seed==null||(!free&&loreCountHere()>=2)) return null; const ids=[]; for(let i=0;i<LORE.length;i++) if(LORE[i][0].split(',').indexOf(tag)>=0&&!loreHas(i)&&loreGateOk(i)) ids.push(i);
   if(!ids.length) return null; const r=seedRng((W.seed>>>0)^Math.imul(tag.length+3,0x9E37),0x10AE); return ids[(r()*ids.length)|0]; }
-function loreTake(i){ const p=part(); p.lore=Array.isArray(p.lore)?p.lore:[]; if(p.lore.indexOf(i)>=0) return false; p.lore.push(i); p.loreAt=p.loreAt||{}; p.loreAt[W.seed>>>0]=(p.loreAt[W.seed>>>0]||0)+1; journalSave(); return true; }
+function loreTake(i,free){ const p=part(); p.lore=Array.isArray(p.lore)?p.lore:[]; if(p.lore.indexOf(i)>=0) return false; p.lore.push(i); p.loreAt=p.loreAt||{}; if(!free) p.loreAt[W.seed>>>0]=(p.loreAt[W.seed>>>0]||0)+1; journalSave(); return true; }
 // on the thread's road there is always one: the gate on the way says it with the rumor
 function loreOnRoad(){ for(const e of leftThreads()){ const i=e.path.indexOf(W.seed>>>0); if(i>0&&i<e.path.length) return true; } return false; }
 // ---------------- talking on purpose (v0.28.1) ----------------
@@ -6147,6 +6233,19 @@ const LORE6=[
  ['crownafter,old',"The crown was cut in two by the sisters so neither would rule alone. Lay the halves side by side and they look less like a crown and more like a lantern. Odd, that."],
  ['crownafter,hermit',"Ysolde's line kept the crown, and the other line kept the road. That's why the peddlers know every valley. They were the other half."]];
 LORE.push.apply(LORE,LORE6);
+ // under the water (v0.47)
+LORE.push.apply(LORE,[
+ ['wreck',"A name cut into the stern, worn nearly smooth. Under it, smaller, a later hand: we did not want to sail."],
+ ['wreck',"The hold is full of jars, all sealed, all empty. Whatever they carried, they carried it out of the world."],
+ ['wreck',"A ship has no business sinking in a lake this calm. Unless the lake wanted it."],
+ ['wreck',"Scratched inside the cabin door: nine marks for nine days. Then nothing."],
+ ['drowned',"Steps carved for feet, not fins. Whoever built this hall built it dry, and the lake came after."],
+ ['drowned',"Over the door, a carving of a woman holding a bowl of water upside down, and none spilling out."],
+ ['drowned',"The pillars lean all the same way, toward the keep. As if the hall had turned to watch it being built."],
+ ['drowned',"The old ones say the lake is a lid. This is what it keeps the lid on."],
+ ['pocket',"Dry. The air tastes of old stone and lamp oil, and the lamp is still burning. Nobody has trimmed it in a lifetime."],
+ ['pocket',"Words on the wall, in the old hand: what the water takes, it keeps. What it keeps, it keeps safe."],
+ ['pocket',"A bench, a bowl, a lamp that will not go out. Somebody meant to come back here."]]);
 function loreIndexOf(word){ for(let i=0;i<LORE.length;i++) if(LORE[i][1].indexOf('Green Lady')>=0&&word==='well') return i; return -1; }
 // a gated piece of lore is only told once its gate is open
 function loreGateOk(i){ const tg=LORE[i][0].split(','); if(tg.indexOf('ringafter')>=0&&!ringTag('ringdone')) return false;
@@ -6619,9 +6718,9 @@ function slotWho(id,key,here){ if(key==='eva'||key==='evb'||key==='evother'){ co
   const r=ROLEKEY.indexOf(key); if(r>=0) return (here[r]&&castOf(r))?r:-1;
   if(key==='innkeeper'||key==='miller'||key==='harbormaster'){ const w=townId(key); return (w>=0&&here[w])?w:-1; }
   if(key==='me') return castOf(id)?id:-1; if(RELREV[key]) return relOf(id,key,here); return -2; }
-function placeHere(k){ return k==='ruin'?W.ruins.length>0:!!folkHere(k); }
-function placeName(k){ if(k==='ruin') return W.ruins.length?W.ruins[0].name:'the old stones'; const p=folkHere(k); return p?p.name:'the woods'; }
-function placeDir(k){ if(k!=='ruin') return dirWord(k); const r=W.ruins[0]; if(!r) return 'woods';
+function placeHere(k){ return k==='ruin'?!!landRuin():!!folkHere(k); }
+function placeName(k){ if(k==='ruin') return landRuin()?landRuin().name:'the old stones'; const p=folkHere(k); return p?p.name:'the woods'; }
+function placeDir(k){ if(k!=='ruin') return dirWord(k); const r=landRuin(); if(!r) return 'woods';
   const a=Math.atan2(r.y-FORT.y,r.x-FORT.x)*180/Math.PI, q=Math.round(((a+360)%360)/45)%8;
   return ['east','southeast','south','southwest','west','northwest','north','northeast'][q]; }
 const OWNPLACE={4:'farm1',5:'farm2',6:'wood',7:'hermit'};
@@ -6653,7 +6752,7 @@ function lineOk(id,l,here,who){ const m=TAG_RE.exec(l), c=castOf(id);
     else if(t==='stormout'){ if(underCover(P.x,P.y,P.z)||!outInIt(id)) return false; }
     else if(t==='invite'){ if(id===7) return false; }   // the hermit came here to be alone
     else if(t==='aloof'){ if(c&&(c.traits.indexOf('cheerful')>=0||c.traits.indexOf('kind')>=0||c.traits.indexOf('gossip')>=0)) return false; }
-    else if(t==='ruins'){ if(!W.ruins.length) return false; }
+    else if(t==='ruins'){ if(!landRuin()) return false; }
     else if(t==='asleep2'){ if(!guard2Asleep()) return false; }
     else if(t==='day'){ if(dayPart()===3||DAY.k<0.5) return false; }   // daylight, not just the clock
     else if(t==='night'){ if(dayPart()!==3) return false; }
@@ -6838,6 +6937,9 @@ defMask(SP.FIRE,7,10,[
  ".11111.","..222..","..222..","..222..",".22222."],
  {1:[84,76,70],2:[120,114,104],9:[200,96,40]});
 // a torch in an iron bracket on a wall (9 = the flame, lit at night)
+// kelp: a long strand with leaves off alternate sides, darker at the root
+defMaskFn(SP.KELP,7,26,{1:[34,74,40],2:[58,112,58],3:[92,146,72]},function(set){
+  for(let y=0;y<26;y++){ const x=3+Math.round(Math.sin(y*0.45)*1.2); set(x,y,y>18?1:2); if(y%4===1&&y<22){ const d=(y%8===1)?1:-1; set(x+d,y,3); set(x+2*d,y+1,3); set(x+d,y+1,2); } } });
 defMask(SP.TORCH,5,9,[
  "..9..",".999.",".999.","..9..",".222.","..2..","..2..","1.2.1",".111."],
  {1:[60,56,52],2:[110,78,46],9:[200,96,40]});
@@ -6848,7 +6950,15 @@ function addCreature(sp,x,y,ax,ay,age,par){ const c=CR_.n++; ANI.vr[c]=(Math.ran
   CR_.age[c]=age==null?1:age; CR_.par[c]=par==null?-1:par;
   CR_.energy[c]= sp===SP.WOLF?(CR_.age[c]<1?40:92):(sp===SP.DEER?(CR_.age[c]<1?22:40):(CR_.age[c]<1?16:30)); return c; }
 
-function populate(seed){ populateLife(seed); addPeople(); addFolk(); festAway(seed); }
+function populate(seed){ populateLife(seed); addPeople(); addFolk(); festAway(seed); addKelp(seed); addLamps(); }
+// kelp beds in the lake where it is deep enough to hide them, from their own stream (nothing else moves)
+function addKelp(seed){ W.kelpN=0; if(!DIALS.on||!(DIALS.water>0.3)) return; const rnd=mul32((seed^0x6E1F)>>>0); let beds=0;
+  for(let t=0;t<600&&beds<8;t++){ const an=rnd()*6.2832, rr=LAKE.r*(0.4+1.1*rnd()), x=LAKE.x+Math.cos(an)*rr, y=LAKE.y+Math.sin(an)*rr; if(x<6||y<6||x>N-7||y>N-7) continue;
+    const d=WATER-terr(x,y); if(d<4||d>12) continue; beds++;
+    for(let k=0;k<11&&CR_.n<CMAX-8;k++){ const kx=x+(rnd()-0.5)*7, ky=y+(rnd()-0.5)*7, dd=WATER-terr(kx,ky); if(dd<4||W.st[(ky|0)*N+(kx|0)]>0||W.spn[(ky|0)*N+(kx|0)]>0) continue;
+      const c=addCreature(SP.KELP,kx,ky,kx,ky,1,-1); CR_.z[c]=terr(kx,ky)-0.1; CR_.ph[c]=rnd()*6.283; W.kelpN++; } } }
+// lamps that never went out, in rooms under the lake
+function addLamps(){ for(const q of (W.lamps||[])){ if(CR_.n>=CMAX) break; const c=addCreature(SP.TORCH,q[0],q[1],0,0,1,-1); CR_.z[c]=q[2]; } }
 function populateLife(seed){
   const rnd=mul32((seed^0x9e3779b9)>>>0); CR_.n=0;
   RESERVE.burrows.length=0; RESERVE.meadows.length=0; RESERVE.dens.length=0;
@@ -7104,10 +7214,12 @@ function tickFish(c,dt){
   vx+=dvx*dt*p.turn*0.5; vy+=dvy*dt*p.turn*0.5;
   const s=Math.hypot(vx,vy)||1e-4, mx=p.speed; if(s>mx){ vx=vx/s*mx; vy=vy/s*mx; }
   let nx=x+vx*dt, ny=y+vy*dt;
-  if(terr(nx,ny)>WATER-0.8){ const hx=CR_.ax[c]-x, hy=CR_.ay[c]-y, hd=Math.hypot(hx,hy)+1e-4;
-    vx=hx/hd*p.speed; vy=hy/hd*p.speed; nx=x+vx*dt; ny=y+vy*dt; }
+  const sh=(Math.imul(c+17,2654435761)>>>0)%100, df=sh<30?0:0.2+0.007*(sh-30);   // each fish its own depth: a third near the top, the rest spread down through the water
+  const zt=(x,y)=>Math.min(WATER-0.18,Math.max(groundAt(x,y)+0.6,WATER-0.18-df*(WATER-groundAt(x,y)-0.8)));
+  if(terr(nx,ny)>WATER-0.8||spanSolid(nx,ny,zt(nx,ny))||(W.air&&W.air[(ny|0)*N+(nx|0)]>0)){ const hx=CR_.ax[c]-x, hy=CR_.ay[c]-y, hd=Math.hypot(hx,hy)+1e-4;
+    vx=hx/hd*p.speed; vy=hy/hd*p.speed; nx=x+vx*dt; ny=y+vy*dt; if(spanSolid(nx,ny,zt(nx,ny))){ nx=x; ny=y; } }
   nx=clamp(nx,4,N-5); ny=clamp(ny,4,N-5);
-  CR_.x[c]=nx; CR_.y[c]=ny; CR_.vx[c]=vx; CR_.vy[c]=vy; CR_.z[c]=WATER-0.18;
+  CR_.x[c]=nx; CR_.y[c]=ny; CR_.vx[c]=vx; CR_.vy[c]=vy; { const z=zt(nx,ny); CR_.z[c]+= (z-CR_.z[c])*Math.min(1,dt*2); if(Math.abs(CR_.z[c]-z)>3) CR_.z[c]=z; const fl=groundAt(nx,ny)+0.35; if(CR_.z[c]<fl) CR_.z[c]=Math.min(fl,WATER-0.18); }
 }
 
 function tickWolf(c,dt){
@@ -7287,6 +7399,7 @@ function tick(dt){
     else if(s===SP.DEER) tickDeer(c,dt,px,py);
     else if(s===SP.SQUIRREL) tickSquirrel(c,dt,px,py);
     else if(s===SP.FISH) tickFish(c,dt);
+    else if(s===SP.KELP){ CR_.ph[c]+=dt*(0.7+0.0007*(c%97)); CR_.x[c]=CR_.ax[c]+Math.sin(CR_.ph[c])*0.16; CR_.y[c]=CR_.ay[c]+Math.sin(CR_.ph[c]*0.73+1.3)*0.1; continue; }   // it sways
     else if(s===SP.CARCASS||s===SP.FIRE||s===SP.TORCH) continue;
     else if(s===SP.KEEPER){ if(CR_.ax[c]===300) tickPeddler(c,dt); else if(CR_.ax[c]>=100) tickFolk(c,dt); else tickKeeper(c,dt); }
     else if(s===SP.SHEEP||s===SP.COW||s===SP.HEN||s===SP.HORSE) tickStock(c,dt);
@@ -7365,15 +7478,22 @@ function updatePlayer(dt){
   const run=(IN.run||k.ShiftLeft||k.ShiftRight)?2:1;
   const fx=Math.cos(P.yaw), fy=Math.sin(P.yaw);
   const pI=clamp(P.y|0,0,N-1)*N+clamp(P.x|0,0,N-1), bottom=(W.spn[pI]>0&&P.gz<W.h[pI]+W.spt[pI*SPANS]-1.6)?groundAt(P.x,P.y):floorAt(P.x,P.y,P.gz);   // planks you can reach up to count (the lowest, so a ship's hold counts); a diver under them stays a diver
-  if(bottom<WATER-0.4){
+  const WL=waterLine(P.x,P.y,P.z);
+  if(bottom<WL-0.4){
     // ---- swim / wade: look down + move to dive, up to rise, level on the bed to walk it ----
     const sp=5.4*run*dt; const mvx=fx*mf-fy*ms, mvy=fy*mf+fx*ms;
     let nx=clamp(P.x+mvx*sp,2,N-3), ny=clamp(P.y+mvy*sp,2,N-3);
-    const hull=function(x,y){ const i=clamp(y|0,0,N-1)*N+clamp(x|0,0,N-1); return W.spn[i]>0&&W.h[i]+W.spb[i*SPANS]<WATER-0.2; };   // a ship's hull reaches down into the water: swimmers and divers go round it, never through or under it
+    // built things (hulls, wrecks, temple walls) and rocks on the bed block a swimmer's body; banks and the bed itself never do
+    const atTop=P.z>waterLine(P.x,P.y,P.z)+0.55;   // head out at a surface: only the body above the water can bump, so you can climb out onto a ledge
+    const hull=function(x,y){ if(spanSolid(x,y,P.z-0.3)||(!atTop&&spanSolid(x,y,P.z-0.9))) return true; const i=clamp(y|0,0,N-1)*N+clamp(x|0,0,N-1); return W.st[i]>0&&terr(x,y)<WATER-1&&groundAt(x,y)>P.z-0.9&&groundAt(x,y)>groundAt(P.x,P.y)+0.5; };
     if((terr(nx,P.y)<WATER+2||terr(nx,P.y)-bottom<1.5)&&!hull(nx,P.y)) P.x=nx;
     if((terr(P.x,ny)<WATER+2||terr(P.x,ny)-bottom<1.5)&&!hull(P.x,ny)) P.y=ny;
     let nz=P.z + mf*Math.sin(P.pitch)*sp*1.5;
-    const bedEye=terr(P.x,P.y)+0.55, surfEye=WATER+1.05;
+    const wl=waterLine(P.x,P.y,P.z), pi2=clamp(P.y|0,0,N-1)*N+clamp(P.x|0,0,N-1), g2=W.h[pi2], o2=pi2*SPANS;
+    let bedEye=groundAt(P.x,P.y)+0.55, surfEye=wl+1.05;
+    for(let k=0;k<W.spn[pi2];k++){ const b=g2+W.spb[o2+k], t=g2+W.spt[o2+k];   // a floor below you and a ceiling above you, from what is built here
+      if(t<=P.z-0.5&&t+0.55>bedEye) bedEye=t+0.55; else if(b>=P.z-0.4&&b-0.3<surfEye) surfEye=b-0.3; }
+    if(surfEye<bedEye) surfEye=bedEye;
     if(nz<bedEye)nz=bedEye; if(nz>surfEye)nz=surfEye;
     P.z=nz; P.gz=P.z-EYE; P.jz=0; P.jv=0; IN.jump=false;
   } else {
@@ -7437,19 +7557,19 @@ function updatePlayer(dt){
           if(mf>0.3 && Math.abs(ms)<0.5*mf && P.noLook>0.6) easeYaw(run>1?3.2:1.6); } } }
     // a jump: up about a metre, so you can hop onto something low (never over a wall or a rail), and down off it again
     P.jz=P.jz||0; P.jv=P.jv||0;
-    if((IN.jump||k.Space)&&P.jz<=0.001&&!P.jumpHeld&&bottom>WATER-0.2&&CHAT.id<0){ P.jv=6.6; P.jumpHeld=true; }
+    if((IN.jump||k.Space)&&P.jz<=0.001&&!P.jumpHeld&&bottom>WL-0.2&&CHAT.id<0){ P.jv=6.6; P.jumpHeld=true; }
     if(!(IN.jump||k.Space)) P.jumpHeld=false; IN.jump=false;
     const lift=P.jz;
     const nx=P.x+mvx*sp, ny=P.y+mvy*sp;
     const zf=P.gz, F=function(x,y){ return floorAt(x,y,zf+lift); };
-    const g0=Math.max(F(P.x,P.y),WATER-0.6);
+    const g0=Math.max(F(P.x,P.y),WL-0.6);
     const bvx=mvx, bvy=mvy, bl=Math.hypot(bvx,bvy)||1;
     const pbx=nx+bvx/bl*0.45, pby=ny+bvy/bl*0.45;
     // ledge guard: a step UP is capped (as before) and now a step DOWN is too, so you cannot walk off
     // the rampart, the stairs, or the tower top. Natural slopes never drop this much in one step.
     const LEDGE=1.8;
     const RL=function(x,y){ return W.rail[clamp(y|0,0,N-1)*N+clamp(x|0,0,N-1)]&&F(x,y)>g0+0.3; };
-    const DROP=function(x,y){ const f=F(x,y); return g0-f<(lift>0.2?2.6:LEDGE)||f<WATER-0.4; };
+    const DROP=function(x,y){ const f=F(x,y); return g0-f<(lift>0.2?2.6:LEDGE)||f<waterLine(x,y,zf+EYE)-0.4; };
     // a tree trunk stands in the middle of its cell: you walk round it, not through it
     const TRUNK=function(x,y){ const cx=x|0, cy=y|0; for(let oy=-1;oy<=1;oy++)for(let ox=-1;ox<=1;ox++){ const tx=cx+ox, ty=cy+oy; if(tx<0||ty<0||tx>=N||ty>=N||!(W.tree[ty*N+tx]>0)) continue;
       const d=Math.hypot(x-tx-0.5,y-ty-0.5); if(d<0.42&&d<Math.hypot(P.x-tx-0.5,P.y-ty-0.5)) return true; } return false; };
@@ -7463,7 +7583,7 @@ function updatePlayer(dt){
     if(onSpiral && kr>0.01 && W.st[(P.y|0)*N+(P.x|0)]>0){ const tr=(KEEP.RIN+KEEP.RWI)*0.5; if(kr>tr){ const k=Math.min(1,dt*1.5);
       const sx=P.x+(kdx/kr)*(tr-kr)*k, sy=P.y+(kdy/kr)*(tr-kr)*k;
       if(Math.abs(F(sx,sy)-F(P.x,P.y))<1.6 && !wallBlocked(sx,sy,zf)){ P.x=sx; P.y=sy; } } }
-    const g=Math.max(F(P.x,P.y),WATER-0.6), top=P.gz+P.jz;
+    const g=Math.max(F(P.x,P.y),waterLine(P.x,P.y,P.z)-0.6), top=P.gz+P.jz;
     P.gz+=(g-P.gz)*Math.min(1,dt*(P.jz>0?30:12));
     if(P.jz>0||P.jv>0){ P.jv-=20*dt; let jz=top-P.gz+P.jv*dt;
       const ci=clamp(P.y|0,0,N-1)*N+clamp(P.x|0,0,N-1), cz_=ceilOver(P.x,P.y,P.gz+0.5), ceil=cz_<1e8?cz_-EYE-0.25-P.gz:99;   // never through a ceiling
@@ -7471,7 +7591,7 @@ function updatePlayer(dt){
       if(jz<=0){ jz=0; P.jv=0; } P.jz=jz; }
     P.z=P.gz+P.jz+EYE;
   }
-  UW=clamp((WATER-P.z)/2.5,0,1);
+  const wlE=waterLine(P.x,P.y,P.z); UW=clamp((wlE-P.z)/2.5,0,1); UWDEEP=clamp((wlE-P.z)/20,0,1);
 }
 
 // ---------------- boot (browser only) ----------------
@@ -8014,7 +8134,7 @@ function boot(){
           if(ms>30 && qCell<1.9){ qCell=Math.min(1.9,qCell*1.2); govT=now; setupGrid(); }
           else if(ms<9 && qCell>1.0){ qCell=Math.max(1.0,qCell/1.15); govT=now; setupGrid(); } }
         fAcc=0; fN=0; fT=0; }
-      $('fps').textContent=fpsTxt+(fpsTxt?' · ':'')+CR_.n+' alive · '+fmtTod(DAY.tod);
+      $('fps').textContent=fpsTxt+(fpsTxt?' · ':'')+(CR_.n-(W.kelpN||0))+' alive · '+fmtTod(DAY.tod);
       if(skyHud&&!$('dials').classList.contains('hidden')) skyHud(); }
     if(card){ if(now-slowAt<250) return; slowAt=now; }   // a card is open: redraw 4 times a second, save the battery
     const t0=performance.now();
@@ -8034,7 +8154,7 @@ function boot(){
 }
 
 if(IS_NODE){ module.exports={genWorld,allocGrid,buildGlyphs,renderFrame,compose,spawn,populate,tick,ecology,simBin,updatePlayer,W,RS,FB,P,IN,CR_,SP,SPP,MASKS,RESERVE,RAMP,N,WATER,EYE,terr,groundAt,DIALS,growOf,isAdult,addCreature,WALLS,buildWalls,nearestWall,allWallHits,wallBlocked,setSkyTime:function(t){skyTime=t;},setUW:function(v){UW=v;},DAY,SUN,MOON,SKY,DAYMODES,sunAltAz,sunUpdate,updateDay,relightAll,relightStep,RELIGHT,dayDate,fmtTod,setTod:function(h){DAY.tod=h;sunUpdate();},floorAt,KPATHS,KEEP,FORT,eventsForDay,weddingDay,babyDay,valleyDay,logEvent,eventsRefresh,dayTick,restock,stockTakeable,stockOwner,evBind,evWhen,evKey,seedDials,valleyTraits,chooseSeed,applyWorld,worldOf,TRAITS37,WORLD_KEYS,getPlayerLand:function(){ return PLAYER_LAND; },seedParse,babyFor,pedWays,pedShelter,carveRoads,exitAngles,roadCheck,roadStay,travelTo,spawnAtExit,VISITED,ROADS,PED,pedTick,pedDay,pedFind,pedRouteIn,pedPitch,pedWay,TALKP,ROAD_DIALS,ROLEPED,stormLevel,stormWindows,stormOngoing,underCover,stormLight,TALKS,STORMC,evBase,keeperAbed,FISHSIZE,TALKE,EVTAG,EVKINDS,wedNow,relOf,TALK,TALKX,LINES,POSEWHO,talkPick,talk,chatMore,closeChat,chatTick,CHAT,HEARD,VISITS,heardKey,heardAdd,lineOk,whoOk,placeName,placeDir,setChat:function(h){chatHook=h;},castValley,valleyName,valleyNames,seedRng,rebuildPeople,KEEPERS,GREETN,lineOk,fillLine,peopleHere,ALLHERE,ROLEKEY,ROLES,NAMES_F,NAMES_M,NAMES_X,BYNAMES,CLOTHES,SKINS,HAIRS,TRAITS,TRAIT_CLASH,RELREV,dayPart,folkMissing,tickKeeper,KMASK,KL,keeperFrame,GREETT,setGreet:function(f){greetHook=f;},RENDERS,SPANS,spanTop,spanBot,ceilOver,solidAt,pushToOpen,addSpan,YARD,stampKeepMass,keepLook,getKLOOK:function(){ return KLOOK; },CBIN,AM2,AMASK};
-  Object.assign(module.exports,{fPlace,buildHouse,UPF,FOLK_BUILD,FARM_BED,SHIP,lakeCountry,LAKE,talkPick,townId,});
+  Object.assign(module.exports,{fPlace,buildHouse,UPF,FOLK_BUILD,FARM_BED,SHIP,lakeCountry,LAKE,talkPick,townId,waterLine,spanSolid,levelBed,setGreet:function(f){ greetHook=f; },ruinCheck,UWnow:function(){ return UW; },landRuin,});
   Object.assign(module.exports,{SOUND,soundScene,soundFloor,soundPan,soundTick,soundToast,soundOn,soundOff,soundWanted,SOUNDS,banditsLeave,mendRoad,ringBusy,setGreet:function(f){ greetHook=f; },keepLook,keepWord,KLOOK_:function(){ return KLOOK; },keepDress,keepFires,banditsHere,banditCast,chiefId,beatMend,beatMoths,beatBandit,mothCheck,hallNow,keepTag,TALKK3,keepNotes,LORE5,BANDIT_PATH,SONGLORE,songWho,RING_N,RING,ringBusy,ringSpot,ringPlan,ringRead,exitAngles,ringCheck,beatRing,ringTag,ringNotes,TALKR,LORE4,ringNight,roleName,festAway,festList,nearRoad,sentHere,GREETN,TROUBLES2,beatRoof,beatRoofW,beatAxe,beatBet,beatCake,beatSong,beatFest,trouble2Tag,trouble2Notes,festNotes,festGuests,festEnd,festTag,helpedAway,FEST,TALKT2,TALKF,LORE3,SONG,SONGLORE,songWho,farFor,roadPath,beatCrown,beatFriend,CROWN,crownTag,friendTag,TALKC,LORE2,FRIENDWHAT,PAUSED,chatPause,chatResume,nearPerson,talkTo,REP,TITLES,NICKS,earned,deedName,calledBy,legendName,didHere,legendFor,legendTold,LORE,loreFor,loreTake,loreCountHere,TALKK,leftFacts,leftPath,leftEnsure,leftThreads,leftHere,leftOf,hasAsker,leftKey,LREASONS,TALKL,fillBeat,troublesFor,trGet,trTag,stoneFacts,lightCheck,LIGHTS,TALKT,arriveExit,SNOOZE,part,fixPart,neighborSeed,roadDest,roadLink,visitNote,metNote,valleyCount,storyBeat,journalNotes,chatPick,ERRANDS,errandTarget,letterFacts,CHATX:CHAT,cleanName,nameHash,randomName,homeSeed,isHome,inHome,youName,journalLoad,journalSave,journalBlank,storyNew,storyResume,storyAt,parentsFor,castWithHome,addParents,TALKH,PARENT_IDS,addKeeper,
     setMode:function(m,st){ MODE=m; STORY=st; },getStory:function(){ return STORY; },getMode:function(){ return MODE; },setJournal:function(j){ JOURNAL=j; },getJournal:function(){ return JOURNAL; },journalOff:function(){ return JOURNAL_OFF; }}); }
 else boot();
