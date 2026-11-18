@@ -295,7 +295,7 @@ function create(A){
   const texCl=tex(256,256,gl.R8,gl.RED,gl.UNSIGNED_BYTE,gl.LINEAR,gl.REPEAT);
   const texCl2=tex(256,256,gl.R8,gl.RED,gl.UNSIGNED_BYTE,gl.LINEAR,gl.REPEAT);
   const cData=new Uint8Array(N*N*4), tData=new Uint8Array(N*N*4);
-  function packRows(y0,y1){ const cr=W.cr,cg=W.cg,cb=W.cb,s=W.shad,tr=W.tr,tg=W.tg,tb=W.tb,st=W.shadTop,su=W.su;
+  function packRows(y0,y1){ const cr=W.cr,cg=W.cg,cb=W.cb,s=W.shad,tr=W.tr,tg=W.tg,tb=W.tb,st=W.shadTop,su=W.spn;
     for(let i=y0*N;i<y1*N;i++){ const o=i*4;
       cData[o]=cr[i]; cData[o+1]=cg[i]; cData[o+2]=cb[i]; cData[o+3]=Math.max(0,Math.min(255,s[i]*255));
       tData[o]=tr[i]; tData[o+1]=tg[i]; tData[o+2]=tb[i]; tData[o+3]=su[i]>0?Math.max(0,Math.min(255,st[i]*255)):255; } }
@@ -341,7 +341,7 @@ function create(A){
   const NB=N/8, texMax=tex(NB,NB,gl.R32F,gl.RED,gl.FLOAT,gl.NEAREST,gl.CLAMP_TO_EDGE);
   const matF=new Float32Array(42), matT=new Float32Array(42), matCH=new Float32Array(14), matMoss=new Float32Array(14);
   for(let m=0;m<14;m++){ const M=A.RMAT[m]||A.RMAT[0]; for(let k=0;k<3;k++){ matF[m*3+k]=M.f[k]/255; matT[m*3+k]=M.t[k]/255; } matCH[m]=M.ch; matMoss[m]=M.moss; }
-  function buildWorldTex(){ const h=W.h, st=W.st, sb=W.sb, su=W.su;
+  function buildWorldTex(){ const h=W.h, st=W.st, HU=A.spanHulls(), sb=HU.b, su=HU.t;
     const S=new Float32Array(N*N*4), AL=new Uint8Array(N*N*4), IN=new Uint8Array(N*N*4), CRD=new Uint8Array(CR*CR*2);
     for(let i=0;i<CR*CR;i++){ CRD[i*2]=255; CRD[i*2+1]=0; }   // no crown: bottom high, top low, so the edge of a crown stays crisp
     for(let y=0;y<N;y++)for(let x=0;x<N;x++){ const i=y*N+x;

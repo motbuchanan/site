@@ -237,7 +237,7 @@ function create(A){
   const texCl=tex(256,256,gl.R8,gl.RED,gl.UNSIGNED_BYTE,gl.LINEAR,gl.REPEAT);
   const texCl2=tex(256,256,gl.R8,gl.RED,gl.UNSIGNED_BYTE,gl.LINEAR,gl.REPEAT);
   const cData=new Uint8Array(N*N*4), tData=new Uint8Array(N*N*4);
-  function packRows(y0,y1){ const cr=W.cr,cg=W.cg,cb=W.cb,s=W.shad,tr=W.tr,tg=W.tg,tb=W.tb,st=W.shadTop,su=W.su;
+  function packRows(y0,y1){ const cr=W.cr,cg=W.cg,cb=W.cb,s=W.shad,tr=W.tr,tg=W.tg,tb=W.tb,st=W.shadTop,su=W.spn;
     for(let i=y0*N;i<y1*N;i++){ const o=i*4;
       cData[o]=cr[i]; cData[o+1]=cg[i]; cData[o+2]=cb[i]; cData[o+3]=Math.max(0,Math.min(255,s[i]*255));
       tData[o]=tr[i]; tData[o+1]=tg[i]; tData[o+2]=tb[i]; tData[o+3]=su[i]>0?Math.max(0,Math.min(255,st[i]*255)):255; } }
@@ -337,7 +337,7 @@ function create(A){
   let sig='', relPass=-1, relRow=0;
   function worldSig(){ const D=A.DIALS; return W.seed+'|'+D.keep+'|'+D.forest+'|'+D.water+'|'+D.ruins+'|'+W.ruins.length+'|'+W.keepBuilt+'|'+(W.places?W.places.map(function(p){ return p.key; }).join(','):'')+'|'+(W.castSig||''); }
   function buildStone(){
-    const h=W.h, st=W.st, sb=W.sb, su=W.su, ruin=W.ruin, RM=A.RMAT, out=[]; let n=0;
+    const h=W.h, st=W.st, ruin=W.ruin, RM=A.RMAT, out=[]; let n=0;
     const V=function(x,y,z,nx,ny,nz,c,k,cx,cy,al,M,bot){ out.push(x,y,z,nx,ny,nz,c[0]/255,c[1]/255,c[2]/255,k,cx,cy,al,M?M.ch:0,M?M.cl:1,M?M.moss:0,bot); n++; };
     const quad=function(a,b,c,d,nx,ny,nz,col,k,cx,cy,al,M,bot){ // a b c d around; along per corner
       V(a[0],a[1],a[2],nx,ny,nz,col,k,cx,cy,a[3],M,bot); V(b[0],b[1],b[2],nx,ny,nz,col,k,cx,cy,b[3],M,bot); V(c[0],c[1],c[2],nx,ny,nz,col,k,cx,cy,c[3],M,bot);
@@ -353,17 +353,20 @@ function create(A){
           let ax,ay,bx,by; if(d===0){ ax=x+1;ay=y;bx=x+1;by=y+1; } else if(d===1){ ax=x;ay=y+1;bx=x;by=y; } else if(d===2){ ax=x+1;ay=y+1;bx=x;by=y+1; } else { ax=x;ay=y;bx=x+1;by=y; }
           const ha=H(ax,ay), hb=H(bx,by), alA=d<2?ay:ax, alB=d<2?by:bx;
           quad([ax,ay,ha+s2,alA],[bx,by,hb+s2,alB],[bx,by,hb+s,alB],[ax,ay,ha+s,alA],NB[d][0],NB[d][1],0,M.f,1,nx,ny,0,M,Math.min(ha,hb)+s2); } }
-      if(su[i]>0){ const M=RM[W.smat[i]||ruin[i]]||RM[0], zg=h[i], zb=zg+sb[i], zt=zg+su[i];
-        const top=M.t;
-        quad([x,y,zt,0],[x+1,y,zt,0],[x+1,y+1,zt,0],[x,y+1,zt,0],0,0,1,top,2,x,y,0,M,0);
+      // every span over the cell (v0.40): its top, its underside, and each side wherever the neighbour has no span to meet it
+      const nI=W.spn[i];
+      for(let sk=0;sk<nI;sk++){ const so=i*3+sk, M=RM[W.spm[so]||W.smat[i]||ruin[i]]||RM[0], zg=h[i], zb=zg+W.spb[so], zt=zg+W.spt[so];
+        quad([x,y,zt,0],[x+1,y,zt,0],[x+1,y+1,zt,0],[x,y+1,zt,0],0,0,1,M.t,2,x,y,0,M,0);
         quad([x,y,zb,0],[x,y+1,zb,0],[x+1,y+1,zb,0],[x+1,y,zb,0],0,0,-1,M.f,3,x,y,0,M,0);
         for(let d=0;d<4;d++){ const nx=x+NB[d][0], ny=y+NB[d][1], j=ny*N+nx;
           let ax,ay,bx,by; if(d===0){ ax=x+1;ay=y;bx=x+1;by=y+1; } else if(d===1){ ax=x;ay=y+1;bx=x;by=y; } else if(d===2){ ax=x+1;ay=y+1;bx=x;by=y+1; } else { ax=x;ay=y;bx=x+1;by=y; }
           const alA=d<2?ay:ax, alB=d<2?by:bx;
-          const spans=[];
-          if(su[j]<=0) spans.push([zb,zt]);
-          else { const nb=h[j]+sb[j], nt=h[j]+su[j]; if(nb>zb+0.01) spans.push([zb,Math.min(zt,nb)]); if(nt<zt-0.01) spans.push([Math.max(zb,nt),zt]); }
-          for(const sp of spans){ if(sp[1]<=sp[0]) continue;
+          let parts=[[zb,zt]];
+          const nJ=W.spn[j]; for(let q=0;q<nJ;q++){ const nb=h[j]+W.spb[j*3+q], nt=h[j]+W.spt[j*3+q], nxt=[];
+            for(const pr of parts){ if(nt<=pr[0]+0.01||nb>=pr[1]-0.01){ nxt.push(pr); continue; } if(nb>pr[0]+0.01) nxt.push([pr[0],nb]); if(nt<pr[1]-0.01) nxt.push([nt,pr[1]]); }
+            parts=nxt; }
+          const gT=h[j]+st[j]; if(gT>zb){ const nxt=[]; for(const pr of parts){ if(gT>=pr[1]-0.01) continue; nxt.push([Math.max(pr[0],gT),pr[1]]); } parts=nxt; }   // hidden behind the neighbour's solid stone
+          for(const sp of parts){ if(sp[1]<=sp[0]) continue;
             quad([ax,ay,sp[0],alA],[bx,by,sp[0],alB],[bx,by,sp[1],alB],[ax,ay,sp[1],alA],NB[d][0],NB[d][1],0,M.f,4,x,y,0,M,zg); } } } }
     gl.bindBuffer(gl.ARRAY_BUFFER,vbS); gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(out),gl.STATIC_DRAW); nStone=n; }
   function buildTrees(){

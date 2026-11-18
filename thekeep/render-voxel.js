@@ -207,7 +207,7 @@ function create(A){
   const texCl=tex(256,256,gl.R8,gl.RED,gl.UNSIGNED_BYTE,gl.LINEAR,gl.REPEAT);
   const texCl2=tex(256,256,gl.R8,gl.RED,gl.UNSIGNED_BYTE,gl.LINEAR,gl.REPEAT);
   const cData=new Uint8Array(N*N*4), tData=new Uint8Array(N*N*4);
-  function packRows(y0,y1){ const cr=W.cr,cg=W.cg,cb=W.cb,s=W.shad,tr=W.tr,tg=W.tg,tb=W.tb,st=W.shadTop,su=W.su;
+  function packRows(y0,y1){ const cr=W.cr,cg=W.cg,cb=W.cb,s=W.shad,tr=W.tr,tg=W.tg,tb=W.tb,st=W.shadTop,su=W.spn;
     for(let i=y0*N;i<y1*N;i++){ const o=i*4;
       cData[o]=cr[i]; cData[o+1]=cg[i]; cData[o+2]=cb[i]; cData[o+3]=Math.max(0,Math.min(255,s[i]*255));
       tData[o]=tr[i]; tData[o+1]=tg[i]; tData[o+2]=tb[i]; tData[o+3]=su[i]>0?Math.max(0,Math.min(255,st[i]*255)):255; } }
@@ -218,7 +218,7 @@ function create(A){
   // ---- block columns: the same heights, rounded to whole blocks, with a material per column ----
   const colTop=new Int16Array(N*N), colMat=new Uint8Array(N*N), slabB=new Int16Array(N*N), slabT=new Int16Array(N*N);
   // materials: 0 grass, 1 sand, 2 snow, 3 rock, 4 path, 5..11 stone of the keep and the ruins (RMAT 0..6), 12 leaves, 13 wood
-  function buildColumns(){ const h=W.h, st=W.st, WATER=A.WATER;
+  function buildColumns(){ const h=W.h, st=W.st, WATER=A.WATER, HU=A.spanHulls();
     for(let y=0;y<N;y++)for(let x=0;x<N;x++){ const i=y*N+x, hh=h[i];
       const g=hh+st[i]; colTop[i]=g<WATER?Math.min(Math.round(g),Math.ceil(WATER)-1):Math.round(g);
       if(st[i]>0.3&&g>=WATER&&colTop[i]<=Math.round(hh)) colTop[i]=Math.round(hh)+1;   // a low bench or pew still stands one block up
@@ -233,7 +233,7 @@ function create(A){
       else if(slope>1.0||hh>44) m=3;
       else m=0;
       colMat[i]=m;
-      if(W.su[i]>0){ slabB[i]=Math.round(hh+W.sb[i]); slabT[i]=Math.round(hh+W.su[i]); } else { slabB[i]=0; slabT[i]=0; } } }
+      if(HU.t[i]>0){ slabB[i]=Math.round(hh+HU.b[i]); slabT[i]=Math.round(hh+HU.t[i]); } else { slabB[i]=0; slabT[i]=0; } } }
   const VSZ=16;   // bytes per vertex: Int16 x,y,z,top | Uint16 cell x,y | Uint8 face,mat,ao,0
   function ChunkBuf(){ this.vb=new ArrayBuffer(262144*VSZ); this.v16=new Int16Array(this.vb); this.u16=new Uint16Array(this.vb); this.u8=new Uint8Array(this.vb); this.nv=0; this.idx=new Uint32Array(262144*3/2); this.ni=0; this.full=false; this.sl=0; }
   ChunkBuf.prototype.vert=function(x,y,z,top,cx,cy,face,mat,ao){ const k=this.nv++, o=k*8;
