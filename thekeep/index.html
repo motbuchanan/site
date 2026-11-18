@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="keep-version" content="v0.47.0">
+<meta name="keep-version" content="v0.48.0">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#000">
 <title>The Keep</title>
@@ -203,7 +203,7 @@ html.fromshelf #inPage #inViews{padding-top:calc(58px + env(safe-area-inset-top)
   </section>
   <section id="inViews" hidden>
    <h2>How do you want to see the world?</h2>
-   <div id="inCards" role="radiogroup" aria-label="How to draw the world"><button class="vcard" type="button" role="radio" aria-checked="false" data-r="0"><img src="views/view-ascii.jpg" alt="" loading="lazy" width="320" height="200"><b>ASCII</b><span>Letters, the original</span></button><button class="vcard" type="button" role="radio" aria-checked="false" data-r="1"><img src="views/view-pixels.jpg" alt="" loading="lazy" width="320" height="200"><b>Pixels</b><span>Blocks of color, no letters</span></button><button class="vcard" type="button" role="radio" aria-checked="false" data-r="2"><img src="views/view-mesh.jpg" alt="" loading="lazy" width="320" height="200"><b>Mesh</b><span>Triangles, like most 3D games</span><i>needs a newer phone</i></button><button class="vcard" type="button" role="radio" aria-checked="false" data-r="3"><img src="views/view-voxel.jpg" alt="" loading="lazy" width="320" height="200"><b>Voxels</b><span>Cubes, like Minecraft</span><i>needs a newer phone</i></button><button class="vcard" type="button" role="radio" aria-checked="false" data-r="4"><img src="views/view-ray.jpg" alt="" loading="lazy" width="320" height="200"><b>Rays</b><span>Soft shadows and a lake that reflects</span><i>needs a newer phone</i></button><button class="vcard" type="button" role="radio" aria-checked="false" data-r="5"><img src="views/view-iso.jpg" alt="" loading="lazy" width="320" height="200"><b>Iso</b><span>From above at a slant, like SimCity</span><i>needs a newer phone</i></button></div>
+   <div id="inCards" role="radiogroup" aria-label="How to draw the world"><button class="vcard" type="button" role="radio" aria-checked="false" data-r="0"><img src="views/view-ascii.jpg" alt="" loading="lazy" width="320" height="200"><b>ASCII</b><span>Letters, the original</span></button><button class="vcard" type="button" role="radio" aria-checked="false" data-r="1"><img src="views/view-pixels.jpg" alt="" loading="lazy" width="320" height="200"><b>Pixels</b><span>Blocks of color, no letters</span></button><button class="vcard" type="button" role="radio" aria-checked="false" data-r="2"><img src="views/view-mesh.jpg" alt="" loading="lazy" width="320" height="200"><b>Mesh</b><span>Triangles, like most 3D games</span><i>needs a newer phone</i></button><button class="vcard" type="button" role="radio" aria-checked="false" data-r="3"><img src="views/view-voxel.jpg" alt="" loading="lazy" width="320" height="200"><b>Voxels</b><span>Cubes, like Minecraft</span><i>needs a newer phone</i></button><button class="vcard" type="button" role="radio" aria-checked="false" data-r="4"><img src="views/view-ray.jpg" alt="" loading="lazy" width="320" height="200"><b>Rays</b><span>Soft shadows and a lake that reflects</span><i>needs a newer phone</i></button><button class="vcard" type="button" role="radio" aria-checked="false" data-r="5"><img src="views/view-iso.jpg" alt="" loading="lazy" width="320" height="200"><b>Iso</b><span>From above at a slant, like SimCity</span><i>needs a newer phone</i></button><button class="vcard" type="button" role="radio" aria-checked="false" data-r="6"><img src="views/view-deep.jpg" alt="" loading="lazy" width="320" height="200"><b>Deep</b><span>Haze, light and water you can see into</span><i>needs a newer phone</i></button></div>
    <p class="note">You can change this any time in the menu.</p>
    <div class="vbtns"><button id="inBack" type="button">Back</button><button id="inWalk" class="pri" type="button">Walk in</button></div>
   </section>
@@ -220,7 +220,7 @@ html.fromshelf #inPage #inViews{padding-top:calc(58px + env(safe-area-inset-top)
  </div>
  <div id="stick"><div id="knob"></div></div>
  <div id="fps"></div>
- <button class="mb-ver" id="mbVer" type="button">v0.47.0 &middot; Nov 18</button>
+ <button class="mb-ver" id="mbVer" type="button">v0.48.0 &middot; Nov 18</button>
  <div id="toast"></div>
  <div id="updNudge" hidden role="status"><span>A new version of The Keep is here (<b id="updVer"></b>).<span id="updMsg" style="display:block;font-weight:400"></span></span><button class="btn go" id="updGo" type="button">refresh</button><button class="btn" id="updNo" type="button">later</button></div>
  <div id="bkNudge" hidden role="status"><span>Big moment. Back up your progress?</span><button class="btn go" id="bkNudgeGo" type="button">back up</button><button class="btn" id="bkNudgeNo" type="button">later</button></div>
@@ -243,7 +243,9 @@ html.fromshelf #inPage #inViews{padding-top:calc(58px + env(safe-area-inset-top)
   <p><b>Things happen.</b> Market days, weddings, new babies, quarrels and harvests. At night a wolf might take a hen. Storms roll in at any hour, the rain comes down and everyone heads indoors.</p>
   <p><b>Roads out.</b> Every valley has roads through the hills. Walk to the end of one and you can stay, take a random valley, choose the kind of valley you want, or type a seed. A seed always grows the same valley, with the same people, so you can find your way back.</p>
   <p><b>Stone over stone.</b> For most of its life the world kept one height per spot, so anything you could walk on had to be solid all the way down. Now a spot can hold up to three layers floating over the ground, a vault, a floor and a roof, and every way of drawing the world reads them. The gatehouse was the first thing built with them: a passage you walk through, a room over it the guards walk through, and holes in the vault between the two. The donjon came next: a hollow tower with a stair climbing the inside of its wall past three floors.</p>
-  <p><b>Six ways to see it.</b> ASCII, all letters, is the original. Pixels, Mesh, Voxels, Rays and Iso draw the same world other ways, the last four on the graphics chip. Change it any time in the menu.</p>
+  <p><b>Seven ways to see it.</b> ASCII, all letters, is the original. Pixels, Mesh, Voxels, Rays, Iso and Deep draw the same world other ways, the last five on the graphics chip. Change it any time in the menu.</p>
+  <p><b>Deep.</b> The newest view takes its look from Abyssal Garden, a small open-source underwater world. Its trick is to draw the world into a picture first, then run a second pass over it that works out what the light does between your eye and each thing you see: how much haze, how much of each colour the water has soaked up, where the shafts of light hang. The Keep borrows that second pass, and keeps its own world under it.</p>
+
   <div class="shots">
    <img src="25-the-hearth.jpg" alt="the hearth at sunrise, the title lit by the light from the window" loading="lazy">
    <img src="24-talk.jpg" alt="a farmer among his hens, talking" loading="lazy">
@@ -1333,9 +1335,10 @@ var SHELF={on:false,url:'https://motbuchanan.com/gameshelf/'};
   SHELF.place=place;
 })();
 
-const VERSION='The Keep v0.47.0 · Nov 18 2026';
-const VER_SHORT='v0.47.0 · Nov 18'; // what the badge shows; bump with VERSION
+const VERSION='The Keep v0.48.0 · Nov 18 2026';
+const VER_SHORT='v0.48.0 · Nov 18'; // what the badge shows; bump with VERSION
 const CHANGELOG=[
+ ['v0.48.0 · Nov 18 2026','A seventh way to see the world: Deep. It is the Mesh world drawn for light and water, the look that started this whole run of work, borrowed from Noniv\'s Abyssal Garden. The world is drawn into a picture first, and a second pass adds what light does on the way to your eye: haze that thickens with distance in the air; under the lake, colour soaked up by distance (red goes first, then green), shafts of light hanging in the water, caustic light wandering over the bed and anything that faces up, and a bright round window in the surface overhead. Kelp sways from the root, grass grows and leans in the wind around you, and the sun\'s glint on the lake glows. It is the heaviest view, so it draws its picture smaller to stay smooth, and thins the grass if it has to.'],
  ['v0.47.0 · Nov 18 2026','Under the lake. The water closes in green and murky as you dive, darker the deeper you go, with slow shafts of light from the surface. Kelp sways in beds on the lake floor, and fish swim at every depth, not just the top. In lake country there is a wreck on the bottom: her side stove in, her deck fallen into the hold, her mast lying beside her. Swim in. Deeper still is a drowned temple. Swim through its door, find the hole in the hall ceiling, and come up into a dry room where the air is still good and a lamp is still burning. Each of them has something to tell you. Divers now swim round built things instead of through them, and cannot pass through a floor from above or below.'],
  ['v0.46.0 · Nov 18 2026','Lake country. About one valley in five now grows a big, deep lake to the southeast, with a port on its shore: a pier out over the water, a fish market under red and straw awnings, and the harbormaster\'s house. A ship with red sails is tied up alongside the pier. Walk up the gangway onto the deck, into the captain\'s cabin at the stern, or down the hatch by the mast into the hold. The harbormaster looks after her all day and has plenty to say. Swimmers now go round a ship\'s hull instead of through it. Choose a valley lets you ask for a big lake. Valleys that are not lake country keep their land exactly as before.'],
  ['v0.45.0 · Nov 18 2026','An inn and a mill in every valley, and two new people to run them. The inn stands by a path with a sign over the door: a taproom with a bar, barrels, tables and a fire downstairs, and a passage upstairs with three rooms off it. The innkeeper works the bar by day and sleeps in the east room. The mill is a tall stone mill with its sails over the door, the millstones downstairs and the grain upstairs, where the miller sleeps. Both have plenty to say, and the rest of the valley talks about them too.'],
@@ -1447,7 +1450,8 @@ const RENDERS=[
   {id:'mesh',   name:'Mesh',   note:'The same world built from triangles on the graphics chip, the way most 3D games are drawn', file:'render-mesh.js', glob:'KeepMesh'},
   {id:'voxel',  name:'Voxels', note:'The same world built from 1 m blocks, the way Minecraft draws its worlds: every height rounded to a whole block', file:'render-voxel.js', glob:'KeepVoxel'},
   {id:'ray',    name:'Rays',   note:'Raymarched: no triangles at all, every pixel walks its own ray across the land, so shadows go soft and the lake reflects the keep. Drawn at half detail to keep it smooth', file:'render-ray.js', glob:'KeepRay'},
-  {id:'iso',    name:'Iso',    note:'Isometric: the Voxels world seen from above at a fixed slant, the way SimCity and Diablo frame theirs. Nothing shrinks with distance, the camera follows behind you, and a small figure shows where you are, even through walls', file:'render-iso.js', glob:'KeepIso'}
+  {id:'iso',    name:'Iso',    note:'Isometric: the Voxels world seen from above at a fixed slant, the way SimCity and Diablo frame theirs. Nothing shrinks with distance, the camera follows behind you, and a small figure shows where you are, even through walls', file:'render-iso.js', glob:'KeepIso'},
+  {id:'deep',   name:'Deep',   note:'The Mesh world drawn for light and water, after Abyssal Garden: haze that thickens with distance, light shafts and caustics under the lake, a bright window in the surface overhead, swaying kelp and grass, and a glow where the light is strongest. The heaviest view: it draws smaller to stay smooth', file:'render-deep.js', glob:'KeepDeep'}
 ];
 function growOf(c){
   const s=CR_.sp[c];
@@ -7930,7 +7934,7 @@ function boot(){
   const GLR={};   // id -> {r: the renderer, loading, lost, t0}
   const glCur=function(){ const m=RENDERS[DIALS.render|0]||RENDERS[0]; return m.file?m:null; };
   const glApi={ N:N, W:W, WATER:WATER, CLOUDH:CLOUDH, DAY:DAY, SUN:SUN, MOON:MOON, SKY:SKY, RS:RS, RMAT:RMAT, CR_:CR_, SP:SP, SPP:SPP,
-    MASKS:MASKS, KMASK:KMASK, P:P, IN:IN, DIALS:DIALS, DECO:KDECO, DECO_IMG:DECO_IMG, FORT:FORT, KEEP:KEEP, RELIGHT:RELIGHT, hash2:hash2, growOf:growOf, keeperPoseFrame:keeperPoseFrame, AM2:AM2, ANI:ANI, animalFrame:animalFrame, isAdult:isAdult, spanHulls:spanHulls, spanK:SPANS,
+    MASKS:MASKS, KMASK:KMASK, P:P, IN:IN, DIALS:DIALS, DECO:KDECO, DECO_IMG:DECO_IMG, FORT:FORT, KEEP:KEEP, RELIGHT:RELIGHT, hash2:hash2, growOf:growOf, keeperPoseFrame:keeperPoseFrame, AM2:AM2, ANI:ANI, animalFrame:animalFrame, isAdult:isAdult, spanHulls:spanHulls, spanK:SPANS, terr:terr,
     fog:function(){ return [FOG_R,FOG_G,FOG_B]; }, uw:function(){ return UW; }, skyTime:function(){ return skyTime; } };
   if(/[?&]test=1/.test(location.search)) window.__keepTest={P:P,FORT:FORT,DAY:DAY,DIALS:DIALS,sunUpdate:sunUpdate,floorAt:floorAt,terr:terr,genWorld:genWorld,populate:populate,spawn:spawn,EYE:EYE,applyWorld:applyWorld,seedDials:seedDials,chooseRender:function(i){ chooseRender(i); }};   // headless render checks only
   const glSlot=function(id){ return GLR[id]||(GLR[id]={r:null,loading:false,lost:0,t0:0}); };
