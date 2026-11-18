@@ -1,4 +1,4 @@
-// The Keep · render-iso.js · v0.21.0 · Oct 30 2026
+// The Keep · render-iso.js · v0.43.0 · Nov 18 2026 (spans; cutaway indoors)
 // The same world seen from above at a fixed slant, the way SimCity, Diablo and Monument Valley frame theirs: an
 // isometric (orthographic) camera, so nothing shrinks with distance and the whole keep reads like a model on a table.
 // It draws the Voxels blocks; the camera follows behind you as you turn, so the walk stick works the same.
@@ -28,6 +28,10 @@ precision highp float; precision highp int; precision highp sampler2D;
 uniform mat4 uVP; uniform vec3 uEye; uniform vec3 uFog; uniform vec3 uTint; uniform float uFogK; uniform float uUW;
 uniform vec2 uScr; uniform vec3 uLight; uniform float uNight; uniform float uTime; uniform vec2 uRight;
 uniform int uNL; uniform vec4 uLP[16]; uniform vec4 uLC[16];
+uniform vec4 uCut; uniform vec3 uFwd;   // the cutaway: centre x,y, cut height, radius (0 = off); the camera's view direction
+bool inCut(vec2 xy){ if(uCut.w<=0.0) return false; vec2 r=xy-uCut.xy; if(length(r)<uCut.w) return true;   // round you, and a lane toward the camera so nothing in front hides you
+  vec2 dv=normalize(-uFwd.xy+vec2(1e-5)); float t=clamp(dot(r,dv),0.0,48.0); return length(r-dv*t)<uCut.w*0.45; }
+bool cutAway(vec3 w){ return w.z>uCut.z&&inCut(w.xy); }
 float hash(vec2 p){ p=fract(p*vec2(123.34,456.21)); p+=dot(p,p+45.32); return fract(p.x*p.y); }
 `;
 // fog, underwater and the day tint, in the order the ASCII compose applies them; warm light from lanterns is added on top
@@ -56,6 +60,10 @@ const FS_VOX=HEAD+FINISH+`
 uniform sampler2D uC; uniform sampler2D uT; uniform vec3 uMatF[14]; uniform vec3 uMatT[14]; uniform float uMatCH[14];
 in vec3 vW; flat in ivec2 vCell; flat in int vFace; flat in int vMat; flat in int vSl; flat in float vTop; in float vAO; out vec4 o;
 void main(){
+  if(cutAway(vW)) discard;
+  if(uCut.w>0.0&&inCut(vW.xy)){   // looking into a wall or floor that the cut opened: paint the cut face, flat and dark
+    vec3 fn=vFace==0?vec3(0,0,1):vFace==5?vec3(0,0,-1):vFace==1?vec3(1,0,0):vFace==2?vec3(-1,0,0):vFace==3?vec3(0,1,0):vec3(0,-1,0);
+    if(dot(fn,uFwd)>0.05){ vec3 cc=(vMat>=5&&vMat<=18)?uMatT[vMat-5]*0.42:vec3(0.20,0.17,0.14); o=vec4(finish(cc,vec3(0.0),vW,0.0),1.0); return; } }
   vec4 lit=texelFetch(uC,vCell,0); float sh=vSl==1?texelFetch(uT,vCell,0).a:lit.a;
   vec2 fc=(vFace==0||vFace==5)?vW.xy:((vFace<=2)?vec2(vW.y,vW.z):vec2(vW.x,vW.z));
   vec2 blk=floor(fc-0.0001*vec2(0.0,1.0)), px=floor(fract(fc)*16.0);
@@ -87,15 +95,15 @@ void main(){
 // creatures and keepers: the same pixel sprites, standing up as cards that turn to face you
 const VS_SPR=HEAD+`
 layout(location=0) in vec4 iP; layout(location=1) in vec4 iS; layout(location=2) in vec4 iU; layout(location=3) in vec4 iX;
-out vec2 vUV; out vec2 vLoc; flat out vec4 vS; flat out vec4 vX; out vec3 vW;
+out vec2 vUV; out vec2 vLoc; flat out vec4 vS; flat out vec4 vX; out vec3 vW; flat out vec3 vBase;
 void main(){ int id=gl_VertexID; float cx=(id==1||id==3)?1.0:-1.0, cy=(id>=2)?1.0:0.0;
   vec3 p=vec3(iP.xy+uRight*cx*iS.x,iP.z+cy*iS.y);
   float u=cx*0.5+0.5; if(iX.z>0.5) u=1.0-u;
-  vUV=vec2(mix(iU.x,iU.z,u),mix(iU.w,iU.y,cy)); vLoc=vec2(u,1.0-cy); vS=iS; vX=iX; vW=p;
+  vUV=vec2(mix(iU.x,iU.z,u),mix(iU.w,iU.y,cy)); vLoc=vec2(u,1.0-cy); vS=iS; vX=iX; vW=p; vBase=iP.xyz;
   gl_Position=uVP*vec4(p,1.0); }`;
 const FS_SPR=HEAD+FINISH+`
-uniform sampler2D uA; in vec2 vUV; in vec2 vLoc; flat in vec4 vS; flat in vec4 vX; in vec3 vW; out vec4 o;
-void main(){ vec4 t=texture(uA,vUV); if(t.a<0.2) discard;
+uniform sampler2D uA; in vec2 vUV; in vec2 vLoc; flat in vec4 vS; flat in vec4 vX; in vec3 vW; flat in vec3 vBase; out vec4 o;
+void main(){ if(vS.z<0.5&&cutAway(vBase+vec3(0.0,0.0,0.4))) discard; /* someone on a floor above the cut goes with it, never your own marker */ vec4 t=texture(uA,vUV); if(t.a<0.2) discard;
   if(t.a<0.75&&uNight>0.02&&vX.w>0.5){ float fl=0.86+0.14*sin(uTime*9.0+vW.z*7.0);
     o=vec4(vec3(1.0,0.84,0.47)*fl,1.0); return; }
   vec3 c=t.rgb*vS.w; float w=0.0;
@@ -133,9 +141,11 @@ vec3 skyCol(vec3 d){ float hl=max(length(d.xy),1e-4); vec2 dh=d.xy/hl; float sg=
 `;
 const VS_SKY=`#version 300 es
 out vec2 vN; void main(){ vec2 p=vec2((gl_VertexID==1)?3.0:-1.0,(gl_VertexID==2)?3.0:-1.0); vN=p; gl_Position=vec4(p,0.9999,1.0); }`;
-const FS_SKY=HEAD+SKYFN+`
+const FS_SKY=HEAD+FINISH+SKYFN+`
 uniform mat4 uInv; in vec2 vN; out vec4 o;
 void main(){ vec4 a=uInv*vec4(vN,-1.0,1.0), b=uInv*vec4(vN,1.0,1.0); vec3 d=normalize(b.xyz/b.w-a.xyz/a.w);
+  if(uCut.w>0.0&&abs(d.z)>1e-4){ vec3 ro=a.xyz/a.w; float tc=(uCut.z-ro.z)/d.z; vec3 q=ro+d*tc;   // inside a wall the cut opened: its cut face, not sky
+    if(tc>0.0&&inCut(q.xy)){ o=vec4(finish(vec3(206.,198.,182.)/255.*0.42,vec3(0.0),q,0.0),1.0); return; } }
   vec3 c=skyCol(d);
   if(uUW>0.0){ float s=gl_FragCoord.y/uScr.y; vec3 ut=mix(vec3(12.,46.,72.),vec3(46.,118.,150.),s)/255.; c=mix(c,ut,uUW*0.6); }
   o=vec4(c,1.0); }`;
@@ -169,7 +179,7 @@ out vec3 vW; out vec2 vU; flat out ivec2 vCell;
 void main(){ vW=aP; vU=aU; vCell=ivec2(aC); gl_Position=uVP*vec4(aP,1.0); }`;
 const FS_DECO=HEAD+FINISH+`
 uniform sampler2D uD; uniform sampler2D uC; in vec3 vW; in vec2 vU; flat in ivec2 vCell; out vec4 o;
-void main(){ vec4 t=texture(uD,vU); if(t.a<0.5) discard; float sh=texelFetch(uC,vCell,0).a;
+void main(){ if(cutAway(vW)) discard; vec4 t=texture(uD,vU); if(t.a<0.5) discard; float sh=texelFetch(uC,vCell,0).a;
   vec3 b=t.a<0.9?t.rgb*(0.55+0.6*(1.0-uNight)):t.rgb*0.9*sh;   // stained glass glows with the daylight behind it
   o=vec4(finish(b,vec3(0.0),vW,uNight>0.0?pool(vW):0.0),1.0); }`;
 // ---------------- the renderer ----------------
@@ -216,9 +226,9 @@ function create(A){
     gl.bindTexture(gl.TEXTURE_2D,texT); gl.texSubImage2D(gl.TEXTURE_2D,0,0,y0,N,y1-y0,gl.RGBA,gl.UNSIGNED_BYTE,tData.subarray(y0*N*4,y1*N*4)); }
 
   // ---- block columns: the same heights, rounded to whole blocks, with a material per column ----
-  const colTop=new Int16Array(N*N), colMat=new Uint8Array(N*N), slabB=new Int16Array(N*N), slabT=new Int16Array(N*N);
+  const colTop=new Int16Array(N*N), colMat=new Uint8Array(N*N), slabN=new Uint8Array(N*N), slabB=new Int16Array(N*N*4), slabT=new Int16Array(N*N*4), slabM=new Uint8Array(N*N*4), slabHi=new Int16Array(N*N);   // up to four spans per cell, in whole blocks
   // materials: 0 grass, 1 sand, 2 snow, 3 rock, 4 path, 5..11 stone of the keep and the ruins (RMAT 0..6), 12 leaves, 13 wood
-  function buildColumns(){ const h=W.h, st=W.st, WATER=A.WATER, HU=A.spanHulls();
+  function buildColumns(){ const h=W.h, st=W.st, WATER=A.WATER, K=A.spanK;
     for(let y=0;y<N;y++)for(let x=0;x<N;x++){ const i=y*N+x, hh=h[i];
       const g=hh+st[i]; colTop[i]=g<WATER?Math.min(Math.round(g),Math.ceil(WATER)-1):Math.round(g);
       if(st[i]>0.3&&g>=WATER&&colTop[i]<=Math.round(hh)) colTop[i]=Math.round(hh)+1;   // a low bench or pew still stands one block up
@@ -233,7 +243,14 @@ function create(A){
       else if(slope>1.0||hh>44) m=3;
       else m=0;
       colMat[i]=m;
-      if(HU.t[i]>0){ slabB[i]=Math.round(hh+HU.b[i]); slabT[i]=Math.round(hh+HU.t[i]); } else { slabB[i]=0; slabT[i]=0; } } }
+      // the spans over the cell (vaults, floors, roofs), each rounded to whole blocks, at least one block thick, never overlapping
+      let n=0, last=-1e9; slabHi[i]=-32000;
+      for(let k=0;k<Math.min(4,W.spn[i]);k++){ let zb=Math.round(hh+W.spb[i*K+k]), zt=Math.round(hh+W.spt[i*K+k]);
+        if(zt<=zb) zb=zt-1;                      // at least one block, grown downward so the surface you stand on stays put
+        if(zb<last) zb=last; if(zt<=zb) zt=zb+1;
+        if(n>0&&zb<slabT[i*4+n-1]){ slabT[i*4+n-1]=Math.max(slabT[i*4+n-1],zt); last=slabT[i*4+n-1]; continue; }
+        slabB[i*4+n]=zb; slabT[i*4+n]=zt; slabM[i*4+n]=W.spm[i*K+k]; last=zt; n++; }
+      slabN[i]=n; if(n) slabHi[i]=slabT[i*4+n-1]; } }
   const VSZ=16;   // bytes per vertex: Int16 x,y,z,top | Uint16 cell x,y | Uint8 face,mat,ao,0
   function ChunkBuf(){ this.vb=new ArrayBuffer(262144*VSZ); this.v16=new Int16Array(this.vb); this.u16=new Uint16Array(this.vb); this.u8=new Uint8Array(this.vb); this.nv=0; this.idx=new Uint32Array(262144*3/2); this.ni=0; this.full=false; this.sl=0; }
   ChunkBuf.prototype.vert=function(x,y,z,top,cx,cy,face,mat,ao){ const k=this.nv++, o=k*8;
@@ -299,11 +316,12 @@ function create(A){
         if(nH>=H) continue;
         const fc=cellOf(Math.max(0,Math.min(N-1,nx)),Math.max(0,Math.min(N-1,ny)),s);
         side(B,x,y,s,d,Math.max(nH,H-64),H,H,fc[0],fc[1],mat,s===1?AOS:AO1); } }
-    if(lod===0){ for(let y=oy;y<oy+SIDE;y++)for(let x=ox;x<ox+SIDE;x++){ const i=y*N+x; if(slabT[i]<=slabB[i]) continue;
-        const zb=slabB[i], zt=slabT[i], mat=W.smat[i]?5+Math.min(13,W.smat[i]):(colMat[i]>=5?colMat[i]:5+Math.min(13,W.ruin[i]));
-        let skip=0; const cov=function(j){ return slabT[j]>slabB[j]&&slabB[j]<=zb&&slabT[j]>=zt; };
-        if(cov(i+1)) skip|=2; if(cov(i-1)) skip|=4; if(cov(i+N)) skip|=8; if(cov(i-N)) skip|=16;
-        B.sl=1; box(B,x,y,zb,x+1,y+1,zt,x,y,mat,skip); B.sl=0; } }
+    if(lod===0){ for(let y=oy;y<oy+SIDE;y++)for(let x=ox;x<ox+SIDE;x++){ const i=y*N+x, n=slabN[i]; if(!n) continue;
+        for(let k=0;k<n;k++){ const zb=slabB[i*4+k], zt=slabT[i*4+k], sm=slabM[i*4+k];
+          const mat=sm?5+Math.min(13,sm-1):(W.smat[i]?5+Math.min(13,W.smat[i]):(colMat[i]>=5?colMat[i]:5+Math.min(13,W.ruin[i])));
+          let skip=0; const cov=function(j){ for(let q=0;q<slabN[j];q++){ if(slabB[j*4+q]<=zb&&slabT[j*4+q]>=zt) return true; } return colTop[j]>=zt; };   // a side hidden by the neighbour's span or its solid stone
+          if(cov(i+1)) skip|=2; if(cov(i-1)) skip|=4; if(cov(i+N)) skip|=8; if(cov(i-N)) skip|=16;
+          B.sl=1; box(B,x,y,zb,x+1,y+1,zt,x,y,mat,skip); B.sl=0; } } }
     if(lod<=3){ for(let y=oy;y<oy+SIDE;y++)for(let x=ox;x<ox+SIDE;x++) voxTree(B,x,y,lod===0); }
     const vb=gl.createBuffer(), ib=gl.createBuffer(), vao=gl.createVertexArray();
     gl.bindVertexArray(vao);
@@ -321,7 +339,7 @@ function create(A){
   function freeChunks(){ for(let k=0;k<chunks.length;k++){ const c=chunks[k]; if(c){ gl.deleteBuffer(c.vb); gl.deleteBuffer(c.ib); gl.deleteVertexArray(c.vao); chunks[k]=null; } } stats.verts=0; stats.chunks=0; }
   function chunkBounds(){ for(let cy=0;cy<CH;cy++)for(let cx=0;cx<CH;cx++){ let lo=1e9,hi=-1e9;
       for(let y=cy*SIDE;y<cy*SIDE+SIDE;y++)for(let x=cx*SIDE;x<cx*SIDE+SIDE;x++){ const i=y*N+x; const g=colTop[i]; if(g<lo)lo=g;
-        const v=Math.max(g,slabT[i])+(W.tree[i]>0?W.tree[i]+2:0); if(v>hi)hi=v; }
+        const v=Math.max(g,slabHi[i])+(W.tree[i]>0?W.tree[i]+2:0); if(v>hi)hi=v; }
       chunkMin[cy*CH+cx]=Math.min(lo-64,A.WATER); chunkMax[cy*CH+cx]=hi+2; } }
   // material colors for the keep and ruin stone, the same table the raycaster uses
   const matF=new Float32Array(42), matT=new Float32Array(42), matCH=new Float32Array(14);
@@ -372,7 +390,7 @@ function create(A){
         const v=a*src[y*S+x]+b*src[y*S+x2]+c*src[y2*S+x]+d*src[y2*S+x2], k=1/Math.sqrt(a*a+b*b+c*c+d*d);
         out[y*S+x]=Math.max(0,Math.min(255,Math.round(mean+(v-mean)*k))); } }
     return out; }
-  let sig='', relPass=-1, relRow=0, camYaw=A.P.yaw, zoom=1, lastT=0;
+  let sig='', relPass=-1, relRow=0, camYaw=A.P.yaw, zoom=1, lastT=0, cutR=0, cutZ=0, cutHold=0;
   function worldSig(){ const D=A.DIALS; return W.seed+'|'+D.keep+'|'+D.forest+'|'+D.water+'|'+D.ruins+'|'+W.ruins.length+'|'+W.keepBuilt+'|'+(W.places?W.places.map(function(p){ return p.key; }).join(','):'')+'|'+(W.castSig||''); }
 
   // ---- wall decorations ----
@@ -425,6 +443,7 @@ function create(A){
     const set=function(n,f){ if(P.u[n]!=null) f(P.u[n]); };
     set('uVP',function(l){ gl.uniformMatrix4fv(l,false,vp); });
     set('uEye',function(l){ gl.uniform3f(l,U.ex,U.ey,U.ez); });
+    set('uCut',function(l){ gl.uniform4f(l,U.cut[0],U.cut[1],U.cut[2],U.cut[3]); }); set('uFwd',function(l){ gl.uniform3f(l,U.fx,U.fy,U.fz); });
     set('uFog',function(l){ gl.uniform3f(l,U.fog[0],U.fog[1],U.fog[2]); });
     set('uTint',function(l){ gl.uniform3f(l,U.tint[0],U.tint[1],U.tint[2]); });
     set('uFogK',function(l){ gl.uniform1f(l,U.fogK||0.0032); });
@@ -500,7 +519,17 @@ function create(A){
     const proj=new Float32Array([1/hw,0,0,0, 0,1/hh,0,0, 0,0,-2/(f-n),0, 0,0,-(f+n)/(f-n),1]), vp=mul(proj,view), ivp=inv(vp);
     const night=Math.max(0,Math.min(1,(0.6-DAY.k)/0.6));
     const fogA=A.fog();
-    const U={ex:ex,ey:ey,ez:ez,fogK:0.0005,fog:[fogA[0]/255,fogA[1]/255,fogA[2]/255],tint:[DAY.tr,DAY.tg,DAY.tb],uw:0,L:DAY.light,night:night,time:A.skyTime(),rx:rx,ry:ry,nl:0,lp:lp,lc:lc};
+    // indoors (a floor, vault or roof over your head): cut away everything above head height near you, the way The Sims
+    // does, so you can see the room you are in and who is in it; outdoors the roofs come back
+    { const K=A.spanK; let over=1e9;   // your cell and the eight round it, so a murder hole or the stair hatch overhead doesn't count as outdoors
+      for(let oy=-1;oy<=1;oy++)for(let ox=-1;ox<=1;ox++){ const xx=Math.max(0,Math.min(N-1,(px|0)+ox)), yy=Math.max(0,Math.min(N-1,(py|0)+oy)), ci=yy*N+xx, g=W.h[ci];
+        for(let k=0;k<W.spn[ci];k++){ const b=g+W.spb[ci*K+k]; if(b>feet+0.6&&b<over) over=b; } }
+      const inside=over<1e8&&over-feet<14;
+      if(inside) cutHold=0.35; else cutHold=Math.max(0,cutHold-dts);   // a moment's grace before the roofs come back
+      const goal=(inside||cutHold>0)?16:0;
+      cutR+=(goal-cutR)*(1-Math.pow(0.82,dts*60)); if(cutR<0.3&&goal===0) cutR=0;
+      if(inside){ const z=Math.min(over-0.05,feet+3.2); cutZ=cutR<0.3?z:cutZ+(z-cutZ)*(1-Math.pow(0.8,dts*60)); } }
+    const U={cut:[px,py,cutZ,cutR>0.3?cutR:0],fx:fx,fy:fy,fz:fz,ex:ex,ey:ey,ez:ez,fogK:0.0005,fog:[fogA[0]/255,fogA[1]/255,fogA[2]/255],tint:[DAY.tr,DAY.tg,DAY.tb],uw:0,L:DAY.light,night:night,time:A.skyTime(),rx:rx,ry:ry,nl:0,lp:lp,lc:lc};
     U.nl=gather(px,py,feet,yaw,rx,ry,night);
     gl.viewport(0,0,canvas.width,canvas.height);
     gl.disable(gl.CULL_FACE); gl.disable(gl.BLEND);
@@ -527,7 +556,7 @@ function create(A){
       gl.enable(gl.POLYGON_OFFSET_FILL); gl.polygonOffset(-1,-2); gl.bindVertexArray(vaoD); gl.drawArrays(gl.TRIANGLES,0,nDeco); gl.disable(gl.POLYGON_OFFSET_FILL); }
     { const uv=slotUV[atlasMap.me], o=Math.min(nSpr,SPMAX-1)*16, ci=(Math.max(0,Math.min(N-1,py|0)))*N+Math.max(0,Math.min(N-1,px|0));
       const amb=(W.shadRaw[ci]>0.99&&DAY.lightAlt>0.035)?1.0:0.62+0.38*W.shadRaw[ci];
-      spData.set([px,py,Math.max(feet,colTop[ci]),0, 0.7,2.5,0,amb, uv[0],uv[1],uv[2],uv[3], -1,0,0,0],o); nSpr=Math.min(nSpr+1,SPMAX); }
+      spData.set([px,py,Math.max(feet,colTop[ci]),0, 0.7,2.5,1,amb, uv[0],uv[1],uv[2],uv[3], -1,0,0,0],o); nSpr=Math.min(nSpr+1,SPMAX); }
     if(nSpr){ common(PSP,U,vp); bindTex(PSP,'uA',3,texA); gl.bindVertexArray(vaoSp); gl.bindBuffer(gl.ARRAY_BUFFER,vbSp);
       gl.bufferSubData(gl.ARRAY_BUFFER,0,spData,0,nSpr*16); gl.drawArraysInstanced(gl.TRIANGLE_STRIP,0,4,nSpr);
       // x-ray: the figure again, faint, where something stands between it and the camera

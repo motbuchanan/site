@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="keep-version" content="v0.41.0">
+<meta name="keep-version" content="v0.43.0">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#000">
 <title>The Keep</title>
@@ -220,7 +220,7 @@ html.fromshelf #inPage #inViews{padding-top:calc(58px + env(safe-area-inset-top)
  </div>
  <div id="stick"><div id="knob"></div></div>
  <div id="fps"></div>
- <button class="mb-ver" id="mbVer" type="button">v0.41.0 &middot; Nov 18</button>
+ <button class="mb-ver" id="mbVer" type="button">v0.43.0 &middot; Nov 18</button>
  <div id="toast"></div>
  <div id="updNudge" hidden role="status"><span>A new version of The Keep is here (<b id="updVer"></b>).<span id="updMsg" style="display:block;font-weight:400"></span></span><button class="btn go" id="updGo" type="button">refresh</button><button class="btn" id="updNo" type="button">later</button></div>
  <div id="bkNudge" hidden role="status"><span>Big moment. Back up your progress?</span><button class="btn go" id="bkNudgeGo" type="button">back up</button><button class="btn" id="bkNudgeNo" type="button">later</button></div>
@@ -1333,9 +1333,11 @@ var SHELF={on:false,url:'https://motbuchanan.com/gameshelf/'};
   SHELF.place=place;
 })();
 
-const VERSION='The Keep v0.41.0 · Nov 18 2026';
-const VER_SHORT='v0.41.0 · Nov 18'; // what the badge shows; bump with VERSION
+const VERSION='The Keep v0.43.0 · Nov 18 2026';
+const VER_SHORT='v0.43.0 · Nov 18'; // what the badge shows; bump with VERSION
 const CHANGELOG=[
+ ['v0.43.0 · Nov 18 2026','Iso cuts the roof away when you go inside. Step under a roof, a floor or a vault and everything above head height around you fades out, the way The Sims does it, so you can see the room you are in and who is standing in it. The walls you cut through show their tops in dark stone. Go up a floor and the cut goes up with you; step back outside and the roofs come back.'],
+ ['v0.42.0 · Nov 18 2026','Every way of drawing the world now has the insides. Voxels, Rays and Iso used to draw each spot as one solid lump from its lowest stone to its highest, so the gate passage had no guard room over it and the donjon was solid above the hall: climbing the stair put you inside the stone. Now they draw each layer on its own, the same as ASCII and Mesh. In Voxels you climb a stair of whole blocks; in Rays the light comes in through the windows; in Iso you can see the hatch on the lookout and the murder holes in the guard room floor.'],
  ['v0.41.0 · Nov 18 2026','The donjon is hollow. The tower in the middle of the keep is wider now, and you go in through a door on the south side, facing the gate. Inside is a hall with a long table, benches and a fire. A stair climbs three full turns up the inside of the wall, past a window at every floor. It stops at a timber chamber with a bed, then at a stone room where the arms are kept, and comes out through a hatch onto the lookout, with a clear view every way. The outside stair is gone. Push along the stair and it carries you round; push toward a floor and you step off onto it. The steward climbs it too, on the daily round.'],
  ['v0.40.0 · Nov 17 2026','Through the gate. The world can now stack stone over stone: up to three floors, vaults and roofs over any spot, and every way of drawing the world reads them. The first thing built with it is the gate. Walk up the road between two towers that stand forward of the wall, under a portcullis wound up into its slot, through a vaulted passage with murder holes in the roof (daylight falls through them), and out into the courtyard. Over the passage is a guard chamber with windows front and back; the wall-walk runs straight through it, so the guards on their rounds pass right over your head. The parapets are chest high between the merlons now, so you can look out from the wall. The high end of the rampart stair stands on arches with casks stored underneath. The courtyard has a well, a stable with a horse, a smithy with a lit forge, two carts, stacked crates and banners in the keep\'s colors, and torches on the walls that light up at dusk and inside the gate passage all day. The idea came from Abyssal Garden, a world built from a true 3D shape instead of one height per spot.'],
  ['v0.39.1 · Nov 5 2026','The game now notices when a newer version has been put up. A small note offers a refresh (your progress is saved first), so you are never playing an old copy without knowing. It checks quietly every ten minutes and whenever you come back to the tab.'],
