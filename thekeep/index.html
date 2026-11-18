@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="keep-version" content="v0.43.0">
+<meta name="keep-version" content="v0.46.0">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#000">
 <title>The Keep</title>
@@ -220,7 +220,7 @@ html.fromshelf #inPage #inViews{padding-top:calc(58px + env(safe-area-inset-top)
  </div>
  <div id="stick"><div id="knob"></div></div>
  <div id="fps"></div>
- <button class="mb-ver" id="mbVer" type="button">v0.43.0 &middot; Nov 18</button>
+ <button class="mb-ver" id="mbVer" type="button">v0.46.0 &middot; Nov 18</button>
  <div id="toast"></div>
  <div id="updNudge" hidden role="status"><span>A new version of The Keep is here (<b id="updVer"></b>).<span id="updMsg" style="display:block;font-weight:400"></span></span><button class="btn go" id="updGo" type="button">refresh</button><button class="btn" id="updNo" type="button">later</button></div>
  <div id="bkNudge" hidden role="status"><span>Big moment. Back up your progress?</span><button class="btn go" id="bkNudgeGo" type="button">back up</button><button class="btn" id="bkNudgeNo" type="button">later</button></div>
@@ -1333,9 +1333,12 @@ var SHELF={on:false,url:'https://motbuchanan.com/gameshelf/'};
   SHELF.place=place;
 })();
 
-const VERSION='The Keep v0.43.0 · Nov 18 2026';
-const VER_SHORT='v0.43.0 · Nov 18'; // what the badge shows; bump with VERSION
+const VERSION='The Keep v0.46.0 · Nov 18 2026';
+const VER_SHORT='v0.46.0 · Nov 18'; // what the badge shows; bump with VERSION
 const CHANGELOG=[
+ ['v0.46.0 · Nov 18 2026','Lake country. About one valley in five now grows a big, deep lake to the southeast, with a port on its shore: a pier out over the water, a fish market under red and straw awnings, and the harbormaster\'s house. A ship with red sails is tied up alongside the pier. Walk up the gangway onto the deck, into the captain\'s cabin at the stern, or down the hatch by the mast into the hold. The harbormaster looks after her all day and has plenty to say. Swimmers now go round a ship\'s hull instead of through it. Choose a valley lets you ask for a big lake. Valleys that are not lake country keep their land exactly as before.'],
+ ['v0.45.0 · Nov 18 2026','An inn and a mill in every valley, and two new people to run them. The inn stands by a path with a sign over the door: a taproom with a bar, barrels, tables and a fire downstairs, and a passage upstairs with three rooms off it. The innkeeper works the bar by day and sleeps in the east room. The mill is a tall stone mill with its sails over the door, the millstones downstairs and the grain upstairs, where the miller sleeps. Both have plenty to say, and the rest of the valley talks about them too.'],
+ ['v0.44.0 · Nov 18 2026','The farmhouses have an upstairs. Both farms now build a two-storey house: a kitchen with the hearth and a table downstairs, a stair up the back wall, and a bedroom under the roof with a window in the gable. The farmer goes up to bed at night and comes down in the morning. The woodcutter\'s cabin and the hermit\'s hut get windows, a chimney and their own furniture. Every home is now built by one shared builder.'],
  ['v0.43.0 · Nov 18 2026','Iso cuts the roof away when you go inside. Step under a roof, a floor or a vault and everything above head height around you fades out, the way The Sims does it, so you can see the room you are in and who is standing in it. The walls you cut through show their tops in dark stone. Go up a floor and the cut goes up with you; step back outside and the roofs come back.'],
  ['v0.42.0 · Nov 18 2026','Every way of drawing the world now has the insides. Voxels, Rays and Iso used to draw each spot as one solid lump from its lowest stone to its highest, so the gate passage had no guard room over it and the donjon was solid above the hall: climbing the stair put you inside the stone. Now they draw each layer on its own, the same as ASCII and Mesh. In Voxels you climb a stair of whole blocks; in Rays the light comes in through the windows; in Iso you can see the hatch on the lookout and the murder holes in the guard room floor.'],
  ['v0.41.0 · Nov 18 2026','The donjon is hollow. The tower in the middle of the keep is wider now, and you go in through a door on the south side, facing the gate. Inside is a hall with a long table, benches and a fire. A stair climbs three full turns up the inside of the wall, past a window at every floor. It stops at a timber chamber with a bed, then at a stone room where the arms are kept, and comes out through a hatch onto the lookout, with a clear view every way. The outside stair is gone. Push along the stair and it carries you round; push toward a floor and you step off onto it. The steward climbs it too, on the daily round.'],
@@ -1850,6 +1853,9 @@ function wallBlocked(x,y,zf){
 }
 buildWalls();
 const LAKE={x:300,y:280,r:40};
+// lake country (v0.46): a share of the wettest valleys grow one big deep lake to the southeast, with a port and a ship.
+// Its own stream, so no other dial moves; valleys outside the share keep their land exactly as before.
+function lakeCountry(seed,water){ return water>1.25&&seedRng(seed>>>0,0x1A4E)()<0.6; }
 const W={
   h:new Float32Array(N*N), st:new Float32Array(N*N), tree:new Float32Array(N*N), gh:new Float32Array(N*N),
   cr:new Uint8Array(N*N), cg:new Uint8Array(N*N), cb:new Uint8Array(N*N),
@@ -1865,6 +1871,8 @@ function genWorld(seed){
   { const vn=valleyNames(seed); W.valley=vn.valley; W.farmNames=[vn.farm1,vn.farm2]; }
   W.cast=castWithHome(seed); W.castSig=seed+':'+W.cast.map(function(c){ return c.name; }).join(','); rebuildPeople();
   W.arriveMsg='You arrive in '+W.valley+'.'; W.loreMsg=''; W.keepSay=''; W.banditsOut=false;
+  W.waterKind=lakeCountry(seed,DIALS.water)?'lake':'pond';
+  if(W.waterKind==='lake'){ LAKE.x=335; LAKE.y=335; LAKE.r=52; } else { LAKE.x=300; LAKE.y=280; LAKE.r=40; }
   const h=W.h, st=W.st, tree=W.tree;
   st.fill(0); tree.fill(0); spanClear(); W.rail.fill(0); W.floor.fill(0); W.ruin.fill(0); W.smat.fill(0); W.places.length=0; W.pens.length=0; W.keepBuilt=false;
   for(let y=0;y<N;y++)for(let x=0;x<N;x++){
@@ -1875,7 +1883,7 @@ function genWorld(seed){
     v+=60*sm(0.6,1,r)*(0.5+0.5*fbm(x*0.045,y*0.045,seed+3,4));
     const lakeR=LAKE.r*(0.55+0.70*DIALS.water);
     const dl=Math.hypot(x-LAKE.x,y-LAKE.y)*(0.85+0.3*fbm(x*0.03,y*0.03,seed+11,2));
-    v-=(8+12*DIALS.water)*(1-sm(lakeR*0.5,lakeR+6,dl));
+    v-=(W.waterKind==='lake'?10+14*DIALS.water:8+12*DIALS.water)*(1-sm(lakeR*0.5,lakeR+6,dl));
     h[y*N+x]=v;
   }
   const rvLen=0.45+0.70*DIALS.water;
@@ -1941,6 +1949,7 @@ function genWorld(seed){
   carveRoads(seed);   // roads out through passes in the rim, with their signposts
   placeFolk(seed);   // who lives here: before the ruins, so the ruins keep clear of them
   placeStructures(seed);
+  placeTown(seed);   // the inn and the mill: after the ruins, from their own stream, so no ruin moves
   for(let y=0;y<N-1;y++)for(let x=0;x<N-1;x++){ const i=y*N+x; W.gh[i]=(h[i]+h[i+1]+h[i+N]+h[i+N+1])*0.25+st[i]; }   // tree bases, on the ground as the ruins left it
   // base colors (albedo); the light itself is applied by shadeRows so the sun can move
   W.shadowCells=0;
@@ -2230,14 +2239,38 @@ function fPut(T,u,v,s,mat){ const i=fCell(T,u,v); if(i<0) return; if(s>W.st[i]) 
 function fSet(T,u,v,s,mat){ const i=fCell(T,u,v); if(i<0) return; W.st[i]=s; W.ruin[i]=mat; W.tree[i]=0; }
 function fSlab(T,u,v,sb,su,mat){ const i=fCell(T,u,v); if(i<0) return; setSpan(i,sb,su,null); W.smat[i]=mat; W.tree[i]=0; }
 function fFloor(T,u,v,f){ const i=fCell(T,u,v); if(i<0) return; W.floor[i]=f; W.tree[i]=0; }
-// a house: walls, one door, a pitched roof with its ridge along u (the roof is the second layer, so you walk in under it)
-function fHouse(T,u0,v0,u1,v1,o){ const mid=(v0+v1)/2, half=(v1-v0)/2+0.5, wH=o.wallH;
-  const roof=function(v){ return wH+0.35+o.ridge*Math.max(0,1-Math.abs(v-mid)/half); };
-  for(let v=v0;v<=v1;v++)for(let u=u0;u<=u1;u++){ const side=(v===v0||v===v1), end=(u===u0||u===u1), door=u===o.door[0]&&v===o.door[1];
-    if(door){ fSet(T,u,v,0,0); fFloor(T,u,v,o.floor); fSlab(T,u,v,o.doorH||2.3,side?roof(v):wH+0.35,o.wall); }
-    else if(side){ fSet(T,u,v,wH,o.wall); fSlab(T,u,v,wH,roof(v),o.roof); }        // the long walls, the eaves on top
-    else if(end){ fSet(T,u,v,roof(v),o.wall); }                                      // the gable ends, up to the roof line
-    else { fSet(T,u,v,0,0); fFloor(T,u,v,o.floor); fSlab(T,u,v,wH,roof(v),o.roof); } } }
+// buildHouse (v0.44): every home in the valley is built by this one call. Walls with a door and windows, a stone
+// chimney, a pitched roof (the top layer, so you walk in under it), and for two storeys an upper floor reached by a
+// straight stair along the back wall. s.furn: [u0,v0,u1,v1,height,material,storey]. s.windows: [u,v,storey].
+const UPF=3.0;   // the upper floor's top, above the ground floor
+function buildHouse(T,s){
+  const two=s.storeys===2, wH=two?UPF+2.8:s.wallH, mid=(s.v0+s.v1)/2, half=(s.v1-s.v0)/2+0.5;
+  const roof=function(v){ return wH+0.35+s.ridge*Math.max(0,1-Math.abs(v-mid)/half); };
+  const win=function(u,v,l){ return (s.windows||[]).some(function(w){ return w[0]===u&&w[1]===v&&(w[2]|0)===l; }); };
+  const sr=s.stair, stepK=function(u,v){ if(!sr||v!==sr.v) return -1; const k=(u-sr.u0)*sr.d; return (k>=0&&k<sr.n)?k:-1; };
+  const chim=s.chimney&&s.chimney.length?s.chimney:null;
+  for(let v=s.v0;v<=s.v1;v++)for(let u=s.u0;u<=s.u1;u++){ const i=fCell(T,u,v); if(i<0) continue;
+    const side=(v===s.v0||v===s.v1), end=(u===s.u0||u===s.u1), door=u===s.door[0]&&v===s.door[1];
+    W.tree[i]=0; W.spn[i]=0; W.smat[i]=s.roof;
+    if(side||end){
+      if(chim&&chim[0]===u&&chim[1]===v){ W.st[i]=wH+0.35+s.ridge+1.1; W.ruin[i]=4; continue; }   // the chimney stack, stone, above the ridge
+      const top=side?wH:roof(v), holes=[];
+      if(door){ holes.push([0,s.doorH||2.3]); W.floor[i]=s.floor; }
+      else if(win(u,v,0)) holes.push([1.0,2.1]);
+      if(two&&win(u,v,1)) holes.push([UPF+0.9,UPF+2.0]);
+      W.ruin[i]=s.wall; W.st[i]=holes.length?holes[0][0]:top;
+      for(let k=0;k<holes.length;k++){ const b=holes[k][1], t=k+1<holes.length?holes[k+1][0]:top; if(t>b) addSpan(i,b,t,s.wall); }
+      if(side) addSpan(i,wH+0.02,roof(v),s.roof);   // the eaves
+      continue; }
+    W.floor[i]=s.floor; W.ruin[i]=s.upMat||7;
+    const k=stepK(u,v);
+    if(k>=0) W.st[i]=UPF*(k+1)/sr.n;                 // a stair step (the top one is level with the upper floor)
+    else { W.st[i]=0; if(two) addSpan(i,UPF-0.3,UPF,s.upMat||7); }
+    addSpan(i,wH,roof(v),s.roof); }
+  for(const f of s.furn||[]) for(let v=f[1];v<=f[3];v++)for(let u=f[0];u<=f[2];u++){ const i=fCell(T,u,v); if(i<0) continue;
+    if(f[6]===1&&two) addSpan(i,UPF+0.02,UPF+f[4],f[5]);   // upstairs: a slab just clear of the floor, so it keeps its own colour
+    else { if(f[4]>W.st[i]) W.st[i]=f[4]; W.ruin[i]=f[5]; } }
+  }
 function fFence(T,u0,v0,u1,v1,gates){ const gap=function(u,v){ return gates.some(function(g){ return g[0]===u&&g[1]===v; }); };
   for(let v=v0;v<=v1;v++)for(let u=u0;u<=u1;u++){ if(u!==u0&&u!==u1&&v!==v0&&v!==v1) continue; if(gap(u,v)){ fFloor(T,u,v,3); continue; }
     const corner=(u===u0||u===u1)&&(v===v0||v===v1), post=corner||gap(u+1,v)||gap(u-1,v)||gap(u,v+1)||gap(u,v-1)||((u+v)%3===0);
@@ -2252,12 +2285,21 @@ function fBed(T,door,inside,bed,face){ const b=fRoute(T,[door,inside,bed.concat(
 function K_ground(i){ return W.h[i]+W.st[i]; }
 function segClear(ax,ay,bx,by,maxSt){ const L=Math.hypot(bx-ax,by-ay), n=Math.max(1,Math.ceil(L/0.3));
   for(let k=0;k<=n;k++){ const px=ax+(bx-ax)*k/n, py=ay+(by-ay)*k/n, i=(py|0)*N+(px|0); if(W.st[i]>maxSt) return false; } return true; }
+// the farmhouse: two storeys, a kitchen with the hearth below, the bedroom up the back stair
+function farmHouse(T,p,wall,roof){
+  buildHouse(T,{u0:-15,v0:-14,u1:-6,v1:-9,storeys:2,wall:wall,roof:roof,upMat:7,ridge:1.8,floor:1,door:[-11,-9],
+    windows:[[-13,-9,0],[-8,-9,0],[-13,-9,1],[-11,-9,1],[-8,-9,1],[-10,-14,0],[-12,-14,1],[-9,-14,1],[-15,-11,1]],
+    chimney:[-6,-12], stair:{u0:-9,v:-13,d:-1,n:6},
+    furn:[[-13,-11,-12,-11,0.8,8,0],[-13,-12,-12,-12,0.45,8,0],[-13,-10,-12,-10,0.45,8,0],[-7,-10,-7,-10,1.6,8,0],[-9,-10,-9,-10,0.9,8,0],[-7,-12,-7,-12,0.3,4,0],
+          [-14,-11,-14,-10,0.5,9,1],[-10,-10,-9,-10,0.6,8,1],[-7,-10,-7,-10,1.8,8,1],[-7,-12,-7,-11,0.8,8,1]]});
+  p.fires.push(T.F(-6.5,-11.5)); }
+// to bed: in at the door, across the kitchen, up the stair, into bed; and down again in the morning
+function FARM_BED(T){ const b=fRoute(T,[[-10.5,-7.5],[-10.5,-10.5],[-7.8,-11.6],[-7.5,-12.5],[-13.5,-12.5],[-13.5,-11.6],[-13.6,-10.6,0,4,0,1]]);
+  const w=fRoute(T,[[-13.6,-10.6],[-13.5,-11.6],[-13.5,-12.5],[-7.5,-12.5],[-7.8,-11.6],[-10.5,-10.5],[-10.5,-7.5]]); return {bed:b, wake:w}; }
 const FOLK_BUILD={
   // Harrow Farm: a stone house under thatch, a fenced field of wheat and cabbages, a hen house and a haystack
   farm1:function(T,p){
-    fHouse(T,-14,-13,-8,-9,{wall:4,roof:10,wallH:3.0,ridge:1.7,floor:1,door:[-11,-9]});
-    fPut(T,-13,-12,0.5,9); fPut(T,-12,-12,0.5,9); fPut(T,-10,-11,0.8,8); fPut(T,-13,-10,0.6,8); fPut(T,-9,-12,0.7,4);
-    p.fires.push(T.F(-8.5,-11.5));
+    farmHouse(T,p,4,10);
     fFence(T,-3,-14,14,3,[[5,3],[6,3]]);
     for(let v=-13;v<=2;v++){ const crop=((v+13)&1)===0;
       for(let u=-2;u<=13;u++){ if(u===5||u===6||!crop){ fFloor(T,u,v,3); continue; }
@@ -2268,13 +2310,11 @@ const FOLK_BUILD={
     p.stock.push({pen:fPen(T,-12,-6,-6,2), sp:SP.HEN, n:7});
     p.route={ loop:fRoute(T,[[-10.5,-7.5],[-10.5,-5.5],[-6.5,1.5],[-6.5,4.6],[6.0,4.6],[6.0,-1.5,9,5,-1,0],[6.0,-5.5],[1.5,-5.5,10,5,0,-1],[6.0,-5.5],
       [6.0,-10.5,8,5,1,0],[6.0,4.6],[-6.5,4.6],[-6.5,1.5],[-8.5,-3.5,7,1,-1,0],[-10.5,-5.5],[-10.5,-7.5],[-10.5,-10.5,6,1,1,0]]) };
-    Object.assign(p.route,fBed(T,[-10.5,-7.5],[-10.5,-10.5],[-12.0,-11.6]));
+    Object.assign(p.route,FARM_BED(T));
     p.trail=T.F(6.0,7.0); p.cam=T.F(9.0,12.0).concat(T.F(-3,-5)); },
   // Brookside: a timber house, a fenced pasture with a barn, sheep and two cows, a kitchen garden by the door
   farm2:function(T,p){
-    fHouse(T,-14,-13,-8,-9,{wall:7,roof:5,wallH:3.0,ridge:1.5,floor:1,door:[-11,-9]});
-    fPut(T,-13,-12,0.5,9); fPut(T,-12,-12,0.5,9); fPut(T,-10,-11,0.8,8); fPut(T,-13,-10,0.9,8); fPut(T,-9,-12,0.7,4);
-    p.fires.push(T.F(-8.5,-11.5));
+    farmHouse(T,p,7,5);
     fFence(T,-3,-12,14,5,[[5,5],[6,5]]);
     // the barn: a back wall, short sides, posts at the open front, one roof over all of it, hay at the back
     const bR=function(v){ return 3.35+1.3*Math.max(0,1-Math.abs(v+9)/2.5); };
@@ -2287,13 +2327,14 @@ const FOLK_BUILD={
     p.stock.push({pen:pen, sp:SP.SHEEP, n:6}); p.stock.push({pen:pen, sp:SP.COW, n:2});
     p.route={ loop:fRoute(T,[[-10.5,-7.5],[-4.5,6.6],[6.0,6.6],[6.0,3.0,14,2,0,-1],[2.0,-3.5,12,2,1,0],[10.5,-6.0,6,1,0,-1],
       [6.0,4.2],[6.0,6.6],[-4.5,6.6],[-11.5,-4.5,8,1,0,-1],[-10.5,-7.5],[-10.5,-10.5,5,1,1,0]]) };
-    Object.assign(p.route,fBed(T,[-10.5,-7.5],[-10.5,-10.5],[-12.0,-11.6]));
+    Object.assign(p.route,FARM_BED(T));
     p.trail=T.F(6.0,9.0); p.cam=T.F(-6.0,14.0).concat(T.F(2,-3)); },
   // the woodcutter: a log cabin in a glade, a woodpile to the eaves, a chopping block, stumps, and two trees he is working on
   wood:function(T,p,rnd){
-    fHouse(T,-4,-4,2,0,{wall:7,roof:5,wallH:2.9,ridge:1.5,floor:1,door:[-1,0]});
-    fPut(T,-3,-3,0.5,9); fPut(T,-3,-2,0.5,9); fPut(T,0,-2,0.8,8); fPut(T,1,-3,0.7,4);
-    p.fires.push(T.F(1.5,-2.5));
+    buildHouse(T,{u0:-4,v0:-4,u1:2,v1:0,storeys:1,wallH:2.9,wall:13,roof:5,ridge:1.6,floor:1,door:[-1,0],
+      windows:[[-3,0,0],[1,0,0],[-1,-4,0],[-4,-2,0]], chimney:[2,-2],
+      furn:[[-3,-3,-3,-2,0.5,9],[0,-3,0,-3,0.8,8],[-3,-1,-3,-1,0.6,8],[1,-2,1,-2,0.3,4],[1,-3,1,-3,1.5,8]]});
+    p.fires.push(T.F(1.5,-1.5));
     for(let v=-4;v<=-1;v++) fPut(T,3,v,1.5,13); for(let v=-4;v<=-2;v++) fPut(T,4,v,0.9,13);
     fPut(T,1,3,0.55,5); fPut(T,3,4,0.45,13); fPut(T,4,4,0.45,13);
     for(let k=0,a=0;k<7&&a<80;a++){ const an=rnd()*6.2832, rr=6.5+rnd()*2.5, u=Math.round(Math.cos(an)*rr), v=Math.round(Math.sin(an)*rr);
@@ -2317,8 +2358,9 @@ const FOLK_BUILD={
     p.trail=T.F(0.5,7.0); p.cam=T.F(3.5,9.5).concat(T.F(-1,-2)); },
   // the hermit: a little stone hut under thatch above the shore, a jetty out over the water, a fire ring and a drying rack
   hermit:function(T,p,rnd,sh){
-    fHouse(T,-3,-6,1,-2,{wall:4,roof:10,wallH:2.8,ridge:1.4,floor:1,door:[-1,-2]});
-    fPut(T,-2,-5,0.5,9); fPut(T,-2,-4,0.5,9); fPut(T,0,-5,0.7,8);
+    buildHouse(T,{u0:-3,v0:-6,u1:1,v1:-2,storeys:1,wallH:2.8,wall:4,roof:10,ridge:1.4,floor:1,door:[-1,-2],
+      windows:[[1,-4,0],[-1,-6,0]],
+      furn:[[-2,-5,-2,-4,0.5,9],[0,-5,0,-5,0.7,8],[0,-3,0,-3,0.55,13]]});
     for(let v=-3;v<=-1;v++)for(let u=2;u<=4;u++){ if(u===3&&v===-2) continue; fPut(T,u,v,0.3,4); }
     p.fires.push(T.F(3.5,-1.5));
     fPut(T,-5,0,1.8,5); fPut(T,-5,2,1.8,5); fSlab(T,-5,1,1.45,1.7,5);
@@ -2342,6 +2384,144 @@ const FOLK_BUILD={
       [-0.5,-0.5],[-0.5,-3.5,6,1,0,-1]]) };
     Object.assign(p.route,fBed(T,[-0.5,-0.5],[-0.5,-3.5],[-1.6,-4.0]));
     p.trail=null; p.cam=T.F(0.0,vEnd+0.2).concat(T.F(-1,-4)); } };
+// the inn (v0.45): the taproom below (a bar with barrels behind it, tables and benches, the hearth), a back stair,
+// a passage upstairs and three rooms off it; the innkeeper sleeps in the east room
+const TOWN_BUILD={
+  inn:function(T,p){
+    buildHouse(T,{u0:-7,v0:-4,u1:6,v1:3,storeys:2,wall:4,roof:10,upMat:7,ridge:2.0,floor:1,door:[0,3],
+      windows:[[-5,3,0],[-2,3,0],[3,3,0],[5,3,0],[-5,3,1],[0,3,1],[4,3,1],[-3,-4,0],[3,-4,0],[-7,0,1],[6,1,1],[-7,1,0]],
+      chimney:[6,-1], stair:{u0:-1,v:-3,d:-1,n:6},
+      furn:[[-4,-1,-4,1,1.1,8,0],[-6,-1,-6,1,1.2,8,0],
+            [-2,0,-1,0,0.8,8,0],[-2,-1,-1,-1,0.45,8,0],[-2,1,-1,1,0.45,8,0],[2,0,3,0,0.8,8,0],[2,-1,3,-1,0.45,8,0],[2,1,3,1,0.45,8,0],
+            [4,2,4,2,0.8,8,0],[5,-1,5,-1,0.3,4,0],
+            [-6,-1,-5,-1,2.76,7,1],[-3,-1,-1,-1,2.76,7,1],[1,-1,3,-1,2.76,7,1],[5,-1,5,-1,2.76,7,1],[-2,0,-2,2,2.76,7,1],[2,0,2,2,2.76,7,1],
+            [-6,1,-6,2,0.5,9,1],[-4,2,-4,2,0.6,8,1],[1,1,1,2,0.5,9,1],[-1,2,-1,2,0.6,8,1],[5,1,5,2,0.5,9,1],[3,2,3,2,0.6,8,1]]});
+    p.fires.push(T.F(5.5,-0.5));
+    fPut(T,-3,5,0.45,8); fPut(T,3,5,0.45,8); fPut(T,-9,1,0.9,8); fPut(T,-9,2,0.9,8);   // benches by the door, barrels round the side
+    fPut(T,-2,4,3.1,8); { const i=fCell(T,-3,4); if(i>=0){ W.tree[i]=0; addSpan(i,2.25,2.95,9); W.smat[i]=9; } }   // the sign on its post
+    p.route={ loop:fRoute(T,[[0.5,5.5],[0.5,1.5],[0.5,-1.5],[-4.5,-1.5],[-4.5,0.5,16,1,1,0],[-4.5,-1.5],[1.5,-1.5],[1.5,1.6,8,1,1,0],
+      [0.5,1.6],[0.5,5.5],[2.0,6.5,8,1,0,1],[0.5,5.5]]) };
+    p.route.bed=fRoute(T,[[0.5,5.5],[0.5,1.5],[0.5,-2.5],[-5.5,-2.5],[-5.5,-1.5],[4.5,-1.5],[4.5,-0.5],[4.5,0.5],[5.4,1.4,0,4,0,1]]);
+    p.route.wake=fRoute(T,[[5.4,1.4],[4.5,0.5],[4.5,-0.5],[4.5,-1.5],[-5.5,-1.5],[-5.5,-2.5],[0.5,-2.5],[0.5,1.5],[0.5,5.5]]);
+    p.trail=T.F(0.5,9.0); p.cam=T.F(6.0,12.0).concat(T.F(0,0)); },
+  // the mill: a tall stone mill under a steep thatch cap, its sails on the back wall, the millstones on the ground floor,
+  // grain bins and the miller's bed upstairs, a cart and sacks by the door
+  mill:function(T,p){
+    buildHouse(T,{u0:-4,v0:-3,u1:4,v1:3,storeys:2,wall:4,roof:10,upMat:7,ridge:2.8,floor:1,door:[0,3],
+      windows:[[-2,3,0],[2,3,1],[-2,3,1],[-4,0,1],[4,0,1],[4,1,0]],
+      stair:{u0:2,v:-2,d:-1,n:6},
+      furn:[[-1,0,0,1,0.45,4,0],[-3,1,-3,2,0.6,11,0],[-2,2,-2,2,0.6,11,0],[3,2,3,2,0.6,11,0],
+            [-3,1,-2,2,1.2,8,1],[3,1,3,2,0.5,9,1],[1,2,1,2,0.6,8,1]]});
+    // the sails: a wooden X on the front wall over the door, hub just under the eaves, high enough to walk under
+    const H=UPF+2.8+0.7;
+    for(let du=-4;du<=4;du++){ const i=fCell(T,du,4); if(i<0) continue; W.st[i]=0; W.tree[i]=0; W.spn[i]=0; W.smat[i]=7;
+      if(du===0){ addSpan(i,H-0.6,H+0.6,8); continue; }
+      const a=Math.abs(du)*0.95; addSpan(i,H+a-0.3,H+a+0.3,7); addSpan(i,H-a-0.3,H-a+0.3,7); }
+    fPut(T,4,5,1.0,8); fPut(T,5,5,1.0,8); fPut(T,4,6,0.5,8); fPut(T,5,6,0.5,8);   // the cart
+    fPut(T,-3,5,0.6,11); fPut(T,-2,5,0.6,11); fPut(T,-3,6,0.6,11);              // sacks waiting
+    p.route={ loop:fRoute(T,[[0.5,4.5],[0.5,2.5],[1.5,2.0],[1.5,0.5,14,5,-1,0],[1.5,2.0],[0.5,2.5],[0.5,4.5],[3.5,4.5,8,1,1,0],[0.5,4.5],[-1.5,4.6,6,1,-1,0],[0.5,4.5],
+      [0.5,8.0,10,1,0,1],[0.5,4.5]]) };
+    p.route.bed=fRoute(T,[[0.5,4.5],[0.5,2.5],[3.5,1.5],[3.5,-1.5],[-2.5,-1.5],[-2.5,-0.5],[2.5,-0.5],[2.5,1.0],[3.4,1.4,0,4,0,1]]);
+    p.route.wake=fRoute(T,[[3.4,1.4],[2.5,1.0],[2.5,-0.5],[-2.5,-0.5],[-2.5,-1.5],[3.5,-1.5],[3.5,1.5],[0.5,2.5],[0.5,4.5]]);
+    p.trail=T.F(0.5,9.0); p.cam=T.F(7.0,11.0).concat(T.F(0,0)); } };
+// ---- the port (v0.46): a pier out over the lake, a ship moored alongside it, the harbormaster's house and a fish market ----
+// The place's grid has +v pointing out over the water; the shore is at v=sh.
+const SHIP={HB:WATER-1.6, HF:WATER+0.05, DB:WATER+2.35, DT:WATER+2.6};   // hull bottom, hold floor, deck underside, deck
+function shipCell(T,u,v){ const i=fCell(T,u,v); if(i<0) return -1; if(W.h[i]>SHIP.HB-0.3) W.h[i]=SHIP.HB-0.3; W.st[i]=0; W.tree[i]=0; W.spn[i]=0; W.smat[i]=7; return i; }
+// buildShip: a hull of planks over the water with a hold below deck you can stand in, a stair down through a hatch,
+// a cabin at the stern, a mast and a red sail. Cells u0..u0+5 across, v0..v0+L-1 from stern to bow.
+function buildShip(T,u0,v0,L){ const S=SHIP, RT=S.DT+1.0, CT=S.DT+2.7, cu=u0+3;   // the keel runs between u0+2 and u0+3
+  const half=function(j){ return j>L-5?3-(j-(L-5))*0.75:3; }, inHull=function(u,j){ return j>=0&&j<L&&Math.abs(u+0.5-cu)<=half(j); };
+  const hatch=function(u,j){ return u===u0+1&&j>=8&&j<=12; }, mastJ=10, gang=function(u,j){ return u===u0&&(j===6||j===7); };
+  const cabin=function(u,j){ return j<=3; };
+  for(let j=0;j<L;j++)for(let u=u0-1;u<=u0+6;u++){ if(!inHull(u,j)) continue; const i=shipCell(T,u,v0+j); if(i<0) continue; const g=W.h[i];
+    const side=!inHull(u-1,j)||!inHull(u+1,j)||!inHull(u,j-1)||!inHull(u,j+1);
+    if(side){ addSpan(i,S.HB-g,(cabin(u,j)?CT:(gang(u,j)?S.DT:RT))-g,7); if(!gang(u,j)) W.rail[i]=1; if(j===mastJ) addSpan(i,S.DT+2.8-g,S.DT+8-g,9); continue; }
+    if(hatch(u,j)){ addSpan(i,S.HB-g,S.HF+0.5*(j-7)-g,8); if(j===mastJ) addSpan(i,S.DT+2.8-g,S.DT+8-g,9); continue; }   // the stair down: five steps from the deck to the hold floor
+    addSpan(i,S.HB-g,S.HF-g,8); addSpan(i,S.DB-g,S.DT-g,7);
+    if(u===u0+3&&j===mastJ){ addSpan(i,S.HB-g,S.DT+9.5-g,8); continue; }   // the mast, from the keel up through the deck
+    if(j===mastJ) addSpan(i,S.DT+2.8-g,S.DT+8-g,9);                       // the sail, across the ship
+    if(cabin(u,j)){ const wall=j===3||u===u0||u===u0+5, door=j===3&&u===u0+2;
+      if(door) addSpan(i,S.DT+2.25-g,CT-g,8); else if(wall) addSpan(i,S.DT+0.02-g,CT-g,8); else addSpan(i,S.DT+2.4-g,CT-g,7); } }
+  // the cabin: a table and a bunk; the hold: barrels and a coil of rope
+  const put=function(u,j,b,t,m){ const i=fCell(T,u,v0+j); if(i>=0) addSpan(i,b-W.h[i],t-W.h[i],m); };
+  put(u0+3,1,S.DT+0.02,S.DT+0.8,8); put(u0+4,1,S.DT+0.02,S.DT+0.5,9); put(u0+4,2,S.DT+0.02,S.DT+0.5,9);
+  for(const q of [[u0+4,5],[u0+4,6],[u0+2,14],[u0+3,14]]) put(q[0],q[1],S.HF+0.02,S.HF+0.9,8);
+  put(u0+2,4,S.HF+0.02,S.HF+0.35,5); }
+// the pier: a deck of planks a hand above the water from the bank out to v1, a path cut evenly down to it
+function buildPier(T,u0,u1,sh,v1,land){ const DK0=WATER+0.55;
+  const lift=function(v){ if(!land) return 0; const d=Math.abs(v-land); return d<=1?0.55:(d>=4?0:0.55*(4-d)/3); };
+  const DK=DK0; let H0=DK; for(let u=u0;u<=u1;u++){ const i=fCell(T,u,-1); if(i>=0) H0=Math.max(H0,W.h[i]); }
+  for(let v=0;v<sh;v++){ const hv=H0+(DK-H0)*(v+1)/sh; for(let u=u0-1;u<=u1+1;u++){ const i=fCell(T,u,v); if(i<0||W.st[i]>0) continue; const k=(u<u0||u>u1)?0.5:1, g=W.h[i]; W.h[i]=Math.max(WATER+0.3,g+(hv-g)*k); W.tree[i]=0; } }
+  for(let v=sh;v<=v1;v++) for(let u=u0;u<=u1;u++){ const i=fCell(T,u,v); if(i<0) continue;
+    const DK=DK0+lift(v), DB=DK-0.28;
+    if(v===sh){ W.h[i]=DK-0.04; W.st[i]=0; setSpan(i,0.01,0.04,null); W.smat[i]=5; W.tree[i]=0; continue; }
+    if(W.h[i]>DB-0.12) W.h[i]=DB-0.12; W.st[i]=0; setSpan(i,DB-W.h[i],DK-W.h[i],null); W.smat[i]=5; W.tree[i]=0; }
+  for(let v=sh;v<=v1;v++) for(let u=u0;u<=u1;u++){ const i=fCell(T,u,v); if(i<0) continue; const DK=DK0+lift(v), DB=DK-0.28, cap=v===sh?DK-0.04:DB-0.12;
+    for(const j of [i+1,i+N,i+N+1]){ if(W.spn[j]>0) continue; if(W.st[j]>0) continue; if(W.h[j]>cap) W.h[j]=cap; } } }
+// a shore for the port: land here, the bank going down gently ahead, then water deep enough for a ship all along the pier
+function portSpot(rnd){ const h=W.h, dirs=[[0,1,0],[-1,0,1],[0,-1,2],[1,0,3]];
+  for(let a=0;a<9000;a++){ const easy=a>=5000, an=rnd()*6.2832, rr=LAKE.r*(1.0+0.9*rnd()), x=Math.round(LAKE.x+Math.cos(an)*rr), y=Math.round(LAKE.y+Math.sin(an)*rr);
+    if(x<30||y<30||x>N-30||y>N-30) continue; if(Math.max(Math.abs(x-FORT.x),Math.abs(y-FORT.y))<92) continue;
+    const g0=h[y*N+x]; if(g0<WATER+0.8||g0>WATER+5) continue;
+    for(const d of dirs){ let sh=-1; for(let k=2;k<=8;k++){ if(h[(y+d[1]*k)*N+x+d[0]*k]<WATER+0.2){ sh=k; break; } } if(sh<3) continue;
+      const T=fPlace(x,y,d[2]); let bad=false;
+      for(let v=sh+2;v<=sh+24&&!bad;v++)for(let u=-1;u<=9;u++){ const i=fCell(T,u,v); if(i<0){ bad=true; break; } if(u>=1&&v>=sh+3&&v<=sh+22&&h[i]>(easy?WATER-0.8:WATER-2.4)){ bad=true; break; } if(h[i]>WATER-0.3){ bad=true; break; } }
+      if(bad) continue;
+      let lo=1e9,hi=-1e9; for(let v=-12;v<=-1&&!bad;v++)for(let u=-10;u<=9;u++){ const i=fCell(T,u,v); if(i<0){ bad=true; break; } const g=h[i];
+        if(W.st[i]>0||W.spn[i]>0||W.road[i]||g<WATER+0.6){ bad=true; break; } if(g<lo)lo=g; if(g>hi)hi=g; }
+      if(bad||hi-lo>(easy?6:4)) continue;
+      for(const o of W.places){ if(Math.hypot(o.x-x,o.y-y)<o.r+(easy?18:30)){ bad=true; break; } }
+      for(const o of W.ruins){ if(Math.hypot(o.x-x,o.y-y)<o.r+24){ bad=true; break; } }
+      if(!bad) return {x:x,y:y,rot:d[2],sh:sh}; } }
+  return null; }
+function placePort(seed){ const rnd=mul32((seed^0x9047)>>>0), s=portSpot(rnd); if(!s) return;
+  const T=fPlace(s.x,s.y,s.rot), sh=s.sh, F=TOWN.find(function(f){ return f.key==='port'; });
+  { const c=T.F(-1,-6); folkLevel(c[0],c[1],8,12,WATER+1.2); ruinClear(c[0]|0,c[1]|0,14); ruinGlade(c[0]|0,c[1]|0,10); }
+  for(let v=-13;v<=sh+25;v++)for(let u=-11;u<=10;u++){ const i=fCell(T,u,v); if(i>=0){ W.path[i]=0; if(v<sh) W.tree[i]=0; } }
+  const p={key:'port', name:F.name, blurb:F.blurb, who:-1, x:s.x+0.5, y:s.y+0.5, r:F.R, dr:11, found:false, fires:[], stock:[], route:null, trail:null, keepTrees:[], b0:F.b0, b1:F.b1, slot:-1, rot:s.rot, town:true, sh:sh};
+  // the harbormaster's house, its door to the water
+  buildHouse(T,{u0:-9,v0:-11,u1:-3,v1:-6,storeys:1,wallH:3.0,wall:7,roof:5,ridge:1.6,floor:1,door:[-6,-6],
+    windows:[[-8,-6,0],[-4,-6,0],[-6,-11,0],[-9,-8,0]], chimney:[-3,-9],
+    furn:[[-8,-10,-8,-9,0.5,9],[-6,-10,-6,-10,0.8,8],[-4,-10,-4,-10,0.7,8],[-4,-9,-4,-9,0.3,4]]});
+  p.fires.push(T.F(-3.5,-8.5));
+  // the fish market: three stalls under awnings, counters to the front, crates of fish behind
+  for(let k=0;k<3;k++){ const a=1+k*3;
+    for(let u=a;u<=a+1;u++){ fPut(T,u,-3,0.95,8); fPut(T,u,-4,0.7,1); }
+    fPut(T,a,-5,2.8,8); fPut(T,a+1,-5,2.8,8);
+    for(let v=-5;v<=-2;v++)for(let u=a;u<=a+1;u++){ const i=fCell(T,u,v); if(i<0||(v===-5)) continue; W.tree[i]=0; addSpan(i,2.55,2.8,k===1?10:9); W.smat[i]=9; } }
+  buildPier(T,-1,0,sh,sh+23,sh+9.5);
+  // the gangway: two planks from the pier to the ship's side, halfway up
+  for(const v of [sh+9,sh+10]){ const i=fCell(T,1,v); if(i<0) continue; if(W.h[i]>WATER-0.5) W.h[i]=WATER-0.5; W.st[i]=0; W.tree[i]=0; setSpan(i,WATER+1.55-W.h[i],WATER+1.85-W.h[i],5); }
+  buildShip(T,2,sh+3,18);
+  const v0=sh+3;
+  p.route={ loop:fRoute(T,[[-5.5,-4.5],[-0.5,-1.0],[0.0,sh+6],[0.0,sh+20,10,1,0,1],[0.0,v0+6.5],[1.5,v0+6.5],[2.6,v0+6.5],[4.5,v0+6.5],[4.5,v0+4.5],
+      [4.5,v0+3.5],[4.5,v0+2.0,10,1,1,0],[4.5,v0+3.5],[4.5,v0+4.5],[4.5,v0+13.5],[3.5,v0+13.5],[3.5,v0+12.5],[3.5,v0+8.4],[3.5,v0+7.5],[5.5,v0+6.5,12,1,1,0],[3.5,v0+7.5],
+      [3.5,v0+8.4],[3.5,v0+12.5],[3.5,v0+13.5],[4.5,v0+13.5],[4.5,v0+14.5,10,1,0,1],[4.5,v0+6.5],[2.6,v0+6.5],[1.5,v0+6.5],[0.0,v0+6.5],[0.0,sh+2],[3.5,-1.5],[3.5,-1.6,8,1,0,-1],[-0.5,-1.0],[-5.5,-4.5]]) };
+  p.route.bed=fRoute(T,[[-5.5,-4.5],[-5.5,-7.5],[-7.0,-8.5],[-7.6,-9.4,0,4,0,1]]);
+  p.route.wake=fRoute(T,[[-7.6,-9.4],[-7.0,-8.5],[-5.5,-7.5],[-5.5,-4.5]]);
+  p.trail=T.F(-6.0,-14.0); p.cam=T.F(8.0,v0-2).concat(T.F(4,v0+8));
+  p.ship=T.F(4.5,v0+9);
+  W.places.push(p);
+  { const q=nearestPath(p.trail[0],p.trail[1],200); if(q) carvePath(p.trail[0],p.trail[1],q[0],q[1],seed+530,1.0); } }
+// somewhere for the inn or the mill: like a farm, but within reach of a path, the door turned toward it
+function townSpot(R,rnd){ let last=null;
+  for(let t=0;t<30;t++){ const s=folkSpot(R,rnd,'meadow'); if(!s) break; if(W.ruins.some(function(o){ return Math.hypot(o.x-s[0],o.y-s[1])<o.r+R+14; })) continue; last=s; const q=nearestPath(s[0],s[1],R+14); if(q&&Math.hypot(q[0]-s[0],q[1]-s[1])>R+3) return {x:s[0],y:s[1],q:q}; }
+  return last?{x:last[0],y:last[1],q:nearestPath(last[0],last[1],180)}:null; }
+function placeTown(seed){ if(!DIALS.people) return; const rnd=mul32((seed^0x51A7E77)>>>0);
+  if(W.waterKind==='lake') placePort(seed);
+  for(let k=0;k<TOWN.length;k++){ const F=TOWN[k]; if(F.lake) continue; const s=townSpot(F.R,rnd); if(!s) continue;
+    let rot=(rnd()*4)|0; if(s.q){ const dx=s.q[0]-s.x, dy=s.q[1]-s.y, D=[[0,1],[-1,0],[0,-1],[1,0]]; let bd=-9; for(let r=0;r<4;r++){ const d=D[r][0]*dx+D[r][1]*dy; if(d>bd){ bd=d; rot=r; } } }
+    const x=s.x, y=s.y, T=fPlace(x,y,rot);
+    ruinFlatten(x,y,F.R+5); ruinClear(x,y,F.R+7); ruinGlade(x,y,F.R+3);
+    const p={key:F.key, name:F.name, blurb:F.blurb, who:-1, x:x+0.5, y:y+0.5, r:F.R, dr:Math.min(F.R,11), found:false,
+      fires:[], stock:[], route:null, trail:null, keepTrees:[], b0:F.b0, b1:F.b1, slot:-1, rot:rot, town:true};
+    for(let oy=-F.R-1;oy<=F.R+1;oy++)for(let ox=-F.R-1;ox<=F.R+1;ox++){ const qx=x+ox, qy=y+oy; if(qx>3&&qy>3&&qx<N-4&&qy<N-4) W.path[qy*N+qx]=0; }
+    TOWN_BUILD[F.key](T,p);
+    W.places.push(p);
+    if(p.trail){ const q=nearestPath(p.trail[0],p.trail[1],180); if(q) carvePath(p.trail[0],p.trail[1],q[0],q[1],seed+520+k,1.0); } }
+  for(const p of W.places) if(p.town){ const R=p.r+1; for(let oy=-R;oy<=R;oy++)for(let ox=-R;ox<=R;ox++){ const i=((p.y|0)+oy)*N+(p.x|0)+ox; if(W.path[i]&&(W.st[i]>0||W.floor[i]||W.spn[i]>0)) W.path[i]=0; } }
+  try{ const f=JSON.parse(localStorage.getItem('keep_places_'+seed)||'[]'); if(Array.isArray(f)) for(const o of W.places) if(o.town&&f.indexOf(o.key)>=0) o.found=true; }catch(e){} }
 // somewhere level and clear for a place, not too near the keep, the water or anything already built
 function folkSpot(R,rnd,want){
   const h=W.h, fMin=0.58-0.24*DIALS.forest;
@@ -2395,9 +2575,9 @@ function placeFolk(seed){
     const T=fPlace(x,y,rot);
     if(F.key==='hermit'){ const c=T.F(-1,-4); folkLevel(c[0],c[1],4,6,WATER+1.0); ruinClear(c[0]|0,c[1]|0,9); ruinGlade(c[0]|0,c[1]|0,6); }
     else if(F.key==='wood'){ ruinFlatten(x,y,8); ruinClear(x,y,9); ruinGlade(x,y,5); }
-    else { ruinFlatten(x,y,17); ruinClear(x,y,23); ruinGlade(x,y,19); }
+    else { ruinFlatten(x,y,22); ruinClear(x,y,23); ruinGlade(x,y,19); }
     const p={key:F.key, name:F.key==='farm1'?W.farmNames[0]:(F.key==='farm2'?W.farmNames[1]:F.name), blurb:F.blurb, who:F.who, x:x+0.5, y:y+0.5, r:F.R, dr:Math.min(F.R,11), found:false,
-      fires:[], stock:[], route:null, trail:null, keepTrees:[], b0:F.b0, b1:F.b1, slot:k};
+      fires:[], stock:[], route:null, trail:null, keepTrees:[], b0:F.b0, b1:F.b1, slot:k, rot:rot};
     { const rr=F.key==='hermit'?8:F.R+1; for(let oy=-rr;oy<=rr;oy++)for(let ox=-rr;ox<=rr;ox++){ const c=F.key==='hermit'?T.F(-1,-3):[x,y], qx=(c[0]|0)+ox, qy=(c[1]|0)+oy; if(qx>3&&qy>3&&qx<N-4&&qy<N-4) W.path[qy*N+qx]=0; } }
     FOLK_BUILD[F.key](T,p,rnd,sh);
     W.places.push(p);
@@ -2421,7 +2601,8 @@ function dirWord(key){ const p=folkHere(key); if(!p) return 'woods';
   return ['east','southeast','south','southwest','west','northwest','north','northeast'][k]; }
 function folkSleeps(p){ const t=DAY.tod; return t>=p.b0||t<p.b1; }
 function addFolk(){
-  for(let pi=0;pi<W.places.length;pi++){ const p=W.places[pi]; if(!DIALS.folk[p.slot]||CR_.n>CMAX-40) continue;
+  for(let pi=0;pi<W.places.length;pi++){ const p=W.places[pi]; if((p.slot>=0&&!DIALS.folk[p.slot])||CR_.n>CMAX-40) continue;
+    if(p.town){ p.who=townId(TOWN.find(function(f){ return f.key===p.key; }).role); if(p.who<0) continue; }
     for(const f of p.fires){ const c=addCreature(SP.FIRE,f[0],f[1],0,1,1,-1); CR_.z[c]=groundAt(f[0],f[1]); }
     for(const s of p.stock){ const pen=W.pens[s.pen]; if(!pen) continue;
       for(let k=0;k<s.n;k++){ let x=0,y=0,ok=false;
@@ -2434,6 +2615,10 @@ function addFolk(){
     else { const k=(Math.random()*n)|0; x=R.loop[k*6]; y=R.loop[k*6+1]; ph=(k+1)%n; rt=0; }
     const c=addCreature(SP.KEEPER,x,y,100+pi,p.who,1,-1);
     CR_.energy[c]=rt; CR_.ph[c]=ph; CR_.z[c]=standAt(x,y);
+    { const b=asleep?R.bed:R.loop, m=asleep?b.length/6:((ph+n-1)%n)+1; let z=standAt(b[0],b[1]);   // walk the way there once, so someone upstairs or aboard starts there
+      for(let j=1;j<m;j++){ const ax=b[(j-1)*6], ay=b[(j-1)*6+1], bx=b[j*6], by=b[j*6+1], L=Math.hypot(bx-ax,by-ay), q=Math.max(1,Math.ceil(L/0.25));
+        for(let t=1;t<=q;t++) z=floorAt(ax+(bx-ax)*t/q,ay+(by-ay)*t/q,z); }
+      CR_.z[c]=z; }
     if(asleep){ CR_.st[c]=2; CR_.po[c]=4; CR_.vx[c]=0.01; CR_.vy[c]=0; } }
 }
 // a person's day: round from their door and back; at bedtime they finish the round without stopping, go in and sleep
@@ -4074,6 +4259,27 @@ function rebuildPeople(){ const cast=W.cast; if(!cast||!cast.length) return;
       braid:c.hairStyle==='braid', tool:c.tool, robe:c.robe, skin:c.skin, hair:c.hair, cloak:c.cloak, tunic:c.tunic, legs:c.legs, accent:c.accent};
     KEEPERS.push(K); KMASK.push(buildPerson2(K)); GREETN[c.id]=c.name+', '+(c.guest||c.bandit?roleName(c):'the '+c.role); }
   GREETT.fill(-1e9); GLAST.fill(''); }
+// the innkeeper and the miller, and what the rest of the valley says about the inn and the mill (v0.45)
+const TALKI={
+ innkeeper:{
+  0:["Morning. Fire's lit, kettle's on. Beds upstairs are made, if you're stopping.","[day]First thing I do is sweep the step. Folk judge an inn by its step.","Nobody up yet but me and the bread.","[mill]Flour from @mill comes this morning. {miller} is never late. Nearly never."],
+  1:["Quiet at noon. The taproom fills when the light goes.","[farm1]{farmer} stops in for a bite most days. Pays in eggs.","Sit anywhere. The good bench is by the fire, and it's taken by nobody."],
+  2:["Evening's the inn's time. Lamps on, door open.","[keep]{guard1} comes down off the wall for a cup before the night watch. Don't tell {steward}.","Stew's on. It's always stew. Folk come back for it anyway."],
+  3:["Late. The last of them have gone up or gone home.","[night]I bank the fire before bed. If it goes out, the whole inn sulks.","Rooms are up the back stair. Mind the third step, it creaks."],
+  a:["Three rooms upstairs. One's mine. The other two are for whoever the road brings.","Barrels behind the bar, ale in the barrels. That's the whole secret of an inn.","I've heard every story there is. Twice. Tell me one anyway.","A traveller's coat tells you where they've been. Yours says a long way.","[gossip]Sit by the fire long enough and you'll hear everything in {valley}. I already have.","[kind]Nobody leaves my inn hungry. Some leave full of stew and argument.","[keep]The keep sends down for ale on feast days. Very grand. Very thirsty.","[farm2]{shepherd} sits in the corner and says nothing for an hour. Then one joke. Always a good one.","[wood]{woodcutter} brings the firewood and drinks the price of it.","[hermit]{hermit} came in once. Looked at everyone. Went out again.","[old]I've kept this inn longer than the sign's been up. The sign's new. Well. Newer.","[young]It was my aunt's inn. Now it's mine. I'm still finding her lists in the drawers.","The beds are straw and wool. Better than the road. Most roads.","[mill]{miller} and I trade. Flour for ale. Good trade for both of us.","Wipe the tables, sweep the step, bank the fire. Same three things, every day. I like it."]},
+ miller:{
+  0:["Morning. The wind's up early. So am I.","[day]First sacks go to @inn. Then the keep. Then whoever's knocking.","Dust on everything already. That's a good day starting."],
+  1:["Noon's when the wind's steadiest. Don't stand behind the sails.","[farm1]{farmer}'s wheat came in fine this year. Fine flour from it.","Grind, sack, stack. Grind, sack, stack."],
+  2:["Wind's dropping. Stones will rest soon. So will I.","[inn]Last sacks of the day go to @inn. {innkeeper} pays in supper.","Evening light through the flour dust. Prettiest thing in {valley}."],
+  3:["Sails are tied. Stones are quiet. Go on, it's late.","[night]A mill's a noisy house by day. At night you hear every mouse."],
+  a:["The sails turn the stones. The stones turn wheat to flour. The flour turns into bread. I just keep the sails turning.","Upstairs the grain, downstairs the stones, me in the middle.","Flour in my hair, flour in my boots. I stopped minding years ago.","[farm1]Every loaf in {valley} starts in {farmer}'s field and comes through my stones.","[keep]The keep eats more bread than the rest of the valley put together. Guards. Hungry lot.","[inn]{innkeeper} says my flour makes the best crust in three valleys. {innkeeper} may be right.","[old]My grandfather built these sails. I've mended every board of them since.","[young]I'm new to the mill. The stones aren't. They taught me more than anyone.","You can tell the weather by the sails. Fast means rain coming. Still means stay in.","[worrier]If the wind stops for a week, nobody in {valley} gets bread. I think about that a lot.","[cheerful]Best job there is. The wind does the work and I get the credit.","[birds]Pigeons in the cap. They're after the grain. They don't get much. They get some.","Mind the millstone. It doesn't stop for fingers.","[wood]{woodcutter} cut the new arm for the sails. Straight as a rule."]},
+ harbormaster:{
+  0:["Morning. First thing, I check the ropes. Ships wander off in the night if you let them.","[day]Fog on the lake. It'll burn off by the time the fish are in.","Up before the gulls. That's the job."],
+  1:["Noon. The lake's flat as a table. Good day for nothing to happen.","[inn]{innkeeper} sends down a pie at noon. I've never once asked."],
+  2:["Evening. Lamps on the pier, ropes doubled.","Wind's turning. I'll check her lines again before dark."],
+  3:["Late to be on the pier. Mind the edge, the water's colder than it looks.","[night]I can hear her creak from my bed. That's how I know she's still there."],
+  a:["She's tied up here till the spring. Walk aboard if you like. Mind your head going down into the hold.","The cabin's at the stern. The captain's left a map on the table. I've not touched it. Much.","There's a hatch by the mast. Five steps down to the hold. Barrels, rope, and the smell of tar.","Red sails. You can see them from the far shore. That's the point of red.","The pier's new planks at the far end. The old ones went into the lake one stormy night. Me nearly with them.","[fish]The market sells what the boats bring in. Today that's not much. Tomorrow, who knows.","It's deep off the end of the pier. Deeper than you'd think. There's things down there.","[old]I've watched this lake longer than anyone. It keeps its secrets.","[young]I took the job because nobody else would stand on a pier in the rain. Turns out I like the rain.","[worrier]Every storm I lie awake counting her ropes.","[keep]The keep sends down for salt fish in winter. Crates of it.","[mill]{miller}'s flour goes out on the ship when she sails. Every sack.","Knots. Everything here is knots. Learn three and you'll get by.","[cheerful]Best view in the valley is from the end of the pier at sunset. Free, too.","A ship's a house that can leave. I find that a comfort."]},
+ any:["[port]There's a ship tied up at @port. Red sails. Off to the $port.","[port]{harbormaster} at @port knows every rope on that ship by name.","[port]Go and stand on the deck of that ship. You'll feel taller.","[port,fish]Fish from the market at @port. Fresh as you'll get.","[inn]Stop at @inn if you're tired. It's off to the $inn, by the path.","[inn]{innkeeper}'s stew. You'll smell it before you see the inn.","[mill]You can see the mill's sails from half the valley. That's @mill, to the $mill.","[mill]Bread in {valley} comes through {miller}'s stones.","[inn,mill]{miller} and {innkeeper} are thick as thieves. Flour and ale.","[inn,night]The lamps at @inn are the last ones lit at night."]};
 // ---------------- talk (v0.22): the line library ----------------
 // Each list holds lines one person might say. A line may start with [tags] that must all hold:
 //   keep ruins asleep2 young adult old notold she he farm1 farm2 wood hermit wolves deer birds rabbits fish squirrels, or a trait.
@@ -4182,6 +4388,14 @@ const TALK={
 // pose 4 (asleep) and 5 (work) lines belong to whoever sleeps or works that way
 const POSEWHO={4:{guard2:[0,1,2],farmer:[0,3,4],shepherd:[0,5],woodcutter:[0,6],hermit:[0,7,8]},5:{farmer:[0,1,2,3],woodcutter:[0,1,4,5],hermit:[6,7,8]},
   1:{guard1:[0,1,2,3,4],guard2:[0,1,2,3,4],steward:[0,2,3],farmer:[3,4],shepherd:[3,4],woodcutter:[3],hermit:[3]},2:{gatekeeper:[0,1,2,3],shepherd:[4,5]},3:{steward:[0,1,2]}};
+// the innkeeper and the miller have their own sleep, work and standing lines
+(function(){ const P4=TALK.pose[4], P5=TALK.pose[5], P1=TALK.pose[1];
+  const a=P4.push("...one more for the road... mmm...")-1, b=P4.push("...flour... everywhere... hmm...")-1;
+  const c=P5.push("Mind the stones. They don't stop for anyone.")-1, d=P5.push("Grind, sack, stack.")-1;
+  const e=P1.push("Just looking over the tables. Somebody always leaves a cup.")-1, f=P1.push("Watching the sails. They tell you the weather before the sky does.")-1;
+  POSEWHO[4].innkeeper=[0,a]; POSEWHO[4].miller=[0,b]; POSEWHO[5].miller=[c,d]; POSEWHO[1].innkeeper=[e]; POSEWHO[1].miller=[f];
+  const g=P4.push("...double the bow line... mmm...")-1, h=P1.push("Watching the water. It's never the same twice.")-1;
+  POSEWHO[4].harbormaster=[0,g]; POSEWHO[1].harbormaster=[h]; })();
 // more of the same, kept apart so the lists above stay readable
 const TALKX={
  guard1:{a:["I saw a light on the lake once, at night. >> Moving slow, out on the water. >> Turned out to be {hermit}'s lantern. Still gave me a fright.","Night's long on the wall. I count the braziers. Two. Every time."]},
@@ -4434,11 +4648,11 @@ var PLAYER_LAND=worldOf(DIALS);   // the player's own world settings (loaded fro
 function seedDials(seed){ const r=seedRng(seed>>>0,0xD1A1);
   const forest=Math.round((0.3+1.4*r())*10)/10, water=Math.round((0.3+1.4*r())*10)/10, ruins=(r()*4)|0, wild=Math.round((0.45+1.2*r())*100)/100, pred=r()<0.8?1:0;
   const pop=[]; for(let i=0;i<6;i++) pop.push(Math.max(0.25,Math.min(2,Math.round(wild*(0.8+0.4*r())*100)/100)));
-  return {forest:forest, water:water, ruins:ruins, predators:pred, keep:1, people:1, on:[1,1,1,1,1,pred], pop:pop, folk:[1,1,1,1], wild:wild}; }
+  return {forest:forest, water:water, ruins:ruins, predators:pred, keep:1, people:1, on:[1,1,1,1,1,pred], pop:pop, folk:[1,1,1,1], wild:wild, lake:lakeCountry(seed,water)}; }
 // the traveller's words for a valley's settings: 0, 1 or 2 for each trait
 const TRAITS37=[
   {key:'forest', name:'Forest', words:['open','some','thick'], of:function(w){ return w.forest<0.75?0:(w.forest<=1.25?1:2); }},
-  {key:'water', name:'Water', words:['dry','some','lakes'], of:function(w){ return w.water<0.75?0:(w.water<=1.25?1:2); }},
+  {key:'water', name:'Water', words:['dry','some','big lake'], of:function(w){ return w.lake?2:(w.water<0.75?0:1); }},
   {key:'ruins', name:'Ruins', words:['few or none','some','many'], of:function(w){ return w.ruins<=1?0:(w.ruins===2?1:2); }},
   {key:'wild', name:'Wildlife', words:['sparse','some','plenty'], of:function(w){ return w.wild<0.85?0:(w.wild<=1.25?1:2); }}];
 function valleyTraits(seed){ const w=seedDials(seed); return TRAITS37.map(function(t){ return t.of(w); }); }
@@ -4749,7 +4963,27 @@ function parentsFor(seed,cast,you){ const r=seedRng(seed>>>0,0x9A7E), used=new S
   return out; }
 // the cast for a valley, with your parents at home
 function castWithHome(seed){ let c=castValley(seed); if(isHome(seed)) c=c.concat(parentsFor(seed,c,STORY.name));
-  for(const L of leftHere(seed)){ if(c.length>=15) break; c=c.concat([leftPerson(L,c.length,c)]); } c=c.concat(festGuests(seed,c)); return c.concat(banditCast(seed,c)); }
+  for(const L of leftHere(seed)){ if(c.length>=15) break; c=c.concat([leftPerson(L,c.length,c)]); } c=c.concat(festGuests(seed,c)); c=c.concat(banditCast(seed,c)); return c.concat(townCast(seed,c)); }   // the inn and the mill last, so nobody else's id moves
+// the innkeeper and the miller (v0.45): their own stream, drawn after everyone else, so nobody already cast ever changes
+const TOWN=[{key:'inn', role:'innkeeper', name:'the inn', R:13, b0:23, b1:6, tool:'keys', blurb:'where {innkeeper} keeps the fire in and the beds made'},
+            {key:'mill', role:'miller', name:'the mill', R:11, b0:21, b1:5, tool:'staff', blurb:"where {miller} grinds the valley's wheat"},
+            {key:'port', role:'harbormaster', name:'the harbor', R:12, b0:22, b1:5, tool:'staff', blurb:'where {harbormaster} keeps the ship tied up and the fish coming in', lake:true}];
+function townCast(seed,cast){ const r=seedRng(seed,0x7A3E), used=new Set(cast.map(function(c){ return c.given; })), out=[];
+  const usedBy=new Set(cast.map(function(c){ return c.by; })), worn=new Set(cast.map(function(c){ return CLOTHES.findIndex(function(q){ return q.c===c.cloak&&q.t===c.tunic; }); }));
+  const lake=lakeCountry(seed,DIALS.water);
+  TOWN.forEach(function(T,i){ if(T.lake&&!lake) return; const pr=r()<0.5?'she':'he', ar=r(), age=ar<0.2?'young':(ar<0.75?'adult':'old');
+    let given=null; for(let k=0;k<200&&!given;k++){ const pool=r()<0.4?NAMES_X:(pr==='she'?NAMES_F:NAMES_M), g=ipick(r,pool); if(!used.has(g)) given=g; }
+    if(!given) given=i?'Hob':'Mabel'; used.add(given);
+    let by=ipick(r,BYNAMES); for(let k=0;k<60&&usedBy.has(by);k++) by=ipick(r,BYNAMES); usedBy.add(by);
+    let ck=(r()*CLOTHES.length)|0; for(let k=0;k<CLOTHES.length&&worn.has(ck);k++) ck=(ck+1)%CLOTHES.length; worn.add(ck); const C=CLOTHES[ck];
+    const traits=[]; for(let k=0;k<40&&traits.length<2;k++){ const t=TRAITS[(r()*TRAITS.length)|0]; if(traits.indexOf(t)<0&&!TRAIT_CLASH.some(function(p){ return (p[0]===t&&traits.indexOf(p[1])>=0)||(p[1]===t&&traits.indexOf(p[0])>=0); })) traits.push(t); }
+    out.push({id:cast.length+out.length, role:T.role, key:T.role, town:T.key, name:(age==='old'&&r()<0.4)?'Old '+given:given, given:given, by:by, pr:pr, age:age,
+      build:wpick(r,i?{stout:3,tall:2,short:1}:{stout:2,short:2,tall:2}), skin:SKINS[(r()*SKINS.length)|0], hair:(age==='old'&&r()<0.8)?HAIRS[8+((r()*2)|0)]:HAIRS[(r()*8)|0],
+      hairStyle:pr==='she'?wpick(r,{long:2,bun:3,braid:2,tied:2}):wpick(r,{short:4,tied:2,long:1,bald:age==='old'?2:0}),
+      beard:pr==='he'?wpick(r,{none:2,short:2,full:2}):'none', head:i?wpick(r,{cap:3,kerchief:2,none:1}):wpick(r,{none:3,kerchief:2,cap:1}), tool:T.tool, robe:!i&&r()<0.5,
+      cloak:C.c, tunic:C.t, legs:C.l, accent:C.a, traits:traits, rel:[]}); });
+  return out; }
+function townId(key){ if(!W.cast) return -1; for(const c of W.cast) if(c&&(c.key===key||c.town===key)&&c.town) return c.id; return -1; }
 // they walk the steward's round in the keep, starting from two places in the courtyard so the three of them never bunch up
 function flatStarts(){ const a=KPATHS[3], n=a.length/3, flat=[]; for(let w=0;w<n;w++){ const x=a[w*3]-FORT.x, y=a[w*3+1]-FORT.y; if(Math.abs(Math.hypot(x,y)-KEEP.RA)<0.2) flat.push(w); } return flat; }   // waypoints on the walk round the courtyard, on the ground
 function flatStart(fr){ const fl=flatStarts(); return fl.length?fl[Math.floor(fl.length*(fr%1))]:1; }
@@ -4813,7 +5047,7 @@ function visitNote(seed){ seed=seed>>>0; const p=part(), k=String(seed), v=p.val
     keys.sort(function(a,b){ return (p.valleys[a].l||0)-(p.valleys[b].l||0); }); let drop=keys.length-120;
     for(let i=0;i<keys.length&&drop>0;i++){ const k=keys[i]; if(isHome(+k)||keep[+k>>>0]||(+k>>>0)===seed) continue; delete p.valleys[k]; drop--; } } }
 function metNote(id){ const c=castOf(id); if(!c||W.seed==null) return; const v=part().valleys[String(W.seed>>>0)]; if(!v) return; const nm=c.name+' '+c.by+', '+roleName(c);
-  if(v.m.indexOf(nm)<0){ v.m.push(nm); if(v.m.length>12) v.m.shift(); } }
+  if(v.m.indexOf(nm)<0){ v.m.push(nm); if(v.m.length>16) v.m.shift(); } }
 function valleyCount(){ return Object.keys(part().valleys).length; }
 // ---- beats ----
 function nm(id){ const c=castOf(id); return c?c.name:'someone'; }
@@ -6155,7 +6389,8 @@ function lineHash(t){ let h=0x811c9dc5; for(let i=0;i<t.length;i++){ h^=t.charCo
 (function(){
   const add=function(who,part,pose,text,extra){ const ch=text.split(' >> '), tg=(/^\[([\w,]+)\]/.exec(text)||['',''])[1].split(','); const e={id:lineHash(who+'|'+text), who:who, part:part, pose:pose, text:ch[0], chain:ch.slice(1), check:ch.join(' '), first:tg.indexOf('first')>=0, last:tg.indexOf('last')>=0};
     if(extra) for(const k in extra) e[k]=extra[k]; LINES.push(e); };
-  for(const T of [TALK,TALKX,TALKH,TALKT,TALKL,TALKK,TALKC,TALKT2,TALKF,TALKR,TALKK3,TALKT3]) for(const who in T){ if(who==='trait'||who==='rel'||who==='pose') continue;
+  for(const T of [TALK,TALKX,TALKH,TALKT,TALKL,TALKK,TALKC,TALKT2,TALKF,TALKR,TALKK3,TALKT3,TALKI]) for(const who in T){ if(who==='trait'||who==='rel'||who==='pose') continue;
+    if(Array.isArray(T[who])){ for(const t of T[who]) add(who,-1,0,t); continue; }
     for(const pt in T[who]) for(const t of T[who][pt]) add(who,pt==='a'?-1:+pt,0,t); }
   for(const tr in TALK.trait) for(const t of TALK.trait[tr]){ const m=/^\[([\w,]+)\]/.exec(t);   // the trait joins any tags the line already has
     add('any',-1,0,m?'['+tr+','+m[1]+']'+t.slice(m[0].length):'['+tr+']'+t,{trait:tr}); }
@@ -6364,14 +6599,14 @@ let greetHook=null, chatHook=null; const GREETT=[-1e9,-1e9,-1e9,-1e9,-1e9,-1e9,-
 function dayPart(){ const t=DAY.tod; return t>=5.5&&t<11?0:(t>=11&&t<17?1:(t>=17&&t<21.5?2:3)); }
 function sleepHours(){ const t=DAY.tod; return t>=20||t<5.5; }   // the second guard turns in at eight and is up at half five
 function guard2Asleep(){ for(let c=0;c<CR_.n;c++) if(CR_.sp[c]===SP.KEEPER&&(CR_.ay[c]|0)===1&&CR_.ax[c]<100) return CR_.st[c]===2; return false; }
-const FOLKKEYS=['farm1','farm2','wood','hermit'], LIFEKEYS={birds:SP.BIRD,rabbits:SP.RABBIT,deer:SP.DEER,squirrels:SP.SQUIRREL,fish:SP.FISH,wolves:SP.WOLF};
-const SLOT_RE=/\{(\w+)(?:\.(\w+))?\}/g, PLACE_RE=/([@$])(farm1|farm2|wood|hermit|ruin)\b/g, TAG_RE=/^\[([\w,]+)\]/;
+const FOLKKEYS=['farm1','farm2','wood','hermit','inn','mill','port'], LIFEKEYS={birds:SP.BIRD,rabbits:SP.RABBIT,deer:SP.DEER,squirrels:SP.SQUIRREL,fish:SP.FISH,wolves:SP.WOLF};
+const SLOT_RE=/\{(\w+)(?:\.(\w+))?\}/g, PLACE_RE=/([@$])(farm1|farm2|wood|hermit|inn|mill|port|ruin)\b/g, TAG_RE=/^\[([\w,]+)\]/;
 // who is really here (a person is here when they were spawned into this valley), and which animals are about
-function peopleHere(){ const h=new Uint8Array(16), life={}; for(const k in LIFEKEYS) life[k]=0;
-  for(let c=0;c<CR_.n;c++){ const s=CR_.sp[c]; if(s===SP.KEEPER) h[Math.min(15,CR_.ay[c]|0)]=1;
+function peopleHere(){ const h=new Uint8Array(24), life={}; for(const k in LIFEKEYS) life[k]=0;
+  for(let c=0;c<CR_.n;c++){ const s=CR_.sp[c]; if(s===SP.KEEPER) h[Math.min(23,CR_.ay[c]|0)]=1;
     else for(const k in LIFEKEYS) if(LIFEKEYS[k]===s){ life[k]++; break; } }
   h.life=life; return h; }
-const ALLHERE=new Uint8Array(16).fill(1);
+const ALLHERE=new Uint8Array(24).fill(1);
 function castOf(id){ return (W.cast&&id>=0)?W.cast[id]:null; }
 function relOf(id,kind,here){ const c=castOf(id); if(!c) return -1;
   if(kind==='spouse'||kind==='sweetheart'){ const w=wedNow(id); if(w>=0) return (kind==='spouse'&&here[w])?w:-1; } for(const q of c.rel) if(q.kind===kind&&here[q.to]) return q.to; return -1; }
@@ -6382,6 +6617,7 @@ function evPerson(id,key){ const e=LINE_EV; if(!e) return -1; if(key==='eva') re
 function slotWho(id,key,here){ if(key==='eva'||key==='evb'||key==='evother'){ const w=evPerson(id,key); return (w!=null&&w>=0&&here[w]&&castOf(w))?w:-1; }
   if(EVSLOT[key]) return LINE_EV?-3:-1;
   const r=ROLEKEY.indexOf(key); if(r>=0) return (here[r]&&castOf(r))?r:-1;
+  if(key==='innkeeper'||key==='miller'||key==='harbormaster'){ const w=townId(key); return (w>=0&&here[w])?w:-1; }
   if(key==='me') return castOf(id)?id:-1; if(RELREV[key]) return relOf(id,key,here); return -2; }
 function placeHere(k){ return k==='ruin'?W.ruins.length>0:!!folkHere(k); }
 function placeName(k){ if(k==='ruin') return W.ruins.length?W.ruins[0].name:'the old stones'; const p=folkHere(k); return p?p.name:'the woods'; }
@@ -6392,15 +6628,15 @@ const OWNPLACE={4:'farm1',5:'farm2',6:'wood',7:'hermit'};
 // who: the list the line comes from. Lines everyone shares never name the speaker's own home as if it were someone
 // else's, and only keepers (who stand at the keep) give bare directions, which are measured from the keep.
 function lineOk(id,l,here,who){ const m=TAG_RE.exec(l), c=castOf(id);
-  if(who==='any'||who==='folk'){ const own=OWNPLACE[id]; if(own&&(l.indexOf('@'+own)>=0||l.indexOf('$'+own)>=0)) return false; }
-  if(id>=4&&/\$(farm1|farm2|wood|hermit|ruin)\b/.test(l)&&l.indexOf('of the keep')<0) return false;
+  if(who==='any'||who==='folk'){ const own=OWNPLACE[id]||(c&&c.town)||null; if(own&&(l.indexOf('@'+own)>=0||l.indexOf('$'+own)>=0)) return false; }
+  if(id>=4&&/\$(farm1|farm2|wood|hermit|inn|mill|port|ruin)\b/.test(l)&&l.indexOf('of the keep')<0) return false;
   if(m) for(const t of m[1].split(',')){
     if(t==='keep'){ if(!W.keepBuilt) return false; }
     else if(t==='keepers'){ if(!W.keepBuilt||!(here[0]||here[1]||here[2]||here[3])) return false; }
     else if(t==='nothermit'){ if(id===7) return false; }
     else if(t==='first'||t==='last'||t==='leaving'){ }
     else if(t==='home'){ if(!inHome()) return false; }
-    else if(t==='notparent'){ if(id>=9) return false; }
+    else if(t==='notparent'){ if(id>=9&&!(c&&c.town)) return false; }
     else if(t==='crownwhole'||t==='crownapart'){ if(!crownTag(t,id)) return false; }
     else if(t==='oldfriend'){ if(!friendTag(t,id)) return false; }
     else if(t==='roofcrust'||t==='rooffix'||t==='axeback'||t==='betwon'||t==='cakegot'||t==='songback'){ if(!trouble2Tag(t,id)) return false; }
@@ -6447,7 +6683,7 @@ function fillLine(id,l,here){ here=here||ALLHERE;
   l=l.replace(/(^|[^.])([.!?] )([a-z])/g,function(_,z,a,b){ return z+a+b.toUpperCase(); });   // a filled-in phrase that starts a sentence
   return l.charAt(0).toUpperCase()+l.slice(1); }
 // which lists a person draws from
-function whoOk(id,who){ if(id===ROLEPED) return who==='peddler'; if(id>=9){ const c=castOf(id); if(c&&c.guest) return who==='guest'; if(c&&c.bandit) return who==='bandit'; if(c&&c.left) return who==='left'||who==='any'; return who==='home'||who==='any'; } const k=ROLEKEY[id]; return who===k||who==='any'||(who==='guard'&&id<2)||(who==='keep'&&id<4)||(who==='folk'&&id>=4); }
+function whoOk(id,who){ if(id===ROLEPED) return who==='peddler'; if(id>=9){ const c=castOf(id); if(c&&c.town) return who===c.key||who==='any'; if(c&&c.guest) return who==='guest'; if(c&&c.bandit) return who==='bandit'; if(c&&c.left) return who==='left'||who==='any'; return who==='home'||who==='any'; } const k=ROLEKEY[id]; return who===k||who==='any'||(who==='guard'&&id<2)||(who==='keep'&&id<4)||(who==='folk'&&id>=4); }
 // what has been heard: per valley and person, line id -> the order it was heard in
 const HEARD={}, VISITS={}; let heardN=0;
 function heardKey(id){ return W.seed+':'+id; }
@@ -7128,13 +7364,14 @@ function updatePlayer(dt){
   const l=Math.hypot(mf,ms); if(l>1){ mf/=l; ms/=l; }
   const run=(IN.run||k.ShiftLeft||k.ShiftRight)?2:1;
   const fx=Math.cos(P.yaw), fy=Math.sin(P.yaw);
-  const pI=clamp(P.y|0,0,N-1)*N+clamp(P.x|0,0,N-1), bottom=(W.spn[pI]>0&&P.gz<W.h[pI]+spanTop(pI)-1.6)?groundAt(P.x,P.y):floorAt(P.x,P.y,P.gz);   // planks you can reach up to count; a diver under them stays a diver
+  const pI=clamp(P.y|0,0,N-1)*N+clamp(P.x|0,0,N-1), bottom=(W.spn[pI]>0&&P.gz<W.h[pI]+W.spt[pI*SPANS]-1.6)?groundAt(P.x,P.y):floorAt(P.x,P.y,P.gz);   // planks you can reach up to count (the lowest, so a ship's hold counts); a diver under them stays a diver
   if(bottom<WATER-0.4){
     // ---- swim / wade: look down + move to dive, up to rise, level on the bed to walk it ----
     const sp=5.4*run*dt; const mvx=fx*mf-fy*ms, mvy=fy*mf+fx*ms;
     let nx=clamp(P.x+mvx*sp,2,N-3), ny=clamp(P.y+mvy*sp,2,N-3);
-    if(terr(nx,P.y)<WATER+2||terr(nx,P.y)-bottom<1.5) P.x=nx;
-    if(terr(P.x,ny)<WATER+2||terr(P.x,ny)-bottom<1.5) P.y=ny;
+    const hull=function(x,y){ const i=clamp(y|0,0,N-1)*N+clamp(x|0,0,N-1); return W.spn[i]>0&&W.h[i]+W.spb[i*SPANS]<WATER-0.2; };   // a ship's hull reaches down into the water: swimmers and divers go round it, never through or under it
+    if((terr(nx,P.y)<WATER+2||terr(nx,P.y)-bottom<1.5)&&!hull(nx,P.y)) P.x=nx;
+    if((terr(P.x,ny)<WATER+2||terr(P.x,ny)-bottom<1.5)&&!hull(P.x,ny)) P.y=ny;
     let nz=P.z + mf*Math.sin(P.pitch)*sp*1.5;
     const bedEye=terr(P.x,P.y)+0.55, surfEye=WATER+1.05;
     if(nz<bedEye)nz=bedEye; if(nz>surfEye)nz=surfEye;
@@ -7575,7 +7812,7 @@ function boot(){
   const glApi={ N:N, W:W, WATER:WATER, CLOUDH:CLOUDH, DAY:DAY, SUN:SUN, MOON:MOON, SKY:SKY, RS:RS, RMAT:RMAT, CR_:CR_, SP:SP, SPP:SPP,
     MASKS:MASKS, KMASK:KMASK, P:P, IN:IN, DIALS:DIALS, DECO:KDECO, DECO_IMG:DECO_IMG, FORT:FORT, KEEP:KEEP, RELIGHT:RELIGHT, hash2:hash2, growOf:growOf, keeperPoseFrame:keeperPoseFrame, AM2:AM2, ANI:ANI, animalFrame:animalFrame, isAdult:isAdult, spanHulls:spanHulls, spanK:SPANS,
     fog:function(){ return [FOG_R,FOG_G,FOG_B]; }, uw:function(){ return UW; }, skyTime:function(){ return skyTime; } };
-  if(/[?&]test=1/.test(location.search)) window.__keepTest={P:P,FORT:FORT,DAY:DAY,DIALS:DIALS,sunUpdate:sunUpdate,floorAt:floorAt,terr:terr,genWorld:genWorld,populate:populate,spawn:spawn,EYE:EYE,chooseRender:function(i){ chooseRender(i); }};   // headless render checks only
+  if(/[?&]test=1/.test(location.search)) window.__keepTest={P:P,FORT:FORT,DAY:DAY,DIALS:DIALS,sunUpdate:sunUpdate,floorAt:floorAt,terr:terr,genWorld:genWorld,populate:populate,spawn:spawn,EYE:EYE,applyWorld:applyWorld,seedDials:seedDials,chooseRender:function(i){ chooseRender(i); }};   // headless render checks only
   const glSlot=function(id){ return GLR[id]||(GLR[id]={r:null,loading:false,lost:0,t0:0}); };
   function glDrop(id){ const g=GLR[id]; if(!g||!g.r) return; g.r.onLost=null; try{ g.r.destroy(); }catch(e){} g.r=null; }
   function glFail(m,why){
@@ -7797,6 +8034,7 @@ function boot(){
 }
 
 if(IS_NODE){ module.exports={genWorld,allocGrid,buildGlyphs,renderFrame,compose,spawn,populate,tick,ecology,simBin,updatePlayer,W,RS,FB,P,IN,CR_,SP,SPP,MASKS,RESERVE,RAMP,N,WATER,EYE,terr,groundAt,DIALS,growOf,isAdult,addCreature,WALLS,buildWalls,nearestWall,allWallHits,wallBlocked,setSkyTime:function(t){skyTime=t;},setUW:function(v){UW=v;},DAY,SUN,MOON,SKY,DAYMODES,sunAltAz,sunUpdate,updateDay,relightAll,relightStep,RELIGHT,dayDate,fmtTod,setTod:function(h){DAY.tod=h;sunUpdate();},floorAt,KPATHS,KEEP,FORT,eventsForDay,weddingDay,babyDay,valleyDay,logEvent,eventsRefresh,dayTick,restock,stockTakeable,stockOwner,evBind,evWhen,evKey,seedDials,valleyTraits,chooseSeed,applyWorld,worldOf,TRAITS37,WORLD_KEYS,getPlayerLand:function(){ return PLAYER_LAND; },seedParse,babyFor,pedWays,pedShelter,carveRoads,exitAngles,roadCheck,roadStay,travelTo,spawnAtExit,VISITED,ROADS,PED,pedTick,pedDay,pedFind,pedRouteIn,pedPitch,pedWay,TALKP,ROAD_DIALS,ROLEPED,stormLevel,stormWindows,stormOngoing,underCover,stormLight,TALKS,STORMC,evBase,keeperAbed,FISHSIZE,TALKE,EVTAG,EVKINDS,wedNow,relOf,TALK,TALKX,LINES,POSEWHO,talkPick,talk,chatMore,closeChat,chatTick,CHAT,HEARD,VISITS,heardKey,heardAdd,lineOk,whoOk,placeName,placeDir,setChat:function(h){chatHook=h;},castValley,valleyName,valleyNames,seedRng,rebuildPeople,KEEPERS,GREETN,lineOk,fillLine,peopleHere,ALLHERE,ROLEKEY,ROLES,NAMES_F,NAMES_M,NAMES_X,BYNAMES,CLOTHES,SKINS,HAIRS,TRAITS,TRAIT_CLASH,RELREV,dayPart,folkMissing,tickKeeper,KMASK,KL,keeperFrame,GREETT,setGreet:function(f){greetHook=f;},RENDERS,SPANS,spanTop,spanBot,ceilOver,solidAt,pushToOpen,addSpan,YARD,stampKeepMass,keepLook,getKLOOK:function(){ return KLOOK; },CBIN,AM2,AMASK};
+  Object.assign(module.exports,{fPlace,buildHouse,UPF,FOLK_BUILD,FARM_BED,SHIP,lakeCountry,LAKE,talkPick,townId,});
   Object.assign(module.exports,{SOUND,soundScene,soundFloor,soundPan,soundTick,soundToast,soundOn,soundOff,soundWanted,SOUNDS,banditsLeave,mendRoad,ringBusy,setGreet:function(f){ greetHook=f; },keepLook,keepWord,KLOOK_:function(){ return KLOOK; },keepDress,keepFires,banditsHere,banditCast,chiefId,beatMend,beatMoths,beatBandit,mothCheck,hallNow,keepTag,TALKK3,keepNotes,LORE5,BANDIT_PATH,SONGLORE,songWho,RING_N,RING,ringBusy,ringSpot,ringPlan,ringRead,exitAngles,ringCheck,beatRing,ringTag,ringNotes,TALKR,LORE4,ringNight,roleName,festAway,festList,nearRoad,sentHere,GREETN,TROUBLES2,beatRoof,beatRoofW,beatAxe,beatBet,beatCake,beatSong,beatFest,trouble2Tag,trouble2Notes,festNotes,festGuests,festEnd,festTag,helpedAway,FEST,TALKT2,TALKF,LORE3,SONG,SONGLORE,songWho,farFor,roadPath,beatCrown,beatFriend,CROWN,crownTag,friendTag,TALKC,LORE2,FRIENDWHAT,PAUSED,chatPause,chatResume,nearPerson,talkTo,REP,TITLES,NICKS,earned,deedName,calledBy,legendName,didHere,legendFor,legendTold,LORE,loreFor,loreTake,loreCountHere,TALKK,leftFacts,leftPath,leftEnsure,leftThreads,leftHere,leftOf,hasAsker,leftKey,LREASONS,TALKL,fillBeat,troublesFor,trGet,trTag,stoneFacts,lightCheck,LIGHTS,TALKT,arriveExit,SNOOZE,part,fixPart,neighborSeed,roadDest,roadLink,visitNote,metNote,valleyCount,storyBeat,journalNotes,chatPick,ERRANDS,errandTarget,letterFacts,CHATX:CHAT,cleanName,nameHash,randomName,homeSeed,isHome,inHome,youName,journalLoad,journalSave,journalBlank,storyNew,storyResume,storyAt,parentsFor,castWithHome,addParents,TALKH,PARENT_IDS,addKeeper,
     setMode:function(m,st){ MODE=m; STORY=st; },getStory:function(){ return STORY; },getMode:function(){ return MODE; },setJournal:function(j){ JOURNAL=j; },getJournal:function(){ return JOURNAL; },journalOff:function(){ return JOURNAL_OFF; }}); }
 else boot();
