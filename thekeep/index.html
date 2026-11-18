@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="keep-version" content="v0.48.0">
+<meta name="keep-version" content="v0.48.1">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#000">
 <title>The Keep</title>
@@ -30,6 +30,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
 .mb-ver{position:fixed;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:900;font:600 10px var(--mb-mono);letter-spacing:.04em;color:var(--mb-teal);background:var(--mb-glass);border:1px solid rgba(76,240,224,.25);border-radius:999px;padding:4px 9px;backdrop-filter:blur(8px);cursor:pointer;user-select:none;opacity:.85;pointer-events:auto}
 .mb-ver::after{content:'';position:absolute;inset:-9px} /* bigger thumb target, same look */
 .bar-sp{flex:1 1 auto}
+#cmp{flex:0 1 250px;min-width:90px;width:250px;height:44px;pointer-events:auto;cursor:pointer;border-radius:8px;background:rgba(14,18,26,.62);border:1px solid rgba(255,255,255,.10);touch-action:manipulation}
 .btns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;pointer-events:auto}
 .seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px}.seg .btn{padding:11px 2px;min-height:44px;font-size:13px;min-width:0}.seg .btn.on{background:var(--mb-ink);color:#10151c;border-color:var(--mb-ink)}
 .btn{font:700 14px var(--mb-ui);color:var(--mb-ink);background:var(--mb-glass);border:1px solid var(--mb-line);padding:11px 16px;border-radius:13px;pointer-events:auto;cursor:pointer;backdrop-filter:blur(8px)}
@@ -43,7 +44,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
 #toast{position:absolute;left:50%;top:64px;transform:translateX(-50%);background:rgba(16,21,28,.92);border:1px solid var(--mb-line);color:var(--mb-ink);padding:9px 16px;border-radius:18px;font:600 11px var(--mb-mono);opacity:0;transition:opacity .25s;white-space:normal;text-align:center;max-width:calc(100vw - 32px);width:max-content;z-index:950}
 #help{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);pointer-events:auto}
 #help.hidden,#log.hidden,#seed.hidden,#dials.hidden,#menu.hidden,#about.hidden,#leave.hidden,#journal.hidden,#backup.hidden{display:none!important}
-.btn.menu{font:700 12px var(--mb-mono);letter-spacing:.04em;padding:9px 14px;border-radius:8px}
+.btn.menu{white-space:nowrap;flex:0 0 auto;font:700 12px var(--mb-mono);letter-spacing:.04em;padding:9px 14px;border-radius:8px}
 .shots{display:flex;gap:8px;overflow-x:auto;margin:10px 0;padding-bottom:4px;-webkit-overflow-scrolling:touch}
 .shots img{height:116px;border-radius:8px;flex:0 0 auto;border:1px solid var(--mb-line);background:#000}
 .card .fsize{background:var(--mb-glass);border:1px solid var(--mb-line);border-radius:13px;padding:8px 10px;font-size:13px;color:var(--mb-soft);margin:10px 0}
@@ -214,13 +215,14 @@ html.fromshelf #inPage #inViews{padding-top:calc(58px + env(safe-area-inset-top)
 <canvas id="c"></canvas>
 <div id="hud">
  <div id="bar">
+  <canvas id="cmp" aria-label="Compass" role="button" tabindex="0"></canvas>
   <div class="bar-sp"></div>
   <button class="btn menu" id="bJournal" type="button">journal</button>
   <button class="btn menu" id="bMenu">☰ menu</button>
  </div>
  <div id="stick"><div id="knob"></div></div>
  <div id="fps"></div>
- <button class="mb-ver" id="mbVer" type="button">v0.48.0 &middot; Nov 18</button>
+ <button class="mb-ver" id="mbVer" type="button">v0.48.1 &middot; Nov 18</button>
  <div id="toast"></div>
  <div id="updNudge" hidden role="status"><span>A new version of The Keep is here (<b id="updVer"></b>).<span id="updMsg" style="display:block;font-weight:400"></span></span><button class="btn go" id="updGo" type="button">refresh</button><button class="btn" id="updNo" type="button">later</button></div>
  <div id="bkNudge" hidden role="status"><span>Big moment. Back up your progress?</span><button class="btn go" id="bkNudgeGo" type="button">back up</button><button class="btn" id="bkNudgeNo" type="button">later</button></div>
@@ -1335,9 +1337,10 @@ var SHELF={on:false,url:'https://motbuchanan.com/gameshelf/'};
   SHELF.place=place;
 })();
 
-const VERSION='The Keep v0.48.0 · Nov 18 2026';
-const VER_SHORT='v0.48.0 · Nov 18'; // what the badge shows; bump with VERSION
+const VERSION='The Keep v0.48.1 · Nov 18 2026';
+const VER_SHORT='v0.48.1 · Nov 18'; // what the badge shows; bump with VERSION
 const CHANGELOG=[
+ ['v0.48.1 · Nov 18 2026','A compass. A strip in the top bar shows which way you face, N, NE, E and round, with north in teal, so the directions people give can be followed. When you have an errand, an orange diamond on the strip points at the person you need, and follows them as they walk, with their name and how far. When the next step is in another valley, a hollow diamond points at the road that goes there. An arrow at the edge means they are behind you. Tap the strip to switch to your next errand, or to turn the marker off. Fish now swim wholly under the surface and keep to water deep enough to hide them, so none poke up through the water in the 3D views.'],
  ['v0.48.0 · Nov 18 2026','A seventh way to see the world: Deep. It is the Mesh world drawn for light and water, the look that started this whole run of work, borrowed from Noniv\'s Abyssal Garden. The world is drawn into a picture first, and a second pass adds what light does on the way to your eye: haze that thickens with distance in the air; under the lake, colour soaked up by distance (red goes first, then green), shafts of light hanging in the water, caustic light wandering over the bed and anything that faces up, and a bright round window in the surface overhead. Kelp sways from the root, grass grows and leans in the wind around you, and the sun\'s glint on the lake glows. It is the heaviest view, so it draws its picture smaller to stay smooth, and thins the grass if it has to.'],
  ['v0.47.0 · Nov 18 2026','Under the lake. The water closes in green and murky as you dive, darker the deeper you go, with slow shafts of light from the surface. Kelp sways in beds on the lake floor, and fish swim at every depth, not just the top. In lake country there is a wreck on the bottom: her side stove in, her deck fallen into the hold, her mast lying beside her. Swim in. Deeper still is a drowned temple. Swim through its door, find the hole in the hall ceiling, and come up into a dry room where the air is still good and a lamp is still burning. Each of them has something to tell you. Divers now swim round built things instead of through them, and cannot pass through a floor from above or below.'],
  ['v0.46.0 · Nov 18 2026','Lake country. About one valley in five now grows a big, deep lake to the southeast, with a port on its shore: a pier out over the water, a fish market under red and straw awnings, and the harbormaster\'s house. A ship with red sails is tied up alongside the pier. Walk up the gangway onto the deck, into the captain\'s cabin at the stern, or down the hatch by the mast into the hold. The harbormaster looks after her all day and has plenty to say. Swimmers now go round a ship\'s hull instead of through it. Choose a valley lets you ask for a big lake. Valleys that are not lake country keep their land exactly as before.'],
@@ -5199,6 +5202,66 @@ function beatGoing(b){ const t=part().tasks[b.key]; return !!(t&&typeof t==='obj
 function storyBeat(id){ if(id===ROLEPED){ const b=beatCrown(id)||beatFoxLetter(id); return b?fillBeat(id,b):null; } let first=null;
   for(const f of BEATS){ const b=f(id); if(!b||(SNOOZE[b.key]&&Date.now()-SNOOZE[b.key]<180000)) continue; if(beatGoing(b)) return fillBeat(id,b); if(!first) first=b; }
   return first?fillBeat(id,first):null; }
+
+// ---------------- the compass (v0.48.1): which way you face, and the way to your next errand ----------------
+// A strip in the top bar: N, NE, E and round, north in teal, the way you face under the notch in the middle.
+// The orange diamond is your errand's next person in this valley, wherever they are walking right now; a hollow one
+// is the road out when the next step is in another valley. Tap the strip to change which errand it follows, or to
+// turn the marker off. Bearings: north is up the map (-y), east is +x; P.yaw 0 faces east.
+const NAV={sel:0, off:false, key:'', list:[], t:0, pick:'', w:0, h:0};
+function navNames(c){ const o=[]; if(!c) return o; if(c.name) o.push(c.name); if(c.given&&c.given!==c.name) o.push(c.given); return o; }
+const NAVROLE=[[/\bthe hermit\b/,7],[/\bthe woodcutter\b/,6],[/\bthe gatekeeper\b|\bat the gate\b|\bthe gate here\b/,2],[/\bthe steward\b|\bat the keep\b/,3],[/\bthe farmer\b/,4],[/\bthe shepherd\b/,5]];
+function navWho(t0,cast){ const t=t0.split(':')[0]; let best=-1, at=-1;   // a quoted verse or a carved name after a colon is not who you want
+  for(const R of NAVROLE){ const m=R[0].exec(t); if(m&&m.index>at&&cast.some(function(c){ return c&&c.id===R[1]; })){ at=m.index; best=R[1]; } }
+  for(const c of cast){ if(!c) continue; for(const n of navNames(c)){ if(n.length<3) continue;
+      const re=new RegExp('(^|[^A-Za-z])'+n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(?![A-Za-z])','g'); let m; while((m=re.exec(t))){ const ix=m.index+m[1].length; if(ix>at){ at=ix; best=c.id; } } } }
+  // a letter or a message goes to the last person named, so "Take A's letter to B" points at B
+  return best; }
+function navTargets(){ const out=[]; if(W.seed==null) return out; let notes; try{ notes=journalNotes().open; }catch(e){ return out; }
+  for(const n of notes){ if(!n||!n.t) continue; const v=n.v==null?(W.seed>>>0):(n.v>>>0);
+    if(v===(W.seed>>>0)){ const id=navWho(n.t,W.cast||[]); if(id<0) continue; const c=castOf(id); out.push({kind:'who', id:id, label:(c&&c.name)||'someone', t:n.t}); }
+    else { let ex=null; for(const e of W.exits){ if(roadDest(W.seed,e.id)===v){ ex=e; break; } }
+      const vn=valleyName(v); out.push({kind:'road', ex:ex, label:ex?ex.name+' to '+vn:'the road to '+vn, far:!ex, t:n.t}); } }
+  return out; }
+function navGoal(){ if(NAV.off||!DIALS.people&&false) return null; const now=performance.now();
+  if(now-NAV.t>700){ NAV.t=now; NAV.list=navTargets(); const k=NAV.list.findIndex(function(g){ return g.t===NAV.pick; }); NAV.sel=k>=0?k:(NAV.sel<NAV.list.length?NAV.sel:0); }
+  const g=NAV.list[NAV.sel]; if(!g) return null;
+  if(g.kind==='who'){ for(let c=0;c<CR_.n;c++) if(CR_.al[c]&&CR_.sp[c]===SP.KEEPER&&(CR_.ay[c]|0)===g.id) return {x:CR_.x[c], y:CR_.y[c], label:g.label, hollow:false};
+    return {none:true, label:g.label+': not about'}; }
+  if(g.ex) return {x:g.ex.x, y:g.ex.y, label:g.label, hollow:true};
+  // the next step is in a valley no road here leads to: point at the nearest road out
+  let b=null, bd=1e9; for(const e of W.exits){ const d=Math.hypot(e.x-P.x,e.y-P.y); if(d<bd){ bd=d; b=e; } }
+  return b?{x:b.x, y:b.y, label:'a road out, toward '+g.label.replace(/^.* to /,''), hollow:true}:null; }
+function navCycle(){ const L=navTargets(); NAV.list=L; NAV.t=performance.now();
+  if(NAV.off){ NAV.off=false; NAV.sel=0; } else if(NAV.sel+1<L.length) NAV.sel++; else { NAV.off=true; }
+  const g=NAV.off?null:L[NAV.sel]; NAV.key=''; NAV.pick=g?g.t:'';
+  (NAV.toast||function(){})(NAV.off||!g?(L.length?'Compass: north only. Tap again for your errands.':'Compass: north only. No errands open.'):'Compass: '+g.t,3200); }
+function compassFrame(){ const cv=document.getElementById('cmp'); if(!cv) return;
+  if(!NAV.w){ NAV.w=cv.clientWidth||250; NAV.h=cv.clientHeight||44; if(!NAV.ro){ NAV.ro=1; window.addEventListener('resize',function(){ NAV.w=0; }); } }
+  const dpr=Math.min(window.devicePixelRatio||1,2), w=Math.round(NAV.w*dpr), h=Math.round(NAV.h*dpr);
+  if(!w||!h) return; if(cv.width!==w) cv.width=w; if(cv.height!==h) cv.height=h;
+  const head=Math.atan2(Math.cos(P.yaw),-Math.sin(P.yaw));   // 0 = north, +pi/2 = east
+  const g=navGoal(); let gb=null, gd=0; if(g&&!g.none){ const dx=g.x-P.x, dy=g.y-P.y; gd=Math.hypot(dx,dy); gb=Math.atan2(dx,-dy); }
+  const key=w+'|'+h+'|'+Math.round(head*180/Math.PI*2)+'|'+(gb==null?'-'+(g&&g.none?g.label:''):Math.round(gb*180/Math.PI*2)+'|'+Math.round(gd)+'|'+g.label+(g.hollow?1:0));
+  if(key===NAV.key) return; NAV.key=key;
+  const x=cv.getContext('2d'); x.clearRect(0,0,w,h); const SPAN=Math.PI*0.85, cx=w/2, top=h*0.06, bandH=h*0.58;
+  const px=function(b){ let d=b-head; d=Math.atan2(Math.sin(d),Math.cos(d)); return {d:d, x:cx+d/(SPAN/2)*(w/2-6*dpr)}; };
+  x.font='700 '+Math.round(11*dpr)+'px ui-monospace,Menlo,monospace'; x.textAlign='center'; x.textBaseline='middle';
+  const W8=['N','NE','E','SE','S','SW','W','NW'];
+  for(let k=0;k<24;k++){ const b=k*Math.PI/12, q=px(b); if(Math.abs(q.d)>SPAN/2) continue; const fade=1-Math.abs(q.d)/(SPAN/2)*0.6;
+    if(k%3===0){ const lab=W8[k/3], isN=k===0; x.fillStyle=isN?'rgba(76,240,224,'+fade+')':'rgba(232,236,242,'+fade*(lab.length>1?0.75:1)+')'; x.fillText(lab,q.x,top+bandH*0.5); }
+    else { x.fillStyle='rgba(232,236,242,'+fade*0.35+')'; x.fillRect(q.x-0.5*dpr,top+bandH*0.35,1*dpr,bandH*0.3); } }
+  // the notch: the way you face
+  x.fillStyle='rgba(76,240,224,.95)'; x.beginPath(); x.moveTo(cx-4*dpr,0); x.lineTo(cx+4*dpr,0); x.lineTo(cx,5*dpr); x.closePath(); x.fill();
+  // the errand marker, or an arrow at the edge when it is behind you
+  if(gb!=null){ const q=px(gb), yy=top+bandH*0.5, s=5.5*dpr; x.strokeStyle='#ff9a3c'; x.fillStyle='#ff9a3c'; x.lineWidth=2*dpr;
+    if(Math.abs(q.d)<=SPAN/2){ x.beginPath(); x.moveTo(q.x,yy-s); x.lineTo(q.x+s,yy); x.lineTo(q.x,yy+s); x.lineTo(q.x-s,yy); x.closePath(); if(g.hollow) x.stroke(); else x.fill(); }
+    else { const L=q.d<0, ex=L?7*dpr:w-7*dpr; x.beginPath(); x.moveTo(ex+(L?4:-4)*dpr,yy-s); x.lineTo(ex+(L?-3:3)*dpr,yy); x.lineTo(ex+(L?4:-4)*dpr,yy+s); x.stroke(); }
+    x.font='600 '+Math.round(9.5*dpr)+'px ui-monospace,Menlo,monospace'; x.fillStyle='rgba(255,186,120,.95)';
+    const sh=g.label.replace(/^the (north|south|east|west|northeast|northwest|southeast|southwest) road/,function(m,d){ return d.replace('north','N').replace('south','S').replace('east','E').replace('west','W').toUpperCase()+' road'; });
+    let lab=(gd<1000?Math.round(gd)+' m':(gd/1000).toFixed(1)+' km')+' · '+sh; while(lab.length>8&&x.measureText(lab).width>w-10*dpr) lab=lab.slice(0,-2);   // the distance first, so a narrow strip keeps it
+    x.fillText(lab,cx,h*0.82); }
+  else { x.font='600 '+Math.round(9.5*dpr)+'px ui-monospace,Menlo,monospace'; x.fillStyle='rgba(232,236,242,.45)'; let lab=g&&g.none?g.label:(NAV.off?'tap for errands':''); while(lab.length>8&&x.measureText(lab).width>w-10*dpr) lab=lab.slice(0,-2); x.fillText(lab,cx,h*0.82); } }
 // ---- the journal's words: your own notes, from what each task knows ----
 function journalNotes(){ const p=part(), open=[], done=[];
   for(const k in p.tasks){ const e=p.tasks[k]; if(!e||typeof e!=='object') continue;
@@ -7023,7 +7086,7 @@ function populateLife(seed){
       const a=rnd()*6.283, rr=rnd()*(LAKE.r*DIALS.water+8); const x=LAKE.x+Math.cos(a)*rr, y=LAKE.y+Math.sin(a)*rr;
       if(terr(x,y)>WATER-1.5) continue;
       sch++; const fn=Math.max(4,Math.round((16+(rnd()*8|0))*pop[SP.FISH]));
-      for(let k=0;k<fn;k++){ if(CR_.n>=CMAX)break; const c=addCreature(SP.FISH, x+(rnd()-0.5)*8, y+(rnd()-0.5)*8, x, y); CR_.z[c]=WATER-0.18; }
+      for(let k=0;k<fn;k++){ if(CR_.n>=CMAX)break; let fx=x+(rnd()-0.5)*8, fy=y+(rnd()-0.5)*8; if(terr(fx,fy)>WATER-1.2){ fx=x; fy=y; } const c=addCreature(SP.FISH, fx, fy, x, y); CR_.z[c]=WATER-0.8; }
     }
   }
   // wolf pack: den near a deer meadow so the pack has prey within range
@@ -7219,11 +7282,12 @@ function tickFish(c,dt){
   const s=Math.hypot(vx,vy)||1e-4, mx=p.speed; if(s>mx){ vx=vx/s*mx; vy=vy/s*mx; }
   let nx=x+vx*dt, ny=y+vy*dt;
   const sh=(Math.imul(c+17,2654435761)>>>0)%100, df=sh<30?0:0.2+0.007*(sh-30);   // each fish its own depth: a third near the top, the rest spread down through the water
-  const zt=(x,y)=>Math.min(WATER-0.18,Math.max(groundAt(x,y)+0.6,WATER-0.18-df*(WATER-groundAt(x,y)-0.8)));
-  if(terr(nx,ny)>WATER-0.8||spanSolid(nx,ny,zt(nx,ny))||(W.air&&W.air[(ny|0)*N+(nx|0)]>0)){ const hx=CR_.ax[c]-x, hy=CR_.ay[c]-y, hd=Math.hypot(hx,hy)+1e-4;
-    vx=hx/hd*p.speed; vy=hy/hd*p.speed; nx=x+vx*dt; ny=y+vy*dt; if(spanSolid(nx,ny,zt(nx,ny))){ nx=x; ny=y; } }
+  const zt=(x,y)=>Math.max(groundAt(x,y)+0.35,Math.min(WATER-0.78,WATER-0.78-df*(WATER-groundAt(x,y)-1.4)));   // the whole fish under the surface: its card is 0.62 tall
+  if(terr(nx,ny)>WATER-1.2||spanSolid(nx,ny,zt(nx,ny))||(W.air&&W.air[(ny|0)*N+(nx|0)]>0)){ const hx=CR_.ax[c]-x, hy=CR_.ay[c]-y, hd=Math.hypot(hx,hy)+1e-4;
+    vx=hx/hd*p.speed; vy=hy/hd*p.speed; nx=x+vx*dt; ny=y+vy*dt;
+    if((terr(nx,ny)>WATER-1.2&&!(terr(nx,ny)<terr(x,y)-0.02))||spanSolid(nx,ny,zt(nx,ny))||(W.air&&W.air[(ny|0)*N+(nx|0)]>0)){ nx=x; ny=y; const a=Math.random()*6.2832; vx=Math.cos(a)*p.speed; vy=Math.sin(a)*p.speed; if(terr(x,y)<=WATER-1.2){ CR_.ax[c]=x; CR_.ay[c]=y; } } }   // the way home is over land: turn about here, and call this deep spot home
   nx=clamp(nx,4,N-5); ny=clamp(ny,4,N-5);
-  CR_.x[c]=nx; CR_.y[c]=ny; CR_.vx[c]=vx; CR_.vy[c]=vy; { const z=zt(nx,ny); CR_.z[c]+= (z-CR_.z[c])*Math.min(1,dt*2); if(Math.abs(CR_.z[c]-z)>3) CR_.z[c]=z; const fl=groundAt(nx,ny)+0.35; if(CR_.z[c]<fl) CR_.z[c]=Math.min(fl,WATER-0.18); }
+  CR_.x[c]=nx; CR_.y[c]=ny; CR_.vx[c]=vx; CR_.vy[c]=vy; { const z=zt(nx,ny); CR_.z[c]+= (z-CR_.z[c])*Math.min(1,dt*2); if(Math.abs(CR_.z[c]-z)>3) CR_.z[c]=z; const fl=groundAt(nx,ny)+0.35; if(CR_.z[c]<fl) CR_.z[c]=fl; }
 }
 
 function tickWolf(c,dt){
@@ -7936,7 +8000,7 @@ function boot(){
   const glApi={ N:N, W:W, WATER:WATER, CLOUDH:CLOUDH, DAY:DAY, SUN:SUN, MOON:MOON, SKY:SKY, RS:RS, RMAT:RMAT, CR_:CR_, SP:SP, SPP:SPP,
     MASKS:MASKS, KMASK:KMASK, P:P, IN:IN, DIALS:DIALS, DECO:KDECO, DECO_IMG:DECO_IMG, FORT:FORT, KEEP:KEEP, RELIGHT:RELIGHT, hash2:hash2, growOf:growOf, keeperPoseFrame:keeperPoseFrame, AM2:AM2, ANI:ANI, animalFrame:animalFrame, isAdult:isAdult, spanHulls:spanHulls, spanK:SPANS, terr:terr,
     fog:function(){ return [FOG_R,FOG_G,FOG_B]; }, uw:function(){ return UW; }, skyTime:function(){ return skyTime; } };
-  if(/[?&]test=1/.test(location.search)) window.__keepTest={P:P,FORT:FORT,DAY:DAY,DIALS:DIALS,sunUpdate:sunUpdate,floorAt:floorAt,terr:terr,genWorld:genWorld,populate:populate,spawn:spawn,EYE:EYE,applyWorld:applyWorld,seedDials:seedDials,chooseRender:function(i){ chooseRender(i); }};   // headless render checks only
+  if(/[?&]test=1/.test(location.search)) window.__keepTest={P:P,FORT:FORT,DAY:DAY,DIALS:DIALS,sunUpdate:sunUpdate,floorAt:floorAt,terr:terr,genWorld:genWorld,populate:populate,spawn:spawn,EYE:EYE,applyWorld:applyWorld,seedDials:seedDials,NAV:NAV,CR_:CR_,SP:SP,W:W,chooseRender:function(i){ chooseRender(i); }};   // headless render checks only
   const glSlot=function(id){ return GLR[id]||(GLR[id]={r:null,loading:false,lost:0,t0:0}); };
   function glDrop(id){ const g=GLR[id]; if(!g||!g.r) return; g.r.onLost=null; try{ g.r.destroy(); }catch(e){} g.r=null; }
   function glFail(m,why){
@@ -8026,6 +8090,9 @@ function boot(){
       if(MODE==='story') storyAt(seed); else saveSeedOnly(seed);
       W.arriveMsg=home?'Home again, in '+W.valley+'.':'You arrive in '+W.valley+'.';
       if(folkMissing().length) W.arriveMsg+=' No room here for '+folkMissing().join(' or ')+'.'; },0); }); },30); }
+  NAV.toast=toast;
+  $('cmp').addEventListener('click',function(e){ e.stopPropagation(); navCycle(); if(e.detail>0) this.blur(); });
+  $('cmp').addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); e.stopPropagation(); navCycle(); } });
   $('bJournal').addEventListener('click',function(){ if(!$('journal').classList.contains('hidden')){ $('journal').classList.add('hidden'); return; } openJournal(); });
   $('journal').addEventListener('click',function(ev){ if(ev.target===$('journal')) $('journal').classList.add('hidden'); });
   window.addEventListener('keydown',function(ev){ if($('journal').classList.contains('hidden')) return; if(ev.key==='Escape'){ $('journal').classList.add('hidden'); ev.preventDefault(); ev.stopPropagation(); } },true);
@@ -8128,6 +8195,7 @@ function boot(){
     ecoAcc+=dt; if(ecoAcc>=ECOSTEP){ ecology(); ecoAcc-=ECOSTEP; }
     relightStep(2);   // the sun moves: re-light two rows of the map per frame
     if(now-talkT>160){ talkT=now; paintTalk(); }
+    try{ compassFrame(); }catch(e){ if(!NAV.err){ NAV.err=1; try{ console.warn('compass: '+e.message); }catch(_){} } }
     const card=anyCard();
     const glm=glCur(), G=glm&&GLR[glm.id], GR=G&&G.r&&G.r.ok?G.r:null, meshOn=!!GR;
     if(now-hudT>500){ hudT=now;   // the corner readout: twice a second, clock included, card open or not
@@ -8158,7 +8226,7 @@ function boot(){
 }
 
 if(IS_NODE){ module.exports={genWorld,allocGrid,buildGlyphs,renderFrame,compose,spawn,populate,tick,ecology,simBin,updatePlayer,W,RS,FB,P,IN,CR_,SP,SPP,MASKS,RESERVE,RAMP,N,WATER,EYE,terr,groundAt,DIALS,growOf,isAdult,addCreature,WALLS,buildWalls,nearestWall,allWallHits,wallBlocked,setSkyTime:function(t){skyTime=t;},setUW:function(v){UW=v;},DAY,SUN,MOON,SKY,DAYMODES,sunAltAz,sunUpdate,updateDay,relightAll,relightStep,RELIGHT,dayDate,fmtTod,setTod:function(h){DAY.tod=h;sunUpdate();},floorAt,KPATHS,KEEP,FORT,eventsForDay,weddingDay,babyDay,valleyDay,logEvent,eventsRefresh,dayTick,restock,stockTakeable,stockOwner,evBind,evWhen,evKey,seedDials,valleyTraits,chooseSeed,applyWorld,worldOf,TRAITS37,WORLD_KEYS,getPlayerLand:function(){ return PLAYER_LAND; },seedParse,babyFor,pedWays,pedShelter,carveRoads,exitAngles,roadCheck,roadStay,travelTo,spawnAtExit,VISITED,ROADS,PED,pedTick,pedDay,pedFind,pedRouteIn,pedPitch,pedWay,TALKP,ROAD_DIALS,ROLEPED,stormLevel,stormWindows,stormOngoing,underCover,stormLight,TALKS,STORMC,evBase,keeperAbed,FISHSIZE,TALKE,EVTAG,EVKINDS,wedNow,relOf,TALK,TALKX,LINES,POSEWHO,talkPick,talk,chatMore,closeChat,chatTick,CHAT,HEARD,VISITS,heardKey,heardAdd,lineOk,whoOk,placeName,placeDir,setChat:function(h){chatHook=h;},castValley,valleyName,valleyNames,seedRng,rebuildPeople,KEEPERS,GREETN,lineOk,fillLine,peopleHere,ALLHERE,ROLEKEY,ROLES,NAMES_F,NAMES_M,NAMES_X,BYNAMES,CLOTHES,SKINS,HAIRS,TRAITS,TRAIT_CLASH,RELREV,dayPart,folkMissing,tickKeeper,KMASK,KL,keeperFrame,GREETT,setGreet:function(f){greetHook=f;},RENDERS,SPANS,spanTop,spanBot,ceilOver,solidAt,pushToOpen,addSpan,YARD,stampKeepMass,keepLook,getKLOOK:function(){ return KLOOK; },CBIN,AM2,AMASK};
-  Object.assign(module.exports,{fPlace,buildHouse,UPF,FOLK_BUILD,FARM_BED,SHIP,lakeCountry,LAKE,talkPick,townId,waterLine,spanSolid,levelBed,setGreet:function(f){ greetHook=f; },ruinCheck,UWnow:function(){ return UW; },landRuin,});
+  Object.assign(module.exports,{navWho,navTargets,navGoal,NAV,journalNotes,fPlace,buildHouse,UPF,FOLK_BUILD,FARM_BED,SHIP,lakeCountry,LAKE,talkPick,townId,waterLine,spanSolid,levelBed,setGreet:function(f){ greetHook=f; },ruinCheck,UWnow:function(){ return UW; },landRuin,});
   Object.assign(module.exports,{SOUND,soundScene,soundFloor,soundPan,soundTick,soundToast,soundOn,soundOff,soundWanted,SOUNDS,banditsLeave,mendRoad,ringBusy,setGreet:function(f){ greetHook=f; },keepLook,keepWord,KLOOK_:function(){ return KLOOK; },keepDress,keepFires,banditsHere,banditCast,chiefId,beatMend,beatMoths,beatBandit,mothCheck,hallNow,keepTag,TALKK3,keepNotes,LORE5,BANDIT_PATH,SONGLORE,songWho,RING_N,RING,ringBusy,ringSpot,ringPlan,ringRead,exitAngles,ringCheck,beatRing,ringTag,ringNotes,TALKR,LORE4,ringNight,roleName,festAway,festList,nearRoad,sentHere,GREETN,TROUBLES2,beatRoof,beatRoofW,beatAxe,beatBet,beatCake,beatSong,beatFest,trouble2Tag,trouble2Notes,festNotes,festGuests,festEnd,festTag,helpedAway,FEST,TALKT2,TALKF,LORE3,SONG,SONGLORE,songWho,farFor,roadPath,beatCrown,beatFriend,CROWN,crownTag,friendTag,TALKC,LORE2,FRIENDWHAT,PAUSED,chatPause,chatResume,nearPerson,talkTo,REP,TITLES,NICKS,earned,deedName,calledBy,legendName,didHere,legendFor,legendTold,LORE,loreFor,loreTake,loreCountHere,TALKK,leftFacts,leftPath,leftEnsure,leftThreads,leftHere,leftOf,hasAsker,leftKey,LREASONS,TALKL,fillBeat,troublesFor,trGet,trTag,stoneFacts,lightCheck,LIGHTS,TALKT,arriveExit,SNOOZE,part,fixPart,neighborSeed,roadDest,roadLink,visitNote,metNote,valleyCount,storyBeat,journalNotes,chatPick,ERRANDS,errandTarget,letterFacts,CHATX:CHAT,cleanName,nameHash,randomName,homeSeed,isHome,inHome,youName,journalLoad,journalSave,journalBlank,storyNew,storyResume,storyAt,parentsFor,castWithHome,addParents,TALKH,PARENT_IDS,addKeeper,
     setMode:function(m,st){ MODE=m; STORY=st; },getStory:function(){ return STORY; },getMode:function(){ return MODE; },setJournal:function(j){ JOURNAL=j; },getJournal:function(){ return JOURNAL; },journalOff:function(){ return JOURNAL_OFF; }}); }
 else boot();
