@@ -355,14 +355,14 @@ function create(A){
           quad([ax,ay,ha+s2,alA],[bx,by,hb+s2,alB],[bx,by,hb+s,alB],[ax,ay,ha+s,alA],NB[d][0],NB[d][1],0,M.f,1,nx,ny,0,M,Math.min(ha,hb)+s2); } }
       // every span over the cell (v0.40): its top, its underside, and each side wherever the neighbour has no span to meet it
       const nI=W.spn[i];
-      for(let sk=0;sk<nI;sk++){ const so=i*3+sk, M=RM[W.spm[so]||W.smat[i]||ruin[i]]||RM[0], zg=h[i], zb=zg+W.spb[so], zt=zg+W.spt[so];
+      for(let sk=0;sk<nI;sk++){ const so=i*A.spanK+sk, M=RM[W.spm[so]?W.spm[so]-1:(W.smat[i]||ruin[i])]||RM[0], zg=h[i], zb=zg+W.spb[so], zt=zg+W.spt[so];
         quad([x,y,zt,0],[x+1,y,zt,0],[x+1,y+1,zt,0],[x,y+1,zt,0],0,0,1,M.t,2,x,y,0,M,0);
         quad([x,y,zb,0],[x,y+1,zb,0],[x+1,y+1,zb,0],[x+1,y,zb,0],0,0,-1,M.f,3,x,y,0,M,0);
         for(let d=0;d<4;d++){ const nx=x+NB[d][0], ny=y+NB[d][1], j=ny*N+nx;
           let ax,ay,bx,by; if(d===0){ ax=x+1;ay=y;bx=x+1;by=y+1; } else if(d===1){ ax=x;ay=y+1;bx=x;by=y; } else if(d===2){ ax=x+1;ay=y+1;bx=x;by=y+1; } else { ax=x;ay=y;bx=x+1;by=y; }
           const alA=d<2?ay:ax, alB=d<2?by:bx;
           let parts=[[zb,zt]];
-          const nJ=W.spn[j]; for(let q=0;q<nJ;q++){ const nb=h[j]+W.spb[j*3+q], nt=h[j]+W.spt[j*3+q], nxt=[];
+          const nJ=W.spn[j]; for(let q=0;q<nJ;q++){ const nb=h[j]+W.spb[j*A.spanK+q], nt=h[j]+W.spt[j*A.spanK+q], nxt=[];
             for(const pr of parts){ if(nt<=pr[0]+0.01||nb>=pr[1]-0.01){ nxt.push(pr); continue; } if(nb>pr[0]+0.01) nxt.push([pr[0],nb]); if(nt<pr[1]-0.01) nxt.push([nt,pr[1]]); }
             parts=nxt; }
           const gT=h[j]+st[j]; if(gT>zb){ const nxt=[]; for(const pr of parts){ if(gT>=pr[1]-0.01) continue; nxt.push([Math.max(pr[0],gT),pr[1]]); } parts=nxt; }   // hidden behind the neighbour's solid stone
