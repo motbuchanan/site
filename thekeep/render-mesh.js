@@ -1,4 +1,4 @@
-// The Keep · render-mesh.js · v0.21.0 · Oct 30 2026
+// The Keep · render-mesh.js · v0.50.0 · Nov 19 2026
 // The same world drawn the way most 3D games draw theirs: triangles on the graphics chip (WebGL2).
 // Nothing here makes the world. It reads the exact arrays the ASCII raycaster reads (heights, stone,
 // slabs, trees, the lit colors and shadows) and turns them into meshes. Loaded only when Mesh is picked.
@@ -132,6 +132,42 @@ void main(){ vec4 t=texture(uA,vUV); if(t.a<0.2) discard;
   if(vX.w>0.5&&uNight>0.02&&vX.x>=0.0){ vec2 px=vLoc*vec2(24.0,48.0); w=uNight*max(0.0,1.0-length(px-vX.xy)/18.0)*1.1; }
   o=vec4(finish(c,vec3(0.0),vW,w),1.0); }`;
 
+// people in 3D (v0.50.0): rounded blocks from the cast data, one draw each; bones turn about fixed pivots, then the figure
+// is sized, turned to face where it walks and set down. Lit by the sun or moon, the shade where it stands, the lanterns.
+const VS_P3=HEAD+`
+layout(location=0) in vec3 aP; layout(location=1) in vec3 aN; layout(location=2) in vec4 aC; layout(location=3) in float aB;
+uniform vec4 uM; uniform vec3 uS; uniform float uA[12];
+out vec3 vW; out vec3 vN; out vec4 vC;
+vec3 rx(vec3 p,vec3 c,float a){ vec3 q=p-c; float co=cos(a), si=sin(a); return c+vec3(q.x,q.y*co-q.z*si,q.y*si+q.z*co); }
+vec3 rn(vec3 n,float a){ float co=cos(a), si=sin(a); return vec3(n.x,n.y*co-n.z*si,n.y*si+n.z*co); }
+vec3 ry(vec3 p,vec3 c,float a){ vec3 q=p-c; float co=cos(a), si=sin(a); return c+vec3(q.x*co+q.z*si,q.y,-q.x*si+q.z*co); }
+vec3 ryn(vec3 n,float a){ float co=cos(a), si=sin(a); return vec3(n.x*co+n.z*si,n.y,-n.x*si+n.z*co); }
+void main(){ int b=int(aB+0.5); vec3 p=aP, n=aN;
+  if(b==9){ p=aP*vec3(uS.xy*1.0,1.0); float co=cos(uM.w), si=sin(uM.w); vec2 f=vec2(co,si), r=vec2(-si,co); vec3 w=vec3(uM.xy+r*p.x+f*p.y,uM.z+p.z); vW=w; vN=vec3(0.0,0.0,1.0); vC=aC; gl_Position=uVP*vec4(w,1.0); return; }
+  if(b==7){ p=rx(p,vec3(-0.085,0.0,0.74),uA[6]); n=rn(n,uA[6]); }
+  if(b==8){ p=rx(p,vec3(0.085,0.0,0.74),uA[7]); n=rn(n,uA[7]); }
+  if(b==4){ p=rx(p,vec3(-0.2725,0.0,1.04),uA[3]); n=rn(n,uA[3]); }
+  if(b==3||b==4){ p=rx(p,vec3(-0.255,0.0,1.29),uA[2]); n=rn(n,uA[2]); }
+  if(b==6){ p=rx(p,vec3(0.2725,0.0,1.04),uA[5]); n=rn(n,uA[5]); }
+  if(b==5||b==6){ p=rx(p,vec3(0.255,0.0,1.29),uA[4]); n=rn(n,uA[4]); p=ry(p,vec3(0.255,0.0,1.29),uA[11]); n=ryn(n,uA[11]); }
+  if(b==10){ p=rx(p,vec3(0.0,0.0,0.74),uA[10]); n=rn(n,uA[10]); }
+  if(b==2){ p=rx(p,vec3(0.0,0.0,1.38),-uA[1]); n=rn(n,-uA[1]); }
+  if(b>=1&&b<=6){ p=rx(p,vec3(0.0,0.0,0.86),-uA[0]); n=rn(n,-uA[0]); }
+  p.z+=uA[8]; p*=uS;
+  float co=cos(uM.w), si=sin(uM.w); vec2 f=vec2(co,si), r=vec2(-si,co);
+  vec3 w=vec3(uM.xy+r*p.x+f*p.y,uM.z+max(p.z,0.005));
+  vN=vec3(r*n.x+f*n.y,n.z); vW=w; vC=vec4(aC.rgb,aC.a*uA[9]);
+  gl_Position=uVP*vec4(w,1.0); }`;
+const FS_P3=HEAD+FINISH+`
+uniform float uAmb; in vec3 vW; in vec3 vN; in vec4 vC; out vec4 o;
+void main(){
+  if(vC.a<-0.5){ o=vec4(0.0,0.0,0.0,0.5*(1.0-vC.r)*uAmb); return; }   // the soft shadow on the ground under them
+  if(vC.a>0.05&&uNight>0.02){ float fl=0.86+0.14*sin(uTime*9.0+vW.z*7.0); o=vec4(vec3(1.0,0.84,0.47)*fl*(0.35+0.65*vC.a),1.0); return; }
+  vec3 n=normalize(vN); vec3 L=normalize(uLight+vec3(0.0,0.0,1e-4));
+  float d=max(0.0,dot(n,L)), lit=(0.48+0.12*n.z+0.55*d)*uAmb;
+  vec3 c=vC.rgb*lit; float w=uNight>0.0?pool(vW)*0.6:0.0;
+  o=vec4(finish(c,vec3(0.0),vW,w),1.0); }`;
+
 // the sky: the same palette, sun, moon, stars and two cloud layers as the raycaster's sky(), per pixel
 const SKYFN=`
 uniform vec3 uSkyT; uniform vec3 uSkyH; uniform vec3 uSkyC; uniform vec3 uSunC; uniform vec4 uSkyK; // nd, du, cl, hx
@@ -221,7 +257,7 @@ function create(A){
     if(!gl.getProgramParameter(p,gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p));
     const u={}; const n=gl.getProgramParameter(p,gl.ACTIVE_UNIFORMS); for(let i=0;i<n;i++){ const a=gl.getActiveUniform(p,i); u[a.name.replace(/\[0\]$/,'')]=gl.getUniformLocation(p,a.name); }
     return {p:p,u:u}; }
-  let PT,PS,PTR,PSP,PSK,PW;
+  let PT,PS,PTR,PSP,PSK,PW, P3=null;
   try{ PT=prog(VS_TERR,FS_TERR); PS=prog(VS_STONE,FS_STONE); PTR=prog(VS_TREE,FS_TREE); PSP=prog(VS_SPR,FS_SPR); PSK=prog(VS_SKY,FS_SKY); PW=prog(VS_WATER,FS_WATER); }
   catch(e){ R.error=String(e&&e.message||e).slice(0,300); canvas.remove(); return R; }
 
@@ -323,6 +359,21 @@ function create(A){
   for(let a=0;a<4;a++){ gl.enableVertexAttribArray(a); gl.vertexAttribPointer(a,4,gl.FLOAT,false,64,a*16); gl.vertexAttribDivisor(a,1); }
   gl.bindVertexArray(null);
   const vaoEmpty=gl.createVertexArray();
+  try{ P3=prog(VS_P3,FS_P3); }catch(e){ P3=null; R.p3Error=String(e&&e.message||e).slice(0,300); }
+  try{ if(/[?&]p3=0/.test(location.search)) R.people3D=false; }catch(e){}   // ?p3=0: the old cards, to compare
+  // the people's figures: one buffer each, kept as long as the person is (a new valley makes new ones)
+  const p3Geo=new WeakMap(), P3MAX=18, p3L=new Float32Array(P3MAX*6), p3On=new Uint8Array(8192), p3List=[]; let nP3=0, p3G0=null;
+  function p3Sweep(){ const g0=A.person3D?A.person3D(0):null; if(g0===p3G0) return; p3G0=g0;   // a new valley's people: let the last ones' buffers go
+    for(const v of p3List){ if(v.keep) continue; gl.deleteVertexArray(v.vao); gl.deleteBuffer(v.vb); } for(let i=p3List.length-1;i>=0;i--) if(!p3List[i].keep) p3List.splice(i,1); }
+  // one shared disc for the shadow under each figure: centre dark, fading to the rim
+  const p3Disc=(function(){ const a=[]; const S=14; for(let i=0;i<S;i++){ const a0=i/S*Math.PI*2, a1=(i+1)/S*Math.PI*2;
+      a.push(0,0,0.03,0,0,1,0,0,0,-1,9, Math.cos(a0)*0.42,Math.sin(a0)*0.30,0.03,0,0,1,1,0,0,-1,9, Math.cos(a1)*0.42,Math.sin(a1)*0.30,0.03,0,0,1,1,0,0,-1,9); }
+    return {buf:new Float32Array(a), n:S*3}; })();
+  function p3Vao(g){ let v=p3Geo.get(g); if(v) return v; const vao=gl.createVertexArray(), vb=gl.createBuffer();
+    gl.bindVertexArray(vao); gl.bindBuffer(gl.ARRAY_BUFFER,vb); gl.bufferData(gl.ARRAY_BUFFER,g.buf,gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0,3,gl.FLOAT,false,44,0); gl.enableVertexAttribArray(1); gl.vertexAttribPointer(1,3,gl.FLOAT,false,44,12);
+    gl.enableVertexAttribArray(2); gl.vertexAttribPointer(2,4,gl.FLOAT,false,44,24); gl.enableVertexAttribArray(3); gl.vertexAttribPointer(3,1,gl.FLOAT,false,44,40);
+    gl.bindVertexArray(null); v={vao:vao, vb:vb, n:g.n, keep:g===p3Disc}; p3Geo.set(g,v); p3List.push(v); return v; }
 
   // ---- build the static meshes from the world ----
   // the cloud field does not repeat on its own, and a smooth texture shows that edge as a straight line across the sky;
@@ -454,7 +505,7 @@ function create(A){
 
   const lp=new Float32Array(64), lc=new Float32Array(64);
   function gather(px,py,pz,yaw,rx,ry,night){
-    const C=A.CR_, SP=A.SP, SPP=A.SPP, R2=130*130; let k=0, nl=0; const DK=A.DAY.k<0.6;
+    const C=A.CR_, SP=A.SP, SPP=A.SPP, R2=130*130; let k=0, nl=0; const DK=A.DAY.k<0.6; nP3=0; const use3=!!(P3&&A.person3D&&R.people3D!==false); if(use3) p3Sweep();
     if(A.animalFrame) A.animalFrame(px,py,yaw);
     for(let c=0;c<C.n;c++){ if(C.al[c]===0) continue; const sp=C.sp[c], x=C.x[c], y=C.y[c], z=C.z[c], ex=x-px, ey=y-py;
       if(ex*ex+ey*ey>R2) continue;
@@ -464,7 +515,8 @@ function create(A){
       if(k>=SPMAX) continue;
       const o=k*16; const ci=(Math.max(0,Math.min(N-1,y|0)))*N+Math.max(0,Math.min(N-1,x|0));
       const shd=W.shadRaw[ci]; let amb=(shd>0.99&&A.DAY.lightAlt>0.035)?0.92:(0.56+0.36*shd);
-      if(sp===SP.KEEPER){ const id=Math.min(A.KMASK.length-1,C.ay[c]|0), hx=C.vx[c], hy=C.vy[c], hl=Math.hypot(hx,hy)||1, tl=Math.hypot(ex,ey)||1;
+      if(sp===SP.KEEPER&&use3&&nP3<P3MAX&&ex*ex+ey*ey<(p3On[c]?42*42:38*38)&&A.person3D(C.ay[c]|0)){ p3On[c]=1; const q=nP3*6; p3L[q]=c; p3L[q+1]=x; p3L[q+2]=y; p3L[q+3]=z; p3L[q+4]=Math.atan2(C.vy[c],C.vx[c]); p3L[q+5]=amb; nP3++; continue; }
+      if(sp===SP.KEEPER){ p3On[c]=0; const id=Math.min(A.KMASK.length-1,C.ay[c]|0), hx=C.vx[c], hy=C.vy[c], hl=Math.hypot(hx,hy)||1, tl=Math.hypot(ex,ey)||1;
         const dot=-(hx*ex+hy*ey)/(hl*tl), v=dot>0.42?0:(dot<-0.42?2:1), mir=(v===1&&(hx*rx+hy*ry)<0)?1:0, fr=A.keeperPoseFrame(c);
         const uv=slotUV[atlasMap['k'+id+'_'+v+'_'+fr]]; const ln=A.KMASK[id].lan[v][fr];
         const P_=SPP[SP.KEEPER];
@@ -524,6 +576,15 @@ function create(A){
       gl.enable(gl.POLYGON_OFFSET_FILL); gl.polygonOffset(-1,-2); gl.bindVertexArray(vaoD); gl.drawArrays(gl.TRIANGLES,0,nDeco); gl.disable(gl.POLYGON_OFFSET_FILL); }
     if(nSpr){ common(PSP,U,vp); bindTex(PSP,'uA',3,texA); gl.bindVertexArray(vaoSp); gl.bindBuffer(gl.ARRAY_BUFFER,vbSp);
       gl.bufferSubData(gl.ARRAY_BUFFER,0,spData,0,nSpr*16); gl.drawArraysInstanced(gl.TRIANGLE_STRIP,0,4,nSpr); }
+    if(nP3){ common(P3,U,vp);
+      for(let i=0;i<nP3;i++){ const q=i*6, c=p3L[q]|0, id=A.CR_.ay[c]|0, g=A.person3D(id); if(!g) continue; const v=p3Vao(g), pose=A.person3DPose(c);
+        gl.uniform4f(P3.u.uM,p3L[q+1],p3L[q+2],p3L[q+3],p3L[q+4]); gl.uniform3f(P3.u.uS,g.sx,g.sy,g.sz); gl.uniform1fv(P3.u.uA,pose); gl.uniform1f(P3.u.uAmb,p3L[q+5]);
+        gl.bindVertexArray(v.vao); gl.drawArrays(gl.TRIANGLES,0,v.n); }
+      gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA); gl.depthMask(false); gl.enable(gl.POLYGON_OFFSET_FILL); gl.polygonOffset(-1,-4);
+      const dv=p3Vao(p3Disc); gl.bindVertexArray(dv.vao);
+      for(let i=0;i<nP3;i++){ const q=i*6, c=p3L[q]|0, g=A.person3D(A.CR_.ay[c]|0); if(!g||A.CR_.po[c]===4) continue;
+        gl.uniform4f(P3.u.uM,p3L[q+1],p3L[q+2],p3L[q+3],p3L[q+4]); gl.uniform3f(P3.u.uS,g.sx,g.sy,g.sz); gl.uniform1f(P3.u.uAmb,p3L[q+5]); gl.drawArrays(gl.TRIANGLES,0,dv.n); }
+      gl.disable(gl.POLYGON_OFFSET_FILL); gl.depthMask(true); gl.disable(gl.BLEND); }
     // water last, see-through near the shore
     gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA); gl.depthMask(false);
     common(PW,U,vp); skyUniforms(PW,U); bindTex(PW,'uH',0,texH); gl.uniform1f(PW.u.uWater,A.WATER);
@@ -545,5 +606,5 @@ function create(A){
   try{ rebuild(); resize(); R.ok=true; }catch(e){ R.error=String(e&&e.message||e).slice(0,300); canvas.remove(); }
   return R;
 }
-window.KeepMesh={ create:create, version:'v0.21.0' };
+window.KeepMesh={ create:create, version:'v0.50.0' };
 })();
