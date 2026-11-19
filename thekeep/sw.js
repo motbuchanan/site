@@ -1,21 +1,15 @@
-// Ravenmarrow service worker. Cache name changes every version so installed phones update.
-const CACHE = 'ravenmarrow-v3.5';
-const CORE = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png', './apple-touch-icon.png', './rm-title.webp', './rm-eye.webp', './rm-barrow.webp', './rm-hel.webp', './rm-realms.webp', './rm-squad.webp', './village-iso.js?v=3.5'];
-self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)));
-});
-self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k.startsWith('ravenmarrow-') && k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim()));
-});
-self.addEventListener('message', e => { if (e.data === 'skipWaiting') self.skipWaiting(); });
-self.addEventListener('fetch', e => {
-  const req = e.request;
-  if (req.method !== 'GET' || new URL(req.url).origin !== location.origin) return;
-  const isPage = req.mode === 'navigate' || req.url.endsWith('.html');
-  if (isPage) {
-    // network first: new chapters show up as soon as there is signal
-    e.respondWith(fetch(req, {cache: 'no-store'}).then(r => { if (r.ok){ const copy = r.clone(); caches.open(CACHE).then(c => c.put('./index.html', copy)); } return r; }).catch(() => caches.match('./index.html')));
-  } else {
-    e.respondWith(caches.match(req).then(r => r || fetch(req).then(res => { if (res.ok){ const copy = res.clone(); caches.open(CACHE).then(c => c.put(req, copy)); } return res; })));
-  }
+// The Keep · sw.js · Nov 19 2026
+// The Keep has no service worker of its own. This file replaces Ravenmarrow's, which was uploaded into thekeep/ by
+// mistake and took over the page on phones that had opened it. On its next check the phone installs this one, which
+// clears only the copies of thekeep/ pages that worker kept (Ravenmarrow's own offline copy is left alone),
+// unregisters itself, and reloads any open Keep page straight from the site.
+self.addEventListener('install', function(){ self.skipWaiting(); });
+self.addEventListener('activate', function(e){
+  e.waitUntil((async function(){
+    try{ const keys=await caches.keys();
+      for(const k of keys){ if(k.indexOf('ravenmarrow-')!==0) continue; const c=await caches.open(k), reqs=await c.keys();
+        for(const r of reqs){ if(new URL(r.url).pathname.indexOf('/thekeep/')===0) await c.delete(r); } } }catch(err){}
+    try{ await self.registration.unregister(); }catch(err){}
+    try{ const cs=await self.clients.matchAll({type:'window'}); for(const c of cs){ try{ c.navigate(c.url); }catch(err){} } }catch(err){}
+  })());
 });
