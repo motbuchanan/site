@@ -1,4 +1,4 @@
-// The Keep · render-iso.js · v0.43.0 · Nov 18 2026 (spans; cutaway indoors)
+// The Keep · render-iso.js · v0.51.0 · Nov 19 2026 (spans; cutaway indoors)
 // The same world seen from above at a fixed slant, the way SimCity, Diablo and Monument Valley frame theirs: an
 // isometric (orthographic) camera, so nothing shrinks with distance and the whole keep reads like a model on a table.
 // It draws the Voxels blocks; the camera follows behind you as you turn, so the walk stick works the same.
@@ -153,7 +153,7 @@ void main(){ vec4 a=uInv*vec4(vN,-1.0,1.0), b=uInv*vec4(vN,1.0,1.0); vec3 d=norm
 // water: one sheet at the waterline; it shows the bed through it near the shore and the sky in it at a glance
 const VS_WATER=HEAD+`
 uniform float uWater; out vec3 vW;
-void main(){ vec2 p=vec2((gl_VertexID==1||gl_VertexID==3)?512.0:0.0,(gl_VertexID>=2)?512.0:0.0);
+void main(){ vec2 p=vec2((gl_VertexID==1||gl_VertexID==3)?2048.0:-1536.0,(gl_VertexID>=2)?2048.0:-1536.0);   // past the map too: on a coast the sea runs on (the bed is the edge's, so hills stay dry)
   vW=vec3(p,uWater); gl_Position=uVP*vec4(vW,1.0); }`;
 const FS_WATER=HEAD+FINISH+SKYFN+`
 uniform sampler2D uH; uniform float uWater; in vec3 vW; out vec4 o;
@@ -585,5 +585,5 @@ function create(A){
   try{ rebuild(); resize(); R.ok=true; }catch(e){ R.error=String(e&&e.message||e).slice(0,300); canvas.remove(); }
   return R;
 }
-window.KeepIso={ create:create, version:'v0.21.0' };
+window.KeepIso={ create:create, version:'v0.51.0' };
 })();

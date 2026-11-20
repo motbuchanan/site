@@ -1,4 +1,4 @@
-// The Keep · render-voxel.js · v0.21.0 · Oct 30 2026
+// The Keep · render-voxel.js · v0.51.0 · Nov 19 2026 (up to four spans per cell)
 // The same world drawn as blocks, the way Minecraft draws its worlds: every cell becomes a column of 1 m blocks.
 // Nothing here makes the world. It reads the exact arrays the ASCII raycaster reads, rounds each height to a whole
 // block, and gives each column a block type. Sky, water, light and the people are shared with the Mesh renderer.
@@ -143,7 +143,7 @@ void main(){ vec4 a=uInv*vec4(vN,-1.0,1.0), b=uInv*vec4(vN,1.0,1.0); vec3 d=norm
 // water: one sheet at the waterline; it shows the bed through it near the shore and the sky in it at a glance
 const VS_WATER=HEAD+`
 uniform float uWater; out vec3 vW;
-void main(){ vec2 p=vec2((gl_VertexID==1||gl_VertexID==3)?512.0:0.0,(gl_VertexID>=2)?512.0:0.0);
+void main(){ vec2 p=vec2((gl_VertexID==1||gl_VertexID==3)?2048.0:-1536.0,(gl_VertexID>=2)?2048.0:-1536.0);   // past the map too: on a coast the sea runs on to the horizon (the bed is the edge's, so hills stay dry)
   vW=vec3(p,uWater); gl_Position=uVP*vec4(vW,1.0); }`;
 const FS_WATER=HEAD+FINISH+SKYFN+`
 uniform sampler2D uH; uniform float uWater; in vec3 vW; out vec4 o;
@@ -216,9 +216,9 @@ function create(A){
     gl.bindTexture(gl.TEXTURE_2D,texT); gl.texSubImage2D(gl.TEXTURE_2D,0,0,y0,N,y1-y0,gl.RGBA,gl.UNSIGNED_BYTE,tData.subarray(y0*N*4,y1*N*4)); }
 
   // ---- block columns: the same heights, rounded to whole blocks, with a material per column ----
-  const colTop=new Int16Array(N*N), colMat=new Uint8Array(N*N), slabB=new Int16Array(N*N), slabT=new Int16Array(N*N);
+  const colTop=new Int16Array(N*N), colMat=new Uint8Array(N*N), slabN=new Uint8Array(N*N), slabB=new Int16Array(N*N*4), slabT=new Int16Array(N*N*4), slabM=new Uint8Array(N*N*4), slabHi=new Int16Array(N*N);   // up to four spans per cell, in whole blocks
   // materials: 0 grass, 1 sand, 2 snow, 3 rock, 4 path, 5..11 stone of the keep and the ruins (RMAT 0..6), 12 leaves, 13 wood
-  function buildColumns(){ const h=W.h, st=W.st, WATER=A.WATER, HU=A.spanHulls();
+  function buildColumns(){ const h=W.h, st=W.st, WATER=A.WATER, K=A.spanK;
     for(let y=0;y<N;y++)for(let x=0;x<N;x++){ const i=y*N+x, hh=h[i];
       const g=hh+st[i]; colTop[i]=g<WATER?Math.min(Math.round(g),Math.ceil(WATER)-1):Math.round(g);
       if(st[i]>0.3&&g>=WATER&&colTop[i]<=Math.round(hh)) colTop[i]=Math.round(hh)+1;   // a low bench or pew still stands one block up
@@ -233,7 +233,14 @@ function create(A){
       else if(slope>1.0||hh>44) m=3;
       else m=0;
       colMat[i]=m;
-      if(HU.t[i]>0){ slabB[i]=Math.round(hh+HU.b[i]); slabT[i]=Math.round(hh+HU.t[i]); } else { slabB[i]=0; slabT[i]=0; } } }
+      // the spans over the cell (vaults, floors, roofs), each rounded to whole blocks, at least one block thick, never overlapping
+      let n=0, last=-1e9; slabHi[i]=-32000;
+      for(let k=0;k<Math.min(4,W.spn[i]);k++){ let zb=Math.round(hh+W.spb[i*K+k]), zt=Math.round(hh+W.spt[i*K+k]);
+        if(zt<=zb) zb=zt-1;                      // at least one block, grown downward so the surface you stand on stays put
+        if(zb<last) zb=last; if(zt<=zb) zt=zb+1;
+        if(n>0&&zb<slabT[i*4+n-1]){ slabT[i*4+n-1]=Math.max(slabT[i*4+n-1],zt); last=slabT[i*4+n-1]; continue; }
+        slabB[i*4+n]=zb; slabT[i*4+n]=zt; slabM[i*4+n]=W.spm[i*K+k]; last=zt; n++; }
+      slabN[i]=n; if(n) slabHi[i]=slabT[i*4+n-1]; } }
   const VSZ=16;   // bytes per vertex: Int16 x,y,z,top | Uint16 cell x,y | Uint8 face,mat,ao,0
   function ChunkBuf(){ this.vb=new ArrayBuffer(262144*VSZ); this.v16=new Int16Array(this.vb); this.u16=new Uint16Array(this.vb); this.u8=new Uint8Array(this.vb); this.nv=0; this.idx=new Uint32Array(262144*3/2); this.ni=0; this.full=false; this.sl=0; }
   ChunkBuf.prototype.vert=function(x,y,z,top,cx,cy,face,mat,ao){ const k=this.nv++, o=k*8;
@@ -299,11 +306,12 @@ function create(A){
         if(nH>=H) continue;
         const fc=cellOf(Math.max(0,Math.min(N-1,nx)),Math.max(0,Math.min(N-1,ny)),s);
         side(B,x,y,s,d,Math.max(nH,H-64),H,H,fc[0],fc[1],mat,s===1?AOS:AO1); } }
-    if(lod===0){ for(let y=oy;y<oy+SIDE;y++)for(let x=ox;x<ox+SIDE;x++){ const i=y*N+x; if(slabT[i]<=slabB[i]) continue;
-        const zb=slabB[i], zt=slabT[i], mat=W.smat[i]?5+Math.min(13,W.smat[i]):(colMat[i]>=5?colMat[i]:5+Math.min(13,W.ruin[i]));
-        let skip=0; const cov=function(j){ return slabT[j]>slabB[j]&&slabB[j]<=zb&&slabT[j]>=zt; };
-        if(cov(i+1)) skip|=2; if(cov(i-1)) skip|=4; if(cov(i+N)) skip|=8; if(cov(i-N)) skip|=16;
-        B.sl=1; box(B,x,y,zb,x+1,y+1,zt,x,y,mat,skip); B.sl=0; } }
+    if(lod===0){ for(let y=oy;y<oy+SIDE;y++)for(let x=ox;x<ox+SIDE;x++){ const i=y*N+x, n=slabN[i]; if(!n) continue;
+        for(let k=0;k<n;k++){ const zb=slabB[i*4+k], zt=slabT[i*4+k], sm=slabM[i*4+k];
+          const mat=sm?5+Math.min(13,sm-1):(W.smat[i]?5+Math.min(13,W.smat[i]):(colMat[i]>=5?colMat[i]:5+Math.min(13,W.ruin[i])));
+          let skip=0; const cov=function(j){ for(let q=0;q<slabN[j];q++){ if(slabB[j*4+q]<=zb&&slabT[j*4+q]>=zt) return true; } return colTop[j]>=zt; };   // a side hidden by the neighbour's span or its solid stone
+          if(cov(i+1)) skip|=2; if(cov(i-1)) skip|=4; if(cov(i+N)) skip|=8; if(cov(i-N)) skip|=16;
+          B.sl=1; box(B,x,y,zb,x+1,y+1,zt,x,y,mat,skip); B.sl=0; } } }
     if(lod<=3){ for(let y=oy;y<oy+SIDE;y++)for(let x=ox;x<ox+SIDE;x++) voxTree(B,x,y,lod===0); }
     const vb=gl.createBuffer(), ib=gl.createBuffer(), vao=gl.createVertexArray();
     gl.bindVertexArray(vao);
@@ -321,7 +329,7 @@ function create(A){
   function freeChunks(){ for(let k=0;k<chunks.length;k++){ const c=chunks[k]; if(c){ gl.deleteBuffer(c.vb); gl.deleteBuffer(c.ib); gl.deleteVertexArray(c.vao); chunks[k]=null; } } stats.verts=0; stats.chunks=0; }
   function chunkBounds(){ for(let cy=0;cy<CH;cy++)for(let cx=0;cx<CH;cx++){ let lo=1e9,hi=-1e9;
       for(let y=cy*SIDE;y<cy*SIDE+SIDE;y++)for(let x=cx*SIDE;x<cx*SIDE+SIDE;x++){ const i=y*N+x; const g=colTop[i]; if(g<lo)lo=g;
-        const v=Math.max(g,slabT[i])+(W.tree[i]>0?W.tree[i]+2:0); if(v>hi)hi=v; }
+        const v=Math.max(g,slabHi[i])+(W.tree[i]>0?W.tree[i]+2:0); if(v>hi)hi=v; }
       chunkMin[cy*CH+cx]=Math.min(lo-64,A.WATER); chunkMax[cy*CH+cx]=hi+2; } }
   // material colors for the keep and ruin stone, the same table the raycaster uses
   const matF=new Float32Array(42), matT=new Float32Array(42), matCH=new Float32Array(14);
@@ -531,5 +539,5 @@ function create(A){
   try{ rebuild(); resize(); R.ok=true; }catch(e){ R.error=String(e&&e.message||e).slice(0,300); canvas.remove(); }
   return R;
 }
-window.KeepVoxel={ create:create, version:'v0.21.0' };
+window.KeepVoxel={ create:create, version:'v0.51.0' };
 })();

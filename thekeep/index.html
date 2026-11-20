@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="keep-version" content="v0.50.0">
+<meta name="keep-version" content="v0.51.0">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#000">
 <title>The Keep</title>
@@ -222,7 +222,7 @@ html.fromshelf #inPage #inViews{padding-top:calc(58px + env(safe-area-inset-top)
  </div>
  <div id="stick"><div id="knob"></div></div>
  <div id="fps"></div>
- <button class="mb-ver" id="mbVer" type="button">v0.50.0 &middot; Nov 19</button>
+ <button class="mb-ver" id="mbVer" type="button">v0.51.0 &middot; Nov 19</button>
  <div id="toast"></div>
  <div id="updNudge" hidden role="status"><span>A new version of The Keep is here (<b id="updVer"></b>).<span id="updMsg" style="display:block;font-weight:400"></span></span><button class="btn go" id="updGo" type="button">refresh</button><button class="btn" id="updNo" type="button">later</button></div>
  <div id="bkNudge" hidden role="status"><span>Big moment. Back up your progress?</span><button class="btn go" id="bkNudgeGo" type="button">back up</button><button class="btn" id="bkNudgeNo" type="button">later</button></div>
@@ -1337,9 +1337,10 @@ var SHELF={on:false,url:'https://motbuchanan.com/gameshelf/'};
   SHELF.place=place;
 })();
 
-const VERSION='The Keep v0.50.0 · Nov 19 2026';
-const VER_SHORT='v0.50.0 · Nov 19'; // what the badge shows; bump with VERSION
+const VERSION='The Keep v0.51.0 · Nov 19 2026';
+const VER_SHORT='v0.51.0 · Nov 19'; // what the badge shows; bump with VERSION
 const CHANGELOG=[
+ ['v0.51.0 · Nov 19 2026','The coast. About one valley in six now meets the sea on one side, the side no road takes, so the roads stay dry. The land comes down to sandy beaches in some places and stops at rocky cliffs in others, and past the shore the sea runs on to the horizon in every way of drawing, with the sun going down into it. Swim out far enough and the water gets heavy and someone tells you the sea runs on further than anyone can swim. You come on it the way you come on anything: from a road near the shore you see it at once, from the far side you find it.'],
  ['v0.50.0 · Nov 19 2026','People in three dimensions. In Mesh and Deep everyone is now a figure built from rounded blocks: shoulders, elbows, hands, a face with eyes, brows, nose and ears, and their own hair, beard, hat, helmet, hood, kerchief, coat, apron, sash and tool, all taken from the same look as their pixel sprite. They walk with their arms and legs swinging, look out with a hand to the brow, lean on a staff, knock, chop, hoe, fish, and sit down to sleep. The sun and the shade fall on them, their lanterns glow after dark, and a soft shadow sits under their feet. Far off, and in the other ways of drawing, they are the pixel people as before.'],
  ['v0.49.0 · Nov 18 2026','What the Lake Keeps: a new story. Once you have been down to a wreck or met a harbormaster, the gatekeeper at home asks about a brother or sister lost on a ship years ago. Ask at a port, swim to the wreck, find the dry room under the lake, and go home. Every harbor now has a trouble of its own: a ring off the stern, a pier lamp gone dry, or a torn red sail. Ten new pieces of lore about lost ships and the people who built the drowned halls. Every lake now gets its harbor. The compass now finds the way through valleys in between, and points at places as well as people.'],
  ['v0.48.2 · Nov 18 2026','The inn has a cellar. Steps go down beside the back stair, under the floor, into a stone room three metres down with the barrels, a rack of casks and a lamp that stays lit. The taproom floor over it holds, tables and all, and the innkeeper has a word or two about it.'],
@@ -1867,6 +1868,25 @@ const LAKE={x:300,y:280,r:40};
 // lake country (v0.46): a share of the wettest valleys grow one big deep lake to the southeast, with a port and a ship.
 // Its own stream, so no other dial moves; valleys outside the share keep their land exactly as before.
 function lakeCountry(seed,water){ return water>1.25&&seedRng(seed>>>0,0x1A4E)()<0.6; }
+// coast country (v0.51.0): about one valley in six that isn't lake country meets the sea on one side. The sea side is the
+// middle of the widest gap between the valley's roads, and only where every road stays well clear of it, so no road runs
+// into the water. dir: the unit vector toward the sea; s0: how far out the shore runs (0 the middle of the map, 1 the edge)
+function coastOf(seed,water){ seed=seed>>>0; if(lakeCountry(seed,water)) return null; const r=seedRng(seed,0xC0A5); if(r()>=0.21) return null;
+  const ex=exitAngles(seed).slice().sort(function(a,b){ return a-b; }); let best=0, at=r()*Math.PI*2;
+  if(ex.length){ for(let i=0;i<ex.length;i++){ const a0=ex[i], a1=i+1<ex.length?ex[i+1]:ex[0]+Math.PI*2, g=a1-a0; if(g>best){ best=g; at=a0+g/2; } } }
+  for(const q of ex){ if(Math.abs(Math.atan2(Math.sin(q-at),Math.cos(q-at)))<1.15) return null; }
+  const C={dir:[Math.cos(at),Math.sin(at)], a:at, s0:0.40+0.10*r()};
+  const kd=coastD(FORT.x,FORT.y,C,null); if(kd>-0.52) C.s0+=kd+0.52;   // the shore stays a good walk from the keep
+  return C.s0>0.9?null:C; }
+// how far into the sea a point is (negative on land), in map halves; also works off the map, for the sea past the edge
+function coastD(x,y,C,seed){ const px=(x/N-0.5)*2, py=(y/N-0.5)*2, s=px*C.dir[0]+py*C.dir[1], t=-px*C.dir[1]+py*C.dir[0];
+  const wob=seed==null?0:0.06*(fbm(x*0.012,y*0.012,seed+91,3)-0.5)*2;
+  return s-0.35*t*t-(C.s0+wob); }
+// near the map's edge, heading out: how much of the step is left (the outward share of it slows to a stop at 3 m)
+function edgeEase(mvx,mvy){ const ed=Math.min(P.x,P.y,N-1-P.x,N-1-P.y); if(ed>=26) return 1; const l=Math.hypot(mvx,mvy); if(l<1e-6) return 1;
+  const ox=P.x<26?-1:(P.x>N-27?1:0), oy=P.y<26?-1:(P.y>N-27?1:0), out=Math.max(0,(mvx*ox+mvy*oy)/(l*Math.hypot(ox,oy)||1));
+  return 1-out*(1-clamp((ed-3)/23,0,1)); }
+function seaAt(x,y){ const C=W.coast; return !!C&&coastD(x,y,C,null)>0.02; }
 const W={
   h:new Float32Array(N*N), st:new Float32Array(N*N), tree:new Float32Array(N*N), gh:new Float32Array(N*N),
   cr:new Uint8Array(N*N), cg:new Uint8Array(N*N), cb:new Uint8Array(N*N),
@@ -1881,8 +1901,8 @@ function genWorld(seed){
   PED.cyc=null; PED.gone=null; PED.phase=''; PED.route=null; PED.lastTod=null; PED.ways=null; PED.shelter=undefined; ROADS.sign=-1;
   { const vn=valleyNames(seed); W.valley=vn.valley; W.farmNames=[vn.farm1,vn.farm2]; }
   W.cast=castWithHome(seed); W.castSig=seed+':'+W.cast.map(function(c){ return c.name; }).join(','); rebuildPeople();
-  W.arriveMsg='You arrive in '+W.valley+'.'; W.loreMsg=''; W.keepSay=''; W.banditsOut=false;
-  W.waterKind=lakeCountry(seed,DIALS.water)?'lake':'pond';
+  W.arriveMsg='You arrive in '+W.valley+'.'; W.loreMsg=''; W.keepSay=''; W.banditsOut=false; W.seaSaid=false;
+  W.coast=coastOf(seed,DIALS.water); W.waterKind=lakeCountry(seed,DIALS.water)?'lake':(W.coast?'coast':'pond');
   if(W.waterKind==='lake'){ LAKE.x=335; LAKE.y=335; LAKE.r=52; } else { LAKE.x=300; LAKE.y=280; LAKE.r=40; }
   const h=W.h, st=W.st, tree=W.tree;
   if(!W.air||W.air.length!==N*N) W.air=new Float32Array(N*N); W.air.fill(0); W.lamps=[];
@@ -1896,11 +1916,17 @@ function genWorld(seed){
     const lakeR=LAKE.r*(0.55+0.70*DIALS.water);
     const dl=Math.hypot(x-LAKE.x,y-LAKE.y)*(0.85+0.3*fbm(x*0.03,y*0.03,seed+11,2));
     v-=(W.waterKind==='lake'?10+14*DIALS.water:8+12*DIALS.water)*(1-sm(lakeR*0.5,lakeR+6,dl));
+    if(W.coast&&coastD(x,y,W.coast,null)>-0.2){ const d=coastD(x,y,W.coast,seed), cl=sm(0.55,0.7,fbm(x*0.01,y*0.01,seed+93,3));   // cl: 1 on a headland (cliffs)
+      const bf=sm(-0.12,0,d)*(1-cl)*(1-sm(0.82,0.95,r)); if(v>WATER+0.7) v-=(v-(WATER+0.7))*bf;   // land eases to a beach (rising back into the rim hills at the map's edge)                       // land eases down to a beach
+      const cf=sm(0,0.035+(0.006-0.035)*cl,d), sea=WATER-1.2-3*sm(0,0.08,d)-18*sm(0.08,0.35,d);   // then the shelf, then deep water
+      v+=(sea-v)*cf; }
     h[y*N+x]=v;
   }
   const rvLen=0.45+0.70*DIALS.water;
   carveRiver(LAKE.x-LAKE.r+6,LAKE.y,-1,0,Math.round(360*rvLen),seed+41);
-  carveRiver(LAKE.x,LAKE.y+LAKE.r-6,0,1,Math.round(300*rvLen),seed+43);
+  { let rx=0, ry=1;   // on a coast the second river runs out to sea, if its way there stays clear of the keep
+    if(W.coast){ const dx=W.coast.dir[0], dy=W.coast.dir[1]; let clear=true; for(let k=0;k<340;k+=4){ const qx=LAKE.x+dx*k, qy=LAKE.y+dy*k; if(Math.max(Math.abs(qx-FORT.x),Math.abs(qy-FORT.y))<80){ clear=false; break; } } if(clear){ rx=dx; ry=dy; } }
+    carveRiver(LAKE.x+rx*(LAKE.r-6),LAKE.y+ry*(LAKE.r-6),rx,ry,Math.round((W.coast&&rx!==0?380:300)*rvLen),seed+43); }
   // fort plateau + walls
   {
     let sum=0,cnt=0;
@@ -2053,6 +2079,7 @@ function carveRiver(x0,y0,dx0,dy0,len,s2){
     x+=Math.cos(ang); y+=Math.sin(ang);
     if(x<8||y<8||x>N-9||y>N-9) break;
     if(Math.max(Math.abs(x-FORT.x),Math.abs(y-FORT.y))<76) break;
+    if(W.coast&&seaAt(x,y)&&terr(x,y)<WATER-1.5) break;   // it has reached the sea
     const xi=Math.round(x), yi=Math.round(y);
     for(let oy=-7;oy<=7;oy++)for(let ox=-7;ox<=7;ox++){
       const d=Math.hypot(ox,oy); if(d>7) continue;
@@ -2815,6 +2842,7 @@ function carvePath(x0,y0,x1,y1,sd,wd){
     const ang=Math.atan2(dy,dx)+(fbm(steps*0.05,sd*0.001,sd,2)-0.5)*0.6;
     x+=Math.cos(ang); y+=Math.sin(ang);
     if(x<5||y<5||x>N-6||y>N-6) break;
+    if(W.coast&&terr(x,y)<WATER+0.3&&seaAt(x,y)) break;   // a trail stops at the sea
     const xi=Math.round(x), yi=Math.round(y);
     for(let oy=-2;oy<=2;oy++)for(let ox=-2;ox<=2;ox++){ const dd=Math.hypot(ox,oy); if(dd>wd+0.4)continue;
       const j=(yi+oy)*N+xi+ox; if(j<0||j>=N*N)continue; if(KEEPT.has(j)) continue; W.path[j]=1; W.tree[j]=0; }
@@ -3390,6 +3418,12 @@ function renderFrame(px,py,pz,yaw,pitch){
       if(slabTop>0){ prevSt=slabTop; prevValid=false; }   // seen from above, the layer's top continues into the next cell's top
       if(ybuf===0) break;
     }
+    // the sea past the map's edge (v0.51.0): a ray that runs out over open sea sees water all the way to the horizon
+    if(!uw&&W.coast&&pz>WATER&&ybuf>horizon+1){ const tx=t>MAXT?MAXT:t, qx=px+dx*tx, qy=py+dy*tx;
+      if(seaAt(qx,qy)||seaAt(qx+dx*12,qy+dy*12)){ const lo=Math.max(0,Math.floor(horizon)+1);
+        for(let r=ybuf-1;r>=lo;r--){ if(flag[r]) continue; const tr=(pz-WATER)*K/(r-horizon); if(tr<tx*0.97) continue;
+          wflag[r]=1; wdepth[r]=20; wt[r]=tr<MAXT-1?tr:MAXT-1; wCount++; if(r<wMin)wMin=r; if(r>wMax)wMax=r; }
+        if(lo<ybuf) ybuf=lo; } }
     while(planeI<planeHits.length){
       const planeHit=planeHits[planeI++];
       const tw=planeHit.t;
@@ -7822,7 +7856,9 @@ function updatePlayer(dt){
   const WL=waterLine(P.x,P.y,P.z);
   if(bottom<WL-0.4){
     // ---- swim / wade: look down + move to dive, up to rise, level on the bed to walk it ----
-    const sp=5.4*run*dt; const mvx=fx*mf-fy*ms, mvy=fy*mf+fx*ms;
+    let sp=5.4*run*dt; const mvx=fx*mf-fy*ms, mvy=fy*mf+fx*ms;
+    // the open sea past the edge: the last stretch before the map ends gets heavier, and you're told once (v0.51.0)
+    if(W.coast&&seaAt(P.x,P.y)){ const m=edgeEase(mvx,mvy); sp*=m; if(m<0.6&&!W.seaSaid&&Math.min(P.x,P.y,N-1-P.x,N-1-P.y)<14){ W.seaSaid=true; if(NAV.toast) NAV.toast('The sea runs on further than anyone can swim. The shore is behind you.'); } }
     let nx=clamp(P.x+mvx*sp,2,N-3), ny=clamp(P.y+mvy*sp,2,N-3);
     // built things (hulls, wrecks, temple walls) and rocks on the bed block a swimmer's body; banks and the bed itself never do
     const atTop=P.z>waterLine(P.x,P.y,P.z)+0.55;   // head out at a surface: only the body above the water can bump, so you can climb out onto a ledge
@@ -7901,7 +7937,8 @@ function updatePlayer(dt){
     if((IN.jump||k.Space)&&P.jz<=0.001&&!P.jumpHeld&&bottom>WL-0.2&&CHAT.id<0){ P.jv=6.6; P.jumpHeld=true; }
     if(!(IN.jump||k.Space)) P.jumpHeld=false; IN.jump=false;
     const lift=P.jz;
-    const nx=P.x+mvx*sp, ny=P.y+mvy*sp;
+    const em=W.coast?edgeEase(mvx,mvy):1;   // a beach that runs to the map's edge eases you to a stop, as the hills do
+    const nx=P.x+mvx*sp*em, ny=P.y+mvy*sp*em;
     const zf=P.gz, F=function(x,y){ return floorAt(x,y,zf+lift); };
     const g0=Math.max(F(P.x,P.y),WL-0.6);
     const bvx=mvx, bvy=mvy, bl=Math.hypot(bvx,bvy)||1;
@@ -8273,7 +8310,7 @@ function boot(){
   const glApi={ N:N, W:W, WATER:WATER, CLOUDH:CLOUDH, DAY:DAY, SUN:SUN, MOON:MOON, SKY:SKY, RS:RS, RMAT:RMAT, CR_:CR_, SP:SP, SPP:SPP,
     MASKS:MASKS, KMASK:KMASK, P:P, IN:IN, DIALS:DIALS, DECO:KDECO, DECO_IMG:DECO_IMG, FORT:FORT, KEEP:KEEP, RELIGHT:RELIGHT, hash2:hash2, growOf:growOf, keeperPoseFrame:keeperPoseFrame, person3D:person3D, person3DPose:person3DPose, P3PIV:P3PIV, AM2:AM2, ANI:ANI, animalFrame:animalFrame, isAdult:isAdult, spanHulls:spanHulls, spanK:SPANS, terr:terr,
     fog:function(){ return [FOG_R,FOG_G,FOG_B]; }, uw:function(){ return UW; }, skyTime:function(){ return skyTime; } };
-  if(/[?&]test=1/.test(location.search)) window.__keepTest={P:P,FORT:FORT,DAY:DAY,DIALS:DIALS,sunUpdate:sunUpdate,floorAt:floorAt,terr:terr,genWorld:genWorld,populate:populate,spawn:spawn,EYE:EYE,applyWorld:applyWorld,seedDials:seedDials,NAV:NAV,CR_:CR_,SP:SP,W:W,fPlace:fPlace,chooseRender:function(i){ chooseRender(i); }};   // headless render checks only
+  if(/[?&]test=1/.test(location.search)) window.__keepTest={P:P,FORT:FORT,DAY:DAY,DIALS:DIALS,sunUpdate:sunUpdate,floorAt:floorAt,terr:terr,genWorld:genWorld,populate:populate,spawn:spawn,EYE:EYE,applyWorld:applyWorld,seedDials:seedDials,NAV:NAV,CR_:CR_,SP:SP,W:W,fPlace:fPlace,seaAt:seaAt,WATER:WATER,chooseRender:function(i){ chooseRender(i); }};   // headless render checks only
   const glSlot=function(id){ return GLR[id]||(GLR[id]={r:null,loading:false,lost:0,t0:0}); };
   function glDrop(id){ const g=GLR[id]; if(!g||!g.r) return; g.r.onLost=null; try{ g.r.destroy(); }catch(e){} g.r=null; }
   function glFail(m,why){
@@ -8500,7 +8537,7 @@ function boot(){
 
 if(IS_NODE){ module.exports={genWorld,allocGrid,buildGlyphs,renderFrame,compose,spawn,populate,tick,ecology,simBin,updatePlayer,W,RS,FB,P,IN,CR_,SP,SPP,MASKS,RESERVE,RAMP,N,WATER,EYE,terr,groundAt,DIALS,growOf,isAdult,addCreature,WALLS,buildWalls,nearestWall,allWallHits,wallBlocked,setSkyTime:function(t){skyTime=t;},setUW:function(v){UW=v;},DAY,SUN,MOON,SKY,DAYMODES,sunAltAz,sunUpdate,updateDay,relightAll,relightStep,RELIGHT,dayDate,fmtTod,setTod:function(h){DAY.tod=h;sunUpdate();},floorAt,KPATHS,KEEP,FORT,eventsForDay,weddingDay,babyDay,valleyDay,logEvent,eventsRefresh,dayTick,restock,stockTakeable,stockOwner,evBind,evWhen,evKey,seedDials,valleyTraits,chooseSeed,applyWorld,worldOf,TRAITS37,WORLD_KEYS,getPlayerLand:function(){ return PLAYER_LAND; },seedParse,babyFor,pedWays,pedShelter,carveRoads,exitAngles,roadCheck,roadStay,travelTo,spawnAtExit,VISITED,ROADS,PED,pedTick,pedDay,pedFind,pedRouteIn,pedPitch,pedWay,TALKP,ROAD_DIALS,ROLEPED,stormLevel,stormWindows,stormOngoing,underCover,stormLight,TALKS,STORMC,evBase,keeperAbed,FISHSIZE,TALKE,EVTAG,EVKINDS,wedNow,relOf,TALK,TALKX,LINES,POSEWHO,talkPick,talk,chatMore,closeChat,chatTick,CHAT,HEARD,VISITS,heardKey,heardAdd,lineOk,whoOk,placeName,placeDir,setChat:function(h){chatHook=h;},castValley,valleyName,valleyNames,seedRng,rebuildPeople,KEEPERS,GREETN,lineOk,fillLine,peopleHere,ALLHERE,ROLEKEY,ROLES,NAMES_F,NAMES_M,NAMES_X,BYNAMES,CLOTHES,SKINS,HAIRS,TRAITS,TRAIT_CLASH,RELREV,dayPart,folkMissing,tickKeeper,KMASK,KL,keeperFrame,GREETT,setGreet:function(f){greetHook=f;},RENDERS,SPANS,spanTop,spanBot,ceilOver,solidAt,pushToOpen,addSpan,YARD,stampKeepMass,keepLook,getKLOOK:function(){ return KLOOK; },CBIN,AM2,AMASK};
   Object.assign(module.exports,{navWho,navTargets,navGoal,NAV,journalNotes,fPlace,buildHouse,UPF,FOLK_BUILD,FARM_BED,SHIP,lakeCountry,LAKE,talkPick,townId,waterLine,spanSolid,levelBed,setGreet:function(f){ greetHook=f; },ruinCheck,UWnow:function(){ return UW; },landRuin,});
-  Object.assign(module.exports,{SOUND,soundScene,soundFloor,soundPan,soundTick,soundToast,soundOn,soundOff,soundWanted,SOUNDS,banditsLeave,mendRoad,ringBusy,setGreet:function(f){ greetHook=f; },keepLook,keepWord,KLOOK_:function(){ return KLOOK; },keepDress,keepFires,banditsHere,banditCast,chiefId,beatMend,beatMoths,beatBandit,mothCheck,hallNow,keepTag,TALKK3,keepNotes,LORE5,BANDIT_PATH,SONGLORE,songWho,RING_N,RING,ringBusy,ringSpot,ringPlan,ringRead,exitAngles,ringCheck,beatRing,ringTag,ringNotes,TALKR,LORE4,ringNight,roleName,festAway,festList,nearRoad,sentHere,GREETN,TROUBLES2,beatRoof,beatRoofW,beatAxe,beatBet,beatCake,beatSong,beatFest,trouble2Tag,trouble2Notes,festNotes,festGuests,festEnd,festTag,helpedAway,FEST,TALKT2,TALKF,LORE3,SONG,SONGLORE,songWho,farFor,roadPath,beatCrown,beatFriend,person3D,person3DPose,buildPerson3D,beatLake,lakeCheck,lakeNotes,lakeSeen,lakeTag,lakeOf,beatPort,portCheck,portNotes,portKind,portRingAt,portLampAt,navRoute,navRouteC,LAKESHIPS,TALKW,CROWN,crownTag,friendTag,TALKC,LORE2,FRIENDWHAT,PAUSED,chatPause,chatResume,nearPerson,talkTo,REP,TITLES,NICKS,earned,deedName,calledBy,legendName,didHere,legendFor,legendTold,LORE,loreFor,loreTake,loreCountHere,TALKK,leftFacts,leftPath,leftEnsure,leftThreads,leftHere,leftOf,hasAsker,leftKey,LREASONS,TALKL,fillBeat,troublesFor,trGet,trTag,stoneFacts,lightCheck,LIGHTS,TALKT,arriveExit,SNOOZE,part,fixPart,neighborSeed,roadDest,roadLink,visitNote,metNote,valleyCount,storyBeat,journalNotes,chatPick,ERRANDS,errandTarget,letterFacts,CHATX:CHAT,cleanName,nameHash,randomName,homeSeed,isHome,inHome,youName,journalLoad,journalSave,journalBlank,storyNew,storyResume,storyAt,parentsFor,castWithHome,addParents,TALKH,PARENT_IDS,addKeeper,
+  Object.assign(module.exports,{SOUND,soundScene,soundFloor,soundPan,soundTick,soundToast,soundOn,soundOff,soundWanted,SOUNDS,banditsLeave,mendRoad,ringBusy,setGreet:function(f){ greetHook=f; },keepLook,keepWord,KLOOK_:function(){ return KLOOK; },keepDress,keepFires,banditsHere,banditCast,chiefId,beatMend,beatMoths,beatBandit,mothCheck,hallNow,keepTag,TALKK3,keepNotes,LORE5,BANDIT_PATH,SONGLORE,songWho,RING_N,RING,ringBusy,ringSpot,ringPlan,ringRead,exitAngles,ringCheck,beatRing,ringTag,ringNotes,TALKR,LORE4,ringNight,roleName,festAway,festList,nearRoad,sentHere,GREETN,TROUBLES2,beatRoof,beatRoofW,beatAxe,beatBet,beatCake,beatSong,beatFest,trouble2Tag,trouble2Notes,festNotes,festGuests,festEnd,festTag,helpedAway,FEST,TALKT2,TALKF,LORE3,SONG,SONGLORE,songWho,farFor,roadPath,beatCrown,beatFriend,coastOf,coastD,seaAt,person3D,person3DPose,buildPerson3D,beatLake,lakeCheck,lakeNotes,lakeSeen,lakeTag,lakeOf,beatPort,portCheck,portNotes,portKind,portRingAt,portLampAt,navRoute,navRouteC,LAKESHIPS,TALKW,CROWN,crownTag,friendTag,TALKC,LORE2,FRIENDWHAT,PAUSED,chatPause,chatResume,nearPerson,talkTo,REP,TITLES,NICKS,earned,deedName,calledBy,legendName,didHere,legendFor,legendTold,LORE,loreFor,loreTake,loreCountHere,TALKK,leftFacts,leftPath,leftEnsure,leftThreads,leftHere,leftOf,hasAsker,leftKey,LREASONS,TALKL,fillBeat,troublesFor,trGet,trTag,stoneFacts,lightCheck,LIGHTS,TALKT,arriveExit,SNOOZE,part,fixPart,neighborSeed,roadDest,roadLink,visitNote,metNote,valleyCount,storyBeat,journalNotes,chatPick,ERRANDS,errandTarget,letterFacts,CHATX:CHAT,cleanName,nameHash,randomName,homeSeed,isHome,inHome,youName,journalLoad,journalSave,journalBlank,storyNew,storyResume,storyAt,parentsFor,castWithHome,addParents,TALKH,PARENT_IDS,addKeeper,
     setMode:function(m,st){ MODE=m; STORY=st; },getStory:function(){ return STORY; },getMode:function(){ return MODE; },setJournal:function(j){ JOURNAL=j; },getJournal:function(){ return JOURNAL; },journalOff:function(){ return JOURNAL_OFF; }}); }
 else boot();
 })();
