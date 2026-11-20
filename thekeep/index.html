@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="keep-version" content="v0.51.1">
+<meta name="keep-version" content="v0.51.2">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#000">
 <title>The Keep</title>
@@ -50,6 +50,21 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var
 .card .fsize{background:var(--mb-glass);border:1px solid var(--mb-line);border-radius:13px;padding:8px 10px;font-size:13px;color:var(--mb-soft);margin:10px 0}
 .card .fsize b{color:var(--mb-teal);font-family:var(--mb-mono)}
 .card{background:rgba(16,21,28,.92);border:1px solid var(--mb-line);border-radius:16px;padding:18px 20px;max-width:340px;font-size:14px;line-height:1.5;max-height:min(86vh,720px);overflow:auto;color:var(--mb-ink)}
+.msel{display:block;width:100%;min-height:44px;margin-top:6px;font:700 14px var(--mb-ui);color:var(--mb-ink);background:var(--mb-glass);border:1px solid var(--mb-line);border-radius:13px;padding:0 12px}
+.msel option{background:#10151c;color:#e8edf2}
+.msel-s{width:auto;flex:0 1 auto;max-width:60%;margin-top:0;font-size:13px}
+.trow{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:6px;flex-wrap:wrap}
+#mTodV{font:600 20px var(--mb-mono);color:var(--mb-ink)}
+.ttrack{position:relative;padding-bottom:18px;margin-top:4px}
+#mTod{-webkit-appearance:none;appearance:none;width:100%;height:40px;margin:0;background:transparent;--trk:#334}
+#mTod::-webkit-slider-runnable-track{height:16px;border-radius:8px;background:var(--trk);border:1px solid var(--mb-line)}
+#mTod::-moz-range-track{height:16px;border-radius:8px;background:var(--trk);border:1px solid var(--mb-line)}
+#mTod::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;margin-top:-6px;border-radius:50%;background:#f4f1e6;border:3px solid #10151c;box-shadow:0 0 0 1px var(--mb-line)}
+#mTod::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#f4f1e6;border:3px solid #10151c}
+.tmarks{position:absolute;left:13px;right:13px;bottom:0;height:16px;pointer-events:none;font:500 11px var(--mb-mono);color:var(--mb-dim)}
+.tmarks span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.mgrid .btn{padding:10px 6px;min-height:44px;font-size:13px;min-width:0}
+#menu.peek{background:transparent!important}#menu.peek .card{background:rgba(16,21,28,.12);border-color:transparent}#menu.peek .card>*:not(#mTime){opacity:.12!important}
 .dial-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:6px 0;font-size:13px}
 .dial-row label{flex:1;display:flex;align-items:center;gap:8px;min-height:40px}
 .dial-row input[type=range]{flex:1 1 140px;min-width:140px;height:40px}
@@ -222,7 +237,7 @@ html.fromshelf #inPage #inViews{padding-top:calc(58px + env(safe-area-inset-top)
  </div>
  <div id="stick"><div id="knob"></div></div>
  <div id="fps"></div>
- <button class="mb-ver" id="mbVer" type="button">v0.51.1 &middot; Nov 20</button>
+ <button class="mb-ver" id="mbVer" type="button">v0.51.2 &middot; Nov 20</button>
  <div id="toast"></div>
  <div id="updNudge" hidden role="status"><span>A new version of The Keep is here (<b id="updVer"></b>).<span id="updMsg" style="display:block;font-weight:400"></span></span><button class="btn go" id="updGo" type="button">refresh</button><button class="btn" id="updNo" type="button">later</button></div>
  <div id="bkNudge" hidden role="status"><span>Big moment. Back up your progress?</span><button class="btn go" id="bkNudgeGo" type="button">back up</button><button class="btn" id="bkNudgeNo" type="button">later</button></div>
@@ -277,18 +292,18 @@ html.fromshelf #inPage #inViews{padding-top:calc(58px + env(safe-area-inset-top)
  <div id="menu" class="hidden" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);pointer-events:auto"><div class="card">
   <h1>Menu</h1>
   <button class="btn go" id="mSeed">new world</button>
-  <div class="dial-sec" style="margin-top:14px">DRAW THE WORLD AS</div>
-  <div id="mRender" class="seg"></div>
+  <div class="dial-sec" style="margin-top:14px">VIEW</div>
+  <select id="mRender" class="msel" aria-label="How to draw the world"></select>
   <p id="mRenderNote" style="margin:6px 0 2px;font-size:12px;opacity:.75"></p>
-  <div class="dial-sec" style="margin-top:14px">THE SKY</div>
-  <div id="mSky" class="seg"></div>
-  <p id="mSkyNote" style="margin:6px 0 2px;font-size:12px;opacity:.75"></p>
-  <button class="btn" id="mBackup" style="width:100%;margin-top:8px">backup your progress</button>
+  <div class="dial-sec" style="margin-top:14px">TIME</div>
+  <div id="mTime">
+   <div class="trow"><span id="mTodV"></span><select id="mDay" class="msel msel-s" aria-label="Length of a day"></select></div>
+   <div class="ttrack"><input id="mTod" type="range" min="0" max="23.95" step="0.05" aria-label="Time of day"><div id="mTodMarks" class="tmarks"></div></div>
+   <p id="mSkyNote" style="margin:4px 0 2px;font-size:12px;opacity:.75"></p>
+  </div>
+  <button class="btn" id="mBackup" style="width:100%;margin-top:10px">backup your progress</button>
   <button class="btn" id="mDials" style="width:100%;margin-top:8px">dials</button>
-  <button class="btn" id="mAbout" style="width:100%;margin-top:8px">about this build</button>
-  <button class="btn" id="mLog" style="width:100%;margin-top:8px">changelog</button>
-  <button class="btn" id="mHelp" style="width:100%;margin-top:8px">how to play</button>
-  <button class="btn" id="mIntro" style="width:100%;margin-top:8px">replay the intro</button>
+  <div class="mgrid"><button class="btn" id="mHelp">how to play</button><button class="btn" id="mLog">changelog</button><button class="btn" id="mAbout">about this build</button><button class="btn" id="mIntro">replay the intro</button></div>
   <button class="btn" id="mClose" style="width:100%;margin-top:10px">close</button>
  </div></div>
  <div id="leave" class="hidden" style="position:absolute;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.55);pointer-events:auto"><div class="card" id="leaveCard"></div></div>
@@ -1340,9 +1355,10 @@ var SHELF={on:false,url:'https://motbuchanan.com/gameshelf/'};
   SHELF.place=place;
 })();
 
-const VERSION='The Keep v0.51.1 · Nov 20 2026';
-const VER_SHORT='v0.51.1 · Nov 20'; // what the badge shows; bump with VERSION
+const VERSION='The Keep v0.51.2 · Nov 20 2026';
+const VER_SHORT='v0.51.2 · Nov 20'; // what the badge shows; bump with VERSION
 const CHANGELOG=[
+ ['v0.51.2 · Nov 20 2026','A tidier menu. VIEW is one picker for the seven ways to draw the world. TIME is one slider for the hour, its track painted with today\'s real sky from night through dawn, day and dusk, with sunrise and sunset marked, plus a picker for how long a day lasts (paused, 3, 8 or 20 minutes, or the Akron clock). While you drag the slider the menu clears so you can watch the sky change. Sliding off the Akron clock gives a 20 minute day. The sky dials left the dials card, since they live in the menu now. The four smaller buttons sit two to a row. The moon now shows only once the sun is down, so at sunset the full moon rising opposite no longer looks like a second sun coming up.'],
  ['v0.51.1 · Nov 20 2026','The sky in the menu: tap dawn, noon, sunset or night to see the valley then, in any mode, or my clock to put the sky back on Akron time. The times come from the real sun for the day, so sunset is when the sun is touching the sea. Past the edge of a coast valley the sea now runs on beside the headlands too, so there is no line where the map ends. Birds no longer hang in the air flapping when they rest: they fly right in and sit still in a tree, on the ground, or on the water by the shore, and a bird far out over the sea flies back to land to rest.'],
  ['v0.51.0 · Nov 19 2026','The coast. About one valley in six now meets the sea on one side, the side no road takes, so the roads stay dry. The land comes down to sandy beaches in some places and stops at rocky cliffs in others, and past the shore the sea runs on to the horizon in every way of drawing, with the sun going down into it. Swim out far enough and the water gets heavy and someone tells you the sea runs on further than anyone can swim. You come on it the way you come on anything: from a road near the shore you see it at once, from the far side you find it.'],
  ['v0.50.0 · Nov 19 2026','People in three dimensions. In Mesh and Deep everyone is now a figure built from rounded blocks: shoulders, elbows, hands, a face with eyes, brows, nose and ears, and their own hair, beard, hat, helmet, hood, kerchief, coat, apron, sash and tool, all taken from the same look as their pixel sprite. They walk with their arms and legs swinging, look out with a hand to the brow, lean on a staff, knock, chop, hoe, fish, and sit down to sleep. The sun and the shade fall on them, their lanterns glow after dark, and a soft shadow sits under their feet. Far off, and in the other ways of drawing, they are the pixel people as before.'],
@@ -2992,9 +3008,9 @@ function sky(dx,dy,sg,px,py,pz){
   if(SUN.z>-0.03){ const d=(dx*SUN.x+dy*SUN.y+sg*SUN.z)/len;
     if(d>0.9993) return (SKY.sr<<16)|((SKY.sg|0)<<8)|(SKY.sb|0);
     if(d>0.96){ const k=(d-0.96)/0.04, gl=k*k*(1+SKY.du); r+=70*gl; g+=(55-30*SKY.du)*gl; b+=(10-10*SKY.du)*gl; } }
-  if(MOON.z>-0.03 && nd>0){ const d=(dx*MOON.x+dy*MOON.y+sg*MOON.z)/len;
-    if(d>0.9991) return ((226*(0.5+0.5*nd))<<16)|(((228*(0.5+0.5*nd))|0)<<8)|((214*(0.5+0.5*nd))|0);
-    if(d>0.975){ const k=(d-0.975)/0.025*nd; r+=40*k*k; g+=44*k*k; b+=60*k*k; } }
+  if(MOON.z>-0.03 && nd>0.55){ const d=(dx*MOON.x+dy*MOON.y+sg*MOON.z)/len, mv=sm(0.55,0.85,nd);   // the moon shows once the sun is down
+    if(d>0.9991){ const br=0.55+0.45*nd, mr=r+(222*br-r)*mv, mg=g+(228*br-g)*mv, mb=b+(240*br-b)*mv; return (Math.min(255,mr|0)<<16)|(Math.min(255,mg|0)<<8)|Math.min(255,mb|0); }
+    if(d>0.975){ const k=(d-0.975)/0.025*nd*mv; r+=40*k*k; g+=44*k*k; b+=60*k*k; } }
   if(sg>0.03){
     const cl=SKY.cl, cR=SKY.cr*cl, cG=SKY.cg*cl, cB=SKY.cb*cl;
     const dist2=(CLOUDH+50-pz)/sg;
@@ -8042,7 +8058,7 @@ function boot(){
   $('mbVer').addEventListener('click',function(){ toast(VER_SHORT+' loaded · seed '+W.seed+' · '+RS.C+'x'+RS.R+(RS.letterbox?' · letterboxed':'')); });
   // one card at a time: every opener closes the rest first, so nothing paints dead behind another card
   const OVERLAYS=['help','about','menu','seed','log','dials','leave','journal','backup'];
-  let skyHud=null;   // set by openDials: refreshes the sky dials' clock while the card is open
+  let skyHud=null;   // set when the menu opens: keeps the Time section's clock in step with the running day
   var LEAVE=null;   // the road end the leave card is open for (cleared whenever cards close, so nothing holds you)
   function closeAll(){ LEAVE=null; for(let i=0;i<OVERLAYS.length;i++) $(OVERLAYS[i]).classList.add('hidden'); }
   // the dials remember both states across reloads (seed, species, predators, keep, landmarks, forest, water)
@@ -8180,23 +8196,11 @@ function boot(){
       '<div class="dial-row" style="opacity:.75;font-size:13px">Built when you grow the world. Whoever lives here knows their neighbours.</div>'+
       '<div class="dial-sec">CONTROLS</div>'+
       '<div class="dial-row"><label><input type="checkbox" id="dStick"'+(DIALS.stickTurn?' checked':'')+'> walk stick turns you (off: steps sideways)</label></div>'+
-      '<div class="dial-sec">SKY</div>'+
-      '<div class="dial-row"><label>time <b id="dTodV" style="font-family:var(--mb-mono);font-weight:600"></b></label><input id="dTod" type="range" min="0" max="23.75" step="0.25" value="'+(Math.round(DAY.tod*4)/4)+'"></div>'+
-      '<div class="dial-row"><label>day length <b id="dDayV" style="font-family:var(--mb-mono);font-weight:600"></b></label><input id="dDay" type="range" min="0" max="4" step="1" value="'+DIALS.dayMode+'"></div>'+
       '<button class="btn go" id="dGrow">grow this world</button>'+
       '<button class="btn" id="dLife" style="width:100%;margin-top:8px">restock life only</button>'+
       '<button class="btn" id="dClose" style="width:100%;margin-top:8px">cancel</button>';
     $('dials').classList.remove('hidden');
-    // the sky dials apply as you slide them (no regrow needed)
-    const DAYNAMES=['paused','3 min day','8 min day','20 min day','Akron clock'];
-    let held=false;
-    const showSky=function(){ $('dTodV').textContent=fmtTod(DAY.tod); $('dDayV').textContent=DAYNAMES[DAY.mode]||''; $('dTod').disabled=(DAYMODES[DAY.mode]<0); if(!held) $('dTod').value=Math.round(DAY.tod*4)/4; };
-    skyHud=showSky;   // frame() keeps the card's clock and slider in step with the running day
-    $('dTod').addEventListener('pointerdown',function(){ held=true; }); window.addEventListener('pointerup',function(){ held=false; }); window.addEventListener('pointercancel',function(){ held=false; });
-    $('dTod').addEventListener('input',function(){ const v=parseFloat($('dTod').value); if(isFinite(v)){ DAY.tod=v; DIALS.tod=v; W.lastTod=null; sunUpdate(); saveDials(); showSky(); } });
-    $('dDay').addEventListener('input',function(){ const v=parseInt($('dDay').value,10); if(v>=0&&v<DAYMODES.length){ DAY.mode=v; DIALS.dayMode=v; updateDay(0); $('dTod').value=Math.round(DAY.tod*4)/4; saveDials(); showSky(); } });
     $('dRuins').addEventListener('input',function(){ $('dRuinsV').textContent=RUIN_LEVELS[parseInt($('dRuins').value,10)|0]||''; });
-    showSky();
     $('dStick').addEventListener('change',function(){ DIALS.stickTurn=$('dStick').checked?1:0; saveDials(); });   // applies at once
     $('dGrow').addEventListener('click',function(){ readDialsFromCard(); genWorld(DIALS.seed); populate(DIALS.seed); spawn(); $('dials').classList.add('hidden');
       const miss=folkMissing(); if(miss.length) W.arriveMsg+=' No room here for '+miss.join(' or ')+'.'; });
@@ -8316,7 +8320,7 @@ function boot(){
   document.addEventListener('visibilitychange',function(){ if(document.visibilityState==='visible') updCheck(false); });
   try{ if(navigator.storage&&navigator.storage.persist) navigator.storage.persisted().then(function(p){ if(!p) return navigator.storage.persist(); }).catch(function(){}); }catch(e){}
   // top-right menu: one button that reaches everything, so nothing is off-screen in portrait
-  const closeMenu=function(){ $('menu').classList.add('hidden'); };
+  const closeMenu=function(){ $('menu').classList.add('hidden'); $('menu').classList.remove('peek'); };
   // ---- the 3D renderers (Mesh, Voxels): each in its own file, fetched only when someone picks it ----
   const GLR={};   // id -> {r: the renderer, loading, lost, t0}
   const glCur=function(){ const m=RENDERS[DIALS.render|0]||RENDERS[0]; return m.file?m:null; };
@@ -8355,34 +8359,47 @@ function boot(){
     const cur=glCur(); if(cur&&cur.id===m.id) toast('Drawn as '+m.name,1800);
   }
   function paintRenderSeg(){
-    const box=$('mRender'); if(!box) return;
-    box.innerHTML=RENDERS.map(function(m,i){ return '<button class="btn'+(i===(DIALS.render|0)?' on':'')+'" data-r="'+i+'" aria-pressed="'+(i===(DIALS.render|0))+'">'+m.name+'</button>'; }).join('');
-    $('mRenderNote').textContent=(RENDERS[DIALS.render|0]||RENDERS[0]).note+'. Switching keeps you right where you are.';
+    const box=$('mRender'); if(!box) return; const cur=DIALS.render|0;
+    if(box.options.length!==RENDERS.length) box.innerHTML=RENDERS.map(function(m,i){ return '<option value="'+i+'">'+m.name+'</option>'; }).join('');
+    box.value=String(cur);
+    $('mRenderNote').textContent=(RENDERS[cur]||RENDERS[0]).note+'. Switching keeps you right where you are.';
   }
   function chooseRender(i){ if(!(i>=0&&i<RENDERS.length)) return; DIALS.render=i; saveDials(); paintRenderSeg();
     const m=RENDERS[i]; if(!m.file){ for(const k in GLR) glDrop(k); return; }
     if(!(GLR[m.id]&&GLR[m.id].r&&GLR[m.id].r.ok)) loadGL(m); }
-  // the sky (v0.51.1): jump to dawn, noon, sunset or night in any mode, or go back to the Akron clock. Times come from
-  // the real sun for today, so sunset is the moment the sun touches the horizon, whatever the season
-  function skyFind(which){ const keep=DAY.tod; let best=12, bv=-9;
-    const alt=function(t){ DAY.tod=t; sunUpdate(); return DAY.alt*180/Math.PI; };
-    if(which==='noon'){ for(let t=9;t<=15;t+=0.05){ const a=alt(t); if(a>bv){ bv=a; best=t; } } }
-    else if(which==='dawn'){ best=6.5; for(let t=3;t<=12;t+=0.05){ if(alt(t)>=2){ best=t; break; } } }
-    else if(which==='sunset'){ best=17.5; for(let t=12;t<=23;t+=0.05){ if(alt(t)<=0.5){ best=t; break; } } }
-    else { best=20; for(let t=12;t<=23.5;t+=0.05){ if(alt(t)<=-12){ best=t; break; } } }
-    DAY.tod=keep; sunUpdate(); return best; }
-  function paintSky(){ const box=$('mSky'); if(!box) return; const real=DAYMODES[DAY.mode]<0;
-    box.innerHTML=['dawn','noon','sunset','night'].map(function(k){ return '<button class="btn" data-sky="'+k+'">'+k+'</button>'; }).join('')+'<button class="btn'+(real?' on':'')+'" data-sky="clock" aria-pressed="'+real+'">my clock</button>';
-    $('mSkyNote').textContent=real?'The sky follows the clock in Akron, Ohio. Pick a time to look at it, and the day runs on from there.':'Now '+fmtTod(DAY.tod)+', '+(DAYNAMES_M[DAY.mode]||'')+'. My clock puts the sky back on Akron time.'; }
-  const DAYNAMES_M=['a paused day','a 3 minute day','an 8 minute day','a 20 minute day','a day on the Akron clock'];
-  $('mSky').addEventListener('click',function(e){ const b=e.target.closest?e.target.closest('button[data-sky]'):null; if(!b) return; const k=b.getAttribute('data-sky');
-    if(k==='clock'){ DAY.mode=4; DIALS.dayMode=4; updateDay(0); }
-    else { const t=skyFind(k); if(DAYMODES[DAY.mode]<0){ DAY.mode=3; DIALS.dayMode=3; } DAY.tod=t; }
-    DIALS.tod=DAY.tod; W.lastTod=null; sunUpdate(); saveDials(); paintSky(); closeMenu(); toast(k==='clock'?'The sky is back on the Akron clock':'It is '+fmtTod(DAY.tod),1800); });
-  $('mRender').addEventListener('click',function(e){
-    const b=e.target.closest?e.target.closest('button[data-r]'):null; if(!b) return;
-    const i=parseInt(b.getAttribute('data-r'),10); if(!(i>=0&&i<RENDERS.length)) return;
-    if(i===(DIALS.render|0)){ closeMenu(); return; }
+  // the Time section (v0.51.2): one slider for the time of day, its track painted with today's real sky (night, dawn,
+  // day, dusk) so sunrise and sunset can be seen and dragged to, and one picker for how long a day lasts
+  const DAYNAMES_M=['paused','3 minute day','8 minute day','20 minute day','Akron clock'];
+  let todHeld=false, skyDay='';
+  function skyCol(a){ // sun altitude in degrees to a track colour
+    const L=[[-90,[16,22,44]],[-12,[22,30,62]],[-5,[70,62,120]],[-1,[214,110,70]],[3,[236,170,96]],[10,[120,172,214]],[90,[96,160,220]]];
+    for(let i=1;i<L.length;i++) if(a<=L[i][0]){ const p=L[i-1], q=L[i], k=(a-p[0])/(q[0]-p[0]); return 'rgb('+[0,1,2].map(function(j){ return Math.round(p[1][j]+(q[1][j]-p[1][j])*k); }).join(',')+')'; }
+    return 'rgb(96,160,220)'; }
+  function paintTrack(){ const keep=DAY.tod, st=[]; let rise=-1, set=-1, prev=null;
+    for(let t=0;t<=24.001;t+=0.25){ DAY.tod=t%24; sunUpdate(); const a=DAY.alt*180/Math.PI; st.push(skyCol(a)+' calc(13px + (100% - 26px) * '+(t/24).toFixed(4)+')');   // inset like the thumb, so a colour sits under the thumb at its hour
+      if(prev!=null){ if(prev<0&&a>=0&&rise<0) rise=t-0.25+0.25*(-prev)/(a-prev); if(prev>=0&&a<0&&set<0&&t>12) set=t-0.25+0.25*prev/(prev-a); } prev=a; }
+    DAY.tod=keep; sunUpdate();
+    $('mTod').style.setProperty('--trk','linear-gradient(90deg,'+st.join(',')+')');
+    const mk=function(t,lab){ return t<0?'':'<span style="left:'+(t/24*100).toFixed(1)+'%">'+lab+' '+fmtTod(t).replace(/ [ap]m$/,'')+'</span>'; };
+    $('mTodMarks').innerHTML=mk(rise,'rise')+mk(set,'set'); }
+  function paintSky(){ if(!$('mTod')) return; const real=DAYMODES[DAY.mode]<0;
+    const day=new Date(dayDate().getTime()+DAY.tzOff*3600000).toISOString().slice(0,10); if(day!==skyDay){ skyDay=day; paintTrack(); }   // day: the Akron date
+    const dy=$('mDay'); if(dy.options.length!==DAYNAMES_M.length) dy.innerHTML=DAYNAMES_M.map(function(n,i){ return '<option value="'+i+'">'+n+'</option>'; }).join('');
+    dy.value=String(DAY.mode);
+    $('mTodV').textContent=fmtTod(DAY.tod); $('mTod').setAttribute('aria-valuetext',fmtTod(DAY.tod)); if(!todHeld) $('mTod').value=DAY.tod;
+    $('mSkyNote').textContent=real?'The sky follows the clock in Akron, Ohio. Drag the slider to look at another time and the day runs on from there.':DAY.mode===0?'The sun stands still. Drag the slider to move it.':'Drag the slider to any time. Pick Akron clock to follow the real time again.'; }
+  skyHud=paintSky;
+  function skyPeek(on){ todHeld=on; $('menu').classList.toggle('peek',on); }
+  $('mTod').addEventListener('pointerdown',function(){ skyPeek(true); });
+  window.addEventListener('pointerup',function(){ if(todHeld) skyPeek(false); }); window.addEventListener('pointercancel',function(){ if(todHeld) skyPeek(false); });
+  $('mTod').addEventListener('input',function(){ const v=parseFloat($('mTod').value); if(!isFinite(v)) return;
+    if(DAYMODES[DAY.mode]<0){ DAY.mode=3; DIALS.dayMode=3; }   // off the real clock once you pick a time
+    DAY.tod=v; DIALS.tod=v; W.lastTod=null; sunUpdate(); paintSky(); });
+  $('mTod').addEventListener('change',function(){ saveDials(); });
+  $('mDay').addEventListener('change',function(){ const v=parseInt($('mDay').value,10); if(!(v>=0&&v<DAYMODES.length)) return;
+    DAY.mode=v; DIALS.dayMode=v; updateDay(0); DIALS.tod=DAY.tod; W.lastTod=null; saveDials(); paintSky(); });
+  $('mRender').addEventListener('change',function(){
+    const i=parseInt($('mRender').value,10); if(!(i>=0&&i<RENDERS.length)||i===(DIALS.render|0)) return;
     DIALS.render=i; saveDials(); paintRenderSeg(); closeMenu();
     const m=RENDERS[i]; if(!m.file){ for(const k in GLR) glDrop(k); }   // back to letters or pixels: hand the 3D memory back
     if(m.file&&!(GLR[m.id]&&GLR[m.id].r&&GLR[m.id].r.ok)) loadGL(m); else toast('Drawn as '+m.name,1800);
@@ -8536,7 +8553,7 @@ function boot(){
     relightStep(2);   // the sun moves: re-light two rows of the map per frame
     if(now-talkT>160){ talkT=now; paintTalk(); }
     try{ compassFrame(); }catch(e){ if(!NAV.err){ NAV.err=1; try{ console.warn('compass: '+e.message); }catch(_){} } }
-    const card=anyCard();
+    const card=anyCard()&&!$('menu').classList.contains('peek');   // dragging the time slider: full speed so the sky slides
     const glm=glCur(), G=glm&&GLR[glm.id], GR=G&&G.r&&G.r.ok?G.r:null, meshOn=!!GR;
     if(now-hudT>500){ hudT=now;   // the corner readout: twice a second, clock included, card open or not
       if(fN>0&&fT>0){ const ms=fAcc/fN; fpsTxt=Math.round(fN/fT)+' fps'+(meshOn||window.innerWidth<560?'':' · '+ms.toFixed(1)+' ms');   // a narrow screen keeps the clock clear of the version badge
@@ -8547,7 +8564,7 @@ function boot(){
           else if(ms<9 && qCell>1.0){ qCell=Math.max(1.0,qCell/1.15); govT=now; setupGrid(); } }
         fAcc=0; fN=0; fT=0; }
       $('fps').textContent=fpsTxt+(fpsTxt?' · ':'')+(CR_.n-(W.kelpN||0))+' alive · '+fmtTod(DAY.tod);
-      if(skyHud&&!$('dials').classList.contains('hidden')) skyHud(); }
+      if(skyHud&&!$('menu').classList.contains('hidden')) skyHud(); }
     if(card){ if(now-slowAt<250) return; slowAt=now; }   // a card is open: redraw 4 times a second, save the battery
     const t0=performance.now();
     for(const k in GLR){ const r=GLR[k].r; if(r&&r.shown&&r!==GR) r.show(false); }

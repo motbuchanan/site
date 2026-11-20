@@ -1,4 +1,4 @@
-// The Keep · render-voxel.js · v0.51.1 · Nov 20 2026 (up to four spans per cell)
+// The Keep · render-voxel.js · v0.51.2 · Nov 20 2026 (up to four spans per cell)
 // The same world drawn as blocks, the way Minecraft draws its worlds: every cell becomes a column of 1 m blocks.
 // Nothing here makes the world. It reads the exact arrays the ASCII raycaster reads, rounds each height to a whole
 // block, and gives each column a block type. Sky, water, light and the people are shared with the Mesh renderer.
@@ -119,9 +119,9 @@ vec3 skyCol(vec3 d){ float hl=max(length(d.xy),1e-4); vec2 dh=d.xy/hl; float sg=
   if(uSun.w>-0.03){ float k=dot(dn,uSun.xyz);
     if(k>0.9993) return uSunC;
     if(k>0.96){ float q=(k-0.96)/0.04; float gl=q*q*(1.0+du); c+=vec3(70.0,55.0-30.0*du,10.0-10.0*du)/255.0*gl; } }
-  if(uMoon.w>-0.03&&nd>0.0){ float k=dot(dn,uMoon.xyz);
-    if(k>0.9991) return vec3(226.,228.,214.)/255.*(0.5+0.5*nd);
-    if(k>0.975){ float q=(k-0.975)/0.025*nd; c+=vec3(40.,44.,60.)/255.*q*q; } }
+  if(uMoon.w>-0.03&&nd>0.55){ float k=dot(dn,uMoon.xyz); float mv=smoothstep(0.55,0.85,nd);   // the moon shows once the sun is down, so it never passes for the sun
+    if(k>0.9991) return mix(c,vec3(222.,228.,240.)/255.*(0.55+0.45*nd),mv);
+    if(k>0.975){ float q=(k-0.975)/0.025*nd*mv; c+=vec3(40.,44.,60.)/255.*q*q; } }
   if(sg>0.03){ vec3 cc=uSkyC*cl;
     float dist2=(uCloudH+50.0-uEye.z)/sg; vec2 p2=uEye.xy+dh*dist2+vec2(uTime*1.5,0.0);
     float c2=texture(uCl2,p2*0.7/256.0).r; float a2=smoothstep(0.52,0.74,c2)*clamp(1.0-dist2/1400.0,0.0,1.0)*0.7;
@@ -540,5 +540,5 @@ function create(A){
   try{ rebuild(); resize(); R.ok=true; }catch(e){ R.error=String(e&&e.message||e).slice(0,300); canvas.remove(); }
   return R;
 }
-window.KeepVoxel={ create:create, version:'v0.51.1' };
+window.KeepVoxel={ create:create, version:'v0.51.2' };
 })();
