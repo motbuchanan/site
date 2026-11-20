@@ -1,4 +1,4 @@
-// The Keep · render-ray.js · v0.51.2 · Nov 20 2026 (up to four spans per cell: vaults, floors, roofs)
+// The Keep · render-ray.js · v0.52.0 · Nov 20 2026 (up to four spans per cell: vaults, floors, roofs)
 // The same world drawn with rays, the way Shadertoy demos draw theirs: no triangles for the land at all. For every pixel
 // one small program walks a ray across the same height data the ASCII raycaster reads, then walks toward the sun for a
 // soft shadow and off the lake for a real reflection. Sky, light and the people are shared with the Mesh renderer.
@@ -82,7 +82,7 @@ const FS_RAY=HEAD+FINISH+SKYFN+`
 uniform mat4 uInv; uniform sampler2D uMax; uniform sampler2D uH; uniform sampler2D uS; uniform sampler2D uAlb; uniform sampler2D uInf; uniform sampler2D uCr; uniform sampler2D uC;
 uniform sampler2D uSA; uniform sampler2D uSB; uniform sampler2D uSM;
 uniform vec3 uMatF[14]; uniform vec3 uMatT[14]; uniform float uMatCH[14]; uniform float uMatMoss[14];
-uniform float uDk; uniform float uDark; uniform float uCast; uniform float uWater; uniform int uSteps;
+uniform float uDk; uniform float uDark; uniform float uCast; uniform float uWater; uniform int uSteps; uniform vec3 uSea;
 in vec2 vN; out vec4 o;
 float hLin(vec2 p){ return texture(uH,(p+0.5)/512.0).r; }
 // what stands at p: ground (h + stone), up to four floating spans (vaults, floors, roofs: a = spans 0 and 1 as
@@ -237,7 +237,13 @@ void main(){
     float fres=0.12+0.78*pow(1.0-clamp(-rd.z,0.0,1.0),3.0);
     int k2; vec3 h2,p2,n2i; bool sp2; float t2=march(wp+vec3(0,0,0.05),rr,200.0,64,k2,h2,p2,sp2,n2i);
     vec3 refl; if(t2>0.0){ vec3 n2; vec3 rc=shade(k2,h2,p2,rr,t2,true,n2i,n2); float f2=1.0-exp(-t2*uFogK); refl=mix(rc,uFog,f2)*uTint; } else refl=skyCol(rr);
-    col=bed*(1.0-fres); raw=refl*fres; }
+    col=bed*(1.0-fres); raw=refl*fres;
+    if(uSea.z>0.5&&t>0.0){ vec2 q=wp.xy/256.0-1.0; float s=dot(q,uSea.xy), tt=-q.x*uSea.y+q.y*uSea.x;   // v0.52.0 surf, as in the other views: depth from where the ray meets the bed
+      if(s-0.35*tt*tt-(uSea.z-1.0)>-0.14){ float ds=(t-tw)*max(-rd.z,0.05);
+        if(ds<4.5){ float br=0.8+0.2*sin(wp.x*1.7+wp.y*1.3+uTime*0.6)*sin(wp.x*0.7-wp.y*1.9);
+          float roll=fract(ds*0.32+uTime*0.13), band=smoothstep(0.70,0.93,roll)*(1.0-smoothstep(0.93,1.0,roll))*(1.0-smoothstep(1.5,4.5,ds));
+          float edge=1.0-smoothstep(0.2,1.1,ds+0.3*sin(uTime*0.9+wp.x*0.4+wp.y*0.3));
+          float fm=clamp(max(edge,band*0.95)*br,0.0,1.0); col=mix(col,vec3(0.93,0.95,0.95),fm); raw*=1.0-fm; } } } }
   else { wp=hp; col=shade(kind,hp,pp,rd,t,t>70.0,hn,n); }
   if(uNight>0.0) warm=pool(wp);
   vec4 cp=uVP*vec4(wp,1.0); gl_FragDepth=clamp(0.5*cp.z/cp.w+0.5,0.0,1.0);
@@ -326,6 +332,8 @@ function create(A){
   { const BW=16,BH=8; for(let fr=0;fr<2;fr++){ const px=new Uint8Array(BW*BH);   // birds: a small dark wing-beat V
       for(let x=0;x<BW;x++){ const ax=Math.abs(x-7.5)/7.5; const y=Math.round(fr?(2+3.5*ax):(5-3*ax+2*ax*ax)); for(let d=0;d<2;d++){ const yy=Math.min(BH-1,Math.max(0,y+d)); px[yy*BW+x]=1; } }
       px[4*BW+7]=1; px[4*BW+8]=1; addSlot('b'+fr,BW,BH,px,[null,[46,44,54]],-1); } }
+  { const F=12, px=new Uint8Array(F*F); for(let y=0;y<F;y++)for(let x=0;x<F;x++) if(Math.hypot(x-5.5,y-5.5)<=5.7) px[y*F+x]=9;   // v0.52.0: the lighthouse lamp's flare
+    const pal=[]; pal[9]=[255,214,120]; addSlot('fl',F,F,px,pal,9); }
   const ARows=Math.ceil(slots.length/ACOLS), AW=ACOLS*SLOT_W, AH=ARows*SLOT_H, atlas=new Uint8Array(AW*AH*4);
   slots.forEach(function(s,i){ const ox=(i%ACOLS)*SLOT_W, oy=((i/ACOLS)|0)*SLOT_H;
     for(let y=0;y<s.h;y++)for(let x=0;x<s.w;x++){ const pi=s.px[y*s.w+x]; if(!pi) continue; const c=s.pal[pi]||[255,0,255]; const o=((oy+y)*AW+ox+x)*4;
@@ -479,7 +487,7 @@ function create(A){
     const C=A.CR_, SP=A.SP, SPP=A.SPP, R2=130*130; let k=0, nl=0; const DK=A.DAY.k<0.6;
     if(A.animalFrame) A.animalFrame(px,py,yaw);
     for(let c=0;c<C.n;c++){ if(C.al[c]===0) continue; const sp=C.sp[c], x=C.x[c], y=C.y[c], z=C.z[c], ex=x-px, ey=y-py;
-      if(ex*ex+ey*ey>R2) continue;
+      if(ex*ex+ey*ey>R2&&c!==A.W.beaconC) continue;   // the lighthouse lamp is seen from anywhere
       if((sp===SP.KEEPER||sp===SP.FIRE)&&nl<16&&night>0.02){ const low=C.po[c]===4;
         lp[nl*4]=x; lp[nl*4+1]=y; lp[nl*4+2]=z+(sp===SP.FIRE?1.0:0.9); lp[nl*4+3]=sp===SP.FIRE?3.6:(low?1.8:2.6);
         lc[nl*4]=night*(sp===SP.FIRE?1.1:(low?0.4:0.72)); nl++; }
@@ -493,11 +501,14 @@ function create(A){
         spData.set([x,y,z,0, P_.wsize,P_.hsize,0,amb, uv[0],uv[1],uv[2],uv[3], ln[0],ln[1],mir,1],o); k++; continue; }
       const P_=SPP[sp], g=A.growOf(c);
       const Q2=A.AM2&&A.AM2[sp];
-      if(Q2&&A.ANI){ const AN=A.ANI, bi=(Q2.banks.length>1&&(AN.vr[c]%3)===0&&(!A.isAdult||A.isAdult(c)))?1:0, vi=AN.v[c], vw=Q2.banks[bi][vi]||Q2.banks[bi][0];
+      if(Q2&&A.ANI){ const AN=A.ANI, bi=A.bankOf?A.bankOf(c):((Q2.banks.length>1&&(AN.vr[c]%3)===0&&(!A.isAdult||A.isAdult(c)))?1:0), vi=AN.v[c], vw=Q2.banks[bi][vi]||Q2.banks[bi][0];
         const key='a'+sp+'_'+bi+'_'+(vw.has||vi===0?vi:0)+'_'+AN.f[c]; if(atlasMap[key]==null) continue; const uv=slotUV[atlasMap[key]];
         spData.set([x,y,z,0, P_.wsize*g*vw.wf,P_.hsize*g,0,sp===SP.BIRD?1:amb, uv[0],uv[1],uv[2],uv[3], -1,0,AN.m[c],0],o); k++; continue; }
       if(sp===SP.BIRD){ const fr=(C.st[c]===1&&Math.hypot(C.vx[c],C.vy[c])<0.05)?0:(Math.sin(A.skyTime()*7+c*1.7)>0?1:0), uv=slotUV[atlasMap['b'+fr]];
         spData.set([x,y,z+P_.hsize*g*0.2,0, P_.wsize*g,P_.hsize*g*0.55,0,1, uv[0],uv[1],uv[2],uv[3], -1,0,0,0],o); k++; continue; }
+      if(c===A.W.beaconC){ const L=A.W.light; if(!L||z<L.z-1||atlasMap.fl==null) continue;   // the lamp, lit and facing you: a flare that stays a few pixels wide however far off
+        const fs=Math.max(1.0,Math.sqrt(ex*ex+ey*ey)*0.022), uvf=slotUV[atlasMap.fl];
+        spData.set([x,y,z-fs*0.5,0, fs,fs,0,1, uvf[0],uvf[1],uvf[2],uvf[3], -1,0,0,1],o); k++; continue; }
       const key='m'+sp; if(atlasMap[key]==null) continue; const uv=slotUV[atlasMap[key]];
       // the masks face right; turn them to face the way the animal walks, as seen from here
       const mir=(C.vx[c]*(-Math.sin(yaw))+C.vy[c]*Math.cos(yaw)<0)?1:0;
@@ -530,7 +541,7 @@ function create(A){
     gl.uniform3fv(PR.u.uMatF,matF); gl.uniform3fv(PR.u.uMatT,matT); gl.uniform1fv(PR.u.uMatCH,matCH); gl.uniform1fv(PR.u.uMatMoss,matMoss);
     { const L=DAY.light, lz=Math.max(0.0001,L.z); const dk=0.70*(DAY.sunLight?1:0.70)*(0.75/Math.max(0.6,lz))*Math.min(1,lz/0.14);
       gl.uniform1f(PR.u.uDk,L.z>0?dk:0); gl.uniform1f(PR.u.uDark,DAY.shadowK); gl.uniform1f(PR.u.uCast,DAY.lightAlt>0.035?1:0); }
-    gl.uniform1f(PR.u.uWater,A.WATER); gl.uniform1i(PR.u.uSteps,Math.round(120+160*(scale-0.5)));
+    gl.uniform1f(PR.u.uWater,A.WATER); { const Cs=A.W&&A.W.coast; if(PR.u.uSea) gl.uniform3f(PR.u.uSea,Cs?Cs.dir[0]:0,Cs?Cs.dir[1]:0,Cs?1+Cs.s0:0); } gl.uniform1i(PR.u.uSteps,Math.round(120+160*(scale-0.5)));
     gl.bindVertexArray(vaoEmpty); gl.drawArrays(gl.TRIANGLES,0,3);
     gl.depthFunc(gl.LEQUAL);
     if(nDeco){ common(PD,U,vp); bindTex(PD,'uD',4,texD); bindTex(PD,'uC',1,texC);
@@ -554,5 +565,5 @@ function create(A){
   try{ rebuild(); resize(); R.ok=true; }catch(e){ R.error=String(e&&e.message||e).slice(0,300); canvas.remove(); }
   return R;
 }
-window.KeepRay={ create:create, version:'v0.51.2' };
+window.KeepRay={ create:create, version:'v0.52.0' };
 })();

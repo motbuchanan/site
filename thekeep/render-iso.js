@@ -1,4 +1,4 @@
-// The Keep · render-iso.js · v0.51.2 · Nov 20 2026 (spans; cutaway indoors)
+// The Keep · render-iso.js · v0.52.0 · Nov 20 2026 (spans; cutaway indoors)
 // The same world seen from above at a fixed slant, the way SimCity, Diablo and Monument Valley frame theirs: an
 // isometric (orthographic) camera, so nothing shrinks with distance and the whole keep reads like a model on a table.
 // It draws the Voxels blocks; the camera follows behind you as you turn, so the walk stick works the same.
@@ -170,6 +170,14 @@ void main(){ ivec2 cell=clamp(ivec2(floor(vW.xy)),ivec2(0),ivec2(511)); float be
   float a=clamp(0.30+max(depth,0.0)*0.16,0.0,0.88); a=mix(a,1.0,fres*0.85);
   vec3 sk=skyCol(r);
   vec3 cw=body*(1.0-fres)/max(a,0.01), craw=sk*fres/max(a,0.01);
+  if(uSea.z>0.5){ vec2 q=vW.xy/256.0-1.0; float s=dot(q,uSea.xy), t=-q.x*uSea.y+q.y*uSea.x;   // v0.52.0 surf: on the sea's side only, rolling in over the shallows
+    if(s-0.35*t*t-(uSea.z-1.0)>-0.14){ vec2 fp=vW.xy-0.5; ivec2 c0=clamp(ivec2(floor(fp)),ivec2(0),ivec2(510)); vec2 w=fract(fp);
+      float ds=uWater-mix(mix(texelFetch(uH,c0,0).r,texelFetch(uH,c0+ivec2(1,0),0).r,w.x),mix(texelFetch(uH,c0+ivec2(0,1),0).r,texelFetch(uH,c0+ivec2(1,1),0).r,w.x),w.y);
+      if(ds<4.5){ float br=0.8+0.2*sin(vW.x*1.7+vW.y*1.3+uTime*0.6)*sin(vW.x*0.7-vW.y*1.9);
+        float roll=fract(ds*0.32+uTime*0.13), band=smoothstep(0.70,0.93,roll)*(1.0-smoothstep(0.93,1.0,roll))*(1.0-smoothstep(1.5,4.5,ds));
+        float edge=1.0-smoothstep(0.2,1.1,ds+0.3*sin(uTime*0.9+vW.x*0.4+vW.y*0.3));
+        float fm=clamp(max(edge,band*0.95)*br,0.0,1.0);
+        cw=mix(cw,vec3(0.93,0.95,0.95),fm); craw*=1.0-fm; a=mix(a,0.96,fm); } } }
   o=vec4(finish(cw,craw,vW,0.0),a); }`;
 
 
@@ -357,6 +365,8 @@ function create(A){
   { const BW=16,BH=8; for(let fr=0;fr<2;fr++){ const px=new Uint8Array(BW*BH);   // birds: a small dark wing-beat V
       for(let x=0;x<BW;x++){ const ax=Math.abs(x-7.5)/7.5; const y=Math.round(fr?(2+3.5*ax):(5-3*ax+2*ax*ax)); for(let d=0;d<2;d++){ const yy=Math.min(BH-1,Math.max(0,y+d)); px[yy*BW+x]=1; } }
       px[4*BW+7]=1; px[4*BW+8]=1; addSlot('b'+fr,BW,BH,px,[null,[46,44,54]],-1); } }
+  { const F=12, px=new Uint8Array(F*F); for(let y=0;y<F;y++)for(let x=0;x<F;x++) if(Math.hypot(x-5.5,y-5.5)<=5.7) px[y*F+x]=9;   // v0.52.0: the lighthouse lamp's flare
+    const pal=[]; pal[9]=[255,214,120]; addSlot('fl',F,F,px,pal,9); }
   { const W=16,H=32, px=new Uint8Array(W*H), set=function(x,y,c){ if(x>=0&&x<W&&y>=0&&y<H) px[y*W+x]=c; };
     for(let y=3;y<=10;y++)for(let x=3;x<=12;x++){ const dx=(x+0.5-8)/4.6, dy=(y+0.5-7.2)/4.2; if(dx*dx+dy*dy<=1) set(x,y,x>=9?4:3); }   // hood
     for(let y=6;y<=10;y++)for(let x=6;x<=10;x++){ const dx=(x+0.5-8.2)/2.5, dy=(y+0.5-8.4)/2.4; if(dx*dx+dy*dy<=1) set(x,y,2); }  // face
@@ -473,7 +483,7 @@ function create(A){
     const C=A.CR_, SP=A.SP, SPP=A.SPP, R2=130*130; let k=0, nl=0; const DK=A.DAY.k<0.6;
     if(A.animalFrame) A.animalFrame(px,py,yaw);
     for(let c=0;c<C.n;c++){ if(C.al[c]===0) continue; const sp=C.sp[c], x=C.x[c], y=C.y[c], z=C.z[c], ex=x-px, ey=y-py;
-      if(ex*ex+ey*ey>R2) continue;
+      if(ex*ex+ey*ey>R2&&c!==A.W.beaconC) continue;   // the lighthouse lamp is seen from anywhere
       if((sp===SP.KEEPER||sp===SP.FIRE)&&nl<16&&night>0.02){ const low=C.po[c]===4;
         lp[nl*4]=x; lp[nl*4+1]=y; lp[nl*4+2]=z+(sp===SP.FIRE?1.0:0.9); lp[nl*4+3]=sp===SP.FIRE?3.6:(low?1.8:2.6);
         lc[nl*4]=night*(sp===SP.FIRE?1.1:(low?0.4:0.72)); nl++; }
@@ -487,11 +497,14 @@ function create(A){
         spData.set([x,y,z,0, P_.wsize,P_.hsize,0,amb, uv[0],uv[1],uv[2],uv[3], ln[0],ln[1],mir,1],o); k++; continue; }
       const P_=SPP[sp], g=A.growOf(c);
       const Q2=A.AM2&&A.AM2[sp];
-      if(Q2&&A.ANI){ const AN=A.ANI, bi=(Q2.banks.length>1&&(AN.vr[c]%3)===0&&(!A.isAdult||A.isAdult(c)))?1:0, vi=AN.v[c], vw=Q2.banks[bi][vi]||Q2.banks[bi][0];
+      if(Q2&&A.ANI){ const AN=A.ANI, bi=A.bankOf?A.bankOf(c):((Q2.banks.length>1&&(AN.vr[c]%3)===0&&(!A.isAdult||A.isAdult(c)))?1:0), vi=AN.v[c], vw=Q2.banks[bi][vi]||Q2.banks[bi][0];
         const key='a'+sp+'_'+bi+'_'+(vw.has||vi===0?vi:0)+'_'+AN.f[c]; if(atlasMap[key]==null) continue; const uv=slotUV[atlasMap[key]];
         spData.set([x,y,z,0, P_.wsize*g*vw.wf,P_.hsize*g,0,sp===SP.BIRD?1:amb, uv[0],uv[1],uv[2],uv[3], -1,0,AN.m[c],0],o); k++; continue; }
       if(sp===SP.BIRD){ const fr=(C.st[c]===1&&Math.hypot(C.vx[c],C.vy[c])<0.05)?0:(Math.sin(A.skyTime()*7+c*1.7)>0?1:0), uv=slotUV[atlasMap['b'+fr]];
         spData.set([x,y,z+P_.hsize*g*0.2,0, P_.wsize*g,P_.hsize*g*0.55,0,1, uv[0],uv[1],uv[2],uv[3], -1,0,0,0],o); k++; continue; }
+      if(c===A.W.beaconC){ const L=A.W.light; if(!L||z<L.z-1||atlasMap.fl==null) continue;   // the lamp, lit and facing you: a flare that stays a few pixels wide however far off
+        const fs=2.2, uvf=slotUV[atlasMap.fl];
+        spData.set([x,y,z-fs*0.5,0, fs,fs,0,1, uvf[0],uvf[1],uvf[2],uvf[3], -1,0,0,1],o); k++; continue; }
       const key='m'+sp; if(atlasMap[key]==null) continue; const uv=slotUV[atlasMap[key]];
       // the masks face right; turn them to face the way the animal walks, as seen from here
       const mir=(C.vx[c]*(-Math.sin(yaw))+C.vy[c]*Math.cos(yaw)<0)?1:0;
@@ -567,7 +580,7 @@ function create(A){
       gl.depthFunc(gl.LEQUAL); gl.depthMask(true); gl.disable(gl.BLEND); }
     // water last, see-through near the shore
     gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA); gl.depthMask(false);
-    common(PW,U,vp); skyUniforms(PW,U); bindTex(PW,'uH',0,texH); gl.uniform1f(PW.u.uWater,A.WATER-0.12); { const Cs=A.W&&A.W.coast; gl.uniform3f(PW.u.uSea,Cs?Cs.dir[0]:0,Cs?Cs.dir[1]:0,Cs?1:0); }   // just under a block top at the waterline, so the two never flicker
+    common(PW,U,vp); skyUniforms(PW,U); bindTex(PW,'uH',0,texH); gl.uniform1f(PW.u.uWater,A.WATER-0.12); { const Cs=A.W&&A.W.coast; gl.uniform3f(PW.u.uSea,Cs?Cs.dir[0]:0,Cs?Cs.dir[1]:0,Cs?1+Cs.s0:0); }   // just under a block top at the waterline, so the two never flicker
     gl.bindVertexArray(vaoEmpty); gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
     gl.depthMask(true); gl.disable(gl.BLEND); gl.bindVertexArray(null);
   }
@@ -586,5 +599,5 @@ function create(A){
   try{ rebuild(); resize(); R.ok=true; }catch(e){ R.error=String(e&&e.message||e).slice(0,300); canvas.remove(); }
   return R;
 }
-window.KeepIso={ create:create, version:'v0.51.2' };
+window.KeepIso={ create:create, version:'v0.52.0' };
 })();

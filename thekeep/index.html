@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="keep-version" content="v0.51.2">
+<meta name="keep-version" content="v0.52.0">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#000">
 <title>The Keep</title>
@@ -237,7 +237,7 @@ html.fromshelf #inPage #inViews{padding-top:calc(58px + env(safe-area-inset-top)
  </div>
  <div id="stick"><div id="knob"></div></div>
  <div id="fps"></div>
- <button class="mb-ver" id="mbVer" type="button">v0.51.2 &middot; Nov 20</button>
+ <button class="mb-ver" id="mbVer" type="button">v0.52.0 &middot; Nov 20</button>
  <div id="toast"></div>
  <div id="updNudge" hidden role="status"><span>A new version of The Keep is here (<b id="updVer"></b>).<span id="updMsg" style="display:block;font-weight:400"></span></span><button class="btn go" id="updGo" type="button">refresh</button><button class="btn" id="updNo" type="button">later</button></div>
  <div id="bkNudge" hidden role="status"><span>Big moment. Back up your progress?</span><button class="btn go" id="bkNudgeGo" type="button">back up</button><button class="btn" id="bkNudgeNo" type="button">later</button></div>
@@ -1355,9 +1355,10 @@ var SHELF={on:false,url:'https://motbuchanan.com/gameshelf/'};
   SHELF.place=place;
 })();
 
-const VERSION='The Keep v0.51.2 · Nov 20 2026';
-const VER_SHORT='v0.51.2 · Nov 20'; // what the badge shows; bump with VERSION
+const VERSION='The Keep v0.52.0 · Nov 20 2026';
+const VER_SHORT='v0.52.0 · Nov 20'; // what the badge shows; bump with VERSION
 const CHANGELOG=[
+ ['v0.52.0 · Nov 20 2026','Life on the coast. Coast valleys now have a harbor: the pier, the ship and the fish market on the shore, the berth dug deep and a stone breakwater along the sea side that turns in across the bow. The drowned temple and the wreck lie out in the sea. Kelp grows along the shelf and fish school over it. Surf rolls in: froth at the edge of the sand and lines of foam coming in over the shallows, in every view. Gulls fly low along the shore in small flocks, white with black wingtips, and rest on the beach or float on the water. A lighthouse stands on the highest bit of shore, a headland where there is one: white with a red band, a gallery and an open lantern under a dark cap. At night its lamp turns, so from a distance you see it flash each time the beam sweeps past you. No keeper yet.'],
  ['v0.51.2 · Nov 20 2026','A tidier menu. VIEW is one picker for the seven ways to draw the world. TIME is one slider for the hour, its track painted with today\'s real sky from night through dawn, day and dusk, with sunrise and sunset marked, plus a picker for how long a day lasts (paused, 3, 8 or 20 minutes, or the Akron clock). While you drag the slider the menu clears so you can watch the sky change. Sliding off the Akron clock gives a 20 minute day. The sky dials left the dials card, since they live in the menu now. The four smaller buttons sit two to a row. The moon now shows only once the sun is down, so at sunset the full moon rising opposite no longer looks like a second sun coming up.'],
  ['v0.51.1 · Nov 20 2026','The sky in the menu: tap dawn, noon, sunset or night to see the valley then, in any mode, or my clock to put the sky back on Akron time. The times come from the real sun for the day, so sunset is when the sun is touching the sea. Past the edge of a coast valley the sea now runs on beside the headlands too, so there is no line where the map ends. Birds no longer hang in the air flapping when they rest: they fly right in and sit still in a tree, on the ground, or on the water by the shore, and a bird far out over the sea flies back to land to rest.'],
  ['v0.51.0 · Nov 19 2026','The coast. About one valley in six now meets the sea on one side, the side no road takes, so the roads stay dry. The land comes down to sandy beaches in some places and stops at rocky cliffs in others, and past the shore the sea runs on to the horizon in every way of drawing, with the sun going down into it. Swim out far enough and the water gets heavy and someone tells you the sea runs on further than anyone can swim. You come on it the way you come on anything: from a road near the shore you see it at once, from the far side you find it.'],
@@ -1909,6 +1910,9 @@ function edgeEase(mvx,mvy){ const ed=Math.min(P.x,P.y,N-1-P.x,N-1-P.y); if(ed>=2
 // for the views: past the map's edge, everything on the sea's side counts as open sea (beside the headlands too)
 function seaFar(x,y){ const C=W.coast; if(!C) return false; if(x>=0&&y>=0&&x<=N&&y<=N) return seaAt(x,y); return (x/(N/2)-1)*C.dir[0]+(y/(N/2)-1)*C.dir[1]>0.25; }
 function seaAt(x,y){ const C=W.coast; return !!C&&coastD(x,y,C,null)>0.02; }
+// a random point inside the map whose distance into the sea (coastD, with the shore's wobble) is between lo and hi, or null
+function coastPick(rnd,lo,hi,M){ const C=W.coast; if(!C) return null; M=M||24;
+  for(let t=0;t<400;t++){ const x=M+rnd()*(N-2*M), y=M+rnd()*(N-2*M), d=coastD(x,y,C,W.seed); if(d>=lo&&d<=hi) return [x,y]; } return null; }
 const W={
   h:new Float32Array(N*N), st:new Float32Array(N*N), tree:new Float32Array(N*N), gh:new Float32Array(N*N),
   cr:new Uint8Array(N*N), cg:new Uint8Array(N*N), cb:new Uint8Array(N*N),
@@ -2010,6 +2014,7 @@ function genWorld(seed){
   placeFolk(seed);   // who lives here: before the ruins, so the ruins keep clear of them
   placeStructures(seed);
   placeTown(seed);   // the inn and the mill: after the ruins, from their own stream, so no ruin moves
+  placeLighthouse(seed);
   for(let y=0;y<N-1;y++)for(let x=0;x<N-1;x++){ const i=y*N+x; W.gh[i]=(h[i]+h[i+1]+h[i+N]+h[i+N+1])*0.25+st[i]; }   // tree bases, on the ground as the ruins left it
   // base colors (albedo); the light itself is applied by shadeRows so the sun can move
   W.shadowCells=0;
@@ -2558,16 +2563,16 @@ function buildTemple(T,B){ const P0=0.6, WH=7.1, RF=7.8, CW=10.8, CR=11.5, STONE
   { const i=fCell(T,0,1); if(i>=0){ W.st[i]=P0+1.0; W.ruin[i]=DARK; } }
   return {x:T.F(0.5,0.5), room:T.F(0.5,-3.5), hole:T.F(0.5,-2.5), door:T.F(0.5,6.5), out:T.F(0.5,12), air:B+RF, B:B}; }
 // where they go: the temple in the deepest water clear of the port and the ship, the wreck at middling depth elsewhere
-function placeDeep(seed){ if(W.waterKind!=='lake') return; const rnd=mul32((seed^0xDEE9)>>>0), port=W.places.find(function(o){ return o.key==='port'; });
+function placeDeep(seed){ if(W.waterKind!=='lake'&&W.waterKind!=='coast') return; const sea=W.waterKind==='coast'; const rnd=mul32((seed^0xDEE9)>>>0), port=W.places.find(function(o){ return o.key==='port'; });
   const clear=function(x,y,R){ if(port&&Math.hypot(port.x-x,port.y-y)<R+40) return false; for(const o of W.ruins) if(Math.hypot(o.x-x,o.y-y)<o.r+R+6) return false; return true; };
   const deepAll=function(T,u0,v0,u1,v1,need){ for(let v=v0;v<=v1;v++)for(let u=u0;u<=u1;u++){ const i=fCell(T,u,v); if(i<0||W.h[i]>WATER-need) return false; } return true; };
   let best=null;
-  for(let t=0;t<1500;t++){ const an=rnd()*6.2832, rr=LAKE.r*0.8*Math.sqrt(rnd()), x=Math.round(LAKE.x+Math.cos(an)*rr), y=Math.round(LAKE.y+Math.sin(an)*rr), rot=(rnd()*4)|0;
+  for(let t=0;t<1500;t++){ const an=rnd()*6.2832, rr=LAKE.r*0.8*Math.sqrt(rnd()), q=sea?coastPick(rnd,0.16,0.7,30):null; if(sea&&!q) continue; const x=Math.round(sea?q[0]:LAKE.x+Math.cos(an)*rr), y=Math.round(sea?q[1]:LAKE.y+Math.sin(an)*rr), rot=(rnd()*4)|0;
     if(!clear(x,y,12)) continue; const T=fPlace(x,y,rot); if(!deepAll(T,-8,-8,8,10,14)) continue; const d=WATER-W.h[y*N+x]; if(!best||d>best.d) best={x:x,y:y,rot:rot,d:d}; if(t>500&&best) break; }
   if(best){ const T=fPlace(best.x,best.y,best.rot), B=levelBed(T,-8,-8,8,10); const r=buildTemple(T,B), nm=TEMPLE_NAMES[(rnd()*TEMPLE_NAMES.length)|0];
     W.ruins.push({x:r.x[0], y:r.x[1], r:10, dr:9, kind:'temple', name:nm, found:false, zMax:r.B+7.8+2.5, deep:true, hole:r.hole, door:r.door, out:r.out, B:r.B});
     W.ruins.push({x:r.room[0], y:r.room[1], r:3, dr:2.6, kind:'pocket', name:'the dry room in '+nm, found:false, zMin:r.air-0.2, zMax:r.air+4, deep:true}); }
-  for(let t=0;t<1500;t++){ const an=rnd()*6.2832, rr=LAKE.r*(0.3+0.6*rnd()), x=Math.round(LAKE.x+Math.cos(an)*rr), y=Math.round(LAKE.y+Math.sin(an)*rr), rot=(rnd()*4)|0;
+  for(let t=0;t<1500;t++){ const an=rnd()*6.2832, rr=LAKE.r*(0.3+0.6*rnd()), q=sea?coastPick(rnd,0.07,0.4,30):null; if(sea&&!q) continue; const x=Math.round(sea?q[0]:LAKE.x+Math.cos(an)*rr), y=Math.round(sea?q[1]:LAKE.y+Math.sin(an)*rr), rot=(rnd()*4)|0;
     if(!clear(x,y,10)) continue; const T=fPlace(x,y,rot); if(!deepAll(T,-1,-1,16,17,6)) continue;
     const B=levelBed(T,-1,-1,16,17); const r=buildWreck(T,B);
     W.ruins.push({x:r.x[0], y:r.x[1], open:r.open, r:9, dr:6, kind:'wreck', name:WRECK_NAMES[(rnd()*WRECK_NAMES.length)|0], found:false, zMax:Math.min(WATER-1.5,B+6), deep:true}); break; }
@@ -2607,14 +2612,22 @@ function buildPier(T,u0,u1,sh,v1,land){ const DK0=WATER+0.55;
     if(W.h[i]>DB-0.12) W.h[i]=DB-0.12; W.st[i]=0; setSpan(i,DB-W.h[i],DK-W.h[i],null); W.smat[i]=5; W.tree[i]=0; }
   for(let v=sh;v<=v1;v++) for(let u=u0;u<=u1;u++){ const i=fCell(T,u,v); if(i<0) continue; const DK=DK0+lift(v), DB=DK-0.28, cap=v===sh?DK-0.04:DB-0.12;
     for(const j of [i+1,i+N,i+N+1]){ if(W.spn[j]>0) continue; if(W.st[j]>0) continue; if(W.h[j]>cap) W.h[j]=cap; } } }
+// the harbor on a coast (v0.52.0): the berth dug deep enough for the ship, and a stone breakwater along the sea side
+// that turns in across the bow, so the ship lies in still water with a gap to sail out by
+function buildHarbor(T,sh){
+  for(let v=sh+1;v<=sh+25;v++)for(let u=1;u<=9;u++){ const i=fCell(T,u,v); if(i<0) continue; const k=Math.min(1,(v-sh)/3); if(W.h[i]>WATER-0.6-2.4*k) W.h[i]=WATER-0.6-2.4*k; }
+  const wall=function(u,v){ const i=fCell(T,u,v); if(i<0) return; W.spn[i]=0; W.tree[i]=0; W.st[i]=WATER+1.3+0.25*hash2(u+31,v+17,W.seed); W.ruin[i]=4; };
+  for(let v=sh+1;v<=sh+27;v++){ wall(10,v); wall(11,v); }
+  for(let u=4;u<=9;u++){ wall(u,sh+26); wall(u,sh+27); } }
 // a shore for the port: land here, the bank going down gently ahead, then water deep enough for a ship all along the pier
-function portSpot(rnd){ const h=W.h, dirs=[[0,1,0],[-1,0,1],[0,-1,2],[1,0,3]];
-  for(let a=0;a<12000;a++){ const easy=a>=5000, hard=a>=9000, an=rnd()*6.2832, rr=LAKE.r*(1.0+0.9*rnd()), x=Math.round(LAKE.x+Math.cos(an)*rr), y=Math.round(LAKE.y+Math.sin(an)*rr);
+function portSpot(rnd){ const h=W.h, dirs=[[0,1,0],[-1,0,1],[0,-1,2],[1,0,3]], sea=!!W.coast;   // v0.52.0: on a coast, a stretch of shore, and the harbor is dug out and walled after
+  for(let a=0;a<12000;a++){ const easy=sea||a>=5000, hard=a>=9000, an=rnd()*6.2832, rr=LAKE.r*(1.0+0.9*rnd()); let x=Math.round(LAKE.x+Math.cos(an)*rr), y=Math.round(LAKE.y+Math.sin(an)*rr);
+    if(sea){ const q=coastPick(rnd,-0.06,-0.012,34); if(!q) continue; x=Math.round(q[0]); y=Math.round(q[1]); }
     if(x<30||y<30||x>N-30||y>N-30) continue; if(Math.max(Math.abs(x-FORT.x),Math.abs(y-FORT.y))<92) continue;
     const g0=h[y*N+x]; if(g0<WATER+(hard?0.6:0.8)||g0>WATER+(hard?8:5)) continue;
     for(const d of dirs){ let sh=-1; for(let k=2;k<=(hard?12:8);k++){ if(h[(y+d[1]*k)*N+x+d[0]*k]<WATER+0.2){ sh=k; break; } } if(sh<3) continue;
       const T=fPlace(x,y,d[2]); let bad=false;
-      for(let v=sh+2;v<=sh+24&&!bad;v++)for(let u=-1;u<=9;u++){ const i=fCell(T,u,v); if(i<0){ bad=true; break; } if(u>=1&&v>=sh+3&&v<=sh+22&&h[i]>(hard?WATER-0.5:(easy?WATER-0.8:WATER-2.4))){ bad=true; break; } if(h[i]>WATER-0.3){ bad=true; break; } }
+      for(let v=sh+2;v<=sh+(sea?28:24)&&!bad;v++)for(let u=-1;u<=(sea?11:9);u++){ const i=fCell(T,u,v); if(i<0){ bad=true; break; } if(!sea&&u>=1&&v>=sh+3&&v<=sh+22&&h[i]>(hard?WATER-0.5:(easy?WATER-0.8:WATER-2.4))){ bad=true; break; } if(h[i]>WATER-0.3){ bad=true; break; } }
       if(bad) continue;
       let lo=1e9,hi=-1e9; for(let v=-12;v<=-1&&!bad;v++)for(let u=-10;u<=9;u++){ const i=fCell(T,u,v); if(i<0){ bad=true; break; } const g=h[i];
         if(W.st[i]>0||W.spn[i]>0||(W.road[i]&&!hard)||g<WATER+0.6){ bad=true; break; } if(g<lo)lo=g; if(g>hi)hi=g; }
@@ -2638,6 +2651,7 @@ function placePort(seed){ const rnd=mul32((seed^0x9047)>>>0), s=portSpot(rnd); i
     for(let u=a;u<=a+1;u++){ fPut(T,u,-3,0.95,8); fPut(T,u,-4,0.7,1); }
     fPut(T,a,-5,2.8,8); fPut(T,a+1,-5,2.8,8);
     for(let v=-5;v<=-2;v++)for(let u=a;u<=a+1;u++){ const i=fCell(T,u,v); if(i<0||(v===-5)) continue; W.tree[i]=0; addSpan(i,2.55,2.8,k===1?10:9); W.smat[i]=9; } }
+  if(W.coast) buildHarbor(T,sh);
   buildPier(T,-1,0,sh,sh+23,sh+9.5);
   // the gangway: two planks from the pier to the ship's side, halfway up
   for(const v of [sh+9,sh+10]){ const i=fCell(T,1,v); if(i<0) continue; if(W.h[i]>WATER-0.5) W.h[i]=WATER-0.5; W.st[i]=0; W.tree[i]=0; setSpan(i,WATER+1.55-W.h[i],WATER+1.85-W.h[i],5); }
@@ -2653,12 +2667,36 @@ function placePort(seed){ const rnd=mul32((seed^0x9047)>>>0), s=portSpot(rnd); i
   p.ship=T.F(4.5,v0+9);
   W.places.push(p);
   { const q=nearestPath(p.trail[0],p.trail[1],200); if(q) carvePath(p.trail[0],p.trail[1],q[0],q[1],seed+530,1.0); } }
+// the lighthouse (v0.52.0): on the highest bit of shore it can find, a headland if there is one, clear of the port, the keep
+// and every place and ruin. A whitewashed tower with a red band, a gallery and a lantern under a dark cap; the lamp is lit
+// at night and turns (tickBeacon). No keeper yet.
+function placeLighthouse(seed){ W.light=null; if(!W.coast) return; const rnd=mul32((seed^0x116E7)>>>0); let best=null;
+  for(let t=0;t<900;t++){ const q=coastPick(rnd,-0.035,-0.006,26); if(!q) continue; const x=Math.round(q[0]), y=Math.round(q[1]);
+    if(Math.max(Math.abs(x-FORT.x),Math.abs(y-FORT.y))<80) continue;
+    let ok=true, lo=1e9, hi=-1e9; for(let oy=-4;oy<=4&&ok;oy++)for(let ox=-4;ox<=4;ox++){ const i=(y+oy)*N+x+ox, g=W.h[i]; if(ox*ox+oy*oy>16) continue; if(g<WATER+0.8||W.st[i]>0||W.spn[i]>0||W.road[i]||W.floor[i]){ ok=false; break; } lo=Math.min(lo,g); hi=Math.max(hi,g); }
+    if(!ok||hi-lo>(t>450?5:3)) continue;
+    for(const o of W.places){ if(Math.hypot(o.x-x,o.y-y)<o.r+(o.key==='port'?40:16)){ ok=false; break; } }
+    for(const o of W.ruins){ if(Math.hypot(o.x-x,o.y-y)<(o.r||8)+14){ ok=false; break; } }
+    if(!ok) continue; const sc=lo+4*sm(0.55,0.7,fbm(x*0.01,y*0.01,seed+93,3));   // high ground, and a headland if there is one
+    if(!best||sc>best.sc) best={x:x,y:y,lo:lo,sc:sc}; }
+  if(!best) return; const x=best.x, y=best.y, B=best.lo-0.4, H1=B+6.0, H2=H1+2.2, H3=H2+5.4, CAP=H3+2.4;
+  ruinClear(x,y,7);
+  for(let oy=-4;oy<=4;oy++)for(let ox=-4;ox<=4;ox++){ const d=Math.hypot(ox,oy); if(d>3.6) continue; const i=(y+oy)*N+x+ox, g=W.h[i]; W.tree[i]=0; W.spn[i]=0; W.path[i]=0;
+    if(d<=2.3){ addSpan(i,B-g,H1-g,3); addSpan(i,H1+0.03-g,H2-g,9); addSpan(i,H2+0.03-g,H3-g,3);   // the tower: white, the red band, white (a hair apart, or they would merge into one span)
+      if(d<=1.2) addSpan(i,CAP-g,CAP+0.9-g,6); else addSpan(i,CAP-g,CAP+0.5-g,6); }      // the lantern stands open under the cap
+    else addSpan(i,H3-0.3-g,H3-g,6); }                                                    // the gallery round it
+  (W.lamps=W.lamps||[]).push([x+0.5,y+0.5,H3+1.6,'beacon']);   // high in the lantern, so it shows over the gallery rim
+  W.light={x:x+0.5,y:y+0.5,z:H3+1.6,top:CAP+0.9}; }
+// the lighthouse lamp: dark by day; at night a beam turns once every eight seconds, and the lamp shows while it faces you
+function tickBeacon(c){ const L=W.light; if(!L) return; const night=DAY.k<0.45;
+  const turn=skyTime*Math.PI*2/8, to=Math.atan2(P.y-L.y,P.x-L.x), face=Math.cos(turn-to), near=Math.hypot(P.x-L.x,P.y-L.y)<6;
+  CR_.z[c]=(night&&(face>0.86||near))?L.z:L.z-4; }
 // somewhere for the inn or the mill: like a farm, but within reach of a path, the door turned toward it
 function townSpot(R,rnd){ let last=null;
   for(let t=0;t<30;t++){ const s=folkSpot(R,rnd,'meadow'); if(!s) break; if(W.ruins.some(function(o){ return Math.hypot(o.x-s[0],o.y-s[1])<o.r+R+14; })) continue; last=s; const q=nearestPath(s[0],s[1],R+14); if(q&&Math.hypot(q[0]-s[0],q[1]-s[1])>R+3) return {x:s[0],y:s[1],q:q}; }
   return last?{x:last[0],y:last[1],q:nearestPath(last[0],last[1],180)}:null; }
 function placeTown(seed){ if(!DIALS.people) return; const rnd=mul32((seed^0x51A7E77)>>>0);
-  if(W.waterKind==='lake'){ placePort(seed); placeDeep(seed); }
+  if(W.waterKind==='lake'||W.waterKind==='coast'){ placePort(seed); placeDeep(seed); }   // v0.52.0: the coast gets them too
   for(let k=0;k<TOWN.length;k++){ const F=TOWN[k]; if(F.lake) continue; const s=townSpot(F.R,rnd); if(!s) continue;
     let rot=(rnd()*4)|0; if(s.q){ const dx=s.q[0]-s.x, dy=s.q[1]-s.y, D=[[0,1],[-1,0],[0,-1],[1,0]]; let bd=-9; for(let r=0;r<4;r++){ const d=D[r][0]*dx+D[r][1]*dy; if(d>bd){ bd=d; rot=r; } } }
     const x=s.x, y=s.y, T=fPlace(x,y,rot);
@@ -3346,7 +3384,7 @@ function renderFrame(px,py,pz,yaw,pitch){
         if(ww>0.3&&spc!==SP.BIRD&&(((px+dx*sdep)|0)!==cx||((py+dy*sdep)|0)!==cy)) continue;   // listed in several cells: drawn only where the ray passes closest
         const f2=fogLUT[(sdep*4)|0]; const cbase=CR_.z[cj];
         const A2=AM2[spc];
-        if(A2){ const bk=A2.banks[(A2.banks.length>1&&(ANI.vr[cj]%3)===0&&isAdult(cj))?1:0], vw=bk[ANI.v[cj]], qq=ssig/(ww*vw.wf); if(qq<=-1||qq>=1) continue;
+        if(A2){ const bk=A2.banks[bankOf(cj)], vw=bk[ANI.v[cj]], qq=ssig/(ww*vw.wf); if(qq<=-1||qq>=1) continue;
           let u=qq*0.5+0.5; if(ANI.m[cj]) u=1-u; const VW=vw.w, VH=vw.h; let mx=(u*VW)|0; if(mx<0)mx=0; if(mx>=VW)mx=VW-1;
           const fr=vw.frames[ANI.f[cj]]||vw.frames[0], H=P_.hsize*gsz, apal=A2.pal;
           let rTc=Math.floor(horizon-(cbase+H-pz)*K/sdep), rBc=Math.floor(horizon-(cbase-pz)*K/sdep);
@@ -3519,6 +3557,10 @@ function renderFrame(px,py,pz,yaw,pitch){
         const m=mirror[r]; const mr=(m>>16)&255, mg=(m>>8)&255, mb=m&255;
         let fr=wr+(mr-wr)*refl, fg=wg+(mg-wg)*refl, fbb=wb+(mb-wb)*refl;
         if(d<0.5){ const foam=(1-d/0.5)*0.5; fr+=(232-fr)*foam; fg+=(238-fg)*foam; fbb+=(238-fbb)*foam; }
+        if(W.coast&&d<4.5){ const wx=px+dx*wt[r], wy=py+dy*wt[r];   // v0.52.0 surf on the sea's side: froth at the edge, lines of foam rolling in
+          if(coastD(wx,wy,W.coast,null)>-0.14){ const roll=((d*0.32+skyTime*0.13)%1+1)%1, band=sm(0.70,0.93,roll)*(1-sm(0.93,1,roll))*(1-sm(1.5,4.5,d)),
+              edge=1-sm(0.2,1.1,d+0.3*Math.sin(skyTime*0.9+wx*0.4+wy*0.3)), fm=Math.min(1,Math.max(edge,band*0.95))*(0.85+0.15*Math.sin(wx*1.7+wy*1.3));
+            fr+=(236-fr)*fm; fg+=(241-fg)*fm; fbb+=(242-fbb)*fm; } }
         fb[r*C+i]=pack(fr,fg,fbb,fogLUT[(wt[r]*4)|0]);
         wflag[r]=0;
       }
@@ -3876,7 +3918,17 @@ const AMASK={};
     C.line(bx-4,4.4+bend*0.6,2,tip+1,7,1); C.line(bx+4,4.4+bend*0.6,18,tip+1,7,1);   // pale wing bar
     C.rect(bx-1,6.8,bx+1,7.4,3); };
   const S={up:mk(W,H,function(C){ fly(C,0.6,-1.4); }),level:mk(W,H,function(C){ fly(C,3.4,0); }),down:mk(W,H,function(C){ fly(C,6.4,1.2); }),glide:mk(W,H,function(C){ fly(C,3,0.6); })};
-  AMASK.bird={w:W+PW_,h:H+PH_,pal:pal,views:{side:{wf:1,frames:S}},walk:['up','level','down','level'],idle:['glide'],run:['up','level','down','level']}; })();
+  // the gull (v0.52.0): the same wingbeats in white, grey wings with black tips, a yellow bill; the bird's second bank
+  pal[8]=[236,236,230]; pal[10]=[156,162,170]; pal[11]=[22,22,26]; pal[6]=[226,182,60];
+  const gull=function(C,tip,bend){ const bx=10;
+    C.ell(bx,4.4,1.6,2.6,8,10,8); C.set(bx,1.6,6);
+    C.line(bx-1.4,3.6,bx-5,3.6+bend,10,2); C.line(bx-5,3.6+bend,1,tip,10,2); C.line(bx+1.4,3.6,bx+5,3.6+bend,10,2); C.line(bx+5,3.6+bend,19,tip,10,2);
+    C.line(bx-4,4.4+bend*0.6,2,tip+1,8,1); C.line(bx+4,4.4+bend*0.6,18,tip+1,8,1);
+    C.line(1,tip,2.6,tip+0.2,11,2); C.line(19,tip,17.4,tip+0.2,11,2);
+    C.rect(bx-1,6.8,bx+1,7.4,8); };
+  const mkG=function(fn){ const C=amCanvas(W+PW_,H+PH_,PAD[3],PAD[0]); fn(C); return C.outline(10); };   // a grey outline, so a white gull doesn't read as a dark one
+  const G={up:mkG(function(C){ gull(C,0.6,-1.4); }),level:mkG(function(C){ gull(C,3.4,0); }),down:mkG(function(C){ gull(C,6.4,1.2); }),glide:mkG(function(C){ gull(C,3,0.6); })};
+  AMASK.bird={w:W+PW_,h:H+PH_,pal:pal,views:{side:{wf:1,frames:S}},alt:{side:{wf:1,frames:G}},walk:['up','level','down','level'],idle:['glide'],run:['up','level','down','level']}; })();
 // ---- the animals at run time: which view and frame each one shows this frame ----
 const AMAP={}; AMAP[SP.BIRD]='bird'; AMAP[SP.RABBIT]='rabbit'; AMAP[SP.DEER]='deer'; AMAP[SP.SQUIRREL]='squirrel'; AMAP[SP.FISH]='fish';
 AMAP[SP.WOLF]='wolf'; AMAP[SP.CARCASS]='carcass'; AMAP[SP.SHEEP]='sheep'; AMAP[SP.COW]='cow'; AMAP[SP.HEN]='hen'; AMAP[SP.HORSE]='horse';
@@ -3890,6 +3942,9 @@ const AM2=[];
   for(const sp in AMAP){ const a=AMASK[AMAP[sp]], t=ATUNE[AMAP[sp]], b=[bank(a,a.views)]; if(a.alt) b.push(bank(a,a.alt));
     const idx=function(list){ return list.map(function(n){ return b[0][0].names.indexOf(n); }); };
     AM2[sp]={key:AMAP[sp], pal:a.pal, banks:b, walk:idx(a.walk), idle:idx(a.idle), run:idx(a.run), night:a.night?b[0][0].names.indexOf(a.night):-1, fpm:t.fpm, idleRate:t.idle, runAt:t.runAt, views:!!a.views.front}; } })();
+const GULL=new Uint8Array(CMAX);   // v0.52.0: which birds are gulls (drawn from the bird's second bank, kept by the shore)
+// which art bank a creature draws from: gulls for birds, otherwise every third grown animal gets the second look
+function bankOf(c){ const sp=CR_.sp[c], Q=AM2[sp]; if(!Q||Q.banks.length<2) return 0; if(sp===SP.BIRD) return GULL[c]?1:0; return ((ANI.vr[c]%3)===0&&isAdult(c))?1:0; }
 const ANI={vr:new Uint8Array(CMAX), px:new Float32Array(CMAX), py:new Float32Array(CMAX), d:new Float32Array(CMAX), v:new Uint8Array(CMAX), f:new Uint8Array(CMAX), m:new Uint8Array(CMAX), seen:new Uint32Array(CMAX), tick:1, last:0};
 // a frame name's index is the same in every view of an animal (all views draw the same poses)
 function animalFrame(px,py,yaw){ const now=skyTime, dt=Math.min(0.25,Math.max(0.001,now-ANI.last)); ANI.last=now; const tk=++ANI.tick;
@@ -5284,7 +5339,7 @@ const TOWN=[{key:'inn', role:'innkeeper', name:'the inn', R:13, b0:23, b1:6, too
             {key:'port', role:'harbormaster', name:'the harbor', R:12, b0:22, b1:5, tool:'staff', blurb:'where {harbormaster} keeps the ship tied up and the fish coming in', lake:true}];
 function townCast(seed,cast){ const r=seedRng(seed,0x7A3E), used=new Set(cast.map(function(c){ return c.given; })), out=[];
   const usedBy=new Set(cast.map(function(c){ return c.by; })), worn=new Set(cast.map(function(c){ return CLOTHES.findIndex(function(q){ return q.c===c.cloak&&q.t===c.tunic; }); }));
-  const lake=lakeCountry(seed,DIALS.water);
+  const lake=lakeCountry(seed,DIALS.water)||!!coastOf(seed,DIALS.water);   // v0.52.0: a coast harbor has its harbormaster too
   TOWN.forEach(function(T,i){ if(T.lake&&!lake) return; const pr=r()<0.5?'she':'he', ar=r(), age=ar<0.2?'young':(ar<0.75?'adult':'old');
     let given=null; for(let k=0;k<200&&!given;k++){ const pool=r()<0.4?NAMES_X:(pr==='she'?NAMES_F:NAMES_M), g=ipick(r,pool); if(!used.has(g)) given=g; }
     if(!given) given=i?'Hob':'Mabel'; used.add(given);
@@ -7340,7 +7395,7 @@ defMask(SP.TORCH,5,9,[
  "..9..",".999.",".999.","..9..",".222.","..2..","..2..","1.2.1",".111."],
  {1:[60,56,52],2:[110,78,46],9:[200,96,40]});
 function mul32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
-function addCreature(sp,x,y,ax,ay,age,par){ const c=CR_.n++; ANI.vr[c]=(Math.random()*256)|0; ANI.px[c]=x; ANI.py[c]=y; ANI.d[c]=Math.random()*4; CR_.sp[c]=sp; CR_.x[c]=x; CR_.y[c]=y; CR_.ax[c]=ax; CR_.ay[c]=ay;
+function addCreature(sp,x,y,ax,ay,age,par){ const c=CR_.n++; GULL[c]=0; ANI.vr[c]=(Math.random()*256)|0; ANI.px[c]=x; ANI.py[c]=y; ANI.d[c]=Math.random()*4; CR_.sp[c]=sp; CR_.x[c]=x; CR_.y[c]=y; CR_.ax[c]=ax; CR_.ay[c]=ay;
   CR_.vx[c]=0; CR_.vy[c]=0; CR_.st[c]=0; CR_.tm[c]=Math.random()*4; CR_.ph[c]=Math.random()*6.283;
   CR_.z[c]=Math.max(terr(x,y),WATER)+0.3; CR_.al[c]=1; CR_.tgt[c]=-1; CR_.po[c]=0; CR_.ss[c]=0;
   CR_.age[c]=age==null?1:age; CR_.par[c]=par==null?-1:par;
@@ -7348,13 +7403,14 @@ function addCreature(sp,x,y,ax,ay,age,par){ const c=CR_.n++; ANI.vr[c]=(Math.ran
 
 function populate(seed){ populateLife(seed); addPeople(); addFolk(); festAway(seed); addKelp(seed); addLamps(); }
 // kelp beds in the lake where it is deep enough to hide them, from their own stream (nothing else moves)
-function addKelp(seed){ W.kelpN=0; if(!DIALS.on||!(DIALS.water>0.3)) return; const rnd=mul32((seed^0x6E1F)>>>0); let beds=0;
-  for(let t=0;t<600&&beds<8;t++){ const an=rnd()*6.2832, rr=LAKE.r*(0.4+1.1*rnd()), x=LAKE.x+Math.cos(an)*rr, y=LAKE.y+Math.sin(an)*rr; if(x<6||y<6||x>N-7||y>N-7) continue;
+function addKelp(seed){ W.kelpN=0; if(!DIALS.on||(!(DIALS.water>0.3)&&!W.coast)) return; const rnd=mul32((seed^0x6E1F)>>>0); let beds=0;
+  const nb=W.coast?16:8;   // v0.52.0: on a coast, beds along the shelf as well
+  for(let t=0;t<900&&beds<nb;t++){ const an=rnd()*6.2832, rr=LAKE.r*(0.4+1.1*rnd()), q=(W.coast&&t%3!==0)?coastPick(rnd,0.03,0.22,10):null; const x=q?q[0]:LAKE.x+Math.cos(an)*rr, y=q?q[1]:LAKE.y+Math.sin(an)*rr; if(x<6||y<6||x>N-7||y>N-7) continue;
     const d=WATER-terr(x,y); if(d<4||d>12) continue; beds++;
     for(let k=0;k<11&&CR_.n<CMAX-8;k++){ const kx=x+(rnd()-0.5)*7, ky=y+(rnd()-0.5)*7, dd=WATER-terr(kx,ky); if(dd<4||W.st[(ky|0)*N+(kx|0)]>0||W.spn[(ky|0)*N+(kx|0)]>0) continue;
       const c=addCreature(SP.KELP,kx,ky,kx,ky,1,-1); CR_.z[c]=terr(kx,ky)-0.1; CR_.ph[c]=rnd()*6.283; W.kelpN++; } } }
 // lamps that never went out, in rooms under the lake
-function addLamps(){ for(const q of (W.lamps||[])){ if(CR_.n>=CMAX) break; const c=addCreature(SP.TORCH,q[0],q[1],0,0,1,-1); CR_.z[c]=q[2]; } }
+function addLamps(){ W.beaconC=-1; for(const q of (W.lamps||[])){ if(CR_.n>=CMAX) break; const c=addCreature(SP.TORCH,q[0],q[1],0,0,1,-1); CR_.z[c]=q[2]; if(q[3]==='beacon') W.beaconC=c; } }
 function populateLife(seed){
   const rnd=mul32((seed^0x9e3779b9)>>>0); CR_.n=0;
   RESERVE.burrows.length=0; RESERVE.meadows.length=0; RESERVE.dens.length=0;
@@ -7417,6 +7473,10 @@ function populateLife(seed){
       sch++; const fn=Math.max(4,Math.round((16+(rnd()*8|0))*pop[SP.FISH]));
       for(let k=0;k<fn;k++){ if(CR_.n>=CMAX)break; let fx=x+(rnd()-0.5)*8, fy=y+(rnd()-0.5)*8; if(terr(fx,fy)>WATER-1.2){ fx=x; fy=y; } const c=addCreature(SP.FISH, fx, fy, x, y); CR_.z[c]=WATER-0.8; }
     }
+    if(W.coast){ let k2=0; tries=0;   // v0.52.0: schools in the sea, over the shelf where you can see them
+      while(k2<nSch+2&&tries<2000){ tries++; const q=coastPick(rnd,0.03,0.25,12); if(!q) continue; const x=q[0], y=q[1]; if(terr(x,y)>WATER-2) continue; k2++;
+        const fn=Math.max(4,Math.round((14+(rnd()*8|0))*pop[SP.FISH]));
+        for(let k=0;k<fn;k++){ if(CR_.n>=CMAX)break; let fx=x+(rnd()-0.5)*8, fy=y+(rnd()-0.5)*8; if(terr(fx,fy)>WATER-1.2){ fx=x; fy=y; } const c=addCreature(SP.FISH, fx, fy, x, y); CR_.z[c]=WATER-0.8-rnd()*0.8; } } }
   }
   // wolf pack: den near a deer meadow so the pack has prey within range
   let dx=140, dy=340;
@@ -7446,6 +7506,11 @@ function populateLife(seed){
         const jx=x+(rnd()-0.5)*16, jy=y+(rnd()-0.5)*16;
         const c=addCreature(SP.BIRD, jx, jy, jx, jy); CR_.z[c]=gc+10+rnd()*8; CR_.tm[c]=4+rnd()*14; birdRoost(c,jx,jy); }
     }
+    if(W.coast){ let gf=0; tries=0;   // v0.52.0: gulls, in small flocks along the shore
+      while(gf<3&&tries<400){ tries++; const q=coastPick(rnd,-0.02,0.04,16); if(!q) continue; gf++;
+        const nb=Math.max(3,Math.round((5+(rnd()*4|0))*pop[SP.BIRD]));
+        for(let k=0;k<nb;k++){ if(CR_.n>=CMAX)break; const jx=q[0]+(rnd()-0.5)*14, jy=q[1]+(rnd()-0.5)*14;
+          const c=addCreature(SP.BIRD, jx, jy, q[0], q[1]); GULL[c]=1; CR_.z[c]=WATER+6+rnd()*5; CR_.tm[c]=4+rnd()*14; gullRoost(c,jx,jy); } } }
   }
 }
 
@@ -7500,6 +7565,14 @@ function birdRoost(c,x,y){ let bx=-1, by=-1, bd=1e9, lx=-1, ly=-1, ld=1e9;
     if(W.tree[i]>0&&d<bd){ bd=d; bx=tx; by=ty; } else if(terr(tx+0.5,ty+0.5)>WATER+0.4&&!W.st[i]&&!W.spn[i]&&!W.floor[i]&&d<ld){ ld=d; lx=tx; ly=ty; } }
   if(bx>=0){ CR_.ax[c]=bx+0.5; CR_.ay[c]=by+0.5; } else if(lx>=0){ CR_.ax[c]=lx+0.5; CR_.ay[c]=ly+0.5; }
   else { const dx=FORT.x-x, dy=FORT.y-y, d=Math.hypot(dx,dy)||1; let qx=x, qy=y; for(let k=0;k<700;k++){ qx+=dx/d; qy+=dy/d; if(terr(qx,qy)>WATER+0.4) break; } CR_.ax[c]=qx; CR_.ay[c]=qy; } }   // far out over the sea: head back toward the keep to the first dry land
+// where a gull rests: the nearest beach or the shallows just off it, never a tree or a roof
+function gullRoost(c,x,y){ let bx=-1, by=-1, bd=1e9;
+  for(let k=0;k<70;k++){ const r=2+k*0.8, a=k*2.4, tx=clamp(Math.round(x+Math.cos(a)*r),2,N-3), ty=clamp(Math.round(y+Math.sin(a)*r),2,N-3), i=ty*N+tx, g=terr(tx+0.5,ty+0.5), d=Math.hypot(tx-x,ty-y);
+    if(g>WATER-1.6&&g<WATER+1.6&&!W.st[i]&&!W.spn[i]&&!W.floor[i]&&!(W.tree[i]>0)&&d<bd){ bd=d; bx=tx; by=ty; } }
+  if(bx>=0){ CR_.ax[c]=bx+0.5; CR_.ay[c]=by+0.5; return; }
+  const C=W.coast; if(!C){ birdRoost(c,x,y); return; } let qx=x, qy=y;   // too far inland: fly out toward the sea to the first shallows
+  for(let k=0;k<500;k++){ qx+=C.dir[0]; qy+=C.dir[1]; if(qx<3||qy<3||qx>N-4||qy>N-4) break; if(terr(qx,qy)<WATER+1.4) break; }
+  CR_.ax[c]=clamp(qx,3,N-4); CR_.ay[c]=clamp(qy,3,N-4); }
 function tickBird(c,dt){
   const x=CR_.x[c], y=CR_.y[c]; let vx=CR_.vx[c], vy=CR_.vy[c]; const p=SPP[SP.BIRD];
   CR_.tm[c]-=dt;
@@ -7517,11 +7590,11 @@ function tickBird(c,dt){
     vx+=dvx*dt*p.turn*0.5; vy+=dvy*dt*p.turn*0.5;
     const s=Math.hypot(vx,vy)||1e-4, mx=p.speed;
     if(s>mx){ vx=vx/s*mx; vy=vy/s*mx; } else if(s<mx*0.5){ vx=vx/s*mx*0.5; vy=vy/s*mx*0.5; }
-    CR_.z[c]+=(Math.max(terr(x,y),WATER)+12-CR_.z[c])*Math.min(1,dt*1.5);
+    CR_.z[c]+=(Math.max(terr(x,y),WATER)+(GULL[c]?6+3*Math.sin(CR_.ph[c]*0.7):12)-CR_.z[c])*Math.min(1,dt*1.5);   // gulls fly lower, rising and dipping
     if(DAY.k<0.5 && CR_.tm[c]>3) CR_.tm[c]=3;   // dusk: head for the trees
-    if(CR_.tm[c]<=0){ CR_.st[c]=1; CR_.tm[c]=8+Math.random()*12; }
+    if(CR_.tm[c]<=0){ CR_.st[c]=1; CR_.tm[c]=8+Math.random()*12; if(GULL[c]) gullRoost(c,x,y); }
   } else {
-    { const ti0=(CR_.ay[c]|0)*N+(CR_.ax[c]|0); if(!(W.tree[ti0]>0)&&terr(CR_.ax[c],CR_.ay[c])<WATER+0.2) birdRoost(c,x,y); }   // never rest over the water: find a tree, or dry ground
+    if(!GULL[c]){ const ti0=(CR_.ay[c]|0)*N+(CR_.ax[c]|0); if(!(W.tree[ti0]>0)&&terr(CR_.ax[c],CR_.ay[c])<WATER+0.2) birdRoost(c,x,y); }   // never rest over the water: find a tree, or dry ground (gulls sit on the water)
     const hx=CR_.ax[c]-x, hy=CR_.ay[c]-y, hd=Math.hypot(hx,hy)+1e-4;
     if(hd>0.3){ const sp=p.speed*0.6*Math.min(1,hd/2); vx=hx/hd*sp; vy=hy/hd*sp; } else { vx=0; vy=0; }   // in to the branch or the ground, then sit still (v0.51.1: no more hovering in place)
     const ax=CR_.ax[c]|0, ay=CR_.ay[c]|0, ti=ay*N+ax;
@@ -7804,13 +7877,14 @@ function tick(dt){
     else if(s===SP.SQUIRREL) tickSquirrel(c,dt,px,py);
     else if(s===SP.FISH) tickFish(c,dt);
     else if(s===SP.KELP){ CR_.ph[c]+=dt*(0.7+0.0007*(c%97)); CR_.x[c]=CR_.ax[c]+Math.sin(CR_.ph[c])*0.16; CR_.y[c]=CR_.ay[c]+Math.sin(CR_.ph[c]*0.73+1.3)*0.1; continue; }   // it sways
-    else if(s===SP.CARCASS||s===SP.FIRE||s===SP.TORCH) continue;
+    else if(s===SP.TORCH){ if(c===W.beaconC) tickBeacon(c); continue; }
+    else if(s===SP.CARCASS||s===SP.FIRE) continue;
     else if(s===SP.KEEPER){ if(CR_.ax[c]===300) tickPeddler(c,dt); else if(CR_.ax[c]>=100) tickFolk(c,dt); else tickKeeper(c,dt); }
     else if(s===SP.SHEEP||s===SP.COW||s===SP.HEN||s===SP.HORSE) tickStock(c,dt);
     else tickWolf(c,dt); }
 }
 
-function copyC(d,src){ ANI.vr[d]=ANI.vr[src]; ANI.px[d]=ANI.px[src]; ANI.py[d]=ANI.py[src]; ANI.d[d]=ANI.d[src]; CR_.sp[d]=CR_.sp[src]; CR_.x[d]=CR_.x[src]; CR_.y[d]=CR_.y[src]; CR_.z[d]=CR_.z[src];
+function copyC(d,src){ GULL[d]=GULL[src]; ANI.vr[d]=ANI.vr[src]; ANI.px[d]=ANI.px[src]; ANI.py[d]=ANI.py[src]; ANI.d[d]=ANI.d[src]; CR_.sp[d]=CR_.sp[src]; CR_.x[d]=CR_.x[src]; CR_.y[d]=CR_.y[src]; CR_.z[d]=CR_.z[src];
   CR_.vx[d]=CR_.vx[src]; CR_.vy[d]=CR_.vy[src]; CR_.ax[d]=CR_.ax[src]; CR_.ay[d]=CR_.ay[src];
   CR_.st[d]=CR_.st[src]; CR_.tm[d]=CR_.tm[src]; CR_.ph[d]=CR_.ph[src];
   CR_.energy[d]=CR_.energy[src]; CR_.al[d]=CR_.al[src]; CR_.tgt[d]=CR_.tgt[src];
@@ -7824,6 +7898,7 @@ function compact(){
     map[c]=n; n++;
   }
   CR_.n=n;
+  if(W.beaconC>=0) W.beaconC=W.beaconC<oldN?map[W.beaconC]:-1;   // the lighthouse lamp moves with its creature
   for(let c=0;c<n;c++){
     const p=CR_.par[c]; CR_.par[c]=(p>=0&&p<oldN)?map[p]:-1;
     const tg=CR_.tgt[c]; CR_.tgt[c]=(tg>=0&&tg<oldN)?map[tg]:-1;
@@ -8325,9 +8400,9 @@ function boot(){
   const GLR={};   // id -> {r: the renderer, loading, lost, t0}
   const glCur=function(){ const m=RENDERS[DIALS.render|0]||RENDERS[0]; return m.file?m:null; };
   const glApi={ N:N, W:W, WATER:WATER, CLOUDH:CLOUDH, DAY:DAY, SUN:SUN, MOON:MOON, SKY:SKY, RS:RS, RMAT:RMAT, CR_:CR_, SP:SP, SPP:SPP,
-    MASKS:MASKS, KMASK:KMASK, P:P, IN:IN, DIALS:DIALS, DECO:KDECO, DECO_IMG:DECO_IMG, FORT:FORT, KEEP:KEEP, RELIGHT:RELIGHT, hash2:hash2, growOf:growOf, keeperPoseFrame:keeperPoseFrame, person3D:person3D, person3DPose:person3DPose, P3PIV:P3PIV, AM2:AM2, ANI:ANI, animalFrame:animalFrame, isAdult:isAdult, spanHulls:spanHulls, spanK:SPANS, terr:terr,
+    MASKS:MASKS, KMASK:KMASK, P:P, IN:IN, DIALS:DIALS, DECO:KDECO, DECO_IMG:DECO_IMG, FORT:FORT, KEEP:KEEP, RELIGHT:RELIGHT, hash2:hash2, growOf:growOf, keeperPoseFrame:keeperPoseFrame, bankOf:bankOf, person3D:person3D, person3DPose:person3DPose, P3PIV:P3PIV, AM2:AM2, ANI:ANI, animalFrame:animalFrame, isAdult:isAdult, spanHulls:spanHulls, spanK:SPANS, terr:terr,
     fog:function(){ return [FOG_R,FOG_G,FOG_B]; }, uw:function(){ return UW; }, skyTime:function(){ return skyTime; } };
-  if(/[?&]test=1/.test(location.search)) window.__keepTest={P:P,FORT:FORT,DAY:DAY,DIALS:DIALS,sunUpdate:sunUpdate,floorAt:floorAt,terr:terr,genWorld:genWorld,populate:populate,spawn:spawn,EYE:EYE,applyWorld:applyWorld,seedDials:seedDials,NAV:NAV,CR_:CR_,SP:SP,W:W,fPlace:fPlace,seaAt:seaAt,WATER:WATER,chooseRender:function(i){ chooseRender(i); }};   // headless render checks only
+  if(/[?&]test=1/.test(location.search)) window.__keepTest={GULL:GULL,P:P,FORT:FORT,DAY:DAY,DIALS:DIALS,sunUpdate:sunUpdate,floorAt:floorAt,terr:terr,genWorld:genWorld,populate:populate,spawn:spawn,EYE:EYE,applyWorld:applyWorld,seedDials:seedDials,NAV:NAV,CR_:CR_,SP:SP,W:W,fPlace:fPlace,seaAt:seaAt,WATER:WATER,chooseRender:function(i){ chooseRender(i); }};   // headless render checks only
   const glSlot=function(id){ return GLR[id]||(GLR[id]={r:null,loading:false,lost:0,t0:0}); };
   function glDrop(id){ const g=GLR[id]; if(!g||!g.r) return; g.r.onLost=null; try{ g.r.destroy(); }catch(e){} g.r=null; }
   function glFail(m,why){
@@ -8584,7 +8659,7 @@ function boot(){
 
 if(IS_NODE){ module.exports={genWorld,allocGrid,buildGlyphs,renderFrame,compose,spawn,populate,tick,ecology,simBin,updatePlayer,W,RS,FB,P,IN,CR_,SP,SPP,MASKS,RESERVE,RAMP,N,WATER,EYE,terr,groundAt,DIALS,growOf,isAdult,addCreature,WALLS,buildWalls,nearestWall,allWallHits,wallBlocked,setSkyTime:function(t){skyTime=t;},setUW:function(v){UW=v;},DAY,SUN,MOON,SKY,DAYMODES,sunAltAz,sunUpdate,updateDay,relightAll,relightStep,RELIGHT,dayDate,fmtTod,setTod:function(h){DAY.tod=h;sunUpdate();},floorAt,KPATHS,KEEP,FORT,eventsForDay,weddingDay,babyDay,valleyDay,logEvent,eventsRefresh,dayTick,restock,stockTakeable,stockOwner,evBind,evWhen,evKey,seedDials,valleyTraits,chooseSeed,applyWorld,worldOf,TRAITS37,WORLD_KEYS,getPlayerLand:function(){ return PLAYER_LAND; },seedParse,babyFor,pedWays,pedShelter,carveRoads,exitAngles,roadCheck,roadStay,travelTo,spawnAtExit,VISITED,ROADS,PED,pedTick,pedDay,pedFind,pedRouteIn,pedPitch,pedWay,TALKP,ROAD_DIALS,ROLEPED,stormLevel,stormWindows,stormOngoing,underCover,stormLight,TALKS,STORMC,evBase,keeperAbed,FISHSIZE,TALKE,EVTAG,EVKINDS,wedNow,relOf,TALK,TALKX,LINES,POSEWHO,talkPick,talk,chatMore,closeChat,chatTick,CHAT,HEARD,VISITS,heardKey,heardAdd,lineOk,whoOk,placeName,placeDir,setChat:function(h){chatHook=h;},castValley,valleyName,valleyNames,seedRng,rebuildPeople,KEEPERS,GREETN,lineOk,fillLine,peopleHere,ALLHERE,ROLEKEY,ROLES,NAMES_F,NAMES_M,NAMES_X,BYNAMES,CLOTHES,SKINS,HAIRS,TRAITS,TRAIT_CLASH,RELREV,dayPart,folkMissing,tickKeeper,KMASK,KL,keeperFrame,GREETT,setGreet:function(f){greetHook=f;},RENDERS,SPANS,spanTop,spanBot,ceilOver,solidAt,pushToOpen,addSpan,YARD,stampKeepMass,keepLook,getKLOOK:function(){ return KLOOK; },CBIN,AM2,AMASK};
   Object.assign(module.exports,{navWho,navTargets,navGoal,NAV,journalNotes,fPlace,buildHouse,UPF,FOLK_BUILD,FARM_BED,SHIP,lakeCountry,LAKE,talkPick,townId,waterLine,spanSolid,levelBed,setGreet:function(f){ greetHook=f; },ruinCheck,UWnow:function(){ return UW; },landRuin,});
-  Object.assign(module.exports,{SOUND,soundScene,soundFloor,soundPan,soundTick,soundToast,soundOn,soundOff,soundWanted,SOUNDS,banditsLeave,mendRoad,ringBusy,setGreet:function(f){ greetHook=f; },keepLook,keepWord,KLOOK_:function(){ return KLOOK; },keepDress,keepFires,banditsHere,banditCast,chiefId,beatMend,beatMoths,beatBandit,mothCheck,hallNow,keepTag,TALKK3,keepNotes,LORE5,BANDIT_PATH,SONGLORE,songWho,RING_N,RING,ringBusy,ringSpot,ringPlan,ringRead,exitAngles,ringCheck,beatRing,ringTag,ringNotes,TALKR,LORE4,ringNight,roleName,festAway,festList,nearRoad,sentHere,GREETN,TROUBLES2,beatRoof,beatRoofW,beatAxe,beatBet,beatCake,beatSong,beatFest,trouble2Tag,trouble2Notes,festNotes,festGuests,festEnd,festTag,helpedAway,FEST,TALKT2,TALKF,LORE3,SONG,SONGLORE,songWho,farFor,roadPath,beatCrown,beatFriend,coastOf,coastD,seaAt,person3D,person3DPose,buildPerson3D,beatLake,lakeCheck,lakeNotes,lakeSeen,lakeTag,lakeOf,beatPort,portCheck,portNotes,portKind,portRingAt,portLampAt,navRoute,navRouteC,LAKESHIPS,TALKW,CROWN,crownTag,friendTag,TALKC,LORE2,FRIENDWHAT,PAUSED,chatPause,chatResume,nearPerson,talkTo,REP,TITLES,NICKS,earned,deedName,calledBy,legendName,didHere,legendFor,legendTold,LORE,loreFor,loreTake,loreCountHere,TALKK,leftFacts,leftPath,leftEnsure,leftThreads,leftHere,leftOf,hasAsker,leftKey,LREASONS,TALKL,fillBeat,troublesFor,trGet,trTag,stoneFacts,lightCheck,LIGHTS,TALKT,arriveExit,SNOOZE,part,fixPart,neighborSeed,roadDest,roadLink,visitNote,metNote,valleyCount,storyBeat,journalNotes,chatPick,ERRANDS,errandTarget,letterFacts,CHATX:CHAT,cleanName,nameHash,randomName,homeSeed,isHome,inHome,youName,journalLoad,journalSave,journalBlank,storyNew,storyResume,storyAt,parentsFor,castWithHome,addParents,TALKH,PARENT_IDS,addKeeper,
+  Object.assign(module.exports,{GULL,bankOf,coastPick,placeLighthouse,tickBeacon,SOUND,soundScene,soundFloor,soundPan,soundTick,soundToast,soundOn,soundOff,soundWanted,SOUNDS,banditsLeave,mendRoad,ringBusy,setGreet:function(f){ greetHook=f; },keepLook,keepWord,KLOOK_:function(){ return KLOOK; },keepDress,keepFires,banditsHere,banditCast,chiefId,beatMend,beatMoths,beatBandit,mothCheck,hallNow,keepTag,TALKK3,keepNotes,LORE5,BANDIT_PATH,SONGLORE,songWho,RING_N,RING,ringBusy,ringSpot,ringPlan,ringRead,exitAngles,ringCheck,beatRing,ringTag,ringNotes,TALKR,LORE4,ringNight,roleName,festAway,festList,nearRoad,sentHere,GREETN,TROUBLES2,beatRoof,beatRoofW,beatAxe,beatBet,beatCake,beatSong,beatFest,trouble2Tag,trouble2Notes,festNotes,festGuests,festEnd,festTag,helpedAway,FEST,TALKT2,TALKF,LORE3,SONG,SONGLORE,songWho,farFor,roadPath,beatCrown,beatFriend,coastOf,coastD,seaAt,person3D,person3DPose,buildPerson3D,beatLake,lakeCheck,lakeNotes,lakeSeen,lakeTag,lakeOf,beatPort,portCheck,portNotes,portKind,portRingAt,portLampAt,navRoute,navRouteC,LAKESHIPS,TALKW,CROWN,crownTag,friendTag,TALKC,LORE2,FRIENDWHAT,PAUSED,chatPause,chatResume,nearPerson,talkTo,REP,TITLES,NICKS,earned,deedName,calledBy,legendName,didHere,legendFor,legendTold,LORE,loreFor,loreTake,loreCountHere,TALKK,leftFacts,leftPath,leftEnsure,leftThreads,leftHere,leftOf,hasAsker,leftKey,LREASONS,TALKL,fillBeat,troublesFor,trGet,trTag,stoneFacts,lightCheck,LIGHTS,TALKT,arriveExit,SNOOZE,part,fixPart,neighborSeed,roadDest,roadLink,visitNote,metNote,valleyCount,storyBeat,journalNotes,chatPick,ERRANDS,errandTarget,letterFacts,CHATX:CHAT,cleanName,nameHash,randomName,homeSeed,isHome,inHome,youName,journalLoad,journalSave,journalBlank,storyNew,storyResume,storyAt,parentsFor,castWithHome,addParents,TALKH,PARENT_IDS,addKeeper,
     setMode:function(m,st){ MODE=m; STORY=st; },getStory:function(){ return STORY; },getMode:function(){ return MODE; },setJournal:function(j){ JOURNAL=j; },getJournal:function(){ return JOURNAL; },journalOff:function(){ return JOURNAL_OFF; }}); }
 else boot();
 })();
