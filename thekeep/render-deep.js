@@ -1,4 +1,4 @@
-// The Keep · render-deep.js · v0.51.0 · Nov 19 2026
+// The Keep · render-deep.js · v0.51.1 · Nov 20 2026
 // Deep: the same world as Mesh, drawn for light and water, after Noniv's Abyssal Garden (MIT).
 // What it borrows: the world is drawn into an off-screen picture first, and a second pass then adds what
 // light does in air and water. Distance haze above the water; under it, colour soaked up by distance
@@ -220,8 +220,9 @@ uniform float uWater; out vec3 vW;
 void main(){ vec2 p=vec2((gl_VertexID==1||gl_VertexID==3)?2048.0:-1536.0,(gl_VertexID>=2)?2048.0:-1536.0);   // past the map too: on a coast the sea runs on to the horizon (the bed is the edge's, so hills stay dry)
   vW=vec3(p,uWater); gl_Position=uVP*vec4(vW,1.0); }`;
 const FS_WATER=HEAD+FINISH+SKYFN+`
-uniform sampler2D uH; uniform float uWater; in vec3 vW; out vec4 o;
+uniform sampler2D uH; uniform float uWater; uniform vec3 uSea; in vec3 vW; out vec4 o;
 void main(){ ivec2 cell=clamp(ivec2(floor(vW.xy)),ivec2(0),ivec2(511)); float bed=texelFetch(uH,cell,0).r;
+  if(uSea.z>0.5&&(vW.x<0.0||vW.y<0.0||vW.x>512.0||vW.y>512.0)&&dot(vW.xy/256.0-1.0,uSea.xy)>0.25) bed=min(bed,uWater-20.0);   // past the map on the sea's side: open sea, beside the headlands too
   float depth=uWater-bed; if(depth<-0.4) discard;
   vec3 v=normalize(vW-uEye);
   vec2 rp=vec2(0.030*sin(vW.x*0.9+uTime*1.3)+0.018*sin(vW.y*1.7-uTime*0.9+vW.x*0.3), 0.030*cos(vW.y*0.8+uTime*1.1)+0.018*cos(vW.x*1.5+uTime*0.7));
@@ -638,7 +639,7 @@ function create(A){
       if(Q2&&A.ANI){ const AN=A.ANI, bi=(Q2.banks.length>1&&(AN.vr[c]%3)===0&&(!A.isAdult||A.isAdult(c)))?1:0, vi=AN.v[c], vw=Q2.banks[bi][vi]||Q2.banks[bi][0];
         const key='a'+sp+'_'+bi+'_'+(vw.has||vi===0?vi:0)+'_'+AN.f[c]; if(atlasMap[key]==null) continue; const uv=slotUV[atlasMap[key]];
         spData.set([x,y,z,0, P_.wsize*g*vw.wf,P_.hsize*g,0,sp===SP.BIRD?1:amb, uv[0],uv[1],uv[2],uv[3], -1,0,AN.m[c],0],o); k++; continue; }
-      if(sp===SP.BIRD){ const fr=Math.sin(A.skyTime()*7+c*1.7)>0?1:0, uv=slotUV[atlasMap['b'+fr]];
+      if(sp===SP.BIRD){ const fr=(C.st[c]===1&&Math.hypot(C.vx[c],C.vy[c])<0.05)?0:(Math.sin(A.skyTime()*7+c*1.7)>0?1:0), uv=slotUV[atlasMap['b'+fr]];
         spData.set([x,y,z+P_.hsize*g*0.2,0, P_.wsize*g,P_.hsize*g*0.55,0,1, uv[0],uv[1],uv[2],uv[3], -1,0,0,0],o); k++; continue; }
       const key='m'+sp; if(atlasMap[key]==null) continue; const uv=slotUV[atlasMap[key]];
       // the masks face right; turn them to face the way the animal walks, as seen from here
@@ -702,7 +703,7 @@ function create(A){
       gl.disable(gl.POLYGON_OFFSET_FILL); gl.depthMask(true); gl.disable(gl.BLEND); }
     // water last, see-through near the shore; it writes depth, so the second pass measures haze and murk to the surface
     gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA); gl.depthMask(true);
-    common(PW,U,vp); skyUniforms(PW,U); bindTex(PW,'uH',0,texH); gl.uniform1f(PW.u.uWater,A.WATER);
+    common(PW,U,vp); skyUniforms(PW,U); bindTex(PW,'uH',0,texH); gl.uniform1f(PW.u.uWater,A.WATER); { const Cs=A.W&&A.W.coast; gl.uniform3f(PW.u.uSea,Cs?Cs.dir[0]:0,Cs?Cs.dir[1]:0,Cs?1:0); }
     gl.bindVertexArray(vaoEmpty); gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
     gl.disable(gl.BLEND); gl.disable(gl.DEPTH_TEST);
     // ---- the second pass ----
@@ -743,5 +744,5 @@ function create(A){
   try{ rebuild(); resize(); R.ok=true; }catch(e){ R.error=String(e&&e.message||e).slice(0,300); canvas.remove(); }
   return R;
 }
-window.KeepDeep={ create:create, version:'v0.51.0' };
+window.KeepDeep={ create:create, version:'v0.51.1' };
 })();

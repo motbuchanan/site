@@ -1,4 +1,4 @@
-// The Keep · render-ray.js · v0.21.0 · Oct 30 2026
+// The Keep · render-ray.js · v0.51.1 · Nov 20 2026 (up to four spans per cell: vaults, floors, roofs)
 // The same world drawn with rays, the way Shadertoy demos draw theirs: no triangles for the land at all. For every pixel
 // one small program walks a ray across the same height data the ASCII raycaster reads, then walks toward the sun for a
 // soft shadow and off the lake for a real reflection. Sky, light and the people are shared with the Mesh renderer.
@@ -80,16 +80,22 @@ const VS_RAY=`#version 300 es
 out vec2 vN; void main(){ vec2 p=vec2((gl_VertexID==1)?3.0:-1.0,(gl_VertexID==2)?3.0:-1.0); vN=p; gl_Position=vec4(p,0.0,1.0); }`;
 const FS_RAY=HEAD+FINISH+SKYFN+`
 uniform mat4 uInv; uniform sampler2D uMax; uniform sampler2D uH; uniform sampler2D uS; uniform sampler2D uAlb; uniform sampler2D uInf; uniform sampler2D uCr; uniform sampler2D uC;
+uniform sampler2D uSA; uniform sampler2D uSB; uniform sampler2D uSM;
 uniform vec3 uMatF[14]; uniform vec3 uMatT[14]; uniform float uMatCH[14]; uniform float uMatMoss[14];
 uniform float uDk; uniform float uDark; uniform float uCast; uniform float uWater; uniform int uSteps;
 in vec2 vN; out vec4 o;
 float hLin(vec2 p){ return texture(uH,(p+0.5)/512.0).r; }
-// what stands at p: ground (h + stone), a floating slab [s.y,s.z], a tree crown [h+bot,h+top], a trunk up to s.w
-struct Col { float h; float g; vec4 s; float cb; float ct; };
+// what stands at p: ground (h + stone), up to four floating spans (vaults, floors, roofs: a = spans 0 and 1 as
+// bottom,top,bottom,top; b = spans 2 and 3), a tree crown [h+bot,h+top], a trunk up to s.w
+struct Col { float h; float g; vec4 s; vec4 a; vec4 b; float cb; float ct; };
 Col colAt(vec2 p){ Col c; ivec2 q=clamp(ivec2(floor(p)),ivec2(0),ivec2(511)); c.h=hLin(p); c.s=texelFetch(uS,q,0); c.g=c.h+c.s.x;
+  if(c.s.y>0.5){ c.a=texelFetch(uSA,q,0); c.b=texelFetch(uSB,q,0); } else { c.a=vec4(0.0); c.b=vec4(0.0); }   // s.y: how many spans (most cells: none, skip the reads)
   vec2 cr=texture(uCr,p/512.0).rg*(255.0/4.0); c.cb=c.h+cr.x; c.ct=c.h+cr.y; return c; }
 bool crownAt(Col c,float z){ return c.ct-c.cb>0.35&&z>c.cb&&z<c.ct; }
-bool slabAt(Col c,float z){ return c.s.z>c.s.y&&z>=c.s.y&&z<=c.s.z; }
+vec2 spanK(Col c,int k){ return k==0?c.a.xy:(k==1?c.a.zw:(k==2?c.b.xy:c.b.zw)); }
+bool hasSpan(Col c){ return c.a.y>c.a.x; }
+bool slabAt(Col c,float z){ for(int k=0;k<4;k++){ vec2 q=spanK(c,k); if(q.y>q.x&&z>=q.x&&z<=q.y) return true; } return false; }
+float slabDist(Col c,float z){ float d=1e9; for(int k=0;k<4;k++){ vec2 q=spanK(c,k); if(q.y>q.x) d=min(d,z<q.x?q.x-z:z-q.y); } return d; }
 bool trunkAt(Col c,vec3 p){ if(c.s.w<=0.0||p.z>c.s.w) return false; vec2 d=fract(p.xy)-0.5; return dot(d,d)<0.04; }
 // kind: 1 ground, 2 stone, 3 slab, 4 leaves, 5 trunk
 int solidAt(vec3 p){ Col c=colAt(p.xy);
@@ -129,13 +135,13 @@ float march(vec3 ro,vec3 rd,float tmax,int steps,out int kind,out vec3 hp,out ve
         if(s.x>0.02&&lastN!=vec3(0.0)){ kind=2; hp=p; pp=p-rd*0.01; hn=lastN; return t; }
         float a=tp, b=t; for(int j=0;j<8;j++){ float m=0.5*(a+b); if(solidAt(ro+rd*m)>0) b=m; else a=m; }
         kind=solidAt(ro+rd*b); if(kind==0) kind=s.x>0.02?2:1; hp=ro+rd*b; pp=ro+rd*a; return b; }
-      if(s.z>s.y&&p.z>=s.y&&p.z<=s.z){ kind=3; hp=p; pp=p-rd*0.01; hn=lastN!=vec3(0.0)?lastN:vec3(0.0,0.0,rd.z<0.0?1.0:-1.0); return t; }
+      if(slabAt(c,p.z)){ kind=3; hp=p; pp=p-rd*0.01; hn=lastN!=vec3(0.0)?lastN:vec3(0.0,0.0,rd.z<0.0?1.0:-1.0); return t; }
       float tHit=1e9; int kh=0; vec3 nh=vec3(0.0);
       if(pX.z<gX){ float a=t, b=t1; for(int j=0;j<10;j++){ float m=0.5*(a+b); vec3 q=ro+rd*m; if(q.z<hLin(q.xy)+s.x) b=m; else a=m; }
         tHit=b; kh=s.x>0.02?2:1; nh=s.x>0.02?vec3(0.0,0.0,1.0):vec3(0.0); }
-      if(s.z>s.y){
-        if(rd.z<0.0&&p.z>s.z){ float tq=(s.z-ro.z)/rd.z; if(tq<=t1&&tq<tHit){ tHit=tq; kh=3; nh=vec3(0.0,0.0,1.0); } }
-        if(rd.z>0.0&&p.z<s.y){ float tq=(s.y-ro.z)/rd.z; if(tq<=t1&&tq<tHit){ tHit=tq; kh=3; nh=vec3(0.0,0.0,-1.0); } } }
+      for(int k=0;k<4;k++){ vec2 q=spanK(c,k); if(q.y<=q.x) continue;
+        if(rd.z<0.0&&p.z>q.y){ float tq=(q.y-ro.z)/rd.z; if(tq<=t1&&tq<tHit){ tHit=tq; kh=3; nh=vec3(0.0,0.0,1.0); } }
+        if(rd.z>0.0&&p.z<q.x){ float tq=(q.x-ro.z)/rd.z; if(tq<=t1&&tq<tHit){ tHit=tq; kh=3; nh=vec3(0.0,0.0,-1.0); } } }
       if(s.w>0.0){ vec2 cc=cf+0.5, d=ro.xy-cc; float aa=dot(rd.xy,rd.xy), bq=dot(d,rd.xy), cq=dot(d,d)-0.04, disc=bq*bq-aa*cq;
         if(disc>0.0&&aa>1e-8){ float tt=(-bq-sqrt(disc))/aa; if(tt>=t&&tt<=t1&&tt<tHit){ vec3 q=ro+rd*tt; if(q.z<s.w&&q.z>hLin(q.xy)){ tHit=tt; kh=5; nh=vec3(normalize(q.xy-cc),0.0); } } } }
       for(int j=0;j<3;j++){ float tm=mix(t,t1,(float(j)+0.5)/3.0); if(tm>=tHit) break; vec3 q=ro+rd*tm;
@@ -151,7 +157,7 @@ float march(vec3 ro,vec3 rd,float tmax,int steps,out int kind,out vec3 hp,out ve
       kind=k; hp=ro+rd*b; pp=ro+rd*a; return b; }
     float d=p.z-c.g;
     if(c.ct-c.cb>0.35) d=min(d,p.z<c.cb?c.cb-p.z:p.z-c.ct);
-    if(c.s.z>c.s.y) d=min(d,p.z<c.s.y?c.s.y-p.z:p.z-c.s.z);
+    if(hasSpan(c)) d=min(d,slabDist(c,p.z));
     tp=t; t+=clamp(d*0.6,0.05,0.5+(t-80.0)*0.02); lastN=vec3(0.0);
     if(t>tmax) break; }
   return -1.0; }
@@ -162,7 +168,7 @@ float shadowRay(vec3 p,vec3 L){ if(uCast<0.5||L.z<=0.0) return 1.0;
     if(q.z>bm+1.5){ t=max(blockExit(p,L,q,-1e3),t+0.25); if(t>160.0) break; continue; }   // clear air over this block: skip it; the penumbra comes from the near walk
     Col c=colAt(q.xy);
     if(q.z<c.g||slabAt(c,q.z)||crownAt(c,q.z)) return 0.0;
-    float d=q.z-c.g; if(c.ct-c.cb>0.35&&q.z<c.cb) d=min(d,c.cb-q.z);
+    float d=q.z-c.g; if(c.ct-c.cb>0.35&&q.z<c.cb) d=min(d,c.cb-q.z); if(hasSpan(c)) d=min(d,slabDist(c,q.z));   // thin floors stop the sun too
     res=min(res,6.0*d/t); t+=clamp(d*0.7,0.2,1.0); if(t>160.0) break; }
   return clamp(res,0.0,1.0); }
 float aoAt(vec3 p,vec3 n){ float occ=0.0, w=1.0;
@@ -175,16 +181,21 @@ float bricks(vec3 w,float along,int m,out float bi,out float zi){ float ch=uMatC
   zi=floor(w.z*1.3); bi=floor(along*1.3); return 0.86+0.20*hash(vec2(bi,zi)+17.0); }
 // light and color at a hit, the same light the raycaster uses: (ambient + sun on the slope) x shadow
 vec3 shade(int kind,vec3 hp,vec3 pp,vec3 rd,float t,bool cheap,vec3 nIn,out vec3 nrm){
-  ivec2 cell=clamp(ivec2(floor(hp.xy)),ivec2(0),ivec2(511)); vec3 n=vec3(0.0,0.0,1.0); vec3 alb; vec4 inf0=texelFetch(uInf,cell,0); int m=int(inf0.r*255.0+0.5); if(kind==3){ int sm=int(inf0.b*255.0+0.5); if(sm>0) m=sm; } m=min(m,13);
-  vec4 sc=texelFetch(uS,cell,0);
-  bool side=(kind==2&&pp.z<hLin(hp.xy)+sc.x-0.02)||(kind==3&&pp.z>sc.y+0.02&&pp.z<sc.z-0.02);
+  ivec2 cell=clamp(ivec2(floor(hp.xy)),ivec2(0),ivec2(511)); vec3 n=vec3(0.0,0.0,1.0); vec3 alb; vec4 inf0=texelFetch(uInf,cell,0); int m=int(inf0.r*255.0+0.5);
+  vec4 sc=texelFetch(uS,cell,0); vec2 sq=vec2(0.0);
+  if(kind==3){ int sm=int(inf0.b*255.0+0.5); if(sm>0) m=sm;
+    Col cc=colAt(hp.xy); vec4 mm=texelFetch(uSM,cell,0); float best=1e9; int bk=0;   // the span nearest the hit
+    for(int k=0;k<4;k++){ vec2 q=spanK(cc,k); if(q.y<=q.x) continue; float dd=hp.z<q.x?q.x-hp.z:(hp.z>q.y?hp.z-q.y:0.0); if(dd<best){ best=dd; bk=k; sq=q; } }
+    float mk=bk==0?mm.r:(bk==1?mm.g:(bk==2?mm.b:mm.a)); int mi=int(mk*255.0+0.5); if(mi>0) m=mi-1; }
+  m=min(m,13);
+  bool side=(kind==2&&pp.z<hLin(hp.xy)+sc.x-0.02)||(kind==3&&pp.z>sq.x+0.02&&pp.z<sq.y-0.02);
   if(side){ vec2 f=fract(hp.xy)-0.5; n=abs(f.x)>=abs(f.y)?vec3(sign(f.x),0.0,0.0):vec3(0.0,sign(f.y),0.0);
     vec2 g=pp.xy-hp.xy; if(dot(n.xy,g)<0.0) n=-n; }
   if((kind==2||kind==3)&&dot(nIn,nIn)>0.5){ n=nIn; side=abs(nIn.z)<0.5; }
   if(kind==1){ float e=0.5; n=normalize(vec3(hLin(hp.xy-vec2(e,0))-hLin(hp.xy+vec2(e,0)),hLin(hp.xy-vec2(0,e))-hLin(hp.xy+vec2(0,e)),2.0*e));
     alb=texture(uAlb,hp.xy/512.0).rgb*(0.93+0.12*hash(floor(hp.xy*3.0))); }
   else if(kind==2||kind==3){
-    if(kind==3&&!side&&pp.z<sc.y+0.02) n=vec3(0.0,0.0,-1.0);
+    if(kind==3&&!side&&pp.z<sq.x+0.02) n=vec3(0.0,0.0,-1.0);
     if(n.z>0.5){ alb=uMatT[m]*(0.94+0.14*hash(vec2(cell))); if(uMatMoss[m]>0.0&&hash(vec2(cell)+13.0)<uMatMoss[m]*0.5) alb=mix(alb,vec3(92.,124.,62.)/255.,0.55); }
     else if(n.z<-0.5){ nrm=n; return uMatF[m]*0.83*texelFetch(uC,cell,0).a; }
     else { float bi,zi; float along=abs(n.x)>0.5?hp.y:hp.x; alb=uMatF[m]*bricks(hp,along,m,bi,zi);
@@ -334,6 +345,7 @@ function create(A){
 
   // ---- what the rays read: heights, stone and slabs, albedo, materials, and a map of tree crowns at half-metre detail ----
   const texSt=tex(N,N,gl.RGBA16F,gl.RGBA,gl.FLOAT,gl.NEAREST,gl.CLAMP_TO_EDGE);
+  const texSA=tex(N,N,gl.RGBA16F,gl.RGBA,gl.FLOAT,gl.NEAREST,gl.CLAMP_TO_EDGE), texSB=tex(N,N,gl.RGBA16F,gl.RGBA,gl.FLOAT,gl.NEAREST,gl.CLAMP_TO_EDGE), texSM=tex(N,N,gl.RGBA8,gl.RGBA,gl.UNSIGNED_BYTE,gl.NEAREST,gl.CLAMP_TO_EDGE);
   const texAlb=tex(N,N,gl.RGBA8,gl.RGBA,gl.UNSIGNED_BYTE,gl.LINEAR,gl.CLAMP_TO_EDGE);
   const texInf=tex(N,N,gl.RGBA8,gl.RGBA,gl.UNSIGNED_BYTE,gl.NEAREST,gl.CLAMP_TO_EDGE);
   const CR=1024, texCr=tex(CR,CR,gl.RG8,gl.RG,gl.UNSIGNED_BYTE,gl.LINEAR,gl.CLAMP_TO_EDGE);
@@ -341,11 +353,13 @@ function create(A){
   const NB=N/8, texMax=tex(NB,NB,gl.R32F,gl.RED,gl.FLOAT,gl.NEAREST,gl.CLAMP_TO_EDGE);
   const matF=new Float32Array(42), matT=new Float32Array(42), matCH=new Float32Array(14), matMoss=new Float32Array(14);
   for(let m=0;m<14;m++){ const M=A.RMAT[m]||A.RMAT[0]; for(let k=0;k<3;k++){ matF[m*3+k]=M.f[k]/255; matT[m*3+k]=M.t[k]/255; } matCH[m]=M.ch; matMoss[m]=M.moss; }
-  function buildWorldTex(){ const h=W.h, st=W.st, HU=A.spanHulls(), sb=HU.b, su=HU.t;
+  function buildWorldTex(){ const h=W.h, st=W.st, HU=A.spanHulls(), su=HU.t, K=A.spanK;
+    const SA=new Float32Array(N*N*4), SB=new Float32Array(N*N*4), SM=new Uint8Array(N*N*4);
+    for(let i=0;i<N*N;i++){ const n=Math.min(4,W.spn[i]); for(let k=0;k<n;k++){ const D=k<2?SA:SB, o=i*4+(k&1)*2; D[o]=h[i]+W.spb[i*K+k]; D[o+1]=h[i]+W.spt[i*K+k]; SM[i*4+k]=W.spm[i*K+k]; } }
     const S=new Float32Array(N*N*4), AL=new Uint8Array(N*N*4), IN=new Uint8Array(N*N*4), CRD=new Uint8Array(CR*CR*2);
     for(let i=0;i<CR*CR;i++){ CRD[i*2]=255; CRD[i*2+1]=0; }   // no crown: bottom high, top low, so the edge of a crown stays crisp
     for(let y=0;y<N;y++)for(let x=0;x<N;x++){ const i=y*N+x;
-      S[i*4]=st[i]; if(su[i]>0){ S[i*4+1]=h[i]+sb[i]; S[i*4+2]=h[i]+su[i]; }
+      S[i*4]=st[i]; S[i*4+1]=Math.min(4,W.spn[i]);
       AL[i*4]=W.ar[i]; AL[i*4+1]=W.ag[i]; AL[i*4+2]=W.ab[i]; AL[i*4+3]=255;
       IN[i*4]=W.ruin[i]; IN[i*4+1]=W.ttype[i]; IN[i*4+2]=W.smat[i];
       const th=W.tree[i]; if(!(th>0)) continue;
@@ -361,6 +375,9 @@ function create(A){
         const j=(v*CR+u)*2, bot=Math.max(0,Math.round((cb0-base)*4)), tp=Math.min(255,Math.round((ct-base)*4));
         if(tp>CRD[j+1]){ CRD[j+1]=tp; CRD[j]=bot; } } }   // where crowns overlap, the tallest one owns the texel, bottom and top
     gl.bindTexture(gl.TEXTURE_2D,texSt); gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,N,N,gl.RGBA,gl.FLOAT,S);
+    gl.bindTexture(gl.TEXTURE_2D,texSA); gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,N,N,gl.RGBA,gl.FLOAT,SA);
+    gl.bindTexture(gl.TEXTURE_2D,texSB); gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,N,N,gl.RGBA,gl.FLOAT,SB);
+    gl.bindTexture(gl.TEXTURE_2D,texSM); gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,N,N,gl.RGBA,gl.UNSIGNED_BYTE,SM);
     gl.bindTexture(gl.TEXTURE_2D,texAlb); gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,N,N,gl.RGBA,gl.UNSIGNED_BYTE,AL);
     gl.bindTexture(gl.TEXTURE_2D,texInf); gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,N,N,gl.RGBA,gl.UNSIGNED_BYTE,IN);
     gl.bindTexture(gl.TEXTURE_2D,texCr); gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,CR,CR,gl.RG,gl.UNSIGNED_BYTE,CRD);
@@ -479,7 +496,7 @@ function create(A){
       if(Q2&&A.ANI){ const AN=A.ANI, bi=(Q2.banks.length>1&&(AN.vr[c]%3)===0&&(!A.isAdult||A.isAdult(c)))?1:0, vi=AN.v[c], vw=Q2.banks[bi][vi]||Q2.banks[bi][0];
         const key='a'+sp+'_'+bi+'_'+(vw.has||vi===0?vi:0)+'_'+AN.f[c]; if(atlasMap[key]==null) continue; const uv=slotUV[atlasMap[key]];
         spData.set([x,y,z,0, P_.wsize*g*vw.wf,P_.hsize*g,0,sp===SP.BIRD?1:amb, uv[0],uv[1],uv[2],uv[3], -1,0,AN.m[c],0],o); k++; continue; }
-      if(sp===SP.BIRD){ const fr=Math.sin(A.skyTime()*7+c*1.7)>0?1:0, uv=slotUV[atlasMap['b'+fr]];
+      if(sp===SP.BIRD){ const fr=(C.st[c]===1&&Math.hypot(C.vx[c],C.vy[c])<0.05)?0:(Math.sin(A.skyTime()*7+c*1.7)>0?1:0), uv=slotUV[atlasMap['b'+fr]];
         spData.set([x,y,z+P_.hsize*g*0.2,0, P_.wsize*g,P_.hsize*g*0.55,0,1, uv[0],uv[1],uv[2],uv[3], -1,0,0,0],o); k++; continue; }
       const key='m'+sp; if(atlasMap[key]==null) continue; const uv=slotUV[atlasMap[key]];
       // the masks face right; turn them to face the way the animal walks, as seen from here
@@ -509,7 +526,7 @@ function create(A){
     // the whole world in one pass of rays; it writes its own depth so the people and animals sit in it correctly
     gl.enable(gl.DEPTH_TEST); gl.depthFunc(gl.ALWAYS);
     common(PR,U,vp); gl.uniformMatrix4fv(PR.u.uInv,false,ivp); skyUniforms(PR,U);
-    bindTex(PR,'uC',1,texC); bindTex(PR,'uS',2,texSt); bindTex(PR,'uAlb',3,texAlb); bindTex(PR,'uInf',4,texInf); bindTex(PR,'uCr',7,texCr); bindTex(PR,'uMax',0,texMax); bindTex(PR,'uH',8,texHL);
+    bindTex(PR,'uC',1,texC); bindTex(PR,'uS',2,texSt); bindTex(PR,'uAlb',3,texAlb); bindTex(PR,'uInf',4,texInf); bindTex(PR,'uCr',7,texCr); bindTex(PR,'uMax',0,texMax); bindTex(PR,'uH',8,texHL); bindTex(PR,'uSA',9,texSA); bindTex(PR,'uSB',10,texSB); bindTex(PR,'uSM',11,texSM);
     gl.uniform3fv(PR.u.uMatF,matF); gl.uniform3fv(PR.u.uMatT,matT); gl.uniform1fv(PR.u.uMatCH,matCH); gl.uniform1fv(PR.u.uMatMoss,matMoss);
     { const L=DAY.light, lz=Math.max(0.0001,L.z); const dk=0.70*(DAY.sunLight?1:0.70)*(0.75/Math.max(0.6,lz))*Math.min(1,lz/0.14);
       gl.uniform1f(PR.u.uDk,L.z>0?dk:0); gl.uniform1f(PR.u.uDark,DAY.shadowK); gl.uniform1f(PR.u.uCast,DAY.lightAlt>0.035?1:0); }
@@ -537,5 +554,5 @@ function create(A){
   try{ rebuild(); resize(); R.ok=true; }catch(e){ R.error=String(e&&e.message||e).slice(0,300); canvas.remove(); }
   return R;
 }
-window.KeepRay={ create:create, version:'v0.21.0' };
+window.KeepRay={ create:create, version:'v0.51.1' };
 })();
