@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="keep-version" content="v0.55.0">
+<meta name="keep-version" content="v0.55.1">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#000">
 <title>The Keep</title>
@@ -237,7 +237,7 @@ html.fromshelf #inPage #inViews{padding-top:calc(58px + env(safe-area-inset-top)
  </div>
  <div id="stick"><div id="knob"></div></div>
  <div id="fps"></div>
- <button class="mb-ver" id="mbVer" type="button">v0.55.0 &middot; Nov 21</button>
+ <button class="mb-ver" id="mbVer" type="button">v0.55.1 &middot; Nov 22</button>
  <div id="toast"></div>
  <div id="updNudge" hidden role="status"><span>A new version of The Keep is here (<b id="updVer"></b>).<span id="updMsg" style="display:block;font-weight:400"></span></span><button class="btn go" id="updGo" type="button">refresh</button><button class="btn" id="updNo" type="button">later</button></div>
  <div id="bkNudge" hidden role="status"><span>Big moment. Back up your progress?</span><button class="btn go" id="bkNudgeGo" type="button">back up</button><button class="btn" id="bkNudgeNo" type="button">later</button></div>
@@ -259,8 +259,9 @@ html.fromshelf #inPage #inViews{padding-top:calc(58px + env(safe-area-inset-top)
   <p><b>Who lives here.</b> Every valley has its own people: guards on the wall, a gatekeeper, a steward, farmers, a shepherd, a woodcutter and a hermit down by the lake. They have names, families, friends and grudges, and they keep their own hours. Walk up to anyone and they'll talk about their work, each other, and what happened this week.</p>
   <p><b>Things happen.</b> Market days, weddings, new babies, quarrels and harvests. At night a wolf might take a hen. Storms roll in at any hour, the rain comes down and everyone heads indoors.</p>
   <p><b>Roads out.</b> Every valley has roads through the hills. Walk to the end of one and you can stay, take a random valley, choose the kind of valley you want, or type a seed. A seed always grows the same valley, with the same people, so you can find your way back.</p>
-  <p><b>Stone over stone.</b> For most of its life the world kept one height per spot, so anything you could walk on had to be solid all the way down. Now a spot can hold up to three layers floating over the ground, a vault, a floor and a roof, and every way of drawing the world reads them. The gatehouse was the first thing built with them: a passage you walk through, a room over it the guards walk through, and holes in the vault between the two. The donjon came next: a hollow tower with a stair climbing the inside of its wall past three floors.</p>
-  <p><b>Seven ways to see it.</b> ASCII, all letters, is the original. Pixels, Mesh, Voxels, Rays, Iso and Deep draw the same world other ways, the last five on the graphics chip. In Mesh and Deep the people stand as figures in three dimensions, built from the same looks as their pixel selves. Change it any time in the menu.</p>
+  <p><b>Stone over stone.</b> For most of its life the world kept one height per spot, so anything you could walk on had to be solid all the way down. Now a spot can hold up to four layers floating over the ground, a vault, a floor and a roof, and every way of drawing the world reads them. The gatehouse was the first thing built with them: a passage you walk through, a room over it the guards walk through, and holes in the vault between the two. The donjon came next: a hollow tower with a stair climbing the inside of its wall past three floors.</p>
+  <p><b>Seven ways to see it.</b> ASCII, all letters, is the original. Pixels, Mesh, Voxels, Rays, Iso and Deep draw the same world other ways, the last five on the graphics chip. In Mesh and Deep the people and the animals near you stand as figures in three dimensions, built from the same looks as their pixel selves. Change it any time in the menu.</p>
+  <p><b>The water.</b> About one valley in five has a big, deep lake with a harbor, a ship at the pier, a wreck on the bottom and a drowned hall you can swim down to. About one in six of the rest meets the sea: surf on the sand, gulls along the shore, a harbor behind a stone breakwater, and on most of them a lighthouse whose keeper lights the lamp at dusk. Choose a valley has a pick for the sea.</p>
   <p><b>Deep.</b> The newest view takes its look from Abyssal Garden, a small open-source underwater world. Its trick is to draw the world into a picture first, then run a second pass over it that works out what the light does between your eye and each thing you see: how much haze, how much of each colour the water has soaked up, where the shafts of light hang. The Keep borrows that second pass, and keeps its own world under it.</p>
 
   <div class="shots">
@@ -268,9 +269,10 @@ html.fromshelf #inPage #inViews{padding-top:calc(58px + env(safe-area-inset-top)
    <img src="24-talk.jpg" alt="a farmer among his hens, talking" loading="lazy">
    <img src="26-storm.jpg" alt="rain in a valley" loading="lazy">
    <img src="27-roads-out.jpg" alt="a signpost on the road out" loading="lazy">
-   <img src="23-the-cast.jpg" alt="the people of two valleys" loading="lazy">
-   <img src="12-gate-at-night.jpg" alt="a brazier at the gate arch" loading="lazy">
-   <img src="11-moonlit.jpg" alt="the keep by moonlight" loading="lazy">
+   <img src="29-through-the-gate.jpg" alt="looking through the gate passage into the courtyard" loading="lazy">
+   <img src="33-the-coast.jpg" alt="the sun going down over the sea" loading="lazy">
+   <img src="34-the-lighthouse.jpg" alt="the lighthouse and the keeper's cottage" loading="lazy">
+   <img src="35-animals-in-the-round.jpg" alt="the animals of the valley in a row" loading="lazy">
   </div>
   <p><b>The Hollow Crown.</b> Long ago two sisters broke the Hollow Crown in half and walked away in opposite directions. Their families still keep the halves, without ever having met. Learn enough of the old lore and someone will give you half a map. In Story, one of your parents has an old friend over the hills, too.</p>
   <p><b>More troubles.</b> Every valley now has three or four things wrong with it: a leaking roof (and the Thatch-Wife), an axe at the bottom of the lake, two guards betting on the Heron King, a honey cake recipe two valleys away, and an old song missing its last verse. In Story, help enough people over the hills and your home holds a harvest festival, with the people you helped as guests.</p>
@@ -1355,9 +1357,10 @@ var SHELF={on:false,url:'https://motbuchanan.com/gameshelf/'};
   SHELF.place=place;
 })();
 
-const VERSION='The Keep v0.55.0 · Nov 21 2026';
-const VER_SHORT='v0.55.0 · Nov 21'; // what the badge shows; bump with VERSION
+const VERSION='The Keep v0.55.1 · Nov 22 2026';
+const VER_SHORT='v0.55.1 · Nov 22'; // what the badge shows; bump with VERSION
 const CHANGELOG=[
+ ['v0.55.1 · Nov 22 2026','About this build is up to date: the lakes, the sea and the lighthouse have their own paragraph, and there are new pictures of the gate, the coast, the lighthouse and the animals.'],
  ['v0.55.0 · Nov 21 2026','The animals in the round, in Mesh and Deep. Deer, stags, wolves, sheep, cows, horses, rabbits, squirrels and hens near you are now built from the same rounded boxes as the people, on the proportions of their pictures: short deep bodies, big heads, sturdy legs, and their markings (the horse\'s blaze and mane, the cow\'s patches, the sheep\'s wool and dark face, the deer\'s white rump, the stag\'s antlers). Legs swing as they walk, runners gallop, rabbits and squirrels hop and sit up, hens peck, grazers put their heads down, and deer, sheep and cows lie down at night. Farther off they are still pictures, as the people are. Birds, gulls and fish stay pictures for now.'],
  ['v0.54.0 · Nov 20 2026','The lighthouse has its keeper. A small cottage with a red roof stands nine paces from the tower, door toward it, with a hearth, a bed, a bench and an oil barrel. The keeper walks out to the tower, round to the seaward side to look out with a hand to the brow, and back; they are up late for the lamp and abed late in the morning. They have their own things to say about the steps, the oil, the gulls and the ships, and the harbormaster knows who keeps the light. Also: at night the sea keeps a dim sheen and the moon lays a path on it (Mesh, Voxels, Iso, Rays), where it used to go black. Under water, distant things fade into blue water and not pale haze, past the edge of the map too. Cliffs show layers of rock (Mesh, Deep). The lighthouse may stand on a different stretch of shore than before, where there is room for the cottage. A robe lies along the legs when someone sits, where it used to stand up like a board.'],
  ['v0.53.0 · Nov 20 2026','The stories reach the sea. On a coast, people say sea where they used to say lake, in their talk, their old tales and the notes that pop up, and a drowned hall out at sea is named for the sea. The harbor gets its troubles (the ring, the pier lamp, the torn sail) and its old stories of lost ships, the same as in lake country. What the Lake Keeps can now lead you to a coast harbor as well as a lake one, and the compass and journal point to whichever is nearer. Coast harbormasters and innkeepers have some lines of their own, about tides, gulls, salt, fish stew and the light on the point. Choose a valley has a fourth choice for water, the sea, so you can go straight to a coast. The drowned hall finds room in a narrow sea more often too.'],

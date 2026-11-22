@@ -7,7 +7,7 @@
 <title>The Keep · build log</title>
 <link rel="icon" type="image/png" href="the-keep-icon.png">
 <link rel="apple-touch-icon" href="the-keep-icon.png">
-<meta name="description" content="The Keep: a living world drawn entirely as characters. The story, how it is built, and a shot from every version.">
+<meta name="description" content="The Keep: a living world drawn as characters, or six other ways. The story, how it is built, and frames from along the way.">
 <meta property="og:title" content="The Keep · build log">
 <meta property="og:description" content="A whole world drawn as characters. The story of how it is being built, one improvement at a time.">
 <meta property="og:image" content="https://motbuchanan.com/thekeep/the-keep-icon.png">
@@ -51,7 +51,7 @@ p .k{color:var(--orange)}
 .feat h3{font-family:var(--disp);font-weight:700;font-size:16px;margin:0 0 6px;color:#fff}
 .feat p{font-size:14px;color:var(--dim);margin:0}
 /* gallery */
-.gal{display:grid;grid-template-columns:1fr;gap:22px}
+.gal{display:grid;grid-template-columns:1fr;gap:22px;align-items:start}
 @media(min-width:620px){.gal{grid-template-columns:1fr 1fr}}
 figure{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
 figure img{width:100%;display:block;background:#000}
@@ -77,26 +77,27 @@ footer a{color:var(--soft)}
   <p class="tag">A living valley, drawn in letters. Walk in, listen to the people, and leave by the road.</p>
   <p class="sub">a world of letters that grows one improvement at a time</p>
   <a class="cta" href="index.html">▶ &nbsp;walk the keep</a>
-  <div class="badge">in active development · updated Nov 4, 2026</div>
+  <div class="badge">in active development · updated Nov 22, 2026</div>
 </header>
 
 <main class="wrap">
 
 <section>
   <h2>What it is</h2>
-  <p class="lead">The Keep is a living valley drawn as a grid of colored characters, the way it began, or in five other ways, four of them on the graphics chip. It is not a game with a score to win, and it is not a building sandbox.</p>
+  <p class="lead">The Keep is a living valley drawn as a grid of colored characters, the way it began, or in six other ways, five of them on the graphics chip. It is not a game with a score to win, and it is not a building sandbox.</p>
   <p>It opens on a stone hearth at sunrise. Then you walk into a valley: hills, a lake, forests, farms, a stone keep, and <span class="k">people who live there</span>. Guards walk the wall, the farmer works the field, the hermit fishes off his dock. Each of them has a name, a family, friends and grudges, and a day of their own, and if you walk up to them they talk: about their work, each other, and what happened this week.</p>
   <p>Things happen. Market days, weddings, new babies, quarrels and harvests. At night a wolf might take a hen. Storms roll in at any hour and everyone heads indoors.</p>
-  <p>And the valley is not alone. Roads lead out through the hills to <span class="k">other valleys</span>, each grown from its own seed, with its own people, forests, water and ruins. Take a random one, choose the kind you want, or type a seed to find one again. Draw it all in ASCII letters, the original, or in Pixels, Mesh, Voxels, Rays or Iso.</p>
+  <p>And the valley is not alone. Roads lead out through the hills to <span class="k">other valleys</span>, each grown from its own seed, with its own people, forests, water and ruins. Take a random one, choose the kind you want, or type a seed to find one again. Draw it all in ASCII letters, the original, or in Pixels, Mesh, Voxels, Rays, Iso or Deep.</p>
+  <p>Some valleys hold more water than others. About one in five has a deep lake with a <span class="k">harbor</span>, a ship at the pier, a wreck on the bottom and a drowned hall you can swim down to. About one in six of the rest meets <span class="k">the sea</span>: surf on the sand, gulls along the shore, and on most of them a lighthouse whose keeper lights the lamp at dusk.</p>
   <p>Play it two ways. <span class="k">Story</span> starts you at home: you name yourself, say what your valley has plenty of, and wake by the gate of the keep your parents keep, where everyone knows you. <span class="k">Wander</span> drops you into any valley as a stranger. Every valley has troubles of its own, and someone at home has a brother, sister, son or daughter who left. What you choose earns you a nickname and a title, strangers tell stories about you, and the ruins remember the land as it was. Learn enough of the old lore and someone will hand you half a map to the Hollow Crown. It develops live, so the world you visit today is not the one you will visit next month.</p>
 </section>
 
 <section>
   <h2>How it is built</h2>
   <div class="two">
-    <div class="feat"><h3>One ray per column</h3><p>A heightfield raycaster walks the terrain, one ray for each column of the screen, and draws it as vertical spans of characters. That is the whole renderer for the letters; Mesh, Voxels, Rays and Iso redraw the same world on the graphics chip.</p></div>
+    <div class="feat"><h3>One ray per column</h3><p>A heightfield raycaster walks the terrain, one ray for each column of the screen, and draws it as vertical spans of characters. That is the whole renderer for the letters; Mesh, Voxels, Rays, Iso and Deep redraw the same world on the graphics chip.</p></div>
     <div class="feat"><h3>Water that reflects</h3><p>Every water column runs a second march to mirror what is above it, with a depth gradient and a foam line where you cross the surface.</p></div>
-    <div class="feat"><h3>A keep of planes and mass</h3><p>The castle faces are brick planes the ray intersects directly, so walls read as solid, crenellated stone. Under them, raised ground gives the walls their thickness and makes the rampart, stairs and lookout walkable. A second layer of stone can float above the ground, which is how the gate arch, the tunnel and the round room under the tower work.</p></div>
+    <div class="feat"><h3>A keep of planes and mass</h3><p>The castle faces are brick planes the ray intersects directly, so walls read as solid, crenellated stone. Under them, raised ground gives the walls their thickness and makes the rampart, stairs and lookout walkable. A second layer of stone can float above the ground, which is how the gate arch, the tunnel and the round room under the tower work. Now any spot can stack up to four floors, vaults and roofs, so the tower is hollow with a stair inside, the farmhouses have an upstairs and the inn has a cellar.</p></div>
     <div class="feat"><h3>A world that lives</h3><p>Under the renderer, every creature is a tiny agent running steering rules and a state machine. Flocking, herding, and the hunt fall out of that, held in balance by soft floors and carrying caps.</p></div>
     <div class="feat"><h3>A sun that moves</h3><p>The sun's place in the sky comes from the same formulas as a sunrise table, for Akron on today's date. A blurred shadow map, re-marched a few rows per frame as the sun moves, is sampled per character, so shade falls softly and swings round through the day.</p></div>
     <div class="feat"><h3>Same on any screen</h3><p>The vertical field of view is locked and the detail auto-sizes, so the world looks correct on a phone, a tablet, or a desktop, in any orientation.</p></div>
@@ -134,12 +135,35 @@ footer a{color:var(--soft)}
     <figure><img src="26-storm.jpg" alt="Rain coming down across a valley, the keep grey behind it" loading="lazy"><figcaption><div class="v">v0.23.1 · STORMS</div><div class="d">Storms come at any hour. The sky greys, the rain comes down in every view, lightning flashes, the flocks bunch up and the folk go indoors.</div></figcaption></figure>
     <figure><img src="27-roads-out.jpg" alt="The card at the end of a road: stay, a random valley, type a seed, or choose a valley" loading="lazy"><figcaption><div class="v">v0.24 · ROADS OUT</div><div class="d">Roads lead out through the hills. At the end of one you can stay, take a random valley, type a seed, or choose the kind of valley you want. Every valley grows from its own seed.</div></figcaption></figure>
     <figure><img src="25-the-hearth.jpg" alt="A stone hearth at sunrise, the words The Keep lit by the light from the window" loading="lazy"><figcaption><div class="v">v0.25.0 · THE HEARTH</div><div class="d">The Keep now opens on a hearth at sunrise. The light comes through the window, finds the title in the dark and moves on, and then the embers rise. After it, you pick how to see the world.</div></figcaption></figure>
+    <figure><img src="29-through-the-gate.jpg" alt="Looking through the keep's stone gate passage, torches on the walls, the courtyard and the tower beyond" loading="lazy"><figcaption><div class="v">v0.40 to 0.48 · THROUGH THE GATE</div><div class="d">Stone can now stack over stone. You walk in under the gate, cross the courtyard, climb the stair inside the hollow tower, go upstairs in the farmhouses and down into the inn's cellar, in every way of drawing the world.</div></figcaption></figure>
+    <figure><img src="30-the-harbor.jpg" alt="A ship with a red sail tied up at a pier on a wide lake, seen from over the fish market roof" loading="lazy"><figcaption><div class="v">v0.46 · LAKE COUNTRY</div><div class="d">About one valley in five grows a big, deep lake with a port on its shore: a pier, a fish market, a harbormaster and a ship you can board.</div></figcaption></figure>
+    <figure><img src="31-under-the-water.jpg" alt="Under the water: green light, sunbeams from the surface and the stones of a drowned hall" loading="lazy"><figcaption><div class="v">v0.47 to 0.49 · UNDER THE WATER</div><div class="d">Dive and the water closes in, with shafts of light from the surface, kelp, fish, a wreck and a drowned hall with a dry room under it. A story about a ship that never came home leads you there. This view is Deep, the seventh way to draw the world.</div></figcaption></figure>
+    <figure><img src="32-people-in-the-round.jpg" alt="Valley folk standing in a row in front of the keep wall, built from rounded blocks" loading="lazy"><figcaption><div class="v">v0.50 · PEOPLE IN THE ROUND</div><div class="d">In Mesh and Deep the people near you are no longer flat pictures. They are built from rounded blocks on the same designs, and they walk, work, sit and sleep.</div></figcaption></figure>
+    <figure><img src="33-the-coast.jpg" alt="The sun going down over the sea from a grassy shore, gulls in the sky" loading="lazy"><figcaption><div class="v">v0.51 to 0.53 · THE COAST</div><div class="d">Some valleys meet the sea. Surf rolls in on the sand, gulls work the shore, the harbor sits behind a stone breakwater, and on a coast people say sea where they used to say lake.</div></figcaption></figure>
+    <figure><img src="34-the-lighthouse.jpg" alt="A pale stone lighthouse with a red band beside a small red-roofed cottage, the sun low behind them" loading="lazy"><figcaption><div class="v">v0.54 · THE LIGHTHOUSE KEEPER</div><div class="d">On most coasts a lighthouse stands on the highest bit of shore, and its keeper lives in the cottage beside it. At night the lamp turns, and from out at sea you see it flash.</div></figcaption></figure>
+    <figure><img src="35-animals-in-the-round.jpg" alt="A horse, a cow, a stag, a doe, a wolf, a sheep, a rabbit, a squirrel and a hen in a row on the grass, built from rounded blocks" loading="lazy"><figcaption><div class="v">v0.55 · ANIMALS IN THE ROUND</div><div class="d">The animals near you are built in the round too, on the proportions of their drawings. They walk, gallop, hop, graze, and lie down at night.</div></figcaption></figure>
   </div>
 </section>
 
 <section>
   <h2>Version history</h2>
   <ul class="tl">
+    <li><span class="v">v0.55.0</span> <span class="d">the animals in the round, in Mesh and Deep</span></li>
+    <li><span class="v">v0.54.0</span> <span class="d">the lighthouse keeper and a cottage by the tower; a sheen on the night sea; rock layers on cliffs</span></li>
+    <li><span class="v">v0.53.0</span> <span class="d">the stories reach the sea: sea talk, harbor troubles and old tales on the coast</span></li>
+    <li><span class="v">v0.52.0</span> <span class="d">life on the coast: a harbor, a wreck and a drowned hall at sea, surf, gulls and a lighthouse</span></li>
+    <li><span class="v">v0.51.0</span> <span class="d">the coast: about one valley in six outside lake country meets the sea; a tidier menu with one picker for the view and a slider for the time of day</span></li>
+    <li><span class="v">v0.50.0</span> <span class="d">people in the round, in Mesh and Deep</span></li>
+    <li><span class="v">v0.49.0</span> <span class="d">What the Lake Keeps, a story across the water valleys, and troubles at the port</span></li>
+    <li><span class="v">v0.48.0</span> <span class="d">Deep, a seventh way to see the world; a compass; a cellar under the inn</span></li>
+    <li><span class="v">v0.47.0</span> <span class="d">under the lake: murk, light shafts, kelp, fish, a wreck and a drowned hall</span></li>
+    <li><span class="v">v0.46.0</span> <span class="d">lake country: a big lake, a port, a harbormaster and a ship</span></li>
+    <li><span class="v">v0.45.0</span> <span class="d">an inn and a mill in every valley, and two new people to run them</span></li>
+    <li><span class="v">v0.44.0</span> <span class="d">farmhouses with an upstairs</span></li>
+    <li><span class="v">v0.43.0</span> <span class="d">Iso cuts the roof away when you step inside</span></li>
+    <li><span class="v">v0.42.0</span> <span class="d">every way of drawing the world shows the insides</span></li>
+    <li><span class="v">v0.41.0</span> <span class="d">the tower is hollow, with a stair inside</span></li>
+    <li><span class="v">v0.40.0</span> <span class="d">through the gate: stone stacked over stone, a real gate passage and a courtyard</span></li>
     <li><span class="v">v0.39.1</span> <span class="d">notices when a newer version is up and offers a refresh, saving your progress first</span></li>
     <li><span class="v">v0.39.0</span> <span class="d">more to do in every valley: six new troubles, quests that grow out of what you did before, and old stories that wait until you have earned them</span></li>
     <li><span class="v">v0.38.0</span> <span class="d">talk that does not repeat: over three hundred new things to say, never the same line from two people in a valley, remembered between visits, and a plain word when someone has nothing new</span></li>
