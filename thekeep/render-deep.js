@@ -1,4 +1,4 @@
-// The Keep · render-deep.js · v0.55.0 · Nov 21 2026
+// The Keep · render-deep.js · v0.56.0 · Nov 22 2026
 // Deep: the same world as Mesh, drawn for light and water, after Noniv's Abyssal Garden (MIT).
 // What it borrows: the world is drawn into an off-screen picture first, and a second pass then adds what
 // light does in air and water. Distance haze above the water; under it, colour soaked up by distance
@@ -469,7 +469,7 @@ function create(A){
       a.push(0,0,0.03,0,0,1,0,0,0,-1,9, Math.cos(a0)*0.42,Math.sin(a0)*0.30,0.03,0,0,1,1,0,0,-1,9, Math.cos(a1)*0.42,Math.sin(a1)*0.30,0.03,0,0,1,1,0,0,-1,9); }
     return {buf:new Float32Array(a), n:S*3}; })();
   // the animals in the round: the nearest few, the rest stay as pictures
-  const A3MAX=40, a3L=new Float32Array(A3MAX*6), a3On=new Uint8Array(8192); let nA3=0, a3Last=0;
+  const A3MAX=40, a3L=new Float32Array(A3MAX*6), a3On=new Uint8Array(8192), a3Pick=new Uint8Array(8192), a3C=new Uint16Array(400), a3D2=new Float32Array(400); let nA3=0, a3Last=0;
   function p3Vao(g){ let v=p3Geo.get(g); if(v) return v; const vao=gl.createVertexArray(), vb=gl.createBuffer();
     gl.bindVertexArray(vao); gl.bindBuffer(gl.ARRAY_BUFFER,vb); gl.bufferData(gl.ARRAY_BUFFER,g.buf,gl.STATIC_DRAW);
     gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0,3,gl.FLOAT,false,44,0); gl.enableVertexAttribArray(1); gl.vertexAttribPointer(1,3,gl.FLOAT,false,44,12);
@@ -643,6 +643,10 @@ function create(A){
   function gather(px,py,pz,yaw,rx,ry,night){
     const C=A.CR_, SP=A.SP, SPP=A.SPP, R2=130*130; let k=0, nl=0; const DK=A.DAY.k<0.6; nP3=0; const use3=!!(P3&&A.person3D&&R.people3D!==false); if(use3) p3Sweep(); nA3=0; const useA3=!!(P3&&A.animal3D&&R.animals3D!==false), a3Now=performance.now(), a3Ease=1-Math.exp(-Math.min(0.25,(a3Now-a3Last)/1000)*12); a3Last=a3Now;
     if(A.animalFrame) A.animalFrame(px,py,yaw);
+    if(useA3){ a3Pick.fill(0,0,Math.min(C.n,8192)); let m=0;   // v0.56.0: the nearest forty animals stand in the round, picked by distance
+      for(let c=0;c<C.n&&c<8192;c++){ if(C.al[c]===0||C.sp[c]===SP.KEEPER) continue; const ex=C.x[c]-px, ey=C.y[c]-py, d2=ex*ex+ey*ey; if(d2<(a3On[c]?48*48:44*44)&&A.animal3D(c)){ if(m<a3C.length){ a3C[m]=c; a3D2[m]=d2; m++; } } else a3On[c]=0; }
+      if(m<=A3MAX){ for(let i=0;i<m;i++) a3Pick[a3C[i]]=1; }
+      else { const ix=Array.from({length:m},function(_,i){ return i; }).sort(function(p,q){ return a3D2[p]*(a3On[a3C[p]]?0.85:1)-a3D2[q]*(a3On[a3C[q]]?0.85:1); }); for(let i=0;i<m;i++){ if(i<A3MAX) a3Pick[a3C[ix[i]]]=1; else a3On[a3C[ix[i]]]=0; } } }
     for(let c=0;c<C.n;c++){ if(C.al[c]===0) continue; const sp=C.sp[c], x=C.x[c], y=C.y[c], z=C.z[c], ex=x-px, ey=y-py;
       if(ex*ex+ey*ey>R2&&c!==A.W.beaconC) continue;   // the lighthouse lamp is seen from anywhere
       if((sp===SP.KEEPER||sp===SP.FIRE)&&nl<16&&night>0.02){ const low=C.po[c]===4;
@@ -658,7 +662,7 @@ function create(A){
         const P_=SPP[SP.KEEPER];
         spData.set([x,y,z,0, P_.wsize,P_.hsize,0,amb, uv[0],uv[1],uv[2],uv[3], ln[0],ln[1],mir,1],o); k++; continue; }
       if(useA3&&sp!==SP.KEEPER){ const d2=ex*ex+ey*ey;
-        let g3; if(nA3<A3MAX&&d2<(a3On[c]?48*48:44*44)&&(g3=A.animal3D(c))){ const hv=Math.hypot(C.vx[c],C.vy[c]), YW=A.ANI.yaw;   // the heading lives with the animal (ANI.yaw), so it survives the list being packed
+        let g3; if(nA3<A3MAX&&c<8192&&a3Pick[c]&&(g3=A.animal3D(c))){ const hv=Math.hypot(C.vx[c],C.vy[c]), YW=A.ANI.yaw;   // the heading lives with the animal (ANI.yaw), so it survives the list being packed
           if(hv>0.02){ const ty=Math.atan2(C.vy[c],C.vx[c]); if(YW[c]!==YW[c]) YW[c]=ty; else { let dd=ty-YW[c]; dd-=Math.round(dd/6.2832)*6.2832; YW[c]+=dd*a3Ease; } } else if(YW[c]!==YW[c]) YW[c]=c*2.399;
           let z3=z; if(sp===SP.RABBIT||sp===SP.SQUIRREL||sp===SP.DEER||sp===SP.WOLF){ const gt=A.terr(x,y); z3=gt<A.WATER?A.WATER-g3.leg*0.6:gt; }   // the wild ones' z rides above the ground for their pictures: feet on the ground here, wading when in water
           a3On[c]=1; const q=nA3*6; a3L[q]=c; a3L[q+1]=x; a3L[q+2]=z3; a3L[q+3]=y; a3L[q+4]=YW[c]; a3L[q+5]=amb; nA3++; continue; }
@@ -785,5 +789,5 @@ function create(A){
   try{ rebuild(); resize(); R.ok=true; }catch(e){ R.error=String(e&&e.message||e).slice(0,300); canvas.remove(); }
   return R;
 }
-window.KeepDeep={ create:create, version:'v0.55.0' };
+window.KeepDeep={ create:create, version:'v0.56.0' };
 })();

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="keep-version" content="v0.55.1">
+<meta name="keep-version" content="v0.56.0">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#000">
 <title>The Keep</title>
@@ -237,7 +237,7 @@ html.fromshelf #inPage #inViews{padding-top:calc(58px + env(safe-area-inset-top)
  </div>
  <div id="stick"><div id="knob"></div></div>
  <div id="fps"></div>
- <button class="mb-ver" id="mbVer" type="button">v0.55.1 &middot; Nov 22</button>
+ <button class="mb-ver" id="mbVer" type="button">v0.56.0 &middot; Nov 22</button>
  <div id="toast"></div>
  <div id="updNudge" hidden role="status"><span>A new version of The Keep is here (<b id="updVer"></b>).<span id="updMsg" style="display:block;font-weight:400"></span></span><button class="btn go" id="updGo" type="button">refresh</button><button class="btn" id="updNo" type="button">later</button></div>
  <div id="bkNudge" hidden role="status"><span>Big moment. Back up your progress?</span><button class="btn go" id="bkNudgeGo" type="button">back up</button><button class="btn" id="bkNudgeNo" type="button">later</button></div>
@@ -1357,9 +1357,10 @@ var SHELF={on:false,url:'https://motbuchanan.com/gameshelf/'};
   SHELF.place=place;
 })();
 
-const VERSION='The Keep v0.55.1 · Nov 22 2026';
-const VER_SHORT='v0.55.1 · Nov 22'; // what the badge shows; bump with VERSION
+const VERSION='The Keep v0.56.0 · Nov 22 2026';
+const VER_SHORT='v0.56.0 · Nov 22'; // what the badge shows; bump with VERSION
 const CHANGELOG=[
+ ['v0.56.0 · Nov 22 2026','The sea has a voice. With sound on, you hear the surf as you come near a coast: a low wash that swells and draws back about every seven seconds, with the hiss of foam on top, louder in a storm. Gulls cry, a falling two-note call, and no longer chirp like songbirds. Inland, a peddler, an innkeeper or a miller may tell you which road leads toward the sea and the name of the valley where it is, when there is one within three roads; the journal keeps it until you have seen the sea for yourself. The roads of a rumor stay put once you have heard it, so following it gets you there. Deer, sheep and cows now lie down with their legs tucked under them. When a crowd of animals is near, the nearest forty are the ones built in the round.'],
  ['v0.55.1 · Nov 22 2026','About this build is up to date: the lakes, the sea and the lighthouse have their own paragraph, and there are new pictures of the gate, the coast, the lighthouse and the animals.'],
  ['v0.55.0 · Nov 21 2026','The animals in the round, in Mesh and Deep. Deer, stags, wolves, sheep, cows, horses, rabbits, squirrels and hens near you are now built from the same rounded boxes as the people, on the proportions of their pictures: short deep bodies, big heads, sturdy legs, and their markings (the horse\'s blaze and mane, the cow\'s patches, the sheep\'s wool and dark face, the deer\'s white rump, the stag\'s antlers). Legs swing as they walk, runners gallop, rabbits and squirrels hop and sit up, hens peck, grazers put their heads down, and deer, sheep and cows lie down at night. Farther off they are still pictures, as the people are. Birds, gulls and fish stay pictures for now.'],
  ['v0.54.0 · Nov 20 2026','The lighthouse has its keeper. A small cottage with a red roof stands nine paces from the tower, door toward it, with a hearth, a bed, a bench and an oil barrel. The keeper walks out to the tower, round to the seaward side to look out with a hand to the brow, and back; they are up late for the lamp and abed late in the morning. They have their own things to say about the steps, the oil, the gulls and the ships, and the harbormaster knows who keeps the light. Also: at night the sea keeps a dim sheen and the moon lays a path on it (Mesh, Voxels, Iso, Rays), where it used to go black. Under water, distant things fade into blue water and not pale haze, past the edge of the map too. Cliffs show layers of rock (Mesh, Deep). The lighthouse may stand on a different stretch of shore than before, where there is room for the cottage. A robe lies along the legs when someone sits, where it used to stand up like a board.'],
@@ -4616,7 +4617,7 @@ function animal3DPose(c){ const o=A3POSE; o.fill(0); const g=animal3D(c); if(!g)
     else { o[1]=sw*A; o[4]=sw*A; o[2]=-sw*A; o[3]=-sw*A; o[0]=0.05*Math.sin(ph*2); o[8]=0.012*Math.abs(Math.cos(ph)); }
     o[5]=run?0.5:0.1; o[6]=0.1*Math.sin(ph); return o; }
   const night=DAY.k<0.3;
-  if(S.lie&&night&&((ph0*7)%1)<0.7){ o[1]=o[2]=1.45; o[3]=o[4]=-1.45; o[8]=-(g.leg-0.06); o[0]=-0.5; return o; }   // down for the night, legs folded
+  if(S.lie&&night&&((ph0*7)%1)<0.7&&!(c>=0&&terr(CR_.x[c],CR_.y[c])<WATER)){ o[1]=o[2]=1.05; o[3]=o[4]=1.05; o[8]=-(g.leg*0.78); o[0]=-0.45; return o; }   // down for the night, legs folded
   if(S.graze){ const u=(tt*0.06+ph0*3.3)%1; if(u<0.55){ const e=Math.min(1,u/0.06,(0.55-u)/0.06); o[0]=-(1.5-(S.neckA||0.5))*e*(0.92+0.08*Math.sin(tt*5)); } else o[0]=0.06*Math.sin(tt*0.8); }
   else o[0]=0.06*Math.sin(tt*0.9);
   o[6]=(S.wag?0.35:0.5)*Math.sin(tt*(S.wag?2.2:1.1))*(((tt*0.11+ph0)%1)<0.4?1:0.15); return o; }
@@ -4800,13 +4801,13 @@ const TALKI={
   1:["Quiet at noon. The taproom fills when the light goes.","[farm1]{farmer} stops in for a bite most days. Pays in eggs.","Sit anywhere. The good bench is by the fire, and it's taken by nobody."],
   2:["Evening's the inn's time. Lamps on, door open.","[keep]{guard1} comes down off the wall for a cup before the night watch. Don't tell {steward}.","Stew's on. It's always stew. Folk come back for it anyway."],
   3:["Late. The last of them have gone up or gone home.","[night]I bank the fire before bed. If it goes out, the whole inn sulks.","Rooms are up the back stair. Mind the third step, it creaks."],
-  a:["[coast]Fish stew tonight. It's always fish stew. We live by the sea.","[coast]Sailors pay in coins I've never seen. I keep them in a jar. Nobody's come back for change.","[coast]You can hear the surf from the top room. Some folk can't sleep for it. Some can't sleep without it.","Three rooms upstairs. One's mine. The other two are for whoever the road brings.","Barrels behind the bar, ale in the barrels. That's the whole secret of an inn.","[cellar]The cellar's down the steps by the back stair. Ale keeps cool down there. So do I, come summer.","[cellar]Mind your head in the cellar. I put the lamp low on purpose, so I'd stop hitting it.","I've heard every story there is. Twice. Tell me one anyway.","A traveller's coat tells you where they've been. Yours says a long way.","[gossip]Sit by the fire long enough and you'll hear everything in {valley}. I already have.","[kind]Nobody leaves my inn hungry. Some leave full of stew and argument.","[keep]The keep sends down for ale on feast days. Very grand. Very thirsty.","[farm2]{shepherd} sits in the corner and says nothing for an hour. Then one joke. Always a good one.","[wood]{woodcutter} brings the firewood and drinks the price of it.","[hermit]{hermit} came in once. Looked at everyone. Went out again.","[old]I've kept this inn longer than the sign's been up. The sign's new. Well. Newer.","[young]It was my aunt's inn. Now it's mine. I'm still finding her lists in the drawers.","The beds are straw and wool. Better than the road. Most roads.","[mill]{miller} and I trade. Flour for ale. Good trade for both of us.","Wipe the tables, sweep the step, bank the fire. Same three things, every day. I like it."]},
+  a:["[searumor]Had a sailor in last month, walked up from {seavalley}. Said the sea was days behind him and he missed it already. He came in by {seadir}.","[searumor]They say at {seavalley} the water goes on until it meets the sky. I've never been. It's out by {seadir}.","[coast]Fish stew tonight. It's always fish stew. We live by the sea.","[coast]Sailors pay in coins I've never seen. I keep them in a jar. Nobody's come back for change.","[coast]You can hear the surf from the top room. Some folk can't sleep for it. Some can't sleep without it.","Three rooms upstairs. One's mine. The other two are for whoever the road brings.","Barrels behind the bar, ale in the barrels. That's the whole secret of an inn.","[cellar]The cellar's down the steps by the back stair. Ale keeps cool down there. So do I, come summer.","[cellar]Mind your head in the cellar. I put the lamp low on purpose, so I'd stop hitting it.","I've heard every story there is. Twice. Tell me one anyway.","A traveller's coat tells you where they've been. Yours says a long way.","[gossip]Sit by the fire long enough and you'll hear everything in {valley}. I already have.","[kind]Nobody leaves my inn hungry. Some leave full of stew and argument.","[keep]The keep sends down for ale on feast days. Very grand. Very thirsty.","[farm2]{shepherd} sits in the corner and says nothing for an hour. Then one joke. Always a good one.","[wood]{woodcutter} brings the firewood and drinks the price of it.","[hermit]{hermit} came in once. Looked at everyone. Went out again.","[old]I've kept this inn longer than the sign's been up. The sign's new. Well. Newer.","[young]It was my aunt's inn. Now it's mine. I'm still finding her lists in the drawers.","The beds are straw and wool. Better than the road. Most roads.","[mill]{miller} and I trade. Flour for ale. Good trade for both of us.","Wipe the tables, sweep the step, bank the fire. Same three things, every day. I like it."]},
  miller:{
   0:["Morning. The wind's up early. So am I.","[day]First sacks go to @inn. Then the keep. Then whoever's knocking.","Dust on everything already. That's a good day starting."],
   1:["Noon's when the wind's steadiest. Don't stand behind the sails.","[farm1]{farmer}'s wheat came in fine this year. Fine flour from it.","Grind, sack, stack. Grind, sack, stack."],
   2:["Wind's dropping. Stones will rest soon. So will I.","[inn]Last sacks of the day go to @inn. {innkeeper} pays in supper.","Evening light through the flour dust. Prettiest thing in {valley}."],
   3:["Sails are tied. Stones are quiet. Go on, it's late.","[night]A mill's a noisy house by day. At night you hear every mouse."],
-  a:["The sails turn the stones. The stones turn wheat to flour. The flour turns into bread. I just keep the sails turning.","Upstairs the grain, downstairs the stones, me in the middle.","Flour in my hair, flour in my boots. I stopped minding years ago.","[farm1]Every loaf in {valley} starts in {farmer}'s field and comes through my stones.","[keep]The keep eats more bread than the rest of the valley put together. Guards. Hungry lot.","[inn]{innkeeper} says my flour makes the best crust in three valleys. {innkeeper} may be right.","[old]My grandfather built these sails. I've mended every board of them since.","[young]I'm new to the mill. The stones aren't. They taught me more than anyone.","You can tell the weather by the sails. Fast means rain coming. Still means stay in.","[worrier]If the wind stops for a week, nobody in {valley} gets bread. I think about that a lot.","[cheerful]Best job there is. The wind does the work and I get the credit.","[birds]Pigeons in the cap. They're after the grain. They don't get much. They get some.","Mind the millstone. It doesn't stop for fingers.","[wood]{woodcutter} cut the new arm for the sails. Straight as a rule."]},
+  a:["[searumor]Gulls come inland before a storm. White birds, loud. They live down at {seavalley}, by the sea, out along {seadir}.","The sails turn the stones. The stones turn wheat to flour. The flour turns into bread. I just keep the sails turning.","Upstairs the grain, downstairs the stones, me in the middle.","Flour in my hair, flour in my boots. I stopped minding years ago.","[farm1]Every loaf in {valley} starts in {farmer}'s field and comes through my stones.","[keep]The keep eats more bread than the rest of the valley put together. Guards. Hungry lot.","[inn]{innkeeper} says my flour makes the best crust in three valleys. {innkeeper} may be right.","[old]My grandfather built these sails. I've mended every board of them since.","[young]I'm new to the mill. The stones aren't. They taught me more than anyone.","You can tell the weather by the sails. Fast means rain coming. Still means stay in.","[worrier]If the wind stops for a week, nobody in {valley} gets bread. I think about that a lot.","[cheerful]Best job there is. The wind does the work and I get the credit.","[birds]Pigeons in the cap. They're after the grain. They don't get much. They get some.","Mind the millstone. It doesn't stop for fingers.","[wood]{woodcutter} cut the new arm for the sails. Straight as a rule."]},
  harbormaster:{
   0:["Morning. First thing, I check the ropes. Ships wander off in the night if you let them.","[day]Fog on the lake. It'll burn off by the time the fish are in.","Up before the gulls. That's the job."],
   1:["Noon. The lake's flat as a table. Good day for nothing to happen.","[inn]{innkeeper} sends down a pie at noon. I've never once asked."],
@@ -5723,7 +5724,7 @@ function journalNotes(){ const p=part(), open=[], done=[];
       else if(e.s==='replied') open.push({t:e.rg+' says yes, for the harvest. Tell '+e.gn+', at home.', v:STORY&&STORY.home});
       else if(e.s==='done') done.push({t:e.c==='lie'?'Told '+e.gn+' that '+e.rg+' said no. It was not true.':'Took '+e.gn+"'s letter over the hills to "+e.rg+'. '+e.rg+' is coming for the harvest.', v:e.dest}); }
     else if(k==='gate') done.push({t:'Every road leads to the same valley every time. The journal remembers the way home.'}); }
-  crownNotes(open,done); lakeNotes(open,done); portNotes(open,done); leftNotes(open,done); troubleNotes(open,done); trouble2Notes(open,done); trouble3Notes(open,done); festNotes(open,done); ringNotes(open,done); keepNotes(open,done); return {open:open, done:done}; }
+  crownNotes(open,done); seaNotes(open,done); lakeNotes(open,done); portNotes(open,done); leftNotes(open,done); troubleNotes(open,done); trouble2Notes(open,done); trouble3Notes(open,done); festNotes(open,done); ringNotes(open,done); keepNotes(open,done); return {open:open, done:done}; }
 // ---------------- valley troubles (v0.26.1): every valley has its own, from its own seed ----------------
 // Any valley you reach, by road, by a random seed or by your journal, grows one or two troubles from its seed: a lost
 // hen or lamb that turned up over the hills, a quarrel over a fence, a pair of sweethearts too shy to say so, a light
@@ -6217,13 +6218,29 @@ const LAKESHIPS=['the Heron','the Merry Ann','the Long Patience','the Salt Wren'
 function lakeSeen(){ if(MODE!=='story'||!STORY) return; const p=part(); if(!p.tasks.lake){ p.tasks.lake={s:'seen'}; journalSave(); } }
 function lakeOf(seed){ const w=seedDials(seed>>>0).water; if(lakeCountry(seed>>>0,w)) return true; const C=coastOf(seed>>>0,w); return !!C&&C.s0<=0.70; }   // v0.53.0: a harbor valley, lake country or the coast
 // the road graph, breadth first: the first road out of from that leads toward to (or toward the nearest lake country)
-function navRoute(from,to,lakeAny,max){ from=from>>>0; if(to!=null) to=to>>>0; const first=new Map([[from,-1]]); let q=[from];
+function navRoute(from,to,lakeAny,max,pred){ from=from>>>0; if(to!=null) to=to>>>0; const first=new Map([[from,-1]]); let q=[from];
   for(let d=0;d<(max||6)&&q.length;d++){ const nq=[]; for(const s of q){ const n=Math.max(1,exitAngles(s).length);
       for(let k=0;k<n;k++){ const t=roadDest(s,k)>>>0; if(first.has(t)) continue; const f=s===from?k:first.get(s);
-        if(lakeAny?lakeOf(t):t===to) return {ex:f, v:t, hops:d+1}; first.set(t,f); nq.push(t); } }
+        if(pred?pred(t):(lakeAny?lakeOf(t):t===to)) return {ex:f, v:t, hops:d+1}; first.set(t,f); nq.push(t); } }
     q=nq; if(first.size>3000) break; }
   return null; }
-function navRouteC(from,to,lakeAny){ return navRoute(from,to,lakeAny); }   // no cache: a road you walk can change where it leads
+function navRouteC(from,to,lakeAny){ return navRoute(from,to,lakeAny); }
+// v0.56.0 the sea, from inland: the nearest valley with a coast within three roads, and the road that starts you toward it
+function isCoastSeed(t){ const w=seedDials(t>>>0).water; return !lakeCountry(t>>>0,w)&&!!coastOf(t>>>0,w); }
+function coastNear(seed){ return navRoute(seed,null,false,3,isCoastSeed); }
+function seaRumor(){ if(W.seed==null||W.waterKind==='coast') return null; const R=coastNear(W.seed); if(!R) return null; let ex=null; for(const e of (W.exits||[])) if(e.id===R.ex) ex=e; if(!ex) return null;
+  return {v:R.v, name:valleyName(R.v), road:ex.name, hops:R.hops}; }
+function seaKnown(){ const p=part(); if(!p||!p.valleys) return false; for(const k in p.valleys) if(isCoastSeed(+k)) return true; return false; }
+function seaPin(){ let s=W.seed>>>0; for(let i=0;i<3;i++){ const r=coastNear(s); if(!r) return; const d=roadDest(s,r.ex)>>>0; roadLink(s,r.ex,d); if(isCoastSeed(d)) return; s=d; } }   // the roads of the rumor are fixed once it is told, the way an errand's road is
+function seaHeard(R){ const p=part(); if(!p||!p.tasks||!R) return; const e=p.tasks.sea; if(e&&typeof e==='object'&&(e.s==='seen'||e.v===R.v)) return; if(seaKnown()) return;
+  p.tasks.sea={s:'heard', v:R.v, vn:R.name, road:R.road, from:W.seed>>>0}; seaPin(); W.seaMsg='They say the sea lies at '+R.name+', by '+R.road+'.'; journalSave(); }
+let SEA_AIM=null;
+function seaArrive(){ const p=part(), e=p&&p.tasks&&p.tasks.sea; if(!e||typeof e!=='object'||e.s!=='heard'||W.seed==null) return;
+  if(W.waterKind==='coast'){ e.s='seen'; e.sv=W.seed>>>0; e.svn=W.valley; return; }
+  if(SEA_AIM!==W.seed){ SEA_AIM=W.seed; if(!navRoute(W.seed,e.v,false,4)){ const R=coastNear(W.seed); if(R){ e.v=R.v; e.vn=valleyName(R.v); seaPin(); } } } }   // off the route: aim at the nearest sea from here
+function seaNotes(open,done){ const p=part(), e=p&&p.tasks&&p.tasks.sea; if(!e||typeof e!=='object') return; seaArrive();
+  if(e.s==='heard') open.push({t:'They say the sea lies at '+e.vn+'. Go and see it.', v:e.v});
+  else if(e.s==='seen') done.push({t:'Saw the sea, at '+(e.svn||e.vn)+'.', v:e.sv!=null?e.sv:e.v}); }
 function lakeYears(){ const a=[castOf(2),castOf(7)].map(function(c){ return c?c.age:'adult'; }); return a.indexOf('young')>=0?'Fifteen':(a.indexOf('adult')>=0?'Twenty':'Forty'); }   // the younger of the two decides
 function beatLake(id){ if(MODE!=='story'||!STORY||W.seed==null) return null; const p=part(); let e=p.tasks.lake; const seed=W.seed>>>0, c0=castOf(id);
   if(c0&&c0.town==='port'&&!e){ lakeSeen(); e=p.tasks.lake; return null; }
@@ -6898,7 +6915,7 @@ function trouble3Notes(open,done){ const p=part(); for(const k in p.tasks){ cons
 // shallows, the outside muffled when you go indoors, and the old stones humming at night.
 const SOUND={on:false, want:false, ctx:null, out:null, n:{}, t:{}, fired:{}, prevFlash:0, stepAcc:0, lastX:0, lastY:0, wasJ:0, vol:0.7, bolt:null, peakJ:0, duck:1};
 function soundPan(x,y){ const a=Math.atan2(y-P.y,x-P.x)-P.yaw; return Math.max(-1,Math.min(1,Math.sin(a))); }
-function soundNear(sp,R){ let best=null, bd=R; for(let c=0;c<CR_.n;c++){ if(!CR_.al[c]||CR_.sp[c]!==sp) continue; const d=Math.hypot(CR_.x[c]-P.x,CR_.y[c]-P.y); if(d<bd){ bd=d; best={x:CR_.x[c],y:CR_.y[c],d:d}; } } return best; }
+function soundNear(sp,R,gull){ let best=null, bd=R; for(let c=0;c<CR_.n;c++){ if(!CR_.al[c]||CR_.sp[c]!==sp) continue; if(gull!=null&&(GULL[c]?1:0)!==gull) continue; const d=Math.hypot(CR_.x[c]-P.x,CR_.y[c]-P.y); if(d<bd){ bd=d; best={x:CR_.x[c],y:CR_.y[c],d:d}; } } return best; }
 function soundCount(sp,R){ let n=0; for(let c=0;c<CR_.n;c++) if(CR_.al[c]&&CR_.sp[c]===sp&&Math.hypot(CR_.x[c]-P.x,CR_.y[c]-P.y)<R) n++; return n; }
 // what the world sounds like here and now: plain numbers, worked out without any audio, so it can be tested
 function soundScene(){ if(W.seed==null) return null; const night=dayPart()===3||DAY.k<0.3, storm=stormLevel?stormLevel():0;
@@ -6906,7 +6923,10 @@ function soundScene(){ if(W.seed==null) return null; const night=dayPart()===3||
   let wd=99; for(let oy=-12;oy<=12;oy+=2)for(let ox=-12;ox<=12;ox+=2){ const x=(P.x|0)+ox, y=(P.y|0)+oy; if(x<1||y<1||x>=N-1||y>=N-1) continue; if(W.h[y*N+x]<WATER-0.1){ const d=Math.hypot(ox,oy); if(d<wd) wd=d; } }
   let trees=0; for(let oy=-6;oy<=6;oy+=2)for(let ox=-6;ox<=6;ox+=2){ const x=(P.x|0)+ox, y=(P.y|0)+oy; if(x>0&&y>0&&x<N&&y<N&&W.tree[y*N+x]>0) trees++; }
   const fires=[]; for(let c=0;c<CR_.n;c++){ if(!CR_.al[c]||CR_.sp[c]!==SP.FIRE) continue; const d=Math.hypot(CR_.x[c]-P.x,CR_.y[c]-P.y); if(d<14) fires.push({x:CR_.x[c], y:CR_.y[c], d:d}); }
-  const wolf=night?soundNear(SP.WOLF,170):null, bird=!night?soundNear(SP.BIRD,45):null;
+  const wolf=night?soundNear(SP.WOLF,170):null, bird=!night?soundNear(SP.BIRD,45,0):null, gull=!night&&W.coast?soundNear(SP.BIRD,60,1):null;
+  // v0.56.0 the sea: how near the surf is, walking out along the way the coast faces (full within 6 m of the waterline, gone by 40)
+  let sea=0; if(W.coast){ const C=W.coast; let ds=99; for(let k=0;k<=40;k+=2){ const x=P.x+C.dir[0]*k, y=P.y+C.dir[1]*k; if(x<1||y<1||x>=N-1||y>=N-1){ if(seaFar(x,y)) ds=k; break; } if(terr(x,y)<WATER&&coastD(x,y,C,null)>-0.14&&coastD(x,y,C,W.seed)>-0.03){ ds=k; break; } }
+    if(ds<99) sea=clamp(1-(ds-6)/34,0,1)*clamp(1-(P.z-WATER-14)/50,0.35,1); }   // high on a cliff the surf is far below
   const sheep=soundNear(SP.SHEEP,40), cow=soundNear(SP.COW,40), hen=soundNear(SP.HEN,30);
   const wood=folkHere('wood'), hermit=folkHere('hermit');
   const chop=!night&&storm<0.3&&wood&&Math.hypot(wood.x-P.x,wood.y-P.y)<40?{x:wood.x, y:wood.y, d:Math.hypot(wood.x-P.x,wood.y-P.y)}:null;
@@ -6918,7 +6938,7 @@ function soundScene(){ if(W.seed==null) return null; const night=dayPart()===3||
     water:wd<99?clamp(1-wd/12,0,1)*0.35:0,
     rain:storm>0.05?clamp(storm,0,1)*(inside?0.25:0.6):0,
     crickets:night&&!inside&&storm<0.2&&P.gz>WATER?0.06:0,
-    owl:night&&trees>3&&!inside, birds:bird, wolf:wolf, fires:fires, sheep:sheep, cow:cow, hen:hen, chop:chop, fish:fish, hum:hum,
+    owl:night&&trees>3&&!inside, birds:bird, gull:gull, sea:sea, wolf:wolf, fires:fires, sheep:sheep, cow:cow, hen:hen, chop:chop, fish:fish, hum:hum,
     floor:soundFloor(), wet:P.gz<WATER-0.1, swim:terr(P.x,P.y)<WATER-1.2&&P.gz<WATER}; }
 function soundFloor(){ const i=(P.y|0)*N+(P.x|0); if(i<0||i>=N*N) return 'grass'; if(W.floor[i]===1) return 'wood'; if(W.floor[i]===2) return 'stone';
   if(W.st[i]>0.6&&P.gz>terr(P.x,P.y)+0.3) return 'stone'; if(W.spn[i]>0&&P.gz>terr(P.x,P.y)+W.spb[i*SPANS]) return 'stone'; if(W.path[i]||W.road[i]) return 'dirt'; return 'grass'; }
@@ -6937,6 +6957,7 @@ function soundBuild(){ const AC=typeof window!=='undefined'&&(window.AudioContex
     const cv=ctx.createConvolver(); cv.buffer=ir; const vg=ctx.createGain(); vg.gain.value=0.9; cv.connect(vg); vg.connect(muffle); S.verb=cv; }
   const loop=function(type,f,q,dest){ const s=ctx.createBufferSource(); s.buffer=nb; s.loop=true; s.loopStart=Math.random(); const fl=ctx.createBiquadFilter(); fl.type=type; fl.frequency.value=f; fl.Q.value=q; const g=ctx.createGain(); g.gain.value=0; s.connect(fl); fl.connect(g); g.connect(dest); s.start(0,Math.random()*1.5); return {g:g, f:fl}; };
   S.n.wind=loop('lowpass',700,0.7,muffle); S.n.leaves=loop('highpass',3200,0.4,muffle); S.n.water=loop('lowpass',650,0.8,muffle); S.n.rain=loop('highpass',2200,0.3,master);
+  S.n.surf=loop('lowpass',800,0.5,muffle); S.n.foam=loop('highpass',2800,0.3,muffle);   // v0.56.0 the sea: a low wash and the hiss of foam, swelling and drawing back
   // the stones' hum: two low notes, a fifth apart
   { const g=ctx.createGain(); g.gain.value=0; for(const f of [55,82.4,165,247]){ const o=ctx.createOscillator(); o.frequency.value=f; const og=ctx.createGain(); og.gain.value=f<60?1:(f<100?0.5:(f<200?0.35:0.2)); o.connect(og); og.connect(g); o.start(); } g.connect(master); S.n.hum={g:g}; }
   return true; }
@@ -6973,6 +6994,10 @@ function soundVoice(o){ const S=SOUND, ctx=S.ctx; if(!ctx) return; const v=o.v*(
   for(const x of stops){ x.start(t); x.stop(t+dur+0.05); } os.onended=function(){ for(const x of NN){ try{ x.disconnect(); }catch(e){} } };
   S.fired[o.k]=(S.fired[o.k]||0)+1; }
 const SOUNDS={
+  gull:function(x,y,d){ const n=2+((Math.random()*3)|0), f=1250+Math.random()*350, pan=soundPan(x,y);   // v0.56.0: a falling two-note cry, kee-ow, a few times over
+    for(let i=0;i<n;i++){ const t=i*(0.34+Math.random()*0.08), k=1-i*0.04;
+      soundShot({k:'gull', type:'sawtooth', formant:2100, f0:f*1.18*k, f1:f*k, glide:0.07, dur:0.11, a:0.012, v:0.075, delay:t, pan:pan, dist:d, range:70});
+      soundShot({k:'gull', type:'sawtooth', formant:1700, f0:f*k, f1:f*0.72*k, glide:0.16, dur:0.2, a:0.01, v:0.085, delay:t+0.1, pan:pan, dist:d, range:70}); } },
   chirp:function(x,y,d){ const f=2600+Math.random()*1800; for(let i=0;i<2+((Math.random()*3)|0);i++) soundShot({k:'chirp', f0:f, f1:f*(1.2+Math.random()*0.4), glide:0.06, dur:0.09, v:0.05, delay:i*0.12, pan:soundPan(x,y), dist:d, range:45}); },
   owl:function(){ for(let i=0;i<2;i++) soundShot({k:'owl', f0:420, f1:380, dur:i?0.55:0.28, v:0.06, delay:i*0.45, a:0.05, pan:(Math.random()*2-1)*0.7}); },
   howl:function(x,y,d){ const pan=soundPan(x,y), R=function(a,b){ return a+Math.random()*(b-a); }, far=clamp(d/200,0,1);
@@ -7010,11 +7035,14 @@ function soundTick(dt,card){ const S=SOUND; if(!S.on||!S.ctx||S.ctx.state!=='run
     const gust=1+0.35*Math.sin(now*0.23)+0.2*Math.sin(now*0.71);
     soundSet(S.n.wind,sc.wind*0.16*gust,0.8); soundSet(S.n.leaves,sc.leaves*0.4*gust,0.8); soundSet(S.n.water,sc.water*0.6,0.6); soundSet(S.n.rain,sc.rain*0.35,1.0);
     soundSet(S.n.hum,sc.hum*0.5,2.0);
+    { const w=0.5+0.5*Math.sin(now*0.9+0.8*Math.sin(now*0.23)), sw=w*w, v=sc.sea*(1+0.5*sc.storm);   // a wave about every seven seconds, never quite regular
+      soundSet(S.n.surf,v*(0.1+0.3*sw),0.5); soundSet(S.n.foam,v*0.1*sw*sw,0.4); if(S.n.surf&&S.n.surf.f) S.n.surf.f.frequency.setTargetAtTime(500+900*sw,now,0.6); }
     if(sc.inside!==S.wasIn){ S.wasIn=sc.inside; S.muffle.frequency.cancelScheduledValues(now); S.muffle.frequency.setValueAtTime(S.muffle.frequency.value,now); S.muffle.frequency.exponentialRampToValueAtTime(sc.inside?900:16000,now+0.9); } } }
   const sc=S.sc; if(!sc) return; const T=S.t, due=function(k,min,max){ T[k]=(T[k]==null?now+min+Math.random()*(max-min):T[k]); if(now>=T[k]){ T[k]=now+min+Math.random()*(max-min); return true; } return false; };
   // an animal just come into earshot speaks up soon, not after a long wait
   { const H=S.had||(S.had={}); for(const q of [['sheep','baa',1,4],['cow','moo',2,6],['hen','cluck',0.5,2],['wolf','wolf',3,9]]){ const here=!!sc[q[0]]; if(here&&!H[q[0]]) T[q[1]]=Math.min(T[q[1]]==null?Infinity:T[q[1]], now+q[2]+Math.random()*(q[3]-q[2])); H[q[0]]=here; } }
   if(sc.birds&&due('bird',1.5,6)) SOUNDS.chirp(sc.birds.x,sc.birds.y,sc.birds.d);
+  if(sc.gull&&due('gull',5,16)) SOUNDS.gull(sc.gull.x,sc.gull.y,sc.gull.d);
   if(sc.crickets>0&&due('cricket',0.18,0.7)) SOUNDS.cricket();
   if(sc.owl&&due('owl',25,70)) SOUNDS.owl();
   if(sc.wolf&&due('wolf',35,90)) SOUNDS.howl(sc.wolf.x,sc.wolf.y,sc.wolf.d);
@@ -7167,7 +7195,7 @@ const TALKV={
   3:["[fish]Night lines are out. Don't trip on them on your way off my dock.","Hear the water lapping? That's the lake telling you to go home."],
   a:["People come down here to talk. Then they see the lake and stop. Good lake.","Worms in a pot, hooks in a tin, peace in a hut. I had all three till you came.","[aloof]You can stay if you're a stone. Stones don't talk.","[gruff,birds]I don't need company. The ducks are company. Bad company.","[keepers]{guard1} waves a lantern at me some nights. I don't wave back. I notice, though.","[fish]A fish a visit. That's the rent for my dock. You're behind."]},
  peddler:{
-  a:["Ribbons, buttons, needles, news. The news is free. The ribbons are not.","Two valleys over they're all mad for blue thread this year. Don't ask me why.","I've walked every road between here and the hills. Some of them twice, by mistake.","My mule's called Patience. Named in hope.","[first]A customer! Or a browser. I like browsers too. They come back.","Fine pins, good laces, a spoon that's nearly silver. Look, don't lick.","I sell a bit of everything and a lot of nothing. Keeps the pack light.","Every valley says it's the friendliest. {valley} might be right, mind.","Haggle if you like. I enjoy it. I always win, but I enjoy it.","Rain's bad for trade and good for boots. I sell boots, so I'm fine.","[keepers]{steward} bought six spools last time and complained about all six.","The best thing I carry is a needle that never bends. The worst is this hat.","Folk say a peddler's a gossip with a pack. That's unkind. Accurate, but unkind.","Next valley along has a bell nobody's rung in years. I keep meaning to ask why."]},
+  a:["[searumor]Ever seen the sea? Take {seadir} and keep on to {seavalley}. You'll smell it before you see it.","[searumor]I sold a net in {seavalley} once. Big water there. No far shore at all. Start out by {seadir}.","[searumor]My salt comes up from {seavalley}, where the land stops. That's by {seadir}, if you're curious.","Ribbons, buttons, needles, news. The news is free. The ribbons are not.","Two valleys over they're all mad for blue thread this year. Don't ask me why.","I've walked every road between here and the hills. Some of them twice, by mistake.","My mule's called Patience. Named in hope.","[first]A customer! Or a browser. I like browsers too. They come back.","Fine pins, good laces, a spoon that's nearly silver. Look, don't lick.","I sell a bit of everything and a lot of nothing. Keeps the pack light.","Every valley says it's the friendliest. {valley} might be right, mind.","Haggle if you like. I enjoy it. I always win, but I enjoy it.","Rain's bad for trade and good for boots. I sell boots, so I'm fine.","[keepers]{steward} bought six spools last time and complained about all six.","The best thing I carry is a needle that never bends. The worst is this hat.","Folk say a peddler's a gossip with a pack. That's unkind. Accurate, but unkind.","Next valley along has a bell nobody's rung in years. I keep meaning to ask why."]},
  keep:{
   a:["[farm1]Bread's best on the day {farmer} sends the new flour up.","The well in the courtyard is the coldest water in {valley}. Bring a cup.","Somebody's cat has moved into the chapel. Nobody admits to owning it.","[farm1]{farmer}'s eggs come up the hill in a basket that's older than the stair.","Hear that bell? That's the kitchen, not the chapel. Different bell. Same hurry.","[wood]{woodcutter} stacks the wood by the gate so neat you'd think it was a wall.","The keep creaks in the wind. You stop hearing it after a week.","[hermit]{hermit} came up to the keep once. Stood in the courtyard, said it was too loud, went home.","If you get lost inside, follow the smell of bread. Always works.","[farm2]{shepherd} brings the wool up in spring and the whole courtyard sneezes.","Washdays everything flaps on lines across the courtyard. Mind your head.","There's a step on the tower stair taller than the rest. Everyone trips on it once.","Somebody chalked a face on the cellar door. It's been there so long it's got a name."]},
  folk:{
@@ -7352,6 +7380,7 @@ function lineOk(id,l,here,who){ const m=TAG_RE.exec(l), c=castOf(id);
     else if(t==='coast'){ if(W.waterKind!=='coast') return false; }
     else if(t==='notcoast'){ if(W.waterKind==='coast') return false; }
     else if(t==='lhouse'){ if(!folkHere('light')) return false; }
+    else if(t==='searumor'){ if(!seaRumor()) return false; }
     else if(t==='cellar'){ const q=W.places.find(function(o){ return o.key==='inn'; }); if(!q||!q.cellar) return false; }
     else if(t==='first'||t==='last'||t==='leaving'){ }
     else if(t==='home'){ if(!inHome()) return false; }
@@ -7384,7 +7413,7 @@ function lineOk(id,l,here,who){ const m=TAG_RE.exec(l), c=castOf(id);
     else if(TRAITS.indexOf(t)>=0){ if(!c||c.traits.indexOf(t)<0) return false; }
     else return false; }   // an unknown tag is never said (a typo shows up in the tests, not on screen)
   let ok=true; SLOT_RE.lastIndex=0;
-  l.replace(SLOT_RE,function(_,k){ if(k==='valley'||k==='you') return ''; const w=slotWho(id,k,here); if(w===-3) return ''; if(w<0||(w===id&&k!=='me'&&k!=='eva'&&k!=='evb')) ok=false; return ''; });   // nobody talks about themselves by role
+  l.replace(SLOT_RE,function(_,k){ if(k==='valley'||k==='you'||k==='seadir'||k==='seavalley') return ''; const w=slotWho(id,k,here); if(w===-3) return ''; if(w<0||(w===id&&k!=='me'&&k!=='eva'&&k!=='evb')) ok=false; return ''; });   // nobody talks about themselves by role
   if(ok) l.replace(PLACE_RE,function(_,s,k){ if(!placeHere(k)) ok=false; return ''; });
   return ok; }
 function roleName(c){ if(c.parent) return 'your '+pform(c,'par'); if(c.bandit){ const e=part().tasks['bandit:'+(W.seed>>>0)]; return c.chief?(e&&e.c==='work'&&e.s==='done'?'the foreman':'the bandit chief'):(e&&e.c==='work'&&e.s==='done'?'a hired hand':'a bandit'); } if(c.guest) return 'a '+(c.id0===0||c.id0===1?'guard':c.role)+' from '+c.fromv; return c.id===0?'the night guard':(c.id===1?'the day guard':'the '+c.role); }
@@ -7396,6 +7425,7 @@ function pform(c,f){ const he=c.pr==='he';
 function fillLine(id,l,here){ here=here||ALLHERE;
   l=l.replace(TAG_RE,'');
   l=l.replace(SLOT_RE,function(_,k,f){ if(k==='valley') return W.valley||'the valley'; if(k==='you') return youName();
+    if(k==='seadir'||k==='seavalley'){ const R=seaRumor(); return R?(k==='seadir'?R.road:R.name):(k==='seadir'?'the road':'the coast'); }
     if(LINE_EV&&EVSLOT[k]){ const e=LINE_EV; if(k==='evwhen') return evWhen(e); if(k==='evkid') return e.kid||'baby'; if(k==='evname') return e.name||'';
       if(k==='evnote') return e.note||''; if(k==='evnotes') return e.note==='sheep'?'sheep':(e.note||'')+'s'; } const c=castOf(slotWho(id,k,here)); return c?(f?pform(c,f):c.name):'someone'; });
   l=l.replace(PLACE_RE,function(_,s,k){ return s==='$'?placeDir(k):placeName(k); });
@@ -7488,7 +7518,7 @@ function talkPick(id,pose,here,n){ here=here||peopleHere();
     let x=r()*tot; for(let i=0;i<src.length;i++){ x-=w[i]; if(x<0) return src[i]; } return src[src.length-1]; };
   const out=function(){ const head=picks.slice(0,1), mid=picks.slice(1).filter(function(e){ return !e.last; }), tail=picks.slice(1).filter(function(e){ return e.last; });
     mid.sort(function(a,b){ return a.cat-b.cat; });
-    const o=[]; for(const e of head.concat(mid,tail)){ LINE_EV=evOf.get(e.id)||null; o.push({id:hid(e),text:fillLine(id,e.text,here)}); for(let k=0;k<e.chain.length;k++) o.push({id:e.id+'.'+(k+1),text:fillLine(id,e.chain[k],here)}); LINE_EV=null; }
+    const o=[]; for(const e of head.concat(mid,tail)){ LINE_EV=evOf.get(e.id)||null; o.push({id:hid(e),text:fillLine(id,e.text,here),sea:e.text.indexOf('{seavalley}')>=0?1:0}); for(let k=0;k<e.chain.length;k++) o.push({id:e.id+'.'+(k+1),text:fillLine(id,e.chain[k],here),sea:e.chain[k].indexOf('{seavalley}')>=0?1:0}); LINE_EV=null; }
     return o.slice(0,5); };
   // caught in the middle of something (or asleep): that comes first
   if(pose>0){ const e=choose(pose===4?pool(function(e){ return e.pose===4; }):pool(function(e){ return e.pose===pose; }).filter(fresh)); if(e) take(e);   // a pose line already heard is not worth repeating
@@ -7533,7 +7563,7 @@ function talk(c,id,pose,force){
   const p=castOf(id); CHAT.id=id; CHAT.key=key; CHAT.lines=lines; CHAT.k=0; CHAT.ask=beat; CHAT.picked=false; CHAT.sub=p?(roleName(p)+(pose===4?' · asleep':'')):'';
   chatHook.open(p?p.name+' '+p.by:'Someone', CHAT.sub);
   chatShow(); }
-function chatShow(){ const L=CHAT.lines[CHAT.k]; heardAdd(CHAT.key,L.id); const asking=!!(CHAT.ask&&!CHAT.picked&&CHAT.k>=CHAT.lines.length-1);
+function chatShow(){ const L=CHAT.lines[CHAT.k]; heardAdd(CHAT.key,L.id); if(L.sea) seaHeard(seaRumor());   // v0.56.0: the journal takes the rumor when the line is said, not before const asking=!!(CHAT.ask&&!CHAT.picked&&CHAT.k>=CHAT.lines.length-1);
   if(chatHook) chatHook.line(L.text,CHAT.k>=CHAT.lines.length-1,CHAT.k,CHAT.lines.length); if(chatHook&&chatHook.ask) chatHook.ask(asking?CHAT.ask.options.map(function(o){ return o.label; }):null); }
 // a reply: recorded once, before the next line shows
 function chatPick(i){ if(CHAT.id<0||!CHAT.ask||CHAT.picked||CHAT.k<CHAT.lines.length-1) return false; const o=CHAT.ask.options[i]; if(!o) return false; CHAT.picked=true;
@@ -7552,7 +7582,8 @@ function chatTick(){
 function talkNear(c,qd){ return qd<2.6||(CHAT.id>=0&&CHAT.id===(CR_.ay[c]|0)&&qd<3.2); }
 // arriving in a valley: said once, as soon as nothing is in the way
 function arriveCheck(){ if(W.arriveMsg&&W.keepSay&&W.arriveMsg.indexOf(W.keepSay)<0) W.arriveMsg+=' '+W.keepSay; if(W.arriveMsg&&greetHook&&greetHook(W.arriveMsg)!==false){ W.arriveMsg=''; TBUSY=Date.now()+3400; }
-  if(W.loreMsg&&greetHook&&Date.now()>=(W.loreAt||0)&&greetHook(W.loreMsg+' (Journal, Lore)',Math.min(9000,2600+W.loreMsg.length*45))!==false){ TBUSY=Date.now()+Math.min(9000,2600+W.loreMsg.length*45); W.loreMsg=''; } }
+  if(W.loreMsg&&greetHook&&Date.now()>=(W.loreAt||0)&&greetHook(W.loreMsg+' (Journal, Lore)',Math.min(9000,2600+W.loreMsg.length*45))!==false){ TBUSY=Date.now()+Math.min(9000,2600+W.loreMsg.length*45); W.loreMsg=''; }
+  if(W.seaMsg&&greetHook&&greetHook(W.seaMsg+' (Journal)')!==false){ TBUSY=Date.now()+3400; W.seaMsg=''; } }
 // a brazier on a stone post (9 = the fire)
 defMask(SP.FIRE,7,10,[
  "..9.9..",".99999.","9999999",".99999.","1111111",
@@ -8035,7 +8066,7 @@ function tickKeeper(c,dt){
   const g=floorAt(CR_.x[c],CR_.y[c],CR_.z[c]); CR_.z[c]+=(g-CR_.z[c])*Math.min(1,dt*16);
 }
 function tick(dt){
-  if(W.seed!=null&&W.seed!==VN_LAST){ VN_LAST=W.seed; visitNote(W.seed); journalSave(); }
+  if(W.seed!=null&&W.seed!==VN_LAST){ VN_LAST=W.seed; visitNote(W.seed); seaArrive(); journalSave(); }
   lightCheck();
   dayTick(); pedTick(); chatTick(); arriveCheck(); ruinCheck(); lakeCheck(); portCheck(); placeCheck(); ringCheck(); mothCheck();
   if(CR_.n===0) return; buildSGrid(); const px=P.x, py=P.y;
@@ -8830,7 +8861,7 @@ function boot(){
 
 if(IS_NODE){ module.exports={genWorld,allocGrid,buildGlyphs,renderFrame,compose,spawn,populate,tick,ecology,simBin,updatePlayer,W,RS,FB,P,IN,CR_,SP,SPP,MASKS,RESERVE,RAMP,N,WATER,EYE,terr,groundAt,DIALS,growOf,isAdult,addCreature,WALLS,buildWalls,nearestWall,allWallHits,wallBlocked,setSkyTime:function(t){skyTime=t;},setUW:function(v){UW=v;},DAY,SUN,MOON,SKY,DAYMODES,sunAltAz,sunUpdate,updateDay,relightAll,relightStep,RELIGHT,dayDate,fmtTod,setTod:function(h){DAY.tod=h;sunUpdate();},floorAt,KPATHS,KEEP,FORT,eventsForDay,weddingDay,babyDay,valleyDay,logEvent,eventsRefresh,dayTick,restock,stockTakeable,stockOwner,evBind,evWhen,evKey,seedDials,valleyTraits,chooseSeed,applyWorld,worldOf,TRAITS37,WORLD_KEYS,getPlayerLand:function(){ return PLAYER_LAND; },seedParse,babyFor,pedWays,pedShelter,carveRoads,exitAngles,roadCheck,roadStay,travelTo,spawnAtExit,VISITED,ROADS,PED,pedTick,pedDay,pedFind,pedRouteIn,pedPitch,pedWay,TALKP,ROAD_DIALS,ROLEPED,stormLevel,stormWindows,stormOngoing,underCover,stormLight,TALKS,STORMC,evBase,keeperAbed,FISHSIZE,TALKE,EVTAG,EVKINDS,wedNow,relOf,TALK,TALKX,LINES,POSEWHO,talkPick,talk,chatMore,closeChat,chatTick,CHAT,HEARD,VISITS,heardKey,heardAdd,lineOk,whoOk,placeName,placeDir,setChat:function(h){chatHook=h;},castValley,valleyName,valleyNames,seedRng,rebuildPeople,KEEPERS,GREETN,lineOk,fillLine,peopleHere,ALLHERE,ROLEKEY,ROLES,NAMES_F,NAMES_M,NAMES_X,BYNAMES,CLOTHES,SKINS,HAIRS,TRAITS,TRAIT_CLASH,RELREV,dayPart,folkMissing,tickKeeper,KMASK,KL,keeperFrame,GREETT,setGreet:function(f){greetHook=f;},RENDERS,SPANS,spanTop,spanBot,ceilOver,solidAt,pushToOpen,addSpan,YARD,stampKeepMass,keepLook,getKLOOK:function(){ return KLOOK; },CBIN,AM2,AMASK};
   Object.assign(module.exports,{navWho,navTargets,navGoal,NAV,journalNotes,fPlace,buildHouse,UPF,FOLK_BUILD,FARM_BED,SHIP,lakeCountry,LAKE,talkPick,townId,waterLine,spanSolid,levelBed,setGreet:function(f){ greetHook=f; },ruinCheck,UWnow:function(){ return UW; },landRuin,});
-  Object.assign(module.exports,{animal3D,animal3DPose,animal3DKind,A3SPEC,person3D,ANI,castOf,keeperCottage,cottageSpot,seaWords,hasHarbor,harborReady,lakeOf,TEMPLE_NAMES,GULL,bankOf,coastPick,placeLighthouse,tickBeacon,SOUND,soundScene,soundFloor,soundPan,soundTick,soundToast,soundOn,soundOff,soundWanted,SOUNDS,banditsLeave,mendRoad,ringBusy,setGreet:function(f){ greetHook=f; },keepLook,keepWord,KLOOK_:function(){ return KLOOK; },keepDress,keepFires,banditsHere,banditCast,chiefId,beatMend,beatMoths,beatBandit,mothCheck,hallNow,keepTag,TALKK3,keepNotes,LORE5,BANDIT_PATH,SONGLORE,songWho,RING_N,RING,ringBusy,ringSpot,ringPlan,ringRead,exitAngles,ringCheck,beatRing,ringTag,ringNotes,TALKR,LORE4,ringNight,roleName,festAway,festList,nearRoad,sentHere,GREETN,TROUBLES2,beatRoof,beatRoofW,beatAxe,beatBet,beatCake,beatSong,beatFest,trouble2Tag,trouble2Notes,festNotes,festGuests,festEnd,festTag,helpedAway,FEST,TALKT2,TALKF,LORE3,SONG,SONGLORE,songWho,farFor,roadPath,beatCrown,beatFriend,coastOf,coastD,seaAt,person3D,person3DPose,buildPerson3D,beatLake,lakeCheck,lakeNotes,lakeSeen,lakeTag,lakeOf,beatPort,portCheck,portNotes,portKind,portRingAt,portLampAt,navRoute,navRouteC,LAKESHIPS,TALKW,CROWN,crownTag,friendTag,TALKC,LORE2,FRIENDWHAT,PAUSED,chatPause,chatResume,nearPerson,talkTo,REP,TITLES,NICKS,earned,deedName,calledBy,legendName,didHere,legendFor,legendTold,LORE,loreFor,loreTake,loreCountHere,TALKK,leftFacts,leftPath,leftEnsure,leftThreads,leftHere,leftOf,hasAsker,leftKey,LREASONS,TALKL,fillBeat,troublesFor,trGet,trTag,stoneFacts,lightCheck,LIGHTS,TALKT,arriveExit,SNOOZE,part,fixPart,neighborSeed,roadDest,roadLink,visitNote,metNote,valleyCount,storyBeat,journalNotes,chatPick,ERRANDS,errandTarget,letterFacts,CHATX:CHAT,cleanName,nameHash,randomName,homeSeed,isHome,inHome,youName,journalLoad,journalSave,journalBlank,storyNew,storyResume,storyAt,parentsFor,castWithHome,addParents,TALKH,PARENT_IDS,addKeeper,
+  Object.assign(module.exports,{coastNear,seaRumor,seaNotes,seaHeard,seaArrive,seaPin,chatShow,isCoastSeed,soundScene,SOUNDS,animal3D,animal3DPose,animal3DKind,A3SPEC,person3D,ANI,castOf,keeperCottage,cottageSpot,seaWords,hasHarbor,harborReady,lakeOf,TEMPLE_NAMES,GULL,bankOf,coastPick,placeLighthouse,tickBeacon,SOUND,soundScene,soundFloor,soundPan,soundTick,soundToast,soundOn,soundOff,soundWanted,SOUNDS,banditsLeave,mendRoad,ringBusy,setGreet:function(f){ greetHook=f; },keepLook,keepWord,KLOOK_:function(){ return KLOOK; },keepDress,keepFires,banditsHere,banditCast,chiefId,beatMend,beatMoths,beatBandit,mothCheck,hallNow,keepTag,TALKK3,keepNotes,LORE5,BANDIT_PATH,SONGLORE,songWho,RING_N,RING,ringBusy,ringSpot,ringPlan,ringRead,exitAngles,ringCheck,beatRing,ringTag,ringNotes,TALKR,LORE4,ringNight,roleName,festAway,festList,nearRoad,sentHere,GREETN,TROUBLES2,beatRoof,beatRoofW,beatAxe,beatBet,beatCake,beatSong,beatFest,trouble2Tag,trouble2Notes,festNotes,festGuests,festEnd,festTag,helpedAway,FEST,TALKT2,TALKF,LORE3,SONG,SONGLORE,songWho,farFor,roadPath,beatCrown,beatFriend,coastOf,coastD,seaAt,person3D,person3DPose,buildPerson3D,beatLake,lakeCheck,lakeNotes,lakeSeen,lakeTag,lakeOf,beatPort,portCheck,portNotes,portKind,portRingAt,portLampAt,navRoute,navRouteC,LAKESHIPS,TALKW,CROWN,crownTag,friendTag,TALKC,LORE2,FRIENDWHAT,PAUSED,chatPause,chatResume,nearPerson,talkTo,REP,TITLES,NICKS,earned,deedName,calledBy,legendName,didHere,legendFor,legendTold,LORE,loreFor,loreTake,loreCountHere,TALKK,leftFacts,leftPath,leftEnsure,leftThreads,leftHere,leftOf,hasAsker,leftKey,LREASONS,TALKL,fillBeat,troublesFor,trGet,trTag,stoneFacts,lightCheck,LIGHTS,TALKT,arriveExit,SNOOZE,part,fixPart,neighborSeed,roadDest,roadLink,visitNote,metNote,valleyCount,storyBeat,journalNotes,chatPick,ERRANDS,errandTarget,letterFacts,CHATX:CHAT,cleanName,nameHash,randomName,homeSeed,isHome,inHome,youName,journalLoad,journalSave,journalBlank,storyNew,storyResume,storyAt,parentsFor,castWithHome,addParents,TALKH,PARENT_IDS,addKeeper,
     setMode:function(m,st){ MODE=m; STORY=st; },getStory:function(){ return STORY; },getMode:function(){ return MODE; },setJournal:function(j){ JOURNAL=j; },getJournal:function(){ return JOURNAL; },journalOff:function(){ return JOURNAL_OFF; }}); }
 else boot();
 })();
