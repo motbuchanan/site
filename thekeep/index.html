@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="keep-version" content="v0.52.0">
+<meta name="keep-version" content="v0.55.0">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#000">
 <title>The Keep</title>
@@ -237,7 +237,7 @@ html.fromshelf #inPage #inViews{padding-top:calc(58px + env(safe-area-inset-top)
  </div>
  <div id="stick"><div id="knob"></div></div>
  <div id="fps"></div>
- <button class="mb-ver" id="mbVer" type="button">v0.52.0 &middot; Nov 20</button>
+ <button class="mb-ver" id="mbVer" type="button">v0.55.0 &middot; Nov 21</button>
  <div id="toast"></div>
  <div id="updNudge" hidden role="status"><span>A new version of The Keep is here (<b id="updVer"></b>).<span id="updMsg" style="display:block;font-weight:400"></span></span><button class="btn go" id="updGo" type="button">refresh</button><button class="btn" id="updNo" type="button">later</button></div>
  <div id="bkNudge" hidden role="status"><span>Big moment. Back up your progress?</span><button class="btn go" id="bkNudgeGo" type="button">back up</button><button class="btn" id="bkNudgeNo" type="button">later</button></div>
@@ -1355,9 +1355,12 @@ var SHELF={on:false,url:'https://motbuchanan.com/gameshelf/'};
   SHELF.place=place;
 })();
 
-const VERSION='The Keep v0.52.0 · Nov 20 2026';
-const VER_SHORT='v0.52.0 · Nov 20'; // what the badge shows; bump with VERSION
+const VERSION='The Keep v0.55.0 · Nov 21 2026';
+const VER_SHORT='v0.55.0 · Nov 21'; // what the badge shows; bump with VERSION
 const CHANGELOG=[
+ ['v0.55.0 · Nov 21 2026','The animals in the round, in Mesh and Deep. Deer, stags, wolves, sheep, cows, horses, rabbits, squirrels and hens near you are now built from the same rounded boxes as the people, on the proportions of their pictures: short deep bodies, big heads, sturdy legs, and their markings (the horse\'s blaze and mane, the cow\'s patches, the sheep\'s wool and dark face, the deer\'s white rump, the stag\'s antlers). Legs swing as they walk, runners gallop, rabbits and squirrels hop and sit up, hens peck, grazers put their heads down, and deer, sheep and cows lie down at night. Farther off they are still pictures, as the people are. Birds, gulls and fish stay pictures for now.'],
+ ['v0.54.0 · Nov 20 2026','The lighthouse has its keeper. A small cottage with a red roof stands nine paces from the tower, door toward it, with a hearth, a bed, a bench and an oil barrel. The keeper walks out to the tower, round to the seaward side to look out with a hand to the brow, and back; they are up late for the lamp and abed late in the morning. They have their own things to say about the steps, the oil, the gulls and the ships, and the harbormaster knows who keeps the light. Also: at night the sea keeps a dim sheen and the moon lays a path on it (Mesh, Voxels, Iso, Rays), where it used to go black. Under water, distant things fade into blue water and not pale haze, past the edge of the map too. Cliffs show layers of rock (Mesh, Deep). The lighthouse may stand on a different stretch of shore than before, where there is room for the cottage. A robe lies along the legs when someone sits, where it used to stand up like a board.'],
+ ['v0.53.0 · Nov 20 2026','The stories reach the sea. On a coast, people say sea where they used to say lake, in their talk, their old tales and the notes that pop up, and a drowned hall out at sea is named for the sea. The harbor gets its troubles (the ring, the pier lamp, the torn sail) and its old stories of lost ships, the same as in lake country. What the Lake Keeps can now lead you to a coast harbor as well as a lake one, and the compass and journal point to whichever is nearer. Coast harbormasters and innkeepers have some lines of their own, about tides, gulls, salt, fish stew and the light on the point. Choose a valley has a fourth choice for water, the sea, so you can go straight to a coast. The drowned hall finds room in a narrow sea more often too.'],
  ['v0.52.0 · Nov 20 2026','Life on the coast. Coast valleys now have a harbor: the pier, the ship and the fish market on the shore, the berth dug deep and a stone breakwater along the sea side that turns in across the bow. The drowned temple and the wreck lie out in the sea. Kelp grows along the shelf and fish school over it. Surf rolls in: froth at the edge of the sand and lines of foam coming in over the shallows, in every view. Gulls fly low along the shore in small flocks, white with black wingtips, and rest on the beach or float on the water. A lighthouse stands on the highest bit of shore, a headland where there is one: white with a red band, a gallery and an open lantern under a dark cap. At night its lamp turns, so from a distance you see it flash each time the beam sweeps past you. No keeper yet.'],
  ['v0.51.2 · Nov 20 2026','A tidier menu. VIEW is one picker for the seven ways to draw the world. TIME is one slider for the hour, its track painted with today\'s real sky from night through dawn, day and dusk, with sunrise and sunset marked, plus a picker for how long a day lasts (paused, 3, 8 or 20 minutes, or the Akron clock). While you drag the slider the menu clears so you can watch the sky change. Sliding off the Akron clock gives a 20 minute day. The sky dials left the dials card, since they live in the menu now. The four smaller buttons sit two to a row. The moon now shows only once the sun is down, so at sunset the full moon rising opposite no longer looks like a second sun coming up.'],
  ['v0.51.1 · Nov 20 2026','The sky in the menu: tap dawn, noon, sunset or night to see the valley then, in any mode, or my clock to put the sky back on Akron time. The times come from the real sun for the day, so sunset is when the sun is touching the sea. Past the edge of a coast valley the sea now runs on beside the headlands too, so there is no line where the map ends. Birds no longer hang in the air flapping when they rest: they fly right in and sit still in a tree, on the ground, or on the water by the shore, and a bird far out over the sea flies back to land to rest.'],
@@ -1910,6 +1913,13 @@ function edgeEase(mvx,mvy){ const ed=Math.min(P.x,P.y,N-1-P.x,N-1-P.y); if(ed>=2
 // for the views: past the map's edge, everything on the sea's side counts as open sea (beside the headlands too)
 function seaFar(x,y){ const C=W.coast; if(!C) return false; if(x>=0&&y>=0&&x<=N&&y<=N) return seaAt(x,y); return (x/(N/2)-1)*C.dir[0]+(y/(N/2)-1)*C.dir[1]>0.25; }
 function seaAt(x,y){ const C=W.coast; return !!C&&coastD(x,y,C,null)>0.02; }
+// v0.53.0: a valley with a harbor (lake country or the coast), and the words people use there: on a coast the lake
+// in their lines becomes the sea ("lake country" still means the other valleys)
+function hasHarbor(){ return W.waterKind==='lake'||W.waterKind==='coast'; }
+// ...and one the lake story can finish in: a harbor with its port, a wreck and the dry room under the hall
+function harborReady(){ return hasHarbor()&&W.places.some(function(o){ return o.key==='port'; })&&W.ruins.some(function(o){ return o.kind==='wreck'; })&&W.ruins.some(function(o){ return o.kind==='pocket'; }); }
+function seaWords(t){ if(W.waterKind!=='coast'||typeof t!=='string'||t.indexOf('ake')<0) return t;
+  return t.replace(/\blake ?shore\b/g,'shore').replace(/\b(L|l)akes?\b(?! country)/g,function(_,c){ return c==='L'?'Sea':'sea'; }); }
 // a random point inside the map whose distance into the sea (coastD, with the shore's wobble) is between lo and hi, or null
 function coastPick(rnd,lo,hi,M){ const C=W.coast; if(!C) return null; M=M||24;
   for(let t=0;t<400;t++){ const x=M+rnd()*(N-2*M), y=M+rnd()*(N-2*M), d=coastD(x,y,C,W.seed); if(d>=lo&&d<=hi) return [x,y]; } return null; }
@@ -2567,9 +2577,9 @@ function placeDeep(seed){ if(W.waterKind!=='lake'&&W.waterKind!=='coast') return
   const clear=function(x,y,R){ if(port&&Math.hypot(port.x-x,port.y-y)<R+40) return false; for(const o of W.ruins) if(Math.hypot(o.x-x,o.y-y)<o.r+R+6) return false; return true; };
   const deepAll=function(T,u0,v0,u1,v1,need){ for(let v=v0;v<=v1;v++)for(let u=u0;u<=u1;u++){ const i=fCell(T,u,v); if(i<0||W.h[i]>WATER-need) return false; } return true; };
   let best=null;
-  for(let t=0;t<1500;t++){ const an=rnd()*6.2832, rr=LAKE.r*0.8*Math.sqrt(rnd()), q=sea?coastPick(rnd,0.16,0.7,30):null; if(sea&&!q) continue; const x=Math.round(sea?q[0]:LAKE.x+Math.cos(an)*rr), y=Math.round(sea?q[1]:LAKE.y+Math.sin(an)*rr), rot=(rnd()*4)|0;
-    if(!clear(x,y,12)) continue; const T=fPlace(x,y,rot); if(!deepAll(T,-8,-8,8,10,14)) continue; const d=WATER-W.h[y*N+x]; if(!best||d>best.d) best={x:x,y:y,rot:rot,d:d}; if(t>500&&best) break; }
-  if(best){ const T=fPlace(best.x,best.y,best.rot), B=levelBed(T,-8,-8,8,10); const r=buildTemple(T,B), nm=TEMPLE_NAMES[(rnd()*TEMPLE_NAMES.length)|0];
+  for(let t=0;t<1500;t++){ const an=rnd()*6.2832, rr=LAKE.r*0.8*Math.sqrt(rnd()), q=sea?coastPick(rnd,0.14,0.7,14):null; if(sea&&!q) continue; const x=Math.round(sea?q[0]:LAKE.x+Math.cos(an)*rr), y=Math.round(sea?q[1]:LAKE.y+Math.sin(an)*rr), rot=(rnd()*4)|0;
+    if(!clear(x,y,12)) continue; const T=fPlace(x,y,rot); if(!deepAll(T,-8,-8,8,10,sea?12:14)) continue; const d=WATER-W.h[y*N+x]; if(!best||d>best.d) best={x:x,y:y,rot:rot,d:d}; if(t>500&&best) break; }
+  if(best){ const T=fPlace(best.x,best.y,best.rot), B=levelBed(T,-8,-8,8,10); const r=buildTemple(T,B), nm0=TEMPLE_NAMES[(rnd()*TEMPLE_NAMES.length)|0], nm=sea?nm0.replace(/\bLake\b/g,'Sea').replace(/\blake\b/g,'sea'):nm0;
     W.ruins.push({x:r.x[0], y:r.x[1], r:10, dr:9, kind:'temple', name:nm, found:false, zMax:r.B+7.8+2.5, deep:true, hole:r.hole, door:r.door, out:r.out, B:r.B});
     W.ruins.push({x:r.room[0], y:r.room[1], r:3, dr:2.6, kind:'pocket', name:'the dry room in '+nm, found:false, zMin:r.air-0.2, zMax:r.air+4, deep:true}); }
   for(let t=0;t<1500;t++){ const an=rnd()*6.2832, rr=LAKE.r*(0.3+0.6*rnd()), q=sea?coastPick(rnd,0.07,0.4,30):null; if(sea&&!q) continue; const x=Math.round(sea?q[0]:LAKE.x+Math.cos(an)*rr), y=Math.round(sea?q[1]:LAKE.y+Math.sin(an)*rr), rot=(rnd()*4)|0;
@@ -2678,15 +2688,58 @@ function placeLighthouse(seed){ W.light=null; if(!W.coast) return; const rnd=mul
     for(const o of W.places){ if(Math.hypot(o.x-x,o.y-y)<o.r+(o.key==='port'?40:16)){ ok=false; break; } }
     for(const o of W.ruins){ if(Math.hypot(o.x-x,o.y-y)<(o.r||8)+14){ ok=false; break; } }
     if(!ok) continue; const sc=lo+4*sm(0.55,0.7,fbm(x*0.01,y*0.01,seed+93,3));   // high ground, and a headland if there is one
-    if(!best||sc>best.sc) best={x:x,y:y,lo:lo,sc:sc}; }
-  if(!best) return; const x=best.x, y=best.y, B=best.lo-0.4, H1=B+6.0, H2=H1+2.2, H3=H2+5.4, CAP=H3+2.4;
+    const cot=DIALS.people?cottageSpot(x,y):null, sc2=sc+(cot?100:0);   // a spot with room for the keeper's cottage, if there is one
+    if(!best||sc2>best.sc) best={x:x,y:y,lo:lo,sc:sc2,cot:cot}; }
+  if(!best) return; const x=best.x, y=best.y;
+  if(best.cot){ ruinFlatten(best.cot.cx,best.cot.cy,5); let lo=1e9; for(let oy=-4;oy<=4;oy++)for(let ox=-4;ox<=4;ox++) if(ox*ox+oy*oy<=16) lo=Math.min(lo,W.h[(y+oy)*N+x+ox]); best.lo=lo; }   // level the cottage's ground first: it reaches the tower's foot
+  const B=best.lo-0.4, H1=B+6.0, H2=H1+2.2, H3=H2+5.4, CAP=H3+2.4;
   ruinClear(x,y,7);
   for(let oy=-4;oy<=4;oy++)for(let ox=-4;ox<=4;ox++){ const d=Math.hypot(ox,oy); if(d>3.6) continue; const i=(y+oy)*N+x+ox, g=W.h[i]; W.tree[i]=0; W.spn[i]=0; W.path[i]=0;
     if(d<=2.3){ addSpan(i,B-g,H1-g,3); addSpan(i,H1+0.03-g,H2-g,9); addSpan(i,H2+0.03-g,H3-g,3);   // the tower: white, the red band, white (a hair apart, or they would merge into one span)
       if(d<=1.2) addSpan(i,CAP-g,CAP+0.9-g,6); else addSpan(i,CAP-g,CAP+0.5-g,6); }      // the lantern stands open under the cap
     else addSpan(i,H3-0.3-g,H3-g,6); }                                                    // the gallery round it
   (W.lamps=W.lamps||[]).push([x+0.5,y+0.5,H3+1.6,'beacon']);   // high in the lantern, so it shows over the gallery rim
-  W.light={x:x+0.5,y:y+0.5,z:H3+1.6,top:CAP+0.9}; }
+  W.light={x:x+0.5,y:y+0.5,z:H3+1.6,top:CAP+0.9};
+  if(best.cot) keeperCottage(seed,x,y,best.cot); }
+// where the keeper's cottage can go: nine paces from the tower on one of its four sides, on dry ground clear of everything
+function cottageSpot(x,y){ const D=[[0,1],[-1,0],[0,-1],[1,0]], C=W.coast; let pick=null;
+  for(const dist of [9,12]) for(let r=0;r<4;r++){ const cx=x-dist*D[r][0], cy=y-dist*D[r][1]; if(cx<20||cy<20||cx>N-21||cy>N-21) continue; let ok=true, lo=1e9, hi=-1e9;
+    for(let oy=-6;oy<=6&&ok;oy++)for(let ox=-6;ox<=6;ox++){ if(ox*ox+oy*oy>36) continue; const i=(cy+oy)*N+cx+ox, g=W.h[i]; if(g<WATER+1.0||W.st[i]>0||W.spn[i]>0||W.road[i]||W.floor[i]){ ok=false; break; } lo=Math.min(lo,g); hi=Math.max(hi,g); }
+    if(!ok||hi-lo>4.5||Math.abs((lo+hi)/2-W.h[y*N+x])>(dist===9?1.5:2.6)) continue;
+    for(const o of W.places){ if(Math.hypot(o.x-cx,o.y-cy)<o.r+12){ ok=false; break; } }
+    for(const o of W.ruins){ if(Math.hypot(o.x-cx,o.y-cy)<(o.r||8)+10){ ok=false; break; } }
+    if(!ok) continue; const sc=-(hi-lo)+2*(D[r][0]*C.dir[0]+D[r][1]*C.dir[1])+(dist===9?3:0);   // flattest, and inland of the tower if it can be
+    if(!pick||sc>pick.sc) pick={rot:r,cx:cx,cy:cy,sc:sc}; }
+  return pick; }
+// the lighthouse keeper's cottage (v0.54.0): white walls and a red roof to match the tower, the door facing it. The keeper
+// walks out to the tower, round to the seaward side to look out, and back; up late for the lamp, abed late in the morning.
+function keeperCottage(seed,x,y,q){ const F=TOWN.find(function(f){ return f.key==='light'; }), cx=q.cx, cy=q.cy, T=fPlace(cx,cy,q.rot), C=W.coast;
+  ruinClear(cx,cy,7); ruinGlade(cx,cy,9);
+  const p={key:'light', name:F.name, blurb:F.blurb, who:-1, x:cx+0.5, y:cy+0.5, r:F.R, dr:11, found:false, fires:[], stock:[], route:null, trail:null, keepTrees:[], b0:F.b0, b1:F.b1, slot:-1, rot:q.rot, town:true};
+  for(let oy=-7;oy<=7;oy++)for(let ox=-7;ox<=7;ox++) W.path[(cy+oy)*N+cx+ox]=0;
+  buildHouse(T,{u0:-3,v0:-2,u1:2,v1:2,storeys:1,wallH:2.8,wall:3,roof:9,ridge:1.4,floor:1,door:[0,2],windows:[[-2,2,0],[2,0,0],[-1,-2,0]],chimney:[-3,0],
+    furn:[[1,-1,1,0,0.5,9],[-1,-1,-1,-1,0.7,8]]});
+  p.fires.push(T.F(-1.5,0.5));
+  fPut(T,2,3,0.45,8); fPut(T,-2,3,0.9,8);   // a bench and an oil barrel by the door
+  const loop=[[0.5,3.5],[0.5,5.6,10,1,0,1]];
+  { const du=T.D(1,0), dv=T.D(0,1), su=C.dir[0]*du[0]+C.dir[1]*du[1], sv=C.dir[0]*dv[0]+C.dir[1]*dv[1];   // the sea's direction in the place's own grid
+    const a0=-Math.PI/2, as=Math.atan2(sv,su); let da=as-a0; while(da>Math.PI) da-=2*Math.PI; while(da<-Math.PI) da+=2*Math.PI;
+    const n=Math.max(1,Math.ceil(Math.abs(da)/(Math.PI/4))), ring=[];
+    const o0=T.F(0,0), tu=(x+0.5-o0[0])*du[0]+(y+0.5-o0[1])*du[1], tv=(x+0.5-o0[0])*dv[0]+(y+0.5-o0[1])*dv[1];
+    const d0=T.F(0.5,5.6), g0=terr(d0[0],d0[1]);
+    for(let k=0;k<=n;k++){ const a=a0+da*k/n, u=tu+4.9*Math.cos(a), v=tv+4.9*Math.sin(a), w=T.F(u,v), i=(w[1]|0)*N+(w[0]|0), g=terr(w[0],w[1]);
+      if(g<WATER+0.8||Math.abs(g-g0)>1.5||W.st[i]>0||W.floor[i]) break; ring.push([u,v]); }
+    if(ring.length>1){ for(let k=1;k<ring.length-1;k++) loop.push(ring[k]); const e=ring[ring.length-1]; loop.push([e[0],e[1],16,1,su,sv]); for(let k=ring.length-2;k>=1;k--) loop.push(ring[k]); loop.push([0.5,5.6]); } }
+  loop.push([0.5,3.5],[2.4,4.2,9,2,0,1],[0.5,3.5]);
+  p.route={ loop:fRoute(T,loop) };
+  p.route.bed=fRoute(T,[[0.5,3.5],[0.5,1.5],[0.5,-0.5],[1.4,-0.4,0,4,0,1]]);
+  p.route.wake=fRoute(T,[[1.4,-0.4],[0.5,-0.5],[0.5,1.5],[0.5,3.5]]);
+  p.trail=T.F(0.5,4.5); p.cam=T.F(9.0,-6.0).concat(T.F(0.5,6));
+  W.places.push(p);
+  { const t=p.trail, qn=nearestPath(t[0]|0,t[1]|0,180); if(qn) carvePath(t[0]|0,t[1]|0,qn[0],qn[1],seed+523,1.0); }
+  { const R=p.r+5; for(let oy=-R;oy<=R;oy++)for(let ox=-R;ox<=R;ox++){ const i=(cy+oy)*N+cx+ox; if(W.path[i]&&(W.st[i]>0||W.floor[i]||W.spn[i]>0)) W.path[i]=0; } }
+  for(let oy=-4;oy<=4;oy++)for(let ox=-4;ox<=4;ox++) if(ox*ox+oy*oy<=13) W.path[(y+oy)*N+x+ox]=0;
+  try{ const f=JSON.parse(localStorage.getItem('keep_places_'+seed)||'[]'); if(Array.isArray(f)&&f.indexOf('light')>=0) p.found=true; }catch(e){} }
 // the lighthouse lamp: dark by day; at night a beam turns once every eight seconds, and the lamp shows while it faces you
 function tickBeacon(c){ const L=W.light; if(!L) return; const night=DAY.k<0.45;
   const turn=skyTime*Math.PI*2/8, to=Math.atan2(P.y-L.y,P.x-L.x), face=Math.cos(turn-to), near=Math.hypot(P.x-L.x,P.y-L.y)<6;
@@ -2697,7 +2750,7 @@ function townSpot(R,rnd){ let last=null;
   return last?{x:last[0],y:last[1],q:nearestPath(last[0],last[1],180)}:null; }
 function placeTown(seed){ if(!DIALS.people) return; const rnd=mul32((seed^0x51A7E77)>>>0);
   if(W.waterKind==='lake'||W.waterKind==='coast'){ placePort(seed); placeDeep(seed); }   // v0.52.0: the coast gets them too
-  for(let k=0;k<TOWN.length;k++){ const F=TOWN[k]; if(F.lake) continue; const s=townSpot(F.R,rnd); if(!s) continue;
+  for(let k=0;k<TOWN.length;k++){ const F=TOWN[k]; if(F.lake||F.coast) continue; const s=townSpot(F.R,rnd); if(!s) continue;
     let rot=(rnd()*4)|0; if(s.q){ const dx=s.q[0]-s.x, dy=s.q[1]-s.y, D=[[0,1],[-1,0],[0,-1],[1,0]]; let bd=-9; for(let r=0;r<4;r++){ const d=D[r][0]*dx+D[r][1]*dy; if(d>bd){ bd=d; rot=r; } } }
     const x=s.x, y=s.y, T=fPlace(x,y,rot);
     ruinFlatten(x,y,F.R+5); ruinClear(x,y,F.R+7); ruinGlade(x,y,F.R+3);
@@ -2778,7 +2831,7 @@ function placeFolk(seed){
 }
 // walk onto a place for the first time and it tells you whose it is
 function placeCheck(){ if(!greetHook||!W.places.length) return;
-  for(const o of W.places){ if(o.found) continue; if(Math.hypot(P.x-o.x,P.y-o.y)>o.dr) continue;
+  for(const o of W.places){ if(o.found) continue; if(Math.hypot(P.x-o.x,P.y-o.y)>o.dr&&!(o.key==='light'&&W.light&&Math.hypot(P.x-W.light.x,P.y-W.light.y)<7)) continue;
     const bl=fillLine(-1,o.blurb); if(greetHook('You found '+o.name+', '+bl.charAt(0).toLowerCase()+bl.slice(1)+'.')!==false){ o.found=true;
       try{ localStorage.setItem('keep_places_'+W.seed,JSON.stringify(W.places.filter(function(q){ return q.found; }).map(function(q){ return q.key; }))); }catch(e){} }
     return; } }
@@ -3945,14 +3998,15 @@ const AM2=[];
 const GULL=new Uint8Array(CMAX);   // v0.52.0: which birds are gulls (drawn from the bird's second bank, kept by the shore)
 // which art bank a creature draws from: gulls for birds, otherwise every third grown animal gets the second look
 function bankOf(c){ const sp=CR_.sp[c], Q=AM2[sp]; if(!Q||Q.banks.length<2) return 0; if(sp===SP.BIRD) return GULL[c]?1:0; return ((ANI.vr[c]%3)===0&&isAdult(c))?1:0; }
-const ANI={vr:new Uint8Array(CMAX), px:new Float32Array(CMAX), py:new Float32Array(CMAX), d:new Float32Array(CMAX), v:new Uint8Array(CMAX), f:new Uint8Array(CMAX), m:new Uint8Array(CMAX), seen:new Uint32Array(CMAX), tick:1, last:0};
+const ANI={s:new Float32Array(CMAX), yaw:new Float32Array(CMAX).fill(NaN), vr:new Uint8Array(CMAX), px:new Float32Array(CMAX), py:new Float32Array(CMAX), d:new Float32Array(CMAX), v:new Uint8Array(CMAX), f:new Uint8Array(CMAX), m:new Uint8Array(CMAX), seen:new Uint32Array(CMAX), tick:1, last:0};
 // a frame name's index is the same in every view of an animal (all views draw the same poses)
-function animalFrame(px,py,yaw){ const now=skyTime, dt=Math.min(0.25,Math.max(0.001,now-ANI.last)); ANI.last=now; const tk=++ANI.tick;
+let TESTHOOK=null;   // ?test=1 only: lets a test stage hold animals still for a picture
+function animalFrame(px,py,yaw){ if(TESTHOOK) TESTHOOK(); const now=skyTime, dt=Math.min(0.25,Math.max(0.001,now-ANI.last)); ANI.last=now; const tk=++ANI.tick;
   const R2=CDRAW*CDRAW, night=DAY.k<0.3, sx=-Math.sin(yaw), sy=Math.cos(yaw);
   for(let c=0;c<CR_.n;c++){ if(CR_.al[c]===0) continue; const A=AM2[CR_.sp[c]]; if(!A) continue;
     const x=CR_.x[c], y=CR_.y[c], ex=px-x, ey=py-y; if(ex*ex+ey*ey>R2) continue;
     let d=Math.hypot(x-ANI.px[c],y-ANI.py[c]); if(d>1.5||ANI.seen[c]!==tk-1) d=0; ANI.seen[c]=tk; ANI.px[c]=x; ANI.py[c]=y; ANI.d[c]+=d;   // back in range: no leap
-    const spd=d/dt, moving=spd>0.15, list=moving?(spd>A.runAt?A.run:A.walk):A.idle;
+    const spd=d/dt, moving=spd>0.15; ANI.s[c]+=(spd-ANI.s[c])*Math.min(1,dt*8); const list=moving?(spd>A.runAt?A.run:A.walk):A.idle;
     let f; const ph=ANI.vr[c]/256;   // each animal's own phase: it stays with the animal when the list is packed
     if(A.key==='bird'){ f=(CR_.st[c]===1&&!moving)?A.idle[0]:(((now*0.3+ph*7)%1)<0.28?A.idle[0]:A.walk[(((now*7+ph*40)/1.5708)|0)%4]); }   // resting: wings still
     else if(moving) f=list[((ANI.d[c]*A.fpm)|0)%list.length];
@@ -4358,10 +4412,9 @@ const P3PIV={hip:[0,0,0.86], neck:[0,0,1.38], shL:[-0.255,0,1.29], elL:[-0.2725,
 const P3D=new WeakMap();
 const P3HOLD={spear:[0.15,1.1], staff:[0.15,1.05], hoe:[0.15,1.05], axe:[0.05,0.15], rod:[0.3,0.9]};
 function person3D(id){ const K=KEEPERS[id]; if(!K) return null; let g=P3D.get(K); if(!g){ g=buildPerson3D(K); P3D.set(K,g); } return g; }
-function buildPerson3D(K){
-  const out=[]; const X=personExtras(K);
+// the box maker the people and the animals are built from (v0.55.0: shared)
+function p3Boxer(out){
   const c255=function(c,k){ k=k==null?1:k; return [Math.min(255,c[0]*k)/255,Math.min(255,c[1]*k)/255,Math.min(255,c[2]*k)/255]; };
-  const mix=function(a,b,t){ return [a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t]; };
   // a rounded box: w across (x), d deep (y), h tall (z), centre (cx,cy,cz), corner radius r, widths tapered from bottom (t0) to top (t1)
   // and depths (d0 to d1); n: faces split n by n (1 = a plain box, for the small things). rot: [angle about x, pivot] for tools
   function box(w,d,h,cx,cy,cz,col,bone,o){ o=o||{}; const r=Math.min(o.r==null?0.04:o.r,w/2-0.002,d/2-0.002,h/2-0.002), n=o.n||(r>0.05?3:(r>0.015?2:1)),
@@ -4379,6 +4432,12 @@ function buildPerson3D(K){
           if(ax===0){ p[0]=sgn*hx; p[1]=u*hy*sgn; p[2]=v*hz; } else if(ax===1){ p[1]=sgn*hy; p[0]=-u*hx*sgn; p[2]=v*hz; } else { p[2]=sgn*hz; p[0]=u*hx; p[1]=v*hy*sgn; } return p; };
         const a=P(i,j), b=P(i+1,j), c=P(i+1,j+1), e=P(i,j+1); vert(a); vert(b); vert(c); vert(a); vert(c); vert(e); } };
     for(const ax of [0,1,2]) for(const s of [-1,1]) face(ax,s); }
+  return box; }
+function buildPerson3D(K){
+  const out=[]; const X=personExtras(K);
+  const c255=function(c,k){ k=k==null?1:k; return [Math.min(255,c[0]*k)/255,Math.min(255,c[1]*k)/255,Math.min(255,c[2]*k)/255]; };
+  const mix=function(a,b,t){ return [a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t]; };
+  const box=p3Boxer(out);
   const old=K.age==='old', young=K.age==='young', robe=!!K.robe;
   const sk=K.skin, hair=K.hair, tun=K.tunic, leg=K.legs, clo=K.cloak, acc=K.accent;
   const boot=[leg[0]*0.55,leg[1]*0.5,leg[2]*0.45], metal=[176,180,188], wood=[124,88,54], dark=[34,26,24], cream=mix(tun,[240,232,214],0.6);
@@ -4461,6 +4520,103 @@ function buildPerson3D(K){
   const wide=K.build==='stout'?1.14:(K.build==='tall'?0.97:1), tall=K.build==='tall'?1.07:(K.build==='short'?0.9:(K.build==='stout'?0.96:1)), sc=young?0.74:1;
   if(young){ const N=P3PIV.neck; for(let i=0;i<out.length;i+=11) if(out[i+10]===2){ out[i]=N[0]+(out[i]-N[0])*1.15; out[i+1]=N[1]+(out[i+1]-N[1])*1.15; out[i+2]=N[2]+(out[i+2]-N[2])*1.15; } }
   return {buf:new Float32Array(out), n:out.length/11, sx:sc*wide, sy:sc*wide, sz:sc*tall, tool:K.tool, old:old}; }
+// ---- the animals in the round (v0.55.0): the same rounded boxes as the people, on their own small rig ----
+// bones: 19 body, 11 neck and head, 12 to 15 legs (front left, front right, back left, back right), 16 tail, 17 and 18 wings.
+// each animal's pivots travel with its mesh (pv: 8 points); the pose is 12 numbers, like a person's:
+// [head, FL, FR, BL, BR, tail lift, tail wag, wings, lift, -, body pitch, pitch height]
+const A3D={};
+function a3Quad(box,S){ const pv=new Float32Array(24), leg=S.leg, zb=leg+S.hb/2, col=S.col, bel=S.belly||col, lc=S.legCol||col, L=S.L, W=S.W;
+  const setP=function(i,x,y,z){ pv[i*3]=x; pv[i*3+1]=y; pv[i*3+2]=z; };
+  box(W,L,S.hb,0,0,zb,col,19,{r:S.r||Math.min(W,S.hb)*0.4,t0:S.bt0||0.94,t1:1,n:3});
+  if(S.belly) box(W*0.8,L*0.86,S.hb*0.3,0,0,leg+S.hb*0.13,bel,19,{r:S.hb*0.12});
+  if(S.chest) box(W*1.04,L*0.34,S.hb*S.chest,0,L*0.3,zb+S.hb*(S.chest-1)*0.4,col,19,{r:W*0.3,n:3});
+  if(S.saddle) box(W*1.03,L*0.5,S.hb*0.5,0,-L*0.02,zb+S.hb*0.27,S.saddle,19,{r:W*0.3,n:3});
+  for(const q of (S.patches||[])){ const sx=q[0]; box(sx?0.03:W*q[3],L*q[4]*(sx?1:0.3),S.hb*q[5],sx*(W/2-0.008),L*q[1]*(sx?1:1)*(sx?1:0.98),zb+S.hb*q[2],q[6],19,{r:0.012,n:2}); }
+  if(S.wool){ box(W*0.9,L*0.5,S.hb*0.5,0,L*0.2,zb+S.hb*0.3,col,19,{r:0.2,n:3}); box(W*0.92,L*0.5,S.hb*0.5,0,-L*0.22,zb+S.hb*0.28,col,19,{r:0.2,n:3}); }
+  if(S.udder) box(W*0.4,L*0.22,S.hb*0.16,0,-L*0.22,leg-S.hb*0.02,S.udder,19,{r:0.05});
+  const lw=S.legW, fy=L/2-lw*0.9, by=-L/2+lw*0.9, lx=W/2-lw*0.55;
+  [[-lx,fy,12],[lx,fy,13],[-lx,by,14],[lx,by,15]].forEach(function(q,i){ const back=i>1, w2=lw*(back&&S.haunch?S.haunch:1);
+    box(w2,w2*1.15,leg+0.05,q[0],q[1],(leg+0.05)/2,lc,q[2],{r:lw*0.35,t0:0.8,t1:1.12});
+    if(S.hoof) box(w2*0.95,w2*1.25,leg*0.14,q[0],q[1]+w2*0.06,leg*0.07,S.hoof,q[2],{r:lw*0.2});
+    if(S.sock) box(w2*0.9,w2*1.1,leg*0.3,q[0],q[1],leg*0.3,S.sock,q[2],{r:lw*0.3});
+    setP(1+i,q[0],q[1],leg+0.02); });
+  // neck and head: the neck leans forward from the shoulders; the head sits on its end, nose forward
+  const nb=[0,L/2-S.neckW*0.35,leg+S.hb*0.72], t=S.neckA, nl=S.neckL, top=[0,nb[1]+Math.sin(t)*nl,nb[2]+Math.cos(t)*nl];
+  box(S.neckW,S.neckW*1.15,nl+S.neckW*0.5,0,nb[1],nb[2]+nl/2,S.neckCol||col,11,{r:S.neckW*0.4,t0:1.25,t1:0.9,rot:[-t,nb]});
+  const hl=S.headL, hw=S.headW, hh=S.headH, hc=S.headCol||col, hy=top[1]+hl*0.22, hz=top[2]+hh*0.1;
+  box(hw,hl*0.62,hh,0,hy,hz,hc,11,{r:hw*0.38,n:3});
+  box(hw*S.snW,hl*0.5,hh*S.snH,0,hy+hl*0.5,hz-hh*(1-S.snH)*0.42,S.snCol||hc,11,{r:hw*S.snW*0.36,d0:1,d1:0.9});
+  box(hw*S.snW*0.5,0.02,hh*S.snH*0.4,0,hy+hl*0.75,hz-hh*(1-S.snH)*0.3,S.nose||[30,24,24],11,{r:0.008,n:1});
+  for(const sd of [-1,1]){ box(0.022*S.eye,0.03*S.eye,0.034*S.eye,sd*hw*0.47,hy+hl*0.1,hz+hh*0.14,[18,16,18],11,{r:0.01,n:1});
+    const e=S.ear; box(e[0],e[1],e[2],sd*(hw*0.38+e[3]),hy-hl*0.18,hz+hh*0.42+e[2]*0.38,S.earCol||hc,11,{r:Math.min(e[0],e[1])*0.4,t0:1,t1:0.55,rot:[e[4]||0,[0,hy-hl*0.18,hz+hh*0.4]]});
+    if(S.antler){ const az=hz+hh*0.5, ay=hy-hl*0.1, ax=sd*hw*0.3, ac=[196,178,140];
+      box(0.045,0.045,0.34,ax+sd*0.06,ay-0.03,az+0.15,ac,11,{r:0.018,n:1}); box(0.04,0.04,0.22,ax+sd*0.17,ay,az+0.36,ac,11,{r:0.015,n:1}); box(0.036,0.16,0.036,ax+sd*0.09,ay+0.07,az+0.2,ac,11,{r:0.014,n:1}); box(0.034,0.034,0.16,ax+sd*0.03,ay-0.06,az+0.38,ac,11,{r:0.013,n:1}); box(0.14,0.036,0.036,ax+sd*0.12,ay-0.01,az+0.28,ac,11,{r:0.014,n:1}); }
+    if(S.horn) box(0.035,0.035,0.11,sd*hw*0.42,hy-hl*0.2,hz+hh*0.5+0.04,[226,218,196],11,{r:0.014,t1:0.5,n:1}); }
+  if(S.blaze) box(hw*0.34,hl*0.75,hh*0.5,0,hy+hl*0.3,hz+hh*0.27,S.blaze,11,{r:0.02});
+  if(S.headPatch) for(const sd of [-1,1]) box(hw*0.3,hl*0.5,hh*0.6,sd*hw*0.37,hy-hl*0.02,hz+hh*0.2,S.headPatch,11,{r:0.03});
+  if(S.wool) box(hw*0.9,hl*0.3,hh*0.4,0,hy-hl*0.15,hz+hh*0.42,col,11,{r:0.06});
+  if(S.mane) box(S.neckW*0.3,S.neckW*0.5,nl+0.08,0,nb[1]-S.neckW*0.5,nb[2]+nl/2,S.mane,11,{r:0.02,rot:[-t,nb]});
+  if(S.forelock) box(hw*0.5,hl*0.3,hh*0.3,0,hy-hl*0.05,hz+hh*0.5,S.mane,11,{r:0.02});
+  setP(0,nb[0],nb[1],nb[2]);
+  // the tail
+  const T=S.tail, ty=-L/2+0.01, tz=leg+S.hb*0.82; setP(5,0,ty,tz);
+  if(T) box(T[0],T[1],T[2],0,ty-T[1]*0.3,tz-T[2]/2+T[0]*0.3,T[4]||col,16,{r:Math.min(T[0],T[1])*0.42,t0:T[5]||1,t1:1,rot:[T[3],[0,ty,tz]]});
+  if(S.tailTip&&T) { const a=T[3], ex=[0,ty+Math.sin(a)*T[2]*0.9,tz-Math.cos(a)*T[2]*0.9]; box(T[0]*1.1,T[1]*1.1,T[2]*0.3,0,ex[1],ex[2],S.tailTip,16,{r:T[0]*0.45}); }
+  return {pv:pv, top:top[2]+hh, leg:leg, L:L, W:W}; }
+const A3SPEC={   // proportions taken from the sprites: short deep bodies, big heads, sturdy legs
+  deer:{L:0.9,W:0.36,hb:0.46,leg:0.66,legW:0.12,neckW:0.2,neckA:0.32,neckL:0.42,headL:0.34,headW:0.21,headH:0.23,snW:0.66,snH:0.62,eye:1.7,ear:[0.09,0.035,0.2,0.04,0.3],
+    col:[196,146,96],belly:[240,226,200],legCol:[176,128,84],hoof:[70,52,42],snCol:[214,170,124],tail:[0.1,0.06,0.14,0.6,[246,240,228]],
+    patches:[[0,-0.5,0.08,0.5,0.1,0.42,[246,240,228]],[0,0.5,-0.2,0.45,0.1,0.36,[240,226,200]]],stride:1.3,graze:1,lie:1},
+  wolf:{L:0.9,W:0.36,hb:0.42,leg:0.4,legW:0.13,neckW:0.3,neckA:0.55,neckL:0.2,headL:0.38,headW:0.3,headH:0.27,snW:0.5,snH:0.5,eye:1.6,ear:[0.1,0.04,0.17,0.0,0],
+    col:[122,120,122],belly:[196,194,190],legCol:[108,106,108],snCol:[196,194,190],chest:1.1,tail:[0.15,0.15,0.4,0.75,[112,110,112],0.6],tailTip:[70,68,70],
+    patches:[[0,0.5,-0.2,0.5,0.1,0.4,[196,194,190]]],stride:1.0,wag:1},
+  sheep:{L:0.78,W:0.56,hb:0.56,leg:0.24,legW:0.12,neckW:0.24,neckA:1.0,neckL:0.08,headL:0.3,headW:0.24,headH:0.24,snW:0.8,snH:0.8,eye:1.5,ear:[0.11,0.04,0.07,0.04,1.2],
+    col:[236,234,226],legCol:[60,56,60],headCol:[64,60,64],neckCol:[236,234,226],hoof:[36,32,34],r:0.24,bt0:1,tail:[0.12,0.1,0.12,0.2,[236,234,226]],wool:1,stride:0.6,graze:1,lie:1},
+  cow:{L:1.2,W:0.6,hb:0.7,leg:0.48,legW:0.2,neckW:0.4,neckA:1.15,neckL:0.1,headL:0.5,headW:0.4,headH:0.38,snW:0.92,snH:0.62,eye:1.8,ear:[0.14,0.045,0.09,0.07,1.3],horn:1,
+    col:[240,236,228],legCol:[232,228,220],hoof:[60,48,44],snCol:[236,170,170],nose:[120,70,70],tail:[0.06,0.06,0.5,0.08,[150,104,74]],tailTip:[110,72,50],
+    patches:[[1,0.1,0.15,0.1,0.45,0.6,[150,104,74]],[-1,-0.2,0.2,0.1,0.4,0.5,[150,104,74]],[0,-0.3,0.5,0.6,0.3,0.1,[150,104,74]],[1,-0.42,-0.1,0.1,0.2,0.4,[150,104,74]]],
+    headPatch:[150,104,74],udder:[236,170,170],stride:1.1,graze:1,lie:1},
+  horse:{L:1.15,W:0.5,hb:0.6,leg:0.7,legW:0.17,neckW:0.3,neckA:0.42,neckL:0.5,headL:0.52,headW:0.26,headH:0.3,snW:0.74,snH:0.66,eye:1.7,ear:[0.08,0.035,0.14,0.0,0],
+    col:[156,96,56],legCol:[124,74,44],hoof:[50,38,32],snCol:[124,74,44],mane:[60,40,30],forelock:1,blaze:[244,238,226],tail:[0.14,0.14,0.62,0.16,[60,40,30],0.7],stride:1.5,graze:1},
+  rabbit:{L:0.24,W:0.2,hb:0.2,leg:0.06,legW:0.06,haunch:1.5,neckW:0.13,neckA:0.5,neckL:0.03,headL:0.18,headW:0.16,headH:0.16,snW:0.7,snH:0.6,eye:1.3,ear:[0.05,0.025,0.19,-0.02,-0.1],
+    col:[202,170,136],belly:[240,230,214],nose:[226,150,150],earCol:[214,180,150],tail:[0.09,0.09,0.09,0.9,[250,246,238]],r:0.09,stride:0.5,hop:1},
+  squirrel:{L:0.16,W:0.11,hb:0.12,leg:0.045,legW:0.04,haunch:1.4,neckW:0.08,neckA:0.5,neckL:0.02,headL:0.11,headW:0.095,headH:0.095,snW:0.65,snH:0.6,eye:0.9,ear:[0.03,0.018,0.045,-0.012,0],
+    col:[196,110,56],belly:[244,230,206],tail:[0.11,0.11,0.26,2.8,[214,128,66],0.5],r:0.05,stride:0.35,hop:1}};
+// a hen: a round body on two legs, a small head with a comb and a beak, a fan of tail, wings folded at the sides
+function a3Hen(box){ const pv=new Float32Array(24), wh=[236,224,196], setP=function(i,x,y,z){ pv[i*3]=x; pv[i*3+1]=y; pv[i*3+2]=z; };
+  box(0.2,0.28,0.2,0,0,0.22,wh,19,{r:0.085,n:3,t0:0.85}); box(0.12,0.12,0.16,0,-0.15,0.3,wh,16,{r:0.04,t0:0.7,t1:1.5,rot:[0.5,[0,-0.12,0.26]]}); setP(5,0,-0.12,0.26);
+  for(const sd of [-1,1]){ const b=sd<0?12:13; box(0.022,0.022,0.13,sd*0.05,0.0,0.065,[214,160,60],b,{r:0,n:1}); box(0.05,0.07,0.014,sd*0.05,0.02,0.007,[214,160,60],b,{r:0,n:1}); setP(sd<0?1:2,sd*0.05,0,0.13);
+    box(0.03,0.2,0.13,sd*0.1,-0.01,0.23,[214,200,170],sd<0?17:18,{r:0.014}); setP(sd<0?6:7,sd*0.09,0,0.29); }
+  setP(3,0,0,0.1); setP(4,0,0,0.1);
+  box(0.09,0.09,0.15,0,0.12,0.33,wh,11,{r:0.04,rot:[-0.25,[0,0.1,0.26]]}); box(0.085,0.1,0.085,0,0.16,0.42,wh,11,{r:0.035});
+  box(0.03,0.05,0.03,0,0.22,0.41,[226,170,50],11,{r:0.008,n:1}); box(0.02,0.07,0.04,0,0.15,0.475,[200,50,44],11,{r:0.008,n:1}); box(0.022,0.02,0.04,0,0.2,0.375,[200,50,44],11,{r:0.008,n:1});
+  for(const sd of [-1,1]) box(0.012,0.016,0.016,sd*0.043,0.185,0.435,[18,16,18],11,{r:0,n:1});
+  setP(0,0,0.1,0.26); return {pv:pv, top:0.5, leg:0.13, L:0.3, W:0.2}; }
+function animal3DKind(c){ const sp=CR_.sp[c]; return sp===SP.DEER?(bankOf(c)===1?'stag':'deer'):sp===SP.WOLF?'wolf':sp===SP.SHEEP?'sheep':sp===SP.COW?'cow':sp===SP.HORSE?'horse':sp===SP.RABBIT?'rabbit':sp===SP.SQUIRREL?'squirrel':sp===SP.HEN?'hen':null; }
+function animal3D(c){ const k=animal3DKind(c); if(!k) return null; let g=A3D[k]; if(g) return g;
+  const out=[], box=p3Boxer(out); let m, S=null;
+  if(k==='hen') m=a3Hen(box); else { S=Object.assign({},A3SPEC[k==='stag'?'deer':k]); if(k==='stag'){ S.antler=1; S.neckW*=1.2; S.col=[176,128,84]; } m=a3Quad(box,S); }
+  const K=(k==='rabbit'||k==='squirrel'||k==='hen')?1.6:1.15;   // a little larger than life, as the pictures were, so they read at a distance
+  for(let i=0;i<out.length;i+=11){ out[i]*=K; out[i+1]*=K; out[i+2]*=K; } for(let i=0;i<24;i++) m.pv[i]*=K;
+  const S2=S||{stride:0.3,hen:1}; S2.stride*=K;
+  g=A3D[k]={buf:new Float32Array(out), n:out.length/11, pv:m.pv, kind:k, S:S2, leg:m.leg*K, shx:m.W*1.5*K, shy:m.L*1.5*K}; return g; }
+// the pose this frame, from how far the animal has walked and what it is doing
+const A3POSE=new Float32Array(12);
+function animal3DPose(c){ const o=A3POSE; o.fill(0); const g=animal3D(c); if(!g) return o; const S=g.S, tt=skyTime+c*1.37, spd=ANI.s[c]||0, moving=spd>0.15, ph0=ANI.vr[c]/256;
+  const sc=growOf(c), ph=ANI.d[c]/(S.stride*sc)*Math.PI*2;
+  if(S.hen){ if(moving){ const sw=Math.sin(ph); o[1]=sw*0.7; o[2]=-sw*0.7; o[0]=0.25*Math.sin(ph*2); } else { const pk=(tt*0.35+ph0*5)%1; if(pk<0.3) o[0]=-1.1*Math.sin(pk/0.3*Math.PI); o[10]=o[0]*0.25; o[11]=0.13; } return o; }
+  if(S.hop){ if(moving){ const u=(ph/(Math.PI*2))%1, air=Math.sin(u*Math.PI); o[8]=air*g.leg*2.2; o[10]=(0.5-u)*0.7; o[11]=g.leg+0.05; o[1]=o[2]=0.9-u*1.6; o[3]=o[4]=-0.9+u*1.8; o[0]=-o[10]*0.6; }
+    else { o[0]=0.08*Math.sin(tt*2.3); if(((tt*0.2+ph0*3)%1)<0.25){ o[10]=0.5; o[11]=g.leg; o[0]=-0.3; } }   // sitting up to look about, now and then
+    if(g.kind==='squirrel') o[5]=0.15*Math.sin(tt*3.1); return o; }
+  if(moving){ const run=spd>((AM2[CR_.sp[c]]||{}).runAt||99), A=run?0.75:0.48, sw=Math.sin(ph), sw2=Math.sin(ph+(run?0.6:Math.PI));
+    if(run){ o[1]=sw*A; o[2]=Math.sin(ph+0.35)*A; o[3]=-Math.sin(ph+0.2)*A; o[4]=-Math.sin(ph+0.55)*A; o[8]=0.05*Math.abs(Math.cos(ph)); o[10]=0.06*Math.sin(ph); o[11]=g.leg; o[0]=0.1; }
+    else { o[1]=sw*A; o[4]=sw*A; o[2]=-sw*A; o[3]=-sw*A; o[0]=0.05*Math.sin(ph*2); o[8]=0.012*Math.abs(Math.cos(ph)); }
+    o[5]=run?0.5:0.1; o[6]=0.1*Math.sin(ph); return o; }
+  const night=DAY.k<0.3;
+  if(S.lie&&night&&((ph0*7)%1)<0.7){ o[1]=o[2]=1.45; o[3]=o[4]=-1.45; o[8]=-(g.leg-0.06); o[0]=-0.5; return o; }   // down for the night, legs folded
+  if(S.graze){ const u=(tt*0.06+ph0*3.3)%1; if(u<0.55){ const e=Math.min(1,u/0.06,(0.55-u)/0.06); o[0]=-(1.5-(S.neckA||0.5))*e*(0.92+0.08*Math.sin(tt*5)); } else o[0]=0.06*Math.sin(tt*0.8); }
+  else o[0]=0.06*Math.sin(tt*0.9);
+  o[6]=(S.wag?0.35:0.5)*Math.sin(tt*(S.wag?2.2:1.1))*(((tt*0.11+ph0)%1)<0.4?1:0.15); return o; }
 // the pose this frame: [torso lean, head nod, left shoulder, left elbow, right shoulder, right elbow, left leg, right leg, lift, lantern,
 // robe swing, right arm turned in]
 // (positive swings forward). Walking from the distance walked; standing, looking out, leaning, knocking, sitting asleep, working.
@@ -4630,12 +4786,18 @@ function rebuildPeople(){ const cast=W.cast; if(!cast||!cast.length) return;
   GREETT.fill(-1e9); GLAST.fill(''); }
 // the innkeeper and the miller, and what the rest of the valley says about the inn and the mill (v0.45)
 const TALKI={
+ lightkeeper:{
+  0:["Morning. Lamp's out, glass is wiped, and I'm for my breakfast.","[day]Morning's when I trim the wick and count the oil. Dull work. It matters.","Sea's quiet this morning. I don't trust it."],
+  1:["Noon. Nothing for a light to do at noon. I mend things.","Midday I walk the point and look for what the tide left.","[port]{harbormaster} sends word when a ship's due. Mostly the word is: none."],
+  2:["Evening. I'll be going up soon. The lamp wants lighting before the sun's gone, not after.","Watch the tower when the light goes. First turn of the lamp is the best one.","Dusk is when I earn my keep."],
+  3:["Lamp's lit and turning. That's my day done, and my night started.","[night]On a clear night you can see the beam touch the far rocks. On a thick one you can't see your own boots.","I sleep when the lamp's steady. Not before."],
+  a:["One hundred and eleven steps. I've counted them every day and it's never once been a hundred and ten.","The lamp turns once in eight breaths. Slow, if you're watching. Fast enough, if you're a ship.","People think it's lonely. It's quiet. Those aren't the same.","White so you can see it by day. The red band's so you can tell it from the next one along the coast.","Gulls sit on the rail and watch me work. I've named four. They don't answer to any of them.","Salt eats the hinges. Oil, every week, or the door sings.","I've never been on a ship. Odd, isn't it? I just tell them where not to go.","A light doesn't say come here. It says mind the rocks. People get that wrong.","[port]{harbormaster} watches the ships in. I watch them past. Between us nothing's been lost yet.","[inn]{innkeeper} keeps a bed for me at @inn. I've not used it once. Who'd light the lamp?","[old]I've kept this light longer than some of those trees have stood.","[young]The keeper before me taught me the lamp, then walked off down the shore. Said it was my turn.","[worrier]If the oil ran out on a bad night... I keep three winters of it. To be sure.","[cheerful]Best view in {valley}, and I'm paid in fish to look at it.","Storm nights I don't sleep at all. I sit up top and keep her turning by hand if I must.","You can stand under it at night and never see the lamp. Walk off a way, then look back."]},
  innkeeper:{
   0:["Morning. Fire's lit, kettle's on. Beds upstairs are made, if you're stopping.","[day]First thing I do is sweep the step. Folk judge an inn by its step.","Nobody up yet but me and the bread.","[mill]Flour from @mill comes this morning. {miller} is never late. Nearly never."],
   1:["Quiet at noon. The taproom fills when the light goes.","[farm1]{farmer} stops in for a bite most days. Pays in eggs.","Sit anywhere. The good bench is by the fire, and it's taken by nobody."],
   2:["Evening's the inn's time. Lamps on, door open.","[keep]{guard1} comes down off the wall for a cup before the night watch. Don't tell {steward}.","Stew's on. It's always stew. Folk come back for it anyway."],
   3:["Late. The last of them have gone up or gone home.","[night]I bank the fire before bed. If it goes out, the whole inn sulks.","Rooms are up the back stair. Mind the third step, it creaks."],
-  a:["Three rooms upstairs. One's mine. The other two are for whoever the road brings.","Barrels behind the bar, ale in the barrels. That's the whole secret of an inn.","[cellar]The cellar's down the steps by the back stair. Ale keeps cool down there. So do I, come summer.","[cellar]Mind your head in the cellar. I put the lamp low on purpose, so I'd stop hitting it.","I've heard every story there is. Twice. Tell me one anyway.","A traveller's coat tells you where they've been. Yours says a long way.","[gossip]Sit by the fire long enough and you'll hear everything in {valley}. I already have.","[kind]Nobody leaves my inn hungry. Some leave full of stew and argument.","[keep]The keep sends down for ale on feast days. Very grand. Very thirsty.","[farm2]{shepherd} sits in the corner and says nothing for an hour. Then one joke. Always a good one.","[wood]{woodcutter} brings the firewood and drinks the price of it.","[hermit]{hermit} came in once. Looked at everyone. Went out again.","[old]I've kept this inn longer than the sign's been up. The sign's new. Well. Newer.","[young]It was my aunt's inn. Now it's mine. I'm still finding her lists in the drawers.","The beds are straw and wool. Better than the road. Most roads.","[mill]{miller} and I trade. Flour for ale. Good trade for both of us.","Wipe the tables, sweep the step, bank the fire. Same three things, every day. I like it."]},
+  a:["[coast]Fish stew tonight. It's always fish stew. We live by the sea.","[coast]Sailors pay in coins I've never seen. I keep them in a jar. Nobody's come back for change.","[coast]You can hear the surf from the top room. Some folk can't sleep for it. Some can't sleep without it.","Three rooms upstairs. One's mine. The other two are for whoever the road brings.","Barrels behind the bar, ale in the barrels. That's the whole secret of an inn.","[cellar]The cellar's down the steps by the back stair. Ale keeps cool down there. So do I, come summer.","[cellar]Mind your head in the cellar. I put the lamp low on purpose, so I'd stop hitting it.","I've heard every story there is. Twice. Tell me one anyway.","A traveller's coat tells you where they've been. Yours says a long way.","[gossip]Sit by the fire long enough and you'll hear everything in {valley}. I already have.","[kind]Nobody leaves my inn hungry. Some leave full of stew and argument.","[keep]The keep sends down for ale on feast days. Very grand. Very thirsty.","[farm2]{shepherd} sits in the corner and says nothing for an hour. Then one joke. Always a good one.","[wood]{woodcutter} brings the firewood and drinks the price of it.","[hermit]{hermit} came in once. Looked at everyone. Went out again.","[old]I've kept this inn longer than the sign's been up. The sign's new. Well. Newer.","[young]It was my aunt's inn. Now it's mine. I'm still finding her lists in the drawers.","The beds are straw and wool. Better than the road. Most roads.","[mill]{miller} and I trade. Flour for ale. Good trade for both of us.","Wipe the tables, sweep the step, bank the fire. Same three things, every day. I like it."]},
  miller:{
   0:["Morning. The wind's up early. So am I.","[day]First sacks go to @inn. Then the keep. Then whoever's knocking.","Dust on everything already. That's a good day starting."],
   1:["Noon's when the wind's steadiest. Don't stand behind the sails.","[farm1]{farmer}'s wheat came in fine this year. Fine flour from it.","Grind, sack, stack. Grind, sack, stack."],
@@ -4647,7 +4809,7 @@ const TALKI={
   1:["Noon. The lake's flat as a table. Good day for nothing to happen.","[inn]{innkeeper} sends down a pie at noon. I've never once asked."],
   2:["Evening. Lamps on the pier, ropes doubled.","Wind's turning. I'll check her lines again before dark."],
   3:["Late to be on the pier. Mind the edge, the water's colder than it looks.","[night]I can hear her creak from my bed. That's how I know she's still there."],
-  a:["She's tied up here till the spring. Walk aboard if you like. Mind your head going down into the hold.","The cabin's at the stern. The captain's left a map on the table. I've not touched it. Much.","There's a hatch by the mast. Five steps down to the hold. Barrels, rope, and the smell of tar.","Red sails. You can see them from the far shore. That's the point of red.","The pier's new planks at the far end. The old ones went into the lake one stormy night. Me nearly with them.","[fish]The market sells what the boats bring in. Today that's not much. Tomorrow, who knows.","It's deep off the end of the pier. Deeper than you'd think. There's things down there.","[old]I've watched this lake longer than anyone. It keeps its secrets.","[young]I took the job because nobody else would stand on a pier in the rain. Turns out I like the rain.","[worrier]Every storm I lie awake counting her ropes.","[keep]The keep sends down for salt fish in winter. Crates of it.","[mill]{miller}'s flour goes out on the ship when she sails. Every sack.","Knots. Everything here is knots. Learn three and you'll get by.","[cheerful]Best view in the valley is from the end of the pier at sunset. Free, too.","A ship's a house that can leave. I find that a comfort."]},
+  a:["[coast]Tide's on the turn. You can smell it before you see it.","[coast]Gulls will take a fish out of your hand if you hold it up. Don't hold it up.","[coast]That wall out there is older than the pier. Somebody stacked the sea out, one stone at a time.","[coast,lhouse]The light on the point? {lightkeeper} keeps it. Never missed a dusk that I know of.","[coast]Salt gets into everything. Rope, wood, bread. Me.","She's tied up here till the spring. Walk aboard if you like. Mind your head going down into the hold.","The cabin's at the stern. The captain's left a map on the table. I've not touched it. Much.","There's a hatch by the mast. Five steps down to the hold. Barrels, rope, and the smell of tar.","Red sails. You can see them from the far shore. That's the point of red.","The pier's new planks at the far end. The old ones went into the lake one stormy night. Me nearly with them.","[fish]The market sells what the boats bring in. Today that's not much. Tomorrow, who knows.","It's deep off the end of the pier. Deeper than you'd think. There's things down there.","[old]I've watched this lake longer than anyone. It keeps its secrets.","[young]I took the job because nobody else would stand on a pier in the rain. Turns out I like the rain.","[worrier]Every storm I lie awake counting her ropes.","[keep]The keep sends down for salt fish in winter. Crates of it.","[mill]{miller}'s flour goes out on the ship when she sails. Every sack.","Knots. Everything here is knots. Learn three and you'll get by.","[cheerful]Best view in the valley is from the end of the pier at sunset. Free, too.","A ship's a house that can leave. I find that a comfort."]},
  any:["[port]There's a ship tied up at @port. Red sails. Off to the $port.","[port]{harbormaster} at @port knows every rope on that ship by name.","[port]Go and stand on the deck of that ship. You'll feel taller.","[port,fish]Fish from the market at @port. Fresh as you'll get.","[inn]Stop at @inn if you're tired. It's off to the $inn, by the path.","[inn]{innkeeper}'s stew. You'll smell it before you see the inn.","[mill]You can see the mill's sails from half the valley. That's @mill, to the $mill.","[mill]Bread in {valley} comes through {miller}'s stones.","[inn,mill]{miller} and {innkeeper} are thick as thieves. Flour and ale.","[inn,night]The lamps at @inn are the last ones lit at night."]};
 // ---------------- talk (v0.22): the line library ----------------
 // Each list holds lines one person might say. A line may start with [tags] that must all hold:
@@ -4674,7 +4836,7 @@ const TALK={
   3:["[leaving]Nearly time for my bunk. Finally.","Can't sleep till I've done one more lap.","Stars are out. One look along the wall, then my bunk."],
   a:["Four corner towers, one gate, and me. Two of us, counting {guard1}.","Day watch is mine. Nights are {guard1}'s.","I like the day watch. You see who's coming."]},
  guard:{
-  a:["Wall's four sides. I've counted.","Up here you see the whole valley. Most of it, anyway.","[wolves]Wolves keep to the trees. Usually.","[deer]Deer come down to the lake at dawn. Every day. Like they're on watch too.","[birds]The birds roost in the tall trees past the wall. You can set a clock by them.","Spear's mostly for leaning on. Don't tell anyone.","Nothing ever happens here. Keeping it that way is the job.","Mind the battlements. Half the stones up here are loose.","The corner towers are the best for a sit-down.","[farm1,day]From the wall you can see the field at @farm1, off to the $farm1.","[wood,day]Smoke from the trees to the $wood. That'll be {woodcutter}.","[hermit,day]Someone fishing the lake. {hermit}, out on the dock.","[ruins]On a clear day you can see @ruin from here. Off to the $ruin.","Helmet's too big. It was my {parent.par}'s.","[keep]Best view in {valley}: top of the donjon. Take the stair round.","The stair's steep. The view's worth it.","They say the keep was built in a single summer. They say a lot of things.","Keep your eyes on the road and your feet on the stone. That's the whole job.","I counted the steps up the donjon once. I'll count them again tomorrow. I lost my place."]},
+  a:["Wall's four sides. I've counted.","Up here you see the whole valley. Most of it, anyway.","[wolves]Wolves keep to the trees. Usually.","[deer,notcoast]Deer come down to the lake at dawn. Every day. Like they're on watch too.","[birds]The birds roost in the tall trees past the wall. You can set a clock by them.","Spear's mostly for leaning on. Don't tell anyone.","Nothing ever happens here. Keeping it that way is the job.","Mind the battlements. Half the stones up here are loose.","The corner towers are the best for a sit-down.","[farm1,day]From the wall you can see the field at @farm1, off to the $farm1.","[wood,day]Smoke from the trees to the $wood. That'll be {woodcutter}.","[hermit,day]Someone fishing the lake. {hermit}, out on the dock.","[ruins]On a clear day you can see @ruin from here. Off to the $ruin.","Helmet's too big. It was my {parent.par}'s.","[keep]Best view in {valley}: top of the donjon. Take the stair round.","The stair's steep. The view's worth it.","They say the keep was built in a single summer. They say a lot of things.","Keep your eyes on the road and your feet on the stone. That's the whole job.","I counted the steps up the donjon once. I'll count them again tomorrow. I lost my place."]},
  gatekeeper:{
   0:["[first]Gate's open. Always is. Come through.","[old]Up early? So are my knees.","[notold]Up early? Good. The road's best before the carts.","The road's always quiet in the morning.","[day]First light on the arch. Best part of the day."],
   1:["Road's been quiet. Just how I like it.","[old]Forty years on this gate. Never once locked it.","[notold]Nine years on this gate. Never once locked it.","[ruins]My grandad said the old ruins were old when he was a boy.","Mind the cart ruts under the arch. They'll turn your ankle.","@farm1 is off to the $farm1. {farmer} sends eggs up most mornings.","{hermit} fishes the lake, off to the $hermit. Leave {hermit.him} be.","This is {valley}. Folk are friendly, mostly."],
@@ -4776,7 +4938,7 @@ const TALKX={
  shepherd:{a:["[keep]Last spring one of the sheep went missing. >> Found her three days later halfway up the keep's stair. >> Never found out what she wanted up there.","Sheep know the way home. I just go with them.","The cows give milk. The sheep give wool. I give them both a hard time.","Barn's got room for twice this many. Room to grow.","[wolves]If the wolves come close, the cows stand in a ring. Clever things.","I've a name for every sheep. I'll not tell you them. You'd laugh.","Best sound in the world: the flock settling at dusk.","[keep]{gatekeeper} says I smell of sheep. I say {gatekeeper} smells of lantern oil.","[hermit]{hermit} sometimes walks up to watch the flock. Doesn't say anything. Just watches.","Wet wool's the worst smell there is. You get used to it. You don't.","Fill the trough, check the gate, count the sheep, fill the trough again. That's my day.","My crook's for leaning, mostly. The sheep don't take orders."]},
  woodcutter:{a:["My first tree, I got the cut wrong. >> It fell on the cabin. The old cabin. >> This is the new cabin.","Every stump out there, I remember the tree.","Wood splits best on a cold morning. Don't ask me why. I just know.","The axe wants sharpening every evening. So do I, some days.","[farm2]{shepherd} wants posts. {farmer} wants kindling. Everybody wants something from these trees.","[keep]{steward} counts every log I send up. I count them too. We never agree.","Quiet in the glade. Just me and the chopping.","I plant two for every one I fell. You'll not see them grow. Your grandchildren might.","[birds]The birds were here first. I just work around them.","The cabin smells of sap and smoke. Best smell there is.","Felling's easy. Knowing which tree to fell. That's the work.","[hermit,fish]{hermit} buys firewood with fish. I've more fish than I can eat."]},
  hermit:{a:["I wasn't always a hermit. >> Used to talk to people all day long. >> This is why I stopped.","[first]You found the hut, then. Not many do.","[fish]Biggest fish I ever caught, I let go. He was older than me.","The water's cold. The fire's warm. That's all a body needs.","Rain on the lake sounds like applause. For nobody.","[keepers]Up at the keep they think I'm strange. I think they're loud.","Sit. Watch. Say nothing. That's fishing, and it's most of living.","[fish]The fish come close at dusk. Curious things.","Good planks on this dock. Good for sitting.","[birds]Birds come down to the water at dusk. They know when it's quiet.","I've a pot, a rod, and a roof. Riches.","[old,keep]I'll be here when the keep's gone. Me or someone just like me.","You can stay. Just don't splash."]},
- any:{a:["[ruins,keep]You'll find @ruin off to the $ruin of the keep. Strange place.","If you're walking on from {valley}, take bread. The roads are long.","The nights are clear in {valley}. Clearer than anywhere, they say.","[farm1]The field at @farm1 goes gold come harvest. Worth seeing.","[wood]The trees to the $wood are the oldest in {valley}.","[hermit]Down by the lake to the $hermit, that's where you'll find {hermit}. If {hermit.he} wants finding.","Everyone in {valley} has a story. Most of them are about sheep.","[keepers,farm1]The keep eats what @farm1 grows. Fair trade, mostly.","My grandmother told me about the year the lake froze. >> Solid, edge to edge. >> She walked right across it. Or so she said.","Ask anyone the way and they'll tell you. Then they'll tell you something else.","[ruins]Nobody remembers who built @ruin. Nobody remembers who forgot.","{valley} isn't on any map I've seen. Suits us.","There's a saying in {valley}: the lake knows. Nobody knows what it knows.","If you've time, walk the whole of {valley}. It doesn't take long. It takes all day.","[deer,wolves]Deer and wolves both in {valley}. They keep each other honest."]},
+ any:{a:["[ruins,keep]You'll find @ruin off to the $ruin of the keep. Strange place.","If you're walking on from {valley}, take bread. The roads are long.","The nights are clear in {valley}. Clearer than anywhere, they say.","[farm1]The field at @farm1 goes gold come harvest. Worth seeing.","[wood]The trees to the $wood are the oldest in {valley}.","[hermit]Down by the lake to the $hermit, that's where you'll find {hermit}. If {hermit.he} wants finding.","Everyone in {valley} has a story. Most of them are about sheep.","[keepers,farm1]The keep eats what @farm1 grows. Fair trade, mostly.","[notcoast]My grandmother told me about the year the lake froze. >> Solid, edge to edge. >> She walked right across it. Or so she said.","Ask anyone the way and they'll tell you. Then they'll tell you something else.","[ruins]Nobody remembers who built @ruin. Nobody remembers who forgot.","{valley} isn't on any map I've seen. Suits us.","There's a saying in {valley}: the lake knows. Nobody knows what it knows.","If you've time, walk the whole of {valley}. It doesn't take long. It takes all day.","[deer,wolves]Deer and wolves both in {valley}. They keep each other honest."]},
  rel:{
   spouse:["My {spouse.mate} {spouse} and I don't agree on much. We agree on each other.","[keep]Wouldn't trade my {spouse.mate} {spouse} for the whole keep. Maybe for the kitchen."],
   sibling:["When we were small, my {sibling.sib} {sibling} and I dug a hole to the other side of {valley}. Got about a foot.","My {sibling.sib} {sibling} still owes me a pie from when we were children. I haven't forgotten."],
@@ -5021,10 +5183,10 @@ function seedDials(seed){ const r=seedRng(seed>>>0,0xD1A1);
 // the traveller's words for a valley's settings: 0, 1 or 2 for each trait
 const TRAITS37=[
   {key:'forest', name:'Forest', words:['open','some','thick'], of:function(w){ return w.forest<0.75?0:(w.forest<=1.25?1:2); }},
-  {key:'water', name:'Water', words:['dry','some','big lake'], of:function(w){ return w.lake?2:(w.water<0.75?0:1); }},
+  {key:'water', name:'Water', words:['dry','some','big lake','the sea'], of:function(w){ return w.lake?2:(w.coast?3:(w.water<0.75?0:1)); }},   // v0.53.0: the coast
   {key:'ruins', name:'Ruins', words:['few or none','some','many'], of:function(w){ return w.ruins<=1?0:(w.ruins===2?1:2); }},
   {key:'wild', name:'Wildlife', words:['sparse','some','plenty'], of:function(w){ return w.wild<0.85?0:(w.wild<=1.25?1:2); }}];
-function valleyTraits(seed){ const w=seedDials(seed); return TRAITS37.map(function(t){ return t.of(w); }); }
+function valleyTraits(seed){ const w=seedDials(seed); w.coast=!w.lake&&!!coastOf(seed>>>0,w.water); return TRAITS37.map(function(t){ return t.of(w); }); }
 // find a seed whose valley has the traits asked for (-1 = any). Seeds are scanned from a random start, so it is still an
 // ordinary seed: anyone typing it gets the same valley. Returns null when none turns up within the cap.
 function chooseSeed(want,start,cap){ let s=(start>>>0); cap=cap||40000;
@@ -5336,11 +5498,13 @@ function castWithHome(seed){ let c=castValley(seed); if(isHome(seed)) c=c.concat
 // the innkeeper and the miller (v0.45): their own stream, drawn after everyone else, so nobody already cast ever changes
 const TOWN=[{key:'inn', role:'innkeeper', name:'the inn', R:13, b0:23, b1:6, tool:'keys', blurb:'where {innkeeper} keeps the fire in and the beds made'},
             {key:'mill', role:'miller', name:'the mill', R:11, b0:21, b1:5, tool:'staff', blurb:"where {miller} grinds the valley's wheat"},
-            {key:'port', role:'harbormaster', name:'the harbor', R:12, b0:22, b1:5, tool:'staff', blurb:'where {harbormaster} keeps the ship tied up and the fish coming in', lake:true}];
+            {key:'port', role:'harbormaster', name:'the harbor', R:12, b0:22, b1:5, tool:'staff', blurb:'where {harbormaster} keeps the ship tied up and the fish coming in', lake:true},
+            {key:'light', role:'lightkeeper', name:'the lighthouse', R:8, b0:23.5, b1:7.5, tool:'staff', blurb:'where {lightkeeper} keeps the lamp turning', coast:true}];   // v0.54.0: last, so no other id moves
 function townCast(seed,cast){ const r=seedRng(seed,0x7A3E), used=new Set(cast.map(function(c){ return c.given; })), out=[];
   const usedBy=new Set(cast.map(function(c){ return c.by; })), worn=new Set(cast.map(function(c){ return CLOTHES.findIndex(function(q){ return q.c===c.cloak&&q.t===c.tunic; }); }));
   const lake=lakeCountry(seed,DIALS.water)||!!coastOf(seed,DIALS.water);   // v0.52.0: a coast harbor has its harbormaster too
-  TOWN.forEach(function(T,i){ if(T.lake&&!lake) return; const pr=r()<0.5?'she':'he', ar=r(), age=ar<0.2?'young':(ar<0.75?'adult':'old');
+  const sea=!!coastOf(seed,DIALS.water);
+  TOWN.forEach(function(T,i){ if(T.lake&&!lake) return; if(T.coast&&!sea) return; const pr=r()<0.5?'she':'he', ar=r(), age=ar<0.2?'young':(ar<0.75?'adult':'old');
     let given=null; for(let k=0;k<200&&!given;k++){ const pool=r()<0.4?NAMES_X:(pr==='she'?NAMES_F:NAMES_M), g=ipick(r,pool); if(!used.has(g)) given=g; }
     if(!given) given=i?'Hob':'Mabel'; used.add(given);
     let by=ipick(r,BYNAMES); for(let k=0;k<60&&usedBy.has(by);k++) by=ipick(r,BYNAMES); usedBy.add(by);
@@ -6048,7 +6212,7 @@ function friendTag(t,id){ const e=part().tasks.friend; return t==='oldfriend'&&!
 // Opens once you've found a wreck or a temple, or met a harbormaster. p.tasks.lake: seen > ask > wreck > temple > home > done
 const LAKESHIPS=['the Heron','the Merry Ann','the Long Patience','the Salt Wren','the Ninth Daughter'];
 function lakeSeen(){ if(MODE!=='story'||!STORY) return; const p=part(); if(!p.tasks.lake){ p.tasks.lake={s:'seen'}; journalSave(); } }
-function lakeOf(seed){ return lakeCountry(seed>>>0,seedDials(seed>>>0).water); }
+function lakeOf(seed){ const w=seedDials(seed>>>0).water; if(lakeCountry(seed>>>0,w)) return true; const C=coastOf(seed>>>0,w); return !!C&&C.s0<=0.70; }   // v0.53.0: a harbor valley, lake country or the coast
 // the road graph, breadth first: the first road out of from that leads toward to (or toward the nearest lake country)
 function navRoute(from,to,lakeAny,max){ from=from>>>0; if(to!=null) to=to>>>0; const first=new Map([[from,-1]]); let q=[from];
   for(let d=0;d<(max||6)&&q.length;d++){ const nq=[]; for(const s of q){ const n=Math.max(1,exitAngles(s).length);
@@ -6063,14 +6227,14 @@ function beatLake(id){ if(MODE!=='story'||!STORY||W.seed==null) return null; con
   if(!e) return null;
   if(e.s==='seen'&&inHome()&&id===2&&castOf(7)&&folkHere('hermit')&&!(castOf(2).rel||[]).some(function(q){ return q.to===7&&['sibling','friend','rival','owes','grudge'].indexOf(q.kind)<0; })){ const sib=castOf(7).pr==='she'?'sister':'brother', h=castOf(7).pr==='she'?'she':'he',
       ship=LAKESHIPS[(seedRng(STORY.home>>>0,0x1A5E)()*LAKESHIPS.length)|0], yrs=lakeYears();
-    return {key:'lake', lines:["You've been down to the lakes. I can see it on you. Sit a minute.","My "+sib+" went out on a ship called "+ship+", "+(W.waterKind==='lake'?"from a pier like ours, somewhere over the hills":"from a port two valleys or ten from here")+". "+yrs+" years ago. It never came in anywhere.","Everyone says lost. Lost is a word for people who stop looking. Would you look?"], options:[
+    return {key:'lake', lines:["You've been down to the water. I can see it on you. Sit a minute.","My "+sib+" went out on a ship called "+ship+", "+(harborReady()?"from a pier like ours, somewhere over the hills":"from a port two valleys or ten from here")+". "+yrs+" years ago. It never came in anywhere.","Everyone says lost. Lost is a word for people who stop looking. Would you look?"], options:[
       {label:"I'll look", reply:["Ask at a port. Harbormasters remember ships the way I remember faces."], pick:function(){ p.tasks.lake={s:'ask', gn:nm(2), gp:castOf(2).pr, hn:castOf(7).name, hp:castOf(7).pr, sib:sib, ship:ship, yrs:yrs}; logChoice('kind','lake'); }},
       {label:'Not now', reply:[yrs+" years. It'll keep another week."], pick:function(){}, snooze:true}]}; }
-  if(e.s==='ask'&&c0&&c0.town==='port'&&W.waterKind==='lake'){ const wr=W.ruins.find(function(o){ return o.kind==='wreck'; }), pk=W.ruins.find(function(o){ return o.kind==='pocket'; }); if(!wr||!pk) return null;
+  if(e.s==='ask'&&c0&&c0.town==='port'&&hasHarbor()){ const wr=W.ruins.find(function(o){ return o.kind==='wreck'; }), pk=W.ruins.find(function(o){ return o.kind==='pocket'; }); if(!wr||!pk) return null;
     return {key:'lake', lines:[e.ship.charAt(0).toUpperCase()+e.ship.slice(1)+"? Nobody says that name on this pier. Bad luck.","Fine. She went out in a flat calm with a full hold and a crew that didn't want to go. The captain had a bet on getting across in a day.","She went down off the point, out past where the water goes black. There's a wreck out there. Folk say it isn't her. Folk say a lot."], options:[
-      {label:"I'll swim out", reply:["Swim? Out there? ...Mind the cold. It gets into you about halfway down and doesn't leave till supper."], pick:function(){ Object.assign(e,{s:'wreck', pv:seed, pvn:W.valley, wx:wr.x, wy:wr.y, wz:wr.zMax, wd:wr.dr, kx:pk.x, ky:pk.y, kz0:pk.zMin, kz1:pk.zMax, kd:pk.dr}); }}]}; }
+      {label:"I'll swim out", reply:["Swim? Out there? ...Mind the cold. It gets into you about halfway down and doesn't leave till supper."], pick:function(){ Object.assign(e,{s:'wreck', sea:W.waterKind==='coast', pv:seed, pvn:W.valley, wx:wr.x, wy:wr.y, wz:wr.zMax, wd:wr.dr, kx:pk.x, ky:pk.y, kz0:pk.zMin, kz1:pk.zMax, kd:pk.dr}); }}]}; }
   if(e.s==='home'&&inHome()&&id===7){ const sis=e.gp==='she'?'sister':'brother', them=e.gp==='she'?'her':'him';
-    return {key:'lake', lines:["You've been under the lake. You've got the look.","...You found the bench. I wrote that and swam up and walked for a year, and when I got here I couldn't go up to the gate. So I built a hut where I could see it."], options:[
+    return {key:'lake', lines:["You've been under the "+(e.sea?'sea':'lake')+". You've got the look.","...You found the bench. I wrote that and swam up and walked for a year, and when I got here I couldn't go up to the gate. So I built a hut where I could see it."], options:[
       {label:"Your "+sis+"'s still waiting", reply:["Still? ...Then I've kept "+them+" waiting long enough. Tell "+them+" I'll come down at dusk. No. I'll tell "+them+"."], pick:function(){ e.s='done'; e.c='tell'; logChoice('truth','lake'); }},
       {label:"I won't tell anyone", reply:["Kind. Wrong, but kind. I'll go myself. Tomorrow. Probably."], pick:function(){ e.s='done'; e.c='quiet'; logChoice('kind','lake'); }}]}; }
   return null; }
@@ -6084,18 +6248,18 @@ function lakeCheck(){ if(MODE!=='story'||!STORY||W.seed==null||!greetHook||Date.
       W.loreMsg=e.hn+". Nine days in the dry. The lamp kept me. Swam up on the tenth. Took the long way home. Too ashamed to knock."; W.loreAt=Date.now()+6000; journalSave(); } } }
 function lakeTag(t,id){ const e=part().tasks.lake; return t==='lakedone'&&!!(MODE==='story'&&e&&e.s==='done'&&inHome()&&(id===2||id===7)); }
 function lakeNotes(open,done){ const e=part().tasks.lake; if(!e||MODE!=='story'||!STORY) return; const here=W.seed>>>0;
-  if(e.s==='ask'){ if(W.waterKind==='lake') open.push({t:'Find out what happened to '+e.ship+'. Ask the harbormaster here.', v:here, who:townId('port')});
-    else { const R=navRouteC(here,null,true); open.push({t:'Find out what happened to '+e.ship+'. Ask a harbormaster, in lake country'+(R?' ('+valleyName(R.v)+' is nearest)':'')+'.', v:R?R.v:null, far:!R, who:R?null:-2}); } }
+  if(e.s==='ask'){ if(harborReady()) open.push({t:'Find out what happened to '+e.ship+'. Ask the harbormaster here.', v:here, who:townId('port')});
+    else { const R=navRouteC(here,null,true); open.push({t:'Find out what happened to '+e.ship+'. Ask a harbormaster, in lake country or on the coast'+(R?' ('+valleyName(R.v)+' is nearest)':'')+'.', v:R?R.v:null, far:!R, who:R?null:-2}); } }
   else if(e.s==='wreck') open.push({t:e.ship.charAt(0).toUpperCase()+e.ship.slice(1)+' went down in the deep water off '+e.pvn+'. Swim out and look at the wreck.', v:e.pv, at:[e.wx,e.wy], lab:'the wreck'});
-  else if(e.s==='temple') open.push({t:e.hn+' was aboard. Someone carved "there is air in the hall". Find the hall under the lake, in '+e.pvn+'.', v:e.pv, at:[e.kx,e.ky], lab:'the dry room'});
+  else if(e.s==='temple') open.push({t:e.hn+' was aboard. Someone carved "there is air in the hall". Find the hall under the '+(e.sea?'sea':'lake')+', in '+e.pvn+'.', v:e.pv, at:[e.kx,e.ky], lab:'the dry room'});
   else if(e.s==='home') open.push({t:e.hn+' lived. '+(e.hp==='she'?'She':'He')+' walked home and never said. Go home.', v:STORY.home, who:7});
-  else if(e.s==='done') done.push({t:'What the lake kept, it kept safe. '+e.hn+' came home.', v:STORY.home}); }
+  else if(e.s==='done') done.push({t:'What the '+(e.sea?'sea':'lake')+' kept, it kept safe. '+e.hn+' came home.', v:STORY.home}); }
 // ---- v0.49.0: troubles at the port (lake valleys, one each): a ring off the stern, the pier lamp, the torn sail
 function portKind(seed){ return ['ring','lamp','sail'][(seedRng(seed>>>0,0x9A1E)()*3)|0]; }
 function portT(){ const p=folkHere('port'); if(!p) return null; return fPlace(p.x-0.5,p.y-0.5,p.rot); }
 function portRingAt(){ const p=folkHere('port'), T=portT(); return T?T.F(5.5,p.sh+22.5):null; }
 function portLampAt(T,sh){ if(!T){ const p=folkHere('port'); if(!p) return null; T=portT(); sh=p.sh; } const a=T.F(-1.05,sh+22.5); return [a[0],a[1],WATER+2.35]; }   // on the post's face, toward the pier
-function beatPort(id){ if(W.seed==null||W.waterKind!=='lake'||!folkHere('port')) return null; const c0=castOf(id); if(!c0||!c0.town) return null;
+function beatPort(id){ if(W.seed==null||!hasHarbor()||!folkHere('port')) return null; const c0=castOf(id); if(!c0||!c0.town) return null;
   const kind=portKind(W.seed), hm=townId('port'), e=T3('p'+kind);
   if(kind==='ring'){
     if(!e&&id===hm) return {key:'pring:'+(W.seed>>>0), lines:["My ring went in off the end of the ship, past the bow. Silver, with a blue stone.","Thirty years on this pier and I never learned to swim. Don't tell anyone. Everyone knows."], options:[
@@ -6121,7 +6285,7 @@ function beatPort(id){ if(W.seed==null||W.waterKind!=='lake'||!folkHere('port'))
   if(e&&e.s==='carry'&&id===hm) return {key:'psail:'+e.v, lines:["Sailcloth! "+e.mn+" let go of it? You must have asked very nicely.","Red sail for a red ship. Look at her."], options:[
     {label:'She looks ready', reply:["Ready for a calm day and a short trip. That's all a ship should want."], pick:function(){ e.s='done'; logChoice('mend','psail'); }}]};
   return null; }
-function portCheck(){ if(W.seed==null||W.waterKind!=='lake'||!greetHook||Date.now()<TBUSY||W.loreMsg||W.arriveMsg) return; const e=T3('pring'); if(!e||e.s!=='dive') return; const a=portRingAt(); if(!a) return;
+function portCheck(){ if(W.seed==null||!hasHarbor()||!greetHook||Date.now()<TBUSY||W.loreMsg||W.arriveMsg) return; const e=T3('pring'); if(!e||e.s!=='dive') return; const a=portRingAt(); if(!a) return;
   if(Math.hypot(P.x-a[0],P.y-a[1])<2.6&&P.z<WATER-0.3&&greetHook('Something glints in the mud past the bow: a silver ring with a blue stone.')!==false){ TBUSY=Date.now()+3400; e.s='found'; journalSave(); } }
 function portNotes(open,done){ const p=part(); for(const k in p.tasks){ const e=p.tasks[k]; if(!e||typeof e!=='object') continue; const kind=k.split(':')[0]; const here=(W.seed>>>0)===(e.v>>>0);
   if(kind==='pring'){ if(e.s==='dive') open.push(Object.assign({t:'Dive for '+e.hn+"'s ring, past the ship's bow in "+e.vn+'.', v:e.v}, here?{at:portRingAt(), lab:'the ring'}:{})); else if(e.s==='found') open.push({t:'Tell '+e.hn+' where the ring is, in '+e.vn+'.', v:e.v}); else if(e.s==='done') done.push({t:'Found the harbormaster\'s ring, in '+e.vn+'.', v:e.v}); }
@@ -6162,7 +6326,7 @@ LORE.push.apply(LORE,LORE2);
 const TROUBLES2=['roof','axe','bet','cake','song'];
 function tr2Here(k){ return W.seed!=null&&troublesFor(W.seed).kinds.indexOf(k)>=0; }
 function T2(k){ return part().tasks[k+':'+(W.seed>>>0)]; }
-function T2set(k,o){ part().tasks[k+':'+(W.seed>>>0)]=Object.assign({v:W.seed>>>0, vn:W.valley},o); return part().tasks[k+':'+(W.seed>>>0)]; }
+function T2set(k,o){ part().tasks[k+':'+(W.seed>>>0)]=Object.assign({v:W.seed>>>0, vn:W.valley, sea:W.waterKind==='coast'},o); return part().tasks[k+':'+(W.seed>>>0)]; }
 function nearRoad(kind){ const s=W.seed>>>0, n=Math.max(1,exitAngles(s).length); let best=null;
   for(let k=0;k<n;k++){ const d=roadDest(s,k)>>>0; if(d===s) continue; const ok=troublesFor(d).kinds.indexOf(kind)<0; if(!best||(ok&&!best.ok)) best={ex:k, dest:d, ok:ok}; if(ok) break; }
   return best?{ex:best.ex, dest:best.dest, hops:[s,best.dest]}:null; }
@@ -6244,7 +6408,7 @@ const TALKT2={
  shepherd:{a:["[songback]I sing the whole song now, last verse and all. The flock settles right down."]}};
 function trouble2Notes(open,done){ const p=part(); for(const k in p.tasks){ const e=p.tasks[k]; if(!e||typeof e!=='object') continue; const kind=k.split(':')[0];
   if(kind==='roof'){ if(e.s==='crust') open.push({t:'Left a crust on the sill for the Thatch-Wife, in '+e.vn+'. See if the roof is mended.', v:e.v}); else if(e.s==='fetch') open.push({t:'Ask '+e.w+' to patch the leaking roof, in '+e.vn+'.', v:e.v}); else if(e.s==='coming') open.push({t:e.w+' is on the way with straw. Go back to the farm, in '+e.vn+'.', v:e.v}); else if(e.s==='done') done.push({t:{crust:'The Thatch-Wife mended a roof in '+e.vn+'. Probably.', fetch:'Got a leaking roof patched, in '+e.vn+'.', hard:'Told a farmer in '+e.vn+' there is no Thatch-Wife.'}[e.c], v:e.v}); }
-  else if(kind==='axe'){ if(e.s==='ask') open.push({t:'Ask the hermit in '+e.vn+' about the woodcutter\'s axe in the lake.', v:e.v}); else if(e.s==='found') open.push({t:'Take the axe back to the woodcutter, in '+e.vn+'.', v:e.v}); else if(e.s==='done') done.push({t:'Got an axe back from the bottom of the lake, in '+e.vn+'.', v:e.v}); }
+  else if(kind==='axe'){ if(e.s==='ask') open.push({t:'Ask the hermit in '+e.vn+' about the woodcutter\'s axe in the '+(e.sea?'sea':'lake')+'.', v:e.v}); else if(e.s==='found') open.push({t:'Take the axe back to the woodcutter, in '+e.vn+'.', v:e.v}); else if(e.s==='done') done.push({t:'Got an axe back from the bottom of the '+(e.sea?'sea':'lake')+', in '+e.vn+'.', v:e.v}); }
   else if(kind==='bet'){ if(e.s==='ask') open.push({t:e.gn+' and '+e.on+' have a bet about the Heron King, in '+e.vn+'. Ask the hermit.', v:e.v}); else if(e.s==='answer') open.push({t:'The hermit says the Heron King is real. Tell '+e.gn+', in '+e.vn+'.', v:e.v}); else if(e.s==='done') done.push({t:e.c==='truth'?'Settled a bet about the Heron King, in '+e.vn+'. He is real.':'Told '+e.gn+', in '+e.vn+', that the Heron King is made up. He is not.', v:e.v}); }
   else if(kind==='cake'){ if(e.s==='go') open.push({t:'Ask '+e.sn+', the steward in '+e.dn+', for the honey cake recipe, for '+e.an+' in '+e.vn+'.', v:e.dest}); else if(e.s==='back') open.push({t:'More honey than you\'d think, and a pinch of salt. Tell '+e.an+', in '+e.vn+'.', v:e.v}); else if(e.s==='done') done.push({t:'Carried a honey cake recipe over the hills, to '+e.vn+'.', v:e.v}); }
   else if(kind==='song'){ if(e.s==='go') open.push({t:'Find the last verse of '+e.an+'\'s old song. The oldest folk in '+e.dn+' might know it.', v:e.dest}); else if(e.s==='back') open.push({t:'Sing '+e.an+' the last verse, in '+e.vn+': '+SONG.join(' '), v:e.v}); else if(e.s==='done') done.push({t:'Brought the last verse of an old song home to '+e.vn+'.', v:e.v}); } } }
@@ -6550,7 +6714,7 @@ LORE.push.apply(LORE,LORE5);
 const TROUBLES3=['well','owl','letter','boots','crows','wisp'];
 function tr3Here(k){ return W.seed!=null&&troublesFor(W.seed).kinds.indexOf(k)>=0; }
 function T3(k,seed){ return part().tasks[k+':'+((seed==null?W.seed:seed)>>>0)]; }
-function T3set(k,o){ part().tasks[k+':'+(W.seed>>>0)]=Object.assign({v:W.seed>>>0, vn:W.valley},o); return part().tasks[k+':'+(W.seed>>>0)]; }
+function T3set(k,o){ part().tasks[k+':'+(W.seed>>>0)]=Object.assign({v:W.seed>>>0, vn:W.valley, sea:W.waterKind==='coast'},o); return part().tasks[k+':'+(W.seed>>>0)]; }
 function later3(e){ return e.away||(W.vday|0)>(e.day|0); }
 function anyDone(kind,c){ const t=part().tasks; for(const k in t){ const e=t[k]; if(k.indexOf(kind+':')===0&&e&&e.s==='done'&&(c==null||e.c===c)) return e; } return null; }
 // 10. the well bucket at the bottom of the well (the steward; the woodcutter has rope; or climb down yourself)
@@ -7069,7 +7233,7 @@ const TALKV={
    "Rub a bit of fat on your boots tonight. They'll thank you tomorrow.",
    "Over the hills they say there's a valley where it rains upwards. I don't believe it. I'd like to see it.",
    "They say the next valley along has a keep with two gates. Showing off, if you ask me.",
-   "A drover told me there's a lake beyond the ridge so clear you can see the bottom from a boat.",
+   "[notcoast]A drover told me there's a lake beyond the ridge so clear you can see the bottom from a boat.",
    "I heard the far road washed out in the spring. Folk are going round by the hill.",
    "They say over the hills the sheep are black and the people are cheerful. Or the other way round.",
    "Apparently there's a valley where pears grow the size of your head. Somebody exaggerates.",
@@ -7084,7 +7248,7 @@ const TALKV={
    "Rumour has it there's a fox over the hills that follows travellers home and sits by the door. Just sits.",
    "They say the old road north is paved the whole way. Somebody had a lot of time.",
    "Heard there's a valley where everyone has the same name. Must make calling folk in tricky.",
-   "A traveller said the hills past the lake are hollow and you can hear singing in them. Travellers say things.",
+   "[notcoast]A traveller said the hills past the lake are hollow and you can hear singing in them. Travellers say things.",
    "Down the road there's a keep where everybody gets honey on feast days. I don't believe a word.",
    "The far pass gets busier every year, they say. Two carts a week now. Madness.",
    "A slow walker sees twice as much. That's what I tell myself, anyway.",
@@ -7147,13 +7311,13 @@ function dayPart(){ const t=DAY.tod; return t>=5.5&&t<11?0:(t>=11&&t<17?1:(t>=17
 function sleepHours(){ const t=DAY.tod; return t>=20||t<5.5; }   // the second guard turns in at eight and is up at half five
 function guard2Asleep(){ for(let c=0;c<CR_.n;c++) if(CR_.sp[c]===SP.KEEPER&&(CR_.ay[c]|0)===1&&CR_.ax[c]<100) return CR_.st[c]===2; return false; }
 const FOLKKEYS=['farm1','farm2','wood','hermit','inn','mill','port'], LIFEKEYS={birds:SP.BIRD,rabbits:SP.RABBIT,deer:SP.DEER,squirrels:SP.SQUIRREL,fish:SP.FISH,wolves:SP.WOLF};
-const SLOT_RE=/\{(\w+)(?:\.(\w+))?\}/g, PLACE_RE=/([@$])(farm1|farm2|wood|hermit|inn|mill|port|ruin)\b/g, TAG_RE=/^\[([\w,]+)\]/;
+const SLOT_RE=/\{(\w+)(?:\.(\w+))?\}/g, PLACE_RE=/([@$])(farm1|farm2|wood|hermit|inn|mill|port|light|ruin)\b/g, TAG_RE=/^\[([\w,]+)\]/;
 // who is really here (a person is here when they were spawned into this valley), and which animals are about
-function peopleHere(){ const h=new Uint8Array(24), life={}; for(const k in LIFEKEYS) life[k]=0;
-  for(let c=0;c<CR_.n;c++){ const s=CR_.sp[c]; if(s===SP.KEEPER) h[Math.min(23,CR_.ay[c]|0)]=1;
+function peopleHere(){ const h=new Uint8Array(32), life={}; for(const k in LIFEKEYS) life[k]=0;
+  for(let c=0;c<CR_.n;c++){ const s=CR_.sp[c]; if(s===SP.KEEPER) h[Math.min(31,CR_.ay[c]|0)]=1;
     else for(const k in LIFEKEYS) if(LIFEKEYS[k]===s){ life[k]++; break; } }
   h.life=life; return h; }
-const ALLHERE=new Uint8Array(24).fill(1);
+const ALLHERE=new Uint8Array(32).fill(1);
 function castOf(id){ return (W.cast&&id>=0)?W.cast[id]:null; }
 function relOf(id,kind,here){ const c=castOf(id); if(!c) return -1;
   if(kind==='spouse'||kind==='sweetheart'){ const w=wedNow(id); if(w>=0) return (kind==='spouse'&&here[w])?w:-1; } for(const q of c.rel) if(q.kind===kind&&here[q.to]) return q.to; return -1; }
@@ -7164,7 +7328,7 @@ function evPerson(id,key){ const e=LINE_EV; if(!e) return -1; if(key==='eva') re
 function slotWho(id,key,here){ if(key==='eva'||key==='evb'||key==='evother'){ const w=evPerson(id,key); return (w!=null&&w>=0&&here[w]&&castOf(w))?w:-1; }
   if(EVSLOT[key]) return LINE_EV?-3:-1;
   const r=ROLEKEY.indexOf(key); if(r>=0) return (here[r]&&castOf(r))?r:-1;
-  if(key==='innkeeper'||key==='miller'||key==='harbormaster'){ const w=townId(key); return (w>=0&&here[w])?w:-1; }
+  if(key==='innkeeper'||key==='miller'||key==='harbormaster'||key==='lightkeeper'){ const w=townId(key); return (w>=0&&here[w])?w:-1; }
   if(key==='me') return castOf(id)?id:-1; if(RELREV[key]) return relOf(id,key,here); return -2; }
 function placeHere(k){ return k==='ruin'?!!landRuin():!!folkHere(k); }
 function placeName(k){ if(k==='ruin') return landRuin()?landRuin().name:'the old stones'; const p=folkHere(k); return p?p.name:'the woods'; }
@@ -7176,12 +7340,15 @@ const OWNPLACE={4:'farm1',5:'farm2',6:'wood',7:'hermit'};
 // else's, and only keepers (who stand at the keep) give bare directions, which are measured from the keep.
 function lineOk(id,l,here,who){ const m=TAG_RE.exec(l), c=castOf(id);
   if(who==='any'||who==='folk'){ const own=OWNPLACE[id]||(c&&c.town)||null; if(own&&(l.indexOf('@'+own)>=0||l.indexOf('$'+own)>=0)) return false; }
-  if(id>=4&&/\$(farm1|farm2|wood|hermit|inn|mill|port|ruin)\b/.test(l)&&l.indexOf('of the keep')<0) return false;
+  if(id>=4&&/\$(farm1|farm2|wood|hermit|inn|mill|port|light|ruin)\b/.test(l)&&l.indexOf('of the keep')<0) return false;
   if(m) for(const t of m[1].split(',')){
     if(t==='keep'){ if(!W.keepBuilt) return false; }
     else if(t==='keepers'){ if(!W.keepBuilt||!(here[0]||here[1]||here[2]||here[3])) return false; }
     else if(t==='nothermit'){ if(id===7) return false; }
     else if(t==='lakedone'){ if(!lakeTag(t,id)) return false; }
+    else if(t==='coast'){ if(W.waterKind!=='coast') return false; }
+    else if(t==='notcoast'){ if(W.waterKind==='coast') return false; }
+    else if(t==='lhouse'){ if(!folkHere('light')) return false; }
     else if(t==='cellar'){ const q=W.places.find(function(o){ return o.key==='inn'; }); if(!q||!q.cellar) return false; }
     else if(t==='first'||t==='last'||t==='leaving'){ }
     else if(t==='home'){ if(!inHome()) return false; }
@@ -7230,6 +7397,7 @@ function fillLine(id,l,here){ here=here||ALLHERE;
       if(k==='evnote') return e.note||''; if(k==='evnotes') return e.note==='sheep'?'sheep':(e.note||'')+'s'; } const c=castOf(slotWho(id,k,here)); return c?(f?pform(c,f):c.name):'someone'; });
   l=l.replace(PLACE_RE,function(_,s,k){ return s==='$'?placeDir(k):placeName(k); });
   l=l.replace(/(^|[^.])([.!?] )([a-z])/g,function(_,z,a,b){ return z+a+b.toUpperCase(); });   // a filled-in phrase that starts a sentence
+  l=seaWords(l);   // v0.53.0: on a coast, the sea
   return l.charAt(0).toUpperCase()+l.slice(1); }
 // which lists a person draws from
 function whoOk(id,who){ if(id===ROLEPED) return who==='peddler'; if(id>=9){ const c=castOf(id); if(c&&c.town) return who===c.key||who==='any'; if(c&&c.guest) return who==='guest'; if(c&&c.bandit) return who==='bandit'; if(c&&c.left) return who==='left'||who==='any'; return who==='home'||who==='any'; } const k=ROLEKEY[id]; return who===k||who==='any'||(who==='guard'&&id<2)||(who==='keep'&&id<4)||(who==='folk'&&id>=4); }
@@ -7353,11 +7521,11 @@ function talk(c,id,pose,force){
   if(!force&&cl&&(!cl.away||now-cl.t<25000)) return;                       // not straight back to the same person
   const here=peopleHere(), beat=pose===4?null:storyBeat(id), lines=beat?beat.lines:talkPick(id,pose,here).slice(); if(!lines.length) return;
   if(!beat&&pose===0&&lines.length&&lines[0].id.indexOf('NN')!==0){ const c0=castOf(id), plain=c0&&!c0.parent&&!c0.left&&id!==ROLEPED; let extra=null;
-    if(plain&&!inHome()){ const L=legendFor(W.seed); if(L){ extra={id:'LEG'+(W.seed>>>0), text:L}; legendTold(W.seed); } }
-    if(!extra&&c0&&(id===7||c0.age==='old')&&id!==ROLEPED){ const li=loreFor(id===7?'hermit':'old'); if(li!=null&&loreTake(li)) extra={id:'LORE'+li, text:LORE[li][1]}; }
-    if(!extra&&c0&&W.waterKind==='lake'&&(c0.town==='port'||c0.town==='inn')){ const li=loreFor('harbor'); if(li!=null&&loreTake(li)) extra={id:'LORE'+li, text:LORE[li][1]}; }   // v0.49.0: lost ships, from the people who watch for them
+    if(plain&&!inHome()){ const L=legendFor(W.seed); if(L){ extra={id:'LEG'+(W.seed>>>0), text:seaWords(L)}; legendTold(W.seed); } }
+    if(!extra&&c0&&(id===7||c0.age==='old')&&id!==ROLEPED){ const li=loreFor(id===7?'hermit':'old'); if(li!=null&&loreTake(li)) extra={id:'LORE'+li, text:seaWords(LORE[li][1])}; }
+    if(!extra&&c0&&hasHarbor()&&(c0.town==='port'||c0.town==='inn')){ const li=loreFor('harbor'); if(li!=null&&loreTake(li)) extra={id:'LORE'+li, text:seaWords(LORE[li][1])}; }   // v0.49.0: lost ships, from the people who watch for them
     if(extra) lines.splice(Math.min(1,lines.length),0,extra); }
-  if(beat&&beat.key==='leftrumor'){ const li=loreFor('road'); if(li!=null&&loreTake(li)) beat.lines.push({id:'LORE'+li, text:LORE[li][1]}); }
+  if(beat&&beat.key==='leftrumor'){ const li=loreFor('road'); if(li!=null&&loreTake(li)) beat.lines.push({id:'LORE'+li, text:seaWords(LORE[li][1])}); }
   VISITS[key]=(VISITS[key]||0)+1; metNote(id); journalSave();
   const p=castOf(id); CHAT.id=id; CHAT.key=key; CHAT.lines=lines; CHAT.k=0; CHAT.ask=beat; CHAT.picked=false; CHAT.sub=p?(roleName(p)+(pose===4?' · asleep':'')):'';
   chatHook.open(p?p.name+' '+p.by:'Someone', CHAT.sub);
@@ -7395,7 +7563,7 @@ defMask(SP.TORCH,5,9,[
  "..9..",".999.",".999.","..9..",".222.","..2..","..2..","1.2.1",".111."],
  {1:[60,56,52],2:[110,78,46],9:[200,96,40]});
 function mul32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
-function addCreature(sp,x,y,ax,ay,age,par){ const c=CR_.n++; GULL[c]=0; ANI.vr[c]=(Math.random()*256)|0; ANI.px[c]=x; ANI.py[c]=y; ANI.d[c]=Math.random()*4; CR_.sp[c]=sp; CR_.x[c]=x; CR_.y[c]=y; CR_.ax[c]=ax; CR_.ay[c]=ay;
+function addCreature(sp,x,y,ax,ay,age,par){ const c=CR_.n++; GULL[c]=0; ANI.yaw[c]=NaN; ANI.s[c]=0; ANI.vr[c]=(Math.random()*256)|0; ANI.px[c]=x; ANI.py[c]=y; ANI.d[c]=Math.random()*4; CR_.sp[c]=sp; CR_.x[c]=x; CR_.y[c]=y; CR_.ax[c]=ax; CR_.ay[c]=ay;
   CR_.vx[c]=0; CR_.vy[c]=0; CR_.st[c]=0; CR_.tm[c]=Math.random()*4; CR_.ph[c]=Math.random()*6.283;
   CR_.z[c]=Math.max(terr(x,y),WATER)+0.3; CR_.al[c]=1; CR_.tgt[c]=-1; CR_.po[c]=0; CR_.ss[c]=0;
   CR_.age[c]=age==null?1:age; CR_.par[c]=par==null?-1:par;
@@ -7884,7 +8052,7 @@ function tick(dt){
     else tickWolf(c,dt); }
 }
 
-function copyC(d,src){ GULL[d]=GULL[src]; ANI.vr[d]=ANI.vr[src]; ANI.px[d]=ANI.px[src]; ANI.py[d]=ANI.py[src]; ANI.d[d]=ANI.d[src]; CR_.sp[d]=CR_.sp[src]; CR_.x[d]=CR_.x[src]; CR_.y[d]=CR_.y[src]; CR_.z[d]=CR_.z[src];
+function copyC(d,src){ GULL[d]=GULL[src]; ANI.s[d]=ANI.s[src]; ANI.yaw[d]=ANI.yaw[src]; ANI.vr[d]=ANI.vr[src]; ANI.px[d]=ANI.px[src]; ANI.py[d]=ANI.py[src]; ANI.d[d]=ANI.d[src]; CR_.sp[d]=CR_.sp[src]; CR_.x[d]=CR_.x[src]; CR_.y[d]=CR_.y[src]; CR_.z[d]=CR_.z[src];
   CR_.vx[d]=CR_.vx[src]; CR_.vy[d]=CR_.vy[src]; CR_.ax[d]=CR_.ax[src]; CR_.ay[d]=CR_.ay[src];
   CR_.st[d]=CR_.st[src]; CR_.tm[d]=CR_.tm[src]; CR_.ph[d]=CR_.ph[src];
   CR_.energy[d]=CR_.energy[src]; CR_.al[d]=CR_.al[src]; CR_.tgt[d]=CR_.tgt[src];
@@ -8098,7 +8266,7 @@ function boot(){
   $('chBye').addEventListener('click',function(){ if(Date.now()-CHATOPEN<350) return; closeChat(); });
   window.addEventListener('keydown',function(e){ if(CHAT.id<0) return; if(/^[1-4]$/.test(e.key)&&CHAT.ask&&!CHAT.picked){ if(chatPick(+e.key-1)) e.preventDefault(); return; }
     if(e.key==='Enter'){ if(e.target&&e.target.tagName==='BUTTON'&&e.target.closest&&e.target.closest('#chat')) return; chatMore(); e.preventDefault(); } else if(e.key==='Escape') closeChat(); });
-  greetHook=function(m,ms){ if(['help','about','menu','seed','log','dials','leave','journal'].some(function(id){ const e=$(id); return e&&!e.classList.contains('hidden'); })) return false; toast(m,ms||3400); soundToast(m); };
+  greetHook=function(m,ms){ if(['help','about','menu','seed','log','dials','leave','journal'].some(function(id){ const e=$(id); return e&&!e.classList.contains('hidden'); })) return false; m=seaWords(m); toast(m,ms||3400); soundToast(m); };
   function setupGrid(force){
     const cssW=window.innerWidth, cssH=window.innerHeight;
     if(!force && cssW===lastW && cssH===lastH && qCell===lastQ) return; // no real change: don't clear the canvas
@@ -8204,7 +8372,7 @@ function boot(){
     let h='<h1>Choose a valley</h1><p class="chp">Pick what you want. A valley like that is found for you, and its seed works for anyone.</p><div id="chGrid" style="display:grid;grid-template-columns:1fr">';
     for(let i=0;i<TRAITS37.length;i++){ const t=TRAITS37[i];
       h+='<div><div style="margin:8px 0 2px;font:600 12px var(--mb-mono);letter-spacing:.06em;color:var(--mb-soft)">'+t.name.toUpperCase()+'</div><div style="display:flex;gap:6px">';
-      for(let v=-1;v<3;v++) h+='<button class="btn chip" data-t="'+i+'" data-v="'+v+'" style="flex:1;min-width:0;padding:10px 4px;margin:0;font-size:14px'+(CHOOSE[i]===v?';background:var(--mb-teal);color:#06231f;border-color:var(--mb-teal)':'')+'">'+(v<0?'any':t.words[v])+'</button>';
+      for(let v=-1;v<t.words.length;v++) h+='<button class="btn chip" data-t="'+i+'" data-v="'+v+'" style="flex:1;min-width:0;padding:10px 4px;margin:0;font-size:14px'+(CHOOSE[i]===v?';background:var(--mb-teal);color:#06231f;border-color:var(--mb-teal)':'')+'">'+(v<0?'any':t.words[v])+'</button>';
       h+='</div></div>'; }
     h+='</div><div style="display:flex;gap:8px;margin-top:12px"><button class="btn" id="chBack" style="flex:1">back</button><button class="btn go" id="chGo" style="flex:2;margin-top:0">Go</button></div>';
     c.innerHTML=h;
@@ -8400,9 +8568,9 @@ function boot(){
   const GLR={};   // id -> {r: the renderer, loading, lost, t0}
   const glCur=function(){ const m=RENDERS[DIALS.render|0]||RENDERS[0]; return m.file?m:null; };
   const glApi={ N:N, W:W, WATER:WATER, CLOUDH:CLOUDH, DAY:DAY, SUN:SUN, MOON:MOON, SKY:SKY, RS:RS, RMAT:RMAT, CR_:CR_, SP:SP, SPP:SPP,
-    MASKS:MASKS, KMASK:KMASK, P:P, IN:IN, DIALS:DIALS, DECO:KDECO, DECO_IMG:DECO_IMG, FORT:FORT, KEEP:KEEP, RELIGHT:RELIGHT, hash2:hash2, growOf:growOf, keeperPoseFrame:keeperPoseFrame, bankOf:bankOf, person3D:person3D, person3DPose:person3DPose, P3PIV:P3PIV, AM2:AM2, ANI:ANI, animalFrame:animalFrame, isAdult:isAdult, spanHulls:spanHulls, spanK:SPANS, terr:terr,
+    MASKS:MASKS, KMASK:KMASK, P:P, IN:IN, DIALS:DIALS, DECO:KDECO, DECO_IMG:DECO_IMG, FORT:FORT, KEEP:KEEP, RELIGHT:RELIGHT, hash2:hash2, growOf:growOf, keeperPoseFrame:keeperPoseFrame, bankOf:bankOf, animal3D:animal3D, animal3DPose:animal3DPose, person3D:person3D, person3DPose:person3DPose, P3PIV:P3PIV, AM2:AM2, ANI:ANI, animalFrame:animalFrame, isAdult:isAdult, spanHulls:spanHulls, spanK:SPANS, terr:terr,
     fog:function(){ return [FOG_R,FOG_G,FOG_B]; }, uw:function(){ return UW; }, skyTime:function(){ return skyTime; } };
-  if(/[?&]test=1/.test(location.search)) window.__keepTest={GULL:GULL,P:P,FORT:FORT,DAY:DAY,DIALS:DIALS,sunUpdate:sunUpdate,floorAt:floorAt,terr:terr,genWorld:genWorld,populate:populate,spawn:spawn,EYE:EYE,applyWorld:applyWorld,seedDials:seedDials,NAV:NAV,CR_:CR_,SP:SP,W:W,fPlace:fPlace,seaAt:seaAt,WATER:WATER,chooseRender:function(i){ chooseRender(i); }};   // headless render checks only
+  if(/[?&]test=1/.test(location.search)) window.__keepTest={hook:function(f){ TESTHOOK=f; },GULL:GULL,bankOf:bankOf,GLR:GLR,P:P,FORT:FORT,DAY:DAY,DIALS:DIALS,sunUpdate:sunUpdate,floorAt:floorAt,terr:terr,genWorld:genWorld,populate:populate,spawn:spawn,EYE:EYE,applyWorld:applyWorld,seedDials:seedDials,NAV:NAV,CR_:CR_,SP:SP,W:W,fPlace:fPlace,seaAt:seaAt,WATER:WATER,chooseRender:function(i){ chooseRender(i); }};   // headless render checks only
   const glSlot=function(id){ return GLR[id]||(GLR[id]={r:null,loading:false,lost:0,t0:0}); };
   function glDrop(id){ const g=GLR[id]; if(!g||!g.r) return; g.r.onLost=null; try{ g.r.destroy(); }catch(e){} g.r=null; }
   function glFail(m,why){
@@ -8659,7 +8827,7 @@ function boot(){
 
 if(IS_NODE){ module.exports={genWorld,allocGrid,buildGlyphs,renderFrame,compose,spawn,populate,tick,ecology,simBin,updatePlayer,W,RS,FB,P,IN,CR_,SP,SPP,MASKS,RESERVE,RAMP,N,WATER,EYE,terr,groundAt,DIALS,growOf,isAdult,addCreature,WALLS,buildWalls,nearestWall,allWallHits,wallBlocked,setSkyTime:function(t){skyTime=t;},setUW:function(v){UW=v;},DAY,SUN,MOON,SKY,DAYMODES,sunAltAz,sunUpdate,updateDay,relightAll,relightStep,RELIGHT,dayDate,fmtTod,setTod:function(h){DAY.tod=h;sunUpdate();},floorAt,KPATHS,KEEP,FORT,eventsForDay,weddingDay,babyDay,valleyDay,logEvent,eventsRefresh,dayTick,restock,stockTakeable,stockOwner,evBind,evWhen,evKey,seedDials,valleyTraits,chooseSeed,applyWorld,worldOf,TRAITS37,WORLD_KEYS,getPlayerLand:function(){ return PLAYER_LAND; },seedParse,babyFor,pedWays,pedShelter,carveRoads,exitAngles,roadCheck,roadStay,travelTo,spawnAtExit,VISITED,ROADS,PED,pedTick,pedDay,pedFind,pedRouteIn,pedPitch,pedWay,TALKP,ROAD_DIALS,ROLEPED,stormLevel,stormWindows,stormOngoing,underCover,stormLight,TALKS,STORMC,evBase,keeperAbed,FISHSIZE,TALKE,EVTAG,EVKINDS,wedNow,relOf,TALK,TALKX,LINES,POSEWHO,talkPick,talk,chatMore,closeChat,chatTick,CHAT,HEARD,VISITS,heardKey,heardAdd,lineOk,whoOk,placeName,placeDir,setChat:function(h){chatHook=h;},castValley,valleyName,valleyNames,seedRng,rebuildPeople,KEEPERS,GREETN,lineOk,fillLine,peopleHere,ALLHERE,ROLEKEY,ROLES,NAMES_F,NAMES_M,NAMES_X,BYNAMES,CLOTHES,SKINS,HAIRS,TRAITS,TRAIT_CLASH,RELREV,dayPart,folkMissing,tickKeeper,KMASK,KL,keeperFrame,GREETT,setGreet:function(f){greetHook=f;},RENDERS,SPANS,spanTop,spanBot,ceilOver,solidAt,pushToOpen,addSpan,YARD,stampKeepMass,keepLook,getKLOOK:function(){ return KLOOK; },CBIN,AM2,AMASK};
   Object.assign(module.exports,{navWho,navTargets,navGoal,NAV,journalNotes,fPlace,buildHouse,UPF,FOLK_BUILD,FARM_BED,SHIP,lakeCountry,LAKE,talkPick,townId,waterLine,spanSolid,levelBed,setGreet:function(f){ greetHook=f; },ruinCheck,UWnow:function(){ return UW; },landRuin,});
-  Object.assign(module.exports,{GULL,bankOf,coastPick,placeLighthouse,tickBeacon,SOUND,soundScene,soundFloor,soundPan,soundTick,soundToast,soundOn,soundOff,soundWanted,SOUNDS,banditsLeave,mendRoad,ringBusy,setGreet:function(f){ greetHook=f; },keepLook,keepWord,KLOOK_:function(){ return KLOOK; },keepDress,keepFires,banditsHere,banditCast,chiefId,beatMend,beatMoths,beatBandit,mothCheck,hallNow,keepTag,TALKK3,keepNotes,LORE5,BANDIT_PATH,SONGLORE,songWho,RING_N,RING,ringBusy,ringSpot,ringPlan,ringRead,exitAngles,ringCheck,beatRing,ringTag,ringNotes,TALKR,LORE4,ringNight,roleName,festAway,festList,nearRoad,sentHere,GREETN,TROUBLES2,beatRoof,beatRoofW,beatAxe,beatBet,beatCake,beatSong,beatFest,trouble2Tag,trouble2Notes,festNotes,festGuests,festEnd,festTag,helpedAway,FEST,TALKT2,TALKF,LORE3,SONG,SONGLORE,songWho,farFor,roadPath,beatCrown,beatFriend,coastOf,coastD,seaAt,person3D,person3DPose,buildPerson3D,beatLake,lakeCheck,lakeNotes,lakeSeen,lakeTag,lakeOf,beatPort,portCheck,portNotes,portKind,portRingAt,portLampAt,navRoute,navRouteC,LAKESHIPS,TALKW,CROWN,crownTag,friendTag,TALKC,LORE2,FRIENDWHAT,PAUSED,chatPause,chatResume,nearPerson,talkTo,REP,TITLES,NICKS,earned,deedName,calledBy,legendName,didHere,legendFor,legendTold,LORE,loreFor,loreTake,loreCountHere,TALKK,leftFacts,leftPath,leftEnsure,leftThreads,leftHere,leftOf,hasAsker,leftKey,LREASONS,TALKL,fillBeat,troublesFor,trGet,trTag,stoneFacts,lightCheck,LIGHTS,TALKT,arriveExit,SNOOZE,part,fixPart,neighborSeed,roadDest,roadLink,visitNote,metNote,valleyCount,storyBeat,journalNotes,chatPick,ERRANDS,errandTarget,letterFacts,CHATX:CHAT,cleanName,nameHash,randomName,homeSeed,isHome,inHome,youName,journalLoad,journalSave,journalBlank,storyNew,storyResume,storyAt,parentsFor,castWithHome,addParents,TALKH,PARENT_IDS,addKeeper,
+  Object.assign(module.exports,{animal3D,animal3DPose,animal3DKind,A3SPEC,person3D,ANI,castOf,keeperCottage,cottageSpot,seaWords,hasHarbor,harborReady,lakeOf,TEMPLE_NAMES,GULL,bankOf,coastPick,placeLighthouse,tickBeacon,SOUND,soundScene,soundFloor,soundPan,soundTick,soundToast,soundOn,soundOff,soundWanted,SOUNDS,banditsLeave,mendRoad,ringBusy,setGreet:function(f){ greetHook=f; },keepLook,keepWord,KLOOK_:function(){ return KLOOK; },keepDress,keepFires,banditsHere,banditCast,chiefId,beatMend,beatMoths,beatBandit,mothCheck,hallNow,keepTag,TALKK3,keepNotes,LORE5,BANDIT_PATH,SONGLORE,songWho,RING_N,RING,ringBusy,ringSpot,ringPlan,ringRead,exitAngles,ringCheck,beatRing,ringTag,ringNotes,TALKR,LORE4,ringNight,roleName,festAway,festList,nearRoad,sentHere,GREETN,TROUBLES2,beatRoof,beatRoofW,beatAxe,beatBet,beatCake,beatSong,beatFest,trouble2Tag,trouble2Notes,festNotes,festGuests,festEnd,festTag,helpedAway,FEST,TALKT2,TALKF,LORE3,SONG,SONGLORE,songWho,farFor,roadPath,beatCrown,beatFriend,coastOf,coastD,seaAt,person3D,person3DPose,buildPerson3D,beatLake,lakeCheck,lakeNotes,lakeSeen,lakeTag,lakeOf,beatPort,portCheck,portNotes,portKind,portRingAt,portLampAt,navRoute,navRouteC,LAKESHIPS,TALKW,CROWN,crownTag,friendTag,TALKC,LORE2,FRIENDWHAT,PAUSED,chatPause,chatResume,nearPerson,talkTo,REP,TITLES,NICKS,earned,deedName,calledBy,legendName,didHere,legendFor,legendTold,LORE,loreFor,loreTake,loreCountHere,TALKK,leftFacts,leftPath,leftEnsure,leftThreads,leftHere,leftOf,hasAsker,leftKey,LREASONS,TALKL,fillBeat,troublesFor,trGet,trTag,stoneFacts,lightCheck,LIGHTS,TALKT,arriveExit,SNOOZE,part,fixPart,neighborSeed,roadDest,roadLink,visitNote,metNote,valleyCount,storyBeat,journalNotes,chatPick,ERRANDS,errandTarget,letterFacts,CHATX:CHAT,cleanName,nameHash,randomName,homeSeed,isHome,inHome,youName,journalLoad,journalSave,journalBlank,storyNew,storyResume,storyAt,parentsFor,castWithHome,addParents,TALKH,PARENT_IDS,addKeeper,
     setMode:function(m,st){ MODE=m; STORY=st; },getStory:function(){ return STORY; },getMode:function(){ return MODE; },setJournal:function(j){ JOURNAL=j; },getJournal:function(){ return JOURNAL; },journalOff:function(){ return JOURNAL_OFF; }}); }
 else boot();
 })();

@@ -1,4 +1,4 @@
-// The Keep · render-ray.js · v0.52.0 · Nov 20 2026 (up to four spans per cell: vaults, floors, roofs)
+// The Keep · render-ray.js · v0.55.0 · Nov 21 2026 (up to four spans per cell: vaults, floors, roofs)
 // The same world drawn with rays, the way Shadertoy demos draw theirs: no triangles for the land at all. For every pixel
 // one small program walks a ray across the same height data the ASCII raycaster reads, then walks toward the sun for a
 // soft shadow and off the lake for a real reflection. Sky, light and the people are shared with the Mesh renderer.
@@ -39,7 +39,8 @@ float pool(vec3 wp){ float w=0.0;
 vec3 finish(vec3 cw, vec3 craw, vec3 wp, float warm){
   float f=1.0-exp(-length(wp.xy-uEye.xy)*uFogK);
   vec3 c=mix(cw,uFog,f);
-  if(uUW>0.0){ float s=gl_FragCoord.y/uScr.y; vec3 ut=mix(vec3(12.,46.,72.),vec3(46.,118.,150.),s)/255.; c=mix(c,ut,uUW*0.6); }
+  if(uUW>0.0){ float s=gl_FragCoord.y/uScr.y; vec3 ut=mix(vec3(12.,46.,72.),vec3(46.,118.,150.),s)/255.;   // under water: things fade into the water's own blue with distance, not into the valley's haze
+    float fd=1.0-exp(-length(wp-uEye)*0.035); c=mix(cw,ut,clamp(uUW*(0.6+0.4*fd),0.0,1.0)); }
   c=c*uTint+craw*(1.0-f);
   if(warm>0.0){ float k=warm*(1.0-f); c+=cw*k*vec3(1.0,0.74,0.40)+vec3(18.,8.,0.)/255.*k; }
   return min(c,vec3(1.0)); }
@@ -238,6 +239,7 @@ void main(){
     int k2; vec3 h2,p2,n2i; bool sp2; float t2=march(wp+vec3(0,0,0.05),rr,200.0,64,k2,h2,p2,sp2,n2i);
     vec3 refl; if(t2>0.0){ vec3 n2; vec3 rc=shade(k2,h2,p2,rr,t2,true,n2i,n2); float f2=1.0-exp(-t2*uFogK); refl=mix(rc,uFog,f2)*uTint; } else refl=skyCol(rr);
     col=bed*(1.0-fres); raw=refl*fres;
+    if(uNight>0.0){ vec3 rr=reflect(rd,vec3(0.0,0.0,1.0)); float mg=uMoon.w>0.0?pow(max(dot(rr,uMoon.xyz),0.0),90.0):0.0; raw+=uNight*(vec3(0.05,0.085,0.13)+vec3(0.55,0.6,0.66)*mg)*fres; }   // v0.54.0: a dim sheen and the moon's path at night
     if(uSea.z>0.5&&t>0.0){ vec2 q=wp.xy/256.0-1.0; float s=dot(q,uSea.xy), tt=-q.x*uSea.y+q.y*uSea.x;   // v0.52.0 surf, as in the other views: depth from where the ray meets the bed
       if(s-0.35*tt*tt-(uSea.z-1.0)>-0.14){ float ds=(t-tw)*max(-rd.z,0.05);
         if(ds<4.5){ float br=0.8+0.2*sin(wp.x*1.7+wp.y*1.3+uTime*0.6)*sin(wp.x*0.7-wp.y*1.9);
@@ -565,5 +567,5 @@ function create(A){
   try{ rebuild(); resize(); R.ok=true; }catch(e){ R.error=String(e&&e.message||e).slice(0,300); canvas.remove(); }
   return R;
 }
-window.KeepRay={ create:create, version:'v0.52.0' };
+window.KeepRay={ create:create, version:'v0.55.0' };
 })();

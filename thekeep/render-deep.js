@@ -1,4 +1,4 @@
-// The Keep · render-deep.js · v0.52.0 · Nov 20 2026
+// The Keep · render-deep.js · v0.55.0 · Nov 21 2026
 // Deep: the same world as Mesh, drawn for light and water, after Noniv's Abyssal Garden (MIT).
 // What it borrows: the world is drawn into an off-screen picture first, and a second pass then adds what
 // light does in air and water. Distance haze above the water; under it, colour soaked up by distance
@@ -71,6 +71,9 @@ uniform sampler2D uC; in vec3 vW; out vec4 o;
 void main(){ vec4 t=texture(uC,vW.xy/512.0);
   float n=0.94+0.12*hash(floor(vW.xy*3.0))+0.05*hash(floor(vW.xy*0.7));
   vec3 c=t.rgb*t.a*n;
+  { float steep=1.0-abs(normalize(cross(dFdx(vW),dFdy(vW))).z), sat=max(t.r,max(t.g,t.b))-min(t.r,min(t.g,t.b)), k=smoothstep(0.32,0.6,steep)*(1.0-smoothstep(0.11,0.16,sat));   // v0.54.0: rock (grey ground, not sand or grass) lies in layers, so a cliff shows its bands
+    if(k>0.0){ float q=vW.z*0.5+0.7*sin(vW.x*0.045)+0.7*sin(vW.y*0.038), f=fract(q), lay=hash(vec2(floor(q),3.0));
+      c*=1.0+k*((lay-0.5)*0.36-(1.0-smoothstep(0.0,0.12,f))*0.16); c.b*=1.0-k*0.06*lay; } }
   o=vec4(finish(c,vec3(0.0),vW,uNight>0.0?pool(vW):0.0),1.0); }`;
 
 // stone: mass tops (0), mass faces (1), slab tops (2), slab undersides (3), slab faces (4)
@@ -146,7 +149,7 @@ void main(){ vec4 t=texture(uA,vUV); if(t.a<0.2) discard;
 // is sized, turned to face where it walks and set down. Lit by the sun or moon, the shade where it stands, the lanterns.
 const VS_P3=HEAD+`
 layout(location=0) in vec3 aP; layout(location=1) in vec3 aN; layout(location=2) in vec4 aC; layout(location=3) in float aB;
-uniform vec4 uM; uniform vec3 uS; uniform float uA[12];
+uniform vec4 uM; uniform vec3 uS; uniform float uA[12]; uniform vec3 uPv[8];
 out vec3 vW; out vec3 vN; out vec4 vC;
 vec3 rx(vec3 p,vec3 c,float a){ vec3 q=p-c; float co=cos(a), si=sin(a); return c+vec3(q.x,q.y*co-q.z*si,q.y*si+q.z*co); }
 vec3 rn(vec3 n,float a){ float co=cos(a), si=sin(a); return vec3(n.x,n.y*co-n.z*si,n.y*si+n.z*co); }
@@ -160,9 +163,17 @@ void main(){ int b=int(aB+0.5); vec3 p=aP, n=aN;
   if(b==3||b==4){ p=rx(p,vec3(-0.255,0.0,1.29),uA[2]); n=rn(n,uA[2]); }
   if(b==6){ p=rx(p,vec3(0.2725,0.0,1.04),uA[5]); n=rn(n,uA[5]); }
   if(b==5||b==6){ p=rx(p,vec3(0.255,0.0,1.29),uA[4]); n=rn(n,uA[4]); p=ry(p,vec3(0.255,0.0,1.29),uA[11]); n=ryn(n,uA[11]); }
-  if(b==10){ p=rx(p,vec3(0.0,0.0,0.74),uA[10]); n=rn(n,uA[10]); }
+  if(b==10){ float sf=clamp(uA[10]/1.45,0.0,1.0), hk=clamp((0.86-p.z)/0.78,0.0,1.0);   // sitting: the skirt's flare folds in, so it lies along the legs and doesn't stand up like a board
+    p.x/=mix(1.0,1.0+0.34*hk,sf); p.y/=mix(1.0,1.0+0.6*hk,sf); p.y+=0.05*hk*sf;
+    p=rx(p,vec3(0.0,0.0,0.74),uA[10]); n=rn(n,uA[10]); }
   if(b==2){ p=rx(p,vec3(0.0,0.0,1.38),-uA[1]); n=rn(n,-uA[1]); }
   if(b>=1&&b<=6){ p=rx(p,vec3(0.0,0.0,0.86),-uA[0]); n=rn(n,-uA[0]); }
+  if(b>=11){   // the animals' rig: neck and head, four legs, tail, wings, then the whole body's pitch
+    if(b==11){ p=rx(p,uPv[0],uA[0]); n=rn(n,uA[0]); }
+    else if(b>=12&&b<=15){ float a=uA[b-11]; p=rx(p,uPv[b-11],a); n=rn(n,a); }
+    else if(b==16){ p=rx(p,uPv[5],uA[5]); n=rn(n,uA[5]); vec3 q=p-uPv[5]; float co=cos(uA[6]), si=sin(uA[6]); p=uPv[5]+vec3(q.x*co-q.y*si,q.x*si+q.y*co,q.z); n=vec3(n.x*co-n.y*si,n.x*si+n.y*co,n.z); }
+    else if(b==17){ p=ry(p,uPv[6],uA[7]); n=ryn(n,uA[7]); } else if(b==18){ p=ry(p,uPv[7],-uA[7]); n=ryn(n,-uA[7]); }
+    if(uA[10]!=0.0){ p=rx(p,vec3(0.0,0.0,uA[11]),uA[10]); n=rn(n,uA[10]); } }
   p.z+=uA[8]; p*=uS;
   float co=cos(uM.w), si=sin(uM.w); vec2 f=vec2(co,si), r=vec2(-si,co);
   vec3 w=vec3(uM.xy+r*p.x+f*p.y,uM.z+max(p.z,0.005));
@@ -448,7 +459,7 @@ function create(A){
   gl.bindVertexArray(null);
   const vaoEmpty=gl.createVertexArray();
   try{ P3=prog(VS_P3,FS_P3); }catch(e){ P3=null; R.p3Error=String(e&&e.message||e).slice(0,300); }
-  try{ if(/[?&]p3=0/.test(location.search)) R.people3D=false; }catch(e){}   // ?p3=0: the old cards, to compare
+  try{ if(/[?&]p3=0/.test(location.search)) { R.people3D=false; R.animals3D=false; } }catch(e){}   // ?p3=0: the old cards, to compare
   // the people's figures: one buffer each, kept as long as the person is (a new valley makes new ones)
   const p3Geo=new WeakMap(), P3MAX=18, p3L=new Float32Array(P3MAX*6), p3On=new Uint8Array(8192), p3List=[]; let nP3=0, p3G0=null;
   function p3Sweep(){ const g0=A.person3D?A.person3D(0):null; if(g0===p3G0) return; p3G0=g0;   // a new valley's people: let the last ones' buffers go
@@ -457,11 +468,13 @@ function create(A){
   const p3Disc=(function(){ const a=[]; const S=14; for(let i=0;i<S;i++){ const a0=i/S*Math.PI*2, a1=(i+1)/S*Math.PI*2;
       a.push(0,0,0.03,0,0,1,0,0,0,-1,9, Math.cos(a0)*0.42,Math.sin(a0)*0.30,0.03,0,0,1,1,0,0,-1,9, Math.cos(a1)*0.42,Math.sin(a1)*0.30,0.03,0,0,1,1,0,0,-1,9); }
     return {buf:new Float32Array(a), n:S*3}; })();
+  // the animals in the round: the nearest few, the rest stay as pictures
+  const A3MAX=40, a3L=new Float32Array(A3MAX*6), a3On=new Uint8Array(8192); let nA3=0, a3Last=0;
   function p3Vao(g){ let v=p3Geo.get(g); if(v) return v; const vao=gl.createVertexArray(), vb=gl.createBuffer();
     gl.bindVertexArray(vao); gl.bindBuffer(gl.ARRAY_BUFFER,vb); gl.bufferData(gl.ARRAY_BUFFER,g.buf,gl.STATIC_DRAW);
     gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0,3,gl.FLOAT,false,44,0); gl.enableVertexAttribArray(1); gl.vertexAttribPointer(1,3,gl.FLOAT,false,44,12);
     gl.enableVertexAttribArray(2); gl.vertexAttribPointer(2,4,gl.FLOAT,false,44,24); gl.enableVertexAttribArray(3); gl.vertexAttribPointer(3,1,gl.FLOAT,false,44,40);
-    gl.bindVertexArray(null); v={vao:vao, vb:vb, n:g.n, keep:g===p3Disc}; p3Geo.set(g,v); p3List.push(v); return v; }
+    gl.bindVertexArray(null); v={vao:vao, vb:vb, n:g.n, keep:g===p3Disc||!!g.kind}; p3Geo.set(g,v); p3List.push(v); return v; }
 
   // ---- build the static meshes from the world ----
   // the cloud field does not repeat on its own, and a smooth texture shows that edge as a straight line across the sky;
@@ -628,7 +641,7 @@ function create(A){
 
   const lp=new Float32Array(64), lc=new Float32Array(64);
   function gather(px,py,pz,yaw,rx,ry,night){
-    const C=A.CR_, SP=A.SP, SPP=A.SPP, R2=130*130; let k=0, nl=0; const DK=A.DAY.k<0.6; nP3=0; const use3=!!(P3&&A.person3D&&R.people3D!==false); if(use3) p3Sweep();
+    const C=A.CR_, SP=A.SP, SPP=A.SPP, R2=130*130; let k=0, nl=0; const DK=A.DAY.k<0.6; nP3=0; const use3=!!(P3&&A.person3D&&R.people3D!==false); if(use3) p3Sweep(); nA3=0; const useA3=!!(P3&&A.animal3D&&R.animals3D!==false), a3Now=performance.now(), a3Ease=1-Math.exp(-Math.min(0.25,(a3Now-a3Last)/1000)*12); a3Last=a3Now;
     if(A.animalFrame) A.animalFrame(px,py,yaw);
     for(let c=0;c<C.n;c++){ if(C.al[c]===0) continue; const sp=C.sp[c], x=C.x[c], y=C.y[c], z=C.z[c], ex=x-px, ey=y-py;
       if(ex*ex+ey*ey>R2&&c!==A.W.beaconC) continue;   // the lighthouse lamp is seen from anywhere
@@ -644,6 +657,12 @@ function create(A){
         const uv=slotUV[atlasMap['k'+id+'_'+v+'_'+fr]]; const ln=A.KMASK[id].lan[v][fr];
         const P_=SPP[SP.KEEPER];
         spData.set([x,y,z,0, P_.wsize,P_.hsize,0,amb, uv[0],uv[1],uv[2],uv[3], ln[0],ln[1],mir,1],o); k++; continue; }
+      if(useA3&&sp!==SP.KEEPER){ const d2=ex*ex+ey*ey;
+        let g3; if(nA3<A3MAX&&d2<(a3On[c]?48*48:44*44)&&(g3=A.animal3D(c))){ const hv=Math.hypot(C.vx[c],C.vy[c]), YW=A.ANI.yaw;   // the heading lives with the animal (ANI.yaw), so it survives the list being packed
+          if(hv>0.02){ const ty=Math.atan2(C.vy[c],C.vx[c]); if(YW[c]!==YW[c]) YW[c]=ty; else { let dd=ty-YW[c]; dd-=Math.round(dd/6.2832)*6.2832; YW[c]+=dd*a3Ease; } } else if(YW[c]!==YW[c]) YW[c]=c*2.399;
+          let z3=z; if(sp===SP.RABBIT||sp===SP.SQUIRREL||sp===SP.DEER||sp===SP.WOLF){ const gt=A.terr(x,y); z3=gt<A.WATER?A.WATER-g3.leg*0.6:gt; }   // the wild ones' z rides above the ground for their pictures: feet on the ground here, wading when in water
+          a3On[c]=1; const q=nA3*6; a3L[q]=c; a3L[q+1]=x; a3L[q+2]=z3; a3L[q+3]=y; a3L[q+4]=YW[c]; a3L[q+5]=amb; nA3++; continue; }
+        a3On[c]=0; }
       const P_=SPP[sp], g=A.growOf(c);
       const Q2=A.AM2&&A.AM2[sp];
       if(Q2&&A.ANI){ const AN=A.ANI, bi=A.bankOf?A.bankOf(c):((Q2.banks.length>1&&(AN.vr[c]%3)===0&&(!A.isAdult||A.isAdult(c)))?1:0), vi=AN.v[c], vw=Q2.banks[bi][vi]||Q2.banks[bi][0];
@@ -714,6 +733,15 @@ function create(A){
       for(let i=0;i<nP3;i++){ const q=i*6, c=p3L[q]|0, g=A.person3D(A.CR_.ay[c]|0); if(!g||A.CR_.po[c]===4) continue;
         gl.uniform4f(P3.u.uM,p3L[q+1],p3L[q+2],p3L[q+3],p3L[q+4]); gl.uniform3f(P3.u.uS,g.sx,g.sy,g.sz); gl.uniform1f(P3.u.uAmb,p3L[q+5]); gl.drawArrays(gl.TRIANGLES,0,dv.n); }
       gl.disable(gl.POLYGON_OFFSET_FILL); gl.depthMask(true); gl.disable(gl.BLEND); }
+    if(nA3){ common(P3,U,vp);
+      for(let i=0;i<nA3;i++){ const q=i*6, c=a3L[q]|0, g=A.animal3D(c); if(!g) continue; const v=p3Vao(g), gr=A.growOf(c);
+        gl.uniform4f(P3.u.uM,a3L[q+1],a3L[q+3],a3L[q+2],a3L[q+4]); gl.uniform3f(P3.u.uS,gr,gr,gr); gl.uniform1fv(P3.u.uA,A.animal3DPose(c)); gl.uniform3fv(P3.u['uPv[0]']||P3.u.uPv,g.pv); gl.uniform1f(P3.u.uAmb,a3L[q+5]);
+        gl.bindVertexArray(v.vao); gl.drawArrays(gl.TRIANGLES,0,v.n); }
+      gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA); gl.depthMask(false); gl.enable(gl.POLYGON_OFFSET_FILL); gl.polygonOffset(-1,-4);
+      const dv=p3Vao(p3Disc); gl.bindVertexArray(dv.vao);
+      for(let i=0;i<nA3;i++){ const q=i*6, c=a3L[q]|0, g=A.animal3D(c); if(!g) continue; const gr=A.growOf(c);
+        gl.uniform4f(P3.u.uM,a3L[q+1],a3L[q+3],a3L[q+2],a3L[q+4]); gl.uniform3f(P3.u.uS,g.shx*gr,g.shy*gr,1); gl.uniform1f(P3.u.uAmb,a3L[q+5]); gl.drawArrays(gl.TRIANGLES,0,dv.n); }
+      gl.disable(gl.POLYGON_OFFSET_FILL); gl.depthMask(true); gl.disable(gl.BLEND); }
     // water last, see-through near the shore; it writes depth, so the second pass measures haze and murk to the surface
     gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA); gl.depthMask(true);
     common(PW,U,vp); skyUniforms(PW,U); bindTex(PW,'uH',0,texH); gl.uniform1f(PW.u.uWater,A.WATER); { const Cs=A.W&&A.W.coast; gl.uniform3f(PW.u.uSea,Cs?Cs.dir[0]:0,Cs?Cs.dir[1]:0,Cs?1+Cs.s0:0); }
@@ -757,5 +785,5 @@ function create(A){
   try{ rebuild(); resize(); R.ok=true; }catch(e){ R.error=String(e&&e.message||e).slice(0,300); canvas.remove(); }
   return R;
 }
-window.KeepDeep={ create:create, version:'v0.52.0' };
+window.KeepDeep={ create:create, version:'v0.55.0' };
 })();

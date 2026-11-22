@@ -1,4 +1,4 @@
-// The Keep · render-voxel.js · v0.52.0 · Nov 20 2026 (up to four spans per cell)
+// The Keep · render-voxel.js · v0.55.0 · Nov 21 2026 (up to four spans per cell)
 // The same world drawn as blocks, the way Minecraft draws its worlds: every cell becomes a column of 1 m blocks.
 // Nothing here makes the world. It reads the exact arrays the ASCII raycaster reads, rounds each height to a whole
 // block, and gives each column a block type. Sky, water, light and the people are shared with the Mesh renderer.
@@ -39,7 +39,8 @@ float pool(vec3 wp){ float w=0.0;
 vec3 finish(vec3 cw, vec3 craw, vec3 wp, float warm){
   float f=1.0-exp(-length(wp.xy-uEye.xy)*uFogK);
   vec3 c=mix(cw,uFog,f);
-  if(uUW>0.0){ float s=gl_FragCoord.y/uScr.y; vec3 ut=mix(vec3(12.,46.,72.),vec3(46.,118.,150.),s)/255.; c=mix(c,ut,uUW*0.6); }
+  if(uUW>0.0){ float s=gl_FragCoord.y/uScr.y; vec3 ut=mix(vec3(12.,46.,72.),vec3(46.,118.,150.),s)/255.;   // under water: things fade into the water's own blue with distance, not into the valley's haze
+    float fd=1.0-exp(-length(wp-uEye)*0.035); c=mix(cw,ut,clamp(uUW*(0.6+0.4*fd),0.0,1.0)); }
   c=c*uTint+craw*(1.0-f);
   if(warm>0.0){ float k=warm*(1.0-f); c+=cw*k*vec3(1.0,0.74,0.40)+vec3(18.,8.,0.)/255.*k; }
   return min(c,vec3(1.0)); }
@@ -137,7 +138,7 @@ const FS_SKY=HEAD+SKYFN+`
 uniform mat4 uInv; in vec2 vN; out vec4 o;
 void main(){ vec4 a=uInv*vec4(vN,-1.0,1.0), b=uInv*vec4(vN,1.0,1.0); vec3 d=normalize(b.xyz/b.w-a.xyz/a.w);
   vec3 c=skyCol(d);
-  if(uUW>0.0){ float s=gl_FragCoord.y/uScr.y; vec3 ut=mix(vec3(12.,46.,72.),vec3(46.,118.,150.),s)/255.; c=mix(c,ut,uUW*0.6); }
+  if(uUW>0.0){ float s=gl_FragCoord.y/uScr.y; vec3 ut=mix(vec3(12.,46.,72.),vec3(46.,118.,150.),s)/255.; c=mix(c,ut,uUW*mix(1.0,0.6,smoothstep(0.0,0.5,d.z))); }   // level or down, where nothing is drawn: open water
   o=vec4(c,1.0); }`;
 
 // water: one sheet at the waterline; it shows the bed through it near the shore and the sky in it at a glance
@@ -159,6 +160,8 @@ void main(){ ivec2 cell=clamp(ivec2(floor(vW.xy)),ivec2(0),ivec2(511)); float be
   vec3 body=vec3(30.,78.,98.)/255.;
   float a=clamp(0.30+max(depth,0.0)*0.16,0.0,0.88); a=mix(a,1.0,fres*0.85);
   vec3 sk=skyCol(r);
+  if(uNight>0.0){ float mg=uMoon.w>0.0?pow(max(dot(r,uMoon.xyz),0.0),90.0):0.0;   // v0.54.0: at night the sea keeps a dim sheen and the moon lays a path on it, so it isn't a black hole
+    sk+=uNight*(vec3(0.05,0.085,0.13)+vec3(0.55,0.6,0.66)*mg); }
   vec3 cw=body*(1.0-fres)/max(a,0.01), craw=sk*fres/max(a,0.01);
   if(uSea.z>0.5){ vec2 q=vW.xy/256.0-1.0; float s=dot(q,uSea.xy), t=-q.x*uSea.y+q.y*uSea.x;   // v0.52.0 surf: on the sea's side only, rolling in over the shallows
     if(s-0.35*t*t-(uSea.z-1.0)>-0.14){ vec2 fp=vW.xy-0.5; ivec2 c0=clamp(ivec2(floor(fp)),ivec2(0),ivec2(510)); vec2 w=fract(fp);
@@ -553,5 +556,5 @@ function create(A){
   try{ rebuild(); resize(); R.ok=true; }catch(e){ R.error=String(e&&e.message||e).slice(0,300); canvas.remove(); }
   return R;
 }
-window.KeepVoxel={ create:create, version:'v0.52.0' };
+window.KeepVoxel={ create:create, version:'v0.55.0' };
 })();
