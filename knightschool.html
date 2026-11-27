@@ -171,7 +171,7 @@
   <button class="act ghost" id="backBtn" style="display:none;">&#8617; Takeback</button>
   <button class="act" id="learnBtn">Learn</button><button class="act ghost" id="themeBtn">Theme</button>
 </div>
-<button class="mb-ver" id="mbVer" type="button">v1.2.1 &middot; Oct 24</button><div id="mbToast" role="status"></div>
+<button class="mb-ver" id="mbVer" type="button">v1.2.2 &middot; Nov 27</button><div id="mbToast" role="status"></div>
 <div class="ov" id="learnOv"><h1>Learn chess</h1>
   <div style="max-height:56vh;overflow:auto;width:min(88vw,420px);" id="lsList"></div>
   <button class="act" id="lsClose">Close</button></div>
@@ -521,7 +521,7 @@ function make(st,m){
   return u;}
 function unmake(st){
   const u=st.hist.pop();if(!u)return;
-  st.reps[u.key]--;
+  if(--st.reps[u.key]<=0)delete st.reps[u.key]; /* v1.2.2: drop spent keys; the table grew by one key per searched position until the engine threw mid-game */
   const m=u.m,b=st.b;
   st.turn=st.turn==="w"?"b":"w";
   const c=st.turn;
@@ -1135,7 +1135,7 @@ function recapHTML(){
 function finish(stat){phase="over";
   let title,text,winner=null;
   if(stat==="mate"){winner=st.turn==="w"?"b":"w";
-    title=P[winner].name+" wins!";text="Checkmate in "+GS.moves+" moves.";S("fanfare");}
+    title=P[winner].name==="You"?"You win!":P[winner].name+" wins!";text="Checkmate in "+Math.ceil(GS.moves/2)+" moves.";S("fanfare");}
   else{title="Drawn game.";
     text=stat==="stale"?"Stalemate, no legal moves, no check.":
       stat==="rep"?"Threefold repetition.":stat==="fifty"?"Fifty quiet moves.":"Not enough material to mate.";
@@ -1475,5 +1475,5 @@ window.GN&&GN.sync&&GN.sync();
 
 </script>
 <script>
-(function(){var t=document.getElementById("mbToast"),tm=0;document.getElementById("mbVer").onclick=function(){t.textContent="v1.2.1 loaded";t.classList.add("show");clearTimeout(tm);tm=setTimeout(function(){t.classList.remove("show");},1400);};})();
+(function(){var t=document.getElementById("mbToast"),tm=0;document.getElementById("mbVer").onclick=function(){t.textContent="v1.2.2 loaded";t.classList.add("show");clearTimeout(tm);tm=setTimeout(function(){t.classList.remove("show");},1400);};})();
 </script></body></html>
