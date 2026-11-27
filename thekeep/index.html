@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="keep-version" content="v0.56.0">
+<meta name="keep-version" content="v0.56.1">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#000">
 <title>The Keep</title>
@@ -26,6 +26,8 @@
 html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:var(--mb-ui);color:var(--mb-ink);user-select:none;-webkit-user-select:none;touch-action:none;position:fixed;inset:0}
 #c{position:absolute;inset:0;width:100%;height:100%;display:block}
 #hud{position:absolute;inset:0;pointer-events:none}
+body.film #bar,body.film #fps,body.film #mbVer,body.film #bJump,body.film #bSound,body.film #bTalk,body.film #stick{opacity:0!important}
+body.film #toast{visibility:hidden}
 #bar{position:absolute;top:calc(6px + env(safe-area-inset-top));left:8px;right:8px;display:flex;align-items:flex-start;gap:6px;pointer-events:none;z-index:3}
 .mb-ver{position:fixed;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:900;font:600 10px var(--mb-mono);letter-spacing:.04em;color:var(--mb-teal);background:var(--mb-glass);border:1px solid rgba(76,240,224,.25);border-radius:999px;padding:4px 9px;backdrop-filter:blur(8px);cursor:pointer;user-select:none;opacity:.85;pointer-events:auto}
 .mb-ver::after{content:'';position:absolute;inset:-9px} /* bigger thumb target, same look */
@@ -219,7 +221,7 @@ html.fromshelf #inPage #inViews{padding-top:calc(58px + env(safe-area-inset-top)
   </section>
   <section id="inViews" hidden>
    <h2>How do you want to see the world?</h2>
-   <div id="inCards" role="radiogroup" aria-label="How to draw the world"><button class="vcard" type="button" role="radio" aria-checked="false" data-r="0"><img src="views/view-ascii.jpg" alt="" loading="lazy" width="320" height="200"><b>ASCII</b><span>Letters, the original</span></button><button class="vcard" type="button" role="radio" aria-checked="false" data-r="1"><img src="views/view-pixels.jpg" alt="" loading="lazy" width="320" height="200"><b>Pixels</b><span>Blocks of color, no letters</span></button><button class="vcard" type="button" role="radio" aria-checked="false" data-r="2"><img src="views/view-mesh.jpg" alt="" loading="lazy" width="320" height="200"><b>Mesh</b><span>Triangles, like most 3D games</span><i>needs a newer phone</i></button><button class="vcard" type="button" role="radio" aria-checked="false" data-r="3"><img src="views/view-voxel.jpg" alt="" loading="lazy" width="320" height="200"><b>Voxels</b><span>Cubes, like Minecraft</span><i>needs a newer phone</i></button><button class="vcard" type="button" role="radio" aria-checked="false" data-r="4"><img src="views/view-ray.jpg" alt="" loading="lazy" width="320" height="200"><b>Rays</b><span>Soft shadows and a lake that reflects</span><i>needs a newer phone</i></button><button class="vcard" type="button" role="radio" aria-checked="false" data-r="5"><img src="views/view-iso.jpg" alt="" loading="lazy" width="320" height="200"><b>Iso</b><span>From above at a slant, like SimCity</span><i>needs a newer phone</i></button><button class="vcard" type="button" role="radio" aria-checked="false" data-r="6"><img src="views/view-deep.jpg" alt="" loading="lazy" width="320" height="200"><b>Deep</b><span>Haze, light and water you can see into</span><i>needs a newer phone</i></button></div>
+   <div id="inCards" role="radiogroup" aria-label="How to draw the world"><button class="vcard" type="button" role="radio" aria-checked="false" data-r="0"><img src="views/view-ascii.jpg" alt="" loading="lazy" width="320" height="200"><b>ASCII</b><span>Letters, the original</span></button><button class="vcard" type="button" role="radio" aria-checked="false" data-r="1"><img src="views/view-pixels.jpg" alt="" loading="lazy" width="320" height="200"><b>Pixels</b><span>Blocks of color, no letters</span></button><button class="vcard" type="button" role="radio" aria-checked="false" data-r="2"><img src="views/view-mesh.jpg" alt="" loading="lazy" width="320" height="200"><b>Mesh</b><span>Triangles, like most 3D games</span><i>needs a newer phone</i></button><button class="vcard" type="button" role="radio" aria-checked="false" data-r="3"><img src="views/view-voxel.jpg" alt="" loading="lazy" width="320" height="200"><b>Voxels</b><span>Cubes, like Minecraft</span><i>needs a newer phone</i></button><button class="vcard" type="button" role="radio" aria-checked="false" data-r="4"><img src="views/view-ray.jpg" alt="" loading="lazy" width="320" height="200"><b>Rays</b><span>Soft shadows and a lake that reflects</span><i>needs a newer phone</i></button><button class="vcard" type="button" role="radio" aria-checked="false" data-r="5"><img src="views/view-iso.jpg" alt="" loading="lazy" width="320" height="200"><b>Iso</b><span>From above at a slant, like SimCity</span><i>needs a newer phone</i></button><button class="vcard" type="button" role="radio" aria-checked="false" data-r="6"><img src="view-deep.jpg" alt="" loading="lazy" width="320" height="200"><b>Deep</b><span>Haze, light and water you can see into</span><i>needs a newer phone</i></button></div>
    <p class="note">You can change this any time in the menu.</p>
    <div class="vbtns"><button id="inBack" type="button">Back</button><button id="inWalk" class="pri" type="button">Walk in</button></div>
   </section>
@@ -237,7 +239,7 @@ html.fromshelf #inPage #inViews{padding-top:calc(58px + env(safe-area-inset-top)
  </div>
  <div id="stick"><div id="knob"></div></div>
  <div id="fps"></div>
- <button class="mb-ver" id="mbVer" type="button">v0.56.0 &middot; Nov 22</button>
+ <button class="mb-ver" id="mbVer" type="button">v0.56.1 &middot; Nov 27</button>
  <div id="toast"></div>
  <div id="updNudge" hidden role="status"><span>A new version of The Keep is here (<b id="updVer"></b>).<span id="updMsg" style="display:block;font-weight:400"></span></span><button class="btn go" id="updGo" type="button">refresh</button><button class="btn" id="updNo" type="button">later</button></div>
  <div id="bkNudge" hidden role="status"><span>Big moment. Back up your progress?</span><button class="btn go" id="bkNudgeGo" type="button">back up</button><button class="btn" id="bkNudgeNo" type="button">later</button></div>
@@ -305,6 +307,7 @@ html.fromshelf #inPage #inViews{padding-top:calc(58px + env(safe-area-inset-top)
   </div>
   <button class="btn" id="mBackup" style="width:100%;margin-top:10px">backup your progress</button>
   <button class="btn" id="mDials" style="width:100%;margin-top:8px">dials</button>
+  <button class="btn" id="mFilm" type="button" aria-pressed="false" style="width:100%;margin-top:8px">hide the buttons</button>
   <div class="mgrid"><button class="btn" id="mHelp">how to play</button><button class="btn" id="mLog">changelog</button><button class="btn" id="mAbout">about this build</button><button class="btn" id="mIntro">replay the intro</button></div>
   <button class="btn" id="mClose" style="width:100%;margin-top:10px">close</button>
  </div></div>
@@ -1357,9 +1360,10 @@ var SHELF={on:false,url:'https://motbuchanan.com/gameshelf/'};
   SHELF.place=place;
 })();
 
-const VERSION='The Keep v0.56.0 · Nov 22 2026';
-const VER_SHORT='v0.56.0 · Nov 22'; // what the badge shows; bump with VERSION
+const VERSION='The Keep v0.56.1 · Nov 27 2026';
+const VER_SHORT='v0.56.1 · Nov 27'; // what the badge shows; bump with VERSION
 const CHANGELOG=[
+ ['v0.56.1 · Nov 27 2026','A link to a valley. Put ?seed= and a number on the end of the address and Wander opens in that exact valley, with its own forest, water, people and animals, so a valley can be shared with anyone. A clean screen: menu, hide the buttons, takes the compass, the buttons and the counters off the screen for filming or just for looking. Everything still works where it was, and the menu (top right) brings them back. Fixed: sheep, cows, deer and the other animals no longer flicker as they walk (a slow walker was flashing between its walking and standing pictures many times a second). Fixed: since v0.56.0, when someone asked you a question the answer buttons never appeared, so no trouble or errand could be answered; they are back. Fixed: the picture on the Deep card, on the page where you pick how to see the world, was missing.'],
  ['v0.56.0 · Nov 22 2026','The sea has a voice. With sound on, you hear the surf as you come near a coast: a low wash that swells and draws back about every seven seconds, with the hiss of foam on top, louder in a storm. Gulls cry, a falling two-note call, and no longer chirp like songbirds. Inland, a peddler, an innkeeper or a miller may tell you which road leads toward the sea and the name of the valley where it is, when there is one within three roads; the journal keeps it until you have seen the sea for yourself. The roads of a rumor stay put once you have heard it, so following it gets you there. Deer, sheep and cows now lie down with their legs tucked under them. When a crowd of animals is near, the nearest forty are the ones built in the round.'],
  ['v0.55.1 · Nov 22 2026','About this build is up to date: the lakes, the sea and the lighthouse have their own paragraph, and there are new pictures of the gate, the coast, the lighthouse and the animals.'],
  ['v0.55.0 · Nov 21 2026','The animals in the round, in Mesh and Deep. Deer, stags, wolves, sheep, cows, horses, rabbits, squirrels and hens near you are now built from the same rounded boxes as the people, on the proportions of their pictures: short deep bodies, big heads, sturdy legs, and their markings (the horse\'s blaze and mane, the cow\'s patches, the sheep\'s wool and dark face, the deer\'s white rump, the stag\'s antlers). Legs swing as they walk, runners gallop, rabbits and squirrels hop and sit up, hens peck, grazers put their heads down, and deer, sheep and cows lie down at night. Farther off they are still pictures, as the people are. Birds, gulls and fish stay pictures for now.'],
@@ -4002,7 +4006,7 @@ const AM2=[];
 const GULL=new Uint8Array(CMAX);   // v0.52.0: which birds are gulls (drawn from the bird's second bank, kept by the shore)
 // which art bank a creature draws from: gulls for birds, otherwise every third grown animal gets the second look
 function bankOf(c){ const sp=CR_.sp[c], Q=AM2[sp]; if(!Q||Q.banks.length<2) return 0; if(sp===SP.BIRD) return GULL[c]?1:0; return ((ANI.vr[c]%3)===0&&isAdult(c))?1:0; }
-const ANI={s:new Float32Array(CMAX), yaw:new Float32Array(CMAX).fill(NaN), vr:new Uint8Array(CMAX), px:new Float32Array(CMAX), py:new Float32Array(CMAX), d:new Float32Array(CMAX), v:new Uint8Array(CMAX), f:new Uint8Array(CMAX), m:new Uint8Array(CMAX), seen:new Uint32Array(CMAX), tick:1, last:0};
+const ANI={s:new Float32Array(CMAX), yaw:new Float32Array(CMAX).fill(NaN), vr:new Uint8Array(CMAX), px:new Float32Array(CMAX), py:new Float32Array(CMAX), d:new Float32Array(CMAX), v:new Uint8Array(CMAX), f:new Uint8Array(CMAX), m:new Uint8Array(CMAX), mv:new Uint8Array(CMAX), seen:new Uint32Array(CMAX), tick:1, last:0};
 // a frame name's index is the same in every view of an animal (all views draw the same poses)
 let TESTHOOK=null;   // ?test=1 only: lets a test stage hold animals still for a picture
 function animalFrame(px,py,yaw){ if(TESTHOOK) TESTHOOK(); const now=skyTime, dt=Math.min(0.25,Math.max(0.001,now-ANI.last)); ANI.last=now; const tk=++ANI.tick;
@@ -4010,7 +4014,9 @@ function animalFrame(px,py,yaw){ if(TESTHOOK) TESTHOOK(); const now=skyTime, dt=
   for(let c=0;c<CR_.n;c++){ if(CR_.al[c]===0) continue; const A=AM2[CR_.sp[c]]; if(!A) continue;
     const x=CR_.x[c], y=CR_.y[c], ex=px-x, ey=py-y; if(ex*ex+ey*ey>R2) continue;
     let d=Math.hypot(x-ANI.px[c],y-ANI.py[c]); if(d>1.5||ANI.seen[c]!==tk-1) d=0; ANI.seen[c]=tk; ANI.px[c]=x; ANI.py[c]=y; ANI.d[c]+=d;   // back in range: no leap
-    const spd=d/dt, moving=spd>0.15; ANI.s[c]+=(spd-ANI.s[c])*Math.min(1,dt*8); const list=moving?(spd>A.runAt?A.run:A.walk):A.idle;
+    // v0.56.1: walking or standing is read from the smoothed speed. Animals only change place 15 times a second, so the raw speed was zero on three
+    // drawn frames in four and four times too high on the fourth, and a slow walker flashed between its walking and standing pictures
+    const spd=d/dt; ANI.s[c]+=(spd-ANI.s[c])*Math.min(1,dt*8); const sm=ANI.s[c], moving=sm>(ANI.mv[c]?0.06:0.15); ANI.mv[c]=moving?1:0; const list=moving?(sm>A.runAt?A.run:A.walk):A.idle;
     let f; const ph=ANI.vr[c]/256;   // each animal's own phase: it stays with the animal when the list is packed
     if(A.key==='bird'){ f=(CR_.st[c]===1&&!moving)?A.idle[0]:(((now*0.3+ph*7)%1)<0.28?A.idle[0]:A.walk[(((now*7+ph*40)/1.5708)|0)%4]); }   // resting: wings still
     else if(moving) f=list[((ANI.d[c]*A.fpm)|0)%list.length];
@@ -7563,7 +7569,8 @@ function talk(c,id,pose,force){
   const p=castOf(id); CHAT.id=id; CHAT.key=key; CHAT.lines=lines; CHAT.k=0; CHAT.ask=beat; CHAT.picked=false; CHAT.sub=p?(roleName(p)+(pose===4?' · asleep':'')):'';
   chatHook.open(p?p.name+' '+p.by:'Someone', CHAT.sub);
   chatShow(); }
-function chatShow(){ const L=CHAT.lines[CHAT.k]; heardAdd(CHAT.key,L.id); if(L.sea) seaHeard(seaRumor());   // v0.56.0: the journal takes the rumor when the line is said, not before const asking=!!(CHAT.ask&&!CHAT.picked&&CHAT.k>=CHAT.lines.length-1);
+function chatShow(){ const L=CHAT.lines[CHAT.k]; heardAdd(CHAT.key,L.id); if(L.sea) seaHeard(seaRumor());   // v0.56.0: the journal takes the rumor when the line is said, not before
+  const asking=!!(CHAT.ask&&!CHAT.picked&&CHAT.k>=CHAT.lines.length-1);   // v0.56.1: this had slid onto the end of the comment above, so no question ever showed its answers
   if(chatHook) chatHook.line(L.text,CHAT.k>=CHAT.lines.length-1,CHAT.k,CHAT.lines.length); if(chatHook&&chatHook.ask) chatHook.ask(asking?CHAT.ask.options.map(function(o){ return o.label; }):null); }
 // a reply: recorded once, before the next line shows
 function chatPick(i){ if(CHAT.id<0||!CHAT.ask||CHAT.picked||CHAT.k<CHAT.lines.length-1) return false; const o=CHAT.ask.options[i]; if(!o) return false; CHAT.picked=true;
@@ -8086,7 +8093,7 @@ function tick(dt){
     else tickWolf(c,dt); }
 }
 
-function copyC(d,src){ GULL[d]=GULL[src]; ANI.s[d]=ANI.s[src]; ANI.yaw[d]=ANI.yaw[src]; ANI.vr[d]=ANI.vr[src]; ANI.px[d]=ANI.px[src]; ANI.py[d]=ANI.py[src]; ANI.d[d]=ANI.d[src]; CR_.sp[d]=CR_.sp[src]; CR_.x[d]=CR_.x[src]; CR_.y[d]=CR_.y[src]; CR_.z[d]=CR_.z[src];
+function copyC(d,src){ GULL[d]=GULL[src]; ANI.s[d]=ANI.s[src]; ANI.mv[d]=ANI.mv[src]; ANI.yaw[d]=ANI.yaw[src]; ANI.vr[d]=ANI.vr[src]; ANI.px[d]=ANI.px[src]; ANI.py[d]=ANI.py[src]; ANI.d[d]=ANI.d[src]; CR_.sp[d]=CR_.sp[src]; CR_.x[d]=CR_.x[src]; CR_.y[d]=CR_.y[src]; CR_.z[d]=CR_.z[src];
   CR_.vx[d]=CR_.vx[src]; CR_.vy[d]=CR_.vy[src]; CR_.ax[d]=CR_.ax[src]; CR_.ay[d]=CR_.ay[src];
   CR_.st[d]=CR_.st[src]; CR_.tm[d]=CR_.tm[src]; CR_.ph[d]=CR_.ph[src];
   CR_.energy[d]=CR_.energy[src]; CR_.al[d]=CR_.al[src]; CR_.tgt[d]=CR_.tgt[src];
@@ -8736,9 +8743,14 @@ function boot(){
   $('mDials').addEventListener('click',function(){ closeMenu(); openDials(); });
   $('mLog').addEventListener('click',function(){ closeMenu(); openLog(); });
   $('mBackup').addEventListener('click',function(){ closeMenu(); openBackup(false); });
+  // v0.56.1 a clean screen for filming: the HUD goes invisible but every button still works where it was; the menu brings it back. Never saved, so a reload always shows the buttons
+  let FILMT=0;
+  $('mFilm').addEventListener('click',function(){ const b=$('mFilm'), on=!(document.body.classList.contains('film')||FILMT); clearTimeout(FILMT); FILMT=0; closeMenu();
+    if(on){ b.textContent='show the buttons'; b.setAttribute('aria-pressed','true'); toast('Buttons hidden. They still work. The menu is top right.',2800); FILMT=setTimeout(function(){ FILMT=0; document.body.classList.add('film'); },2900); }
+    else { document.body.classList.remove('film'); b.textContent='hide the buttons'; b.setAttribute('aria-pressed','false'); toast('Buttons are back.',1600); } });
   $('mAbout').addEventListener('click',function(){ closeMenu(); openAbout(); });
   $('mHelp').addEventListener('click',function(){ closeMenu(); openHelp(); });
-  $('mIntro').addEventListener('click',function(){ closeMenu(); location.href=location.pathname+'?replay=1'+location.hash; });
+  $('mIntro').addEventListener('click',function(){ closeMenu(); location.href=location.pathname+'?replay=1'+(LINKSEED!=null?'&seed='+LINKSEED:'')+location.hash; });
   $('bGo').addEventListener('click',function(){ $('help').classList.add('hidden'); });
   $('aGo').addEventListener('click',function(){ $('about').classList.add('hidden'); try{localStorage.setItem('keep_about_seen','1');}catch(e){} });
   $('aFull').addEventListener('click',function(){ location.href='keep-about.html'; });
@@ -8782,10 +8794,15 @@ function boot(){
     for(const id of ['mSeed','mDials']){ const b=$(id); if(b) b.style.display='none'; }   // those grow Wander worlds
     if(!journalSave()) setTimeout(function(){ toast('Saving is off in this browser. Your story lasts until you close this tab.',4200); },2600); }
   // go
-  DIALS.seed=20260919; loadDials(); DAY.tzOff=tzOffsetHours(SITE.tz); DAY.tod=DIALS.tod; DAY.mode=DIALS.dayMode; updateDay(0);
+  DIALS.seed=20260919; loadDials();
+  // v0.56.1 a link to a valley: ?seed=57498 opens Wander in that valley as its own seed (the same valley anyone travelling there gets), not shaped by your dials
+  const LINKSEED=(function(){ try{ const m=/[?&]seed=(\d{1,10})(?:&|$)/.exec(location.search); return m?(seedParse(m[1])||null):null; }catch(e){ return null; } })();   // 0 is left out: a saved 0 reads back as no seed
+  if(LINKSEED!=null){ DIALS.trav=1; applyWorld(seedDials(LINKSEED)); DIALS.seed=LINKSEED; }
+  DAY.tzOff=tzOffsetHours(SITE.tz); DAY.tod=DIALS.tod; DAY.mode=DIALS.dayMode; updateDay(0);
   genWorld(DIALS.seed); populate(DIALS.seed); spawn(); setupGrid();
   // first visit ever: show the "about this build" card once, then it lives in the menu
   showSize();
+  if(LINKSEED!=null){ try{ const sp=$('inWander').querySelector('.soon'); if(sp) sp.textContent=W.valley+', seed '+LINKSEED; }catch(e){} }
   if(/[?&]nointro=1/.test(location.search)) KEEP_INTRO.close();
   else { try{ KEEP_INTRO.start({ story:function(){ const j=journalLoad(); return j.story?{name:j.story.name}:null; }, begin:storyStart, roll:function(){ return randomName(); },
       render:function(){ return DIALS.render|0; }, setRender:function(i){ DIALS.render=i; saveDials(); paintRenderSeg(); },
