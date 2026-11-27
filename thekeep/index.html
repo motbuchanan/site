@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="keep-version" content="v0.56.1">
+<meta name="keep-version" content="v0.56.2">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#000">
 <title>The Keep</title>
@@ -239,7 +239,7 @@ html.fromshelf #inPage #inViews{padding-top:calc(58px + env(safe-area-inset-top)
  </div>
  <div id="stick"><div id="knob"></div></div>
  <div id="fps"></div>
- <button class="mb-ver" id="mbVer" type="button">v0.56.1 &middot; Nov 27</button>
+ <button class="mb-ver" id="mbVer" type="button">v0.56.2 &middot; Nov 27</button>
  <div id="toast"></div>
  <div id="updNudge" hidden role="status"><span>A new version of The Keep is here (<b id="updVer"></b>).<span id="updMsg" style="display:block;font-weight:400"></span></span><button class="btn go" id="updGo" type="button">refresh</button><button class="btn" id="updNo" type="button">later</button></div>
  <div id="bkNudge" hidden role="status"><span>Big moment. Back up your progress?</span><button class="btn go" id="bkNudgeGo" type="button">back up</button><button class="btn" id="bkNudgeNo" type="button">later</button></div>
@@ -1360,9 +1360,10 @@ var SHELF={on:false,url:'https://motbuchanan.com/gameshelf/'};
   SHELF.place=place;
 })();
 
-const VERSION='The Keep v0.56.1 · Nov 27 2026';
-const VER_SHORT='v0.56.1 · Nov 27'; // what the badge shows; bump with VERSION
+const VERSION='The Keep v0.56.2 · Nov 27 2026';
+const VER_SHORT='v0.56.2 · Nov 27'; // what the badge shows; bump with VERSION
 const CHANGELOG=[
+ ['v0.56.2 · Nov 27 2026','A proper arm for knocking. Seen from the front, someone knocking at a door raised an arm one dot wide, and it read as a second, tiny arm. Now it is a whole sleeve, raised with the hand up, then bent with the hand out at the latch.'],
  ['v0.56.1 · Nov 27 2026','A link to a valley. Put ?seed= and a number on the end of the address and Wander opens in that exact valley, with its own forest, water, people and animals, so a valley can be shared with anyone. A clean screen: menu, hide the buttons, takes the compass, the buttons and the counters off the screen for filming or just for looking. Everything still works where it was, and the menu (top right) brings them back. Fixed: sheep, cows, deer and the other animals no longer flicker as they walk (a slow walker was flashing between its walking and standing pictures many times a second). Fixed: since v0.56.0, when someone asked you a question the answer buttons never appeared, so no trouble or errand could be answered; they are back. Fixed: the picture on the Deep card, on the page where you pick how to see the world, was missing.'],
  ['v0.56.0 · Nov 22 2026','The sea has a voice. With sound on, you hear the surf as you come near a coast: a low wash that swells and draws back about every seven seconds, with the hiss of foam on top, louder in a storm. Gulls cry, a falling two-note call, and no longer chirp like songbirds. Inland, a peddler, an innkeeper or a miller may tell you which road leads toward the sea and the name of the valley where it is, when there is one within three roads; the journal keeps it until you have seen the sea for yourself. The roads of a rumor stay put once you have heard it, so following it gets you there. Deer, sheep and cows now lie down with their legs tucked under them. When a crowd of animals is near, the nearest forty are the ones built in the round.'],
  ['v0.55.1 · Nov 22 2026','About this build is up to date: the lakes, the sea and the lighthouse have their own paragraph, and there are new pictures of the gate, the coast, the lighthouse and the animals.'],
@@ -4331,7 +4332,10 @@ function buildPerson2(K){
         const lUp=walkA>0?1:0, rUp=walkA<0?1:0;
         const lh=armDown(L-1,sleeveL,lUp);
         if(look){ line(R+1,sh+1,R+2,sh-3,5,0); line(R,sh+1,R+1,sh-3,5,0); late.push(function(){ line(R+1,sh-3,C+5,top+5,5,1); rect(C+2,top+3,C+5,top+4,2); }); lanternAt(L,lh); }
-        else if(knock){ const hy=alt?sh+2:top+6; line(R,sh+1,R+2,hy+2,5,1); rect(R+2,hy,R+3,hy+1,2); lanternAt(L,lh); }
+        else if(knock){   // v0.56.2: a whole sleeve, as wide as the arm that hangs (it was a one-dot line and read as a second, tiny arm)
+          if(alt){ for(let y=sh+1;y<=sh+6;y++){ set(R+1,y,sleeveR); set(R,y,sleeveR); set(R-1,y,y>sh+1?17:sleeveR); } rect(R,sh+7,R+2,sh+8,2); }   // hand down on the latch: the arm bent, the hand out at the side
+          else { const hy=top+6; for(let y=hy+2;y<=sh+3;y++){ set(R+1,y,sleeveR); set(R,y,sleeveR); set(R-1,y,y>sh+1?17:sleeveR); } rect(R-1,hy,R+1,hy+1,2); set(R,hy-1,2); }   // hand up at the door
+          lanternAt(L,lh); }
         else { const hy=armDown(R+1,sleeveR,rUp); lanternAt(R+1,hy); } }
       // ---- the head
       ell(C+0.5+fx,hc,5.4,6.0,2);
