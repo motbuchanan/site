@@ -33,6 +33,9 @@ The "This Phone" portfolio at motbuchanan.com: a phone-shaped home screen of sin
 
 ## What shipped (newest first)
 
+### Nov 27 · about.html: doubled word fixed
+- The short version read "are about about 6 months old": the sentence said "about" and the age script (#age) writes "about N months" too. The sentence now leaves the word to the script. No version stamp on that page.
+
 ### v7.91 · Nov 27 · The Keep card's why and how
 - APPINFO["thekeep/"] why: one sentence added at the end (a valley can be shared with a link). how: three sentences added before the tester line (sound made in code with no sound files; a seed number on the address opens that exact valley; the trailer was filmed from the game in valley 36329). These are drafts for Mot to rewrite in his own words; the rest of both texts is his and unchanged.
 - app/the-keep.html regenerated.
