@@ -83,6 +83,7 @@ body{background:var(--felt);color:var(--ink);font-family:'Archivo',var(--sys);mi
 @keyframes dealIn{from{transform:translate(120px,-180px) rotate(14deg);opacity:0}to{transform:none;opacity:1}}
 .card{animation:dealIn .34s cubic-bezier(.2,.9,.3,1) both}
 @keyframes flipReveal{0%{transform:rotateY(90deg);opacity:.3}100%{transform:rotateY(0);opacity:1}}
+.card.stay{animation:none}
 .card.flipin{animation:flipReveal .32s ease-out both}
 @keyframes bankPulse{0%{transform:scale(1)}40%{transform:scale(1.18)}100%{transform:scale(1)}}
 .bank.win{animation:bankPulse .6s ease-out;color:var(--good)}
@@ -204,7 +205,7 @@ body{background:var(--felt);color:var(--ink);font-family:'Archivo',var(--sys);mi
 </head>
 <body>
 <div id="glow"></div>
-<div id="bar"><span class="t">The Upcard</span><span class="ver" id="ver">v0.7.1 &middot; Oct 24</span></div>
+<div id="bar"><span class="t">The Upcard</span><span class="ver" id="ver" role="button" tabindex="0" title="Tap to check for an update">v0.7.2 &middot; Nov 28</span></div>
 <div class="wrap">
   <div id="start">
     <div class="brand">
@@ -433,7 +434,7 @@ function coachEvaluate(playerMove){
   }
 }
 function $(id){return document.getElementById(id);}
-function money(n){return "$"+Math.round(n).toLocaleString();}
+function money(n){var r=Math.round(n);return (r<0?"-":"")+"$"+Math.abs(r).toLocaleString();}
 function toast(m){var t=$("toast");t.textContent=m;t.classList.add("on");clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove("on");},1600);}
 function loadBank(){bank=parseFloat(lget(K.bank,"500"))||500;}
 function saveBank(){lset(K.bank,String(bank));}
@@ -464,7 +465,7 @@ function endSession(){
   $("endStats").innerHTML =
     stat("Net this session",(net>=0?"+":"")+money(net), net>0?"var(--good)":(net<0?"var(--bad)":"var(--orange)"))+
     stat("Hands played",sess.hands,"var(--ink)")+
-    stat("Correct plays",sess.decisions?(sess.correct+" / "+sess.decisions+" ("+acc+"%)"):"\u2014","var(--teal)")+
+    stat("Correct plays",sess.decisions?(sess.correct+" / "+sess.decisions+" ("+acc+"%)"):"none yet","var(--teal)")+
     stat("W / L / Push",sess.wins+" / "+sess.losses+" / "+sess.pushes,"var(--ink)")+
     stat("Bankroll",money(bank),"var(--teal)");
   $("endSheet").classList.add("on");$("table").classList.remove("on");
@@ -487,9 +488,11 @@ function updateSpot(){var s=$("betspot");if(bet>0){$("betpuck").textContent=mone
 function addChip(v){if(inRound)return;if(bet+v>bank){toast("Not enough bankroll");return;}bet+=v;$("betAmt").textContent=money(bet);$("dealBtn").disabled=bet<=0;updateSpot();}
 function clearBet(){if(inRound)return;bet=0;$("betAmt").textContent="$0";$("dealBtn").disabled=true;updateSpot();}
 function maxBet(){if(inRound)return;bet=Math.min(bank,500);$("betAmt").textContent=money(bet);$("dealBtn").disabled=bet<=0;updateSpot();}
-function cardEl(c){var el=document.createElement("div");el.className="card"+((c.s===1||c.s===2)?" red":"");
+/* v0.7.2: a card already on the table keeps still when the hand redraws; before, every hit, stand or split dealt the whole table again */
+var SHOWN=new WeakSet(),HOLE_SHOWN=false;
+function cardEl(c){var el=document.createElement("div");el.className="card"+((c.s===1||c.s===2)?" red":"")+(SHOWN.has(c)?" stay":"");SHOWN.add(c);
   el.innerHTML='<span class="rk">'+rankStr(c.r)+'</span><span class="big">'+SUITS[c.s]+'</span><span class="su">'+SUITS[c.s]+'</span>';return el;}
-function backCardEl(){var el=document.createElement("div");el.className="card back";
+function backCardEl(){var el=document.createElement("div");el.className="card back"+(HOLE_SHOWN?" stay":"");HOLE_SHOWN=true;
   el.innerHTML='<div class="apwrap"><svg viewBox="940 -200 720 880" aria-hidden="true"><path transform="translate(844.9,-213.7) scale(9.2129)" d="M27.6,5.0 L26.5,6.7 L24.6,9.4 L23.0,11.8 L20.7,15.0 L20.4,15.6 L19.4,15.7 L13.5,15.8 L12.3,16.0 L12.3,19.9 L12.7,20.1 L18.6,20.2 L22.7,20.2 L23.8,18.8 L25.5,16.4 L26.6,14.7 L28.5,12.0 L29.9,9.9 L31.0,8.2 L32.3,6.3 L32.5,6.1 L63.5,6.1 L63.8,6.8 L65.4,9.1 L66.8,11.1 L68.6,13.7 L69.6,15.1 L71.1,17.4 L72.8,19.6 L73.5,20.4 L86.2,20.4 L86.3,20.2 L86.3,15.8 L86.2,15.7 L75.9,15.6 L73.9,13.0 L73.0,11.5 L71.8,9.9 L70.1,7.5 L68.6,5.3 L68.5,5.0 Z  M48.5,33.3 L45.9,33.6 L42.7,34.2 L39.4,35.1 L38.0,35.7 L38.0,36.3 L40.8,38.0 L44.4,40.1 L46.6,41.3 L50.3,43.6 L52.5,45.0 L54.5,46.1 L58.5,48.5 L61.4,50.4 L62.1,50.9 L62.5,50.8 L62.3,49.5 L60.8,43.9 L59.0,36.7 L58.6,34.7 L58.0,34.3 L55.4,33.7 L53.7,33.5 L52.0,33.3 Z  M61.4,35.6 L61.3,36.3 L61.5,37.1 L62.1,39.9 L63.8,46.7 L65.4,52.6 L66.1,55.1 L67.2,59.1 L68.0,62.2 L68.2,63.3 L68.7,63.5 L70.4,60.4 L71.7,58.2 L73.7,54.7 L75.1,52.3 L75.9,50.8 L76.8,49.4 L76.6,48.7 L75.6,47.3 L75.1,46.3 L73.4,44.0 L73.1,44.0 L72.8,43.5 L70.1,40.8 L67.3,38.7 L64.8,37.1 L62.5,36.0 L61.7,35.6 Z  M34.6,37.3 L33.1,38.2 L31.4,39.5 L29.9,40.8 L28.2,42.3 L26.5,44.2 L26.5,44.4 L26.2,44.4 L24.8,46.4 L23.8,48.0 L22.5,49.9 L21.7,51.8 L21.3,53.2 L23.0,52.9 L26.2,52.0 L28.0,51.5 L33.5,49.9 L35.2,49.4 L36.3,49.1 L40.3,48.0 L43.5,47.0 L47.0,46.0 L48.3,45.6 L48.3,45.1 L46.8,44.3 L44.1,42.7 L43.1,42.2 L39.2,39.8 L36.9,38.5 L34.8,37.3 Z  M35.2,51.8 L33.7,52.3 L31.3,53.0 L28.5,54.0 L24.9,55.0 L22.1,55.8 L20.3,56.5 L20.1,57.1 L20.4,57.1 L20.4,57.5 L19.9,57.4 L19.4,60.6 L19.4,61.9 L19.7,61.8 L19.9,60.5 L19.9,62.3 L20.0,63.5 L19.7,63.5 L19.7,62.3 L19.6,62.3 L19.4,65.0 L19.4,68.1 L19.7,70.4 L20.3,72.5 L20.8,74.6 L21.4,76.3 L21.8,76.3 L23.2,73.9 L24.6,71.6 L26.6,68.2 L27.3,67.0 L29.2,63.9 L31.5,59.8 L33.5,56.4 L34.8,54.2 L35.9,52.0 L35.9,51.8 Z  M77.9,51.9 L77.0,53.2 L76.2,54.7 L74.5,57.7 L72.5,61.1 L71.7,62.6 L69.6,66.3 L68.2,68.7 L66.3,71.9 L65.2,73.9 L64.1,75.7 L63.5,76.7 L63.7,77.3 L64.2,77.1 L68.2,76.0 L69.7,75.4 L71.7,74.9 L74.9,73.9 L78.9,72.7 L79.7,72.3 L80.1,70.5 L80.6,67.4 L80.7,66.0 L80.7,61.9 L80.3,58.5 L79.9,56.4 L79.2,54.2 L78.5,52.2 Z  M31.0,65.6 L29.3,68.4 L28.3,70.4 L26.9,72.7 L26.1,74.2 L25.2,75.7 L23.7,78.4 L23.0,79.8 L23.9,81.3 L25.2,83.0 L26.5,84.6 L28.0,86.3 L30.1,88.2 L31.8,89.5 L33.7,90.8 L35.5,91.9 L37.7,92.9 L38.2,92.7 L37.9,91.3 L36.9,87.5 L35.6,82.2 L34.5,77.8 L33.9,75.8 L33.2,72.9 L31.5,66.7 L31.3,65.6 Z  M78.2,75.1 L73.8,76.5 L70.4,77.5 L67.3,78.4 L63.7,79.5 L60.7,80.4 L56.5,81.6 L53.0,82.6 L51.3,83.0 L51.1,83.6 L53.9,85.3 L56.9,87.1 L60.8,89.5 L63.5,91.2 L64.4,91.6 L65.2,91.5 L66.6,90.5 L67.5,89.9 L69.4,88.4 L70.1,87.8 L70.1,87.5 L70.7,87.3 L73.0,85.0 L74.5,83.0 L76.1,80.9 L77.0,79.4 L78.3,76.7 L78.7,75.8 L78.7,75.1 Z  M37.2,78.1 L37.0,78.5 L37.6,80.5 L38.5,83.9 L39.2,87.0 L40.3,91.6 L41.0,93.9 L41.1,94.2 L43.4,94.7 L44.8,95.0 L45.1,95.1 L54.5,95.1 L55.6,94.9 L58.0,94.3 L60.6,93.5 L61.7,93.0 L61.5,92.6 L59.9,91.6 L57.3,90.1 L54.6,88.4 L51.5,86.5 L49.6,85.3 L46.9,83.7 L44.9,82.5 L42.0,80.8 L41.0,80.1 L39.4,79.2 L38.5,78.5 L37.6,78.1 Z" fill="#4cf0e0" fill-rule="evenodd"/></svg></div>';return el;}
 function deal(){
   if(bet<=0||bet>bank)return;
@@ -508,6 +511,7 @@ function deal(){
   }, total);
 }
 function renderProgressive(){
+  HOLE_SHOWN=false;
   var dh=$("dHand"),ph=$("pHand");dh.innerHTML="";ph.innerHTML="";
   $("pTotal").textContent="";$("dTotal").textContent="";
   var steps=[
@@ -642,17 +646,17 @@ function finishHand(resultMsg,cls){
   },1400);
 }
 function resolveNaturals(pBJ,dBJ){
-  if(pBJ&&dBJ){sess.pushes++;finishHand("Both blackjack \u2014 push","push");return;}
+  if(pBJ&&dBJ){sess.pushes++;finishHand("Both blackjack. Push","push");return;}
   if(pBJ){var win=bet*1.5;settle("bj",win);sess.wins++;sess.blackjacks++;feltFx("fbj");finishHand("Blackjack! +"+money(win),"good");return;}
-  settle("lose",bet);sess.losses++;loseHand();finishHand("Dealer blackjack \u2014 "+money(-bet),"bad");
+  settle("lose",bet);sess.losses++;loseHand();finishHand("Dealer blackjack "+money(-bet),"bad");
 }
 function resolve(){
   if(splitMode){ resolveSplit(); return; }
   var pt=handTotal(player),dt=handTotal(dealer);
-  if(pt>21){settle("lose",bet);sess.losses++;loseHand();finishHand("Bust \u2014 "+money(-bet),"bad");return;}
+  if(pt>21){settle("lose",bet);sess.losses++;loseHand();finishHand("Bust "+money(-bet),"bad");return;}
   if(dt>21){settle("win",bet);sess.wins++;feltFx("fwin");finishHand("Dealer busts! +"+money(bet),"good");return;}
   if(pt>dt){settle("win",bet);sess.wins++;feltFx("fwin");finishHand("You win +"+money(bet),"good");}
-  else if(pt<dt){settle("lose",bet);sess.losses++;loseHand();finishHand("Dealer wins \u2014 "+money(-bet),"bad");}
+  else if(pt<dt){settle("lose",bet);sess.losses++;loseHand();finishHand("Dealer wins "+money(-bet),"bad");}
   else{sess.pushes++;finishHand("Push","push");}
 }
 function resolveSplit(){
@@ -795,6 +799,16 @@ $("statsClose").addEventListener("click",closeStats);
 var bs2=$("btnStats2");if(bs2){bs2.addEventListener("click",function(){$("setSheet").classList.remove("on");openStats();});}
 
 refreshStart();
+
+/* tap the version badge to check for a newer build */
+(function(){var v=$("ver");if(!v)return;function cur(t){var m=/v(\d+(?:\.\d+)*)/.exec(t||"");return m?m[1]:"";}
+function newer(a,b){a=a.split(".").map(Number);b=b.split(".").map(Number);for(var i=0;i<Math.max(a.length,b.length);i++){var x=a[i]||0,y=b[i]||0;if(x!==y)return x>y;}return false;}
+function check(){toast("Checking for an update");fetch(location.pathname+"?nc="+Date.now(),{cache:"no-store"}).then(function(r){return r.text();}).then(function(t){
+ var m=/id="ver"[^>]*>([^<]*)</.exec(t),live=m?cur(m[1]):"",mine=cur(v.textContent);
+ if(live&&newer(live,mine)){toast("Updating to v"+live);setTimeout(function(){location.replace(location.pathname+"?v="+live);},700);}
+ else{toast("You have the newest version");}
+}).catch(function(){toast("Couldn't check. No connection?");});}
+v.style.cursor="pointer";v.addEventListener("click",check);v.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();check();}});})();
 </script>
 </body>
 </html>
