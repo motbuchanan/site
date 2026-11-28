@@ -180,6 +180,10 @@ def page(x, apps, ver, stamp, fav):
     facts = ' · '.join(p for p in [a.get('status') or '', ('since ' + since) if since else '', ('one file' if nfiles == 1 else '%d files' % nfiles) if nfiles else ''] if p)
     shots = ''
     media = []
+    if a.get('trailer'):
+        # the trailer goes first with its own controls; nothing downloads until it is played
+        media.append('<video src="../%s" poster="../%s" controls playsinline preload="none" aria-label="%s trailer"></video>'
+                     % (e(a['trailer']['src']), e(a['trailer']['poster']), e(a['name'])))
     if a.get('loop'):
         media.append('<video src="../%s" poster="../%s" muted loop autoplay playsinline preload="metadata" aria-label="%s in use"></video>'
                      % (e(a['loop']['src']), e(a['loop']['poster']), e(a['name'])))
